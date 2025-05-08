@@ -2824,8 +2824,9 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
         return CHIP_NO_ERROR;
     });
 
-    if (err != CHIP_NO_ERROR)
+    if ((info.JFAdministratorFabricIndex == kUndefinedFabricIndex) || (err != CHIP_NO_ERROR))
     {
+        info.JFAdministratorFabricIndex = kUndefinedFabricIndex;
         return err;
     }
 
@@ -2838,12 +2839,13 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
             case Fabrics::Id: {
                 Fabrics::TypeInfo::DecodableType fabrics;
                 ReturnErrorOnFailure(this->mAttributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
+                bool foundMatchingFabricIndex = false;
 
                 auto iter = fabrics.begin();
                 while (iter.Next())
                 {
                     auto & fabricDescriptor = iter.GetValue();
-                    if (fabricDescriptor.fabricID == info.JFAdministratorFabricIndex)
+                    if (fabricDescriptor.fabricIndex == info.JFAdministratorFabricIndex)
                     {
                         if (fabricDescriptor.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
                         {
@@ -2860,9 +2862,14 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
                             ChipLogError(Controller, "JCM: Per-home RCAC are not supported by JF for now!");
                             return CHIP_ERROR_CANCELLED;
                         }
+                        foundMatchingFabricIndex = true;
                         ChipLogProgress(Controller, "JCM: Successfully parsed the Administrator Fabric Table");
                         break;
                     }
+                }
+                if (!foundMatchingFabricIndex)
+                {
+                    return CHIP_ERROR_NOT_FOUND;
                 }
                 return CHIP_NO_ERROR;
             }
@@ -2901,7 +2908,8 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
             return CHIP_NO_ERROR;
         });
 
-    if (err != CHIP_NO_ERROR)
+    if (!rootKeySpan.size() || (info.JFAdminFabricTable.fabricId == kUndefinedFabricId) || !info.JFAdminNOC.size() ||
+        !info.JFAdminICAC.size() || (err != CHIP_NO_ERROR))
     {
         info.JFAdministratorFabricIndex = kUndefinedFabricIndex;
         return err;
@@ -2951,7 +2959,7 @@ CHIP_ERROR DeviceCommissioner::ParseJFAdministratorInfo(ReadCommissioningInfo & 
             return CHIP_NO_ERROR;
         });
 
-    if (err != CHIP_NO_ERROR)
+    if (!info.JFAdminRCAC.size())
     {
         info.JFAdministratorFabricIndex = kUndefinedFabricIndex;
     }
@@ -3557,7 +3565,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         if (!params.GetJFAdministratorFabricIndex().HasValue() || !params.GetJFAdminNOC().HasValue() ||
             params.GetJFAdministratorFabricIndex().Value() == kUndefinedFabricIndex)
         {
-            ChipLogError(Controller, "No JF Admin Values found");
+            ChipLogError(Controller, "JCM: No JF Admin Values found");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
@@ -3566,7 +3574,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Cannot validate JF AdminNOC");
+            ChipLogError(Controller, "JCM: Cannot validate JFAdminNOC");
         }
 
         CommissioningStageComplete(err);
