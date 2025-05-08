@@ -41,7 +41,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError as IME
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, run_with_error_check
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
@@ -123,14 +123,17 @@ class TC_CADMIN_1_5(MatterBaseTest):
     async def commission_on_network(self, setup_code: int, discriminator: int, expected_error: int = 0):
         # This is expected to error as steps 4 and 7 expects timeout issue or pase connection error to occur due to commissioning window being closed already
         if expected_error == 50:
-            try:
-                await self.th2.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, setupPinCode=setup_code,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-
-            except ChipStackError as e:
-                asserts.assert_true(int(e.code) == expected_error,
-                                    'Unexpected error code returned from Commissioning Attempt')
+            await run_with_error_check(
+                self.th2.CommissionOnNetwork,
+                nodeId=self.dut_node_id,
+                setupPinCode=setup_code,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=discriminator,
+                exception_type=ChipStackError,
+                assert_func=lambda e: asserts.assert_true(
+                    int(e.code) == expected_error, 'Unexpected error code returned from Commissioning Attempt'
+                )
+            )
 
         else:
             try:
@@ -279,13 +282,13 @@ class TC_CADMIN_1_5(MatterBaseTest):
         params3 = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=duration.maxCumulativeFailsafeSeconds, node_id=self.dut_node_id)
 
         self.step(14)
-        try:
-            await self.open_commissioning_window(dev_ctrl=self.th1, timeout=duration.maxCumulativeFailsafeSeconds, node_id=self.dut_node_id)
-        except ChipStackError as e:
-            # Converting error code to useable format to do assert with
-            code = int(((e.msg.split(":"))[2]), 16)
-            asserts.assert_equal(code, Clusters.AdministratorCommissioning.Enums.StatusCode.kBusy,
-                                 f'Failed to open commissioning window due to an unexpected error code of {e.code}')
+        await run_with_error_check(
+            self.open_commissioning_window,
+            dev_ctrl=self.th1, timeout=duration.maxCumulativeFailsafeSeconds, node_id=self.dut_node_id,
+            exception_type=ChipStackError,
+            assert_func=lambda e: asserts.assert_equal(
+                int(((e.msg.split(":"))[2]), 16), Clusters.AdministratorCommissioning.Enums.StatusCode.kBusy, f'Failed to open commissioning window due to an unexpected error code of {e.code}')
+        )
 
         self.step(15)
         await self.th2.CommissionOnNetwork(
