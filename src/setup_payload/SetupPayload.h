@@ -26,7 +26,6 @@
 #include <cstdint>
 #include <map>
 #include <string>
-#include <variant>
 #include <vector>
 
 #include <lib/core/CHIPError.h>
@@ -275,12 +274,16 @@ public:
      * @brief Get a list of setup payloads from a string representation.
      *
      * @param[in] stringRepresentation The string representing the payloads.
+
+     * @param[out] outPayloads On success, the contents of this vector will be
+     *                         replaces with the list of parsed payloads.  The
+     *                         result may have only one entry, or multiple
+     *                         entries if concatenated QR codes are used.
      *
-     * @return a CHIP_ERROR on failure, a vector of setup payloads on success.  The vector may
-     *         contain only one payload, or may contain multiple payloads if concatenated QR codes
-     *         are used.
+     *                         On failure, the value of the out param should not
+     *                         be relied on to be anything in particular.
      */
-    static std::variant<CHIP_ERROR, std::vector<SetupPayload>> FromStringRepresentation(std::string stringRepresentation);
+    static CHIP_ERROR FromStringRepresentation(std::string stringRepresentation, std::vector<SetupPayload> & outPayloads);
 
 private:
     std::map<uint8_t, OptionalQRCodeInfo> optionalVendorData;

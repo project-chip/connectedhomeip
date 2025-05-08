@@ -336,7 +336,7 @@ bool SetupPayload::operator==(const SetupPayload & input) const
     return true;
 }
 
-std::variant<CHIP_ERROR, std::vector<SetupPayload>> SetupPayload::FromStringRepresentation(std::string stringRepresentation)
+CHIP_ERROR SetupPayload::FromStringRepresentation(std::string stringRepresentation, std::vector<SetupPayload> & outPayloads)
 {
     // We're going to assume that in practice all these allocations are small
     // enough that allocation failure will not happen.  If that ever turns out
@@ -346,24 +346,20 @@ std::variant<CHIP_ERROR, std::vector<SetupPayload>> SetupPayload::FromStringRepr
     bool isQRCode = (stringRepresentation.rfind(kQRCodePrefix, 0) == 0);
     if (!isQRCode)
     {
-        std::vector<SetupPayload> payloads;
-        auto & payload = payloads.emplace_back();
+        outPayloads.clear();
+        auto & payload = outPayloads.emplace_back();
         ReturnErrorOnFailure(ManualSetupPayloadParser(stringRepresentation).populatePayload(payload));
         VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
-        return payloads;
+        return CHIP_NO_ERROR;
     }
 
-    auto payloads = QRCodeSetupPayloadParser(stringRepresentation).Parse();
-    if (!std::holds_alternative<std::vector<SetupPayload>>(payloads))
-    {
-        return payloads;
-    }
+    ReturnErrorOnFailure(QRCodeSetupPayloadParser(stringRepresentation).populatePayloads(outPayloads));
 
-    for (auto & entry : std::get<std::vector<SetupPayload>>(payloads))
+    for (auto & entry : outPayloads)
     {
         VerifyOrReturnError(entry.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
     }
-    return payloads;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

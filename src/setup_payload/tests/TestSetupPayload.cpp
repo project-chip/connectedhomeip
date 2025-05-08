@@ -32,33 +32,31 @@ namespace {
 
 TEST(TestSetupPayload, TestFromStringInvalidValues)
 {
-    EXPECT_TRUE(std::holds_alternative<CHIP_ERROR>(SetupPayload::FromStringRepresentation("")));
+    std::vector<SetupPayload> payloads;
+    EXPECT_NE(SetupPayload::FromStringRepresentation("", payloads), CHIP_NO_ERROR);
 
     // Has invalid setup passcode 111111111
-    EXPECT_TRUE(std::holds_alternative<CHIP_ERROR>(SetupPayload::FromStringRepresentation("MT:M5L90MP500W-GT68D20")));
-    EXPECT_TRUE(std::holds_alternative<CHIP_ERROR>(SetupPayload::FromStringRepresentation("01120767810")));
+    EXPECT_NE(SetupPayload::FromStringRepresentation("MT:M5L90MP500W-GT68D20", payloads), CHIP_NO_ERROR);
+    EXPECT_NE(SetupPayload::FromStringRepresentation("01120767810", payloads), CHIP_NO_ERROR);
 
     // Has valid payload (kDefaultPayloadQRCode) followed by one with invalid setup passcode 111111111
-    EXPECT_TRUE(
-        std::holds_alternative<CHIP_ERROR>(SetupPayload::FromStringRepresentation("MT:M5L90MP500K64J00000*M5L90MP500W-GT68D20")));
+    EXPECT_NE(SetupPayload::FromStringRepresentation("MT:M5L90MP500K64J00000*M5L90MP500W-GT68D20", payloads), CHIP_NO_ERROR);
 
     // Has payload with invalid setup passcode 111111111 followed by valid payload (kDefaultPayloadQRCode)
-    EXPECT_TRUE(
-        std::holds_alternative<CHIP_ERROR>(SetupPayload::FromStringRepresentation("MT:M5L90MP500W-GT68D20*M5L90MP500K64J00000")));
+    EXPECT_NE(SetupPayload::FromStringRepresentation("MT:M5L90MP500W-GT68D20*M5L90MP500K64J00000", payloads), CHIP_NO_ERROR);
 
     // Payload not starting with MT:
-    EXPECT_TRUE(std::holds_alternative<CHIP_ERROR>(SetupPayload::FromStringRepresentation("AT:M5L90MP500K64J00000")));
+    EXPECT_NE(SetupPayload::FromStringRepresentation("AT:M5L90MP500K64J00000", payloads), CHIP_NO_ERROR);
 }
 
 TEST(TestSetupPayload, TestFromStringNumericCode)
 {
     // Numeric code equivalent of kDefaultPayloadQRCode.
-    auto parseResult = SetupPayload::FromStringRepresentation("00204800002");
-    ASSERT_TRUE(std::holds_alternative<std::vector<SetupPayload>>(parseResult));
+    std::vector<SetupPayload> payloads;
+    auto err = SetupPayload::FromStringRepresentation("00204800002", payloads);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    auto & payloads = std::get<std::vector<SetupPayload>>(parseResult);
-    ASSERT_TRUE(payloads.size() == 1);
-
+    ASSERT_EQ(payloads.size(), 1u);
     auto & payload      = payloads[0];
     auto defaultPayload = GetDefaultPayload();
 
@@ -69,10 +67,10 @@ TEST(TestSetupPayload, TestFromStringNumericCode)
 
 TEST(TestSetupPayload, TestFromStringSinglePayload)
 {
-    auto parseResult = SetupPayload::FromStringRepresentation(kDefaultPayloadQRCode);
-    ASSERT_TRUE(std::holds_alternative<std::vector<SetupPayload>>(parseResult));
+    std::vector<SetupPayload> payloads;
+    auto err = SetupPayload::FromStringRepresentation(kDefaultPayloadQRCode, payloads);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    auto & payloads = std::get<std::vector<SetupPayload>>(parseResult);
     ASSERT_EQ(payloads.size(), 1u);
 
     auto & payload      = payloads[0];
@@ -83,13 +81,10 @@ TEST(TestSetupPayload, TestFromStringSinglePayload)
 
 TEST(TestSetupPayload, TestFromStringMultiplePayloads)
 {
-    // kDefaultPayloadQRCode followed by the same but with passcode and
-    // discriminator incremented by 1, then 2, then 3.
-    auto parseResult = SetupPayload::FromStringRepresentation(
-        "MT:M5L90MP500K64J00000*M5L90U.D010K4J00000*M5L900CM02IX4J00000*M5L908OU03-85J00000");
-    ASSERT_TRUE(std::holds_alternative<std::vector<SetupPayload>>(parseResult));
+    std::vector<SetupPayload> payloads;
+    auto err = SetupPayload::FromStringRepresentation(kConcatenatedQRCode, payloads);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    auto & payloads = std::get<std::vector<SetupPayload>>(parseResult);
     ASSERT_EQ(payloads.size(), 4u);
 
     for (size_t idx = 0; idx < payloads.size(); ++idx)
@@ -98,7 +93,7 @@ TEST(TestSetupPayload, TestFromStringMultiplePayloads)
         comparisonPayload.discriminator.SetLongValue(comparisonPayload.discriminator.GetLongValue() + static_cast<uint16_t>(idx));
         comparisonPayload.setUpPINCode += static_cast<uint32_t>(idx);
 
-        ASSERT_EQ(payloads[idx], comparisonPayload);
+        EXPECT_EQ(payloads[idx], comparisonPayload);
     }
 }
 
