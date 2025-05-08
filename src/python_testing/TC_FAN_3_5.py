@@ -38,6 +38,7 @@ import logging
 import math
 from dataclasses import dataclass
 from enum import Enum
+import operator
 from typing import Any
 
 import chip.clusters as Clusters
@@ -54,6 +55,9 @@ class ActionEnum(Enum):
     Write = 1
     Command = 2
 
+class OrderEnum(Enum):
+    Ascending = 1
+    Descending = 2
 
 @dataclass
 class Update:
@@ -67,63 +71,14 @@ class TC_FAN_3_5(MatterBaseTest):
     def desc_TC_FAN_3_5(self) -> str:
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
 
-    def steps_TC_FAN_3_5(self):
-        return [TestStep("1", "[FC] Commissioning already done.", is_commissioning=True),
-                TestStep("2", "[FC] TH checks the DUT for support of the Step and MultiSpeed features.",
-                         "If the DUT does not support both features, the test is skipped."),
-                TestStep("3", "[FC] TH reads from the DUT the SpeedMax attribute.", "Store value for future reference."),
-                TestStep("4", "[FC] TH subscribes to the FanControl cluster.", "Enables the TH to receive attribute updates."),
+    # def steps_TC_FAN_3_5(self):
+    #     return [TestStep("1", "[FC] Commissioning already done.", is_commissioning=True),
+    #             TestStep("2", "[FC] TH checks the DUT for support of the Step and MultiSpeed features.",
+    #                      "If the DUT does not support both features, the test is skipped."),
+    #             TestStep("3", "[FC] TH reads from the DUT the SpeedMax attribute.", "Store value for future reference."),
 
-                TestStep("5", "[FC] TH writes to the DUT the PercentSetting attribute with value 50.",
-                         "- Verify that the PercentStting and PercentCurrent attributes are both set to 50."),
-                TestStep("5a", "[FC] TH sends command Step with: Direction = Increase, Wrap = False, LowestOff = True.",
-                         "Verify that the PercentStting and PercentCurrent attributes are both greater than 50."),
-
-                TestStep("6", "[FC] TH writes to the DUT the PercentSetting attribute with value 50.",
-                         "- Verify that the PercentStting and PercentCurrent attributes are both set to 50."),
-                TestStep("6a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True.",
-                         "Verify that the PercentStting and PercentCurrent attributes are both less than 50."),
-
-                TestStep("7", "[FC] TH writes to the DUT the SpeedSetting attribute with value 0.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0."),
-                TestStep("7a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - Verify that the PercentStting and PercentCurrent attributes are both set to 0. - Verify that the FanMode attribute is set to Off (0)."),
-
-                TestStep("8", "[FC] TH writes to the DUT the SpeedSetting attribute with value 0.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0."),
-                TestStep("8a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = True, LowestOff = True.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. - Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). - Verify that the FanMode attribute is set to High (3)."),
-
-                TestStep("9", "[FC] TH writes to the DUT the SpeedSetting attribute with value 1.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1."),
-                TestStep("9a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = False.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1. - Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). - Verify that the FanMode attribute is set to Low (1)."),
-
-                TestStep("10", "[FC] TH writes to the DUT the SpeedSetting attribute with value 1.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1."),
-                TestStep("10a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - Verify that the PercentStting and PercentCurrent attributes are both set to 0. - Verify that the FanMode attribute is set to Off (0)."),
-
-                TestStep("11", "[FC] TH writes to the DUT the SpeedSetting attribute with value 1.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1."),
-                TestStep("11a", "[FC] TH sends command Step with: Direction = Decrease, Wrap = True, LowestOff = False.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. - Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). - Verify that the FanMode attribute is set to High (3)."),
-
-                TestStep("12", "[FC] TH writes to the DUT the SpeedSetting attribute with value SpeedMax.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax."),
-                TestStep("12a", "[FC] TH sends command Step with: Direction = Increase, Wrap = False, LowestOff = True.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. - Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). - Verify that the FanMode attribute is set to High (3)."),
-
-                TestStep("13", "[FC] TH writes to the DUT the SpeedSetting attribute with value SpeedMax.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax."),
-                TestStep("13a", "[FC] TH sends command Step with: Direction = Increase, Wrap = True, LowestOff = True.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - Verify that the PercentStting and PercentCurrent attributes are both set to 0. - Verify that the FanMode attribute is set to Off (0)."),
-
-                TestStep("14", "[FC] TH writes to the DUT the SpeedSetting attribute with value SpeedMax.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax."),
-                TestStep("14a", "[FC] TH sends command Step with: Direction = Increase, Wrap = True, LowestOff = False.",
-                         "- Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1. - Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). - Verify that the FanMode attribute is set to Low (1)."),
-                ]
+    #             TestStep("4", "[FC] TH subscribes to the FanControl cluster.", "Enables the TH to recei
+    #             ]
 
     async def read_setting(self, attribute: Any) -> Any:
         """
@@ -220,6 +175,165 @@ class TC_FAN_3_5(MatterBaseTest):
         """
         return math.floor((speed_setting / self.speed_max) * 100)
 
+    async def subscribe_to_attributes(self) -> None:
+        cluster = Clusters.FanControl
+        attr = cluster.Attributes
+
+        self.subscriptions = [
+            ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
+            ClusterAttributeChangeAccumulator(cluster, attr.SpeedSetting),
+            ClusterAttributeChangeAccumulator(cluster, attr.FanMode)
+        ]
+
+        for sub in self.subscriptions:
+            await sub.start(self.default_controller, self.dut_node_id, self.endpoint)
+
+    def verify_attribute_progression(self, order: OrderEnum) -> None:
+        # Setup
+        comp = operator.le if order == OrderEnum.Ascending else operator.ge
+        comp_str = "greater" if order == OrderEnum.Ascending else "less"
+        shared_str = f"not all attribute values progressed in {order.name.lower()} order (current value {comp_str} than previous value)."
+
+        for sub in self.subscriptions:
+            values = [q.value for q in sub.attribute_queue.queue]
+            correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
+            asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
+
+    def verify_expected_reports(self, order: OrderEnum) -> None:
+        percent_setting_report_qty = 0
+        fan_mode_report_qty = 0
+        speed_setting_report_qty = 0
+        fan_mode_values = None
+        speed_setting_values = None
+
+        # - Count the number of each of the subscription reports
+        # - Get the values of the FanMode and SpeedSetting attributes
+        for sub in self.subscriptions:
+            if sub._expected_attribute == Clusters.FanControl.Attributes.PercentSetting:
+                percent_setting_report_qty = len(sub.attribute_queue.queue)
+                sub.log_queue()
+            if sub._expected_attribute == Clusters.FanControl.Attributes.FanMode:
+                fan_mode_report_qty = len(sub.attribute_queue.queue)
+                sub.log_queue()
+                fan_mode_values = [q.value for q in sub.attribute_queue.queue]
+            if sub._expected_attribute == Clusters.FanControl.Attributes.SpeedSetting:
+                speed_setting_report_qty = len(sub.attribute_queue.queue)
+                sub.log_queue()
+                speed_setting_values = [q.value for q in sub.attribute_queue.queue]
+
+        # Get the expected FanMode and SpeedSetting values
+        fan_modes_eval = self.fan_modes[1:] if order == OrderEnum.Ascending else list(reversed(self.fan_modes[:-1]))
+        speed_setting_eval = list(range(1, self.speed_max + 1)) if order == OrderEnum.Ascending else list(range(self.speed_max - 1, -1, -1))
+
+        logging.info(f"[FC] fan_modes_eval: {fan_modes_eval}")
+        logging.info(f"[FC] fan_mode_values: {fan_mode_values}")
+
+        logging.info(f"[FC] speed_setting_eval: {speed_setting_eval}")
+        logging.info(f"[FC] speed_setting_values: {speed_setting_values}")
+
+        # If the number of PercentSetting reports is greater than the number of FanMode reports,
+        # - Verify that all the expected FanMode values are present in the reports
+        if percent_setting_report_qty > fan_mode_report_qty:
+            missing_fan_modes = [mode for mode in fan_modes_eval if mode not in fan_mode_values]
+            asserts.assert_equal(fan_modes_eval, fan_mode_values,
+                                 f"[FC] Some of the expected FanMode values are not present in the reports. Expected: {fan_modes_eval}, missing: {missing_fan_modes}.")
+
+        # If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports,
+        # - Verify that all the expected SpeedSetting values are present in the reports
+        if percent_setting_report_qty >= speed_setting_report_qty:
+            missing_speed_setting = [speed for speed in speed_setting_eval if speed not in speed_setting_values]
+            asserts.assert_equal(speed_setting_eval, speed_setting_values,
+                                 f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_eval}, missing: {missing_speed_setting}.")
+
+    async def get_fan_modes(self, remove_auto: bool = False):
+        # Read FanModeSequence attribute value
+        fan_mode_sequence_attr = Clusters.FanControl.Attributes.FanModeSequence
+        fm_enum = Clusters.FanControl.Enums.FanModeEnum
+        fms_enum = Clusters.FanControl.Enums.FanModeSequenceEnum
+        self.fan_mode_sequence = await self.read_setting(fan_mode_sequence_attr)
+
+        # Verify response contains a FanModeSequenceEnum
+        asserts.assert_is_instance(self.fan_mode_sequence, fms_enum,
+                                   f"[FC] FanModeSequence result isn't of enum type {fms_enum.__name__}")
+
+        fan_modes = None
+        if self.fan_mode_sequence == 0:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh]
+        elif self.fan_mode_sequence == 1:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh]
+        elif self.fan_mode_sequence == 2:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 3:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 4:
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 5:
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh]
+
+        self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
+
+    async def step_command_test(self, percent_setting_sub: ClusterAttributeChangeAccumulator, order: OrderEnum) -> None:
+        cluster = Clusters.FanControl
+        attr = cluster.Attributes
+        cmd = cluster.Commands
+        sd_enum = cluster.Enums.StepDirectionEnum
+        fm_enum = cluster.Enums.FanModeEnum
+        
+        # Initialize PercentSetting
+        percent_setting_init = 0 if order == OrderEnum.Ascending else 100
+        await self.write_setting(attr.PercentSetting, percent_setting_init)
+
+        # Read SpeedSetting and FanMode attributes
+        speed_setting = await self.read_setting(attr.SpeedSetting)
+        fan_mode = await self.read_setting(attr.FanMode)
+
+        # Verify SpeedSetting is at the expected value
+        speed_setting_expected = 0 if order == OrderEnum.Ascending else self.speed_max
+        asserts.assert_equal(speed_setting, speed_setting_expected,
+                             f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({self.speed_max})")
+
+        # Verify FanMode is at the expected value
+        fan_mode_expected = fm_enum.kOff if order == OrderEnum.Ascending else fm_enum.kHigh
+        asserts.assert_equal(fan_mode, fan_mode_expected,
+                             f"[FC] FanMode attribute value ({fan_mode}) is not equal to the expected value ({fm_enum.kOn})")
+
+        # Reset subscriptions
+        for sub in self.subscriptions:
+            sub.reset()
+
+        # Setup Step command with:
+        # - direction: Increase/Decrease depending on the test order
+        # - wrap: False
+        # - lowestOff: True
+        step_direction = sd_enum.kIncrease if order == OrderEnum.Ascending else sd_enum.kDecrease
+        step = cmd.Step(direction=step_direction, wrap=False, lowestOff=True)
+
+        # Send Step command until it reaches the min or max
+        # PercentSetting value depending on the test order
+        percent_setting_expected = 100 if order == OrderEnum.Ascending else 0
+        for i in range(100):
+            await self.send_step_command(step)
+            pecent_setting = percent_setting_sub.get_last_attribute_report_value(self.endpoint, attr.PercentSetting, self.timeout_sec)
+            logging.info(f"[FC] [{i}] PercentSetting attribute value: {pecent_setting}")
+
+            # If the expected PercentSetting value is reached, send an additional Step
+            # command to veiryf the PercentSetting value stays at the expected value
+            if pecent_setting == percent_setting_expected:
+                await self.send_step_command(step)
+                percent_setting = await self.read_setting(attr.PercentSetting)
+                asserts.assert_equal(percent_setting, percent_setting_expected,
+                                     f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})")
+                break
+            else:
+                if i == 100:
+                    asserts.fail(f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({pecent_setting}).")
+
+        # Veirfy attribute progression (each successive value is greater or less than the last)
+        self.verify_attribute_progression(order)
+
+        # Veirfy all expected reports after the Step commands are present
+        self.verify_expected_reports(order)
+
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
 
@@ -229,19 +343,16 @@ class TC_FAN_3_5(MatterBaseTest):
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attr = cluster.Attributes
-        cmd = cluster.Commands
-        sd_enum = cluster.Enums.StepDirectionEnum
-        fm_enum = cluster.Enums.FanModeEnum
         self.timeout_sec: float = 0.5
 
         # *** STEP 1 ***
         # Commissioning already done
-        self.step("1")
+        # self.step("1")
 
         # *** STEP 2 ***
         # TH checks the DUT for support of the Step and MultiSpeed features
         #  - If the DUT does not support both features, the test is skipped
-        self.step("2")
+        # self.step("2")
         feature_map = await self.read_setting(attr.FeatureMap)
         self.supports_step = bool(feature_map & cluster.Bitmaps.Feature.kStep)
         self.supports_multi_speed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
@@ -252,324 +363,28 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** STEP 3 ***
         # TH reads from the DUT the SpeedMax attribute
         #  - Store value for future reference
-        self.step("3")
+        # self.step("3")
         self.speed_max = await self.read_setting(attr.SpeedMax)
 
         # *** STEP 4 ***
-        # TH subscribes to the FanControl cluster
-        #  - Enables the TH to receive attribute updates
-        self.step("4")
-        self.attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
-        await self.attribute_subscription.start(self.default_controller, self.dut_node_id, self.endpoint)
+        # TH reads from the DUT the FanModeSequence attribute
+        # to determine the supported FanMode values
+        #  - Store result for future reference
+        # self.step("4")
+        await self.get_fan_modes(remove_auto=True)
 
-        # *** STEP 5 ***
-        # TH writes to the DUT the PercentSetting attribute with value 50
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to 50
-        self.step("5")
-        percent_setting = 50
-        update = Update(attribute=attr.PercentSetting, attribute_value=percent_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
+        # *** STEP 4 ***
+        # Subscribe to the PercentSetting, FanMode, and SpeedSetting attributes individually
+        # self.step("4")
+        await self.subscribe_to_attributes()
+        percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
 
-        # *** STEP 5a ***
-        # TH sends command Step with: Direction = Increase, Wrap = False, LowestOff = True
-        #  - Verify that the PercentStting and PercentCurrent attributes are both greater than 50
-        self.step("5a")
-        step = cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True)
-        update = Update(step=step, action=ActionEnum.Command)
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.GreaterThan, percent_setting),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.GreaterThan, percent_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
+        await self.step_command_test(percent_setting_sub, OrderEnum.Descending)
+        await self.step_command_test(percent_setting_sub, OrderEnum.Ascending)
 
-        # *** STEP 6 ***
-        # TH writes to the DUT the PercentSetting attribute with value 50
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to 50
-        self.step("6")
-        percent_setting = 50
-        update = Update(attribute=attr.PercentSetting, attribute_value=percent_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
-        # *** STEP 6a ***
-        # TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True
-        #  - Verify that the PercentStting and PercentCurrent attributes are both less than 50
-        self.step("6a")
-        step = cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True)
-        update = Update(step=step, action=ActionEnum.Command)
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.LessThan, percent_setting),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.LessThan, percent_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
 
-        # *** STEP 7 ***
-        # TH writes to the DUT the SpeedSetting attribute with value 0
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
-        self.step("7")
-        speed_setting = 0
-        update = Update(attribute=attr.SpeedSetting, attribute_value=speed_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
 
-        # *** STEP 7a ***
-        # TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to 0
-        #  - Verify that the FanMode attribute is set to Off (0)
-        self.step("7a")
-        step = cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True)
-        update = Update(step=step, action=ActionEnum.Command)
-        speed_setting_expected = 0
-        percent_setting_expected = 0
-        fan_mode_expected = fm_enum.kOff
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=command_expect)
-
-        # *** STEP 8 ***
-        # TH writes to the DUT the SpeedSetting attribute with value 0
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
-        self.step("8")
-        speed_setting = 0
-        update = Update(attribute=attr.SpeedSetting, attribute_value=speed_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
-
-        # *** STEP 8a ***
-        # TH sends command Step with: Direction = Decrease, Wrap = True, LowestOff = True
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to the
-        #    corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100)
-        #  - Verify that the FanMode attribute is set to High (3)
-        self.step("8a")
-        step = cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True)
-        update = Update(step=step, action=ActionEnum.Command)
-        speed_setting_expected = self.speed_max
-        percent_setting_expected = self.compute_percent_setting(speed_setting_expected)
-        fan_mode_expected = fm_enum.kHigh
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
-
-        # *** STEP 9 ***
-        # TH writes to the DUT the SpeedSetting attribute with value 1
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
-        self.step("9")
-        speed_setting = 1
-        update = Update(attribute=attr.SpeedSetting, attribute_value=speed_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
-
-        # *** STEP 9a ***
-        # TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = False
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to the
-        #    corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100)
-        #  - Verify that the FanMode attribute is set to Low (1)
-        self.step("9a")
-        step = cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False)
-        update = Update(step=step, action=ActionEnum.Command)
-        speed_setting_expected = 1
-        percent_setting_expected = self.compute_percent_setting(speed_setting_expected)
-        fan_mode_expected = fm_enum.kLow
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=command_expect)
-
-        # *** STEP 10 ***
-        # TH writes to the DUT the SpeedSetting attribute with value 1
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
-        self.step("10")
-        speed_setting = 1
-        update = Update(attribute=attr.SpeedSetting, attribute_value=speed_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
-
-        # *** STEP "10a" ***
-        # TH sends command Step with: Direction = Decrease, Wrap = False, LowestOff = True
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to 0
-        #  - Verify that the FanMode attribute is set to Off (0)
-        self.step("10a")
-        step = cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True)
-        update = Update(step=step, action=ActionEnum.Command)
-        speed_setting_expected = 0
-        percent_setting_expected = 0
-        fan_mode_expected = fm_enum.kOff
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
-
-        # *** STEP 11 ***
-        # TH writes to the DUT the SpeedSetting attribute with value 1
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
-        self.step("11")
-        speed_setting = 1
-        update = Update(attribute=attr.SpeedSetting, attribute_value=speed_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
-
-        # *** STEP 11a ***
-        # TH sends command Step with: Direction = Decrease, Wrap = True, LowestOff = False
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to the
-        #    corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100)
-        #  - Verify that the FanMode attribute is set to High (3)
-        self.step("11a")
-        step = cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False)
-        update = Update(step=step, action=ActionEnum.Command)
-        speed_setting_expected = self.speed_max
-        percent_setting_expected = self.compute_percent_setting(speed_setting_expected)
-        fan_mode_expected = fm_enum.kHigh
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
-
-        # *** STEP 12 ***
-        # TH writes to the DUT the SpeedSetting attribute with value SpeedMax
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
-        self.step("12")
-        speed_setting = self.speed_max
-        update = Update(attribute=attr.SpeedSetting, attribute_value=speed_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
-
-        # *** STEP 12a ***
-        # TH sends command Step with: Direction = Increase, Wrap = False, LowestOff = True
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to the
-        #    corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100)
-        #  - Verify that the FanMode attribute is set to High (3)
-        self.step("12a")
-        step = cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True)
-        update = Update(step=step, action=ActionEnum.Command)
-        speed_setting_expected = self.speed_max
-        percent_setting_expected = self.compute_percent_setting(speed_setting_expected)
-        fan_mode_expected = fm_enum.kHigh
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=command_expect)
-
-        # *** STEP 13 ***
-        # TH writes to the DUT the SpeedSetting attribute with value SpeedMax
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
-        self.step("13")
-        speed_setting = self.speed_max
-        update = Update(attribute=attr.SpeedSetting, attribute_value=speed_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=False, expected_attributes=write_expect)
-
-        # *** STEP "13a" ***
-        # TH sends command Step with: Direction = Increase, Wrap = True, LowestOff = True
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to 0
-        #  - Verify that the FanMode attribute is set to Off (0)
-        self.step("13a")
-        step = cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True)
-        update = Update(step=step, action=ActionEnum.Command)
-        speed_setting_expected = 0
-        percent_setting_expected = 0
-        fan_mode_expected = fm_enum.kOff
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
-
-        # *** STEP 14 ***
-        # TH writes to the DUT the SpeedSetting attribute with value SpeedMax
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
-        self.step("14")
-        speed_setting = self.speed_max
-        update = Update(attribute=attr.SpeedSetting, attribute_value=speed_setting, action=ActionEnum.Write)
-        write_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=write_expect)
-
-        # *** STEP "14a" ***
-        # TH sends command Step with: Direction = Increase, Wrap = True, LowestOff = False
-        #  - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
-        #  - Verify that the PercentStting and PercentCurrent attributes are both set to the
-        #    corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100)
-        #  - Verify that the FanMode attribute is set to Low (1)
-        self.step("14a")
-        step = cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False)
-        update = Update(step=step, action=ActionEnum.Command)
-        speed_setting_expected = 1
-        percent_setting_expected = self.compute_percent_setting(speed_setting_expected)
-        fan_mode_expected = fm_enum.kLow
-        command_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
-        ]
-        await self.update_and_verify_attribute_values(update, expect_updates=True, expected_attributes=command_expect)
 
 
 if __name__ == "__main__":
