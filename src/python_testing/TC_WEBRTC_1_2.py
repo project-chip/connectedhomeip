@@ -14,23 +14,16 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import logging
-from concurrent.futures import Future
-
-from chip import webrtc
+from chip.ChipDeviceCtrl import TransportPayloadCapability
 from chip.clusters import CameraAvStreamManagement, WebRTCTransportProvider
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.webrtc import ErrorCallback_t, PeerConnectedCallback_t, PeerDisconnectedCallback_t, SdpAnswerCallback_t, StatsCallback_t
+from chip.webrtc import PeerConnection, WebRTCManager
 from mobly import asserts
 from test_plan_support import commission_if_required
 
 
 class TC_WEBRTC_1_2(MatterBaseTest):
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        self._session_established_future = Future()
 
     def steps_TC_WEBRTC_1_2(self) -> list[TestStep]:
         steps = [
@@ -54,82 +47,28 @@ class TC_WEBRTC_1_2(MatterBaseTest):
     def pics_TC_WEBRTC_1_2(self) -> list[str]:
         return ["WEBRTCR", "WEBRTCP"]
 
-    def check_webrtc_session_established(self) -> bool:
-        if not self._session_established_future.result(timeout=30):
-            raise RuntimeError("WebRTC Session not established")
-
     @async_test_body
     async def test_TC_WEBRTC_1_2(self):
-        def on_answer(answer, peer):
-            logging.debug("on_answer called")
-
-        def on_error(error, peer):
-            logging.debug("on_error called")
-
-        def on_connected(peer):
-            logging.debug("on_connected called")
-            if not self._session_established_future.done():
-                self._session_established_future.set_result(True)
-
-        def on_disconnected(peer):
-            logging.debug("on_disconnected called")
-
-        def on_stats(stats, peer):
-            logging.debug(stats)
-
-        answer_callback = SdpAnswerCallback_t(on_answer)
-        error_callback = ErrorCallback_t(on_error)
-        peer_connected_callback = PeerConnectedCallback_t(on_connected)
-        peer_disconnected_callback = PeerDisconnectedCallback_t(on_disconnected)
-        stats_callback = StatsCallback_t(on_stats)
 
         self.step("precondition-1")
 
-        webrtc.webrtc_requestor_init()
-        # Test Invokation
-
-        client = webrtc.CreateWebrtcClient(1)
         endpoint = self.get_endpoint(default=1)
-
-        #! TODO: upsert session from provide offer response.
-        #! But offer response simply reaches too slow here, by which time,
-        #! matter stack would have already received Answer command
-        #! and returned NOT_FOUND status
-        # TODO: Need to handle offer response with CommandSenderCallback directly
-        # Upserting expected session details for now
-
-        webrtc.webrtc_requestor_upsert_session(
-            sessionId=1,
-            audioStreamId=1,
-            videoStreamId=1,
-            nodeId=self.dut_node_id,
-            fabricIndex=self.default_controller.GetFabricIndexInternal(),
-            endpoint=endpoint
-        )
-
+        webrtc_manager = WebRTCManager()
+        webrtc_peer: PeerConnection = webrtc_manager.create_peer(node_id=self.dut_node_id,
+                                                                 fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint)
+        # Test Invokation
         self.step("precondition-2")
-        await establish_webrtc_session(client, endpoint, self)
+        await establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, self)
 
+        self.step(0)
         current_sessions = await self.read_single_attribute_check_success(cluster=WebRTCTransportProvider,
                                                                           attribute=WebRTCTransportProvider.Attributes.CurrentSessions,
                                                                           endpoint=endpoint)
         asserts.assert_equal(len(current_sessions), 1, "No Pre-Existing session found")
-
-        resolution = CameraAvStreamManagement.Structs.VideoResolutionStruct(
-            width=640, height=480
-        )
-        await self.send_single_cmd(cmd=CameraAvStreamManagement.Commands.VideoStreamAllocate(
-            streamUsage=0, videoCodec=0, minFrameRate=30, maxFrameRate=30, minBitRate=10000, maxBitRate=10000, minFragmentLen=1,
-            maxFragmentLen=10, minResolution=resolution, maxResolution=resolution), endpoint=endpoint)
-
-        self.step(0)
         prev_sessionid = current_sessions[0].id
 
-        webrtc.SetCallbacks(client, answer_callback, error_callback,
-                            peer_connected_callback, peer_disconnected_callback, stats_callback)
-
         self.step(1)
-        offer = webrtc.CreateOffer(client)
+        offer = webrtc_peer.get_local_offer()
 
         provide_offer_response: WebRTCTransportProvider.Commands.ProvideOfferResponse = await self.send_single_cmd(
             cmd=WebRTCTransportProvider.Commands.ProvideOffer(
@@ -139,83 +78,54 @@ class TC_WEBRTC_1_2(MatterBaseTest):
                 videoStreamID=NullValue,
                 audioStreamID=NullValue,
                 originatingEndpointID=1
-            ), endpoint=endpoint
+            ), endpoint=endpoint, payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD
         )
 
-        asserts.assert_equal(provide_offer_response.webRTCSessionID, prev_sessionid, "Invalid response")
+        asserts.assert_equal(provide_offer_response.webRTCSessionID, prev_sessionid,
+                             "Session id does not match with the previous session")
 
         self.step(2)
-        answer_sessionId, answer = webrtc.get_remote_answer(timeout=30)
+        answer_sessionId, answer = webrtc_peer.get_remote_answer(timeout=30)
 
-        asserts.assert_equal(prev_sessionid, answer_sessionId)
+        asserts.assert_equal(prev_sessionid, answer_sessionId, "Session id does not match with the previous session")
+        asserts.assert_true(len(answer) > 0, "Invalid answer SDP received")
 
         self.step(3)
-        webrtc.SetAnswer(client, answer)
+        webrtc_peer.set_remote_answer(answer)
 
         self.step(4)
-        local_candidates = webrtc.GetCandidates()
+        local_candidates = webrtc_peer.get_local_ice_candidates()
 
         await self.send_single_cmd(cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
             webRTCSessionID=answer_sessionId,
             ICECandidates=local_candidates
-        ), endpoint=endpoint)
+        ), endpoint=endpoint, payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD)
 
-        # TODO: handle remote candidates
-        #  TH wait for 10s
-        # remote_candidates = get_remote_ice_candidates()
-
-        # for candidate in remote_candidates:
-        #     webrtc.SetCandidate(client, candidate)
-
-        self.skip_step(5)
+        self.step(5)
+        ice_session_id, remote_candidates = webrtc_peer.get_remote_ice_candidates()
+        asserts.assert_equal(prev_sessionid, ice_session_id,
+                             "ProvideIceCandidates invoked with wrong session id")
+        asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
+        webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
         self.step(6)
         if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Verify WebRTC session is established")
         else:
-            self.check_webrtc_session_established()
+            webrtc_peer.wait_for_session_establishment()
 
         self.step(7)
         await self.send_single_cmd(cmd=WebRTCTransportProvider.Commands.EndSession(
             webRTCSessionID=prev_sessionid,
             reason=WebRTCTransportProvider.Enums.WebRTCEndReasonEnum.kUserHangup
-        ), endpoint=endpoint)
+        ), endpoint=endpoint, payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD)
 
-        webrtc.CloseConnection(client)
+        webrtc_manager.close_all()
 
 
-async def establish_webrtc_session(client, endpoint, ctrl):
+async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, ctrl):
 
-    session_established_future = Future()
-
-    def on_connected(peer):
-        logging.debug("on_connected")
-        session_established_future.set_result(None)
-
-    def on_answer(answer, peer):
-        logging.debug("on_answer called")
-
-    def on_error(error, peer):
-        logging.debug("on_error called")
-
-    def on_disconnected(peer):
-        logging.debug("on_disconnected called")
-
-    def on_stats(stats, peer):
-        logging.debug(stats)
-
-    answer_callback = SdpAnswerCallback_t(on_answer)
-    error_callback = ErrorCallback_t(on_error)
-    peer_connected_callback = PeerConnectedCallback_t(on_connected)
-    peer_disconnected_callback = PeerDisconnectedCallback_t(on_disconnected)
-    stats_callback = StatsCallback_t(on_stats)
-
-    webrtc.SetCallbacks(client, answer_callback, error_callback,
-                        peer_connected_callback, peer_disconnected_callback, stats_callback)
-    webrtc.InitialiseConnection(client)
-
-    offer = webrtc.CreateOffer(client)
-
+    offer = webrtc_peer.get_local_offer()
     provide_offer_response: WebRTCTransportProvider.Commands.ProvideOfferResponse = await ctrl.send_single_cmd(
         cmd=WebRTCTransportProvider.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
@@ -224,30 +134,24 @@ async def establish_webrtc_session(client, endpoint, ctrl):
             videoStreamID=NullValue,
             audioStreamID=NullValue,
             originatingEndpointID=1
-        ), endpoint=endpoint
+        ), endpoint=endpoint, payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD
     )
-
     asserts.assert_true(provide_offer_response.webRTCSessionID >= 0, "Invalid response")
+    webrtc_manager.session_id_created(provide_offer_response.webRTCSessionID, ctrl.dut_node_id)
 
-    answer_sessionId, answer = webrtc.get_remote_answer()
+    answer_sessionId, answer = webrtc_peer.get_remote_answer(timeout=30)
+    webrtc_peer.set_remote_answer(answer)
 
-    asserts.assert_equal(provide_offer_response.webRTCSessionID, answer_sessionId)
-
-    webrtc.SetAnswer(client, answer)
-
-    local_candidates = webrtc.GetCandidates()
-
+    local_candidates = webrtc_peer.get_local_ice_candidates()
     await ctrl.send_single_cmd(cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
         webRTCSessionID=answer_sessionId,
         ICECandidates=local_candidates
-    ), endpoint=endpoint)
+    ), endpoint=endpoint, payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD)
 
-    # TODO handle remote candidates
-    # remote_candidates = get_remote_ice_candidates()
+    ice_session_id, remote_candidates = webrtc_peer.get_remote_ice_candidates()
+    webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
-    # for candidate in remote_candidates:
-    #     webrtc.SetCandidate(client, candidate)
-    return session_established_future.result()
+    return webrtc_peer.wait_for_session_establishment()
 
 
 if __name__ == "__main__":
