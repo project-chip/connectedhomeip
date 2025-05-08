@@ -128,7 +128,6 @@ CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, Li
         ReturnErrorOnFailure(
             configManager.StoreSerialNumber(options.serialNumber.Value().c_str(), options.serialNumber.Value().length()));
     }
-    //+++x TODO: Where do the Darwin command-line options for all-clusters-app get stored into the configuration manager?
 
     return CHIP_NO_ERROR;
 }
