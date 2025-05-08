@@ -548,7 +548,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SerialNumber:
         LinuxDeviceOptions::GetInstance().serialNumber.SetValue(std::string{ aValue });
         break;
-    
+
     case kDeviceOption_CustomFlow:
         LinuxDeviceOptions::GetInstance().payload.commissioningFlow = static_cast<CommissioningFlow>(strtoul(aValue, nullptr, 0));
         break;
