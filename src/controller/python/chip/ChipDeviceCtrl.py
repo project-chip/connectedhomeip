@@ -40,7 +40,7 @@ import secrets
 import threading
 import typing
 from ctypes import (CDLL, CFUNCTYPE, POINTER, Structure, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8,
-                    c_uint16, c_uint32, c_uint64, c_void_p, cast, create_string_buffer, pointer, py_object, resize, string_at)
+                    c_uint16, c_uint32, c_uint64, c_void_p, cast, create_string_buffer, pointer, py_object, string_at)
 from dataclasses import dataclass
 
 import dacite  # type: ignore
@@ -375,17 +375,14 @@ class DeviceProxyWrapper():
         self._dmLib.pychip_GetAttestationChallenge.argtypes = (c_void_p, POINTER(c_uint8), POINTER(c_size_t))
         self._dmLib.pychip_GetAttestationChallenge.restype = PyChipError
 
-        # this buffer is overly large, but we shall resize
         size = 64
-        buf = ctypes.c_uint8(size)
+        buf = (ctypes.c_uint8 * size)()
         csize = ctypes.c_size_t(size)
         builtins.chipStack.Call(
             lambda: self._dmLib.pychip_GetAttestationChallenge(self._deviceProxy, buf, ctypes.byref(csize))
         ).raise_on_error()
 
-        resize(buf, csize.value)
-
-        return bytes(buf)
+        return bytes(buf[:csize.value])
 
     @property
     def sessionAllowsLargePayload(self) -> bool:
@@ -575,6 +572,7 @@ class ChipDeviceControllerBase():
         self._fabricId = self.GetFabricIdInternal()
         self._fabricIndex = self.GetFabricIndexInternal()
         self._nodeId = self.GetNodeIdInternal()
+        self._rootPublicKeyBytes = self.GetRootPublicKeyBytesInternal()
 
     def _finish_init(self):
         self._isActive = True
@@ -591,6 +589,10 @@ class ChipDeviceControllerBase():
     @property
     def fabricId(self) -> int:
         return self._fabricId
+
+    @property
+    def rootPublicKeyBytes(self) -> bytes:
+        return self._rootPublicKeyBytes
 
     @property
     def name(self) -> str:
@@ -1106,7 +1108,7 @@ class ChipDeviceControllerBase():
         Get the node ID from the object. Only used to validate cached value from property.
 
         Returns:
-            int: The compressed fabric ID as a 64-bit integer.
+            int: The Node ID as a 64 bit integer.
 
         Raises:
             ChipStackError: On failure.
@@ -1121,6 +1123,27 @@ class ChipDeviceControllerBase():
         ).raise_on_error()
 
         return nodeid.value
+
+    def GetRootPublicKeyBytesInternal(self) -> bytes:
+        '''
+        Get the root public key associated with our fabric.
+
+        Returns:
+            bytes: The root public key raw bytes in uncompressed point form.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        size = 128
+        buf = (ctypes.c_uint8 * size)()
+        csize = ctypes.c_size_t(size)
+        builtins.chipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetRootPublicKeyBytes(self.devCtrl, buf, ctypes.byref(csize))
+        ).raise_on_error()
+
+        return bytes(buf[:csize.value])
 
     def GetClusterHandler(self):
         '''
@@ -2238,6 +2261,9 @@ class ChipDeviceControllerBase():
 
             self._dmLib.pychip_DeviceController_GetLogFilter = [None]
             self._dmLib.pychip_DeviceController_GetLogFilter = c_uint8
+
+            self._dmLib.pychip_DeviceController_GetRootPublicKeyBytes.argtypes = [c_void_p, POINTER(c_uint8), POINTER(c_size_t)]
+            self._dmLib.pychip_DeviceController_GetRootPublicKeyBytes.restype = PyChipError
 
             self._dmLib.pychip_OpCreds_AllocateController.argtypes = [c_void_p, POINTER(
                 c_void_p), POINTER(c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32, c_void_p]

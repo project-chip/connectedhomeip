@@ -35,7 +35,29 @@ namespace app {
 namespace Clusters {
 namespace Descriptor {
 namespace Structs {
-namespace DeviceTypeStruct = Clusters::detail::Structs::DeviceTypeStruct;
+namespace DeviceTypeStruct {
+enum class Fields : uint8_t
+{
+    kDeviceType = 0,
+    kRevision   = 1,
+};
+
+struct Type
+{
+public:
+    chip::DeviceTypeId deviceType = static_cast<chip::DeviceTypeId>(0);
+    uint16_t revision             = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DeviceTypeStruct
 namespace SemanticTagStruct {
 enum class Fields : uint8_t
 {

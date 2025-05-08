@@ -131,7 +131,7 @@ Complete the following steps:
 1. Install some Raspberry Pi specific dependencies:
 
     ```
-    sudo apt-get install pi-bluetooth avahi-utils
+    sudo apt-get install bluez pi-bluetooth avahi-utils
     ```
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
@@ -161,7 +161,7 @@ during the Matter commissioning process.
     ```ini
     [Service]
     ExecStart=
-    ExecStart=/usr/lib/bluetooth/bluetoothd -E -P battery
+    ExecStart=/usr/libexec/bluetooth/bluetoothd -E -P battery
     ```
 
 1. Restart the Bluetooth service by running the following command:

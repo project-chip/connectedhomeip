@@ -303,6 +303,15 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     FabricIndex fabricIndex = event->FailSafeTimerExpired.fabricIndex;
 
     // Report Fabrics table change if SetVIDVerificationStatement had been called.
+    // There are 4 cases:
+    //   1- Fail-safe started, AddNOC/UpdateNOC for fabric A, VVS set for fabric A after that: Need to mark dirty here.
+    //   2- Fail-safe started, UpdateNOC/AddNOC for fabric A, VVS set for fabric B after that: No need to mark dirty.
+    //   3- Fail-safe started, no UpdateNOC/AddNOC, VVS set for fabric X: No need to mark dirty.
+    //   4- ail-safe started, VVS set for fabric A, UpdateNOC for fabric A: No need to mark dirty.
+    //
+    // Right now we will mark dirty no matter what, as the state-keeping logic for cases 2-4 above
+    // was very complex and more likely to be less maintainable than possibly over-reporting Fabrics
+    // attribute in this corner case of fail-safe expiry.
     if (event->FailSafeTimerExpired.setVidVerificationStatementHasBeenInvoked)
     {
         // Opcreds cluster is always on Endpoint 0.

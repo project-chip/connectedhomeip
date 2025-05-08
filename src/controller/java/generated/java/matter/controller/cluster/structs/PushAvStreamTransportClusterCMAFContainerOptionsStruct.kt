@@ -27,12 +27,14 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
   val chunkDuration: UShort,
   val CENCKey: Optional<ByteArray>,
   val metadataEnabled: Optional<Boolean>,
+  val CENCKeyID: Optional<ByteArray>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n")
     append("\tchunkDuration : $chunkDuration\n")
     append("\tCENCKey : $CENCKey\n")
     append("\tmetadataEnabled : $metadataEnabled\n")
+    append("\tCENCKeyID : $CENCKeyID\n")
     append("}\n")
   }
 
@@ -48,6 +50,10 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
         val optmetadataEnabled = metadataEnabled.get()
         put(ContextSpecificTag(TAG_METADATA_ENABLED), optmetadataEnabled)
       }
+      if (CENCKeyID.isPresent) {
+        val optCENCKeyID = CENCKeyID.get()
+        put(ContextSpecificTag(TAG_CENC_KEY_ID), optCENCKeyID)
+      }
       endStructure()
     }
   }
@@ -56,6 +62,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     private const val TAG_CHUNK_DURATION = 0
     private const val TAG_CENC_KEY = 1
     private const val TAG_METADATA_ENABLED = 2
+    private const val TAG_CENC_KEY_ID = 3
 
     fun fromTlv(
       tlvTag: Tag,
@@ -75,6 +82,12 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
         } else {
           Optional.empty()
         }
+      val CENCKeyID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY_ID))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY_ID)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -82,6 +95,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
         chunkDuration,
         CENCKey,
         metadataEnabled,
+        CENCKeyID,
       )
     }
   }

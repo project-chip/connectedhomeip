@@ -2261,6 +2261,8 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull referenceCount MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull encodedPixels MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull hardwareEncoder MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable watermarkEnabled MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable osdEnabled MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2405,6 +2407,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull chunkDuration MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSData * _Nullable cencKey MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable metadataEnabled MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nullable cencKeyID MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2422,7 +2425,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSString * _Nonnull url MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct * _Nonnull triggerOptions MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull ingestMethod MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull containerFormat MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRPushAVStreamTransportClusterContainerOptionsStruct * _Nonnull containerOptions MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable expiryTime MTR_PROVISIONALLY_AVAILABLE;
 @end
@@ -2432,6 +2434,12 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull connectionID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull transportStatus MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRPushAVStreamTransportClusterTransportOptionsStruct * _Nullable transportOptions MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRPushAVStreamTransportClusterSupportedFormatStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull containerFormat MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull ingestMethod MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
