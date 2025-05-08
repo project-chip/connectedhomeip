@@ -150,11 +150,11 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
-    size_t len;
-
 #if CHIP_DISABLE_PLATFORM_KVS
     return CHIP_NO_ERROR;
 #else  // CHIP_DISABLE_PLATFORM_KVS
+    size_t len;
+
     // Initialize the generic implementation base class.
     ReturnErrorOnFailure(Internal::GenericConfigurationManagerImpl<PosixConfig>::Init());
 
