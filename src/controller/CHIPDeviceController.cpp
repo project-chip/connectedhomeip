@@ -578,14 +578,7 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionIds)
-    {
-        if (pafSessionId != WiFiPAF::kUndefinedWiFiPafSessionId)
-        {
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pafSessionId);
-            pafSessionId = WiFiPAF::kUndefinedWiFiPafSessionId;
-        }
-    }
+    mSystemState->WiFiPayLayer()->Shutdown();
 #endif
 
     // Release everything from the commissionee device pool here.
@@ -640,6 +633,15 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
         mSystemState->BleLayer()->CloseAllBleConnections();
     }
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if ((mSystemState->WiFiPayLayer() != nullptr) && (device->GetDeviceTransportType() == Transport::Type::kWiFiPAF) &&
+        (device->IsSecureConnected() == true))
+    {
+        ChipLogProgress(Discovery, "Closing all WiFiPAF connections");
+        mSystemState->WiFiPayLayer()->CloseAllConnections();
+    }
+#endif
+
     // Make sure that there will be no dangling pointer
     if (mDeviceInPASEEstablishment == device)
     {

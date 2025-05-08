@@ -87,17 +87,7 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 static void StopSignalHandler(int signum)
 {
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
-        switch (role)
-        {
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
-            break;
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
-            break;
-        }
-    });
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown();
 }
 #endif
 

@@ -182,6 +182,10 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        mWiFiPafLayer = params.wifipaf_layer;
+#endif
+
         VerifyOrDie(IsInitialized());
     };
 
@@ -234,6 +238,9 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * BleLayer() const { return mBleLayer; };
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAF::WiFiPAFLayer * WiFiPayLayer() const { return mWiFiPafLayer; };
+#endif
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
     chip::app::reporting::ReportScheduler * GetReportScheduler() const { return mReportScheduler; }
@@ -254,6 +261,9 @@ private:
     Inet::EndPointManager<Inet::UDPEndPoint> * mUDPEndPointManager = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAF::WiFiPAFLayer * mWiFiPafLayer = nullptr;
 #endif
     DeviceTransportMgr * mTransportMgr                                             = nullptr;
     SessionManager * mSessionMgr                                                   = nullptr;

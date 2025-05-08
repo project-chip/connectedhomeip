@@ -113,7 +113,6 @@ private:
     CHIP_ERROR StopDiscoveryOverSoftAP();
     CHIP_ERROR StartDiscoveryOverWiFiPAF(SetupPayload & payload);
     CHIP_ERROR StopDiscoveryOverWiFiPAF();
-    CHIP_ERROR StopPairWiFiPAF();
 
     // Returns whether we have kicked off a new connection attempt.
     bool ConnectToDiscoveredDevice();

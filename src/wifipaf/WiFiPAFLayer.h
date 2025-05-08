@@ -163,8 +163,9 @@ public:
     static WiFiPAFLayer & GetWiFiPAFLayer();
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
 
-    typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAF::WiFiPafRole role);
-    void Shutdown(OnCancelDeviceHandle OnCancelDevice);
+    void Shutdown();
+    void CloseAllConnections();
+    void CloseConnection(PafInfoAccess accType, const WiFiPAFSession & PafSession);
     bool OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     CHIP_ERROR OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     CHIP_ERROR SendMessage(WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msg);
@@ -188,7 +189,7 @@ private:
     void InitialPafInfo();
     void CleanPafInfo(WiFiPAFSession & SessionInfo);
     WiFiPAFSession mPafInfoVect[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
-    chip::System::Layer * mSystemLayer;
+    chip::System::Layer * mSystemLayer = nullptr;
 };
 
 } /* namespace WiFiPAF */

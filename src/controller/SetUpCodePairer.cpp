@@ -308,18 +308,6 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetUpCodePairer::StopPairWiFiPAF()
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if (mPAFSessionId != WiFiPAF::kUndefinedWiFiPafSessionId)
-    {
-        DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(mPAFSessionId);
-        mPAFSessionId = WiFiPAF::kUndefinedWiFiPafSessionId;
-    }
-#endif
-    return CHIP_NO_ERROR;
-}
-
 bool SetUpCodePairer::ConnectToDiscoveredDevice()
 {
     if (mWaitingForPASE)
@@ -415,6 +403,11 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
 {
+    if (mWaitingForDiscovery[kWiFiPAFTransport] == false)
+    {
+        // Discovery has stopped or device has been discovered
+        return;
+    }
     ChipLogProgress(Controller, "Discovered device to be commissioned over WiFiPAF, RemoteId: %lu", mRemoteId);
 
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
@@ -426,6 +419,11 @@ void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
 
 void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 {
+    if (mWaitingForDiscovery[kWiFiPAFTransport] == false)
+    {
+        // Discovery has stopped or device has been discovered
+        return;
+    }
     ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 }
@@ -533,7 +531,6 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
 
 bool SetUpCodePairer::StopPairing(NodeId remoteId)
 {
-    LogErrorOnFailure(StopPairWiFiPAF());
     VerifyOrReturnValue(mRemoteId != kUndefinedNodeId, false);
     VerifyOrReturnValue(remoteId == kUndefinedNodeId || remoteId == mRemoteId, false);
 

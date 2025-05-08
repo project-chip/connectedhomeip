@@ -76,7 +76,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         if (mAdvertisingOverWiFiPAF)
         {
             ChipLogProgress(AppServer, "Cancel Wi-Fi PAF publish");
-            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(false);
+            WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().CloseAllConnections();
         }
 #endif
     }

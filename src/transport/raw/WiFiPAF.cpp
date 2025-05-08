@@ -126,7 +126,10 @@ CHIP_ERROR WiFiPAFBase::WiFiPAFMessageSend(WiFiPAFSession & TxInfo, PacketBuffer
 
 CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
 {
-    DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
+    if (SessionInfo.id != kUndefinedWiFiPafSessionId)
+    {
+        DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
+    }
 
     return CHIP_NO_ERROR;
 }
