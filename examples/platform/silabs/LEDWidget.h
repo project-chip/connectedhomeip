@@ -38,8 +38,6 @@ public:
 
 private:
     uint8_t mLed;
-
-protected:
     uint8_t mLevel;
     bool mLedStatus;
     uint64_t mLastChangeTimeMS;

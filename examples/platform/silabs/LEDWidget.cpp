@@ -91,10 +91,12 @@ bool LEDWidget::GetLEDStatus(uint8_t led)
 {
     return mLedStatus;
 }
+
 void LEDWidget::SetLevel(uint8_t level)
 {
     mLevel = level;
 }
+
 uint8_t LEDWidget::GetLevel()
 {
     return mLevel;

@@ -30,18 +30,22 @@ public:
     {
         uint8_t r, g, b;
     };
+
     struct XyColor_t
     {
         uint16_t x, y;
     };
+
     struct HsvColor_t
     {
         uint8_t h, s, v;
     };
+
     struct CtColor_t
     {
         uint16_t ctMireds;
     };
+
     // Union of possible color formats
     union ColorData_t
     {
@@ -49,6 +53,7 @@ public:
         XyColor_t xy;
         CtColor_t ct;
     };
+
     // Setters and Getters
     void SetColor(uint8_t r, uint8_t g, uint8_t b);
     void GetColor(uint16_t & r, uint16_t & g, uint16_t & b);
@@ -59,11 +64,6 @@ public:
     void SetColorFromCT(uint16_t ctMireds);
 
 private:
-    // RGB Color components
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-
     // Helper functions for color conversion
     RgbColor_t HsvToRgb(HsvColor_t hsv);
     RgbColor_t XYToRgb(uint8_t level, uint16_t currentX, uint16_t currentY);

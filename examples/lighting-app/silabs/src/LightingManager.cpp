@@ -74,36 +74,37 @@ CHIP_ERROR LightingManager::Init()
     app::DataModel::Nullable<uint8_t> brightness;
     uint16_t currentx, currenty, currentctmireds;
     uint8_t currenthue, currentsaturation;
-    Protocols::InteractionModel::Status status;
 
     // Read brightness value
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, brightness);
-    if (status == Protocols::InteractionModel::Status::Success && !brightness.IsNull())
+    if (Clusters::LevelControl::Attributes::CurrentLevel::Get(1, brightness) == Protocols::InteractionModel::Status::Success &&
+        !brightness.IsNull())
     {
         mCurrentLevel = brightness.Value();
     }
-    status = Clusters::ColorControl::Attributes::CurrentY::Get(1, &currentx);
-    if (status == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentX::Get(1, &currentx) == Protocols::InteractionModel::Status::Success &&
+        !currentx.IsNull())
     {
         mCurrentX = currentx;
     }
-    status = Clusters::ColorControl::Attributes::CurrentX::Get(1, &currenty);
-    if (status == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentY::Get(1, &currenty) == Protocols::InteractionModel::Status::Success &&
+        !currenty.IsNull())
     {
         mCurrentY = currenty;
     }
-    status = Clusters::ColorControl::Attributes::CurrentHue::Get(1, &currenthue);
-    if (status == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentHue::Get(1, &currenthue) == Protocols::InteractionModel::Status::Success &&
+        !currenthue.IsNull())
     {
         mCurrentHue = currenthue;
     }
-    status = Clusters::ColorControl::Attributes::CurrentSaturation::Get(1, &currentsaturation);
-    if (status == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentSaturation::Get(1, &currentsaturation) ==
+            Protocols::InteractionModel::Status::Success &&
+        !currentsaturation.IsNull())
     {
         mCurrentSaturation = currentsaturation;
     }
-    status = Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(1, &currentctmireds);
-    if (status == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(1, &currentctmireds) ==
+            Protocols::InteractionModel::Status::Success &&
+        !currentctmireds.IsNull())
     {
         mCurrentCTMireds = currentctmireds;
     }
@@ -365,8 +366,7 @@ void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
 }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-bool LightingManager::InitiateLightctrlAction(int32_t aActor, Action_t aAction, uint16_t size, uint32_t aAttributeId,
-                                              uint8_t * value)
+bool LightingManager::InitiateLightctrlAction(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value)
 {
     bool action_initiated = false;
     VerifyOrReturnError(aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT, action_initiated);
@@ -376,21 +376,14 @@ bool LightingManager::InitiateLightctrlAction(int32_t aActor, Action_t aAction, 
     case COLOR_ACTION_XY:
         colorData.xy = {};
 
-        // Check if CurrentX or CurrentY has changed
         if (aAttributeId == ColorControl::Attributes::CurrentX::Id)
         {
-            if (mCurrentX == *reinterpret_cast<uint16_t *>(value))
-            {
-                return action_initiated;
-            }
+            VerifyOrReturnValue(mCurrentX != *reinterpret_cast<uint16_t *>(value), action_initiated);
             mCurrentX = *reinterpret_cast<uint16_t *>(value);
         }
         else if (aAttributeId == ColorControl::Attributes::CurrentY::Id)
         {
-            if (mCurrentY == *reinterpret_cast<uint16_t *>(value))
-            {
-                return action_initiated;
-            }
+            VerifyOrReturnValue(mCurrentY != *reinterpret_cast<uint16_t *>(value), action_initiated);
             mCurrentY = *reinterpret_cast<uint16_t *>(value);
         }
         colorData.xy = { mCurrentX, mCurrentY };
@@ -401,30 +394,22 @@ bool LightingManager::InitiateLightctrlAction(int32_t aActor, Action_t aAction, 
 
         if (aAttributeId == ColorControl::Attributes::CurrentHue::Id)
         {
-            if (mCurrentHue == *value)
-            {
-                return action_initiated;
-            }
+            VerifyOrReturnValue(mCurrentHue != *value, action_initiated);
             mCurrentHue = *value;
         }
         else if (aAttributeId == ColorControl::Attributes::CurrentSaturation::Id)
         {
-            if (mCurrentSaturation == *value)
-            {
-                return action_initiated;
-            }
+            VerifyOrReturnValue(mCurrentSaturation != *value, action_initiated);
             mCurrentSaturation = *value;
         }
         colorData.hsv = { mCurrentHue, mCurrentSaturation };
         break;
     case COLOR_ACTION_CT:
-        if (mCurrentCTMireds == *(uint16_t *) value)
-        {
-            return action_initiated;
-        }
+        VerifyOrReturnValue(mCurrentCTMireds != *(uint16_t *) value, action_initiated);
         colorData.ct.ctMireds = *(uint16_t *) value;
         mCurrentCTMireds      = colorData.ct.ctMireds;
         break;
+
     default:
         break;
     }
