@@ -76,7 +76,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
 
     def pics_TC_CADMIN_1_19(self) -> list[str]:
         return ["CADMIN.S"]
-    
+
     def assert_function(self, e):
         # When attempting to create a new controller we are expected to get the following response:
         # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
