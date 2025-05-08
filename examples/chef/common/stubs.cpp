@@ -281,20 +281,31 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 #endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
 #endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
 
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
         if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
         {
             chef::pump::postOnOff(attributePath.mEndpointId, bool(*value));
         }
+#endif // #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
     }
     else if (clusterId == LevelControl::Id)
     {
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
         if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
         {
             chef::pump::postMoveToLevel(attributePath.mEndpointId, *value);
         }
+#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+#endif // #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+
         // WIP Apply attribute change to Light
     }
 #ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
