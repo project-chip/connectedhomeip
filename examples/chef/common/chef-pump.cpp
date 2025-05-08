@@ -220,6 +220,7 @@ void handleOnOff(EndpointId endpoint, bool value)
             if ((*gLevel[epIndex]).IsNull())
                 (*gLevel[epIndex]).SetNonNull(255);
             LevelControl::Attributes::CurrentLevel::Set(endpoint, *gLevel[epIndex]);
+            MatterReportingAttributeChangeCallback(endpoint, LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id);
         }
         else
         {
@@ -232,7 +233,7 @@ void handleOnOff(EndpointId endpoint, bool value)
         updateSetPointsOnOff(endpoint, value);
     }
     // #else
-    updateSetPointsOnOff(endpoint, value);
+    // updateSetPointsOnOff(endpoint, value);
     // #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 }
 
