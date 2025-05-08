@@ -50,7 +50,6 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
-        "drlc-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
         "meter-identification-cluster.xml",
@@ -121,6 +120,7 @@
         "service-area-cluster.xml",
         "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
+        "soil-measurement-cluster.xml",
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
@@ -215,7 +215,13 @@
             "UnitRange",
             "LimitRange"
         ],
-        "Commodity Price": ["Currency", "CurrentPrice"],
+        "Commodity Price": [
+            "TariffUnit",
+            "Currency",
+            "CurrentPrice",
+            "PriceForecast",
+            "FeatureMap"
+        ],
         "Commodity Tariff": [
             "TariffInfo",
             "CurrentDay",
@@ -322,7 +328,14 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Meter Identification": ["PowerThreshold"],
+        "Meter Identification": [
+            "MeterType",
+            "PointOfDelivery",
+            "MeterSerialNumber",
+            "ProtocolVersion",
+            "PowerThreshold",
+            "FeatureMap"
+        ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",
@@ -724,7 +737,7 @@
             "Viewport",
             "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
-            "NightVisionCapable",
+            "NightVisionUsesInfrared",
             "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
@@ -760,7 +773,9 @@
             "StatusLightBrightness",
             "FeatureMap"
         ],
-        "Camera AV Settings User Level Management": ["MPTZPosition"]
+        "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Soil Measurement": ["SoilMoistureMeasurementLimits"],
+        "Unit Localization": ["TemperatureUnit"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

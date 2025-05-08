@@ -51,31 +51,18 @@ enum class IngestMethodsEnum : uint8_t
 // Enum for StatusCodeEnum
 enum class StatusCodeEnum : uint8_t
 {
-    kAllocationNotPermitted     = 0x02,
-    kInvalidTLSEndpoint         = 0x03,
-    kInvalidStream              = 0x04,
-    kInvalidURL                 = 0x05,
-    kInvalidZone                = 0x06,
-    kUnsupportedContainerFormat = 0x07,
-    kUnsupportedIngestMethod    = 0x08,
-    kInvalidTriggerType         = 0x09,
-    kInvalidTransportStatus     = 0x10,
+    kInvalidTLSEndpoint     = 0x02,
+    kInvalidStream          = 0x03,
+    kInvalidURL             = 0x04,
+    kInvalidZone            = 0x05,
+    kInvalidCombination     = 0x06,
+    kInvalidTriggerType     = 0x07,
+    kInvalidTransportStatus = 0x08,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
-};
-
-// Enum for StreamMultiplexingEnum
-enum class StreamMultiplexingEnum : uint8_t
-{
-    kInterleaved = 0x00,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 1,
 };
 
 using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
@@ -122,18 +109,7 @@ enum class TriggerActivationReasonEnum : uint8_t
 enum class Feature : uint32_t
 {
     kPerZoneSensitivity = 0x1,
-};
-
-// Bitmap for SupportedContainerFormatsBitmap
-enum class SupportedContainerFormatsBitmap : uint8_t
-{
-    kCmaf = 0x1,
-};
-
-// Bitmap for SupportedIngestMethodsBitmap
-enum class SupportedIngestMethodsBitmap : uint8_t
-{
-    kCMAFIngest = 0x1,
+    kMetadata           = 0x2,
 };
 } // namespace PushAvStreamTransport
 } // namespace Clusters

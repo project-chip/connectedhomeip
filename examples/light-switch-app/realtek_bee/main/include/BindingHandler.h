@@ -45,7 +45,6 @@ public:
     };
 
     void Init();
-    bool IsGroupBound();
 
     static void SwitchWorkerFunction(intptr_t);
     static void SwitchWorkerFunction2(int localEndpointId);

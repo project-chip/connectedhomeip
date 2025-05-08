@@ -43,14 +43,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace VideoSensorParams
-namespace NightVisionCapable {
+namespace NightVisionUsesInfrared {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = NightVisionCapable::Id,
+    .attributeId    = NightVisionUsesInfrared::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-} // namespace NightVisionCapable
+} // namespace NightVisionUsesInfrared
 namespace MinViewport {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MinViewport::Id,
@@ -353,70 +353,70 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace AudioStreamAllocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::AudioStreamAllocate::Id,
+    .commandId       = AudioStreamAllocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace AudioStreamAllocate
 namespace AudioStreamDeallocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::AudioStreamDeallocate::Id,
+    .commandId       = AudioStreamDeallocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace AudioStreamDeallocate
 namespace VideoStreamAllocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::VideoStreamAllocate::Id,
+    .commandId       = VideoStreamAllocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace VideoStreamAllocate
 namespace VideoStreamModify {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::VideoStreamModify::Id,
+    .commandId       = VideoStreamModify::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace VideoStreamModify
 namespace VideoStreamDeallocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::VideoStreamDeallocate::Id,
+    .commandId       = VideoStreamDeallocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace VideoStreamDeallocate
 namespace SnapshotStreamAllocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id,
+    .commandId       = SnapshotStreamAllocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SnapshotStreamAllocate
 namespace SnapshotStreamModify {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::SnapshotStreamModify::Id,
+    .commandId       = SnapshotStreamModify::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SnapshotStreamModify
 namespace SnapshotStreamDeallocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id,
+    .commandId       = SnapshotStreamDeallocate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace SnapshotStreamDeallocate
 namespace SetStreamPriorities {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::SetStreamPriorities::Id,
+    .commandId       = SetStreamPriorities::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetStreamPriorities
 namespace CaptureSnapshot {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CameraAvStreamManagement::Commands::CaptureSnapshot::Id,
+    .commandId       = CaptureSnapshot::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

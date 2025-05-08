@@ -54,9 +54,11 @@ void WebRTCManager::Init()
     mWebRTCRequestorServer.Init();
 }
 
-CHIP_ERROR WebRTCManager::SetRemoteDescription(uint16_t webRTCSessionID, const std::string & sdp)
+CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args)
 {
-    mWebRTCProviderClient.NotifyRemoteDecryptorReceived(webRTCSessionID);
+    ChipLogProgress(Camera, "WebRTCManager::HandleOffer");
+
+    mWebRTCProviderClient.HandleOfferReceived(sessionId);
 
     if (!mPeerConnection)
     {
@@ -64,11 +66,62 @@ CHIP_ERROR WebRTCManager::SetRemoteDescription(uint16_t webRTCSessionID, const s
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ChipLogProgress(Camera, "WebRTCManager::SetRemoteDescription");
-    mPeerConnection->setRemoteDescription(sdp);
+    mPeerConnection->setRemoteDescription(rtc::Description{ args.sdp, "offer" });
+
+    if (mLocalDescription.empty())
+    {
+        ChipLogError(Camera, "No local SDP to send");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, webRTCSessionID]() { ProvideICECandidates(webRTCSessionID); });
+    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideAnswer(sessionId, mLocalDescription); });
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & sdp)
+{
+    ChipLogProgress(Camera, "WebRTCManager::HandleAnswer");
+
+    mWebRTCProviderClient.HandleAnswerReceived(sessionId);
+
+    if (!mPeerConnection)
+    {
+        ChipLogError(Camera, "Cannot set remote description: mPeerConnection is null");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    rtc::Description answerDesc(sdp, rtc::Description::Type::Answer);
+    mPeerConnection->setRemoteDescription(answerDesc);
+
+    // Schedule the ProvideICECandidates() call to run asynchronously.
+    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)
+{
+    ChipLogProgress(Camera, "WebRTCManager::HandleICECandidates");
+
+    if (!mPeerConnection)
+    {
+        ChipLogError(Camera, "Cannot process ICE candidates: mPeerConnection is null");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (candidates.empty())
+    {
+        ChipLogError(Camera, "Candidate list is empty. At least one candidate is expected.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    for (const auto & candidate : candidates)
+    {
+        ChipLogProgress(Camera, "Applying candidate: %s", candidate.c_str());
+        mPeerConnection->addRemoteCandidate(candidate);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -95,8 +148,8 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     rtc::Configuration config;
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
-    mPeerConnection->onLocalDescription([this](rtc::Description description) {
-        mLocalDescription = std::string(description);
+    mPeerConnection->onLocalDescription([this](rtc::Description desc) {
+        mLocalDescription = std::string(desc);
         ChipLogProgress(Camera, "Local Description:");
         ChipLogProgress(Camera, "%s", mLocalDescription.c_str());
     });
@@ -138,17 +191,15 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessionID,
+CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId,
                                        Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer command to the peer device");
 
     CHIP_ERROR err =
-        mWebRTCProviderClient.ProvideOffer(webRTCSessionID, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
+        mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
                                            MakeOptional(DataModel::NullNullable), // "Null" for video
-                                           MakeOptional(DataModel::NullNullable), // "Null" for audio
-                                           NullOptional,                          // Omit ICEServers (Optional not present)
-                                           NullOptional                           // Omit ICETransportPolicy (Optional not present)
+                                           MakeOptional(DataModel::NullNullable)  // "Null" for audio
         );
 
     if (err != CHIP_NO_ERROR)
@@ -159,7 +210,38 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessi
     return err;
 }
 
-CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t webRTCSessionID)
+CHIP_ERROR WebRTCManager::SolicitOffer(Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage)
+{
+    ChipLogProgress(Camera, "Sending SolicitOffer command to the peer device");
+
+    CHIP_ERROR err = mWebRTCProviderClient.SolicitOffer(streamUsage, kWebRTCRequesterDynamicEndpointId,
+                                                        MakeOptional(DataModel::NullNullable), // "Null" for video
+                                                        MakeOptional(DataModel::NullNullable)  // "Null" for audio
+    );
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to send SolicitOffer: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return err;
+}
+
+CHIP_ERROR WebRTCManager::ProvideAnswer(uint16_t sessionId, const std::string & sdp)
+{
+    ChipLogProgress(Camera, "Sending ProvideAnswer command to the peer device");
+
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideAnswer(sessionId, sdp);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to send Answer: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return err;
+}
+
+CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates command to the peer device");
 
@@ -179,11 +261,11 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t webRTCSessionID)
 
     auto ICECandidates = chip::app::DataModel::List<const chip::CharSpan>(candidateSpans.data(), candidateSpans.size());
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(webRTCSessionID, ICECandidates);
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, ICECandidates);
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Failed to send ProvideICECandidates: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Camera, "Failed to send ICE candidates: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
