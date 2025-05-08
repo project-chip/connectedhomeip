@@ -284,7 +284,7 @@ void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("OffEffect completed");
 
-    light->InitiateAction(actor, OFF_ACTION, NULL);
+    light->InitiateAction(actor, OFF_ACTION, nullptr);
 }
 
 void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
