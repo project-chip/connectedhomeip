@@ -767,13 +767,13 @@ private:
     Optional<VendorId> mJFAdminVendorId;
 
     Optional<ByteSpan> mJFAdminNOC;
-    Optional<uint16_t> mJFAdminNOCLen;
+    Optional<size_t> mJFAdminNOCLen;
 
     Optional<ByteSpan> mJFAdminICAC;
-    Optional<uint16_t> mJFAdminICACLen;
+    Optional<size_t> mJFAdminICACLen;
 
     Optional<ByteSpan> mJFAdminRCAC;
-    Optional<uint16_t> mJFAdminRCACLen;
+    Optional<size_t> mJFAdminRCACLen;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 };
 

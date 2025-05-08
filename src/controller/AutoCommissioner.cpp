@@ -39,11 +39,7 @@ AutoCommissioner::AutoCommissioner()
     SetCommissioningParameters(CommissioningParameters());
 }
 
-AutoCommissioner::~AutoCommissioner()
-{
-    ReleaseCertificate(&mPAI, &mPAILen);
-    ReleaseCertificate(&mDAC, &mDACLen);
-}
+AutoCommissioner::~AutoCommissioner() {}
 
 void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate)
 {
@@ -794,48 +790,71 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             if (mParams.GetExecuteJCM().ValueOr(false) &&
                 (mDeviceCommissioningInfo.JFAdministratorFabricIndex != kUndefinedFabricIndex))
             {
-                SaveCertificate(mDeviceCommissioningInfo.JFAdminNOC, &mJFAdminNOC, &mJFAdminNOCLen);
-                SaveCertificate(mDeviceCommissioningInfo.JFAdminICAC, &mJFAdminICAC, &mJFAdminICACLen);
-                SaveCertificate(mDeviceCommissioningInfo.JFAdminRCAC, &mJFAdminRCAC, &mJFAdminRCACLen);
-
-                if (mJFAdminNOC && mJFAdminICAC && mJFAdminRCAC)
+                if (!mJFAdminRCAC.Alloc(mDeviceCommissioningInfo.JFAdminRCAC.size()))
                 {
-                    mParams.SetJFAdminNOC(ByteSpan(mJFAdminNOC, mJFAdminNOCLen));
-                    mParams.SetJFAdminICAC(ByteSpan(mJFAdminICAC, mJFAdminICACLen));
-                    mParams.SetJFAdminRCAC(ByteSpan(mJFAdminRCAC, mJFAdminRCACLen));
-                }
-                else
-                {
-                    ChipLogError(Controller, "JCM: Error allocating space for Admin Certs!");
+                    ChipLogError(Controller, "AutoCommissioner: cannot allocate memory for mJFAdminRCAC");
                     return CHIP_ERROR_NO_MEMORY;
+                    ;
                 }
+                memcpy(mJFAdminRCAC.Get(), mDeviceCommissioningInfo.JFAdminRCAC.data(), mJFAdminRCAC.AllocatedSize());
+                mParams.SetJFAdminRCAC(ByteSpan(mJFAdminRCAC.Get(), mJFAdminRCAC.AllocatedSize()));
+
+                if (!mJFAdminICAC.Alloc(mDeviceCommissioningInfo.JFAdminICAC.size()))
+                {
+                    ChipLogError(Controller, "AutoCommissioner: cannot allocate memory for mJFAdminICAC");
+                    return CHIP_ERROR_NO_MEMORY;
+                    ;
+                }
+                memcpy(mJFAdminICAC.Get(), mDeviceCommissioningInfo.JFAdminICAC.data(), mJFAdminICAC.AllocatedSize());
+                mParams.SetJFAdminICAC(ByteSpan(mJFAdminICAC.Get(), mJFAdminICAC.AllocatedSize()));
+
+                if (!mJFAdminNOC.Alloc(mDeviceCommissioningInfo.JFAdminNOC.size()))
+                {
+                    ChipLogError(Controller, "AutoCommissioner: cannot allocate memory for mJFAdminNOC");
+                    return CHIP_ERROR_NO_MEMORY;
+                    ;
+                }
+                memcpy(mJFAdminNOC.Get(), mDeviceCommissioningInfo.JFAdminNOC.data(), mJFAdminNOC.AllocatedSize());
+                mParams.SetJFAdminNOC(ByteSpan(mJFAdminNOC.Get(), mJFAdminNOC.AllocatedSize()));
 
                 mParams.SetJFAdminEndpointId(mDeviceCommissioningInfo.JFAdminEndpointId)
                     .SetJFAdministratorFabricIndex(mDeviceCommissioningInfo.JFAdministratorFabricIndex)
                     .SetJFAdminFabricId(mDeviceCommissioningInfo.JFAdminFabricTable.fabricId)
                     .SetJFAdminVendorId(mDeviceCommissioningInfo.JFAdminFabricTable.vendorId);
             }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
             break;
         }
         case CommissioningStage::kConfigureTimeZone:
             mNeedsDST = report.Get<TimeZoneResponseInfo>().requiresDSTOffsets;
             break;
-        case CommissioningStage::kSendPAICertificateRequest:
-            SaveCertificate(report.Get<RequestedCertificate>().certificate, &mPAI, &mPAILen);
-            if (mPAI != nullptr)
+        case CommissioningStage::kSendPAICertificateRequest: {
+            auto reportPAISpan = report.Get<RequestedCertificate>().certificate;
+
+            if (!mPAI.Alloc(reportPAISpan.size()))
             {
-                mParams.SetPAI(ByteSpan(mPAI, mPAILen));
+                ChipLogError(Controller, "AutoCommissioner cannot allocate memory for mPAI");
+                return CHIP_ERROR_NO_MEMORY;
             }
+
+            memcpy(mPAI.Get(), reportPAISpan.data(), mPAI.AllocatedSize());
+            mParams.SetPAI(ByteSpan(mPAI.Get(), mPAI.AllocatedSize()));
             break;
-        case CommissioningStage::kSendDACCertificateRequest:
-            SaveCertificate(report.Get<RequestedCertificate>().certificate, &mDAC, &mDACLen);
-            if (mDAC != nullptr)
+        }
+        case CommissioningStage::kSendDACCertificateRequest: {
+            auto reportDACSpan = report.Get<RequestedCertificate>().certificate;
+
+            if (!mDAC.Alloc(reportDACSpan.size()))
             {
-                mParams.SetDAC(ByteSpan(mDAC, mDACLen));
+                ChipLogError(Controller, "AutoCommissioner cannot allocate memory for mDAC");
+                return CHIP_ERROR_NO_MEMORY;
             }
+
+            memcpy(mDAC.Get(), reportDACSpan.data(), mDAC.AllocatedSize());
+            mParams.SetDAC(ByteSpan(mDAC.Get(), mDAC.AllocatedSize()));
             break;
+        }
         case CommissioningStage::kSendAttestationRequest: {
             auto & elements  = report.Get<AttestationResponse>().attestationElements;
             auto & signature = report.Get<AttestationResponse>().signature;
@@ -901,8 +920,13 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             {
                 ResetTryingSecondaryNetwork();
             }
-            ReleaseCertificate(&mPAI, &mPAILen);
-            ReleaseCertificate(&mDAC, &mDACLen);
+            mPAI.Free();
+            mDAC.Free();
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+            mJFAdminRCAC.Free();
+            mJFAdminICAC.Free();
+            mJFAdminNOC.Free();
+#endif
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = OperationalDeviceProxy();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
@@ -973,42 +997,6 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(proxy, nextStage));
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AutoCommissioner::SaveCertificate(ByteSpan inCertSpan, uint8_t ** outCert, uint16_t * outCertSize)
-{
-    if ((inCertSpan.size() > Credentials::kMaxDERCertLength) || !(CanCastTo<uint16_t>(inCertSpan.size())))
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    if (*outCertSize > 0)
-    {
-        Platform::MemoryFree(*outCert);
-        *outCertSize = 0;
-    }
-
-    *outCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(inCertSpan.size()));
-    if (!(*outCert))
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    *outCertSize = static_cast<uint16_t>(inCertSpan.size());
-    memcpy(*outCert, inCertSpan.data(), inCertSpan.size());
-
-    return CHIP_NO_ERROR;
-}
-
-void AutoCommissioner::ReleaseCertificate(uint8_t ** cert, uint16_t * certSize)
-{
-    if (*cert != nullptr)
-    {
-        chip::Platform::MemoryFree(*cert);
-    }
-
-    *certSize = 0;
-    *cert     = nullptr;
 }
 
 } // namespace Controller

@@ -66,11 +66,8 @@ private:
     // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set
     void SetCASEFailsafeTimerIfNeeded();
 
-    CHIP_ERROR SaveCertificate(ByteSpan inCertSpan, uint8_t ** outCert, uint16_t * outCertSize);
-    void ReleaseCertificate(uint8_t ** cert, uint16_t * certSize);
-
-    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
-    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+    ByteSpan GetDAC() const { return ByteSpan(mDAC.Get(), mDAC.AllocatedSize()); }
+    ByteSpan GetPAI() const { return ByteSpan(mPAI.Get(), mPAI.AllocatedSize()); }
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Crypto::IdentityProtectionKeySpan ipk,
                                  NodeId adminSubject);
@@ -150,10 +147,9 @@ private:
 
     bool mNeedIcdRegistration = false;
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
-    uint8_t * mDAC   = nullptr;
-    uint16_t mDACLen = 0;
-    uint8_t * mPAI   = nullptr;
-    uint16_t mPAILen = 0;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mDAC;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mPAI;
+
     uint8_t mAttestationNonce[kAttestationNonceLength];
     uint8_t mCSRNonce[kCSRNonceLength];
     uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
@@ -165,14 +161,9 @@ private:
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    uint8_t * mJFAdminRCAC   = nullptr;
-    uint16_t mJFAdminRCACLen = 0;
-
-    uint8_t * mJFAdminICAC   = nullptr;
-    uint16_t mJFAdminICACLen = 0;
-
-    uint8_t * mJFAdminNOC   = nullptr;
-    uint16_t mJFAdminNOCLen = 0;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminRCAC;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminICAC;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminNOC;
 #endif
 };
 } // namespace Controller
