@@ -291,6 +291,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        {
+            chef::pump::handleMoveToLevel(attributePath.mEndpointId, *value);
+        }
         // WIP Apply attribute change to Light
     }
 #ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
