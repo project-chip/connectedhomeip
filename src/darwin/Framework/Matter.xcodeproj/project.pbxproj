@@ -2352,7 +2352,7 @@
 				B20252922459E34F00F97062 /* Sources */,
 				B20252932459E34F00F97062 /* Frameworks */,
 				B20252942459E34F00F97062 /* Resources */,
-				51EBB35B2DC3F2DF00221AA1 /* ShellScript */,
+				51EBB35B2DC3F2DF00221AA1 /* Build Test Fixture Apps */,
 			);
 			buildRules = (
 			);
@@ -2443,7 +2443,7 @@
 			shellPath = /bin/sh;
 			shellScript = "./chip_xcode_build_connector.sh\n";
 		};
-		51EBB35B2DC3F2DF00221AA1 /* ShellScript */ = {
+		51EBB35B2DC3F2DF00221AA1 /* Build Test Fixture Apps */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -2453,13 +2453,14 @@
 			);
 			inputPaths = (
 			);
+			name = "Build Test Fixture Apps";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\n# The project dir is src/darwin/Framework\ncd ${PROJECT_DIR}/../../..\n\nscripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/all-clusters-app\nscripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app non_spec_compliant_ota_action_delay_floor=0\n";
+			shellScript = "set -e\n\nif [[ -n $CHIP_NO_TEST_FIXTURE_APPS ]]; then\n    echo \"Skipping because CHIP_NO_TEST_FIXTURE_APPS is set\"\n    exit 0\nfi\n\ncd \"$CHIP_ROOT\"\nscripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/all-clusters-app\nscripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app non_spec_compliant_ota_action_delay_floor=0\n";
 		};
 		9B7838562CFE3AE600FB04C4 /* Acquire git revision info */ = {
 			isa = PBXShellScriptBuildPhase;
