@@ -112,6 +112,7 @@ uint16_t getIndexLevelControl(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, LevelControl::Id, kLevelControlCount);
 }
+constexpr uint8_t kMaxLevel = 254;
 
 /**
  * @brief Maps the level (from LevelControl) to a setpoint value within range.
@@ -218,7 +219,7 @@ void handleOnOff(EndpointId endpoint, bool value)
             VerifyOrDieWithMsg(bool(gLevel[epIndex]), DeviceLayer, "Storage for current level on endpoint %d isn't initialized.",
                                endpoint);
             if ((*gLevel[epIndex]).IsNull())
-                (*gLevel[epIndex]).SetNonNull(255);
+                (*gLevel[epIndex]).SetNonNull(kMaxLevel);
             LevelControl::Attributes::CurrentLevel::Set(endpoint, *gLevel[epIndex]);
             MatterReportingAttributeChangeCallback(endpoint, LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id);
         }
