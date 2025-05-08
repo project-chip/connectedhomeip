@@ -36,8 +36,6 @@ jobs:
     test_suites_linux:
         name: Test Suites - Linux
 
-        if: github.actor != 'restyled-io[bot]'
-
         strategy:
             matrix:
                 build_variant: [no-ble-no-shell-tsan-clang]
@@ -464,6 +462,9 @@ jobs:
 
     repl_tests_linux:
         name: REPL Tests - Linux
+
+        if: github.actor != 'restyled-io[bot]'
+
         strategy:
           matrix:
             # TODO: ipv6only should be re-enabled ideally, however mDNS seems currently broken someone
