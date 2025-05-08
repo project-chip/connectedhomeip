@@ -107,12 +107,18 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
 
 // #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 constexpr size_t kLevelControlCount = MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
-std::unique_ptr<DataModel::Nullable<uint8_t>> gLevel[kLevelControlCount];
+
+// Level the device should upon receiving the On command. This will always be NULL when device is On. It is updated to the current
+// level when device goes from On to Off. When device goes from Off to On, current level is set to onLevel and onLevel is set to
+// NULL.
+std::unique_ptr<DataModel::Nullable<uint8_t>> onLevel[kLevelControlCount];
+
 uint16_t getIndexLevelControl(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, LevelControl::Id, kLevelControlCount);
 }
-constexpr uint8_t kMaxLevel = 254;
+constexpr uint8_t kMaxLevel  = 254;
+constexpr uint8_t kNullLevel = 255;
 
 /**
  * @brief Maps the level (from LevelControl) to a setpoint value within range.
@@ -168,22 +174,12 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
     // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 }
 
-void handleMoveToLevel(EndpointId endpoint, uint8_t level)
+/**
+ * @brief Post moveToLevel handler. Updates all setpoint values to match current level.
+ */
+void postMoveToLevel(EndpointId endpoint, uint8_t level)
 {
-    ChipLogDetail(DeviceLayer, "[chef-pump] Inside handleMoveToLevel");
-
-    bool onOff = false;
-    if (OnOff::Attributes::OnOff::Get(endpoint, &onOff) != Status::Success)
-    {
-        ChipLogError(DeviceLayer, "Failed to read onOff for Endpoint %d", endpoint);
-        return;
-    }
-
-    if (!onOff)
-    {
-        ChipLogDetail(DeviceLayer, "Device is Off. Returning.");
-        return;
-    }
+    ChipLogDetail(DeviceLayer, "[chef-pump] Inside handleMoveToLevel. level = %d", level);
 
     uint16_t epIndex = getIndexLevelControl(endpoint);
     if (epIndex >= kLevelControlCount)
@@ -192,39 +188,35 @@ void handleMoveToLevel(EndpointId endpoint, uint8_t level)
         return;
     }
 
-    VerifyOrDieWithMsg(bool(gLevel[epIndex]), DeviceLayer, "Storage for current level on endpoint %d isn't initialized.", endpoint);
-
-    if (level)
-        (*gLevel[epIndex]).SetNonNull(level);
+    if (level && level != kNullLevel)
+        updateSetPointsLevel(endpoint, DataModel::Nullable<uint8_t>(level));
     else
-        (*gLevel[epIndex]).SetNull();
-
-    updateSetPointsLevel(endpoint, *gLevel[epIndex]);
+        updateSetPointsLevel(endpoint, DataModel::NullNullable);
 }
 // #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 
 /**
- * @brief Handler when OnOff value has changed. Updates setpoints if LevelControl is disabled for endpoint. If LevelControl is
+ * @brief Post onOff change handler. Updates setpoints if LevelControl is disabled for endpoint. If LevelControl is
  * enabled, only level is updated, handleMoveToLevel should be called to update setponts.
  */
-void handleOnOff(EndpointId endpoint, bool value)
+void postOnOff(EndpointId endpoint, bool value)
 {
-    ChipLogDetail(DeviceLayer, "[chef-pump] Inside handleOnOff");
+    ChipLogDetail(DeviceLayer, "[chef-pump] Inside postOnOff. value: %d", value);
     // #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
     uint16_t epIndex = getIndexLevelControl(endpoint);
     if (epIndex < kLevelControlCount)
     {
-        if (value)
+        VerifyOrDieWithMsg(bool(onLevel[epIndex]), DeviceLayer, "Storage for onLevel on endpoint %d isn't initialized.", endpoint);
+        if (value) // Off to On
         {
-            VerifyOrDieWithMsg(bool(gLevel[epIndex]), DeviceLayer, "Storage for current level on endpoint %d isn't initialized.",
-                               endpoint);
-            if ((*gLevel[epIndex]).IsNull())
-                (*gLevel[epIndex]).SetNonNull(kMaxLevel);
-            ChipLogDetail(DeviceLayer, "Setting CurrentLevel at endpoint %d to %d", endpoint, (*gLevel[epIndex]).ValueOr(0));
-            LevelControl::Attributes::CurrentLevel::Set(endpoint, *gLevel[epIndex]);
+            auto target = (*onLevel[epIndex]).IsNull() ? DataModel::Nullable<uint8_t>(kMaxLevel) : *onLevel[epIndex];
+            ChipLogDetail(DeviceLayer, "Setting CurrentLevel at endpoint %d to %d", endpoint, target.ValueOr(kMaxLevel));
+            LevelControl::Attributes::CurrentLevel::Set(endpoint, target);
+            (*onLevel[epIndex]).SetNull();
         }
-        else
+        else // On to Off
         {
+            LevelControl::Attributes::CurrentLevel::Get(endpoint, *onLevel[epIndex]);
             LevelControl::Attributes::CurrentLevel::SetNull(endpoint);
         }
         MatterReportingAttributeChangeCallback(endpoint, LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id);
@@ -323,7 +315,7 @@ void Init()
         {
             VerifyOrDieWithMsg(LevelControl::Attributes::CurrentLevel::SetNull(endpointId) == Status::Success, DeviceLayer,
                                "Failed to initialize Current Level to NULL for Endpoint: %d", endpointId);
-            gLevel[epIndex] = std::make_unique<DataModel::Nullable<uint8_t>>(DataModel::NullNullable);
+            onLevel[epIndex] = std::make_unique<DataModel::Nullable<uint8_t>>(DataModel::NullNullable);
         }
         // #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 

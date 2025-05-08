@@ -283,7 +283,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
         if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
         {
-            chef::pump::handleOnOff(attributePath.mEndpointId, bool(*value));
+            chef::pump::postOnOff(attributePath.mEndpointId, bool(*value));
         }
     }
     else if (clusterId == LevelControl::Id)
@@ -293,7 +293,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
         if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
         {
-            chef::pump::handleMoveToLevel(attributePath.mEndpointId, *value);
+            chef::pump::postMoveToLevel(attributePath.mEndpointId, *value);
         }
         // WIP Apply attribute change to Light
     }
