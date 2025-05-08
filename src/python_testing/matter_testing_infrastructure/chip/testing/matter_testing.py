@@ -1105,8 +1105,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 app_pipe.write(json.dumps(command_dict) + "\n")
 
             # TODO(#31239): remove the need for sleep
-            # 20ms was tested with matter.js as being reliable enough
-            sleep(0.02)
+            # This was tested with matter.js as being reliable enough
+            sleep(0.05)
         else:
             logging.info(f"Using DUT IP address: {dut_ip}")
 
