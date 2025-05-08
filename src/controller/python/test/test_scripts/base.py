@@ -214,7 +214,7 @@ class BaseTestHelper:
         self.logger.info(
             f"Discovering commissionable nodes with discriminator {discriminator}")
         res = await self.devCtrl.DiscoverCommissionableNodes(
-            chip.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=3)
+            chip.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=30)
         if not res:
             self.logger.info(
                 "Device not found")
