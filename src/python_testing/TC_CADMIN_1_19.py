@@ -34,7 +34,7 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, run_with_error_check
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
@@ -76,6 +76,14 @@ class TC_CADMIN_1_19(MatterBaseTest):
 
     def pics_TC_CADMIN_1_19(self) -> list[str]:
         return ["CADMIN.S"]
+    
+    def assert_function(self, e):
+        # When attempting to create a new controller we are expected to get the following response:
+        # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
+        # Since the FabricTable is full and unable to create any new fabrics
+        self.print_step("Max number of fabrics", "reached")
+        asserts.assert_equal(e.err,  0x0000000B,
+                             "Expected to return table is full since max number of fabrics has been created already")
 
     @async_test_body
     async def test_TC_CADMIN_1_19(self):
@@ -135,19 +143,13 @@ class TC_CADMIN_1_19(MatterBaseTest):
         next_fabric = current_fabrics + 1
         fids_ca2 = self.certificate_authority_manager.NewCertificateAuthority(caIndex=next_fabric)
         fids_fa2 = fids_ca2.NewFabricAdmin(vendorId=0xFFF1, fabricId=next_fabric)
-        try:
-            fids2 = fids_fa2.NewController(nodeId=next_fabric)
-            await fids2.CommissionOnNetwork(
-                nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
 
-        except ChipStackError as e:
-            # When attempting to create a new controller we are expected to get the following response:
-            # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
-            # Since the FabricTable is full and unable to create any new fabrics
-            self.print_step("Max number of fabrics", "reached")
-            asserts.assert_equal(e.err,  0x0000000B,
-                                 "Expected to return table is full since max number of fabrics has been created already")
+        await run_with_error_check(
+            fids_fa2.NewController(nodeId=next_fabric).CommissionOnNetwork,
+            nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator,
+            exception_type=ChipStackError,
+            assert_func=lambda e: self.assert_function(e)
+        )
 
         self.step(8)
         for fab_idx in fabric_idxs:
