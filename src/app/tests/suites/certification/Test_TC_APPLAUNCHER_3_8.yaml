@@ -39,8 +39,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "step 1a: TH sends a LaunchApp command to DUT to launch and bring an application
-          to the foreground"
+    - label:
+          "step 1a: TH sends a LaunchApp command to DUT to launch and bring an
+          application to the foreground"
       PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:
