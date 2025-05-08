@@ -30,12 +30,9 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 
-// #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
-
 namespace chef {
 namespace pump {
 
-// #ifdef MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
 constexpr size_t kTemperatureMeasurementCount = MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT;
 DataModel::Nullable<int16_t> TemperatureRangeMin[kTemperatureMeasurementCount];
 DataModel::Nullable<int16_t> TemperatureRangeMax[kTemperatureMeasurementCount];
@@ -43,9 +40,7 @@ uint16_t getIndexTemperatureMeasurement(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, TemperatureMeasurement::Id, kTemperatureMeasurementCount);
 }
-// #endif // MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
 
-// #ifdef MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
 constexpr size_t kPressureMeasurementCount = MATTER_DM_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT;
 DataModel::Nullable<int16_t> PressureRangeMin[kPressureMeasurementCount];
 DataModel::Nullable<int16_t> PressureRangeMax[kPressureMeasurementCount];
@@ -53,9 +48,7 @@ uint16_t getIndexPressureMeasurement(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, PressureMeasurement::Id, kPressureMeasurementCount);
 }
-// #endif // MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
 
-// #ifdef MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 constexpr size_t kFlowMeasurementCount = MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT;
 DataModel::Nullable<uint16_t> FlowRangeMin[kFlowMeasurementCount];
 DataModel::Nullable<uint16_t> FlowRangeMax[kFlowMeasurementCount];
@@ -63,7 +56,6 @@ uint16_t getIndexFlowMeasurement(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, FlowMeasurement::Id, kFlowMeasurementCount);
 }
-// #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 
 /**
  * @brief Sets all setpoints to Max if state is On else NULL.
@@ -72,7 +64,6 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
 {
     uint16_t epIndex;
 
-    // #ifdef MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
     epIndex = getIndexTemperatureMeasurement(endpointId);
     if (epIndex < kTemperatureMeasurementCount)
     {
@@ -81,9 +72,7 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
-    // #endif // MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
 
-    // #ifdef MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
     epIndex = getIndexPressureMeasurement(endpointId);
     if (epIndex < kPressureMeasurementCount)
     {
@@ -92,9 +81,7 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
         MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
                                                PressureMeasurement::Attributes::MeasuredValue::Id);
     }
-    // #endif // MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
 
-    // #ifdef MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
     epIndex = getIndexFlowMeasurement(endpointId);
     if (epIndex < kFlowMeasurementCount)
     {
@@ -102,10 +89,8 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
         FlowMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedFlow);
         MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
     }
-    // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 }
 
-// #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 constexpr size_t kLevelControlCount = MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
 
 // Level the device should upon receiving the On command. This will always be NULL when device is On. It is updated to the current
@@ -140,7 +125,6 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
 {
     uint16_t epIndex;
 
-    // #ifdef MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
     epIndex = getIndexTemperatureMeasurement(endpointId);
     if (epIndex < kTemperatureMeasurementCount)
     {
@@ -150,9 +134,7 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
-    // #endif // MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
 
-    // #ifdef MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
     epIndex = getIndexPressureMeasurement(endpointId);
     if (epIndex < kPressureMeasurementCount)
     {
@@ -161,9 +143,7 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
         MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
                                                PressureMeasurement::Attributes::MeasuredValue::Id);
     }
-    // #endif // MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
 
-    // #ifdef MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
     epIndex = getIndexFlowMeasurement(endpointId);
     if (epIndex < kFlowMeasurementCount)
     {
@@ -171,7 +151,6 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
         FlowMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedFlow);
         MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
     }
-    // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 }
 
 /**
@@ -193,7 +172,6 @@ void postMoveToLevel(EndpointId endpoint, uint8_t level)
     else
         updateSetPointsLevel(endpoint, DataModel::NullNullable);
 }
-// #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 
 /**
  * @brief Post onOff change handler. Updates setpoints if LevelControl is disabled for endpoint. If LevelControl is
@@ -225,9 +203,6 @@ void postOnOff(EndpointId endpoint, bool value)
     {
         updateSetPointsOnOff(endpoint, value);
     }
-    // #else
-    // updateSetPointsOnOff(endpoint, value);
-    // #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 }
 
 void Init()
@@ -250,7 +225,6 @@ void Init()
 
         uint16_t epIndex;
 
-        // #ifdef MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
         epIndex = getIndexTemperatureMeasurement(endpointId);
         if (epIndex < kTemperatureMeasurementCount)
         {
@@ -269,9 +243,7 @@ void Init()
                 TemperatureRangeMax[epIndex].SetNonNull(40000);
             }
         }
-        // #endif // MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
 
-        // #ifdef MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
         epIndex = getIndexPressureMeasurement(endpointId);
         if (epIndex < kPressureMeasurementCount)
         {
@@ -288,9 +260,7 @@ void Init()
                 PressureRangeMax[epIndex].SetNonNull(10000);
             }
         }
-        // #endif // MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
 
-        // #ifdef MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
         epIndex = getIndexFlowMeasurement(endpointId);
         if (epIndex < kFlowMeasurementCount)
         {
@@ -307,9 +277,7 @@ void Init()
                 FlowRangeMax[epIndex].SetNonNull(10000);
             }
         }
-        // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 
-        // #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
         epIndex = getIndexLevelControl(endpointId);
         if (epIndex < kLevelControlCount)
         {
@@ -317,7 +285,6 @@ void Init()
                                "Failed to initialize Current Level to NULL for Endpoint: %d", endpointId);
             onLevel[epIndex] = std::make_unique<DataModel::Nullable<uint8_t>>(DataModel::NullNullable);
         }
-        // #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 
         VerifyOrDieWithMsg(OnOff::Attributes::OnOff::Set(endpointId, false) == Status::Success, DeviceLayer,
                            "Failed to initialize OnOff to false for Endpoint: %d", endpointId);
