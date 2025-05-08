@@ -31,34 +31,36 @@ namespace ClosureControl {
  */
 struct GenericOverallState : public Structs::OverallStateStruct::Type
 {
-    GenericOverallState(Optional<PositioningEnum> positioningValue       = NullOptional,
-                        Optional<LatchingEnum> latchingValue             = NullOptional,
-                        Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional,
-                        Optional<uint32_t> extraInfoValue                = NullOptional)
+    GenericOverallState(Optional<DataModel::Nullable<PositioningEnum>> positioningValue       = NullOptional,
+                        Optional<DataModel::Nullable<bool>> latchValue                        = NullOptional,
+                        Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speedValue = NullOptional,
+                        Optional<DataModel::Nullable<bool>> secureStateValue                  = NullOptional)
     {
-        Set(positioningValue, latchingValue, speedValue, extraInfoValue);
+        Set(positioningValue, latchValue, speedValue, secureStateValue);
     }
 
     GenericOverallState(const GenericOverallState & overallState) { *this = overallState; }
 
     GenericOverallState & operator=(const GenericOverallState & overallState)
     {
-        Set(overallState.positioning, overallState.latching, overallState.speed, overallState.extraInfo);
+        Set(overallState.positioning, overallState.latch, overallState.speed, overallState.secureState);
         return *this;
     }
 
-    void Set(Optional<PositioningEnum> positioningValue = NullOptional, Optional<LatchingEnum> latchingValue = NullOptional,
-             Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional, Optional<uint32_t> extraInfoValue = NullOptional)
+    void Set(Optional<DataModel::Nullable<PositioningEnum>> positioningValue       = NullOptional,
+             Optional<DataModel::Nullable<bool>> latchValue                        = NullOptional,
+             Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speedValue = NullOptional,
+             Optional<DataModel::Nullable<bool>> secureStateValue                  = NullOptional)
     {
         positioning = positioningValue;
-        latching    = latchingValue;
+        latch       = latchValue;
         speed       = speedValue;
-        extraInfo   = extraInfoValue;
+        secureState = secureStateValue;
     }
 
     bool operator==(const Structs::OverallStateStruct::Type & rhs) const
     {
-        return positioning == rhs.positioning && latching == rhs.latching && speed == rhs.speed && extraInfo == rhs.extraInfo;
+        return positioning == rhs.positioning && latch == rhs.latch && speed == rhs.speed && secureState == rhs.secureState;
     }
 };
 
@@ -67,32 +69,32 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
  */
 struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
 {
-    GenericOverallTarget(Optional<TagPositionEnum> tagPositionValue       = NullOptional,
-                         Optional<TagLatchEnum> tagLatchValue             = NullOptional,
+    GenericOverallTarget(Optional<TargetPositionEnum> targetPositionValue = NullOptional,
+                         Optional<bool> targetLatchValue                  = NullOptional,
                          Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
-        Set(tagPositionValue, tagLatchValue, speedValue);
+        Set(targetPositionValue, targetLatchValue, speedValue);
     }
 
     GenericOverallTarget(const GenericOverallTarget & overallTarget) { *this = overallTarget; }
 
     GenericOverallTarget & operator=(const GenericOverallTarget & overallTarget)
     {
-        Set(overallTarget.tagPosition, overallTarget.tagLatch, overallTarget.speed);
+        Set(overallTarget.position, overallTarget.latch, overallTarget.speed);
         return *this;
     }
 
-    void Set(Optional<TagPositionEnum> tagPositionValue = NullOptional, Optional<TagLatchEnum> tagLatchValue = NullOptional,
+    void Set(Optional<TargetPositionEnum> targetPositionValue = NullOptional, Optional<bool> targetLatchValue = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
-        tagPosition = tagPositionValue;
-        tagLatch    = tagLatchValue;
-        speed       = speedValue;
+        position = targetPositionValue;
+        latch    = targetLatchValue;
+        speed    = speedValue;
     }
 
     bool operator==(const Structs::OverallTargetStruct::Type & rhs) const
     {
-        return tagPosition == rhs.tagPosition && tagLatch == rhs.tagLatch && speed == rhs.speed;
+        return position == rhs.position && latch == rhs.latch && speed == rhs.speed;
     }
 };
 

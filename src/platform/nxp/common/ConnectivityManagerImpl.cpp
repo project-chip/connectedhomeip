@@ -552,10 +552,22 @@ void ConnectivityManagerImpl::BrHandleStateChange()
             DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
             chip::Dnssd::MakeHostName(mHostname, sizeof(mHostname), mac);
 
+            BrInitAppLock(LockThreadStack, UnlockThreadStack);
             BrInitPlatform(ThreadStackMgrImpl().OTInstance(), extNetIfPtr, thrNetIfPtr);
+            BrUpdateLwipThrIf();
             BrInitMdnsHost(mHostname);
         }
     }
+}
+
+void ConnectivityManagerImpl::LockThreadStack()
+{
+    ThreadStackMgrImpl().LockThreadStack();
+}
+
+void ConnectivityManagerImpl::UnlockThreadStack()
+{
+    ThreadStackMgrImpl().UnlockThreadStack();
 }
 
 Inet::InterfaceId ConnectivityManagerImpl::GetThreadInterface()

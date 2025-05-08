@@ -1006,7 +1006,7 @@ class ContentControlCluster(
     }
   }
 
-  suspend fun readBlockUnratedAttribute(): Boolean {
+  suspend fun readBlockUnratedAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 7u
 
     val attributePath =
@@ -1032,7 +1032,12 @@ class ContentControlCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -1076,9 +1081,14 @@ class ContentControlCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+          val decodedValue: Boolean? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getBoolean(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(BooleanSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)

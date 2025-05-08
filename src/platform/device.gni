@@ -23,9 +23,6 @@ declare_args() {
 
   # Substitute fake platform when building with chip_device_platform=auto.
   chip_fake_platform = false
-
-  # Include wifi-paf to commission the device or not
-  chip_device_config_enable_wifipaf = false
 }
 
 if (chip_device_platform == "auto") {
@@ -118,6 +115,14 @@ declare_args() {
   } else {
     chip_persist_subscriptions = false
   }
+}
+
+declare_args() {
+  # Include wifi-paf to commission the device or not
+  # This is a feature of Wi-Fi spec that it can be enabled if wifi is enabled
+  # and the supplicant can support.
+  chip_device_config_enable_wifipaf =
+      chip_enable_wifi && chip_device_platform == "linux"
 }
 
 declare_args() {

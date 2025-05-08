@@ -78,6 +78,7 @@ if (CONFIG_CHIP_LIB_SHELL)
 endif()
 
 target_sources(app PRIVATE
+    ${CHEF}/common/DeviceTypes.cpp
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
     ${CHEF}/common/chef-fan-control-manager.cpp
@@ -97,6 +98,8 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
     ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp
+    ${CHEF}/common/clusters/oven-cavity-operational-state/chef-oven-cavity-operational-state.cpp
+    ${CHEF}/common/clusters/oven-mode/chef-oven-mode.cpp
     ${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp
     ${CHEF}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp

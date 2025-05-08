@@ -70,13 +70,17 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <optionalConform/>
-      <constraint type="maxLength" value="12"/>
+      <constraint>
+        <maxLength value="12"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="LinkLocalAddress" type="ipv6adr">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

@@ -75,7 +75,7 @@ Davis, CA 95616, USA
       <features>
         <feature code="MNGD" name="MNGD">
           <optionalConform>
-            <attribute name="ManagedAclAllowed"/>
+            <condition name="ManagedAclAllowed"/>
           </optionalConform>
         </feature>
       </features>
@@ -116,7 +116,7 @@ Davis, CA 95616, USA
     <cluster id="0x0031" name="Network Commissioning" side="server">
       <mandatoryConform>
         <notTerm>
-          <attribute name="CustomNetworkConfig"/>
+          <condition name="CustomNetworkConfig"/>
         </notTerm>
       </mandatoryConform>
     </cluster>

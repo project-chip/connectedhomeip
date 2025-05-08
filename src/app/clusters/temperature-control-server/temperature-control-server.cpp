@@ -230,3 +230,8 @@ void MatterTemperatureControlPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
+
+void MatterTemperatureControlPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}

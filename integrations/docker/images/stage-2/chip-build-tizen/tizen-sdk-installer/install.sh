@@ -171,15 +171,24 @@ function install_tizen_sdk_common() {
     PKG_ARR=(
         "7.0-iot-things-add-ons_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
+
+    info "Installing Tizen Studio CLI..."
+
+    unzip -o '*.zip'
+    cp -rf data/* "$TIZEN_SDK_ROOT"
+
+    # Cleanup
+    rm -rf -- *
+
 }
 
 # Function for installing Tizen SDK (arm).
 function install_tizen_sdk_arm() {
 
-    TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
+    SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
 
     # Get toolchain
-    info "Downloading Tizen toolchain..."
+    info "Downloading Tizen ARM toolchain..."
 
     # Download
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
@@ -189,7 +198,7 @@ function install_tizen_sdk_arm() {
     download "$URL" "${PKG_ARR[@]}"
 
     # Get Tizen sysroot
-    info "Downloading Tizen sysroot..."
+    info "Downloading Tizen ARM sysroot..."
 
     # Base sysroot
     # Different versions of Tizen have different rootstrap versions
@@ -218,7 +227,7 @@ function install_tizen_sdk_arm() {
     # Unified packages
     URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/armv7l/"
     PKG_ARR=(
-        'app-core-common-*.rpm'
+        'app-core-common-*.armv7l.rpm'
         'aul-0*.armv7l.rpm'
         'aul-devel-*.armv7l.rpm'
         'bluetooth-frwk-0*.armv7l.rpm'
@@ -263,31 +272,34 @@ function install_tizen_sdk_arm() {
     PKG_ARR=()
     download "$URL" "${PKG_ARR[@]}"
 
-    # Install all
-    info "Installing Tizen SDK..."
+    info "Installing Tizen ARM SDK..."
 
     unzip -o '*.zip'
     cp -rf data/* "$TIZEN_SDK_ROOT"
 
     unrpm *.rpm
-    cp -rf lib usr "$TIZEN_SDK_SYSROOT"
+    cp -rf lib usr "$SYSROOT"
 
     # Make symbolic links relative
-    find "$TIZEN_SDK_SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do
+    find "$SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do
         ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
     done
 
-    ln -sf ../../lib/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib/libcap.so"
-    ln -sf openssl3.pc "$TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc"
+    ln -sf ../../lib/libcap.so.2 "$SYSROOT/usr/lib/libcap.so"
+    ln -sf openssl3.pc "$SYSROOT/usr/lib/pkgconfig/openssl.pc"
+
+    # Cleanup
+    rm -rf -- *
+
 }
 
 # Function for installing Tizen SDK (arm64).
 function install_tizen_sdk_arm64() {
 
-    TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core"
+    SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core"
 
     # Get toolchain
-    info "Downloading Tizen toolchain..."
+    info "Downloading Tizen ARM64 toolchain..."
 
     # Download
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
@@ -297,7 +309,7 @@ function install_tizen_sdk_arm64() {
     download "$URL" "${PKG_ARR[@]}"
 
     # Get Tizen sysroot
-    info "Downloading Tizen sysroot..."
+    info "Downloading Tizen ARM64 sysroot..."
 
     # Base sysroot
     # Different versions of Tizen have different rootstrap versions
@@ -326,7 +338,7 @@ function install_tizen_sdk_arm64() {
     # Unified packages
     URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/aarch64/"
     PKG_ARR=(
-        'app-core-common-*.rpm'
+        'app-core-common-*.aarch64.rpm'
         'aul-0*.aarch64.rpm'
         'aul-devel-*.aarch64.rpm'
         'bluetooth-frwk-0*.aarch64.rpm'
@@ -372,25 +384,31 @@ function install_tizen_sdk_arm64() {
     PKG_ARR=()
     download "$URL" "${PKG_ARR[@]}"
 
-    # Install all
-    info "Installing Tizen SDK..."
+    info "Installing Tizen ARM64 SDK..."
 
     unzip -o '*.zip'
     cp -rf data/* "$TIZEN_SDK_ROOT"
 
+    info "Installing Tizen ARM64 sysroot..."
+
     unrpm *.rpm
-    cp -rf lib64 usr "$TIZEN_SDK_SYSROOT"
+    cp -rf lib64 usr "$SYSROOT"
 
     # Make symbolic links relative
-    find "$TIZEN_SDK_SYSROOT/usr/lib64" -maxdepth 1 -type l | while IFS= read -r LNK; do
+    find "$SYSROOT/usr/lib64" -maxdepth 1 -type l | while IFS= read -r LNK; do
         ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
     done
 
-    ln -sf ../../lib64/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib64/libcap.so"
-    ln -sf openssl3.pc "$TIZEN_SDK_SYSROOT/usr/lib64/pkgconfig/openssl.pc"
+    ln -sf ../../lib64/libcap.so.2 "$SYSROOT/usr/lib64/libcap.so"
+    ln -sf openssl3.pc "$SYSROOT/usr/lib64/pkgconfig/openssl.pc"
+
+    # Cleanup
+    rm -rf -- *
+
 }
 
 function install_tizen_sdk_finalize() {
+
     # Install secret tool or not
     if ("$SECRET_TOOL"); then
         info "Overriding secret tool..."

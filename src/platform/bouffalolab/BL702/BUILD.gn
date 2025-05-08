@@ -72,6 +72,7 @@ static_library("BL702") {
   }
 
   deps = [
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/platform/logging:headers",
   ]

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2021-2023, 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +18,13 @@
 
 #pragma once
 
+#include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/core/OTAImageHeader.h>
 #include <map>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/OTAImageProcessor.h>
 #include <platform/nxp/common/ota/OTATlvProcessor.h>
-#include <src/app/clusters/ota-requestor/OTADownloader.h>
-#include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <src/include/platform/CHIPDeviceLayer.h>
-#include <src/include/platform/OTAImageProcessor.h>
 
 /*
  * OTA hooks that can be overwritten by application.
@@ -102,6 +102,11 @@ private:
      * Call AbortAction for all processors that were used
      */
     void AbortAllProcessors();
+
+    /**
+     * Called to reset all processors and revert all previously applied actions
+     */
+    void Cleanup();
 
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;

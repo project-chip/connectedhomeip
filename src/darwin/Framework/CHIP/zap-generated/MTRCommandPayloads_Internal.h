@@ -616,21 +616,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTROperationalCredentialsClusterSetVidVerificationStatementParams (InternalMethods)
+@interface MTROperationalCredentialsClusterSetVIDVerificationStatementParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTROperationalCredentialsClusterSignVidVerificationRequestParams (InternalMethods)
+@interface MTROperationalCredentialsClusterSignVIDVerificationRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTROperationalCredentialsClusterSignVidVerificationResponseParams (InternalMethods)
+@interface MTROperationalCredentialsClusterSignVIDVerificationResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -1048,33 +1048,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams (InternalMethods)
+@interface MTRCommodityPriceClusterGetDetailedPriceRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams (InternalMethods)
+@interface MTRCommodityPriceClusterGetDetailedPriceResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCommodityPriceClusterGetDetailedForecastRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams (InternalMethods)
+@interface MTRCommodityPriceClusterGetDetailedForecastResponseParams (InternalMethods)
 
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -1444,13 +1438,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClosureControlClusterConfigureFallbackParams (InternalMethods)
+@interface MTRClosureDimensionClusterSetTargetParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRClosureControlClusterCancelFallbackParams (InternalMethods)
+@interface MTRClosureDimensionClusterStepParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -2347,6 +2341,30 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRChimeClusterPlayChimeSoundParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCommodityTariffClusterGetTariffComponentParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCommodityTariffClusterGetTariffComponentResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityTariff::Commands::GetTariffComponentResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRCommodityTariffClusterGetDayEntryParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCommodityTariffClusterGetDayEntryResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityTariff::Commands::GetDayEntryResponse::DecodableType &)decodableStruct;
 
 @end
 

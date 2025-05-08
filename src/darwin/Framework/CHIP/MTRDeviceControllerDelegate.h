@@ -68,6 +68,8 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Exactly one of error and nodeID will be nil.
  *
  * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
+ *
+ * This selector will not be used if controller:commissioningComplete:nodeID:metrics: is supported.
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
@@ -81,6 +83,8 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
  *
  * The metrics object contains information corresponding to the commissioning session.
+ *
+ * If supported, this selector will be used in preference to controller:commissioningComplete:nodeID:.
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
@@ -111,6 +115,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Notify the delegate when the list of MTRDevice objects in memory has changed.
  */
 - (void)devicesChangedForController:(MTRDeviceController *)controller MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
+ * Notify the delegate that we have successfully communicated the network
+ * credentials to the device being commissioned and are about to tell it to join
+ * that network.  Note that for devices that are already on-network this
+ * notification will not happen.
+ */
+- (void)controller:(MTRDeviceController *)controller commissioneeHasReceivedNetworkCredentials:(NSNumber *)nodeID MTR_AVAILABLE(ios(18.5), macos(15.5), watchos(11.5), tvos(18.5));
 
 @end
 
