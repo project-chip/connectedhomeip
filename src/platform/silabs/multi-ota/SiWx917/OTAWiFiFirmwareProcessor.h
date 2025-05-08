@@ -36,19 +36,20 @@ class OTAWiFiFirmwareProcessor : public OTATlvProcessor
 public:
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
-    static constexpr size_t kAlignmentBytes = 64;
-    static constexpr size_t kBlockSize      = 1024;
 
 private:
-    uint8_t mFWchunktype = SL_FWUP_RPS_HEADER;
-    bool mReset          = false;
-    CHIP_ERROR ProcessInternal(ByteSpan & block) override;
-    CHIP_ERROR ProcessDescriptor(ByteSpan & block);
-    bool mDescriptorProcessed = false;
+    uint8_t mFWchunktype                    = SL_FWUP_RPS_HEADER;
+    bool mReset                             = false;
+    bool mDescriptorProcessed               = false;
+    static constexpr size_t kAlignmentBytes = 64;
+    static constexpr size_t kBlockSize      = 1024;
 
 #if SL_MATTER_ENABLE_OTA_ENCRYPTION
     uint32_t mUnalignmentNum;
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+
+    CHIP_ERROR ProcessInternal(ByteSpan & block) override;
+    CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 };
 
 } // namespace chip

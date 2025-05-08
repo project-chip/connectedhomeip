@@ -116,7 +116,7 @@ public:
     {
         uint32_t version;
         char versionString[kVersionStringSize] = { 0 };
-        char buildDate[kBuildDateSize] = { 0 };
+        char buildDate[kBuildDateSize]         = { 0 };
     };
     virtual ~OTATlvProcessor() {}
 

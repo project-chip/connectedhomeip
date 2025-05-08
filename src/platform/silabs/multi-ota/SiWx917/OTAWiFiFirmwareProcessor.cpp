@@ -34,7 +34,7 @@ namespace chip {
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
-    int32_t status = SL_STATUS_OK;
+    sl_status_t status = SL_STATUS_OK;
     // Store the header of the OTA file
     static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
     // Used to transfer other block to processor
@@ -88,21 +88,10 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
         memcpy(&writeDataBuffer, block.data(), block.size());
         // Send RPS content
         status = sl_si91x_fwup_load(writeDataBuffer, block.size());
-        if (status != SL_STATUS_OK)
-        {
-            // When TA received all the blocks it will return SL_STATUS_SI91X_FW_UPDATE_DONE status
-            if (status == SL_STATUS_SI91X_FW_UPDATE_DONE)
-            {
-                mReset = true;
-            }
-            else
-            {
-                ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error %ld", status);
-                return CHIP_ERROR_CANCELLED;
-            }
-        }
+        // When TA received all the blocks it will return SL_STATUS_SI91X_FW_UPDATE_DONE status
+        VerifyOrReturnError(status == SL_STATUS_OK || status == SL_STATUS_SI91X_FW_UPDATE_DONE, CHIP_ERROR_INTERNAL,
+                            ChipLogError(SoftwareUpdate, "sl_si91x_fwup_load() failed  0x%lx", static_cast<uint32_t>(status)));
     }
-
     return CHIP_NO_ERROR;
 }
 
@@ -117,16 +106,14 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
+CHIP_ERROR OTAWiFiFirmwareProcessor::FinalizeAction()
 {
-    ChipLogProgress(SoftwareUpdate, "OTAWiFiFirmwareProcessor::ApplyAction called");
-    mReset = true;
-    ChipLogProgress(SoftwareUpdate, "mReset set to: %d", mReset);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAWiFiFirmwareProcessor::FinalizeAction()
+CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
 {
+    mReset = true;
     return CHIP_NO_ERROR;
 }
 
