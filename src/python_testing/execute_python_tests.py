@@ -50,7 +50,7 @@ def load_env_from_yaml(file_path):
 @click.option(
     "--search-directory",
     type=str,
-    defaut="src/python_testing",
+    default="src/python_testing",
     help="Directory to search for Python scripts.",
 )
 @click.option(
