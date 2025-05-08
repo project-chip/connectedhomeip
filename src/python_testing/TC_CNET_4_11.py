@@ -37,11 +37,13 @@
 import asyncio
 import logging
 import subprocess
-import time
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+# from controller.python import chip
+from chip.testing.matter_testing import MatterStackState, MatterTestConfig
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -60,7 +62,6 @@ async def connect_host_wifi(ssid, passphrase, max_retries):
             logger.info(f" --- connect_host_wifi: networksetup return_code: {conn.returncode}")
             if conn.returncode == 0:
                 logger.info(f" --- connect_host_wifi: Connected to {ssid}")
-                # time.sleep(60)
                 # await asyncio.sleep(60)
                 break
         except subprocess.CalledProcessError as e:
@@ -74,7 +75,7 @@ async def change_networks(object, controller, node_id, cluster, ssid, passphrase
     # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
     # so they loose connection between each other. Thus, ConnectNetwork throws an exception
     try:
-        # Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.value = 60
+        Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.value = 60
         # Clusters.BasicInformation.Attributes.CapabilityMinima = 5
         await object.send_single_cmd(
             cmd=cluster.Commands.ConnectNetwork(
@@ -93,32 +94,10 @@ async def change_networks(object, controller, node_id, cluster, ssid, passphrase
         timeout=60
     )
 
-    # await asyncio.wait_for(
-    #     controller.Commission(node_id),
-    #     timeout=120
-    # )
-
-    # await asyncio.sleep(60)
-    # Close previous session
-
-    # await controller.ShutdownAllSessions()
-    # # Wait for new mDNS announce
-    # devices = await asyncio.wait_for(
-    #     controller.ReDiscoverCommissionableNodes(),
-    #     timeout=60
-    # )
-    # if devices:
-    #     logger.info(f" --- change_networks: Devices found: {[d.instance_name for d in devices]}")
-    # # Try to force CASESession if needed
-    # device = await asyncio.wait_for(
-    #     controller.GetConnectedDevice(node_id),
-    #     timeout=60
-    # )
-    # if device:
-    #     logger.info(f" --- change_networks: Reconnected to device: {device.GetDeviceId()}")
-
     # This time ConnectNetwork will return normally
     try:
+        # Let's give the DUT a couple of seconds to finish changing networks
+        await asyncio.sleep(10)
         err = await asyncio.wait_for(
             object.send_single_cmd(
                 cmd=cluster.Commands.ConnectNetwork(
@@ -312,16 +291,19 @@ class TC_CNET_4_11(MatterBaseTest):
                               passphrase=wifi_2nd_ap_credentials.encode(),
                               breadcrumb=2
                               )
-        logger.info(" --- Step 7: Waiting 10 seconds for DUT to switch networks")
-        await asyncio.sleep(10)
+        # logger.info(" --- Step 7: Waiting 10 seconds for DUT to switch networks")
+        # await asyncio.sleep(10)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
         self.step(9)
 
         # Verify that the TH successfully connects to the DUT
-        networks = await self.read_single_attribute_check_success(
-            cluster=cnet,
-            attribute=cnet.Attributes.Networks
+        networks = await asyncio.wait_for(
+            self.read_single_attribute_check_success(
+                cluster=cnet,
+                attribute=cnet.Attributes.Networks
+            ),
+            timeout=60
         )
         logger.info(f" --- Step 9: networks: {networks}")
         for idx, network in enumerate(networks):
@@ -371,17 +353,33 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(13)
 
         try:
-            networks = await self.read_single_attribute_check_success(
-                cluster=cnet,
-                attribute=cnet.Attributes.Networks
+            networks = await asyncio.wait_for(
+                self.read_single_attribute_check_success(
+                    cluster=cnet,
+                    attribute=cnet.Attributes.Networks
+                ),
+                timeout=60
             )
+        # except chip.exceptions.ChipStackError as e:
         except Exception as e:
             logger.error(f" --- Step 13: Exception reading networks: {e}")
-            logger.info(f" --- Step 13: Connecting host back to: {wifi_1st_ap_ssid}")
-            # connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials, max_retries=4)
-            networks = await self.read_single_attribute_check_success(
-                cluster=cnet,
-                attribute=cnet.Attributes.Networks
+            # # CASESession is lost, force establishing a new CASE session by closing it
+            # self.config = MatterTestConfig()
+            # self.stack = MatterStackState(self.config)
+            # devCtrl = self.stack.certificate_authorities[0].adminList[0].NewController(
+            #     nodeId=self.config.controller_node_id,
+            #     paaTrustStorePath=str(self.config.paa_trust_store_path),
+            #     catTags=self.config.controller_cat_tags
+            # )
+            # devCtrl.MarkSessionDefunct(self.dut_node_id)
+            await asyncio.sleep(10)
+            logger.info(" --- Step 13: Reading networks after establishing a new CASE session")
+            networks = await asyncio.wait_for(
+                self.read_single_attribute_check_success(
+                    cluster=cnet,
+                    attribute=cnet.Attributes.Networks
+                ),
+                timeout=60
             )
 
         logger.info(f" --- Step 13: networks: {networks}")
@@ -449,8 +447,8 @@ class TC_CNET_4_11(MatterBaseTest):
                               ssid=wifi_2nd_ap_ssid.encode(),
                               passphrase=wifi_2nd_ap_credentials.encode(),
                               breadcrumb=3)
-        logger.info(" --- Step 17: Waiting 10 seconds for DUT to switch networks")
-        await asyncio.sleep(10)
+        # # logger.info(" --- Step 17: Waiting 10 seconds for DUT to switch networks")
+        # await asyncio.sleep(10)
 
         # TODO: same as step 8, remove from here and from spec
         # TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
@@ -462,19 +460,27 @@ class TC_CNET_4_11(MatterBaseTest):
         # Verify that the TH successfully connects to the DUT
 
         try:
-            networks = await self.read_single_attribute_check_success(
-                cluster=cnet,
-                attribute=cnet.Attributes.Networks
+            networks = await asyncio.wait_for(
+                self.read_single_attribute_check_success(
+                    cluster=cnet,
+                    attribute=cnet.Attributes.Networks
+                ),
+                timeout=60
             )
         except Exception as e:
             logger.error(f" --- Step 19: Exception reading networks: {e}")
-            logger.info(f" --- Step 19: Connecting host back to: {wifi_2nd_ap_ssid}")
-            await asyncio.wait_for(
-                connect_host_wifi(wifi_2nd_ap_ssid, wifi_2nd_ap_credentials, max_retries=4),
-                timeout=60)
-            networks = await self.read_single_attribute_check_success(
-                cluster=cnet,
-                attribute=cnet.Attributes.Networks
+            # logger.info(f" --- Step 19: Connecting host back to: {wifi_2nd_ap_ssid}")
+            # await asyncio.wait_for(
+            #     connect_host_wifi(wifi_2nd_ap_ssid, wifi_2nd_ap_credentials, max_retries=4),
+            #     timeout=60
+            # )
+            await asyncio.sleep(10)
+            networks = await asyncio.wait_for(
+                self.read_single_attribute_check_success(
+                    cluster=cnet,
+                    attribute=cnet.Attributes.Networks
+                ),
+                timeout=60
             )
 
         logger.info(f" --- Step 19: networks: {networks}")
@@ -487,9 +493,12 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(20)
 
-        breadcrumb = await self.read_single_attribute_check_success(
-            cluster=cgen,
-            attribute=cgen.Attributes.Breadcrumb
+        breadcrumb = await asyncio.wait_for(
+            self.read_single_attribute_check_success(
+                cluster=cgen,
+                attribute=cgen.Attributes.Breadcrumb
+            ),
+            timeout=60
         )
         # Verify that the breadcrumb value is set to 3
         asserts.assert_equal(breadcrumb, 3, f"Expected breadcrumb to be 3, but got: {breadcrumb}")
@@ -510,9 +519,12 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(22)
 
         # Verify that the Networks attribute list has an entry with the following fields:
-        networks = await self.read_single_attribute_check_success(
-            cluster=cnet,
-            attribute=cnet.Attributes.Networks
+        networks = await asyncio.wait_for(
+            self.read_single_attribute_check_success(
+                cluster=cnet,
+                attribute=cnet.Attributes.Networks
+            ),
+            timeout=60
         )
         logger.info(f" --- Step 22: networks: {networks}")
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
