@@ -16,6 +16,12 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
+  <struct name="DeviceTypeStruct">
+    <cluster code="0x0750"/>
+    <item fieldId="0" name="DeviceType" type="devtype_id"/>
+    <item fieldId="1" name="Revision" type="int16u" min="1"/>
+  </struct>
+
   <struct name="EcosystemDeviceStruct" isFabricScoped="true">
     <cluster code="0x0750"/>
     <item fieldId="0" name="DeviceName" type="char_string" optional="true" isFabricSensitive="true" length="64"/>

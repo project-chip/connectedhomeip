@@ -117,6 +117,7 @@
         "SERVICE_AREA_CLUSTER": [],
         "SMOKE_CO_ALARM_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": [],
+        "SOIL_MEASUREMENT_CLUSTER": [],
         "SWITCH_CLUSTER": [],
         "TARGET_NAVIGATOR_CLUSTER": [],
         "TEMPERATURE_CONTROL_CLUSTER": [],
@@ -194,7 +195,7 @@
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
         "COMMODITY_METERING_CLUSTER": [],
-        "COMMODITY_PRICE_CLUSTER": [],
+        "COMMODITY_PRICE_CLUSTER": ["commodity-price-server"],
         "COMMODITY_TARIFF_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
         "CONTENT_CONTROL_CLUSTER": ["content-control-server"],
@@ -206,8 +207,10 @@
         "DIAGNOSTIC_LOGS_CLUSTER": ["diagnostic-logs-server"],
         "DISHWASHER_ALARM_CLUSTER": ["dishwasher-alarm-server"],
         "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
-        "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [],
-        "METER_IDENTIFICATION_CLUSTER": [],
+        "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
+            "electrical-grid-conditions-server"
+        ],
+        "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
         "ECOSYSTEM_INFORMATION_CLUSTER": ["ecosystem-information-server"],
@@ -308,6 +311,7 @@
         "SERVICE_AREA_CLUSTER": ["service-area-server"],
         "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
+        "SOIL_MEASUREMENT_CLUSTER": [],
         "SWITCH_CLUSTER": ["switch-server"],
         "TARGET_NAVIGATOR_CLUSTER": ["target-navigator-server"],
         "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
@@ -332,7 +336,7 @@
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "UNIT_LOCALIZATION_CLUSTER": [],
+        "UNIT_LOCALIZATION_CLUSTER": ["unit-localization-server"],
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],
         "VALVE_CONFIGURATION_AND_CONTROL_CLUSTER": [

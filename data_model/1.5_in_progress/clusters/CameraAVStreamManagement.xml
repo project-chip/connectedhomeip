@@ -188,6 +188,22 @@ Davis, CA 95616, USA
         <optionalConform/>
       </item>
     </enum>
+    <struct name="AVMetadataStruct">
+      <field id="1" name="UTCTime" type="DataTypeEpochUs">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MotionZonesActive" type="list">
+        <entry type="ZoneID"/>
+        <optionalConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="BlackAndWhiteActive" type="bool">
+        <optionalConform/>
+      </field>
+    </struct>
     <struct name="AudioCapabilitiesStruct">
       <field id="0" name="MaxNumberOfChannels" type="uint8">
         <mandatoryConform/>

@@ -73,21 +73,21 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Commands {
 namespace Pause {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = RvcOperationalState::Commands::Pause::Id,
+    .commandId       = Pause::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Pause
 namespace Resume {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = RvcOperationalState::Commands::Resume::Id,
+    .commandId       = Resume::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Resume
 namespace GoHome {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = RvcOperationalState::Commands::GoHome::Id,
+    .commandId       = GoHome::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

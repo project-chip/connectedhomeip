@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import ast
 import asyncio
 import time
 from abc import ABC, abstractmethod
@@ -171,6 +172,14 @@ class TestRunner(TestRunnerBase):
                 await self.stop()
             return status
 
+    def _get_arg_value(self, request, key_name: str):
+        if not hasattr(request, 'arguments'):
+            return None
+
+        for item in request.arguments.get('values', []):
+            if item.get('name') == key_name:
+                return item.get('value')
+
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
         status = True
         try:
@@ -188,14 +197,25 @@ class TestRunner(TestRunnerBase):
                     continue
                 elif config.pseudo_clusters.is_manual_step(request):
                     hooks.step_start(request)
-                    await hooks.step_manual()
+                    await hooks.step_manual(request)
                     continue
                 else:
                     hooks.step_start(request)
 
                 start = time.time()
                 if config.pseudo_clusters.supports(request):
-                    responses, logs = await config.pseudo_clusters.execute(request, parser.definitions)
+                    if request.command == "PromptWithResponse":
+                        prompt_msg = self._get_arg_value(request, "message")
+                        placeholder = self._get_arg_value(
+                            request, "placeHolder")
+                        response = await hooks.show_prompt(prompt_msg, placeholder)
+                        parseStr = self._get_arg_value(request, "parseStr")
+                        if parseStr is not None:
+                            response = ast.literal_eval(response)
+                        responses = {'value': {'responseValue': response}}
+                        logs = []
+                    else:
+                        responses, logs = await config.pseudo_clusters.execute(request, parser.definitions)
                 else:
                     encoded_request = config.adapter.encode(request)
                     encoded_response = await self.execute(encoded_request)

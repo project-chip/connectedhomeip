@@ -42,7 +42,6 @@ enum AreaTypeTag : enum8 {
   kGardenDoor = 37;
   kGuestBathroom = 38;
   kGuestBedroom = 39;
-  kGuestRestroom = 40;
   kGuestRoom = 41;
   kGym = 42;
   kHallway = 43;
@@ -50,7 +49,6 @@ enum AreaTypeTag : enum8 {
   kKidsRoom = 45;
   kKidsBedroom = 46;
   kKitchen = 47;
-  kLarder = 48;
   kLaundryRoom = 49;
   kLawn = 50;
   kLibrary = 51;
@@ -75,7 +73,6 @@ enum AreaTypeTag : enum8 {
   kRamp = 70;
   kReceptionRoom = 71;
   kRecreationRoom = 72;
-  kRestroom = 73;
   kRoof = 74;
   kSauna = 75;
   kScullery = 76;
@@ -97,39 +94,13 @@ enum AreaTypeTag : enum8 {
   kUtilityRoom = 92;
   kWard = 93;
   kWorkshop = 94;
+  kToilet = 95;
 }
 
 enum AtomicRequestTypeEnum : enum8 {
   kBeginWrite = 0;
   kCommitWrite = 1;
   kRollbackWrite = 2;
-}
-
-enum FloorSurfaceTag : enum8 {
-  kCarpet = 0;
-  kCeramic = 1;
-  kConcrete = 2;
-  kCork = 3;
-  kDeepCarpet = 4;
-  kDirt = 5;
-  kEngineeredWood = 6;
-  kGlass = 7;
-  kGrass = 8;
-  kHardwood = 9;
-  kLaminate = 10;
-  kLinoleum = 11;
-  kMat = 12;
-  kMetal = 13;
-  kPlastic = 14;
-  kPolishedConcrete = 15;
-  kRubber = 16;
-  kRug = 17;
-  kSand = 18;
-  kStone = 19;
-  kTatami = 20;
-  kTerrazzo = 21;
-  kTile = 22;
-  kVinyl = 23;
 }
 
 enum LandmarkTag : enum8 {
@@ -184,6 +155,34 @@ enum LandmarkTag : enum8 {
   kLaundryWasher = 48;
   kWindow = 49;
   kWineCooler = 50;
+}
+
+enum LocationTag : enum8 {
+  kIndoor = 0;
+  kOutdoor = 1;
+  kInside = 2;
+  kOutside = 3;
+}
+
+enum MeasurementTypeEnum : enum16 {
+  kUnspecified = 0;
+  kVoltage = 1;
+  kActiveCurrent = 2;
+  kReactiveCurrent = 3;
+  kApparentCurrent = 4;
+  kActivePower = 5;
+  kReactivePower = 6;
+  kApparentPower = 7;
+  kRMSVoltage = 8;
+  kRMSCurrent = 9;
+  kRMSPower = 10;
+  kFrequency = 11;
+  kPowerFactor = 12;
+  kNeutralCurrent = 13;
+  kElectricalEnergy = 14;
+  kReactiveEnergy = 15;
+  kApparentEnergy = 16;
+  kSoilMoisture = 17;
 }
 
 enum PositionTag : enum8 {
@@ -248,21 +247,33 @@ struct CurrencyStruct {
   int8u decimalPoints = 1;
 }
 
-struct PowerThresholdStruct {
-  optional power_mw powerThreshold = 0;
-  optional power_mva apparentPowerThreshold = 1;
-  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
-}
-
 struct PriceStruct {
   money amount = 0;
   CurrencyStruct currency = 1;
 }
 
-struct TestGlobalStruct {
-  char_string<128> name = 0;
-  nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+struct MeasurementAccuracyRangeStruct {
+  int64s rangeMin = 0;
+  int64s rangeMax = 1;
+  optional percent100ths percentMax = 2;
+  optional percent100ths percentMin = 3;
+  optional percent100ths percentTypical = 4;
+  optional int64u fixedMax = 5;
+  optional int64u fixedMin = 6;
+  optional int64u fixedTypical = 7;
+}
+
+struct MeasurementAccuracyStruct {
+  MeasurementTypeEnum measurementType = 0;
+  boolean measured = 1;
+  int64s minMeasuredValue = 2;
+  int64s maxMeasuredValue = 3;
+  MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
+}
+
+struct AtomicAttributeStatusStruct {
+  attrib_id attributeID = 0;
+  status statusCode = 1;
 }
 
 struct LocationDescriptorStruct {
@@ -271,9 +282,16 @@ struct LocationDescriptorStruct {
   nullable AreaTypeTag areaType = 2;
 }
 
-struct AtomicAttributeStatusStruct {
-  attrib_id attributeID = 0;
-  status statusCode = 1;
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -614,13 +632,13 @@ deprecated cluster PulseWidthModulation = 28 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
-  revision 2;
+  revision 3;
 
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -629,7 +647,7 @@ cluster Descriptor = 29 {
     nullable vendor_id mfgCode = 0;
     enum8 namespaceID = 1;
     enum8 tag = 2;
-    optional nullable char_string label = 3;
+    optional nullable char_string<64> label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -637,6 +655,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -647,7 +666,7 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -1286,7 +1305,7 @@ cluster TimeFormatLocalization = 44 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 cluster UnitLocalization = 45 {
-  revision 1;
+  revision 2;
 
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
@@ -1299,6 +1318,7 @@ cluster UnitLocalization = 45 {
   }
 
   attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3226,14 +3246,10 @@ cluster OvenCavityOperationalState = 72 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
-  command Pause(): OperationalCommandResponse = 0;
   /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
   command Stop(): OperationalCommandResponse = 1;
   /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
   command Start(): OperationalCommandResponse = 2;
-  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
-  command Resume(): OperationalCommandResponse = 3;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -3279,8 +3295,6 @@ cluster OvenMode = 73 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3294,11 +3308,10 @@ cluster OvenMode = 73 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3385,10 +3398,6 @@ cluster LaundryWasherMode = 81 {
     kWhites = 16387;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3402,8 +3411,6 @@ cluster LaundryWasherMode = 81 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3417,7 +3424,7 @@ cluster LaundryWasherMode = 81 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3444,10 +3451,6 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     kRapidFreeze = 16385;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3461,8 +3464,6 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3476,7 +3477,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3599,6 +3600,7 @@ cluster RvcCleanMode = 85 {
     kDeepClean = 16384;
     kVacuum = 16385;
     kMop = 16386;
+    kVacuumThenMop = 16387;
   }
 
   enum StatusCode : enum8 {
@@ -3721,10 +3723,6 @@ cluster DishwasherMode = 89 {
     kLight = 16386;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3738,8 +3736,6 @@ cluster DishwasherMode = 89 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3753,7 +3749,7 @@ cluster DishwasherMode = 89 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -3971,10 +3967,6 @@ cluster MicrowaveOvenMode = 94 {
     kDefrost = 16385;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -4123,6 +4115,13 @@ cluster RvcOperationalState = 97 {
     kWaterTankMissing = 69;
     kWaterTankLidOpen = 70;
     kMopCleaningPadMissing = 71;
+    kLowBattery = 72;
+    kCannotReachTargetArea = 73;
+    kDirtyWaterTankFull = 74;
+    kDirtyWaterTankMissing = 75;
+    kWheelsJammed = 76;
+    kBrushJammed = 77;
+    kNavigationSensorObscured = 78;
   }
 
   enum OperationalStateEnum : enum8 {
@@ -4133,6 +4132,10 @@ cluster RvcOperationalState = 97 {
     kSeekingCharger = 64;
     kCharging = 65;
     kDocked = 66;
+    kEmptyingDustBin = 67;
+    kCleaningMop = 68;
+    kFillingWaterTank = 69;
+    kUpdatingMaps = 70;
   }
 
   shared struct ErrorStateStruct {
@@ -4883,202 +4886,6 @@ provisional cluster CommodityPrice = 149 {
   command GetDetailedPriceRequest(GetDetailedPriceRequestRequest): GetDetailedPriceResponse = 0;
   /** Upon receipt, this SHALL generate a GetDetailedForecast Response command. */
   command GetDetailedForecastRequest(GetDetailedForecastRequestRequest): GetDetailedForecastResponse = 2;
-}
-
-/** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */
-provisional cluster DemandResponseLoadControl = 150 {
-  revision 4;
-
-  enum CriticalityLevelEnum : enum8 {
-    kUnknown = 0;
-    kGreen = 1;
-    kLevel1 = 2;
-    kLevel2 = 3;
-    kLevel3 = 4;
-    kLevel4 = 5;
-    kLevel5 = 6;
-    kEmergency = 7;
-    kPlannedOutage = 8;
-    kServiceDisconnect = 9;
-  }
-
-  enum HeatingSourceEnum : enum8 {
-    kAny = 0;
-    kElectric = 1;
-    kNonElectric = 2;
-  }
-
-  enum LoadControlEventChangeSourceEnum : enum8 {
-    kAutomatic = 0;
-    kUserAction = 1;
-  }
-
-  enum LoadControlEventStatusEnum : enum8 {
-    kUnknown = 0;
-    kReceived = 1;
-    kInProgress = 2;
-    kCompleted = 3;
-    kOptedOut = 4;
-    kOptedIn = 5;
-    kCanceled = 6;
-    kSuperseded = 7;
-    kPartialOptedOut = 8;
-    kPartialOptedIn = 9;
-    kNoParticipation = 10;
-    kUnavailable = 11;
-    kFailed = 12;
-  }
-
-  bitmap CancelControlBitmap : bitmap16 {
-    kRandomEnd = 0x1;
-  }
-
-  bitmap DeviceClassBitmap : bitmap32 {
-    kHVAC = 0x1;
-    kStripHeater = 0x2;
-    kWaterHeater = 0x4;
-    kPoolPump = 0x8;
-    kSmartAppliance = 0x10;
-    kIrrigationPump = 0x20;
-    kCommercialLoad = 0x40;
-    kResidentialLoad = 0x80;
-    kExteriorLighting = 0x100;
-    kInteriorLighting = 0x200;
-    kEV = 0x400;
-    kGenerationSystem = 0x800;
-    kSmartInverter = 0x1000;
-    kEVSE = 0x2000;
-    kRESU = 0x4000;
-    kEMS = 0x8000;
-    kSEM = 0x10000;
-  }
-
-  bitmap EventControlBitmap : bitmap16 {
-    kRandomStart = 0x1;
-  }
-
-  bitmap EventTransitionControlBitmap : bitmap16 {
-    kRandomDuration = 0x1;
-    kIgnoreOptOut = 0x2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kEnrollmentGroups = 0x1;
-    kTemperatureOffset = 0x2;
-    kTemperatureSetpoint = 0x4;
-    kLoadAdjustment = 0x8;
-    kDutyCycle = 0x10;
-    kPowerSavings = 0x20;
-    kHeatingSource = 0x40;
-  }
-
-  struct HeatingSourceControlStruct {
-    HeatingSourceEnum heatingSource = 0;
-  }
-
-  struct PowerSavingsControlStruct {
-    percent powerSavings = 0;
-  }
-
-  struct DutyCycleControlStruct {
-    percent dutyCycle = 0;
-  }
-
-  struct AverageLoadControlStruct {
-    int8s loadAdjustment = 0;
-  }
-
-  struct TemperatureControlStruct {
-    optional nullable int16u coolingTempOffset = 0;
-    optional nullable int16u heatingtTempOffset = 1;
-    optional nullable temperature coolingTempSetpoint = 2;
-    optional nullable temperature heatingTempSetpoint = 3;
-  }
-
-  struct LoadControlEventTransitionStruct {
-    int16u duration = 0;
-    EventTransitionControlBitmap control = 1;
-    optional TemperatureControlStruct temperatureControl = 2;
-    optional AverageLoadControlStruct averageLoadControl = 3;
-    optional DutyCycleControlStruct dutyCycleControl = 4;
-    optional PowerSavingsControlStruct powerSavingsControl = 5;
-    optional HeatingSourceControlStruct heatingSourceControl = 6;
-  }
-
-  struct LoadControlEventStruct {
-    octet_string<16> eventID = 0;
-    nullable octet_string<16> programID = 1;
-    EventControlBitmap control = 2;
-    DeviceClassBitmap deviceClass = 3;
-    optional int8u enrollmentGroup = 4;
-    CriticalityLevelEnum criticality = 5;
-    nullable epoch_s startTime = 6;
-    LoadControlEventTransitionStruct transitions[] = 7;
-  }
-
-  struct LoadControlProgramStruct {
-    octet_string<16> programID = 0;
-    long_char_string<32> name = 1;
-    nullable int8u enrollmentGroup = 2;
-    nullable int8u randomStartMinutes = 3;
-    nullable int8u randomDurationMinutes = 4;
-  }
-
-  info event LoadControlEventStatusChange = 0 {
-    octet_string eventID = 0;
-    nullable int8u transitionIndex = 1;
-    LoadControlEventStatusEnum status = 2;
-    CriticalityLevelEnum criticality = 3;
-    EventControlBitmap control = 4;
-    optional nullable TemperatureControlStruct temperatureControl = 5;
-    optional nullable AverageLoadControlStruct averageLoadControl = 6;
-    optional nullable DutyCycleControlStruct dutyCycleControl = 7;
-    optional nullable PowerSavingsControlStruct powerSavingsControl = 8;
-    optional nullable HeatingSourceControlStruct heatingSourceControl = 9;
-  }
-
-  readonly attribute LoadControlProgramStruct loadControlPrograms[] = 0;
-  readonly attribute int8u numberOfLoadControlPrograms = 1;
-  readonly attribute LoadControlEventStruct events[] = 2;
-  readonly attribute LoadControlEventStruct activeEvents[] = 3;
-  readonly attribute int8u numberOfEventsPerProgram = 4;
-  readonly attribute int8u numberOfTransitions = 5;
-  attribute access(write: manage) int8u defaultRandomStart = 6;
-  attribute access(write: manage) int8u defaultRandomDuration = 7;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct RegisterLoadControlProgramRequestRequest {
-    LoadControlProgramStruct loadControlProgram = 0;
-  }
-
-  request struct UnregisterLoadControlProgramRequestRequest {
-    octet_string<16> loadControlProgramID = 0;
-  }
-
-  request struct AddLoadControlEventRequestRequest {
-    LoadControlEventStruct event = 0;
-  }
-
-  request struct RemoveLoadControlEventRequestRequest {
-    octet_string<16> eventID = 0;
-    CancelControlBitmap cancelControl = 1;
-  }
-
-  /** Upon receipt, this SHALL insert a new LoadControlProgramStruct into LoadControlPrograms, or if the ProgramID matches an existing LoadControlProgramStruct, then the provider SHALL be updated with the provided values. */
-  command RegisterLoadControlProgramRequest(RegisterLoadControlProgramRequestRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL remove a the LoadControlProgramStruct from LoadControlPrograms with the matching ProgramID. */
-  command UnregisterLoadControlProgramRequest(UnregisterLoadControlProgramRequestRequest): DefaultSuccess = 1;
-  /** On receipt of the AddLoadControlEventsRequest command, the server SHALL add a load control event. */
-  command AddLoadControlEventRequest(AddLoadControlEventRequestRequest): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL remove the LoadControlEventStruct with the matching EventID from LoadEventPrograms. */
-  command RemoveLoadControlEventRequest(RemoveLoadControlEventRequestRequest): DefaultSuccess = 3;
-  /** Upon receipt, this SHALL clear all the load control events. */
-  command ClearLoadControlEventsRequest(): DefaultSuccess = 4;
 }
 
 /** This cluster provides an interface for passing messages to be presented by a device. */
@@ -8674,6 +8481,20 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface to soil measurement functionality, including configuration and provision of notifications of soil measurements. */
+provisional cluster SoilMeasurement = 1072 {
+  revision 1;
+
+  readonly attribute MeasurementAccuracyStruct soilMoistureMeasurementLimits = 0;
+  readonly attribute nullable percent soilMoistureMeasuredValue = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Functionality to retrieve operational information about a managed Wi-Fi network. */
 cluster WiFiNetworkManagement = 1105 {
   revision 1;
@@ -9735,7 +9556,7 @@ provisional cluster ContentControl = 1295 {
   readonly attribute optional char_string<8> scheduledContentRatingThreshold = 4;
   readonly attribute optional elapsed_s screenDailyTime = 5;
   readonly attribute optional elapsed_s remainingScreenTime = 6;
-  readonly attribute boolean blockUnrated = 7;
+  readonly attribute optional boolean blockUnrated = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -9992,6 +9813,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kOnScreenDisplay = 0x80;
     kLocalStorage = 0x100;
     kHighDynamicRange = 0x200;
+    kNightVision = 0x400;
   }
 
   struct VideoResolutionStruct {
@@ -10026,6 +9848,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int8u referenceCount = 6;
     boolean encodedPixels = 7;
     boolean hardwareEncoder = 8;
+    optional boolean watermarkEnabled = 9;
+    optional boolean OSDEnabled = 10;
   }
 
   struct SnapshotCapabilitiesStruct {
@@ -10077,7 +9901,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
-  readonly attribute optional boolean nightVisionCapable = 3;
+  readonly attribute optional boolean nightVisionUsesInfrared = 3;
   readonly attribute optional VideoResolutionStruct minViewport = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
   readonly attribute int32u maxContentBufferSize = 6;
@@ -10536,7 +10360,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
 }
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
-cluster PushAvStreamTransport = 1365 {
+provisional cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum ContainerFormatEnum : enum8 {
@@ -10548,19 +10372,13 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kAllocationNotPermitted = 2;
-    kInvalidTLSEndpoint = 3;
-    kInvalidStream = 4;
-    kInvalidURL = 5;
-    kInvalidZone = 6;
-    kUnsupportedContainerFormat = 7;
-    kUnsupportedIngestMethod = 8;
-    kInvalidTriggerType = 9;
-    kInvalidTransportStatus = 16;
-  }
-
-  enum StreamMultiplexingEnum : enum8 {
-    kInterleaved = 0;
+    kInvalidTLSEndpoint = 2;
+    kInvalidStream = 3;
+    kInvalidURL = 4;
+    kInvalidZone = 5;
+    kInvalidCombination = 6;
+    kInvalidTriggerType = 7;
+    kInvalidTransportStatus = 8;
   }
 
   shared enum StreamUsageEnum : enum8 {
@@ -10589,14 +10407,7 @@ cluster PushAvStreamTransport = 1365 {
 
   bitmap Feature : bitmap32 {
     kPerZoneSensitivity = 0x1;
-  }
-
-  bitmap SupportedContainerFormatsBitmap : bitmap8 {
-    kCMAF = 0x1;
-  }
-
-  bitmap SupportedIngestMethodsBitmap : bitmap8 {
-    kCMAFIngest = 0x1;
+    kMetadata = 0x2;
   }
 
   struct TransportMotionTriggerTimeControlStruct {
@@ -10607,14 +10418,8 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   struct TransportZoneOptionsStruct {
-    nullable int16u zone = 1;
-    optional int8u sensitivity = 2;
-  }
-
-  struct MetadataOptionsStruct {
-    StreamMultiplexingEnum multiplexing = 0;
-    boolean includeMotionZones = 1;
-    boolean enableMetadataPrivacySensitive = 2;
+    nullable int16u zone = 0;
+    optional int8u sensitivity = 1;
   }
 
   struct TransportTriggerOptionsStruct {
@@ -10627,7 +10432,9 @@ cluster PushAvStreamTransport = 1365 {
 
   struct CMAFContainerOptionsStruct {
     int16u chunkDuration = 0;
-    optional octet_string CENCKey = 1;
+    optional octet_string<16> CENCKey = 1;
+    optional boolean metadataEnabled = 2;
+    optional octet_string<16> CENCKeyID = 3;
   }
 
   struct ContainerOptionsStruct {
@@ -10637,22 +10444,25 @@ cluster PushAvStreamTransport = 1365 {
 
   struct TransportOptionsStruct {
     StreamUsageEnum streamUsage = 0;
-    optional int16u videoStreamID = 1;
-    optional int16u audioStreamID = 2;
+    optional nullable int16u videoStreamID = 1;
+    optional nullable int16u audioStreamID = 2;
     int16u endpointID = 3;
     long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
-    ContainerFormatEnum containerFormat = 7;
-    ContainerOptionsStruct containerOptions = 8;
-    optional MetadataOptionsStruct metadataOptions = 9;
-    optional epoch_s expiryTime = 10;
+    ContainerOptionsStruct containerOptions = 7;
+    optional epoch_s expiryTime = 8;
   }
 
   struct TransportConfigurationStruct {
     int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
-    TransportOptionsStruct transportOptions = 2;
+    optional TransportOptionsStruct transportOptions = 2;
+  }
+
+  struct SupportedFormatStruct {
+    ContainerFormatEnum containerFormat = 0;
+    IngestMethodsEnum ingestMethod = 1;
   }
 
   info event PushTransportBegin = 0 {
@@ -10667,9 +10477,8 @@ cluster PushAvStreamTransport = 1365 {
     optional TriggerActivationReasonEnum activationReason = 2;
   }
 
-  readonly attribute SupportedContainerFormatsBitmap supportedContainerFormats = 0;
-  readonly attribute SupportedIngestMethodsBitmap supportedIngestMethods = 1;
-  readonly attribute int16u currentConnections[] = 2;
+  readonly attribute SupportedFormatStruct supportedFormats[] = 0;
+  readonly attribute TransportConfigurationStruct currentConnections[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -10682,9 +10491,7 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   response struct AllocatePushTransportResponse = 1 {
-    int16u connectionID = 0;
-    TransportOptionsStruct transportOptions = 1;
-    TransportStatusEnum transportStatus = 2;
+    TransportConfigurationStruct transportConfiguration = 0;
   }
 
   request struct DeallocatePushTransportRequest {
@@ -10697,7 +10504,7 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   request struct SetTransportStatusRequest {
-    int16u connectionID = 0;
+    nullable int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
   }
 
@@ -10712,21 +10519,21 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   response struct FindTransportResponse = 7 {
-    TransportConfigurationStruct streamConfigurations[] = 0;
+    TransportConfigurationStruct transportConfigurations[] = 0;
   }
 
   /** This command SHALL allocate a transport and return a PushTransportConnectionID. */
-  command access(invoke: manage) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
+  fabric command access(invoke: manage) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
   /** This command SHALL be generated to request the Node deallocates the specified transport. */
-  command access(invoke: manage) DeallocatePushTransport(DeallocatePushTransportRequest): DefaultSuccess = 2;
+  fabric command access(invoke: manage) DeallocatePushTransport(DeallocatePushTransportRequest): DefaultSuccess = 2;
   /** This command is used to request the Node modifies the configuration of the specified push transport. */
-  command access(invoke: manage) ModifyPushTransport(ModifyPushTransportRequest): DefaultSuccess = 3;
-  /** This command SHALL be generated to request the Node modifies the Transport Status of the transport. */
-  command access(invoke: manage) SetTransportStatus(SetTransportStatusRequest): DefaultSuccess = 4;
+  fabric command access(invoke: manage) ModifyPushTransport(ModifyPushTransportRequest): DefaultSuccess = 3;
+  /** This command SHALL be generated to request the Node modifies the Transport Status of a specified transport or all transports. */
+  fabric command access(invoke: manage) SetTransportStatus(SetTransportStatusRequest): DefaultSuccess = 4;
   /** This command SHALL be generated to request the Node to manually start the specified push transport. */
-  command ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
-  /** This command SHALL return the Stream Options Configuration for the specified push transport. */
-  command FindTransport(FindTransportRequest): FindTransportResponse = 6;
+  fabric command ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
+  /** This command SHALL return the Transport Configuration for the specified push transport or all allocated transports for the fabric if null. */
+  fabric command FindTransport(FindTransportRequest): FindTransportResponse = 6;
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
@@ -10928,7 +10735,7 @@ cluster CommodityTariff = 1792 {
 provisional cluster EcosystemInformation = 1872 {
   revision 1;
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
