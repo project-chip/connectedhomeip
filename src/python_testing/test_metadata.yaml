@@ -104,20 +104,25 @@ not_automated:
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
     - name: TC_WEBRTC_1_1.py
-      reason: Depends on Python WebRTC bindings. Will be enabled once
-              local tests are fully verified.
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
     - name: TC_WEBRTC_1_2.py
-      reason: Depends on Python WebRTC bindings. Will be enabled once
-              local tests are fully verified.
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
     - name: TC_WEBRTC_1_3.py
-      reason: Depends on Python WebRTC bindings. Will be enabled once
-              local tests are fully verified.
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
     - name: TC_WEBRTC_1_4.py
-      reason: Depends on Python WebRTC bindings. Will be enabled once
-              local tests are fully verified.
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
     - name: TC_WEBRTC_1_5.py
-      reason: Depends on Python WebRTC bindings. Will be enabled once
-              local tests are fully verified.
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

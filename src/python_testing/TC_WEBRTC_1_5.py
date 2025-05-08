@@ -24,7 +24,6 @@ from test_plan_support import commission_if_required
 
 
 class TC_WEBRTC_1_5(MatterBaseTest):
-
     def steps_TC_WEBRTC_1_5(self) -> list[TestStep]:
         steps = [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
@@ -35,30 +34,30 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             TestStep(4, "TH sends the ICECandidates command with a its ICE candidates to the DUT."),
             TestStep(5, "DUT sends ProvideICECandidates command to TH/WEBRTCR."),
             TestStep(6, "TH waits for 5 seconds."),
-            TestStep(7, "TH sends the EndSession command with the WebRTCSessionID saved in step 1 to the DUT.")
+            TestStep(7, "TH sends the EndSession command with the WebRTCSessionID saved in step 1 to the DUT."),
         ]
 
         return steps
 
     def desc_TC_WEBRTC_1_5(self) -> str:
-        return '[TC-WEBRTC-1.3] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode.'
+        return "[TC-WEBRTC-1.3] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode."
 
     def pics_TC_WEBRTC_1_5(self) -> list[str]:
         return ["WEBRTCR", "WEBRTCP"]
 
     @async_test_body
     async def test_TC_WEBRTC_1_5(self):
-
         self.step("precondition-1")
         endpoint = self.get_endpoint(default=1)
         webrtc_manager = WebRTCManager()
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(node_id=self.dut_node_id,
-                                                                 fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint)
+        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+            node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
+        )
 
         self.step("precondition-2")
-        current_sessions = await self.read_single_attribute_check_success(cluster=WebRTCTransportProvider,
-                                                                          attribute=WebRTCTransportProvider.Attributes.CurrentSessions,
-                                                                          endpoint=endpoint)
+        current_sessions = await self.read_single_attribute_check_success(
+            cluster=WebRTCTransportProvider, attribute=WebRTCTransportProvider.Attributes.CurrentSessions, endpoint=endpoint
+        )
         asserts.assert_equal(len(current_sessions), 0, "Found an existing WebRTC session")
 
         self.step(1)
@@ -73,20 +72,17 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         self.step(3)
         local_answer = webrtc_peer.get_local_answer()
         await self.send_single_cmd(
-            cmd=WebRTCTransportProvider.Commands.ProvideAnswer(
-                webRTCSessionID=session_id,
-                sdp=local_answer
-            ), endpoint=endpoint,
-            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD
+            cmd=WebRTCTransportProvider.Commands.ProvideAnswer(webRTCSessionID=session_id, sdp=local_answer),
+            endpoint=endpoint,
+            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
         self.step(4)
         local_candidates = webrtc_peer.get_local_ice_candidates()
         await self.send_single_cmd(
-            cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
-                webRTCSessionID=session_id,
-                ICECandidates=local_candidates
-            ), endpoint=endpoint, payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD
+            cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(webRTCSessionID=session_id, ICECandidates=local_candidates),
+            endpoint=endpoint,
+            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
         self.step(5)
@@ -102,10 +98,13 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             webrtc_peer.wait_for_session_establishment()
 
         self.step(7)
-        await self.send_single_cmd(cmd=WebRTCTransportProvider.Commands.EndSession(
-            webRTCSessionID=session_id,
-            reason=WebRTCTransportProvider.Enums.WebRTCEndReasonEnum.kUserHangup
-        ), endpoint=endpoint, payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD)
+        await self.send_single_cmd(
+            cmd=WebRTCTransportProvider.Commands.EndSession(
+                webRTCSessionID=session_id, reason=WebRTCTransportProvider.Enums.WebRTCEndReasonEnum.kUserHangup
+            ),
+            endpoint=endpoint,
+            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
+        )
 
         webrtc_manager.close_all()
 

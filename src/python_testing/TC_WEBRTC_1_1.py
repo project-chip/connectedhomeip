@@ -24,7 +24,6 @@ from test_plan_support import commission_if_required
 
 
 class TC_WEBRTC_1_1(MatterBaseTest):
-
     def steps_TC_WEBRTC_1_1(self) -> list[TestStep]:
         steps = [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
@@ -34,13 +33,13 @@ class TC_WEBRTC_1_1(MatterBaseTest):
             TestStep(3, "TH sends the SUCCESS status code to the DUT."),
             TestStep(4, "TH sends the ICECandidates command with a its ICE candidates to the DUT."),
             TestStep(5, "DUT sends ProvideICECandidates command to the TH/WEBRTCR."),
-            TestStep(6, "TH waits for 5 seconds. Verify the WebRTC session has been successfully established.")
+            TestStep(6, "TH waits for 5 seconds. Verify the WebRTC session has been successfully established."),
         ]
 
         return steps
 
     def desc_TC_WEBRTC_1_1(self) -> str:
-        return '[TC-WEBRTC-1.1] Validate that setting an SDP Offer successfully initiates a new WebRTC session.'
+        return "[TC-WEBRTC-1.1] Validate that setting an SDP Offer successfully initiates a new WebRTC session."
 
     def pics_TC_WEBRTC_1_1(self) -> list[str]:
         return ["WEBRTCR", "WEBRTCP"]
@@ -51,24 +50,35 @@ class TC_WEBRTC_1_1(MatterBaseTest):
 
         endpoint = self.get_endpoint(default=1)
         webrtc_manager = WebRTCManager()
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(node_id=self.dut_node_id,
-                                                                 fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint)
+        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+            node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
+        )
 
         self.step("precondition-2")
-        current_sessions = await self.read_single_attribute_check_success(cluster=WebRTCTransportProvider,
-                                                                          attribute=WebRTCTransportProvider.Attributes.CurrentSessions,
-                                                                          endpoint=endpoint)
+        current_sessions = await self.read_single_attribute_check_success(
+            cluster=WebRTCTransportProvider, attribute=WebRTCTransportProvider.Attributes.CurrentSessions, endpoint=endpoint
+        )
         asserts.assert_equal(len(current_sessions), 0, "Found an existing WebRTC session")
 
         # Allocate video stream in camera app to receive actual video stream
         # This step is not from test plan
-        resolution = CameraAvStreamManagement.Structs.VideoResolutionStruct(
-            width=640, height=480
-        )
+        resolution = CameraAvStreamManagement.Structs.VideoResolutionStruct(width=640, height=480)
 
-        await self.send_single_cmd(cmd=CameraAvStreamManagement.Commands.VideoStreamAllocate(
-            streamUsage=0, videoCodec=0, minFrameRate=30, maxFrameRate=30, minBitRate=10000, maxBitRate=10000, minFragmentLen=1,
-            maxFragmentLen=10, minResolution=resolution, maxResolution=resolution), endpoint=endpoint)
+        await self.send_single_cmd(
+            cmd=CameraAvStreamManagement.Commands.VideoStreamAllocate(
+                streamUsage=0,
+                videoCodec=0,
+                minFrameRate=30,
+                maxFrameRate=30,
+                minBitRate=10000,
+                maxBitRate=10000,
+                minFragmentLen=1,
+                maxFragmentLen=10,
+                minResolution=resolution,
+                maxResolution=resolution,
+            ),
+            endpoint=endpoint,
+        )
 
         # Test Invokation
 
@@ -83,9 +93,10 @@ class TC_WEBRTC_1_1(MatterBaseTest):
                 streamUsage=WebRTCTransportProvider.Enums.StreamUsageEnum.kLiveView,
                 videoStreamID=NullValue,
                 audioStreamID=NullValue,
-                originatingEndpointID=1
-            ), endpoint=endpoint,
-            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD
+                originatingEndpointID=1,
+            ),
+            endpoint=endpoint,
+            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
         session_id = provide_offer_response.webRTCSessionID
         asserts.assert_true(session_id >= 0, "Invalid response")
@@ -96,8 +107,7 @@ class TC_WEBRTC_1_1(MatterBaseTest):
 
         answer_sessionId, answer = webrtc_peer.get_remote_answer()
 
-        asserts.assert_equal(session_id, answer_sessionId,
-                             "ProvideAnswer invoked with wrong session id")
+        asserts.assert_equal(session_id, answer_sessionId, "ProvideAnswer invoked with wrong session id")
         asserts.assert_true(len(answer) > 0, "Invalid answer SDP received")
 
         self.step(3)
@@ -107,15 +117,17 @@ class TC_WEBRTC_1_1(MatterBaseTest):
         self.step(4)
         local_candidates = webrtc_peer.get_local_ice_candidates()
 
-        await self.send_single_cmd(cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
-            webRTCSessionID=answer_sessionId,
-            ICECandidates=local_candidates
-        ), endpoint=endpoint, payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD)
+        await self.send_single_cmd(
+            cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
+                webRTCSessionID=answer_sessionId, ICECandidates=local_candidates
+            ),
+            endpoint=endpoint,
+            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
+        )
 
         self.step(5)
         ice_session_id, remote_candidates = webrtc_peer.get_remote_ice_candidates()
-        asserts.assert_equal(session_id, ice_session_id,
-                             "ProvideIceCandidates invoked with wrong session id")
+        asserts.assert_equal(session_id, ice_session_id, "ProvideIceCandidates invoked with wrong session id")
         asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
 
         webrtc_peer.set_remote_ice_candidates(remote_candidates)
