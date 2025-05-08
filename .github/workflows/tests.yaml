@@ -462,7 +462,6 @@ jobs:
 
     repl_tests_linux:
         name: REPL Tests - Linux
-
         strategy:
           matrix:
             # TODO: ipv6only should be re-enabled ideally, however mDNS seems currently broken someone
@@ -474,7 +473,6 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
 
-        if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
         container:
