@@ -180,7 +180,6 @@ void postMoveToLevel(EndpointId endpoint, uint8_t level)
 void postOnOff(EndpointId endpoint, bool value)
 {
     ChipLogDetail(DeviceLayer, "[chef-pump] Inside postOnOff. value: %d", value);
-    // #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
     uint16_t epIndex = getIndexLevelControl(endpoint);
     if (epIndex < kLevelControlCount)
     {
@@ -293,5 +292,3 @@ void Init()
 
 } // namespace pump
 } // namespace chef
-
-// #endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
