@@ -25,6 +25,7 @@
 #include <pw_unit_test/framework.h>
 #include <system/SystemClock.h>
 #include <system/SystemTimer.h>
+#include <vector>
 
 using namespace chip::app::Clusters::ClosureDimension;
 
