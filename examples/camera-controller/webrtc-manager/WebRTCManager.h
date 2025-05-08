@@ -56,7 +56,7 @@ public:
 
     CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage);
 
-    CHIP_ERROR ProvideAnswer(uint16_t sessionId, const std::string & sdp);
+    CHIP_ERROR ProvideAnswer(uint16_t sessionId);
 
     CHIP_ERROR ProvideICECandidates();
 

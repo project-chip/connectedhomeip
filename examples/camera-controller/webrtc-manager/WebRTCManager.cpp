@@ -78,14 +78,8 @@ CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorD
 
     mPeerConnection->setRemoteDescription(rtc::Description{ args.sdp, "offer" });
 
-    if (mLocalDescription.empty())
-    {
-        ChipLogError(Camera, "No local SDP to send");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideAnswer(sessionId, mLocalDescription); });
+    // Schedule the ProvideAnswer() call to run asynchronously.
+    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideAnswer(sessionId); });
 
     return CHIP_NO_ERROR;
 }
@@ -246,8 +240,6 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         });
     }
 
-    mPeerConnection->setLocalDescription();
-
     return CHIP_NO_ERROR;
 }
 
@@ -270,6 +262,8 @@ bool WebRTCManager::initializeSocket()
 CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer command to the peer device");
+
+    mPeerConnection->setLocalDescription();
 
     CHIP_ERROR err =
         mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
@@ -302,11 +296,18 @@ CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage)
     return err;
 }
 
-CHIP_ERROR WebRTCManager::ProvideAnswer(uint16_t sessionId, const std::string & sdp)
+CHIP_ERROR WebRTCManager::ProvideAnswer(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "Sending ProvideAnswer command to the peer device");
+    std::string answer(mPeerConnection->createAnswer());
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideAnswer(sessionId, sdp);
+    if (answer.empty())
+    {
+        ChipLogError(Camera, "No answer SDP to send");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideAnswer(sessionId, answer);
 
     if (err != CHIP_NO_ERROR)
     {

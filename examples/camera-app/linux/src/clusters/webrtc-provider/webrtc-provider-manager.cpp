@@ -306,9 +306,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     mPeerConnection->setRemoteDescription(sdpAnswer);
 
-    MoveToState(State::SendingICECandidates);
-    ScheduleICECandidatesSend();
-
     return CHIP_NO_ERROR;
 }
 
@@ -351,6 +348,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
                                std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end())));
         }
     }
+
+    ScheduleICECandidatesSend();
 
     return CHIP_NO_ERROR;
 }
@@ -451,6 +450,7 @@ void WebRTCProviderManager::ScheduleAnswerSend()
 void WebRTCProviderManager::ScheduleICECandidatesSend()
 {
     ChipLogProgress(Camera, "ScheduleICECandidatesSend called.");
+    MoveToState(State::SendingICECandidates);
 
     DeviceLayer::SystemLayer().ScheduleLambda([this]() {
         ChipLogProgress(Camera, "Sending ICECandidates command to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
