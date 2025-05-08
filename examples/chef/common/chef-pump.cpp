@@ -191,7 +191,7 @@ void handleMoveToLevel(EndpointId endpoint, uint8_t level)
         return;
     }
 
-    VerifyOrDieWithMsg(bool(gLevel[epIndex]), "Storage for current level on endpoint %d isn't initialized.", endpoint);
+    VerifyOrDieWithMsg(bool(gLevel[epIndex]), DeviceLayer, "Storage for current level on endpoint %d isn't initialized.", endpoint);
 
     if (level)
         (*gLevel[epIndex]).SetNonNull(level);
@@ -215,7 +215,8 @@ void handleOnOff(EndpointId endpoint, bool value)
     {
         if (value)
         {
-            VerifyOrDieWithMsg(bool(gLevel[epIndex]), "Storage for current level on endpoint %d isn't initialized.", endpoint);
+            VerifyOrDieWithMsg(bool(gLevel[epIndex]), DeviceLayer, "Storage for current level on endpoint %d isn't initialized.",
+                               endpoint);
             if ((*gLevel[epIndex]).IsNull())
                 (*gLevel[epIndex]).SetNonNull(255);
             LevelControl::Attributes::CurrentLevel::Set(endpoint, *gLevel[epIndex]);
