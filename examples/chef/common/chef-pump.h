@@ -28,9 +28,9 @@
 namespace chef {
 namespace pump {
 
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+// #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 void handleMoveToLevel(chip::EndpointId endpoint, uint8_t level);
-#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+// #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 
 void handleOnOff(chip::EndpointId endpoint, bool value);
 
