@@ -39,6 +39,15 @@ class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImp
 public:
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
+    CHIP_ERROR StoreSoftwareVersionString(const char * buf, size_t bufSize);
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
+    CHIP_ERROR StoreHardwareVersionString(const char * buf, size_t bufSize);
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize);
+    CHIP_ERROR StoreVendorName(const char * buf, size_t bufSize);
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize);
+    CHIP_ERROR StoreProductName(const char * buf, size_t bufSize);
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize);
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize);
 
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
