@@ -150,6 +150,8 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
+    size_t len;
+
 #if CHIP_DISABLE_PLATFORM_KVS
     return CHIP_NO_ERROR;
 #else  // CHIP_DISABLE_PLATFORM_KVS
@@ -168,35 +170,35 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_SoftwareVersionString))
     {
-        size_t len = strlen(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+        len = strlen(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
         VerifyOrReturnError(len <= ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         ReturnErrorOnFailure(StoreSoftwareVersionString(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING, len));
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_HardwareVersionString))
     {
-        size_t len = strlen(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
+        len = strlen(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
         VerifyOrReturnError(len <= ConfigurationManager::kMaxHardwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         ReturnErrorOnFailure(StoreHardwareVersionString(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING, len));
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorName))
     {
-        size_t len = strlen(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
+        len = strlen(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
         VerifyOrReturnError(len <= ConfigurationManager::kMaxVendorNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         ReturnErrorOnFailure(StoreVendorName(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME, len));
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductName))
     {
-        size_t len = strlen(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
+        len = strlen(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
         VerifyOrReturnError(len <= ConfigurationManager::kMaxProductNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         ReturnErrorOnFailure(StoreProductName(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME, len));
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_SerialNum))
     {
-        size_t len = strlen(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+        len = strlen(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
         VerifyOrReturnError(len <= ConfigurationManager::kMaxSerialNumberLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         ReturnErrorOnFailure(StoreSerialNumber(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, len));
     }
