@@ -462,6 +462,9 @@ jobs:
 
     repl_tests_linux:
         name: REPL Tests - Linux
+        # TODO: this NEEDS re-enabling after figuring out what causes IPV6 not to work
+        #       in our GH environment
+        if: false
 
         strategy:
           matrix:
