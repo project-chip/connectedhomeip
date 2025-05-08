@@ -3713,9 +3713,14 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTestExpectation * subscriptionCallbackDeleted = [self expectationWithDescription:@"Subscription callback deleted"];
     XCTestExpectation * controllerAddedDevice = [self expectationWithDescription:@"Controller added device"];
     XCTestExpectation * controllerRemovedDevice = [self expectationWithDescription:@"Controller removed device"];
+
+    // Make sure all the delegates that we want notified are allocated outside the @autoreleasepool
+    // block, so they won't go away before the notifications can happen.  Devices and device
+    // controllers do not hold strong references to delegates.
+    __auto_type * controllerDelegate = [[MTRPerControllerStorageTestsDeallocDelegate alloc] init];
+    __auto_type * deviceDelegate = [[MTRDeviceTestDelegate alloc] init];
     @autoreleasepool {
         // Expected the test device was added and removed
-        MTRPerControllerStorageTestsDeallocDelegate * controllerDelegate = [[MTRPerControllerStorageTestsDeallocDelegate alloc] init];
         __block NSUInteger lastDeviceCount = controller.devices.count;
         controllerDelegate.onDevicesChanged = ^{
             // Use self as lock for lastDeviceCount access, so sanitizer doesn't complain
@@ -3732,23 +3737,22 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         [controller addDeviceControllerDelegate:controllerDelegate queue:queue];
 
         __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
-        __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
 
         XCTestExpectation * subscriptionReportBegin = [self expectationWithDescription:@"Subscription report begin"];
 
-        delegate.onReportBegin = ^{
+        deviceDelegate.onReportBegin = ^{
             [subscriptionReportBegin fulfill];
         };
 
-        delegate.onReportEnd = ^{
+        deviceDelegate.onReportEnd = ^{
             subscriptionReportEnd1 = YES;
         };
 
-        delegate.onSubscriptionCallbackDelete = ^{
+        deviceDelegate.onSubscriptionCallbackDelete = ^{
             [subscriptionCallbackDeleted fulfill];
         };
 
-        [device setDelegate:delegate queue:queue];
+        [device setDelegate:deviceDelegate queue:queue];
 
         [self waitForExpectations:@[ subscriptionReportBegin ] timeout:60];
 
@@ -3766,6 +3770,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     // dealloc -> delete should be called soon after the autoreleasepool reaps
     [self waitForExpectations:@[ subscriptionCallbackDeleted, controllerAddedDevice, controllerRemovedDevice ] timeout:60];
+
+    // Make sure to ignore notifications about device changes triggered by ResetCommissionee.
+    controllerDelegate.onDevicesChanged = nil;
 
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
