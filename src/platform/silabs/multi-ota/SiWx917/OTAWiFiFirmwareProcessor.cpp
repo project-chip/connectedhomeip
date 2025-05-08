@@ -37,7 +37,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
     int32_t status = SL_STATUS_OK;
     // Store the header of the OTA file
     static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
-    // Used to tranfer other block to processor
+    // Used to transfer other block to processor
     static uint8_t writeDataBuffer[kBlockSize] __attribute__((aligned(4))) = { 0 };
 
     ChipLogProgress(SoftwareUpdate, "ProcessInternal WiFi Block processing");
