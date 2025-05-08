@@ -56,8 +56,8 @@ extern "C" {
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/server/ICDConfigurationData.h> // nogncheck
-#include <platform/silabs/wifi/icd/WifiSleepManager.h>
+#include <app/icd/server/ICDConfigurationData.h>       // nogncheck
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
 
 #if SLI_SI91X_MCU_INTERFACE // SoC Only
 #include "rsi_rom_power_save.h"
@@ -68,6 +68,7 @@ extern "C" {
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 using namespace chip::DeviceLayer::Silabs;
+using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
 // TODO : Temporary work-around for wifi-init failure in 917NCP ACX module boards.
 // Can be removed after Wiseconnect fixes region code for all ACX module boards.
@@ -107,7 +108,8 @@ const sl_wifi_device_configuration_t config = {
 #ifdef SLI_SI91X_MCU_INTERFACE
                          (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_WPS_DISABLE),
 #else
-                         (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION),
+                         (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE |
+                          SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1),
 #endif
                      .tcp_ip_feature_bit_map = (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_DNS_CLIENT |
                                                 SL_SI91X_TCP_IP_FEAT_SSL | SL_SI91X_TCP_IP_FEAT_BYPASS
@@ -200,9 +202,9 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
     {
         wfx_wifi_scan_result_t currentScanResult = { 0 };
 
-        // Lenght excludes null-character
-        size_t scannedSsidLenght = strnlen(reinterpret_cast<char *>(result->scan_info[i].ssid), WFX_MAX_SSID_LENGTH);
-        chip::ByteSpan scannedSsidSpan(result->scan_info[i].ssid, scannedSsidLenght);
+        // Length excludes null-character
+        size_t scannedSsidLength = strnlen(reinterpret_cast<char *>(result->scan_info[i].ssid), WFX_MAX_SSID_LENGTH);
+        chip::ByteSpan scannedSsidSpan(result->scan_info[i].ssid, scannedSsidLength);
 
         // Copy the scanned SSID to the current scan ssid buffer that will be forwarded to the callback
         chip::MutableByteSpan currentScanSsid(currentScanResult.ssid, WFX_MAX_SSID_LENGTH);
@@ -217,6 +219,8 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
         currentScanResult.security = static_cast<wfx_sec_t>(result->scan_info[i].security_mode);
         currentScanResult.rssi     = (-1) * result->scan_info[i].rssi_val; // The returned value is positive - we need to flip it
         currentScanResult.chan     = result->scan_info[i].rf_channel;
+        // TODO: change this when SDK provides values
+        currentScanResult.wiFiBand = WiFiBandEnum::k2g4;
 
         // if user has provided ssid, check if the current scan result ssid matches the user provided ssid
         if (!requestedSsidSpan.empty())
@@ -372,7 +376,10 @@ sl_status_t SetWifiConfigurations()
     VerifyOrReturnError(status == SL_STATUS_OK, status,
                         ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval failed: 0x%lx", status));
 
-    sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 5 };
+    // This is be triggered on the disconnect use case, providing the amount of TA tries
+    // Setting the TA retry to 1 and giving the control to the M4 for improved power efficiency
+    // When max_retry_attempts is set to 0, TA will retry indefinitely.
+    sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 1 };
     status = sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
     VerifyOrReturnError(status == SL_STATUS_OK, status,
                         ChipLogError(DeviceLayer, "sl_wifi_set_advanced_client_configuration failed: 0x%lx", status));
@@ -427,6 +434,40 @@ sl_status_t SetWifiConfigurations()
     return status;
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+/**
+ * @brief Converts the Matter Power Save Configuration to the SiWx Power Save Configuration
+ *
+ * @param configuration Matter Power Save Configuration
+ *
+ * @return sl_si91x_performance_profile_t SiWx Power Save Configuration; Default value is High Performance
+ *                                        kHighPerformance: HIGH_PERFORMANCE
+ *                                        kConnectedSleep: ASSOCIATED_POWER_SAVE
+ *                                        kDeepSleep: DEEP_SLEEP_WITH_RAM_RETENTION
+ */
+sl_si91x_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInterface::PowerSaveConfiguration configuration)
+{
+    sl_si91x_performance_profile_t profile = HIGH_PERFORMANCE;
+
+    switch (configuration)
+    {
+    case PowerSaveInterface::PowerSaveConfiguration::kHighPerformance:
+        profile = HIGH_PERFORMANCE;
+        break;
+    case PowerSaveInterface::PowerSaveConfiguration::kConnectedSleep:
+        profile = ASSOCIATED_POWER_SAVE;
+        break;
+    case PowerSaveInterface::PowerSaveConfiguration::kDeepSleep:
+        profile = DEEP_SLEEP_WITH_RAM_RETENTION;
+        break;
+    default:
+        break;
+    }
+
+    return profile;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 } // namespace
 
 namespace chip {
@@ -455,6 +496,11 @@ void WiseconnectWifiInterface::MatterWifiTask(void * arg)
     VerifyOrReturn(status == SL_STATUS_OK,
                    ChipLogError(DeviceLayer, "MatterWifiTask: SiWxPlatformInit failed: 0x%lx", static_cast<uint32_t>(status)));
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Remove High performance request after the device is initialized
+    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     WifiInterfaceImpl::GetInstance().NotifyWifiTaskInitialized();
 
     ChipLogDetail(DeviceLayer, "MatterWifiTask: starting event loop");
@@ -475,6 +521,11 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 {
     sl_status_t status = SL_STATUS_OK;
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Force the device to high performance mode during the init sequence.
+    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithoutTransition();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
 
@@ -490,10 +541,6 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
     sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WiseconnectWifiInterface::WifiPlatformEvent), nullptr);
     VerifyOrReturnError(sWifiEventQueue != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    status = CreateDHCPTimer();
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_NO_MEMORY,
-                        ChipLogError(DeviceLayer, "CreateDHCPTimer failed: %lx", status));
-
     return CHIP_NO_ERROR;
 }
 
@@ -504,7 +551,7 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationConnect:
         ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationConnect");
         wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationConnected);
-        ResetDHCPNotificationFlags();
+        ResetConnectivityNotificationFlags();
         break;
 
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationDisconnect: {
@@ -513,11 +560,10 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
 
         wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationReady)
             .Clear(WifiInterface::WifiState::kStationConnecting)
-            .Clear(WifiInterface::WifiState::kStationConnected)
-            .Clear(WifiInterface::WifiState::kStationDhcpDone);
+            .Clear(WifiInterface::WifiState::kStationConnected);
 
         // TODO: Implement disconnect notify
-        ResetDHCPNotificationFlags();
+        ResetConnectivityNotificationFlags();
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
         NotifyIPv4Change(false);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -595,61 +641,29 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
         JoinWifiNetwork();
         break;
 
-    case WiseconnectWifiInterface::WifiPlatformEvent::kStationDoDhcp:
-        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationDoDhcp");
-        StartDHCPTimer(kDhcpPollIntervalMs);
-        break;
-
-    case WiseconnectWifiInterface::WifiPlatformEvent::kStationDhcpDone:
-        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationDhcpDone");
-        CancelDHCPTimer();
-        break;
-
-    case WiseconnectWifiInterface::WifiPlatformEvent::kStationDhcpPoll:
-        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationDhcpPoll");
-        HandleDHCPPolling();
-        break;
+    case WiseconnectWifiInterface::WifiPlatformEvent::kConnectionComplete:
+        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kConnectionComplete");
+        NotifySuccessfulConnection();
 
     default:
         break;
     }
 }
 
-void WifiInterfaceImpl::HandleDHCPPolling(void)
+void WifiInterfaceImpl::NotifySuccessfulConnection(void)
 {
-    WiseconnectWifiInterface::WifiPlatformEvent event;
-
-    // TODO: Notify the application that the interface is not set up or Chipdie here because we are in an unkonwn state
     struct netif * sta_netif = &wifi_client_context.netif;
-    VerifyOrReturn(sta_netif != nullptr, ChipLogError(DeviceLayer, "HandleDHCPPolling: failed to get STA netif"));
+    VerifyOrReturn(sta_netif != nullptr, ChipLogError(DeviceLayer, "NotifySuccessfulConnection: failed to get STA netif"));
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-    uint8_t dhcp_state = dhcpclient_poll(sta_netif);
-    if (dhcp_state == DHCP_ADDRESS_ASSIGNED && !mHasNotifiedIPv4)
-    {
-        GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-        event = WiseconnectWifiInterface::WifiPlatformEvent::kStationDhcpDone;
-        WiseconnectWifiInterface::PostWifiPlatformEvent(event);
-        NotifyConnectivity();
-    }
-    else if (dhcp_state == DHCP_OFF)
-    {
-        NotifyIPv4Change(false);
-    }
+    GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-    /* Checks if the assigned IPv6 address is preferred by evaluating
-     * the first block of IPv6 address ( block 0)
-     */
-    if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !mHasNotifiedIPv6)
-    {
-        char addrStr[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
-        VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), addrStr, sizeof(addrStr)) != nullptr);
-        ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
-        NotifyIPv6Change(true);
-        event = WiseconnectWifiInterface::WifiPlatformEvent::kStationDhcpDone;
-        PostWifiPlatformEvent(event);
-        NotifyConnectivity();
-    }
+
+    char addrStr[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
+    VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), addrStr, sizeof(addrStr)) != nullptr);
+    ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
+    NotifyIPv6Change(true);
+    NotifyConnectivity();
 }
 
 sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
@@ -671,7 +685,7 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
 // To avoid IOP issues, it is recommended to enable high-performance mode before joining the network.
 // TODO: Remove this once the IOP issue related to power save mode switching is fixed in the Wi-Fi SDK.
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
+    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
@@ -790,14 +804,13 @@ sl_status_t WifiInterfaceImpl::TriggerPlatformWifiDisconnection()
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(rsi_power_save_profile_mode_t sl_si91x_ble_state,
-                                                 sl_si91x_performance_profile_t sl_si91x_wifi_state, uint32_t listenInterval)
+CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval)
 {
-    int32_t error = rsi_bt_power_save_profile(sl_si91x_ble_state, RSI_MAX_PSP);
+    int32_t error = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     VerifyOrReturnError(error == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: %ld", error));
 
-    sl_wifi_performance_profile_t wifi_profile = { .profile = sl_si91x_wifi_state,
+    sl_wifi_performance_profile_t wifi_profile = { .profile = ConvertPowerSaveConfiguration(configuration),
                                                    // TODO: Performance profile fails if not alligned with DTIM
                                                    .dtim_aligned_type = SL_SI91X_ALIGN_WITH_DTIM_BEACON,
                                                    // TODO: Different types need to be fixed in the Wi-Fi SDK

@@ -693,6 +693,10 @@ public:
     }
 };
 
+namespace {
+static GeneralCommissioningFabricTableDelegate fabricDelegate;
+}
+
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
     Breadcrumb::Set(0, 0);
@@ -700,7 +704,6 @@ void MatterGeneralCommissioningPluginServerInitCallback()
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gGeneralCommissioningInstance));
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 
-    static GeneralCommissioningFabricTableDelegate fabricDelegate;
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricDelegate);
     #if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
     //chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -714,6 +717,15 @@ void MatterGeneralCommissioningPluginServerInitCallback()
     }
     //chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     #endif // CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+}
+
+void MatterGeneralCommissioningPluginServerShutdownCallback()
+{
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&fabricDelegate);
+
+    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gGeneralCommissioningInstance);
+    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gGeneralCommissioningInstance));
 }
 
 namespace chip {

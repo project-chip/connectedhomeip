@@ -22,7 +22,7 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
-if (chip_system_config_use_open_thread_inet_endpoints) {
+if (chip_system_config_use_openthread_inet_endpoints) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -128,7 +128,7 @@ static_library("inet") {
     public_deps += [ "${lwip_root}:lwip" ]
   }
 
-  if (chip_system_config_use_open_thread_inet_endpoints) {
+  if (chip_system_config_use_openthread_inet_endpoints) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
   }
 

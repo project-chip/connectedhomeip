@@ -18,8 +18,11 @@
 
 #include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/common/Commands.h>
+#include <commands/delay/Commands.h>
 #include <commands/interactive/Commands.h>
 #include <commands/pairing/Commands.h>
+#include <commands/webrtc/Commands.h>
+#include <webrtc_manager/WebRTCManager.h>
 #include <zap-generated/cluster/Commands.h>
 
 #include <iostream>
@@ -50,11 +53,16 @@ int main(int argc, char * argv[])
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPairing(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
+    registerCommandsDelay(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
+    registerCommandsWebRTC(commands, &credIssuerCommands);
+
+    WebRTCManager::Instance().Init();
 
     std::vector<char *> c_args;
     for (auto & arg : args)
     {
+        ChipLogError(NotSpecified, "Args: %s", arg.c_str());
         c_args.push_back(const_cast<char *>(arg.c_str()));
     }
 

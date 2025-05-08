@@ -118,7 +118,7 @@ public:
                                                             CommandHandler * handler) = 0;
 
 protected:
-    InteractionModelContext mContext = { nullptr };
+    InteractionModelContext mContext = {};
 };
 
 } // namespace DataModel

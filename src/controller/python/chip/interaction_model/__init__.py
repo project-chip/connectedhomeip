@@ -24,8 +24,7 @@
 
 import enum
 
-from chip.exceptions import ChipStackException
-
+from ..exceptions import ChipStackException
 from .delegate import (AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct,
                        PyInvokeRequestData, PyWriteAttributeData, SessionParameters, SessionParametersStruct,
                        TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo)
@@ -87,6 +86,7 @@ class Status(enum.IntEnum):
     FailsafeRequired = 0xca
     InvalidInState = 0xcb
     NoCommandResponse = 0xcc
+    InvalidTransportType = 0xd1
     WriteIgnored = 0xf0
 
 

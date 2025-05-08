@@ -31,7 +31,7 @@ __all__ = [
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from chip.native import PyChipError
+    from ..native import PyChipError
 
 
 class ChipStackException(Exception):

@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include "app/data-model-provider/Context.h"
 #include <app/data-model-provider/ActionContext.h>
+#include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/testing/EmptyProvider.h>
@@ -59,7 +59,7 @@ public:
     }
 
     /// Get a stable pointer to the underlying context
-    app::ServerClusterContext * Get() { return &mContext; }
+    app::ServerClusterContext & Get() { return mContext; }
 
     /// Create a new context bound to this test context
     app::ServerClusterContext Create()

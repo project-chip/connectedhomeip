@@ -23,6 +23,11 @@
  */
 void emberAf{{asUpperCamelCase label}}ClusterInitCallback(chip::EndpointId endpoint);
 
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAf{{asUpperCamelCase label}}ClusterShutdownCallback(chip::EndpointId endpoint);
+
 {{/zcl_clusters}}
 
 // Cluster Server/Client Init Functions

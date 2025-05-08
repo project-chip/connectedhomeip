@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,54 +28,52 @@
 #include <ble/Ble.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/Darwin/BleConnectionDelegate.h>
+#include <platform/Darwin/BleConnectionDelegateImpl.h>
 #include <platform/Darwin/BleScannerDelegate.h>
+#include <platform/Darwin/BleUtils.h>
 #include <platform/LockTracker.h>
 #include <setup_payload/SetupPayload.h>
 #include <tracing/metric_event.h>
 
-#import "MTRUUIDHelper.h"
+#import <CoreBluetooth/CoreBluetooth.h>
+
 #import "PlatformMetricKeys.h"
 
 using namespace chip::Ble;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
 using namespace chip::Tracing::DarwinPlatform;
 
 constexpr uint64_t kScanningWithDiscriminatorTimeoutInSeconds = 60;
 constexpr uint64_t kPreWarmScanTimeoutInSeconds = 120;
 constexpr uint64_t kCachePeripheralTimeoutInSeconds
     = static_cast<uint64_t>(CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX / 1000.0 * 8.0 * 0.625);
-constexpr char kBleWorkQueueName[] = "org.csa-iot.matter.framework.ble.workqueue";
 
 typedef NS_ENUM(uint8_t, BleConnectionMode) {
-    kUndefined = 0,
-    kScanning,
+    kScanning = 1,
     kScanningWithTimeout,
     kConnecting,
 };
 
-@interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
+@interface MTRBleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
-@property (strong, nonatomic) dispatch_queue_t chipWorkQueue;
-@property (strong, nonatomic) dispatch_queue_t workQueue;
+@property (strong, nonatomic) dispatch_queue_t workQueue; // the CHIP work queue
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (strong, nonatomic) CBPeripheral * peripheral;
-@property (strong, nonatomic) CBUUID * shortServiceUUID;
-@property (nonatomic, readonly, nullable) dispatch_source_t timer;
-@property (nonatomic, readonly) BleConnectionMode currentMode;
+@property (strong, nonatomic, readonly, nullable) dispatch_source_t timer;
+@property (assign, nonatomic, readonly) BleConnectionMode currentMode;
 @property (strong, nonatomic) NSMutableDictionary<CBPeripheral *, NSDictionary *> * cachedPeripherals;
-@property (unsafe_unretained, nonatomic) bool found;
-@property (unsafe_unretained, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
-@property (unsafe_unretained, nonatomic) void * appState;
-@property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
-@property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
-@property (unsafe_unretained, nonatomic) chip::DeviceLayer::BleScannerDelegate * scannerDelegate;
-@property (unsafe_unretained, nonatomic) chip::Ble::BleLayer * mBleLayer;
+@property (assign, nonatomic) bool found;
+@property (assign, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
+@property (assign, nonatomic) void * appState;
+@property (assign, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
+@property (assign, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
+@property (assign, nonatomic) chip::DeviceLayer::BleScannerDelegate * scannerDelegate;
+@property (assign, nonatomic) chip::Ble::BleLayer * bleLayer;
 
-- (id)initWithQueue:(dispatch_queue_t)queue;
-- (id)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm queue:(dispatch_queue_t)queue;
-- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator queue:(dispatch_queue_t)queue;
-- (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer;
+- (instancetype)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
+- (instancetype)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
+
 - (void)start;
 - (void)stop;
 - (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
@@ -91,42 +89,37 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 namespace chip {
 namespace DeviceLayer {
     namespace Internal {
-        BleConnection * ble;
-        dispatch_queue_t bleWorkQueue;
+        MTRBleConnection * ble;
 
         void BleConnectionDelegateImpl::NewConnection(
-            Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & inDeviceDiscriminator)
+            Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & deviceDiscriminator)
         {
             assertChipStackLockedByCurrentThread();
 
-            // Make a copy of the device discriminator for the block to capture.
-            SetupDiscriminator deviceDiscriminator = inDeviceDiscriminator;
-
-            ChipLogProgress(Ble, "ConnectionDelegate NewConnection with discriminator");
-            if (!bleWorkQueue) {
-                bleWorkQueue = dispatch_queue_create(kBleWorkQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+            if (deviceDiscriminator.IsShortDiscriminator()) {
+                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with short discriminator %d (0x%x)", deviceDiscriminator.GetShortValue(), deviceDiscriminator.GetShortValue());
+            } else {
+                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with long discriminator %d (0x%x)", deviceDiscriminator.GetLongValue(), deviceDiscriminator.GetLongValue());
             }
 
-            dispatch_async(bleWorkQueue, ^{
-                // If the previous connection delegate was not a try to connect to something, just reuse it instead of
-                // creating a brand new connection but update the discriminator and the ble layer members.
-                if (ble and ![ble isConnecting]) {
-                    [ble setBleLayer:bleLayer];
-                    ble.appState = appState;
-                    ble.onConnectionComplete = OnConnectionComplete;
-                    ble.onConnectionError = OnConnectionError;
-                    [ble updateWithDiscriminator:deviceDiscriminator];
-                    return;
-                }
-
-                [ble stop];
-                ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator queue:bleWorkQueue];
-                [ble setBleLayer:bleLayer];
+            // If the previous connection delegate was not a try to connect to something, just reuse it instead of
+            // creating a brand new connection but update the discriminator and the ble layer members.
+            if (ble and ![ble isConnecting]) {
+                ble.bleLayer = bleLayer;
                 ble.appState = appState;
                 ble.onConnectionComplete = OnConnectionComplete;
                 ble.onConnectionError = OnConnectionError;
-                ble.centralManager = [ble.centralManager initWithDelegate:ble queue:bleWorkQueue];
-            });
+                [ble updateWithDiscriminator:deviceDiscriminator];
+                return;
+            }
+
+            [ble stop];
+            ble = [[MTRBleConnection alloc] initWithDiscriminator:deviceDiscriminator];
+            ble.bleLayer = bleLayer;
+            ble.appState = appState;
+            ble.onConnectionComplete = OnConnectionComplete;
+            ble.onConnectionError = OnConnectionError;
+            ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
         void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj)
@@ -134,31 +127,25 @@ namespace DeviceLayer {
             assertChipStackLockedByCurrentThread();
 
             ChipLogProgress(Ble, "ConnectionDelegate NewConnection with conn obj: %p", connObj);
+            CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
-            if (!bleWorkQueue) {
-                bleWorkQueue = dispatch_queue_create(kBleWorkQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+            // The BLE_CONNECTION_OBJECT represents a CBPeripheral object. In order for it to be valid the central
+            // manager needs to still be running.
+            if (!ble || [ble isConnecting]) {
+                if (OnConnectionError) {
+                    // Avoid calling back prior to returning
+                    dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
+                        OnConnectionError(appState, CHIP_ERROR_INCORRECT_STATE);
+                    });
+                }
+                return;
             }
 
-            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj; // bridge (and retain) before dispatching
-            dispatch_async(bleWorkQueue, ^{
-                // The BLE_CONNECTION_OBJECT represent a CBPeripheral object. In order for it to be valid the central
-                // manager needs to still be running.
-                if (!ble || [ble isConnecting]) {
-                    if (OnConnectionError) {
-                        auto workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
-                        dispatch_async(workQueue, ^{
-                            OnConnectionError(appState, CHIP_ERROR_INCORRECT_STATE);
-                        });
-                    }
-                    return;
-                }
-
-                [ble setBleLayer:bleLayer];
-                ble.appState = appState;
-                ble.onConnectionComplete = OnConnectionComplete;
-                ble.onConnectionError = OnConnectionError;
-                [ble updateWithPeripheral:peripheral];
-            });
+            ble.bleLayer = bleLayer;
+            ble.appState = appState;
+            ble.onConnectionComplete = OnConnectionComplete;
+            ble.onConnectionError = OnConnectionError;
+            [ble updateWithPeripheral:peripheral];
         }
 
         void BleConnectionDelegateImpl::StartScan(BleScannerDelegate * delegate, BleScanMode mode)
@@ -168,99 +155,86 @@ namespace DeviceLayer {
             bool prewarm = (mode == BleScanMode::kPreWarm);
             ChipLogProgress(Ble, "ConnectionDelegate StartScan (%s)", (prewarm ? "pre-warm" : "default"));
 
-            if (!bleWorkQueue) {
-                bleWorkQueue = dispatch_queue_create(kBleWorkQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+            // Pre-warming is best-effort, don't cancel an ongoing scan or connection attempt
+            if (prewarm && ble) {
+                // TODO: Once we get rid of the separate BLE queue we can just return CHIP_ERROR_BUSY.
+                // That will also allow these cases to be distinguished in our metric.
+                ChipLogProgress(Ble, "Not starting pre-warm scan, an operation is already in progress");
+                if (delegate) {
+                    dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
+                        delegate->OnBleScanStopped();
+                    });
+                }
+                return;
             }
 
-            dispatch_async(bleWorkQueue, ^{
-                // Pre-warming is best-effort, don't cancel an ongoing scan or connection attempt
-                if (prewarm && ble) {
-                    // TODO: Once we get rid of the separate BLE queue we can just return CHIP_ERROR_BUSY.
-                    // That will also allow these cases to be distinguished in our metric.
-                    ChipLogProgress(Ble, "Not starting pre-warm scan, an operation is already in progress");
-                    if (delegate) {
-                        dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
-                            delegate->OnBleScanStopped();
-                        });
-                    }
-                    return;
-                }
+            // If the previous connection delegate was not a try to connect to something, just reuse it instead of
+            // creating a brand new connection but update the discriminator and the ble layer members.
+            if (ble and ![ble isConnecting]) {
+                [ble updateWithDelegate:delegate prewarm:prewarm];
+                return;
+            }
 
-                // If the previous connection delegate was not a try to connect to something, just reuse it instead of
-                // creating a brand new connection but update the discriminator and the ble layer members.
-                if (ble and ![ble isConnecting]) {
-                    [ble updateWithDelegate:delegate prewarm:prewarm];
-                    return;
-                }
-
-                [ble stop];
-                ble = [[BleConnection alloc] initWithDelegate:delegate prewarm:prewarm queue:bleWorkQueue];
-                // Do _not_ set onConnectionComplete and onConnectionError
-                // here.  The connection callbacks we have expect an appState
-                // that we do not have here, and in any case connection
-                // complete/error make no sense for a scan.
-                ble.centralManager = [ble.centralManager initWithDelegate:ble queue:bleWorkQueue];
-            });
+            [ble stop];
+            ble = [[MTRBleConnection alloc] initWithDelegate:delegate prewarm:prewarm];
+            // Do _not_ set onConnectionComplete and onConnectionError
+            // here.  The connection callbacks we have expect an appState
+            // that we do not have here, and in any case connection
+            // complete/error make no sense for a scan.
+            ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
         void BleConnectionDelegateImpl::StopScan()
         {
+            assertChipStackLockedByCurrentThread();
             ChipLogProgress(Ble, "ConnectionDelegate StopScan");
-            DoCancel();
+            if (ble && !ble.isConnecting) {
+                [ble stop];
+                ble = nil;
+            }
         }
 
         CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
         {
-            ChipLogProgress(Ble, "ConnectionDelegate CancelConnection");
-            return DoCancel();
-        }
-
-        CHIP_ERROR BleConnectionDelegateImpl::DoCancel()
-        {
             assertChipStackLockedByCurrentThread();
-            if (bleWorkQueue == nil) {
-                return CHIP_NO_ERROR;
-            }
-
-            dispatch_async(bleWorkQueue, ^{
+            ChipLogProgress(Ble, "ConnectionDelegate CancelConnection");
+            if (ble && ble.isConnecting) {
                 [ble stop];
                 ble = nil;
-            });
-
-            bleWorkQueue = nil;
+            }
             return CHIP_NO_ERROR;
         }
     } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
 
-@interface BleConnection ()
+@interface MTRBleConnection ()
 @property (nonatomic, readonly) int32_t totalDevicesAdded;
 @property (nonatomic, readonly) int32_t totalDevicesRemoved;
 @end
 
-@implementation BleConnection
+@implementation MTRBleConnection {
+    CBUUID * _chipServiceUUID;
+}
 
-- (id)initWithQueue:(dispatch_queue_t)queue
+- (instancetype)init
 {
     self = [super init];
     if (self) {
-        self.shortServiceUUID = [MTRUUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
-        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
-        _workQueue = queue;
+        _chipServiceUUID = CBUUIDFromBleUUID(chip::Ble::CHIP_BLE_SVC_ID);
+        _workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
         _centralManager = [CBCentralManager alloc];
         _found = false;
         _cachedPeripherals = [[NSMutableDictionary alloc] init];
-        _currentMode = kUndefined;
         [self _resetCounters];
     }
 
     return self;
 }
 
-- (id)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm queue:(dispatch_queue_t)queue
+- (instancetype)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm
 {
-    self = [self initWithQueue:queue];
+    self = [self init];
     if (self) {
         _scannerDelegate = delegate;
         if (prewarm) {
@@ -274,9 +248,9 @@ namespace DeviceLayer {
     return self;
 }
 
-- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator queue:(dispatch_queue_t)queue
+- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
 {
-    self = [self initWithQueue:queue];
+    self = [self init];
     if (self) {
         _deviceDiscriminator = deviceDiscriminator;
         _currentMode = kConnecting;
@@ -318,26 +292,36 @@ namespace DeviceLayer {
 // All our callback dispatch must happen on _chipWorkQueue
 - (void)dispatchConnectionError:(CHIP_ERROR)error
 {
-    dispatch_async(_chipWorkQueue, ^{
-        if (self.onConnectionError != nil) {
-            self.onConnectionError(self.appState, error);
-        }
-    });
+    auto * onConnectionError = _onConnectionError;
+    auto * appState = _appState;
+    [self clearConnectionCallbacks];
+    if (onConnectionError != nullptr) {
+        onConnectionError(appState, error);
+    }
 }
 
 - (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
 {
-    dispatch_async(_chipWorkQueue, ^{
-        if (self.onConnectionComplete != nil) {
-            self.onConnectionComplete(self.appState, (__bridge void *) peripheral);
-        }
-    });
+    auto * onConnectionComplete = _onConnectionComplete;
+    auto * appState = _appState;
+    [self clearConnectionCallbacks];
+    if (onConnectionComplete != nullptr) {
+        onConnectionComplete(appState, BleConnObjectFromCBPeripheral(peripheral));
+    }
+}
+
+- (void)clearConnectionCallbacks
+{
+    _onConnectionComplete = nullptr;
+    _onConnectionError = nullptr;
+    _appState = nullptr;
 }
 
 // Start CBCentralManagerDelegate
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
+    assertChipStackLockedByCurrentThread();
     MATTER_LOG_METRIC(kMetricBLECentralManagerState, static_cast<uint32_t>(central.state));
 
     switch (central.state) {
@@ -370,15 +354,9 @@ namespace DeviceLayer {
         advertisementData:(NSDictionary *)advertisementData
                      RSSI:(NSNumber *)RSSI
 {
-    NSDictionary * servicesData = [advertisementData objectForKey:CBAdvertisementDataServiceDataKey];
-    NSData * serviceData;
-    for (CBUUID * serviceUUID in servicesData) {
-        if ([serviceUUID.data isEqualToData:_shortServiceUUID.data]) {
-            serviceData = [servicesData objectForKey:serviceUUID];
-            break;
-        }
-    }
+    assertChipStackLockedByCurrentThread();
 
+    NSData * serviceData = advertisementData[CBAdvertisementDataServiceDataKey][_chipServiceUUID];
     if (!serviceData) {
         return;
     }
@@ -443,8 +421,10 @@ namespace DeviceLayer {
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
+    assertChipStackLockedByCurrentThread();
     MATTER_LOG_METRIC_END(kMetricBLEConnectPeripheral);
     MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredServices);
+
     [peripheral setDelegate:self];
     [peripheral discoverServices:nil];
     [self stopScanning];
@@ -456,14 +436,16 @@ namespace DeviceLayer {
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
-    if (nil != error) {
-        ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%s]", [error.localizedDescription UTF8String]);
+    assertChipStackLockedByCurrentThread();
+
+    if (error != nil) {
+        ChipLogError(Ble, "Failed to discover services: %@", error);
     }
 
     MATTER_LOG_METRIC_END(kMetricBLEDiscoveredServices, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
 
     for (CBService * service in peripheral.services) {
-        if ([service.UUID.data isEqualToData:_shortServiceUUID.data] && !self.found) {
+        if ([service.UUID isEqual:_chipServiceUUID] && !self.found) {
             MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredCharacteristics);
             [peripheral discoverCharacteristics:nil forService:service];
             self.found = true;
@@ -472,7 +454,7 @@ namespace DeviceLayer {
     }
 
     if (!self.found || error != nil) {
-        ChipLogError(Ble, "Service not found on the device.");
+        ChipLogError(Ble, "Matter Service not found on the device");
         MATTER_LOG_METRIC(kMetricBLEDiscoveredServices, CHIP_ERROR_INCORRECT_STATE);
         [self dispatchConnectionError:CHIP_ERROR_INCORRECT_STATE];
     }
@@ -480,11 +462,11 @@ namespace DeviceLayer {
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
+    assertChipStackLockedByCurrentThread();
     MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
 
-    if (nil != error) {
-        ChipLogError(
-            Ble, "BLE:Error finding Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
+    if (error != nil) {
+        ChipLogError(Ble, "Failed to discover characterstics: %@", error);
     }
 
     // XXX error ?
@@ -495,20 +477,16 @@ namespace DeviceLayer {
     didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                              error:(NSError *)error
 {
+    assertChipStackLockedByCurrentThread();
+
     if (nil == error) {
-        chip::Ble::ChipBleUUID svcId;
-        chip::Ble::ChipBleUUID charId;
-        [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
-        dispatch_async(_chipWorkQueue, ^{
-            _mBleLayer->HandleWriteConfirmation((__bridge void *) peripheral, &svcId, &charId);
-        });
+        ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
+        ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
+        _bleLayer->HandleWriteConfirmation(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
     } else {
-        ChipLogError(
-            Ble, "BLE:Error writing Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
-        dispatch_async(_chipWorkQueue, ^{
-            MATTER_LOG_METRIC(kMetricBLEWriteChrValueFailed, BLE_ERROR_GATT_WRITE_FAILED);
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_WRITE_FAILED);
-        });
+        ChipLogError(Ble, "Failed to write characteristic: %@", error);
+        MATTER_LOG_METRIC(kMetricBLEWriteChrValueFailed, BLE_ERROR_GATT_WRITE_FAILED);
+        _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_WRITE_FAILED);
     }
 }
 
@@ -516,34 +494,31 @@ namespace DeviceLayer {
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
                                           error:(NSError *)error
 {
+    assertChipStackLockedByCurrentThread();
+
     bool isNotifying = characteristic.isNotifying;
 
     if (nil == error) {
-        chip::Ble::ChipBleUUID svcId;
-        chip::Ble::ChipBleUUID charId;
-        [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
-
-        dispatch_async(_chipWorkQueue, ^{
-            if (isNotifying) {
-                _mBleLayer->HandleSubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
-            } else {
-                _mBleLayer->HandleUnsubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
-            }
-        });
+        ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
+        ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
+        if (isNotifying) {
+            _bleLayer->HandleSubscribeComplete(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
+        } else {
+            _bleLayer->HandleUnsubscribeComplete(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId);
+        }
     } else {
         ChipLogError(Ble, "BLE:Error subscribing/unsubcribing some characteristic on the device: [%s]",
             [error.localizedDescription UTF8String]);
-        dispatch_async(_chipWorkQueue, ^{
-            if (isNotifying) {
-                MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_WRITE_FAILED);
-                // we're still notifying, so we must failed the unsubscription
-                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
-            } else {
-                // we're not notifying, so we must failed the subscription
-                MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
-                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
-            }
-        });
+
+        if (isNotifying) {
+            MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_WRITE_FAILED);
+            // we're still notifying, so we must failed the unsubscription
+            _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
+        } else {
+            // we're not notifying, so we must failed the subscription
+            MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+            _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+        }
     }
 }
 
@@ -551,34 +526,30 @@ namespace DeviceLayer {
     didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
                               error:(NSError *)error
 {
+    assertChipStackLockedByCurrentThread();
+
     if (nil == error) {
-        chip::Ble::ChipBleUUID svcId;
-        chip::Ble::ChipBleUUID charId;
-        [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
+        ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
+        ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
         auto * value = characteristic.value; // read immediately before dispatching
 
-        dispatch_async(_chipWorkQueue, ^{
-            // build a inet buffer from the rxEv and send to blelayer.
-            auto msgBuf = chip::System::PacketBufferHandle::NewWithData(value.bytes, value.length);
+        // build a inet buffer from the rxEv and send to blelayer.
+        auto msgBuf = chip::System::PacketBufferHandle::NewWithData(value.bytes, value.length);
 
-            if (msgBuf.IsNull()) {
-                ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
-                MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, CHIP_ERROR_NO_MEMORY);
-                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, CHIP_ERROR_NO_MEMORY);
-            } else if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
-                // since this error comes from device manager core
-                // we assume it would do the right thing, like closing the connection
-                ChipLogError(Ble, "Failed at handling incoming BLE data");
-                MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, CHIP_ERROR_INCORRECT_STATE);
-            }
-        });
+        if (msgBuf.IsNull()) {
+            ChipLogError(Ble, "Failed to allocate buffer for incoming BLE data");
+            MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, CHIP_ERROR_NO_MEMORY);
+            _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), CHIP_ERROR_NO_MEMORY);
+        } else if (!_bleLayer->HandleIndicationReceived(BleConnObjectFromCBPeripheral(peripheral), &svcId, &charId, std::move(msgBuf))) {
+            // since this error comes from device manager core
+            // we assume it would do the right thing, like closing the connection
+            ChipLogError(Ble, "Failed to handle incoming BLE data");
+            MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, CHIP_ERROR_INCORRECT_STATE);
+        }
     } else {
-        ChipLogError(
-            Ble, "BLE:Error receiving indication of Characteristics on the device: [%s]", [error.localizedDescription UTF8String]);
-        dispatch_async(_chipWorkQueue, ^{
-            MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, BLE_ERROR_GATT_INDICATE_FAILED);
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_INDICATE_FAILED);
-        });
+        ChipLogError(Ble, "Failed to receive characteristic indication: %@", error);
+        MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, BLE_ERROR_GATT_INDICATE_FAILED);
+        _bleLayer->HandleConnectionError(BleConnObjectFromCBPeripheral(peripheral), BLE_ERROR_GATT_INDICATE_FAILED);
     }
 }
 
@@ -603,30 +574,24 @@ namespace DeviceLayer {
     [self stopScanning];
     [self removePeripheralsFromCache];
 
-    if (!_centralManager && !_peripheral) {
-        return;
+    if (_peripheral) {
+        // Close all BLE connections before we release CB objects
+        // TODO: It's not clear that calling back into BLELayer is right here, since this method is
+        // called indirectly by BLELayer::CancelBleIncompleteConnection. There don't seem to be any
+        // other instances of platform delegates making this upwards call. It was introduced here:
+        // https://github.com/project-chip/connectedhomeip/pull/20299/files
+        _bleLayer->CloseAllBleConnections();
+        _peripheral = nil;
     }
 
-    // Properly closing the underlying ble connections needs to happens
-    // on the chip work queue. At the same time the SDK is trying to
-    // properly unsubscribe and shutdown the connection, so if we nullify
-    // the centralManager and the peripheral members too early it won't be
-    // able to reach those.
-    // This is why closing connections happens as 2 async steps.
-    dispatch_async(_chipWorkQueue, ^{
-        if (_peripheral) {
-            _mBleLayer->CloseAllBleConnections();
-        }
+    if (_centralManager) {
+        _centralManager.delegate = nil;
+        _centralManager = nil;
+    }
 
-        dispatch_async(_workQueue, ^{
-            _centralManager.delegate = nil;
-            _centralManager = nil;
-            _peripheral = nil;
-            if (chip::DeviceLayer::Internal::ble == self) {
-                chip::DeviceLayer::Internal::ble = nil;
-            }
-        });
-    });
+    if (chip::DeviceLayer::Internal::ble == self) {
+        chip::DeviceLayer::Internal::ble = nil;
+    }
 }
 
 - (void)_resetCounters
@@ -647,7 +612,7 @@ namespace DeviceLayer {
     [self _resetCounters];
 
     auto scanOptions = @{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES };
-    [_centralManager scanForPeripheralsWithServices:@[ _shortServiceUUID ] options:scanOptions];
+    [_centralManager scanForPeripheralsWithServices:@[ _chipServiceUUID ] options:scanOptions];
 }
 
 - (void)stopScanning
@@ -680,9 +645,7 @@ namespace DeviceLayer {
     auto * existingDelegate = _scannerDelegate;
     if (existingDelegate) {
         _scannerDelegate = nullptr;
-        dispatch_async(_chipWorkQueue, ^{
-            existingDelegate->OnBleScanStopped();
-        });
+        existingDelegate->OnBleScanStopped();
     }
 }
 
@@ -693,11 +656,9 @@ namespace DeviceLayer {
     if (delegate) {
         for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
             NSData * serviceData = _cachedPeripherals[cachedPeripheral][@"data"];
-            dispatch_async(_chipWorkQueue, ^{
-                ChipBLEDeviceIdentificationInfo info;
-                memcpy(&info, [serviceData bytes], sizeof(info));
-                delegate->OnBleScanAdd((__bridge void *) cachedPeripheral, info);
-            });
+            ChipBLEDeviceIdentificationInfo info;
+            memcpy(&info, [serviceData bytes], sizeof(info));
+            delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(cachedPeripheral), info);
         }
         _scannerDelegate = delegate;
     }
@@ -768,12 +729,10 @@ namespace DeviceLayer {
         ChipLogProgress(Ble, "Adding peripheral %p to the cache", peripheral);
         auto delegate = _scannerDelegate;
         if (delegate) {
-            dispatch_async(_chipWorkQueue, ^{
-                ChipBLEDeviceIdentificationInfo info;
-                auto bytes = (const uint8_t *) [data bytes];
-                memcpy(&info, bytes, sizeof(info));
-                delegate->OnBleScanAdd((__bridge void *) peripheral, info);
-            });
+            ChipBLEDeviceIdentificationInfo info;
+            auto bytes = (const uint8_t *) [data bytes];
+            memcpy(&info, bytes, sizeof(info));
+            delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(peripheral), info);
         }
 
         timeoutTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
@@ -820,9 +779,7 @@ namespace DeviceLayer {
 
         auto delegate = _scannerDelegate;
         if (delegate) {
-            dispatch_async(_chipWorkQueue, ^{
-                delegate->OnBleScanRemove((__bridge void *) peripheral);
-            });
+            delegate->OnBleScanRemove(BleConnObjectFromCBPeripheral(peripheral));
         }
     }
 }
@@ -834,58 +791,10 @@ namespace DeviceLayer {
     }
 }
 
-/**
- * private static method to copy service and characteristic UUIDs from CBCharacteristic to a pair of ChipBleUUID objects.
- * this is used in calls into Chip layer to decouple it from CoreBluetooth
- *
- * @param[in] characteristic the source characteristic
- * @param[in] svcId the destination service UUID
- * @param[in] charId the destination characteristic UUID
- *
- */
-+ (void)fillServiceWithCharacteristicUuids:(CBCharacteristic *)characteristic
-                                     svcId:(chip::Ble::ChipBleUUID *)svcId
-                                    charId:(chip::Ble::ChipBleUUID *)charId
+- (NSString *)description
 {
-    static const size_t FullUUIDLength = 16;
-    if ((FullUUIDLength != sizeof(charId->bytes)) || (FullUUIDLength != sizeof(svcId->bytes))
-        || (FullUUIDLength != characteristic.UUID.data.length)) {
-        // we're dead. we expect the data length to be the same (16-byte) across the board
-        ChipLogError(Ble, "UUID of characteristic is incompatible");
-        return;
-    }
-
-    memcpy(charId->bytes, characteristic.UUID.data.bytes, sizeof(charId->bytes));
-    memset(svcId->bytes, 0, sizeof(svcId->bytes));
-
-    // Expand service UUID back to 16-byte long as that's what the BLE Layer expects
-    // this is a buffer pre-filled with BLE service UUID Base
-    // byte 0 to 3 are reserved for shorter versions of BLE service UUIDs
-    // For 4-byte service UUIDs, all bytes from 0 to 3 are used
-    // For 2-byte service UUIDs, byte 0 and 1 shall be 0
-    uint8_t serviceFullUUID[FullUUIDLength]
-        = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB };
-
-    switch (characteristic.service.UUID.data.length) {
-    case 2:
-        // copy the 2-byte service UUID onto the right offset
-        memcpy(serviceFullUUID + 2, characteristic.service.UUID.data.bytes, 2);
-        break;
-    case 4:
-        // flow through
-    case 16:
-        memcpy(serviceFullUUID, characteristic.service.UUID.data.bytes, characteristic.service.UUID.data.length);
-        break;
-    default:
-        // we're dead. we expect the data length to be the same (16-byte) across the board
-        ChipLogError(Ble, "Service UUIDs are incompatible");
-    }
-    memcpy(svcId->bytes, serviceFullUUID, sizeof(svcId->bytes));
-}
-
-- (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer
-{
-    _mBleLayer = bleLayer;
+    return [NSString stringWithFormat:@"<%@ %p mode=%d cbstate=%p peripheral=%@>",
+                     self.class, self, _currentMode, _appState, _peripheral];
 }
 
 @end

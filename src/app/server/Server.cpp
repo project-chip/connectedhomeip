@@ -216,12 +216,17 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
     // Init transport before operations with secure session mgr.
+    //
+    // The logic below expects that the IPv6 transport is at index 0. Keep that logic in sync with
+    // this code.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
                                .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
                                ,
+                           // The logic below expects that the IPv4 transport, if enabled, is at
+                           // index 1. Keep that logic in sync with this code.
                            UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv4)
                                .SetListenPort(mOperationalServicePort)
@@ -236,7 +241,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                            ,
-                           Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
+                           Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
+                               DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
 #endif
     );
 
@@ -318,13 +324,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 #endif
 
-    //
-    // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
-    // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
-    // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
-    // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
-    //
-    app::DnssdServer::Instance().SetSecuredPort(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+    app::DnssdServer::Instance().SetSecuredIPv6Port(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+#if INET_CONFIG_ENABLE_IPV4
+    app::DnssdServer::Instance().SetSecuredIPv4Port(mTransports.GetTransport().GetImplAtIndex<1>().GetBoundPort());
+#endif // INET_CONFIG_ENABLE_IPV4
 
     app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
@@ -428,9 +431,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     //
     // Thread LWIP devices using dedicated Inet endpoint implementations are excluded because they call this function from:
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp
-#if !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     RejoinExistingMulticastGroups();
-#endif // !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
     // Handle deferred clean-up of a previously armed fail-safe that occurred during FabricTable commit.
     // This is done at the very end since at the earlier time above when FabricTable::Init() is called,
@@ -532,7 +535,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         ResumeSubscriptions();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         break;
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     case DeviceEventType::kThreadConnectivityChange:
         if (event.ThreadConnectivityChange.Result == kConnectivity_Established)
         {
@@ -541,7 +544,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
             RejoinExistingMulticastGroups();
         }
         break;
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     default:
         break;
     }
@@ -616,8 +619,21 @@ void Server::GenerateShutDownEvent()
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
 }
 
+void Server::PostFactoryResetEvent()
+{
+    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFactoryReset };
+
+    CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Posting kFactoryReset event failed with %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+
 void Server::ScheduleFactoryReset()
 {
+    PostFactoryResetEvent();
+
     PlatformMgr().ScheduleWork([](intptr_t) {
         // Delete all fabrics and emit Leave event.
         GetInstance().GetFabricTable().DeleteAllFabrics();

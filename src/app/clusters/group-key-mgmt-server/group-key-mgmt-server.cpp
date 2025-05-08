@@ -458,6 +458,10 @@ void MatterGroupKeyManagementPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttribute);
 }
 
+void MatterGroupKeyManagementPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttribute);
+}
 //
 // Commands
 //

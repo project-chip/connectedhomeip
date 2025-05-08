@@ -22,6 +22,7 @@
 #include <platform/CommissionableDataProvider.h>
 
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
+#include "app/icd/server/ICDNotifier.h"
 #include "app/server/CommissioningWindowManager.h"
 #include "app/server/Server.h"
 #include "credentials/FabricTable.h"
@@ -479,6 +480,23 @@ public:
             return pw::Status::Unknown();
         }
         return pw::OkStatus();
+    }
+
+    virtual pw::Status TriggerIcdCheckin(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    {
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) {
+                chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
+                ChipLogDetail(AppServer, "Being triggerred to send ICD check-in message to subscriber");
+                chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+            },
+            reinterpret_cast<intptr_t>(nullptr));
+        return pw::OkStatus();
+#else  // CHIP_CONFIG_ENABLE_ICD_CIP
+        ChipLogError(AppServer, "TriggerIcdCheckin is not supported");
+        return pw::Status::Unimplemented();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     }
 
 private:

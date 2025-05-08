@@ -169,13 +169,18 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.transportMgr = chip::Platform::New<DeviceTransportMgr>();
 
     //
-    // The logic below expects IPv6 to be at index 0 of this tuple. Please do not alter that.
+    // The logic below expects IPv6 to be at index 0 of this tuple. Keep that logic in sync with
+    // this code.
     //
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
                                                             .SetListenPort(params.listenPort)
 #if INET_CONFIG_ENABLE_IPV4
                                                             ,
+                                                        //
+                                                        // The logic below expects IPv4 to be at index 1 of this tuple,
+                                                        // if it's enabled. Keep that logic in sync with this code.
+                                                        //
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
@@ -272,13 +277,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
             stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, sessionResumptionStorage,
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
 
-        //
-        // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
-        // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
-        // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
-        // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
-        //
-        app::DnssdServer::Instance().SetSecuredPort(stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
+        // Our IPv6 transport is at index 0.
+        app::DnssdServer::Instance().SetSecuredIPv6Port(
+            stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
+
+#if INET_CONFIG_ENABLE_IPV4
+        // If enabled, our IPv4 transport is at index 1.
+        app::DnssdServer::Instance().SetSecuredIPv4Port(
+            stateParams.transportMgr->GetTransport().GetImplAtIndex<1>().GetBoundPort());
+#endif // INET_CONFIG_ENABLE_IPV4
 
         //
         // TODO: This is a hack to workaround the fact that we have a bi-polar stack that has controller and server modalities that

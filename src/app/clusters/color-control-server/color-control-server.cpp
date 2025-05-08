@@ -3339,3 +3339,4 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(EndpointId endp
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 void MatterColorControlPluginServerInitCallback() {}
+void MatterColorControlPluginServerShutdownCallback() {}

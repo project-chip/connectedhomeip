@@ -84,22 +84,19 @@ public:
         return Access::SubjectDescriptor(); // return an empty ISD for unauthenticated session.
     }
 
-    bool AllowsMRP() const override
-    {
-        return ((GetPeerAddress().GetTransportType() == Transport::Type::kUdp) ||
-                (GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF));
-    }
+    bool AllowsMRP() const override { return (GetPeerAddress().GetTransportType() == Transport::Type::kUdp); }
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 
-    System::Clock::Milliseconds32 GetAckTimeout() const override
+    System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const override
     {
         switch (mPeerAddress.GetTransportType())
         {
         case Transport::Type::kUdp: {
             const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
             return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
-                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime);
+                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime,
+                                            isFirstMessageOnExchange);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
@@ -111,7 +108,8 @@ public:
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity,
+                                                           bool isFirstMessageOnExchange) const override
     {
         switch (mPeerAddress.GetTransportType())
         {
@@ -120,7 +118,7 @@ public:
             const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
             const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
             return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
-                                            ourLastActivity, localMRPConfig.mActiveThresholdTime);
+                                            ourLastActivity, localMRPConfig.mActiveThresholdTime, isFirstMessageOnExchange);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);

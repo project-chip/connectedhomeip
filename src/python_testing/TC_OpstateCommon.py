@@ -109,11 +109,11 @@ class TC_OPSTATE_BASE():
                 app_pid = get_pid("chip-all-clusters-app")
                 if app_pid is None:
                     asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-            self.app_pipe = self.app_pipe + str(app_pid)
+            self.app_pid = app_pid
 
     def send_raw_manual_or_pipe_command(self, command: dict, msg: str):
         if self.is_ci:
-            self.write_to_app_pipe(command)
+            self.write_to_app_pipe(command, app_pipe_prefix=self.app_pipe, app_pid=self.app_pid)
             time.sleep(0.1)
         else:
             prompt = msg if msg is not None else "Press Enter when ready."
@@ -131,6 +131,24 @@ class TC_OPSTATE_BASE():
             command["Param"] = param
 
         self.send_raw_manual_or_pipe_command(command, msg)
+
+    def opcomplete_test_mandated(self, device_type_list):
+        mandatedevicetypes = [{"devicetype": 115, "revision": 2},  # Laundry Washer
+                              {"devicetype": 116, "revision": 4},  # RVC
+                              {"devicetype": 117, "revision": 2},  # Dishwasher
+                              {"devicetype": 121, "revision": 2},  # Microwave Oven
+                              {"devicetype": 123, "revision": 3},  # Oven
+                              {"devicetype": 124, "revision": 2}]  # Laundry Dryer
+        for device in device_type_list:
+            found = next((mydevice for mydevice in mandatedevicetypes if mydevice["devicetype"] == device.deviceType), None)
+            if found is not None:
+                logging.info("Found matching device type for OpCompletion Event mandate %s", found["devicetype"])
+                if found["revision"] == device.revision:
+                    logging.info("Revision matches")
+                    return True
+                else:
+                    logging.info("Revision does not match")
+        return False
 
     async def send_cmd(self, endpoint, cmd, timedRequestTimeoutMs=None):
         logging.info(f"##### Command {cmd}")
@@ -196,6 +214,7 @@ class TC_OPSTATE_BASE():
     ############################
     #   TEST CASE 1.1
     ############################
+
     def STEPS_TC_OPSTATE_BASE_1_1(self) -> list[TestStep]:
         steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "TH reads from the DUT the ClusterRevision attribute"),
@@ -1024,14 +1043,32 @@ class TC_OPSTATE_BASE():
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
 
-        # STEP 2: Set up a subscription to the OperationCompletion event
+        # Store PICS value for the Op Complete Event
+        opcomplete_pics = self.check_pics(f"{self.test_info.pics_code}.S.E01")
+
+        # Get Device Types
+        device_type_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor,
+                                                                          attribute=Clusters.Descriptor.Attributes.DeviceTypeList,
+                                                                          endpoint=endpoint)
+
+        # Check to see if this test is mandated for the device type in question, that is, we expect support for the OpComplete Event
+        istestmandated = self.opcomplete_test_mandated(device_type_list)
+
+        if istestmandated and not opcomplete_pics:
+            # Device type requires the event, PICS is missing the event, fail
+            asserts.fail("OperationComplete Event support mandated for device type, but not indicated in the PICS")
+
+        # STEP 2: Verify the PICS is set, if not, skip the entire TC. If yes, set up a subscription to the OperationCompletion event
+        if not opcomplete_pics:
+            self.skip_all_remaining_steps(2)
+            return
+
         self.step(2)
-        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.E01")):
-            # Subscribe to Events and when they are sent push them to a queue for checking later
-            events_callback = EventSpecificChangeCallback(events.OperationCompletion)
-            await events_callback.start(self.default_controller,
-                                        self.dut_node_id,
-                                        endpoint)
+        # Subscribe to Events and when they are sent push them to a queue for checking later
+        events_callback = EventSpecificChangeCallback(events.OperationCompletion)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    endpoint)
 
         # STEP 3: Manually put the DUT into a state wherein it can receive a Start Command
         self.step(3)
@@ -1080,19 +1117,18 @@ class TC_OPSTATE_BASE():
 
             # STEP 9: TH waits for OperationCompletion event
             self.step(9)
-            if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.E01")):
-                event_data = events_callback.wait_for_event_report()
+            event_data = events_callback.wait_for_event_report()
 
-                asserts.assert_equal(event_data.completionErrorCode, cluster.Enums.ErrorStateEnum.kNoError,
-                                     f"Completion event error code mismatched from expectation on endpoint {endpoint}.")
+            asserts.assert_equal(event_data.completionErrorCode, cluster.Enums.ErrorStateEnum.kNoError,
+                                 f"Completion event error code mismatched from expectation on endpoint {endpoint}.")
 
-                if event_data.totalOperationalTime is not NullValue:
-                    time_diff = abs(initial_countdown_time - event_data.totalOperationalTime)
-                    asserts.assert_less_equal(time_diff, 1,
-                                              f"The total operation time shall be at least {initial_countdown_time:.1f}")
+            if event_data.totalOperationalTime is not NullValue:
+                time_diff = abs(initial_countdown_time - event_data.totalOperationalTime)
+                asserts.assert_less_equal(time_diff, 1,
+                                          f"The total operation time shall be at least {initial_countdown_time:.1f}")
 
-                asserts.assert_equal(0, event_data.pausedTime,
-                                     f"Paused time ({event_data.pausedTime}) shall be zero")
+            asserts.assert_equal(0, event_data.pausedTime,
+                                 f"Paused time ({event_data.pausedTime}) shall be zero")
 
             # STEP 10: TH reads from the DUT the OperationalState attribute
             self.step(10)
@@ -1108,12 +1144,11 @@ class TC_OPSTATE_BASE():
                 self.wait_for_user_input(prompt_msg="Restart DUT. Press Enter when ready.\n")
                 # Expire the session and re-establish the subscription
                 self.default_controller.ExpireSessions(self.dut_node_id)
-                if self.check_pics(f"{self.test_info.pics_code}.S.E01"):
-                    # Subscribe to Events and when they are received push them to a queue for checking later
-                    events_callback = EventSpecificChangeCallback(events.OperationCompletion)
-                    await events_callback.start(self.default_controller,
-                                                self.dut_node_id,
-                                                endpoint)
+                # Subscribe to Events and when they are received push them to a queue for checking later
+                events_callback = EventSpecificChangeCallback(events.OperationCompletion)
+                await events_callback.start(self.default_controller,
+                                            self.dut_node_id,
+                                            endpoint)
 
             # STEP 12: TH waits for {PIXIT.WAITTIME.REBOOT}
             self.step(12)
@@ -1175,21 +1210,20 @@ class TC_OPSTATE_BASE():
 
             # STEP 22: TH waits for OperationCompletion event
             self.step(22)
-            if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.E01")):
-                event_data = events_callback.wait_for_event_report()
+            event_data = events_callback.wait_for_event_report()
 
-                asserts.assert_equal(event_data.completionErrorCode, cluster.Enums.ErrorStateEnum.kNoError,
-                                     f"Completion event error code mismatched from expectation on endpoint {endpoint}.")
+            asserts.assert_equal(event_data.completionErrorCode, cluster.Enums.ErrorStateEnum.kNoError,
+                                 f"Completion event error code mismatched from expectation on endpoint {endpoint}.")
 
-                if event_data.totalOperationalTime is not NullValue:
-                    expected_value = (1.5 * initial_countdown_time)
+            if event_data.totalOperationalTime is not NullValue:
+                expected_value = (1.5 * initial_countdown_time)
 
-                    asserts.assert_less_equal(expected_value, event_data.totalOperationalTime,
-                                              f"The total operation time shall be at least {expected_value:.1f}")
+                asserts.assert_less_equal(expected_value, event_data.totalOperationalTime,
+                                          f"The total operation time shall be at least {expected_value:.1f}")
 
-                expected_value = (0.5 * initial_countdown_time)
-                asserts.assert_less_equal(expected_value, event_data.pausedTime,
-                                          f"Paused time ({event_data.pausedTime}) shall be at least {expected_value:.1f}")
+            expected_value = (0.5 * initial_countdown_time)
+            asserts.assert_less_equal(expected_value, event_data.pausedTime,
+                                      f"Paused time ({event_data.pausedTime}) shall be at least {expected_value:.1f}")
         else:
             self.skip_step(6)
             self.skip_step(7)

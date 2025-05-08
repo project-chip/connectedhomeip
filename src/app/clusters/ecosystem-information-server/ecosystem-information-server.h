@@ -55,6 +55,17 @@ class TestOnlyParameter
 // of underlying types.
 class EcosystemDeviceStruct
 {
+private:
+    // Originally we wanted the constructor of EcosystemDeviceStruct to be private to ensure
+    // only Builder could construct it. This would ensure that this struct will only be
+    // created with values that conform to the spec. Unfortunately, std::make_unique is
+    // not able to call a private constructor. As a workaround, to ensure the constructor is
+    // only callable internally, we created this PrivateToken as a privately accessible
+    // parameter that needs to be passed into the constructor.
+    class PrivateToken
+    {
+    };
+
 public:
     class Builder
     {
@@ -84,15 +95,10 @@ public:
         bool mIsAlreadyBuilt                       = false;
     };
 
-    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
-
-private:
-    // Constructor is intentionally private. This is to ensure that it is only constructed with
-    // values that conform to the spec.
     explicit EcosystemDeviceStruct(std::string && aDeviceName, uint64_t aDeviceNameLastEditEpochUs, EndpointId aBridgedEndpoint,
                                    EndpointId aOriginalEndpoint, std::vector<Structs::DeviceTypeStruct::Type> && aDeviceTypes,
                                    std::vector<std::string> && aUniqueLocationIds, uint64_t aUniqueLocationIdsLastEditEpochUs,
-                                   FabricIndex aFabricIndex) :
+                                   FabricIndex aFabricIndex, PrivateToken _) :
         mDeviceName(std::move(aDeviceName)),
         mDeviceNameLastEditEpochUs(aDeviceNameLastEditEpochUs), mBridgedEndpoint(aBridgedEndpoint),
         mOriginalEndpoint(aOriginalEndpoint), mDeviceTypes(std::move(aDeviceTypes)),
@@ -101,6 +107,9 @@ private:
 
     {}
 
+    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+
+private:
     const std::string mDeviceName;
     uint64_t mDeviceNameLastEditEpochUs;
     EndpointId mBridgedEndpoint;
@@ -122,6 +131,17 @@ struct LocationDescriptorStruct
 // of underlying types.
 class EcosystemLocationStruct
 {
+private:
+    // Originally we wanted the constructor of EcosystemLocationStruct to be private to ensure
+    // only Builder could construct it. This would ensure that this struct will only be
+    // created with values that conform to the spec. Unfortunately, std::make_unique is
+    // not able to call a private constructor. As a workaround, to ensure the constructor is
+    // only callable internally, we created this PrivateToken as a privately accessible
+    // parameter that needs to be passed into the constructor.
+    class PrivateToken
+    {
+    };
+
 public:
     class Builder
     {
@@ -143,15 +163,16 @@ public:
         bool mIsAlreadyBuilt                        = false;
     };
 
+    explicit EcosystemLocationStruct(LocationDescriptorStruct && aLocationDescriptor, uint64_t aLocationDescriptorLastEditEpochUs,
+                                     PrivateToken _) :
+        mLocationDescriptor(aLocationDescriptor),
+        mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs)
+    {}
+
     CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const std::string & aUniqueLocationId,
                       const FabricIndex & aFabricIndex);
 
 private:
-    // Constructor is intentionally private. This is to ensure that it is only constructed with
-    // values that conform to the spec.
-    explicit EcosystemLocationStruct(LocationDescriptorStruct && aLocationDescriptor, uint64_t aLocationDescriptorLastEditEpochUs) :
-        mLocationDescriptor(aLocationDescriptor), mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs)
-    {}
     // EcosystemLocationStruct is used as a value in a key-value map.
     // Because UniqueLocationId and FabricIndex are mandatory when an entry exist,
     // and needs to be unique, we use it as a key to the key-value pair and is why it is

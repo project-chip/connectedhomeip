@@ -148,3 +148,4 @@ bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(CommandHandler * co
 }
 
 void MatterFaultInjectionPluginServerInitCallback() {}
+void MatterFaultInjectionPluginServerShutdownCallback() {}
