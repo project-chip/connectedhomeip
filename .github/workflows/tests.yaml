@@ -517,6 +517,7 @@ jobs:
                       --target linux-x64-fabric-bridge-rpc-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-fabric-sync-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-camera \
+                      --target linux-x64-camera-controller \
                       --target linux-x64-light-data-model-no-unique-id-ipv6only-no-ble-no-wifi-clang \
                       --target linux-x64-terms-and-conditions \
                       --target linux-x64-python-bindings \
