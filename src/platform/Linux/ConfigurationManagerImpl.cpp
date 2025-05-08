@@ -388,108 +388,16 @@ CHIP_ERROR ConfigurationManagerImpl::StoreHardwareVersionString(const char * buf
     return WriteConfigValueStr(PosixConfig::kConfigKey_HardwareVersionString, buf, bufSize);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetHardwareVersionString(char * buf, size_t bufSize)
-{
-    // Read from Posix config.
-    size_t outLen;
-    auto err = ReadConfigValueStr(PosixConfig::kConfigKey_HardwareVersionString, buf, bufSize, outLen);
-
-    // If not found, get from preprocessor variable.
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        VerifyOrReturnError(bufSize > sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-        strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
-        return CHIP_NO_ERROR;
-    }
-
-    ReturnErrorOnFailure(err);
-
-    // Null terminate buf.
-    VerifyOrReturnError(outLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    buf[outLen] = '\0';
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ConfigurationManagerImpl::StoreVendorName(const char * buf, size_t bufSize)
 {
     VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxVendorNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
     return WriteConfigValueStr(PosixConfig::kConfigKey_VendorName, buf, bufSize);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetVendorName(char * buf, size_t bufSize)
-{
-    // Read from Posix config.
-    size_t outLen;
-    auto err = ReadConfigValueStr(PosixConfig::kConfigKey_VendorName, buf, bufSize, outLen);
-
-    // If not found, get from preprocessor variable.
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        VerifyOrReturnError(bufSize > sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-        strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
-        return CHIP_NO_ERROR;
-    }
-
-    ReturnErrorOnFailure(err);
-
-    // Null terminate buf.
-    VerifyOrReturnError(outLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    buf[outLen] = '\0';
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ConfigurationManagerImpl::StoreProductName(const char * buf, size_t bufSize)
 {
     VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxProductNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
     return WriteConfigValueStr(PosixConfig::kConfigKey_ProductName, buf, bufSize);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductName(char * buf, size_t bufSize)
-{
-    // Read from Posix config.
-    size_t outLen;
-    auto err = ReadConfigValueStr(PosixConfig::kConfigKey_ProductName, buf, bufSize, outLen);
-
-    // If not found, get from preprocessor variable.
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        VerifyOrReturnError(bufSize > sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-        strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
-        return CHIP_NO_ERROR;
-    }
-
-    ReturnErrorOnFailure(err);
-
-    // Null terminate buf.
-    VerifyOrReturnError(outLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    buf[outLen] = '\0';
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetSerialNumber(char * buf, size_t bufSize)
-{
-    // Read from Posix config.
-    size_t outLen;
-    auto err = ReadConfigValueStr(PosixConfig::kConfigKey_SerialNum, buf, bufSize, outLen);
-
-    // If not found, get from preprocessor variable.
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        VerifyOrReturnError(bufSize > sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER), CHIP_ERROR_BUFFER_TOO_SMALL);
-        strcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
-        return CHIP_NO_ERROR;
-    }
-
-    ReturnErrorOnFailure(err);
-
-    // Null terminate buf.
-    VerifyOrReturnError(outLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    buf[outLen] = '\0';
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
