@@ -465,7 +465,10 @@ jobs:
 
         strategy:
           matrix:
-            build_variant: [ ipv6only-no-ble-no-wifi]
+            # TODO: ipv6only should be re-enabled ideally, however mDNS seems currently broken someone
+            #       see https://github.com/project-chip/connectedhomeip/issues/38822
+            #   build_variant: [ ipv6only-no-ble-no-wifi]
+            build_variant: [ no-ble-no-wifi]
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
@@ -567,7 +570,7 @@ jobs:
               run: |
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --keep-going'
                   scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app"
 
             - name: Execute Jupyter Notebooks
