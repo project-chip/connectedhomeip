@@ -2811,13 +2811,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     NSArray<NSNumber *> * orderedDeviceIDs = [deviceOnboardingPayloads allKeys];
 
-    // We have one fake device, which we use an invalid node ID for, that we use
-    // to test what happens if a device is deallocated while its subscription
-    // work item is queued.
-    NSMutableArray<NSNumber *> * orderedDeviceIDsIncludingFake = [orderedDeviceIDs mutableCopy];
-    NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
-    [orderedDeviceIDsIncludingFake insertObject:fakeDeviceID atIndex:0];
-
     // Commission 5 devices
     for (NSNumber * deviceID in orderedDeviceIDs) {
         certificateIssuer.nextNodeID = deviceID;
@@ -2851,7 +2844,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     }
 
     NSMutableDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = [NSMutableDictionary dictionary];
-    for (NSNumber * deviceID in orderedDeviceIDsIncludingFake) {
+    for (NSNumber * deviceID in orderedDeviceIDs) {
         deviceDelegates[deviceID] = [[MTRDeviceTestDelegate alloc] init];
     }
 
@@ -2861,7 +2854,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     __block NSUInteger subscriptionDequeueCount = 0;
     __block BOOL baseDeviceReadCompleted = NO;
 
-    for (NSNumber * deviceID in orderedDeviceIDsIncludingFake) {
+    for (NSNumber * deviceID in orderedDeviceIDs) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
         delegate.pretendThreadEnabled = YES;
 
@@ -2890,17 +2883,17 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         };
         __weak __auto_type weakDelegate = delegate;
         delegate.onReportEnd = ^{
-            // We don't have a subscriptionExpectation for the fake device.
-            XCTestExpectation * subscriptionExpectation = subscriptionExpectations[deviceID];
-            if (subscriptionExpectation) {
-                [subscriptionExpectation fulfill];
-            }
+            [subscriptionExpectations[deviceID] fulfill];
             // reset callback so expectation not fulfilled twice, given the run time of this can be long due to subscription pool
             __strong __auto_type strongDelegate = weakDelegate;
             strongDelegate.onReportEnd = nil;
         };
     }
 
+    // We have one fake device, which we use an invalid node ID for, that we use
+    // to test what happens if a device is deallocated while its subscription
+    // work item is queued.
+    //
     // Schedule a job in the controller's pool that will not complete until the
     // fake device is deallocated.
     __auto_type * fakeDeviceDeletedExpectation = [self expectationWithDescription:@"Fake device deleted"];
@@ -2911,18 +2904,24 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     }];
     [controller.concurrentSubscriptionPool enqueueWorkItem:blockingWorkItem description:@"Waiting for fake device deletion"];
 
+    // Make sure the delegate for the fake device does not go away before the
+    // fake device does, so keep it out of the @autoreleasepool block.
+    MTRDeviceTestDelegate * fakeDeviceDelegate = [[MTRDeviceTestDelegate alloc] init];
+    fakeDeviceDelegate.pretendThreadEnabled = YES;
+
     @autoreleasepool {
         // Create our fake device and have it dealloc before the blocking WorkItem
         // completes and hence before its subscription work item gets a chance
         // to run (in the width-1 case).
-        MTRDeviceTestDelegate * delegate = deviceDelegates[fakeDeviceID];
+
         // onSubscriptionCallbackDelete is called from dealloc
-        delegate.onSubscriptionCallbackDelete = ^{
+        fakeDeviceDelegate.onSubscriptionCallbackDelete = ^{
             [fakeDeviceDeletedExpectation fulfill];
         };
 
+        NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
         __auto_type * device = [MTRDevice deviceWithNodeID:fakeDeviceID controller:controller];
-        [device setDelegate:delegate queue:queue];
+        [device setDelegate:fakeDeviceDelegate queue:queue];
     }
 
     for (NSNumber * deviceID in orderedDeviceIDs) {
