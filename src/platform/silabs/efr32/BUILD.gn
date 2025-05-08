@@ -104,7 +104,7 @@ static_library("efr32") {
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
     ]
 
-    #For SiWx917 family
+    #  OTA processor for SiWx917 family
     if (chip_enable_wifi && use_SiWx917) {
       sources += [
         "${silabs_platform_dir}/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.cpp",
