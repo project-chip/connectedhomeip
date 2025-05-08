@@ -90,7 +90,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
         status = sl_si91x_fwup_load(writeDataBuffer, block.size());
         if (status != SL_STATUS_OK)
         {
-            // When TA recived all the blocks it will return SL_STATUS_SI91X_FW_UPDATE_DONE status
+            // When TA received all the blocks it will return SL_STATUS_SI91X_FW_UPDATE_DONE status
             if (status == SL_STATUS_SI91X_FW_UPDATE_DONE)
             {
                 mReset = true;
