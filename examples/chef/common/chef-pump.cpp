@@ -105,12 +105,66 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 }
 
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+// #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 constexpr size_t kLevelControlCount = MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
 std::unique_ptr<DataModel::Nullable<uint8_t>> gLevel[kLevelControlCount];
 uint16_t getIndexLevelControl(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, LevelControl::Id, kLevelControlCount);
+}
+
+/**
+ * @brief Maps the level (from LevelControl) to a setpoint value within range.
+ */
+template <typename T>
+DataModel::Nullable<T> LevelToSetpoint(DataModel::Nullable<uint8_t> level, DataModel::Nullable<T> RangeMin,
+                                       DataModel::Nullable<T> RangeMax)
+{
+    if (level.IsNull() || !level.Value() || RangeMin.IsNull() || RangeMax.IsNull())
+        return DataModel::NullNullable;
+
+    return RangeMin.Value() + (RangeMax.Value() - RangeMin.Value()) * std::min(level, 200) / 200;
+}
+
+/**
+ * Updates setpoints based on the current level.
+ */
+void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> level)
+{
+    uint16_t epIndex;
+
+    // #ifdef MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
+    epIndex = getIndexTemperatureMeasurement(endpointId);
+    if (epIndex < kTemperatureMeasurementCount)
+    {
+        DataModel::Nullable<int16_t> updatedTemperature =
+            LevelToSetpoint(level, TemperatureRangeMin[epIndex], TemperatureRangeMax[epIndex]);
+        TemperatureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedTemperature);
+        MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
+                                               TemperatureMeasurement::Attributes::MeasuredValue::Id);
+    }
+    // #endif // MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
+
+    // #ifdef MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
+    epIndex = getIndexPressureMeasurement(endpointId);
+    if (epIndex < kPressureMeasurementCount)
+    {
+        DataModel::Nullable<int16_t> updatedPressure = LevelToSetpoint(level, PressureRangeMin[epIndex], PressureRangeMax[epIndex]);
+        PressureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedPressure);
+        MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
+                                               PressureMeasurement::Attributes::MeasuredValue::Id);
+    }
+    // #endif // MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
+
+    // #ifdef MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
+    epIndex = getIndexFlowMeasurement(endpointId);
+    if (epIndex < kFlowMeasurementCount)
+    {
+        DataModel::Nullable<uint16_t> updatedFlow = LevelToSetpoint(level, FlowRangeMin[epIndex], FlowRangeMax[epIndex]);
+        FlowMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedFlow);
+        MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
+    }
+    // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 }
 
 void handleMoveToLevel(EndpointId endpoint, uint8_t level)
@@ -129,8 +183,24 @@ void handleMoveToLevel(EndpointId endpoint, uint8_t level)
         ChipLogDetail(DeviceLayer, "Device is Off. Returning.");
         return;
     }
+
+    uint16_t epIndex = getIndexLevelControl(endpointId);
+    if (epIndex >= kLevelControlCount)
+    {
+        ChipLogError(DeviceLayer, "Level control: No valid index found for endpoint %d", endpoint);
+        return;
+    }
+
+    VerifyOrDieWithMsg(gLevel[epIndex], "Storage for current level on endpoint %d isn't initialized.", endpoint);
+
+    if (level)
+        *gLevel[epIndex].SetNonNull(level);
+    else
+        *gLevel[epIndex].SetNull();
+
+    updateSetPointsLevel(endpoint, *gLevel[epIndex]);
 }
-#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+// #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 
 /**
  * @brief Handler when OnOff value has changed. Updates setpoints if LevelControl is disabled for endpoint. If LevelControl is
@@ -139,27 +209,30 @@ void handleMoveToLevel(EndpointId endpoint, uint8_t level)
 void handleOnOff(EndpointId endpoint, bool value)
 {
     ChipLogDetail(DeviceLayer, "[chef-pump] Inside handleOnOff");
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+    // #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
     uint16_t epIndex = getIndexLevelControl(endpointId);
     if (epIndex < kLevelControlCount)
     {
         if (value)
         {
-            LevelControl::Attributes::CurrentLevel::Set(endpointId, gLevel[epIndex]);
+            VerifyOrDieWithMsg(gLevel[epIndex], "Storage for current level on endpoint %d isn't initialized.", endpoint);
+            if (*gLevel[epIndex].IsNull())
+                *gLevel[epIndex].SetNonNull(255);
+            LevelControl::Attributes::CurrentLevel::Set(endpoint, *gLevel[epIndex]);
         }
         else
         {
-            LevelControl::Attributes::CurrentLevel::SetNull(endpointId);
+            LevelControl::Attributes::CurrentLevel::SetNull(endpoint);
         }
-        MatterReportingAttributeChangeCallback(endpointId, OnOff::Id, OnOff::Attributes::OnOff::Id);
+        MatterReportingAttributeChangeCallback(endpoint, OnOff::Id, OnOff::Attributes::OnOff::Id);
     }
     else
     {
         updateSetPointsOnOff(endpoint, value);
     }
-#else
+    // #else
     updateSetPointsOnOff(endpoint, value);
-#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+    // #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 }
 
 void Init()
