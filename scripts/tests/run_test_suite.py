@@ -290,11 +290,6 @@ def cmd_list(context):
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.option(
-    '--use-netns',
-    default=False,
-    type=bool,
-    help='If true, use netns to isolate app/tool')
-@click.option(
     '--expected-failures',
     type=int,
     default=0,
@@ -303,7 +298,7 @@ def cmd_list(context):
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, chip_repl_yaml_tester,
-            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, use_netns):
+            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
         sys.exit(2)
@@ -372,7 +367,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
 
-    if use_netns:
+    if sys.platform == 'linux':
         chiptest.linux.PrepareNamespacesForTestExecution(
             context.obj.in_unshare)
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
@@ -384,7 +379,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     def cleanup():
         apps_register.uninit()
-        if use_netns:
+        if sys.platform == 'linux':
             chiptest.linux.ShutdownNamespaceForTestExecution()
 
     for i in range(iterations):
