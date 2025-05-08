@@ -107,12 +107,14 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetHardwareVersionString(char * buf, 
 {
     // Read from Posix config.
     size_t outLen;
-    auto err = Internal::PosixConfig::ReadConfigValueStr(Internal::PosixConfig::kConfigKey_HardwareVersionString, buf, bufSize, outLen);
+    auto err =
+        Internal::PosixConfig::ReadConfigValueStr(Internal::PosixConfig::kConfigKey_HardwareVersionString, buf, bufSize, outLen);
 
     // If not found, get from preprocessor variable.
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        VerifyOrReturnError(bufSize > sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(bufSize > sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING),
+                            CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
         return CHIP_NO_ERROR;
     }
