@@ -55,7 +55,7 @@ tests:
           values:
               - name: "Status"
                 value: 0
-   
+
     - label: "Step 1b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint
       cluster: "Application Basic"
