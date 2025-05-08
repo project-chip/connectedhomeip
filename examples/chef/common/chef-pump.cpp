@@ -220,7 +220,7 @@ void handleOnOff(EndpointId endpoint, bool value)
                                endpoint);
             if ((*gLevel[epIndex]).IsNull())
                 (*gLevel[epIndex]).SetNonNull(kMaxLevel);
-            ChipLogDetail(DeviceLayer, "Setting CurrentLevel at endpoint %d to %d", endpoint, *gLevel[epIndex]);
+            ChipLogDetail(DeviceLayer, "Setting CurrentLevel at endpoint %d to %d", endpoint, (*gLevel[epIndex]).ValueOr(0));
             LevelControl::Attributes::CurrentLevel::Set(endpoint, *gLevel[epIndex]);
             MatterReportingAttributeChangeCallback(endpoint, LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id);
         }
