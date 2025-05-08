@@ -266,7 +266,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("Auto Turn Off has been triggered!");
 
-    light->InitiateAction(actor, OFF_ACTION, NULL);
+    light->InitiateAction(actor, OFF_ACTION, nullptr);
 }
 
 void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
