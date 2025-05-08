@@ -123,7 +123,7 @@ DataModel::Nullable<T> LevelToSetpoint(DataModel::Nullable<uint8_t> level, DataM
     if (level.IsNull() || !level.Value() || RangeMin.IsNull() || RangeMax.IsNull())
         return DataModel::NullNullable;
 
-    return RangeMin.Value() + (RangeMax.Value() - RangeMin.Value()) * std::min(level, 200) / 200;
+    return RangeMin.Value() + (RangeMax.Value() - RangeMin.Value()) * std::min(level.ValueOr(0), 200) / 200;
 }
 
 /**
@@ -184,7 +184,7 @@ void handleMoveToLevel(EndpointId endpoint, uint8_t level)
         return;
     }
 
-    uint16_t epIndex = getIndexLevelControl(endpointId);
+    uint16_t epIndex = getIndexLevelControl(endpoint);
     if (epIndex >= kLevelControlCount)
     {
         ChipLogError(DeviceLayer, "Level control: No valid index found for endpoint %d", endpoint);
@@ -210,7 +210,7 @@ void handleOnOff(EndpointId endpoint, bool value)
 {
     ChipLogDetail(DeviceLayer, "[chef-pump] Inside handleOnOff");
     // #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
-    uint16_t epIndex = getIndexLevelControl(endpointId);
+    uint16_t epIndex = getIndexLevelControl(endpoint);
     if (epIndex < kLevelControlCount)
     {
         if (value)
@@ -315,7 +315,7 @@ void Init()
         }
         // #endif // MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+        // #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
         epIndex = getIndexLevelControl(endpointId);
         if (epIndex < kLevelControlCount)
         {
@@ -323,7 +323,7 @@ void Init()
                                "Failed to initialize Current Level to NULL for Endpoint: %d", endpointId);
             gLevel[epIndex] = std::make_unique<DataModel::Nullable<uint8_t>>(DataModel::NullNullable);
         }
-#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+        // #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 
         VerifyOrDieWithMsg(OnOff::Attributes::OnOff::Set(endpointId, false) == Status::Success, DeviceLayer,
                            "Failed to initialize OnOff to false for Endpoint: %d", endpointId);
