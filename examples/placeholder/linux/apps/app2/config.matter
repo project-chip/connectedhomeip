@@ -873,7 +873,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -8704,7 +8704,7 @@ endpoint 0 {
   }
 
   server cluster UnitLocalization {
-    ram      attribute temperatureUnit;
+    callback attribute temperatureUnit;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
