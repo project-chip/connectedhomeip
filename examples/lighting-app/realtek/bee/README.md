@@ -47,7 +47,7 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
 -   Step 1: checkout Realtek specific submodules only
 
     ```bash
-    $ scripts/checkout_submodules.py --shallow --platform realtek_bee --recursive
+    $ scripts/checkout_submodules.py --shallow --platform realtek --recursive
     ```
 
 -   Step 1: Init REALTEK SDK
