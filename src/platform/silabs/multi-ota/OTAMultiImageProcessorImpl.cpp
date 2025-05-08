@@ -32,16 +32,14 @@ extern "C" {
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_driver.h"
 #include "sl_si91x_hal_soc_soft_reset.h"
-#endif
+#else // This is not needed for the 917 SoC; it is required for EFR host applications
+#include "btl_interface.h"
+#include "em_bus.h" // For CORE_CRITICAL_SECTION
+#endif              // SLI_SI91X_MCU_INTERFACE
 #ifdef __cplusplus
 }
 #endif
-extern "C" {
-#include "em_bus.h"             // For CORE_CRITICAL_SECTION
-#ifndef SLI_SI91X_MCU_INTERFACE // This is not needed for the 917 SoC; it is required for EFR host applications
-#include "btl_interface.h"
-#endif // SLI_SI91X_MCU_INTERFACE
-}
+
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -211,7 +209,6 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
 
 CHIP_ERROR OTAMultiImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcessor * processor)
 {
-    ChipLogDetail(SoftwareUpdate, "RegisterProcessor with tag: %lu", tag);
     if (!OTATlvProcessor::IsValidTag(tag))
     {
         ChipLogError(SoftwareUpdate, "Invalid processor tag: %lu", tag);
@@ -434,15 +431,10 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 
     imageProcessor->mAccumulator.Clear();
 
-    ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
+    ChipLogProgress(SoftwareUpdate, "HandleApply: Finished and Soft Reset initiated");
 
     // This reboots the device
-#ifdef SLI_SI91X_MCU_INTERFACE
-    // Handle reset logic
-    ChipLogProgress(SoftwareUpdate, "OTA Firmware update completed");
-    // send system reset request to reset the MCU and upgrade the m4 image
-    ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
-    // Reboots the device
+#ifdef SLI_SI91X_MCU_INTERFACE // 917 SoC reboot
     chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset();
 #else // EFR reboot
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
