@@ -20,58 +20,38 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace AdministratorFabricIndex {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AdministratorFabricIndex::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kAdminister,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(AdministratorFabricIndex::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kAdminister, std::nullopt);
 } // namespace AdministratorFabricIndex
 
 } // namespace Attributes
 
 namespace Commands {
 namespace ICACCSRRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ICACCSRRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ICACCSRRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace ICACCSRRequest
 namespace AddICAC {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AddICAC::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddICAC::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace AddICAC
 namespace OpenJointCommissioningWindow {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = OpenJointCommissioningWindow::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(OpenJointCommissioningWindow::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace OpenJointCommissioningWindow
 namespace TransferAnchorRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TransferAnchorRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(TransferAnchorRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace TransferAnchorRequest
 namespace TransferAnchorComplete {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = TransferAnchorComplete::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(TransferAnchorComplete::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace TransferAnchorComplete
 namespace AnnounceJointFabricAdministrator {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AnnounceJointFabricAdministrator::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceJointFabricAdministrator::Id,
+                                                                BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace AnnounceJointFabricAdministrator
 
 } // namespace Commands
