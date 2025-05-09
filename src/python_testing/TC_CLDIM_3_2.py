@@ -28,7 +28,7 @@
 #        --commissioning-method on-network
 #        --discriminator 1234
 #        --passcode 20202021
-#        --int-arg PIXIT.CLDIM.FullMotionDuration:1
+#        --int-arg PIXIT.CLDIM.LatchingDuration:1
 #        --trace-to json:${TRACE_TEST_JSON}.json
 #        --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #      factory-reset: true
