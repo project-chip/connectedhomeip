@@ -17,17 +17,8 @@ from dataclasses import dataclass
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.storage import GeneratorStorage
-from matter.idl.matter_idl_types import (
-    AccessPrivilege,
-    Attribute,
-    AttributeQuality,
-    Command,
-    CommandQuality,
-    Enum,
-    FieldQuality,
-    Idl,
-    Struct,
-)
+from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, Enum, FieldQuality,
+                                         Idl, Struct)
 
 
 def as_privilege(privilege: AccessPrivilege) -> str:
