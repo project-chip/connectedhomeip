@@ -213,7 +213,7 @@ void postOnOff(EndpointId endpoint, bool value)
     }
 }
 
-void Init()
+void init()
 {
     const uint16_t endpointCount = emberAfEndpointCount();
 

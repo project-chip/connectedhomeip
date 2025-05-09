@@ -30,7 +30,7 @@ void postMoveToLevel(chip::EndpointId endpoint, uint8_t level);
 
 void postOnOff(chip::EndpointId endpoint, bool value);
 
-void Init();
+void init();
 
 } // namespace pump
 } // namespace chef

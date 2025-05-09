@@ -40,7 +40,11 @@ using namespace chip::app::Clusters;
 #include "refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.h"
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
 
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
 #include "chef-pump.h"
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 
 namespace {
 
@@ -498,7 +502,7 @@ void ApplicationInit()
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
-    chef::pump::Init();
+    chef::pump::init();
 
 #ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
     ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
