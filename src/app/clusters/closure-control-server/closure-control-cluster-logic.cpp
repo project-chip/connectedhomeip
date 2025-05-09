@@ -334,6 +334,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     return CHIP_NO_ERROR;
 }
 
+// TODO: Move the CountdownTime handling to Delegate
 CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
 {
     assertChipStackLockedByCurrentThread();
