@@ -847,8 +847,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewpor
     // 2. the new viewport is not snaller than the sensor min
     // 3. the new viewport has the same aspect ratio as the sensor
     //
-    uint16_t requestedWidth  = aViewport.x2 - aViewport.x1;
-    uint16_t requestedHeight = aViewport.y2 - aViewport.y1;
+    uint16_t requestedWidth  = static_cast<uint16_t>(aViewport.x2 - aViewport.x1);
+    uint16_t requestedHeight = static_cast<uint16_t>(aViewport.y2 - aViewport.y1);
     if ((requestedWidth < mMinViewPort.width) || (requestedHeight < mMinViewPort.height) ||
         (requestedWidth > mVideoSensorParams.sensorWidth) || (requestedHeight > mVideoSensorParams.sensorHeight))
     {
