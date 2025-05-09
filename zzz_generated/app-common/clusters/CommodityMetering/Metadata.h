@@ -35,14 +35,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace MeteredQuantityTimestamp
-namespace MeasurementType {
+namespace TariffUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeasurementType::Id,
+    .attributeId    = TariffUnit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-} // namespace MeasurementType
+} // namespace TariffUnit
 
 } // namespace Attributes
 
