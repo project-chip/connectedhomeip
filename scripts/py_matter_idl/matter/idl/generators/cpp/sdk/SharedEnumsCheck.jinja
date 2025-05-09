@@ -14,7 +14,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue({{item.namespace}}::{{i
     using EnumType = {{item.namespace}}::{{item.enum.name}};
     switch (val)
     {
-    {% for entry in item.enum.entries %}
+    {% for entry in item.enum.entries -%}
         case EnumType::{{entry.name | remove_acronyms_from_enum_constant}}:
     {% endfor %}
         return val;
