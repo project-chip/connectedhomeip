@@ -129,6 +129,7 @@ uint16_t UDPEndPointImplLwIP::GetBoundPort() const
 
 CHIP_ERROR UDPEndPointImplLwIP::ListenImpl()
 {
+    mLwIPEndPointType = LwIPEndPointType::UDP;
     RunOnTCPIP([this]() { udp_recv(mUDP, LwIPReceiveUDPMessage, this); });
     return CHIP_NO_ERROR;
 }
@@ -420,11 +421,11 @@ CHIP_ERROR UDPEndPointImplLwIP::SetMulticastLoopback(IPVersion aIPVersion, bool 
     {
         if (aLoopback)
         {
-            udp_set_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
+            RunOnTCPIP([this]() { udp_set_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP); });
         }
         else
         {
-            udp_clear_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
+            RunOnTCPIP([this]() { udp_clear_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP); });
         }
         return CHIP_NO_ERROR;
     }
