@@ -41,6 +41,7 @@ enum chipBLEServiceDataType
 {
     kchipBLEServiceDataType_DeviceIdentificationInfo = 0x01,
     kchipBLEServiceDataType_TokenIdentificationInfo  = 0x02,
+    kchipBLEServiceDataType_NetworkRecoveryInfo      = 0x03,
 };
 
 /**
@@ -129,6 +130,78 @@ struct ChipBLEDeviceIdentificationInfo
         else
         {
             AdditionalDataFlag &= static_cast<uint8_t>(~kExtendedAnnouncementFlagMask);
+        }
+    }
+
+} __attribute__((packed));
+
+/**
+ * chip BLE Network Recovery Information Block
+ *
+ * Defines the over-the-air encoded format of the network recovery information block that appears
+ * within chip BLE service advertisement data.
+ */
+struct ChipBLENetworkRecoveryInfo
+{
+    constexpr static uint8_t kPrimaryReasonMask             = 0x0f;
+    constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
+    constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
+    constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
+
+    uint8_t OpCode;
+
+    uint8_t PrimaryReasonAndAdvVersion;
+    uint8_t RecoveryIdentifier[8];
+    uint8_t AdditionalDataFlag;
+
+    void Init()
+    {
+        memset(this, 0, sizeof(*this));
+        OpCode = 1;
+    }
+
+    uint64_t GetRecoveryIdentifier() const { return chip::Encoding::BigEndian::Get64(RecoveryIdentifier); }
+
+    void SetRecoveryIdentifier(uint64_t recoveryIdentifier)
+    {
+        chip::Encoding::BigEndian::Put64(RecoveryIdentifier, recoveryIdentifier);
+    }
+
+    uint8_t GetAdvertisementVersion() const
+    {
+        uint8_t advertisementVersion =
+            static_cast<uint8_t>((PrimaryReasonAndAdvVersion & kAdvertisementVersionMask) >> kAdvertisementVersionShiftBits);
+        return advertisementVersion;
+    }
+
+    // Use only 4 bits to set advertisement version
+    void SetAdvertisementVersion(uint8_t advertisementVersion)
+    {
+        // Advertisement Version is 4 bit long from 4th to 7th
+        PrimaryReasonAndAdvVersion =
+            static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
+    }
+
+    uint8_t GetPrimaryReason() const { return PrimaryReasonAndAdvVersion & kPrimaryReasonMask; }
+
+    void SetPrimaryReason(uint8_t reason)
+    {
+        // Primary Reason is 4-bit long, so don't overwrite bits 4th through 7th
+        auto advVersion            = static_cast<uint8_t>(PrimaryReasonAndAdvVersion & ~kPrimaryReasonMask);
+        PrimaryReasonAndAdvVersion = static_cast<uint8_t>(advVersion | (reason & kPrimaryReasonMask));
+    }
+
+    uint8_t GetAdditionalDataFlag() const { return (AdditionalDataFlag & kAdditionalDataFlagMask); }
+
+    void SetAdditionalDataFlag(bool flag)
+    {
+        if (flag)
+        {
+            AdditionalDataFlag |= kAdditionalDataFlagMask;
+        }
+        else
+        {
+            AdditionalDataFlag &= static_cast<uint8_t>(~kAdditionalDataFlagMask);
         }
     }
 

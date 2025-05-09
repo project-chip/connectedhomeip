@@ -58,6 +58,7 @@ static_library("controller") {
     # dependencies
     "AbstractDnssdDiscoveryController.h",
     "AutoCommissioner.h",
+    "AutoNetworkRecover.h",
     "CHIPCommissionableNodeController.h",
     "CHIPDeviceController.h",
     "CHIPDeviceControllerSystemState.h",
@@ -69,6 +70,7 @@ static_library("controller") {
     "DeviceDiscoveryDelegate.h",
     "DevicePairingDelegate.h",
     "ExampleOperationalCredentialsIssuer.h",
+    "NetworkRecover.h",
     "SetUpCodePairer.h",
   ]
 
@@ -86,6 +88,7 @@ static_library("controller") {
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
+      "NetworkRecover.cpp",
       "SetUpCodePairer.cpp",
     ]
 
@@ -94,6 +97,7 @@ static_library("controller") {
 
     if (chip_enable_read_client) {
       sources += [
+        "AutoNetworkRecover.cpp",
         "CHIPDeviceController.cpp",
         "CommissioningWindowOpener.cpp",
         "CurrentFabricRemover.cpp",

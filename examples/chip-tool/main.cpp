@@ -26,6 +26,7 @@
 #include "commands/group/Commands.h"
 #include "commands/icd/ICDCommand.h"
 #include "commands/interactive/Commands.h"
+#include "commands/network-recovery/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
 #include "commands/session-management/Commands.h"
@@ -52,6 +53,7 @@ int main(int argc, char * argv[])
     registerCommandsSubscriptions(commands, &credIssuerCommands);
     registerCommandsStorage(commands);
     registerCommandsSessionManagement(commands, &credIssuerCommands);
+    registerCommandsNetworkRecovery(commands, &credIssuerCommands);
 
     return commands.Run(argc, argv);
 }

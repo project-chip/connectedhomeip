@@ -32,6 +32,7 @@ public:
 
     void NewConnection(Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
     void NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override;
+    void NewConnection(Ble::BleLayer * bleLayer, void * appState, uint64_t recoveryIdentifier) override{};
     CHIP_ERROR CancelConnection() override;
 
 private:
