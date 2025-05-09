@@ -479,7 +479,7 @@ public:
     int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
     DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
 
-    static constexpr bool kIsFabricScoped =  false;
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
