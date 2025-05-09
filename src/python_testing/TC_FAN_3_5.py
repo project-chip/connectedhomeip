@@ -199,7 +199,7 @@ class TC_FAN_3_5(MatterBaseTest):
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
             asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
 
-    def verify_expected_reports(self, order: OrderEnum) -> None:
+    def verify_expected_reports(self, order: OrderEnum):
         percent_setting_report_qty = 0
         fan_mode_report_qty = 0
         speed_setting_report_qty = 0
@@ -245,6 +245,8 @@ class TC_FAN_3_5(MatterBaseTest):
             asserts.assert_equal(speed_setting_eval, speed_setting_values,
                                  f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_eval}, missing: {missing_speed_setting}.")
 
+        return fan_mode_values, speed_setting_values
+
     async def get_fan_modes(self, remove_auto: bool = False):
         # Read FanModeSequence attribute value
         fan_mode_sequence_attr = Clusters.FanControl.Attributes.FanModeSequence
@@ -272,7 +274,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
         self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
-    async def step_command_test(self, percent_setting_sub: ClusterAttributeChangeAccumulator, order: OrderEnum) -> None:
+    async def step_command_test(self, percent_setting_sub: ClusterAttributeChangeAccumulator, order: OrderEnum):
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         cmd = cluster.Commands
@@ -332,7 +334,7 @@ class TC_FAN_3_5(MatterBaseTest):
         self.verify_attribute_progression(order)
 
         # Veirfy all expected reports after the Step commands are present
-        self.verify_expected_reports(order)
+        return self.verify_expected_reports(order)
 
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
@@ -379,13 +381,23 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.subscribe_to_attributes()
         percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
 
-        await self.step_command_test(percent_setting_sub, OrderEnum.Descending)
-        await self.step_command_test(percent_setting_sub, OrderEnum.Ascending)
+        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, OrderEnum.Descending)
+        fan_mode_values_asc, speed_setting_values_asc = await self.step_command_test(percent_setting_sub, OrderEnum.Ascending)
 
+        fan_mode_values_desc = fan_mode_values_desc[:-1]
+        speed_setting_values_desc = speed_setting_values_desc[:-1]
+        fan_mode_values_asc = fan_mode_values_asc[:-1]
+        speed_setting_values_asc = speed_setting_values_asc[:-1]
 
-
-
-
+        logger.info(f"[FC] fan_mode_values_desc: {fan_mode_values_desc}")
+        logger.info(f"[FC] speed_setting_values_desc: {speed_setting_values_desc}")
+        logger.info(f"[FC] fan_mode_values_asc: {fan_mode_values_asc}")
+        logger.info(f"[FC] speed_setting_values_asc: {speed_setting_values_asc}")
+        
+        asserts.assert_equal(fan_mode_values_desc, list(reversed(fan_mode_values_asc)),
+                             f"[FC] FanMode attribute values are not equal in ascending and descending order. Descending: {fan_mode_values_desc}, Ascending: {fan_mode_values_asc}.")
+        asserts.assert_equal(speed_setting_values_desc, list(reversed(speed_setting_values_asc)),
+                             f"[FC] SpeedSetting attribute values are not equal in ascending and descending order. Descending: {speed_setting_values_desc}, Ascending: {speed_setting_values_asc}.")
 
 if __name__ == "__main__":
     default_matter_test_main()
