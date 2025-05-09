@@ -518,9 +518,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
 
+    __block id testDelegate = nil;
 #ifdef DEBUG
     // Save the first delegate for testing
-    __block id testDelegate = nil;
     for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
         testDelegate = delegateInfo.delegate;
         break;
@@ -542,7 +542,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Clear this device from subscription pool and persist cached data to storage as needed.
     std::lock_guard lock(_lock);
-    [self _clearSubscriptionPoolWork];
+    [self _clearSubscriptionPoolWorkWithProvidedDelegate:testDelegate];
     [self _doPersistClusterData];
 }
 
@@ -1382,15 +1382,28 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_clearSubscriptionPoolWork
 {
+    [self _clearSubscriptionPoolWorkWithProvidedDelegate:nil];
+}
+
+// We provide a delegate to notify if we are doing
+// _clearSubscriptionPoolWorkWithProvidedDelegate after clearing our delegates
+// in dealloc.
+- (void)_clearSubscriptionPoolWorkWithProvidedDelegate:(nullable id)providedDelegate
+{
     os_unfair_lock_assert_owner(&self->_lock);
     MTRAsyncWorkCompletionBlock completion = self->_subscriptionPoolWorkCompletionBlock;
     if (completion) {
 #ifdef DEBUG
-        [self _callDelegatesWithBlock:^(id testDelegate) {
+        auto notificationBlock = ^(id testDelegate) {
             if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionPoolWorkComplete:)]) {
                 [testDelegate unitTestSubscriptionPoolWorkComplete:self];
             }
-        }];
+        };
+        if (providedDelegate != nil) {
+            notificationBlock(providedDelegate);
+        } else {
+            [self _callDelegatesWithBlock:notificationBlock];
+        }
 #endif
         self->_subscriptionPoolWorkCompletionBlock = nil;
         completion(MTRAsyncWorkComplete);
@@ -1418,7 +1431,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
             mtr_strongify(self);
-            VerifyOrReturn(self, MTR_LOG_DEBUG("_scheduleSubscriptionPoolWork readyHandler called with nil MTRDevice"));
+            if (self == nil) {
+                MTR_LOG_DEBUG("_scheduleSubscriptionPoolWork readyHandler called with nil MTRDevice, nothing to do");
+                completion(MTRAsyncWorkComplete);
+                return;
+            }
 
             MTR_LOG("%@ - work item is ready to attempt pooled subscription", self);
             os_unfair_lock_lock(&self->_lock);
@@ -4511,6 +4528,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         data[sHighestObservedEventNumberKey] = self.highestObservedEventNumber;
         self.highestObservedEventNumberNeedsPersisting = NO;
     }
+
+    MTR_LOG_DEBUG("%@ _storePersistedDeviceData: %@", self, data);
 
     [datastore storeDeviceData:[data copy] forNodeID:self.nodeID];
 }
