@@ -402,7 +402,6 @@ cluster AccessControl = 31 {
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -461,7 +460,6 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -604,7 +602,6 @@ cluster NetworkCommissioning = 49 {
   provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -693,7 +690,7 @@ cluster NetworkCommissioning = 49 {
 
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 cluster DiagnosticLogs = 50 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum IntentEnum : enum8 {
     kEndUserSupport = 0;
@@ -716,7 +713,6 @@ cluster DiagnosticLogs = 50 {
 
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -729,12 +725,12 @@ cluster DiagnosticLogs = 50 {
 
   response struct RetrieveLogsResponse = 1 {
     StatusEnum status = 0;
-    long_octet_string logContent = 1;
+    long_octet_string<1024> logContent = 1;
     optional epoch_us UTCTimeStamp = 2;
     optional systime_us timeSinceBoot = 3;
   }
 
-  /** Retrieving diagnostic logs from a Node */
+  /** Reception of this command starts the process of retrieving diagnostic logs from a Node. */
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
@@ -785,7 +781,6 @@ cluster OperationalCredentials = 62 {
   readonly attribute int8u currentFabricIndex = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
