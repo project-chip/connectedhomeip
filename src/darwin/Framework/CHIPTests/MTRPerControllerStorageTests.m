@@ -2654,7 +2654,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                     MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeGlobalAttributeClusterRevisionID),
                                     // Would be nice if we could get the Descriptor cluster revision
                                     // from somewhere intead of hardcoding it...
-                                    MTRDataKey : unsignedIntValue(2),
+                                    MTRDataKey : unsignedIntValue(3),
                                 },
                                 @{
                                     MTRAttributePathKey : globalAttributePath(@(MTRClusterIDTypeDescriptorID), MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID),
@@ -2811,13 +2811,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     NSArray<NSNumber *> * orderedDeviceIDs = [deviceOnboardingPayloads allKeys];
 
-    // We have one fake device, which we use an invalid node ID for, that we use
-    // to test what happens if a device is deallocated while its subscription
-    // work item is queued.
-    NSMutableArray<NSNumber *> * orderedDeviceIDsIncludingFake = [orderedDeviceIDs mutableCopy];
-    NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
-    [orderedDeviceIDsIncludingFake insertObject:fakeDeviceID atIndex:0];
-
     // Commission 5 devices
     for (NSNumber * deviceID in orderedDeviceIDs) {
         certificateIssuer.nextNodeID = deviceID;
@@ -2851,7 +2844,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     }
 
     NSMutableDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = [NSMutableDictionary dictionary];
-    for (NSNumber * deviceID in orderedDeviceIDsIncludingFake) {
+    for (NSNumber * deviceID in orderedDeviceIDs) {
         deviceDelegates[deviceID] = [[MTRDeviceTestDelegate alloc] init];
     }
 
@@ -2861,7 +2854,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     __block NSUInteger subscriptionDequeueCount = 0;
     __block BOOL baseDeviceReadCompleted = NO;
 
-    for (NSNumber * deviceID in orderedDeviceIDsIncludingFake) {
+    for (NSNumber * deviceID in orderedDeviceIDs) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
         delegate.pretendThreadEnabled = YES;
 
@@ -2890,17 +2883,17 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         };
         __weak __auto_type weakDelegate = delegate;
         delegate.onReportEnd = ^{
-            // We don't have a subscriptionExpectation for the fake device.
-            XCTestExpectation * subscriptionExpectation = subscriptionExpectations[deviceID];
-            if (subscriptionExpectation) {
-                [subscriptionExpectation fulfill];
-            }
+            [subscriptionExpectations[deviceID] fulfill];
             // reset callback so expectation not fulfilled twice, given the run time of this can be long due to subscription pool
             __strong __auto_type strongDelegate = weakDelegate;
             strongDelegate.onReportEnd = nil;
         };
     }
 
+    // We have one fake device, which we use an invalid node ID for, that we use
+    // to test what happens if a device is deallocated while its subscription
+    // work item is queued.
+    //
     // Schedule a job in the controller's pool that will not complete until the
     // fake device is deallocated.
     __auto_type * fakeDeviceDeletedExpectation = [self expectationWithDescription:@"Fake device deleted"];
@@ -2911,18 +2904,24 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     }];
     [controller.concurrentSubscriptionPool enqueueWorkItem:blockingWorkItem description:@"Waiting for fake device deletion"];
 
+    // Make sure the delegate for the fake device does not go away before the
+    // fake device does, so keep it out of the @autoreleasepool block.
+    MTRDeviceTestDelegate * fakeDeviceDelegate = [[MTRDeviceTestDelegate alloc] init];
+    fakeDeviceDelegate.pretendThreadEnabled = YES;
+
     @autoreleasepool {
         // Create our fake device and have it dealloc before the blocking WorkItem
         // completes and hence before its subscription work item gets a chance
         // to run (in the width-1 case).
-        MTRDeviceTestDelegate * delegate = deviceDelegates[fakeDeviceID];
+
         // onSubscriptionCallbackDelete is called from dealloc
-        delegate.onSubscriptionCallbackDelete = ^{
+        fakeDeviceDelegate.onSubscriptionCallbackDelete = ^{
             [fakeDeviceDeletedExpectation fulfill];
         };
 
+        NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
         __auto_type * device = [MTRDevice deviceWithNodeID:fakeDeviceID controller:controller];
-        [device setDelegate:delegate queue:queue];
+        [device setDelegate:fakeDeviceDelegate queue:queue];
     }
 
     for (NSNumber * deviceID in orderedDeviceIDs) {
@@ -3714,9 +3713,14 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTestExpectation * subscriptionCallbackDeleted = [self expectationWithDescription:@"Subscription callback deleted"];
     XCTestExpectation * controllerAddedDevice = [self expectationWithDescription:@"Controller added device"];
     XCTestExpectation * controllerRemovedDevice = [self expectationWithDescription:@"Controller removed device"];
+
+    // Make sure all the delegates that we want notified are allocated outside the @autoreleasepool
+    // block, so they won't go away before the notifications can happen.  Devices and device
+    // controllers do not hold strong references to delegates.
+    __auto_type * controllerDelegate = [[MTRPerControllerStorageTestsDeallocDelegate alloc] init];
+    __auto_type * deviceDelegate = [[MTRDeviceTestDelegate alloc] init];
     @autoreleasepool {
         // Expected the test device was added and removed
-        MTRPerControllerStorageTestsDeallocDelegate * controllerDelegate = [[MTRPerControllerStorageTestsDeallocDelegate alloc] init];
         __block NSUInteger lastDeviceCount = controller.devices.count;
         controllerDelegate.onDevicesChanged = ^{
             // Use self as lock for lastDeviceCount access, so sanitizer doesn't complain
@@ -3733,23 +3737,22 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         [controller addDeviceControllerDelegate:controllerDelegate queue:queue];
 
         __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
-        __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
 
         XCTestExpectation * subscriptionReportBegin = [self expectationWithDescription:@"Subscription report begin"];
 
-        delegate.onReportBegin = ^{
+        deviceDelegate.onReportBegin = ^{
             [subscriptionReportBegin fulfill];
         };
 
-        delegate.onReportEnd = ^{
+        deviceDelegate.onReportEnd = ^{
             subscriptionReportEnd1 = YES;
         };
 
-        delegate.onSubscriptionCallbackDelete = ^{
+        deviceDelegate.onSubscriptionCallbackDelete = ^{
             [subscriptionCallbackDeleted fulfill];
         };
 
-        [device setDelegate:delegate queue:queue];
+        [device setDelegate:deviceDelegate queue:queue];
 
         [self waitForExpectations:@[ subscriptionReportBegin ] timeout:60];
 
@@ -3767,6 +3770,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     // dealloc -> delete should be called soon after the autoreleasepool reaps
     [self waitForExpectations:@[ subscriptionCallbackDeleted, controllerAddedDevice, controllerRemovedDevice ] timeout:60];
+
+    // Make sure to ignore notifications about device changes triggered by ResetCommissionee.
+    controllerDelegate.onDevicesChanged = nil;
 
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
