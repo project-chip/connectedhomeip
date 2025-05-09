@@ -156,6 +156,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/joint-fabric-datastore-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/joint-fabric-administrator-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/laundry-washer-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/laundry-dryer-controls-cluster.xml \
@@ -462,11 +464,14 @@ jobs:
 
     repl_tests_linux:
         name: REPL Tests - Linux
+        # TODO: this NEEDS re-enabling after figuring out what causes IPV6 not to work
+        #       in our GH environment
+        # if: github.actor != 'restyled-io[bot]'
+        if: false
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
-        if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
         container:
