@@ -19,130 +19,147 @@
 #pragma once
 
 #include <clusters/shared/Enums.h>
-#include <cstdint>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace KeypadInput {
+#include <clusters/AccessControl/Enums.h>
+#include <clusters/AccountLogin/Enums.h>
+#include <clusters/Actions/Enums.h>
+#include <clusters/ActivatedCarbonFilterMonitoring/Enums.h>
+#include <clusters/AdministratorCommissioning/Enums.h>
+#include <clusters/AirQuality/Enums.h>
+#include <clusters/ApplicationBasic/Enums.h>
+#include <clusters/ApplicationLauncher/Enums.h>
+#include <clusters/AudioOutput/Enums.h>
+#include <clusters/BallastConfiguration/Enums.h>
+#include <clusters/BasicInformation/Enums.h>
+#include <clusters/Binding/Enums.h>
+#include <clusters/BooleanState/Enums.h>
+#include <clusters/BooleanStateConfiguration/Enums.h>
+#include <clusters/BridgedDeviceBasicInformation/Enums.h>
+#include <clusters/CameraAvSettingsUserLevelManagement/Enums.h>
+#include <clusters/CameraAvStreamManagement/Enums.h>
+#include <clusters/CarbonDioxideConcentrationMeasurement/Enums.h>
+#include <clusters/CarbonMonoxideConcentrationMeasurement/Enums.h>
+#include <clusters/Channel/Enums.h>
+#include <clusters/Chime/Enums.h>
+#include <clusters/ClosureControl/Enums.h>
+#include <clusters/ClosureDimension/Enums.h>
+#include <clusters/ColorControl/Enums.h>
+#include <clusters/CommissionerControl/Enums.h>
+#include <clusters/CommodityMetering/Enums.h>
+#include <clusters/CommodityPrice/Enums.h>
+#include <clusters/CommodityTariff/Enums.h>
+#include <clusters/ContentAppObserver/Enums.h>
+#include <clusters/ContentControl/Enums.h>
+#include <clusters/ContentLauncher/Enums.h>
+#include <clusters/Descriptor/Enums.h>
+#include <clusters/DeviceEnergyManagement/Enums.h>
+#include <clusters/DeviceEnergyManagementMode/Enums.h>
+#include <clusters/DiagnosticLogs/Enums.h>
+#include <clusters/DishwasherAlarm/Enums.h>
+#include <clusters/DishwasherMode/Enums.h>
+#include <clusters/DoorLock/Enums.h>
+#include <clusters/EcosystemInformation/Enums.h>
+#include <clusters/ElectricalEnergyMeasurement/Enums.h>
+#include <clusters/ElectricalGridConditions/Enums.h>
+#include <clusters/ElectricalPowerMeasurement/Enums.h>
+#include <clusters/EnergyEvse/Enums.h>
+#include <clusters/EnergyEvseMode/Enums.h>
+#include <clusters/EnergyPreference/Enums.h>
+#include <clusters/EthernetNetworkDiagnostics/Enums.h>
+#include <clusters/FanControl/Enums.h>
+#include <clusters/FaultInjection/Enums.h>
+#include <clusters/FixedLabel/Enums.h>
+#include <clusters/FlowMeasurement/Enums.h>
+#include <clusters/FormaldehydeConcentrationMeasurement/Enums.h>
+#include <clusters/GeneralCommissioning/Enums.h>
+#include <clusters/GeneralDiagnostics/Enums.h>
+#include <clusters/GroupKeyManagement/Enums.h>
+#include <clusters/Groups/Enums.h>
+#include <clusters/HepaFilterMonitoring/Enums.h>
+#include <clusters/IcdManagement/Enums.h>
+#include <clusters/Identify/Enums.h>
+#include <clusters/IlluminanceMeasurement/Enums.h>
+#include <clusters/JointFabricAdministrator/Enums.h>
+#include <clusters/JointFabricDatastore/Enums.h>
+#include <clusters/KeypadInput/Enums.h>
+#include <clusters/LaundryDryerControls/Enums.h>
+#include <clusters/LaundryWasherControls/Enums.h>
+#include <clusters/LaundryWasherMode/Enums.h>
+#include <clusters/LevelControl/Enums.h>
+#include <clusters/LocalizationConfiguration/Enums.h>
+#include <clusters/LowPower/Enums.h>
+#include <clusters/MediaInput/Enums.h>
+#include <clusters/MediaPlayback/Enums.h>
+#include <clusters/Messages/Enums.h>
+#include <clusters/MeterIdentification/Enums.h>
+#include <clusters/MicrowaveOvenControl/Enums.h>
+#include <clusters/MicrowaveOvenMode/Enums.h>
+#include <clusters/ModeSelect/Enums.h>
+#include <clusters/NetworkCommissioning/Enums.h>
+#include <clusters/NitrogenDioxideConcentrationMeasurement/Enums.h>
+#include <clusters/OccupancySensing/Enums.h>
+#include <clusters/OnOff/Enums.h>
+#include <clusters/OperationalCredentials/Enums.h>
+#include <clusters/OperationalState/Enums.h>
+#include <clusters/OtaSoftwareUpdateProvider/Enums.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
+#include <clusters/OvenCavityOperationalState/Enums.h>
+#include <clusters/OvenMode/Enums.h>
+#include <clusters/OzoneConcentrationMeasurement/Enums.h>
+#include <clusters/Pm10ConcentrationMeasurement/Enums.h>
+#include <clusters/Pm1ConcentrationMeasurement/Enums.h>
+#include <clusters/Pm25ConcentrationMeasurement/Enums.h>
+#include <clusters/PowerSource/Enums.h>
+#include <clusters/PowerSourceConfiguration/Enums.h>
+#include <clusters/PowerTopology/Enums.h>
+#include <clusters/PressureMeasurement/Enums.h>
+#include <clusters/ProxyConfiguration/Enums.h>
+#include <clusters/ProxyDiscovery/Enums.h>
+#include <clusters/ProxyValid/Enums.h>
+#include <clusters/PulseWidthModulation/Enums.h>
+#include <clusters/PumpConfigurationAndControl/Enums.h>
+#include <clusters/PushAvStreamTransport/Enums.h>
+#include <clusters/RadonConcentrationMeasurement/Enums.h>
+#include <clusters/RefrigeratorAlarm/Enums.h>
+#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/Enums.h>
+#include <clusters/RelativeHumidityMeasurement/Enums.h>
+#include <clusters/RvcCleanMode/Enums.h>
+#include <clusters/RvcOperationalState/Enums.h>
+#include <clusters/RvcRunMode/Enums.h>
+#include <clusters/SampleMei/Enums.h>
+#include <clusters/ScenesManagement/Enums.h>
+#include <clusters/ServiceArea/Enums.h>
+#include <clusters/SmokeCoAlarm/Enums.h>
+#include <clusters/SoftwareDiagnostics/Enums.h>
+#include <clusters/SoilMeasurement/Enums.h>
+#include <clusters/Switch/Enums.h>
+#include <clusters/TargetNavigator/Enums.h>
+#include <clusters/TemperatureControl/Enums.h>
+#include <clusters/TemperatureMeasurement/Enums.h>
+#include <clusters/Thermostat/Enums.h>
+#include <clusters/ThermostatUserInterfaceConfiguration/Enums.h>
+#include <clusters/ThreadBorderRouterManagement/Enums.h>
+#include <clusters/ThreadNetworkDiagnostics/Enums.h>
+#include <clusters/ThreadNetworkDirectory/Enums.h>
+#include <clusters/TimeFormatLocalization/Enums.h>
+#include <clusters/TimeSynchronization/Enums.h>
+#include <clusters/Timer/Enums.h>
+#include <clusters/TlsCertificateManagement/Enums.h>
+#include <clusters/TlsClientManagement/Enums.h>
+#include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Enums.h>
+#include <clusters/UnitLocalization/Enums.h>
+#include <clusters/UnitTesting/Enums.h>
+#include <clusters/UserLabel/Enums.h>
+#include <clusters/ValveConfigurationAndControl/Enums.h>
+#include <clusters/WakeOnLan/Enums.h>
+#include <clusters/WaterHeaterManagement/Enums.h>
+#include <clusters/WaterHeaterMode/Enums.h>
+#include <clusters/WebRTCTransportProvider/Enums.h>
+#include <clusters/WebRTCTransportRequestor/Enums.h>
+#include <clusters/WiFiNetworkDiagnostics/Enums.h>
+#include <clusters/WiFiNetworkManagement/Enums.h>
+#include <clusters/WindowCovering/Enums.h>
+#include <clusters/ZoneManagement/Enums.h>
 
-// Enum for CECKeyCodeEnum
-enum class CECKeyCodeEnum : uint8_t
-{
-    kSelect                    = 0x00,
-    kUp                        = 0x01,
-    kDown                      = 0x02,
-    kLeft                      = 0x03,
-    kRight                     = 0x04,
-    kRightUp                   = 0x05,
-    kRightDown                 = 0x06,
-    kLeftUp                    = 0x07,
-    kLeftDown                  = 0x08,
-    kRootMenu                  = 0x09,
-    kSetupMenu                 = 0x0A,
-    kContentsMenu              = 0x0B,
-    kFavoriteMenu              = 0x0C,
-    kExit                      = 0x0D,
-    kMediaTopMenu              = 0x10,
-    kMediaContextSensitiveMenu = 0x11,
-    kNumberEntryMode           = 0x1D,
-    kNumber11                  = 0x1E,
-    kNumber12                  = 0x1F,
-    kNumber0OrNumber10         = 0x20,
-    kNumbers1                  = 0x21,
-    kNumbers2                  = 0x22,
-    kNumbers3                  = 0x23,
-    kNumbers4                  = 0x24,
-    kNumbers5                  = 0x25,
-    kNumbers6                  = 0x26,
-    kNumbers7                  = 0x27,
-    kNumbers8                  = 0x28,
-    kNumbers9                  = 0x29,
-    kDot                       = 0x2A,
-    kEnter                     = 0x2B,
-    kClear                     = 0x2C,
-    kNextFavorite              = 0x2F,
-    kChannelUp                 = 0x30,
-    kChannelDown               = 0x31,
-    kPreviousChannel           = 0x32,
-    kSoundSelect               = 0x33,
-    kInputSelect               = 0x34,
-    kDisplayInformation        = 0x35,
-    kHelp                      = 0x36,
-    kPageUp                    = 0x37,
-    kPageDown                  = 0x38,
-    kPower                     = 0x40,
-    kVolumeUp                  = 0x41,
-    kVolumeDown                = 0x42,
-    kMute                      = 0x43,
-    kPlay                      = 0x44,
-    kStop                      = 0x45,
-    kPause                     = 0x46,
-    kRecord                    = 0x47,
-    kRewind                    = 0x48,
-    kFastForward               = 0x49,
-    kEject                     = 0x4A,
-    kForward                   = 0x4B,
-    kBackward                  = 0x4C,
-    kStopRecord                = 0x4D,
-    kPauseRecord               = 0x4E,
-    kReserved                  = 0x4F,
-    kAngle                     = 0x50,
-    kSubPicture                = 0x51,
-    kVideoOnDemand             = 0x52,
-    kElectronicProgramGuide    = 0x53,
-    kTimerProgramming          = 0x54,
-    kInitialConfiguration      = 0x55,
-    kSelectBroadcastType       = 0x56,
-    kSelectSoundPresentation   = 0x57,
-    kPlayFunction              = 0x60,
-    kPausePlayFunction         = 0x61,
-    kRecordFunction            = 0x62,
-    kPauseRecordFunction       = 0x63,
-    kStopFunction              = 0x64,
-    kMuteFunction              = 0x65,
-    kRestoreVolumeFunction     = 0x66,
-    kTuneFunction              = 0x67,
-    kSelectMediaFunction       = 0x68,
-    kSelectAvInputFunction     = 0x69,
-    kSelectAudioInputFunction  = 0x6A,
-    kPowerToggleFunction       = 0x6B,
-    kPowerOffFunction          = 0x6C,
-    kPowerOnFunction           = 0x6D,
-    kF1Blue                    = 0x71,
-    kF2Red                     = 0x72,
-    kF3Green                   = 0x73,
-    kF4Yellow                  = 0x74,
-    kF5                        = 0x75,
-    kData                      = 0x76,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 14,
-};
-
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
-{
-    kSuccess                  = 0x00,
-    kUnsupportedKey           = 0x01,
-    kInvalidKeyInCurrentState = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kNavigationKeyCodes = 0x1,
-    kLocationKeys       = 0x2,
-    kNumberKeys         = 0x4,
-};
-} // namespace KeypadInput
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+// Included at the end, so all our definitions above are available.
+#include <app/common/CompatEnumNames.h>

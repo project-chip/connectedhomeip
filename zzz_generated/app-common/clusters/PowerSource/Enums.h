@@ -19,270 +19,147 @@
 #pragma once
 
 #include <clusters/shared/Enums.h>
-#include <cstdint>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace PowerSource {
+#include <clusters/AccessControl/Enums.h>
+#include <clusters/AccountLogin/Enums.h>
+#include <clusters/Actions/Enums.h>
+#include <clusters/ActivatedCarbonFilterMonitoring/Enums.h>
+#include <clusters/AdministratorCommissioning/Enums.h>
+#include <clusters/AirQuality/Enums.h>
+#include <clusters/ApplicationBasic/Enums.h>
+#include <clusters/ApplicationLauncher/Enums.h>
+#include <clusters/AudioOutput/Enums.h>
+#include <clusters/BallastConfiguration/Enums.h>
+#include <clusters/BasicInformation/Enums.h>
+#include <clusters/Binding/Enums.h>
+#include <clusters/BooleanState/Enums.h>
+#include <clusters/BooleanStateConfiguration/Enums.h>
+#include <clusters/BridgedDeviceBasicInformation/Enums.h>
+#include <clusters/CameraAvSettingsUserLevelManagement/Enums.h>
+#include <clusters/CameraAvStreamManagement/Enums.h>
+#include <clusters/CarbonDioxideConcentrationMeasurement/Enums.h>
+#include <clusters/CarbonMonoxideConcentrationMeasurement/Enums.h>
+#include <clusters/Channel/Enums.h>
+#include <clusters/Chime/Enums.h>
+#include <clusters/ClosureControl/Enums.h>
+#include <clusters/ClosureDimension/Enums.h>
+#include <clusters/ColorControl/Enums.h>
+#include <clusters/CommissionerControl/Enums.h>
+#include <clusters/CommodityMetering/Enums.h>
+#include <clusters/CommodityPrice/Enums.h>
+#include <clusters/CommodityTariff/Enums.h>
+#include <clusters/ContentAppObserver/Enums.h>
+#include <clusters/ContentControl/Enums.h>
+#include <clusters/ContentLauncher/Enums.h>
+#include <clusters/Descriptor/Enums.h>
+#include <clusters/DeviceEnergyManagement/Enums.h>
+#include <clusters/DeviceEnergyManagementMode/Enums.h>
+#include <clusters/DiagnosticLogs/Enums.h>
+#include <clusters/DishwasherAlarm/Enums.h>
+#include <clusters/DishwasherMode/Enums.h>
+#include <clusters/DoorLock/Enums.h>
+#include <clusters/EcosystemInformation/Enums.h>
+#include <clusters/ElectricalEnergyMeasurement/Enums.h>
+#include <clusters/ElectricalGridConditions/Enums.h>
+#include <clusters/ElectricalPowerMeasurement/Enums.h>
+#include <clusters/EnergyEvse/Enums.h>
+#include <clusters/EnergyEvseMode/Enums.h>
+#include <clusters/EnergyPreference/Enums.h>
+#include <clusters/EthernetNetworkDiagnostics/Enums.h>
+#include <clusters/FanControl/Enums.h>
+#include <clusters/FaultInjection/Enums.h>
+#include <clusters/FixedLabel/Enums.h>
+#include <clusters/FlowMeasurement/Enums.h>
+#include <clusters/FormaldehydeConcentrationMeasurement/Enums.h>
+#include <clusters/GeneralCommissioning/Enums.h>
+#include <clusters/GeneralDiagnostics/Enums.h>
+#include <clusters/GroupKeyManagement/Enums.h>
+#include <clusters/Groups/Enums.h>
+#include <clusters/HepaFilterMonitoring/Enums.h>
+#include <clusters/IcdManagement/Enums.h>
+#include <clusters/Identify/Enums.h>
+#include <clusters/IlluminanceMeasurement/Enums.h>
+#include <clusters/JointFabricAdministrator/Enums.h>
+#include <clusters/JointFabricDatastore/Enums.h>
+#include <clusters/KeypadInput/Enums.h>
+#include <clusters/LaundryDryerControls/Enums.h>
+#include <clusters/LaundryWasherControls/Enums.h>
+#include <clusters/LaundryWasherMode/Enums.h>
+#include <clusters/LevelControl/Enums.h>
+#include <clusters/LocalizationConfiguration/Enums.h>
+#include <clusters/LowPower/Enums.h>
+#include <clusters/MediaInput/Enums.h>
+#include <clusters/MediaPlayback/Enums.h>
+#include <clusters/Messages/Enums.h>
+#include <clusters/MeterIdentification/Enums.h>
+#include <clusters/MicrowaveOvenControl/Enums.h>
+#include <clusters/MicrowaveOvenMode/Enums.h>
+#include <clusters/ModeSelect/Enums.h>
+#include <clusters/NetworkCommissioning/Enums.h>
+#include <clusters/NitrogenDioxideConcentrationMeasurement/Enums.h>
+#include <clusters/OccupancySensing/Enums.h>
+#include <clusters/OnOff/Enums.h>
+#include <clusters/OperationalCredentials/Enums.h>
+#include <clusters/OperationalState/Enums.h>
+#include <clusters/OtaSoftwareUpdateProvider/Enums.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
+#include <clusters/OvenCavityOperationalState/Enums.h>
+#include <clusters/OvenMode/Enums.h>
+#include <clusters/OzoneConcentrationMeasurement/Enums.h>
+#include <clusters/Pm10ConcentrationMeasurement/Enums.h>
+#include <clusters/Pm1ConcentrationMeasurement/Enums.h>
+#include <clusters/Pm25ConcentrationMeasurement/Enums.h>
+#include <clusters/PowerSource/Enums.h>
+#include <clusters/PowerSourceConfiguration/Enums.h>
+#include <clusters/PowerTopology/Enums.h>
+#include <clusters/PressureMeasurement/Enums.h>
+#include <clusters/ProxyConfiguration/Enums.h>
+#include <clusters/ProxyDiscovery/Enums.h>
+#include <clusters/ProxyValid/Enums.h>
+#include <clusters/PulseWidthModulation/Enums.h>
+#include <clusters/PumpConfigurationAndControl/Enums.h>
+#include <clusters/PushAvStreamTransport/Enums.h>
+#include <clusters/RadonConcentrationMeasurement/Enums.h>
+#include <clusters/RefrigeratorAlarm/Enums.h>
+#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/Enums.h>
+#include <clusters/RelativeHumidityMeasurement/Enums.h>
+#include <clusters/RvcCleanMode/Enums.h>
+#include <clusters/RvcOperationalState/Enums.h>
+#include <clusters/RvcRunMode/Enums.h>
+#include <clusters/SampleMei/Enums.h>
+#include <clusters/ScenesManagement/Enums.h>
+#include <clusters/ServiceArea/Enums.h>
+#include <clusters/SmokeCoAlarm/Enums.h>
+#include <clusters/SoftwareDiagnostics/Enums.h>
+#include <clusters/SoilMeasurement/Enums.h>
+#include <clusters/Switch/Enums.h>
+#include <clusters/TargetNavigator/Enums.h>
+#include <clusters/TemperatureControl/Enums.h>
+#include <clusters/TemperatureMeasurement/Enums.h>
+#include <clusters/Thermostat/Enums.h>
+#include <clusters/ThermostatUserInterfaceConfiguration/Enums.h>
+#include <clusters/ThreadBorderRouterManagement/Enums.h>
+#include <clusters/ThreadNetworkDiagnostics/Enums.h>
+#include <clusters/ThreadNetworkDirectory/Enums.h>
+#include <clusters/TimeFormatLocalization/Enums.h>
+#include <clusters/TimeSynchronization/Enums.h>
+#include <clusters/Timer/Enums.h>
+#include <clusters/TlsCertificateManagement/Enums.h>
+#include <clusters/TlsClientManagement/Enums.h>
+#include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Enums.h>
+#include <clusters/UnitLocalization/Enums.h>
+#include <clusters/UnitTesting/Enums.h>
+#include <clusters/UserLabel/Enums.h>
+#include <clusters/ValveConfigurationAndControl/Enums.h>
+#include <clusters/WakeOnLan/Enums.h>
+#include <clusters/WaterHeaterManagement/Enums.h>
+#include <clusters/WaterHeaterMode/Enums.h>
+#include <clusters/WebRTCTransportProvider/Enums.h>
+#include <clusters/WebRTCTransportRequestor/Enums.h>
+#include <clusters/WiFiNetworkDiagnostics/Enums.h>
+#include <clusters/WiFiNetworkManagement/Enums.h>
+#include <clusters/WindowCovering/Enums.h>
+#include <clusters/ZoneManagement/Enums.h>
 
-// Enum for BatApprovedChemistryEnum
-enum class BatApprovedChemistryEnum : uint16_t
-{
-    kUnspecified             = 0x00,
-    kAlkaline                = 0x01,
-    kLithiumCarbonFluoride   = 0x02,
-    kLithiumChromiumOxide    = 0x03,
-    kLithiumCopperOxide      = 0x04,
-    kLithiumIronDisulfide    = 0x05,
-    kLithiumManganeseDioxide = 0x06,
-    kLithiumThionylChloride  = 0x07,
-    kMagnesium               = 0x08,
-    kMercuryOxide            = 0x09,
-    kNickelOxyhydride        = 0x0A,
-    kSilverOxide             = 0x0B,
-    kZincAir                 = 0x0C,
-    kZincCarbon              = 0x0D,
-    kZincChloride            = 0x0E,
-    kZincManganeseDioxide    = 0x0F,
-    kLeadAcid                = 0x10,
-    kLithiumCobaltOxide      = 0x11,
-    kLithiumIon              = 0x12,
-    kLithiumIonPolymer       = 0x13,
-    kLithiumIronPhosphate    = 0x14,
-    kLithiumSulfur           = 0x15,
-    kLithiumTitanate         = 0x16,
-    kNickelCadmium           = 0x17,
-    kNickelHydrogen          = 0x18,
-    kNickelIron              = 0x19,
-    kNickelMetalHydride      = 0x1A,
-    kNickelZinc              = 0x1B,
-    kSilverZinc              = 0x1C,
-    kSodiumIon               = 0x1D,
-    kSodiumSulfur            = 0x1E,
-    kZincBromide             = 0x1F,
-    kZincCerium              = 0x20,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 33,
-};
-
-// Enum for BatChargeFaultEnum
-enum class BatChargeFaultEnum : uint8_t
-{
-    kUnspecified         = 0x00,
-    kAmbientTooHot       = 0x01,
-    kAmbientTooCold      = 0x02,
-    kBatteryTooHot       = 0x03,
-    kBatteryTooCold      = 0x04,
-    kBatteryAbsent       = 0x05,
-    kBatteryOverVoltage  = 0x06,
-    kBatteryUnderVoltage = 0x07,
-    kChargerOverVoltage  = 0x08,
-    kChargerUnderVoltage = 0x09,
-    kSafetyTimeout       = 0x0A,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 11,
-};
-
-// Enum for BatChargeLevelEnum
-enum class BatChargeLevelEnum : uint8_t
-{
-    kOk       = 0x00,
-    kWarning  = 0x01,
-    kCritical = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
-// Enum for BatChargeStateEnum
-enum class BatChargeStateEnum : uint8_t
-{
-    kUnknown        = 0x00,
-    kIsCharging     = 0x01,
-    kIsAtFullCharge = 0x02,
-    kIsNotCharging  = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
-};
-
-// Enum for BatCommonDesignationEnum
-enum class BatCommonDesignationEnum : uint16_t
-{
-    kUnspecified = 0x00,
-    kAaa         = 0x01,
-    kAa          = 0x02,
-    kC           = 0x03,
-    kD           = 0x04,
-    k4v5         = 0x05,
-    k6v0         = 0x06,
-    k9v0         = 0x07,
-    k12aa        = 0x08,
-    kAaaa        = 0x09,
-    kA           = 0x0A,
-    kB           = 0x0B,
-    kF           = 0x0C,
-    kN           = 0x0D,
-    kNo6         = 0x0E,
-    kSubC        = 0x0F,
-    kA23         = 0x10,
-    kA27         = 0x11,
-    kBa5800      = 0x12,
-    kDuplex      = 0x13,
-    k4sr44       = 0x14,
-    k523         = 0x15,
-    k531         = 0x16,
-    k15v0        = 0x17,
-    k22v5        = 0x18,
-    k30v0        = 0x19,
-    k45v0        = 0x1A,
-    k67v5        = 0x1B,
-    kJ           = 0x1C,
-    kCr123a      = 0x1D,
-    kCr2         = 0x1E,
-    k2cr5        = 0x1F,
-    kCrP2        = 0x20,
-    kCrV3        = 0x21,
-    kSr41        = 0x22,
-    kSr43        = 0x23,
-    kSr44        = 0x24,
-    kSr45        = 0x25,
-    kSr48        = 0x26,
-    kSr54        = 0x27,
-    kSr55        = 0x28,
-    kSr57        = 0x29,
-    kSr58        = 0x2A,
-    kSr59        = 0x2B,
-    kSr60        = 0x2C,
-    kSr63        = 0x2D,
-    kSr64        = 0x2E,
-    kSr65        = 0x2F,
-    kSr66        = 0x30,
-    kSr67        = 0x31,
-    kSr68        = 0x32,
-    kSr69        = 0x33,
-    kSr516       = 0x34,
-    kSr731       = 0x35,
-    kSr712       = 0x36,
-    kLr932       = 0x37,
-    kA5          = 0x38,
-    kA10         = 0x39,
-    kA13         = 0x3A,
-    kA312        = 0x3B,
-    kA675        = 0x3C,
-    kAc41e       = 0x3D,
-    k10180       = 0x3E,
-    k10280       = 0x3F,
-    k10440       = 0x40,
-    k14250       = 0x41,
-    k14430       = 0x42,
-    k14500       = 0x43,
-    k14650       = 0x44,
-    k15270       = 0x45,
-    k16340       = 0x46,
-    kRcr123a     = 0x47,
-    k17500       = 0x48,
-    k17670       = 0x49,
-    k18350       = 0x4A,
-    k18500       = 0x4B,
-    k18650       = 0x4C,
-    k19670       = 0x4D,
-    k25500       = 0x4E,
-    k26650       = 0x4F,
-    k32600       = 0x50,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 81,
-};
-
-// Enum for BatFaultEnum
-enum class BatFaultEnum : uint8_t
-{
-    kUnspecified = 0x00,
-    kOverTemp    = 0x01,
-    kUnderTemp   = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
-// Enum for BatReplaceabilityEnum
-enum class BatReplaceabilityEnum : uint8_t
-{
-    kUnspecified        = 0x00,
-    kNotReplaceable     = 0x01,
-    kUserReplaceable    = 0x02,
-    kFactoryReplaceable = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
-};
-
-// Enum for PowerSourceStatusEnum
-enum class PowerSourceStatusEnum : uint8_t
-{
-    kUnspecified = 0x00,
-    kActive      = 0x01,
-    kStandby     = 0x02,
-    kUnavailable = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
-};
-
-// Enum for WiredCurrentTypeEnum
-enum class WiredCurrentTypeEnum : uint8_t
-{
-    kAc = 0x00,
-    kDc = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-
-// Enum for WiredFaultEnum
-enum class WiredFaultEnum : uint8_t
-{
-    kUnspecified  = 0x00,
-    kOverVoltage  = 0x01,
-    kUnderVoltage = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kWired        = 0x1,
-    kBattery      = 0x2,
-    kRechargeable = 0x4,
-    kReplaceable  = 0x8,
-};
-} // namespace PowerSource
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+// Included at the end, so all our definitions above are available.
+#include <app/common/CompatEnumNames.h>
