@@ -2462,6 +2462,393 @@ cluster ColorControl = 768 {
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
+/** The Joint Fabric Datastore Cluster is a cluster that provides a mechanism for the Joint Fabric Administrators to manage the set of Nodes, Groups, and Group membership among Nodes in the Joint Fabric. */
+provisional cluster JointFabricDatastore = 1874 {
+  revision 1;
+
+  enum DatastoreAccessControlEntryAuthModeEnum : enum8 {
+    kPASE = 1;
+    kCASE = 2;
+    kGroup = 3;
+  }
+
+  enum DatastoreAccessControlEntryPrivilegeEnum : enum8 {
+    kView = 1;
+    kProxyView = 2;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
+  }
+
+  enum DatastoreGroupKeyMulticastPolicyEnum : enum8 {
+    kPerGroupID = 0;
+    kAllNodes = 1;
+  }
+
+  enum DatastoreGroupKeySecurityPolicyEnum : enum8 {
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
+  }
+
+  enum DatastoreStateEnum : enum8 {
+    kPending = 0;
+    kCommitted = 1;
+    kDeletePending = 2;
+    kCommitFailed = 3;
+  }
+
+  struct DatastoreStatusEntryStruct {
+    DatastoreStateEnum state = 0;
+    epoch_s updateTimestamp = 1;
+    status failureCode = 2;
+  }
+
+  fabric_scoped struct DatastoreNodeKeySetEntry {
+    node_id nodeID = 0;
+    int16u groupKeySetID = 1;
+    DatastoreStatusEntryStruct statusEntry = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct DatastoreNodeInformationEntryStruct {
+    node_id nodeID = 1;
+    char_string<32> friendlyName = 2;
+    DatastoreStatusEntryStruct commissioningStatusEntry = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct DatastoreEndpointGroupIDEntryStruct {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+    group_id groupID = 2;
+    DatastoreStatusEntryStruct statusEntry = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct DatastoreEndpointEntryStruct {
+    endpoint_no endpointID = 0;
+    node_id nodeID = 1;
+    char_string<32> friendlyName = 2;
+    DatastoreStatusEntryStruct statusEntry = 3;
+  }
+
+  struct DatastoreBindingTargetStruct {
+    optional node_id node = 1;
+    optional group_id group = 2;
+    optional endpoint_no endpoint = 3;
+    optional cluster_id cluster = 4;
+  }
+
+  fabric_scoped struct DatastoreEndpointBindingEntryStruct {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+    int16u listID = 2;
+    DatastoreBindingTargetStruct binding = 3;
+    DatastoreStatusEntryStruct statusEntry = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct DatastoreAccessControlTargetStruct {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
+  struct DatastoreAccessControlEntryStruct {
+    fabric_sensitive DatastoreAccessControlEntryPrivilegeEnum privilege = 1;
+    fabric_sensitive DatastoreAccessControlEntryAuthModeEnum authMode = 2;
+    nullable fabric_sensitive int64u subjects[] = 3;
+    nullable fabric_sensitive DatastoreAccessControlTargetStruct targets[] = 4;
+  }
+
+  fabric_scoped struct DatastoreACLEntryStruct {
+    node_id nodeID = 0;
+    int16u listID = 1;
+    DatastoreAccessControlEntryStruct ACLEntry = 2;
+    DatastoreStatusEntryStruct statusEntry = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct DatastoreAdministratorInformationEntryStruct {
+    node_id nodeID = 1;
+    char_string<32> friendlyName = 2;
+    vendor_id vendorID = 3;
+    long_octet_string<400> icac = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct DatastoreGroupInformationEntryStruct {
+    int64u groupID = 0;
+    char_string<32> friendlyName = 1;
+    nullable int16u groupKeySetID = 2;
+    nullable int16u groupCAT = 3;
+    nullable int16u groupCATVersion = 4;
+    DatastoreAccessControlEntryPrivilegeEnum groupPermission = 5;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct DatastoreGroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    fabric_sensitive DatastoreGroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
+    nullable fabric_sensitive octet_string<16> epochKey0 = 2;
+    nullable fabric_sensitive epoch_us epochStartTime0 = 3;
+    nullable fabric_sensitive octet_string<16> epochKey1 = 4;
+    nullable fabric_sensitive epoch_us epochStartTime1 = 5;
+    nullable fabric_sensitive octet_string<16> epochKey2 = 6;
+    nullable fabric_sensitive epoch_us epochStartTime2 = 7;
+    fabric_sensitive DatastoreGroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
+  }
+
+  fabric_scoped struct DatastoreStatusStruct {
+    DatastoreStateEnum state = 0;
+    epoch_s updateTimestamp = 1;
+    status failureCode = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute access(read: administer) octet_string<254> anchorRootCA = 0;
+  readonly attribute access(read: administer) node_id anchorNodeID = 1;
+  readonly attribute access(read: administer) vendor_id anchorVendorID = 2;
+  readonly attribute access(read: administer) char_string<32> friendlyName = 3;
+  readonly attribute access(read: administer) DatastoreGroupKeySetStruct groupKeySetList[] = 4;
+  readonly attribute access(read: administer) DatastoreGroupInformationEntryStruct groupList[] = 5;
+  readonly attribute access(read: administer) DatastoreNodeInformationEntryStruct nodeList[] = 6;
+  readonly attribute access(read: administer) DatastoreAdministratorInformationEntryStruct adminList[] = 7;
+  readonly attribute access(read: administer) DatastoreStatusStruct status = 8;
+  readonly attribute access(read: administer) DatastoreEndpointGroupIDEntryStruct endpointGroupIDList[] = 9;
+  readonly attribute access(read: administer) DatastoreEndpointBindingEntryStruct endpointBindingList[] = 10;
+  readonly attribute access(read: administer) DatastoreNodeKeySetEntry nodeKeySetList[] = 11;
+  readonly attribute access(read: administer) DatastoreACLEntryStruct nodeACLList[] = 12;
+  readonly attribute access(read: administer) DatastoreEndpointEntryStruct nodeEndpointList[] = 13;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddKeySetRequest {
+    DatastoreGroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct UpdateKeySetRequest {
+    DatastoreGroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct RemoveKeySetRequest {
+    int16u groupKeySetID = 0;
+  }
+
+  request struct AddGroupRequest {
+    group_id groupID = 0;
+    char_string<32> friendlyName = 1;
+    nullable int16u groupKeySetID = 2;
+    nullable int16u groupCAT = 3;
+    nullable int16u groupCATVersion = 4;
+    DatastoreAccessControlEntryPrivilegeEnum groupPermission = 5;
+  }
+
+  request struct UpdateGroupRequest {
+    group_id groupID = 0;
+    nullable char_string<32> friendlyName = 1;
+    nullable int16u groupKeySetID = 2;
+    nullable int16u groupCAT = 3;
+    nullable int16u groupCATVersion = 4;
+    DatastoreAccessControlEntryPrivilegeEnum groupPermission = 5;
+  }
+
+  request struct RemoveGroupRequest {
+    group_id groupID = 0;
+  }
+
+  request struct AddAdminRequest {
+    node_id nodeID = 0;
+    char_string<32> friendlyName = 1;
+    vendor_id vendorID = 2;
+    long_octet_string<400> icac = 3;
+  }
+
+  request struct UpdateAdminRequest {
+    nullable node_id nodeID = 0;
+    nullable char_string<32> friendlyName = 1;
+    nullable long_octet_string<400> icac = 2;
+  }
+
+  request struct RemoveAdminRequest {
+    node_id nodeID = 0;
+  }
+
+  request struct AddPendingNodeRequest {
+    node_id nodeID = 0;
+    char_string<32> friendlyName = 1;
+  }
+
+  request struct RefreshNodeRequest {
+    node_id nodeID = 0;
+  }
+
+  request struct UpdateNodeRequest {
+    node_id nodeID = 0;
+    char_string<32> friendlyName = 1;
+  }
+
+  request struct RemoveNodeRequest {
+    node_id nodeID = 0;
+  }
+
+  request struct UpdateEndpointForNodeRequest {
+    endpoint_no endpointID = 0;
+    node_id nodeID = 1;
+    char_string<32> friendlyName = 2;
+  }
+
+  request struct AddGroupIDToEndpointForNodeRequest {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+    group_id groupID = 2;
+  }
+
+  request struct RemoveGroupIDFromEndpointForNodeRequest {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+    group_id groupID = 2;
+  }
+
+  request struct AddBindingToEndpointForNodeRequest {
+    node_id nodeID = 0;
+    endpoint_no endpointID = 1;
+    DatastoreBindingTargetStruct binding = 2;
+  }
+
+  request struct RemoveBindingFromEndpointForNodeRequest {
+    int16u listID = 0;
+    endpoint_no endpointID = 1;
+    node_id nodeID = 2;
+  }
+
+  request struct AddACLToNodeRequest {
+    node_id nodeID = 0;
+    DatastoreAccessControlEntryStruct ACLEntry = 1;
+  }
+
+  request struct RemoveACLFromNodeRequest {
+    int16u listID = 0;
+    node_id nodeID = 1;
+  }
+
+  /** This command SHALL be used to add a KeySet to the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) AddKeySet(AddKeySetRequest): DefaultSuccess = 0;
+  /** This command SHALL be used to update a KeySet in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) UpdateKeySet(UpdateKeySetRequest): DefaultSuccess = 1;
+  /** This command SHALL be used to remove a KeySet from the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) RemoveKeySet(RemoveKeySetRequest): DefaultSuccess = 2;
+  /** This command SHALL be used to add a group to the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) AddGroup(AddGroupRequest): DefaultSuccess = 3;
+  /** This command SHALL be used to update a group in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) UpdateGroup(UpdateGroupRequest): DefaultSuccess = 4;
+  /** This command SHALL be used to remove a group from the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) RemoveGroup(RemoveGroupRequest): DefaultSuccess = 5;
+  /** This command SHALL be used to add an admin to the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) AddAdmin(AddAdminRequest): DefaultSuccess = 6;
+  /** This command SHALL be used to update an admin in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) UpdateAdmin(UpdateAdminRequest): DefaultSuccess = 7;
+  /** This command SHALL be used to remove an admin from the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) RemoveAdmin(RemoveAdminRequest): DefaultSuccess = 8;
+  /** The command SHALL be used to add a node to the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) AddPendingNode(AddPendingNodeRequest): DefaultSuccess = 9;
+  /** The command SHALL be used to request that Datastore information relating to a Node is refreshed. */
+  fabric command access(invoke: administer) RefreshNode(RefreshNodeRequest): DefaultSuccess = 10;
+  /** The command SHALL be used to update the friendly name for a node in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) UpdateNode(UpdateNodeRequest): DefaultSuccess = 11;
+  /** This command SHALL be used to remove a node from the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) RemoveNode(RemoveNodeRequest): DefaultSuccess = 12;
+  /** This command SHALL be used to update the state of an endpoint for a node in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) UpdateEndpointForNode(UpdateEndpointForNodeRequest): DefaultSuccess = 13;
+  /** This command SHALL be used to add a Group ID to an endpoint for a node in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) AddGroupIDToEndpointForNode(AddGroupIDToEndpointForNodeRequest): DefaultSuccess = 14;
+  /** This command SHALL be used to remove a Group ID from an endpoint for a node in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) RemoveGroupIDFromEndpointForNode(RemoveGroupIDFromEndpointForNodeRequest): DefaultSuccess = 15;
+  /** This command SHALL be used to add a binding to an endpoint for a node in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) AddBindingToEndpointForNode(AddBindingToEndpointForNodeRequest): DefaultSuccess = 16;
+  /** This command SHALL be used to remove a binding from an endpoint for a node in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) RemoveBindingFromEndpointForNode(RemoveBindingFromEndpointForNodeRequest): DefaultSuccess = 17;
+  /** This command SHALL be used to add an ACL to a node in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) AddACLToNode(AddACLToNodeRequest): DefaultSuccess = 18;
+  /** This command SHALL be used to remove an ACL from a node in the Joint Fabric Datastore Cluster. */
+  fabric command access(invoke: administer) RemoveACLFromNode(RemoveACLFromNodeRequest): DefaultSuccess = 19;
+}
+
+/** An instance of the Joint Fabric Administrator Cluster only applies to Joint Fabric Administrator nodes fulfilling the role of Anchor CA. */
+provisional cluster JointFabricAdministrator = 1875 {
+  revision 1;
+
+  enum ICACResponseStatusEnum : enum8 {
+    kOK = 0;
+    kInvalidPublicKey = 1;
+    kInvalidICAC = 2;
+  }
+
+  enum StatusCodeEnum : enum8 {
+    kVIDNotVerified = 2;
+    kInvalidAdministratorFabricIndex = 3;
+  }
+
+  enum TransferAnchorResponseStatusEnum : enum8 {
+    kOK = 0;
+    kTransferAnchorStatusDatastoreBusy = 1;
+    kTransferAnchorStatusNoUserConsent = 2;
+  }
+
+  readonly attribute access(read: administer) nullable fabric_idx administratorFabricIndex = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct ICACCSRResponse = 1 {
+    long_octet_string<600> icaccsr = 0;
+  }
+
+  request struct AddICACRequest {
+    long_octet_string<400> ICACValue = 0;
+  }
+
+  response struct ICACResponse = 3 {
+    ICACResponseStatusEnum statusCode = 0;
+  }
+
+  request struct OpenJointCommissioningWindowRequest {
+    int16u commissioningTimeout = 0;
+    octet_string PAKEPasscodeVerifier = 1;
+    int16u discriminator = 2;
+    int32u iterations = 3;
+    octet_string<32> salt = 4;
+  }
+
+  response struct TransferAnchorResponse = 6 {
+    TransferAnchorResponseStatusEnum statusCode = 0;
+  }
+
+  request struct AnnounceJointFabricAdministratorRequest {
+    endpoint_no endpointID = 0;
+  }
+
+  /** This command SHALL be generated during Joint Commissioning Method and subsequently be responded in the form of an ICACCSRResponse command. */
+  command access(invoke: administer) ICACCSRRequest(): ICACCSRResponse = 0;
+  /** This command SHALL be generated and executed during Joint Commissioning Method and subsequently be responded in the form of an ICACResponse command. */
+  command access(invoke: administer) AddICAC(AddICACRequest): ICACResponse = 2;
+  /** This command SHALL fail with a InvalidAdministratorFabricIndex status code sent back to the initiator if the AdministratorFabricIndex field has the value of null. */
+  command access(invoke: administer) OpenJointCommissioningWindow(OpenJointCommissioningWindowRequest): DefaultSuccess = 4;
+  /** This command SHALL be sent by a candidate Joint Fabric Anchor Administrator to the current Joint Fabric Anchor Administrator to request transfer of the Anchor Fabric. */
+  command access(invoke: administer) TransferAnchorRequest(): TransferAnchorResponse = 5;
+  /** This command SHALL indicate the completion of the transfer of the Anchor Fabric to another Joint Fabric Ecosystem Administrator. */
+  command access(invoke: administer) TransferAnchorComplete(): DefaultSuccess = 7;
+  /** This command SHALL be used for communicating to client the endpoint that holds the Joint Fabric Administrator Cluster. */
+  command access(invoke: administer) AnnounceJointFabricAdministrator(AnnounceJointFabricAdministratorRequest): DefaultSuccess = 8;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 3;
   device type ma_otarequestor = 18, version 1;
@@ -2971,6 +3358,68 @@ endpoint 1 {
     handle command StopMoveStep;
     handle command MoveColorTemperature;
     handle command StepColorTemperature;
+  }
+
+  server cluster JointFabricDatastore {
+    ram      attribute anchorRootCA;
+    ram      attribute anchorNodeID;
+    ram      attribute anchorVendorID;
+    ram      attribute friendlyName;
+    callback attribute groupKeySetList;
+    callback attribute groupList;
+    callback attribute nodeList;
+    callback attribute adminList;
+    callback attribute status;
+    callback attribute endpointGroupIDList;
+    callback attribute endpointBindingList;
+    callback attribute nodeKeySetList;
+    callback attribute nodeACLList;
+    callback attribute nodeEndpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command AddKeySet;
+    handle command UpdateKeySet;
+    handle command RemoveKeySet;
+    handle command AddGroup;
+    handle command UpdateGroup;
+    handle command RemoveGroup;
+    handle command AddAdmin;
+    handle command UpdateAdmin;
+    handle command RemoveAdmin;
+    handle command AddPendingNode;
+    handle command RefreshNode;
+    handle command UpdateNode;
+    handle command RemoveNode;
+    handle command UpdateEndpointForNode;
+    handle command AddGroupIDToEndpointForNode;
+    handle command RemoveGroupIDFromEndpointForNode;
+    handle command AddBindingToEndpointForNode;
+    handle command RemoveBindingFromEndpointForNode;
+    handle command AddACLToNode;
+    handle command RemoveACLFromNode;
+  }
+
+  server cluster JointFabricAdministrator {
+    ram      attribute administratorFabricIndex;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ICACCSRRequest;
+    handle command ICACCSRResponse;
+    handle command AddICAC;
+    handle command ICACResponse;
+    handle command OpenJointCommissioningWindow;
+    handle command TransferAnchorRequest;
+    handle command TransferAnchorResponse;
+    handle command TransferAnchorComplete;
+    handle command AnnounceJointFabricAdministrator;
   }
 }
 
