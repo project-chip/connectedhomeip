@@ -115,6 +115,26 @@ def extract_shared_enums(idl: Idl) -> list[EnumEntry]:
 
     return result
 
+import logging
+
+def remove_acronyms_from_enum_constant(s: str) -> str:
+    """
+    Matter IDL generates enum constants with "preserveAcronyms" so things like
+    TV, OK, CASE, PASE are kept as UPPERCASE instead of being Firstupperonly like
+    Tv, Ok, Case, Pase
+
+    This function undoes that to be compatible with C++ codegen.
+    """
+    result = ""
+    for (c, prev) in zip(s, 'l' + s):
+        if c.isupper() and prev.isupper():
+            result += c.lower()
+        else:
+            result += c
+
+    return result
+
+
 class SdkGenerator(CodeGenerator):
     """
     Generation of cpp code for application implementation for matter.
@@ -130,6 +150,7 @@ class SdkGenerator(CodeGenerator):
         self.jinja_env.filters['extract_attribute_quality_flags'] = extract_attribute_quality_flags
         self.jinja_env.filters['extract_command_quality_flags'] = extract_command_quality_flags
         self.jinja_env.filters['name_for_id_usage'] = name_for_id_usage
+        self.jinja_env.filters['remove_acronyms_from_enum_constant'] = remove_acronyms_from_enum_constant
         self.jinja_env.tests['global_attribute'] = global_attribute
         self.jinja_env.tests['response_struct'] = response_struct
 

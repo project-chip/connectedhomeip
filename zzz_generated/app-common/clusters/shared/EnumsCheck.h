@@ -118,7 +118,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag va
 
     case EnumType::kLounge:
 
-    case EnumType::kMediaTVRoom:
+    case EnumType::kMediaTvroom:
 
     case EnumType::kMudRoom:
 
@@ -230,7 +230,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicatio
     switch (val)
     {
 
-    case EnumType::kOK:
+    case EnumType::kOk:
 
     case EnumType::kWarning:
 
@@ -248,7 +248,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicatio
     switch (val)
     {
 
-    case EnumType::kOK:
+    case EnumType::kOk:
 
     case EnumType::kWarning:
 
@@ -848,11 +848,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTyp
 
     case EnumType::kApparentPower:
 
-    case EnumType::kRMSVoltage:
+    case EnumType::kRmsvoltage:
 
-    case EnumType::kRMSCurrent:
+    case EnumType::kRmscurrent:
 
-    case EnumType::kRMSPower:
+    case EnumType::kRmspower:
 
     case EnumType::kFrequency:
 
@@ -896,57 +896,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementType
 
     case EnumType::kApparentPower:
 
-    case EnumType::kRMSVoltage:
+    case EnumType::kRmsvoltage:
 
-    case EnumType::kRMSCurrent:
+    case EnumType::kRmscurrent:
 
-    case EnumType::kRMSPower:
-
-    case EnumType::kFrequency:
-
-    case EnumType::kPowerFactor:
-
-    case EnumType::kNeutralCurrent:
-
-    case EnumType::kElectricalEnergy:
-
-    case EnumType::kReactiveEnergy:
-
-    case EnumType::kApparentEnergy:
-
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementTypeEnum val)
-{
-    using EnumType = detail::MeasurementTypeEnum;
-    switch (val)
-    {
-
-    case EnumType::kUnspecified:
-
-    case EnumType::kVoltage:
-
-    case EnumType::kActiveCurrent:
-
-    case EnumType::kReactiveCurrent:
-
-    case EnumType::kApparentCurrent:
-
-    case EnumType::kActivePower:
-
-    case EnumType::kReactivePower:
-
-    case EnumType::kApparentPower:
-
-    case EnumType::kRMSVoltage:
-
-    case EnumType::kRMSCurrent:
-
-    case EnumType::kRMSPower:
+    case EnumType::kRmspower:
 
     case EnumType::kFrequency:
 
@@ -988,11 +942,57 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementType
 
     case EnumType::kApparentPower:
 
-    case EnumType::kRMSVoltage:
+    case EnumType::kRmsvoltage:
 
-    case EnumType::kRMSCurrent:
+    case EnumType::kRmscurrent:
 
-    case EnumType::kRMSPower:
+    case EnumType::kRmspower:
+
+    case EnumType::kFrequency:
+
+    case EnumType::kPowerFactor:
+
+    case EnumType::kNeutralCurrent:
+
+    case EnumType::kElectricalEnergy:
+
+    case EnumType::kReactiveEnergy:
+
+    case EnumType::kApparentEnergy:
+
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementTypeEnum val)
+{
+    using EnumType = detail::MeasurementTypeEnum;
+    switch (val)
+    {
+
+    case EnumType::kUnspecified:
+
+    case EnumType::kVoltage:
+
+    case EnumType::kActiveCurrent:
+
+    case EnumType::kReactiveCurrent:
+
+    case EnumType::kApparentCurrent:
+
+    case EnumType::kActivePower:
+
+    case EnumType::kReactivePower:
+
+    case EnumType::kApparentPower:
+
+    case EnumType::kRmsvoltage:
+
+    case EnumType::kRmscurrent:
+
+    case EnumType::kRmspower:
 
     case EnumType::kFrequency:
 
@@ -1018,49 +1018,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     switch (val)
     {
 
-    case EnumType::kPPM:
+    case EnumType::kPpm:
 
-    case EnumType::kPPB:
+    case EnumType::kPpb:
 
-    case EnumType::kPPT:
+    case EnumType::kPpt:
 
-    case EnumType::kMGM3:
+    case EnumType::kMgm3:
 
-    case EnumType::kUGM3:
+    case EnumType::kUgm3:
 
-    case EnumType::kNGM3:
+    case EnumType::kNgm3:
 
-    case EnumType::kPM3:
+    case EnumType::kPm3:
 
-    case EnumType::kBQM3:
-
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
-{
-    using EnumType = detail::MeasurementUnitEnum;
-    switch (val)
-    {
-
-    case EnumType::kPPM:
-
-    case EnumType::kPPB:
-
-    case EnumType::kPPT:
-
-    case EnumType::kMGM3:
-
-    case EnumType::kUGM3:
-
-    case EnumType::kNGM3:
-
-    case EnumType::kPM3:
-
-    case EnumType::kBQM3:
+    case EnumType::kBqm3:
 
         return val;
     default:
@@ -1074,49 +1046,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     switch (val)
     {
 
-    case EnumType::kPPM:
+    case EnumType::kPpm:
 
-    case EnumType::kPPB:
+    case EnumType::kPpb:
 
-    case EnumType::kPPT:
+    case EnumType::kPpt:
 
-    case EnumType::kMGM3:
+    case EnumType::kMgm3:
 
-    case EnumType::kUGM3:
+    case EnumType::kUgm3:
 
-    case EnumType::kNGM3:
+    case EnumType::kNgm3:
 
-    case EnumType::kPM3:
+    case EnumType::kPm3:
 
-    case EnumType::kBQM3:
-
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
-{
-    using EnumType = detail::MeasurementUnitEnum;
-    switch (val)
-    {
-
-    case EnumType::kPPM:
-
-    case EnumType::kPPB:
-
-    case EnumType::kPPT:
-
-    case EnumType::kMGM3:
-
-    case EnumType::kUGM3:
-
-    case EnumType::kNGM3:
-
-    case EnumType::kPM3:
-
-    case EnumType::kBQM3:
+    case EnumType::kBqm3:
 
         return val;
     default:
@@ -1130,49 +1074,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     switch (val)
     {
 
-    case EnumType::kPPM:
+    case EnumType::kPpm:
 
-    case EnumType::kPPB:
+    case EnumType::kPpb:
 
-    case EnumType::kPPT:
+    case EnumType::kPpt:
 
-    case EnumType::kMGM3:
+    case EnumType::kMgm3:
 
-    case EnumType::kUGM3:
+    case EnumType::kUgm3:
 
-    case EnumType::kNGM3:
+    case EnumType::kNgm3:
 
-    case EnumType::kPM3:
+    case EnumType::kPm3:
 
-    case EnumType::kBQM3:
-
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
-{
-    using EnumType = detail::MeasurementUnitEnum;
-    switch (val)
-    {
-
-    case EnumType::kPPM:
-
-    case EnumType::kPPB:
-
-    case EnumType::kPPT:
-
-    case EnumType::kMGM3:
-
-    case EnumType::kUGM3:
-
-    case EnumType::kNGM3:
-
-    case EnumType::kPM3:
-
-    case EnumType::kBQM3:
+    case EnumType::kBqm3:
 
         return val;
     default:
@@ -1186,49 +1102,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     switch (val)
     {
 
-    case EnumType::kPPM:
+    case EnumType::kPpm:
 
-    case EnumType::kPPB:
+    case EnumType::kPpb:
 
-    case EnumType::kPPT:
+    case EnumType::kPpt:
 
-    case EnumType::kMGM3:
+    case EnumType::kMgm3:
 
-    case EnumType::kUGM3:
+    case EnumType::kUgm3:
 
-    case EnumType::kNGM3:
+    case EnumType::kNgm3:
 
-    case EnumType::kPM3:
+    case EnumType::kPm3:
 
-    case EnumType::kBQM3:
-
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
-{
-    using EnumType = detail::MeasurementUnitEnum;
-    switch (val)
-    {
-
-    case EnumType::kPPM:
-
-    case EnumType::kPPB:
-
-    case EnumType::kPPT:
-
-    case EnumType::kMGM3:
-
-    case EnumType::kUGM3:
-
-    case EnumType::kNGM3:
-
-    case EnumType::kPM3:
-
-    case EnumType::kBQM3:
+    case EnumType::kBqm3:
 
         return val;
     default:
@@ -1242,21 +1130,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     switch (val)
     {
 
-    case EnumType::kPPM:
+    case EnumType::kPpm:
 
-    case EnumType::kPPB:
+    case EnumType::kPpb:
 
-    case EnumType::kPPT:
+    case EnumType::kPpt:
 
-    case EnumType::kMGM3:
+    case EnumType::kMgm3:
 
-    case EnumType::kUGM3:
+    case EnumType::kUgm3:
 
-    case EnumType::kNGM3:
+    case EnumType::kNgm3:
 
-    case EnumType::kPM3:
+    case EnumType::kPm3:
 
-    case EnumType::kBQM3:
+    case EnumType::kBqm3:
 
         return val;
     default:
@@ -1270,21 +1158,133 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     switch (val)
     {
 
-    case EnumType::kPPM:
+    case EnumType::kPpm:
 
-    case EnumType::kPPB:
+    case EnumType::kPpb:
 
-    case EnumType::kPPT:
+    case EnumType::kPpt:
 
-    case EnumType::kMGM3:
+    case EnumType::kMgm3:
 
-    case EnumType::kUGM3:
+    case EnumType::kUgm3:
 
-    case EnumType::kNGM3:
+    case EnumType::kNgm3:
 
-    case EnumType::kPM3:
+    case EnumType::kPm3:
 
-    case EnumType::kBQM3:
+    case EnumType::kBqm3:
+
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
+{
+    using EnumType = detail::MeasurementUnitEnum;
+    switch (val)
+    {
+
+    case EnumType::kPpm:
+
+    case EnumType::kPpb:
+
+    case EnumType::kPpt:
+
+    case EnumType::kMgm3:
+
+    case EnumType::kUgm3:
+
+    case EnumType::kNgm3:
+
+    case EnumType::kPm3:
+
+    case EnumType::kBqm3:
+
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
+{
+    using EnumType = detail::MeasurementUnitEnum;
+    switch (val)
+    {
+
+    case EnumType::kPpm:
+
+    case EnumType::kPpb:
+
+    case EnumType::kPpt:
+
+    case EnumType::kMgm3:
+
+    case EnumType::kUgm3:
+
+    case EnumType::kNgm3:
+
+    case EnumType::kPm3:
+
+    case EnumType::kBqm3:
+
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
+{
+    using EnumType = detail::MeasurementUnitEnum;
+    switch (val)
+    {
+
+    case EnumType::kPpm:
+
+    case EnumType::kPpb:
+
+    case EnumType::kPpt:
+
+    case EnumType::kMgm3:
+
+    case EnumType::kUgm3:
+
+    case EnumType::kNgm3:
+
+    case EnumType::kPm3:
+
+    case EnumType::kBqm3:
+
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
+{
+    using EnumType = detail::MeasurementUnitEnum;
+    switch (val)
+    {
+
+    case EnumType::kPpm:
+
+    case EnumType::kPpb:
+
+    case EnumType::kPpt:
+
+    case EnumType::kMgm3:
+
+    case EnumType::kUgm3:
+
+    case EnumType::kNgm3:
+
+    case EnumType::kPm3:
+
+    case EnumType::kBqm3:
 
         return val;
     default:
@@ -1342,15 +1342,15 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
     switch (val)
     {
 
-    case EnumType::kUPC:
+    case EnumType::kUpc:
 
-    case EnumType::kGTIN8:
+    case EnumType::kGtin8:
 
-    case EnumType::kEAN:
+    case EnumType::kEan:
 
-    case EnumType::kGTIN14:
+    case EnumType::kGtin14:
 
-    case EnumType::kOEM:
+    case EnumType::kOem:
 
         return val;
     default:
@@ -1364,15 +1364,15 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
     switch (val)
     {
 
-    case EnumType::kUPC:
+    case EnumType::kUpc:
 
-    case EnumType::kGTIN8:
+    case EnumType::kGtin8:
 
-    case EnumType::kEAN:
+    case EnumType::kEan:
 
-    case EnumType::kGTIN14:
+    case EnumType::kGtin14:
 
-    case EnumType::kOEM:
+    case EnumType::kOem:
 
         return val;
     default:
@@ -1514,9 +1514,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TariffUnitEnum
     switch (val)
     {
 
-    case EnumType::kKWh:
+    case EnumType::kKwh:
 
-    case EnumType::kKVAh:
+    case EnumType::kKvah:
 
         return val;
     default:
