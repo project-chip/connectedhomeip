@@ -45314,12 +45314,12 @@ class ContentAppObserver(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="encodingHint", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="encodingHint", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            data: typing.Optional[str] = None
-            encodingHint: str = ""
+            data: str = ""
+            encodingHint: typing.Optional[str] = None
 
         @dataclass
         class ContentAppMessageResponse(ClusterCommand):
