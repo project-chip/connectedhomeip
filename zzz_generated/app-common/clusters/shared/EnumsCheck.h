@@ -1,7 +1,8 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
 // Generated based on src/controller/data_model/controller-clusters.matter
-//
+#pragma once
+
 #include <clusters/shared/Enums.h>
 
 namespace chip {
