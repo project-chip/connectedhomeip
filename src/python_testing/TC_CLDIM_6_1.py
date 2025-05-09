@@ -107,8 +107,8 @@ class TC_CLDIM_6_1(MatterBaseTest):
         self.step("2c")
         if attributes.LimitRange.attribute_id in attribute_list:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
-            min_position = limit_range.Min
-            max_position = limit_range.Max
+            min_position = limit_range.min
+            max_position = limit_range.max
 
         # STEP 2d: Setup subscription to CurrentState attribute
         self.step("2d")
@@ -131,10 +131,10 @@ class TC_CLDIM_6_1(MatterBaseTest):
     
         # STEP 3c: If ExpectedState.Position != MinPosition, send SetTarget command with Position=MinPosition
         self.step("3c")
-        if expected_state.Position != min_position:
+        if expected_state.position != min_position:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=min_position),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -144,8 +144,8 @@ class TC_CLDIM_6_1(MatterBaseTest):
         
         # STEP 3d: If ExpectedState.Position != MinPosition, wait for CurrentState.Position to be updated to MinPosition
         self.step("3d")
-        if expected_state.Position != min_position:
-            expected_state.Position = min_position
+        if expected_state.position != min_position:
+            expected_state.position = min_position
             expected_final_value = [AttributeValue(endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
             sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
         else:
@@ -157,7 +157,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
 
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=max_position),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -165,7 +165,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
 
         # STEP 3f: Wait for CurrentState.Position to be updated to MaxPosition
         self.step("3f")
-        expected_state.Position = max_position
+        expected_state.position = max_position
         expected_final_value = [AttributeValue(endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
         sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
         
@@ -198,7 +198,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
         if not self.check_pics("CLDIM.S.M.ManualLatching"):
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Latch=True),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -206,7 +206,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
 
         # STEP 4e: Wait for CurrentState.Latch to be updated to True
         self.step("4e")
-        expected_state.Latch = True
+        expected_state.latch = True
         expected_final_value = [AttributeValue(endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
         sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
 
@@ -216,7 +216,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
 
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Latch=False),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -224,7 +224,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
 
         # STEP 4g: Wait for CurrentState.Latch to be updated to False
         self.step("4g")
-        expected_state.Latch = False
+        expected_state.latch = False
         expected_final_value = [AttributeValue(endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
         sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
 
