@@ -20,6 +20,10 @@ package chip.platform;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.util.Log;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
+
 import java.io.IOException;
 
 public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
@@ -51,6 +55,9 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
   private static byte[] chainedResponseBuffer = new byte[MAX_CHAINED_RESPONSE_SIZE];
   private static int chainedResponseLen;
 
+  private HandlerThread handlerThread = null;
+  private Handler workerHandler = null;
+
   @Override
   public void setNfcCallback(NfcCallback nfcCallback) {
     mNfcCallback = nfcCallback;
@@ -63,7 +70,41 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
 
   @Override
   public int init() {
+    // Create and start the NfcWorkerThread
+    handlerThread = new HandlerThread("NfcWorkerThread");
+    handlerThread.start();
+    Log.d(TAG, "NfcWorkerThread created");
+
+    // Create a Handler associated with the HandlerThread's Looper
+    workerHandler = new Handler(handlerThread.getLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+          try {
+            Log.d(TAG, "handleMessage");
+            byte[] buf = (byte[]) msg.obj;
+            byte[] response = sendChainedAPDUs(buf);
+            if (response != null) {
+              mPlatform.onNfcTagResponse(response);
+            }
+          } catch (Exception e) {
+            e.printStackTrace();
+            mPlatform.onNfcTagError();
+          }
+        }
+    };
+
     return 0;
+  }
+
+  @Override
+  public void shutdown() {
+      if (handlerThread != null) {
+          handlerThread.quitSafely();
+          handlerThread = null;
+      }
+
+      // Prevent the use of the workerHandler
+      workerHandler = null;
   }
 
   @Override
@@ -75,21 +116,14 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
   public void sendToNfcTag(byte[] buf) {
     Log.d(TAG, "AndroidNfcCommissioningManager sendToNfcTag");
 
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          byte[] response = sendChainedAPDUs(buf);
-          if (response != null) {
-            // Log.d(TAG,"Transmit response: " + convertHexByteArrayToString(response) );
-            mPlatform.onNfcTagResponse(response);
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-          mPlatform.onNfcTagError();
-        }
-      }
-    }.start();
+    if (workerHandler == null) {
+      Log.e(TAG, "NFC workerHandler is null!");
+      return;
+    }
+
+    Message message = workerHandler.obtainMessage();
+    message.obj = buf.clone(); // Create a copy of the byte array to ensure data integrity
+    workerHandler.sendMessage(message);
   }
 
   /**

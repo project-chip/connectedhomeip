@@ -52,6 +52,7 @@ public:
     using CHIPoNFCServiceMode = ConnectivityManager::CHIPoNFCServiceMode;
 
     CHIP_ERROR Init();
+    void Shutdown();
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -101,6 +102,11 @@ namespace Internal {
 inline CHIP_ERROR NFCCommissioningManager::Init()
 {
     return static_cast<ImplClass *>(this)->_Init();
+}
+
+inline void NFCCommissioningManager::Shutdown()
+{
+    static_cast<ImplClass *>(this)->_Shutdown();
 }
 
 } // namespace Internal

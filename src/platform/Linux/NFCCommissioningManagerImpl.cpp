@@ -120,7 +120,6 @@ public:
     TagInstance(Transport::NFCBase * base, const Transport::PeerAddress address, const char * name, SCARDHANDLE handle) :
         nfcBase(base), peerAddress(address), cardHandle(handle)
     {
-
         readerName    = strdup(name); // Allocate memory and copy the string
         discriminator = 0;            // Will be retrieved when RetrieveDiscriminator() is called
 
@@ -168,7 +167,6 @@ public:
     void SendChainedAPDUs(uint8_t * pMessage, size_t messageSize)
     {
         CHIP_ERROR res;
-
         uint32_t totalLength         = static_cast<uint32_t>(messageSize);
         uint32_t nbrOfBytesRemaining = static_cast<uint32_t>(messageSize);
         uint8_t * pNextDataToSend    = pMessage;
@@ -388,7 +386,10 @@ public:
         return res;
     }
 
-    void PrintSw1Sw2(uint8_t sw1, uint8_t sw2) { ChipLogProgress(DeviceLayer, "SW1=0x%x SW2=0x%x", sw1, sw2); }
+    void PrintSw1Sw2(uint8_t sw1, uint8_t sw2)
+    {
+        ChipLogProgress(DeviceLayer, "SW1=0x%x SW2=0x%x", sw1, sw2);
+    }
 
     void ProcessError(const char * msg)
     {
@@ -404,11 +405,13 @@ public:
         SendOnNfcTagResponse(std::move(buffer));
     }
 
-    void ResetChainedResponseBuffer(void) { mChainedResponseLength = 0; }
+    void ResetChainedResponseBuffer(void)
+    {
+        mChainedResponseLength = 0;
+    }
 
     CHIP_ERROR AddDataToChainedResponseBuffer(uint8_t * data, int dataLen)
     {
-
         // Check that mChainedResponseBuffer will not overflow
         VerifyOrReturnLogError((mChainedResponseLength + dataLen) <= sizeof(mChainedResponseBuffer), CHIP_ERROR_MESSAGE_TOO_LONG);
 
@@ -514,7 +517,6 @@ NFCCommissioningManagerImpl NFCCommissioningManagerImpl::sInstance;
 
 CHIP_ERROR NFCCommissioningManagerImpl::_Init()
 {
-
     // Creates an Application Context to the PC/SC Resource Manager.
     long result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
     CHECK("SCardEstablishContext", result)
@@ -522,6 +524,10 @@ CHIP_ERROR NFCCommissioningManagerImpl::_Init()
     pLastTagInstanceUsed = nullptr;
 
     return CHIP_NO_ERROR;
+}
+
+void NFCCommissioningManagerImpl::_Shutdown()
+{
 }
 
 // ===== start implement virtual methods on NfcApplicationDelegate.
@@ -549,6 +555,7 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
 
     if (pTagInstance != nullptr)
     {
+        // Found a matching cardHandle
         canSendToPeer = true;
     }
     else
@@ -588,6 +595,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
         TagInstance * pTagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
         if (pTagInstance != nullptr)
         {
+            // Found an instance with expected Discriminator
             pTargetedTagInstance = pTagInstance;
         }
     }

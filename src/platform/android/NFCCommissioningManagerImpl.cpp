@@ -64,6 +64,13 @@ void NFCCommissioningManagerImpl::InitializeWithObject(jobject manager)
         env->ExceptionClear();
     }
 
+    mShutdownMethod = env->GetMethodID(NFCCommissioningManagerClass, "shutdown", "()V");
+    if (mShutdownMethod == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to access NFCCommissioningManager 'shutdown' method");
+        env->ExceptionClear();
+    }
+
     mSendToNfcTagCallback = env->GetMethodID(NFCCommissioningManagerClass, "sendToNfcTag", "([B)V");
     if (mSendToNfcTagCallback == nullptr)
     {
@@ -78,14 +85,46 @@ CHIP_ERROR NFCCommissioningManagerImpl::_Init()
 {
     ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::_Init()");
 
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
+
+    VerifyOrReturnError(mNFCCommissioningManagerObject.HasValidObjectRef(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mInitMethod != nullptr, CHIP_ERROR_INTERNAL);
+
+    env->CallIntMethod(mNFCCommissioningManagerObject.ObjectRef(), mInitMethod);
+    if (env->ExceptionCheck())
+    {
+        env->ExceptionClear();
+        ChipLogError(DeviceLayer, "Failed to call init() Java method");
+        return CHIP_ERROR_INTERNAL;
+    }
+
     return CHIP_NO_ERROR;
+}
+
+void NFCCommissioningManagerImpl::_Shutdown()
+{
+    ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::_Shutdown()");
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    VerifyOrReturn(env != nullptr);
+    VerifyOrReturn(mNFCCommissioningManagerObject.HasValidObjectRef());
+    VerifyOrReturn(mShutdownMethod != nullptr);
+
+    env->CallVoidMethod(mNFCCommissioningManagerObject.ObjectRef(), mShutdownMethod);
+    if (env->ExceptionCheck())
+    {
+        env->ExceptionClear();
+        ChipLogError(DeviceLayer, "Failed to call shutdown() Java method");
+        return;
+    }
 }
 
 // ===== start implement virtual methods on NfcApplicationDelegate.
 
 void NFCCommissioningManagerImpl::SetNFCBase(Transport::NFCBase * nfcBase)
 {
-    ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SetNFCBase()");
     mNFCBase = nfcBase;
 }
 
@@ -98,8 +137,6 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
 
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
-    ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SendToNfcTag()");
-
     const uint8_t * buffer = msgBuf->Start();
     uint32_t len           = static_cast<uint32_t>(msgBuf->DataLength());
 
@@ -125,6 +162,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
     }
 
     VerifyOrReturnError(mNFCCommissioningManagerObject.HasValidObjectRef(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSendToNfcTagCallback != nullptr, CHIP_ERROR_INTERNAL);
 
     env->CallVoidMethod(mNFCCommissioningManagerObject.ObjectRef(), mSendToNfcTagCallback, jbArray);
     if (env->ExceptionCheck())
@@ -140,8 +178,6 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
 CHIP_ERROR NFCCommissioningManagerImpl::OnNfcTagResponse(const Transport::PeerAddress & address,
                                                          System::PacketBufferHandle && buffer)
 {
-    ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::OnNfcTagResponse()");
-
     if (mNFCBase == NULL)
     {
         ChipLogError(DeviceLayer, "Error! mNFCBase is null!");
@@ -155,8 +191,6 @@ CHIP_ERROR NFCCommissioningManagerImpl::OnNfcTagResponse(const Transport::PeerAd
 
 CHIP_ERROR NFCCommissioningManagerImpl::OnNfcTagError(const Transport::PeerAddress & address)
 {
-    ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::OnNfcTagError()");
-
     if (mNFCBase == NULL)
     {
         ChipLogError(DeviceLayer, "Error! mNFCBase is null!");

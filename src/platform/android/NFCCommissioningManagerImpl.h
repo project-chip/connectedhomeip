@@ -62,6 +62,7 @@ private:
     // ===== Members that implement the NFCCommissioningManager internal interface.
 
     CHIP_ERROR _Init();
+    void _Shutdown();
 
     // ===== Members for internal use by the following friends.
 
@@ -72,6 +73,7 @@ private:
 
     chip::JniGlobalReference mNFCCommissioningManagerObject;
     jmethodID mInitMethod           = nullptr;
+    jmethodID mShutdownMethod       = nullptr;
     jmethodID mSendToNfcTagCallback = nullptr;
 
     Transport::NFCBase * mNFCBase = nullptr;

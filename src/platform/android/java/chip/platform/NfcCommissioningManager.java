@@ -45,6 +45,12 @@ public interface NfcCommissioningManager {
   int init();
 
   /**
+   * @brief NFCCommissioningManager shutdown function.
+   * @return None
+   */
+  void shutdown();
+
+  /**
    * @brief Function to send data to an NFC Tag. See NfcApplicationDelegate.
    * @param buf contains the byte array to send.
    * @return None
