@@ -1346,6 +1346,26 @@ void emberAfCommissionerControlClusterShutdownCallback(chip::EndpointId endpoint
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfJointFabricDatastoreClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfJointFabricDatastoreClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfJointFabricAdministratorClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfJointFabricAdministratorClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfTlsCertificateManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -6478,6 +6498,82 @@ chip::Protocols::InteractionModel::Status MatterCommissionerControlClusterServer
 void emberAfCommissionerControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Joint Fabric Datastore Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfJointFabricDatastoreClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterJointFabricDatastoreClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfJointFabricDatastoreClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterJointFabricDatastoreClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterJointFabricDatastoreClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfJointFabricDatastoreClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Joint Fabric Administrator Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfJointFabricAdministratorClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterJointFabricAdministratorClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfJointFabricAdministratorClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterJointFabricAdministratorClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterJointFabricAdministratorClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfJointFabricAdministratorClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // TLS Certificate Management Cluster
 //
 
@@ -7835,6 +7931,162 @@ bool emberAfCommodityTariffClusterGetTariffComponentCallback(
 bool emberAfCommodityTariffClusterGetDayEntryCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster AddKeySet Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterAddKeySetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::AddKeySet::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster UpdateKeySet Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterUpdateKeySetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::UpdateKeySet::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster RemoveKeySet Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterRemoveKeySetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::RemoveKeySet::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster AddGroup Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterAddGroupCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster UpdateGroup Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterUpdateGroupCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::UpdateGroup::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster RemoveGroup Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterRemoveGroupCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::RemoveGroup::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster AddAdmin Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterAddAdminCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::AddAdmin::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster UpdateAdmin Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterUpdateAdminCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::UpdateAdmin::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster RemoveAdmin Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterRemoveAdminCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::RemoveAdmin::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster AddPendingNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterAddPendingNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::AddPendingNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster RefreshNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterRefreshNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::RefreshNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster UpdateNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterUpdateNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::UpdateNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster RemoveNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterRemoveNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::RemoveNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster UpdateEndpointForNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterUpdateEndpointForNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::UpdateEndpointForNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster AddGroupIDToEndpointForNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterAddGroupIDToEndpointForNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::AddGroupIDToEndpointForNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster RemoveGroupIDFromEndpointForNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterRemoveGroupIDFromEndpointForNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::RemoveGroupIDFromEndpointForNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster AddBindingToEndpointForNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterAddBindingToEndpointForNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::AddBindingToEndpointForNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster RemoveBindingFromEndpointForNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterRemoveBindingFromEndpointForNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::RemoveBindingFromEndpointForNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster AddACLToNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterAddACLToNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::AddACLToNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Datastore Cluster RemoveACLFromNode Command callback (from client)
+ */
+bool emberAfJointFabricDatastoreClusterRemoveACLFromNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricDatastore::Commands::RemoveACLFromNode::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Administrator Cluster ICACCSRRequest Command callback (from client)
+ */
+bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRRequest::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Administrator Cluster AddICAC Command callback (from client)
+ */
+bool emberAfJointFabricAdministratorClusterAddICACCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::AddICAC::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Administrator Cluster OpenJointCommissioningWindow Command callback (from client)
+ */
+bool emberAfJointFabricAdministratorClusterOpenJointCommissioningWindowCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::OpenJointCommissioningWindow::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Administrator Cluster TransferAnchorRequest Command callback (from client)
+ */
+bool emberAfJointFabricAdministratorClusterTransferAnchorRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorRequest::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Administrator Cluster TransferAnchorComplete Command callback (from client)
+ */
+bool emberAfJointFabricAdministratorClusterTransferAnchorCompleteCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorComplete::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Administrator Cluster AnnounceJointFabricAdministrator Command callback (from client)
+ */
+bool emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::DecodableType & commandData);
 /**
  * @brief TLS Certificate Management Cluster ProvisionRootCertificate Command callback (from client)
  */
