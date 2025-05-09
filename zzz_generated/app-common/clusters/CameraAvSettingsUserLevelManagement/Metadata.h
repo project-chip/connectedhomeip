@@ -34,12 +34,9 @@ inline constexpr DataModel::AttributeEntry
 } // namespace MPTZPresets
 
 namespace DPTZStreams {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DPTZStreams::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry 
+    kMetadataEntry(DPTZStreams::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace DPTZStreams
 
 namespace ZoomMax {
