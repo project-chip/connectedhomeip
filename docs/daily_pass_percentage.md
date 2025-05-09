@@ -1,13 +1,13 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
-| darwin                                  |          21 |
-| tests                                   |          43 |
-| builds                                  |          71 |
+| tests                                   |           0 |
+| darwin                                  |          80 |
 | build-example-nxp                       |         100 |
+| build-chef-ci-examples-on-all-platforms |         100 |
 | documentation-build                     |         100 |
 | build-example-ti-cc32xx                 |         100 |
 | build-example-mw320                     |         100 |
-| build-chef-ci-examples-on-all-platforms |         100 |
+| qemu                                    |         100 |
 | cancel-workflows-on-failing-ci          |         100 |
 | build-example-linux-arm                 |         100 |
 | build-example-qpg                       |         100 |
@@ -15,7 +15,7 @@
 | build-example-tizen                     |         100 |
 | build-example-efr32                     |         100 |
 | build-example-esp32                     |         100 |
-| qemu                                    |         100 |
+| issue-labeler                           |         100 |
 | codeql                                  |         100 |
 | build-example-infineon                  |         100 |
 | build-example-nrf-connect-sdk           |         100 |
@@ -31,12 +31,10 @@
 | test-tv-casting-example                 |         100 |
 | build-example-nuttx                     |         100 |
 | lint-code-base                          |         100 |
-| issue-labeler                           |         100 |
 | validate-gradle-wrapper                 |         100 |
 | minimal-build-linux-configure           |         100 |
-| java-tests                              |         100 |
 | build-example-ameba                     |         100 |
-| run-misspell                            |         100 |
+| builds                                  |         100 |
 | tv-casting-example-darwin               |         100 |
 | process-stale-issues-and-prs            |         100 |
 | cirque                                  |         100 |
