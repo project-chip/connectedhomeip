@@ -432,54 +432,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementMedi
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTypeEnum val)
-{
-    using EnumType = Globals::MeasurementTypeEnum;
-    switch (val)
-    {
-
-    case EnumType::kUnspecified:
-
-    case EnumType::kVoltage:
-
-    case EnumType::kActiveCurrent:
-
-    case EnumType::kReactiveCurrent:
-
-    case EnumType::kApparentCurrent:
-
-    case EnumType::kActivePower:
-
-    case EnumType::kReactivePower:
-
-    case EnumType::kApparentPower:
-
-    case EnumType::kRmsVoltage:
-
-    case EnumType::kRmsCurrent:
-
-    case EnumType::kRmsPower:
-
-    case EnumType::kFrequency:
-
-    case EnumType::kPowerFactor:
-
-    case EnumType::kNeutralCurrent:
-
-    case EnumType::kElectricalEnergy:
-
-    case EnumType::kReactiveEnergy:
-
-    case EnumType::kApparentEnergy:
-
-    case EnumType::kSoilMoisture:
-
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementTypeEnum val)
 {
     using EnumType = detail::MeasurementTypeEnum;
@@ -502,11 +454,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementType
 
     case EnumType::kApparentPower:
 
-    case EnumType::kRmsVoltage:
+    case EnumType::kRMSVoltage:
 
-    case EnumType::kRmsCurrent:
+    case EnumType::kRMSCurrent:
 
-    case EnumType::kRmsPower:
+    case EnumType::kRMSPower:
 
     case EnumType::kFrequency:
 
@@ -526,6 +478,54 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementType
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTypeEnum val)
+{
+    using EnumType = Globals::MeasurementTypeEnum;
+    switch (val)
+    {
+
+    case EnumType::kUnspecified:
+
+    case EnumType::kVoltage:
+
+    case EnumType::kActiveCurrent:
+
+    case EnumType::kReactiveCurrent:
+
+    case EnumType::kApparentCurrent:
+
+    case EnumType::kActivePower:
+
+    case EnumType::kReactivePower:
+
+    case EnumType::kApparentPower:
+
+    case EnumType::kRMSVoltage:
+
+    case EnumType::kRMSCurrent:
+
+    case EnumType::kRMSPower:
+
+    case EnumType::kFrequency:
+
+    case EnumType::kPowerFactor:
+
+    case EnumType::kNeutralCurrent:
+
+    case EnumType::kElectricalEnergy:
+
+    case EnumType::kReactiveEnergy:
+
+    case EnumType::kApparentEnergy:
+
+    case EnumType::kSoilMoisture:
+
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
 {
     using EnumType = detail::MeasurementUnitEnum;
@@ -538,15 +538,15 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
 
     case EnumType::kPpt:
 
-    case EnumType::kMgM3:
+    case EnumType::kMgm3:
 
-    case EnumType::kUgM3:
+    case EnumType::kUgm3:
 
-    case EnumType::kNgM3:
+    case EnumType::kNgm3:
 
-    case EnumType::kPM3:
+    case EnumType::kPm3:
 
-    case EnumType::kBqM3:
+    case EnumType::kBqm3:
 
         return val;
     default:
@@ -606,11 +606,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
 
     case EnumType::kUpc:
 
-    case EnumType::kGtiN8:
+    case EnumType::kGtin8:
 
     case EnumType::kEan:
 
-    case EnumType::kGtiN14:
+    case EnumType::kGtin14:
 
     case EnumType::kOem:
 
@@ -696,7 +696,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TariffUnitEnum
 
     case EnumType::kKWh:
 
-    case EnumType::kKvAh:
+    case EnumType::kKVAh:
 
         return val;
     default:
