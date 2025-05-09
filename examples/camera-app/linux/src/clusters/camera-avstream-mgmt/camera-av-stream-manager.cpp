@@ -290,7 +290,8 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         }
 
         // Inform DPTZ (the server) that the camera default viewport has changed
-        mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().DefaultViewportUpdated(GetCameraAVStreamMgmtServer()->GetViewport());
+        mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().DefaultViewportUpdated(
+            GetCameraAVStreamMgmtServer()->GetViewport());
         break;
     }
     case SpeakerMuted::Id: {

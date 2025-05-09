@@ -50,7 +50,7 @@ void AVSettingsUserLevelManagementDelegate::VideoStreamAllocated(uint16_t aStrea
 {
     // The app needs to invoke this whenever the AV Stream Manager allocates a video stream; this informs the server of the
     // id that is now subject to DPTZ, and the default viewport of the device
-    Structs::ViewportStruct::Type viewport = {0, 0, 1920, 1080};
+    Structs::ViewportStruct::Type viewport = { 0, 0, 1920, 1080 };
     this->GetServer()->AddMoveCapableVideoStream(aStreamID, viewport);
 }
 
@@ -133,7 +133,7 @@ Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoSt
     // The passed in viewport is empty, and needs to be populated by the delegate with the value of the viewport after
     // applying all deltas within the constraints of the sensor.
     //
-    aViewport = {0, 0, 1920, 1080};
+    aViewport = { 0, 0, 1920, 1080 };
     return Status::Success;
 }
 

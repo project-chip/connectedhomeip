@@ -28,8 +28,8 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#include <cstring>
 #include <cmath>
+#include <cstring>
 
 using namespace chip;
 using namespace chip::app;
@@ -859,8 +859,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewpor
     // Get the ARs to no more than 2DP.  Otherwise you get mismatches e.g. 16:9 ratio calculation for 480p isn't the same as
     // 1080p beyond 2DP.
     float requestedAR = floorf((static_cast<float>(requestedWidth) / requestedHeight) * 100) / 100;
-    float deviceAR    = floorf((static_cast<float>(mVideoSensorParams.sensorWidth) / mVideoSensorParams.sensorHeight) *
-                               100) / 100;
+    float deviceAR    = floorf((static_cast<float>(mVideoSensorParams.sensorWidth) / mVideoSensorParams.sensorHeight) * 100) / 100;
 
     // Ensure that the aspect ration of the viewport matches the aspect ratio of the sensor
     ChipLogDetail(Zcl, "DPTZSetViewpoort. AR of viewport %f, AR of device %f.", requestedAR, deviceAR);

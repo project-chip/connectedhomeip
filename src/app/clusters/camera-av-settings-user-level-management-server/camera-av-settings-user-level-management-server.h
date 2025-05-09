@@ -55,15 +55,15 @@ class Delegate;
 
 enum class OptionalAttributes : uint32_t
 {
-    kMptzPosition     = 0x0001,
-    kMaxPresets       = 0x0002,
-    kMptzPresets      = 0x0004,
-    kDptzStreams      = 0x0008,
-    kZoomMax          = 0x0010,
-    kTiltMin          = 0x0020,
-    kTiltMax          = 0x0040,
-    kPanMin           = 0x0080,
-    kPanMax           = 0x0100,
+    kMptzPosition = 0x0001,
+    kMaxPresets   = 0x0002,
+    kMptzPresets  = 0x0004,
+    kDptzStreams  = 0x0008,
+    kZoomMax      = 0x0010,
+    kTiltMin      = 0x0020,
+    kTiltMax      = 0x0040,
+    kPanMin       = 0x0080,
+    kPanMax       = 0x0100,
 };
 
 struct MPTZPresetHelper
@@ -165,8 +165,9 @@ public:
     void SetZoom(Optional<uint8_t> aZoom);
 
     /**
-     * Allows for a delegate or application to provide the ID and default Viewport of an allocated video stream that is capable of digital
-     * movement. This should be invoked by a delegate on the conclusion of allocating a video stream via the AV Stream Management cluster.
+     * Allows for a delegate or application to provide the ID and default Viewport of an allocated video stream that is capable of
+     * digital movement. This should be invoked by a delegate on the conclusion of allocating a video stream via the AV Stream
+     * Management cluster.
      */
     void AddMoveCapableVideoStream(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport);
 
@@ -276,8 +277,8 @@ public:
      * allocated or deallocated stream, or the viewport when the device level viewport is updated.
      * The delegate shall invoke the appropriate MoveCapableVideoStream methods on its instance of the server
      */
-    virtual void VideoStreamAllocated(uint16_t aStreamID) = 0;
-    virtual void VideoStreamDeallocated(uint16_t aStreamID) = 0;
+    virtual void VideoStreamAllocated(uint16_t aStreamID)                        = 0;
+    virtual void VideoStreamDeallocated(uint16_t aStreamID)                      = 0;
     virtual void DefaultViewportUpdated(Structs::ViewportStruct::Type aViewport) = 0;
 
     /**

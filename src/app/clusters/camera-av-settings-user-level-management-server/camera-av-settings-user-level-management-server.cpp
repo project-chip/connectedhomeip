@@ -377,7 +377,7 @@ void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(uint16_t aVi
 {
     DPTZStruct dptzEntry;
     dptzEntry.videoStreamID = aVideoStreamID;
-    dptzEntry.viewport = aViewport;
+    dptzEntry.viewport      = aViewport;
     mDptzStreams.push_back(dptzEntry);
     MarkDirty(Attributes::DPTZStreams::Id);
 }
@@ -400,7 +400,8 @@ void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(uint16_t 
 
 void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStreams(ViewportStruct::Type aViewport)
 {
-    for (auto& dptzStream : mDptzStreams) {
+    for (auto & dptzStream : mDptzStreams)
+    {
         dptzStream.viewport = aViewport;
     }
 
