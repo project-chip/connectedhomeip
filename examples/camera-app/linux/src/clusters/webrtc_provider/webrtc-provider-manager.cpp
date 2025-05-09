@@ -34,6 +34,13 @@ using namespace chip::app::Clusters::WebRTCTransportProvider;
 
 using namespace Camera;
 
+namespace {
+
+// Constants
+constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
+
+} // namespace
+
 void WebRTCProviderManager::Init()
 {
     rtc::Configuration config;
@@ -181,7 +188,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
     if (!mDataChannel)
     {
-        mDataChannel = mPeerConnection->createDataChannel("matter-av");
+        mDataChannel = mPeerConnection->createDataChannel(kWebRTCDataChannelName);
     }
 
     mPeerConnection->createOffer();
