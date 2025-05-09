@@ -130,14 +130,14 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("2d")
         if attributes.LimitRange.attribute_id in attribute_list:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
-            min_position = limit_range.Min
-            max_position = limit_range.Max
+            min_position = limit_range.min
+            max_position = limit_range.max
 
         # STEP 3a: Set Position to MaxPosition
         self.step("3a")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=max_position),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -148,14 +148,14 @@ class TC_CLDIM_3_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
-            asserts.assert_equal(target.Position, max_position, "Target Position does not match MaxPosition")
+            asserts.assert_equal(target.position, max_position, "Target Position does not match MaxPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(target.Speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.Speed, 3, "Target Speed is outside allowed range")
+                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
+                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
         else:
             logging.info("Target attribute is not supported. Skipping step 3b.")
 
@@ -168,14 +168,14 @@ class TC_CLDIM_3_1(MatterBaseTest):
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-            asserts.assert_equal(current_state.Position, max_position, "CurrentState Position does not match MaxPosition")
+            asserts.assert_equal(current_state.position, max_position, "CurrentState Position does not match MaxPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
+                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 3d.")
 
@@ -193,7 +193,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
-                    Position=max_position, Speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium),
+                    position=max_position, speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -204,12 +204,12 @@ class TC_CLDIM_3_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
-            asserts.assert_equal(target.Position, max_position, "Target Position does not match MaxPosition")
+            asserts.assert_equal(target.position, max_position, "Target Position does not match MaxPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
-            asserts.assert_equal(target.Speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium,
+            asserts.assert_equal(target.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium,
                                  "Target Speed does not match Medium")
         else:
             logging.info("Target attribute is not supported. Skipping step 4c.")
@@ -223,12 +223,12 @@ class TC_CLDIM_3_1(MatterBaseTest):
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-            asserts.assert_equal(current_state.Position, max_position, "CurrentState Position does not match MaxPosition")
+            asserts.assert_equal(current_state.position, max_position, "CurrentState Position does not match MaxPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
-            asserts.assert_equal(current_state.Speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium,
+            asserts.assert_equal(current_state.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium,
                                  "CurrentState Speed does not match Medium")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 4e.")
@@ -237,7 +237,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("5a")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=min_position),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -248,13 +248,13 @@ class TC_CLDIM_3_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
-            asserts.assert_equal(target.Position, min_position, "Target Position does not match min_position")
+            asserts.assert_equal(target.position, min_position, "Target Position does not match min_position")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_equal(target.Speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium,
+                asserts.assert_equal(target.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium,
                                      "Target Speed does not match Medium")
         else:
             logging.info("Target attribute is not supported. Skipping step 5b.")
@@ -268,13 +268,13 @@ class TC_CLDIM_3_1(MatterBaseTest):
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-            asserts.assert_equal(current_state.Position, min_position, "CurrentState Position does not match min_position")
+            asserts.assert_equal(current_state.position, min_position, "CurrentState Position does not match min_position")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_equal(current_state.Speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium,
+                asserts.assert_equal(current_state.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium,
                                      "CurrentState Speed does not match Medium")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 5d.")
@@ -293,7 +293,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
-                    Position=max_position, Speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh),
+                    position=max_position, speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -304,12 +304,12 @@ class TC_CLDIM_3_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
-            asserts.assert_equal(target.Position, max_position, "Target Position does not match MaxPosition")
+            asserts.assert_equal(target.position, max_position, "Target Position does not match MaxPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
-            asserts.assert_equal(target.Speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
+            asserts.assert_equal(target.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
                                  "Target Speed does not match High")
         else:
             logging.info("Target attribute is not supported. Skipping step 6c.")
@@ -323,12 +323,12 @@ class TC_CLDIM_3_1(MatterBaseTest):
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-            asserts.assert_equal(current_state.Position, max_position, "CurrentState Position does not match MaxPosition")
+            asserts.assert_equal(current_state.position, max_position, "CurrentState Position does not match MaxPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
-            asserts.assert_equal(current_state.Speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
+            asserts.assert_equal(current_state.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
                                  "CurrentState Speed does not match High")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 6e.")

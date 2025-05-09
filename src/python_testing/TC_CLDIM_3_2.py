@@ -124,8 +124,8 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("2d")
         if attributes.LimitRange.attribute_id in attribute_list:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
-            min_position = limit_range.Min
-            max_position = limit_range.Max
+            min_position = limit_range.min
+            max_position = limit_range.max
 
         # STEP 3a: If manual latching is required, skip steps 3b and 3c
         self.step("3a")
@@ -138,7 +138,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("3b")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Latch=True),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -160,7 +160,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("4b")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Latch=True),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -172,13 +172,13 @@ class TC_CLDIM_3_2(MatterBaseTest):
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
             if is_positioning_supported:
-                asserts.assert_greater_equal(target.Position, min_position, "Target Position is outside expected range")
-                asserts.assert_less_equal(target.Position, max_position, "Target Position is outside expected range")
-            asserts.assert_equal(target.Latch, True, "Target Latch is not True")
+                asserts.assert_greater_equal(target.position, min_position, "Target Position is outside expected range")
+                asserts.assert_less_equal(target.position, max_position, "Target Position is outside expected range")
+            asserts.assert_equal(target.latch, True, "Target Latch is not True")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(target.Speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.Speed, 3, "Target Speed is outside allowed range")
+                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
+                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
         else:
             logging.info("Target attribute is not supported. Skipping step 4c.")
 
@@ -192,14 +192,14 @@ class TC_CLDIM_3_2(MatterBaseTest):
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
             if is_positioning_supported:
-                asserts.assert_greater_equal(current_state.Position, min_position,
+                asserts.assert_greater_equal(current_state.position, min_position,
                                              "CurrentState Position is outside expected range")
-                asserts.assert_less_equal(current_state.Position, max_position, "CurrentState Position is outside expected range")
-            asserts.assert_equal(current_state.Latch, True, "CurrentState Latch is not True")
+                asserts.assert_less_equal(current_state.position, max_position, "CurrentState Position is outside expected range")
+            asserts.assert_equal(current_state.latch, True, "CurrentState Latch is not True")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
+                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 5.")
 
@@ -207,7 +207,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("6a")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Latch=False),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -219,13 +219,13 @@ class TC_CLDIM_3_2(MatterBaseTest):
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
             if is_positioning_supported:
-                asserts.assert_greater_equal(target.Position, min_position, "Target Position is outside expected range")
-                asserts.assert_less_equal(target.Position, max_position, "Target Position is outside expected range")
-            asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_greater_equal(target.position, min_position, "Target Position is outside expected range")
+                asserts.assert_less_equal(target.position, max_position, "Target Position is outside expected range")
+            asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(target.Speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.Speed, 3, "Target Speed is outside allowed range")
+                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
+                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
         else:
             logging.info("Target attribute is not supported. Skipping step 6b.")
 
@@ -239,14 +239,14 @@ class TC_CLDIM_3_2(MatterBaseTest):
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
             if is_positioning_supported:
-                asserts.assert_greater_equal(current_state.Position, min_position,
+                asserts.assert_greater_equal(current_state.position, min_position,
                                              "CurrentState Position is outside expected range")
-                asserts.assert_less_equal(current_state.Position, max_position, "CurrentState Position is outside expected range")
-            asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_less_equal(current_state.position, max_position, "CurrentState Position is outside expected range")
+            asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
+                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 6d.")
 

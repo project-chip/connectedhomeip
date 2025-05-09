@@ -134,8 +134,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("2c")
         if attributes.LimitRange.attribute_id in attribute_list:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
-            min_position = limit_range.Min
-            max_position = limit_range.Max
+            min_position = limit_range.min
+            max_position = limit_range.max
 
         # STEP 2d: Read Resolution attribute if supported
         self.step("2d")
@@ -170,7 +170,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=max_position),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -181,7 +181,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if min_position > 0:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=min_position - 1),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position - 1),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -194,7 +194,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if max_position < 10000:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=max_position + 1),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position + 1),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -206,7 +206,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("4e")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=10001),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10001),
                 endpoint=endpoint
             )
 
@@ -233,7 +233,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if min_position > 0:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=0),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=0),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -246,7 +246,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if min_position > 0:
             if attributes.Target.attribute_id in attribute_list:
                 target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-                asserts.assert_equal(target.Position, min_position, "Target Position does not match MinPosition")
+                asserts.assert_equal(target.position, min_position, "Target Position does not match MinPosition")
         else:
             logging.info("MinPosition not > 0. Skipping step 5c.")
 
@@ -262,7 +262,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if min_position > 0:
             if attributes.CurrentState.attribute_id in attribute_list:
                 current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-                asserts.assert_equal(current_state.Position, min_position, "CurrentState Position does not match MinPosition")
+                asserts.assert_equal(current_state.position, min_position, "CurrentState Position does not match MinPosition")
         else:
             logging.info("MinPosition not > 0. Skipping step 5e.")
 
@@ -271,7 +271,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if max_position < 10000:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=10000),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10000),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -284,7 +284,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if max_position < 10000:
             if attributes.Target.attribute_id in attribute_list:
                 target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-                asserts.assert_equal(target.Position, max_position, "Target Position does not match MaxPosition")
+                asserts.assert_equal(target.position, max_position, "Target Position does not match MaxPosition")
         else:
             logging.info("MaxPosition not < 10000. Skipping step 5g.")
 
@@ -300,7 +300,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if max_position < 10000:
             if attributes.CurrentState.attribute_id in attribute_list:
                 current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-                asserts.assert_equal(current_state.Position, max_position, "CurrentState Position does not match MaxPosition")
+                asserts.assert_equal(current_state.position, max_position, "CurrentState Position does not match MaxPosition")
         else:
             logging.info("MaxPosition not < 10000. Skipping step 5i.")
 
@@ -309,7 +309,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if is_positioning_supported:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=10001),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10001),
                     endpoint=endpoint
                 )
 
@@ -337,7 +337,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("7b")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=min_position + resolution - 1),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position + resolution - 1),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -349,9 +349,9 @@ class TC_CLDIM_3_3(MatterBaseTest):
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
             if resolution == 1:
-                asserts.assert_equal(target.Position, min_position, "Target Position does not match expected value")
+                asserts.assert_equal(target.position, min_position, "Target Position does not match expected value")
             else:
-                asserts.assert_equal(target.Position, min_position + resolution, "Target Position does not match expected value")
+                asserts.assert_equal(target.position, min_position + resolution, "Target Position does not match expected value")
         else:
             logging.info("Target attribute not supported. Skipping step 7c.")
 
@@ -365,9 +365,9 @@ class TC_CLDIM_3_3(MatterBaseTest):
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
             if resolution == 1:
-                asserts.assert_equal(current_state.Position, min_position, "CurrentState Position does not match expected value")
+                asserts.assert_equal(current_state.position, min_position, "CurrentState Position does not match expected value")
             else:
-                asserts.assert_equal(current_state.Position, min_position + resolution,
+                asserts.assert_equal(current_state.position, min_position + resolution,
                                      "CurrentState Position does not match expected value")
         else:
             logging.info("CurrentState attribute not supported. Skipping step 7e.")
@@ -376,7 +376,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("7f")
         try:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Position=(max_position - resolution) + 1),
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=(max_position - resolution) + 1),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -388,9 +388,9 @@ class TC_CLDIM_3_3(MatterBaseTest):
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
             if resolution <= 2:
-                asserts.assert_equal(target.Position, max_position, "Target Position does not match expected value")
+                asserts.assert_equal(target.position, max_position, "Target Position does not match expected value")
             else:
-                asserts.assert_equal(target.Position, max_position - resolution, "Target Position does not match expected value")
+                asserts.assert_equal(target.position, max_position - resolution, "Target Position does not match expected value")
         else:
             logging.info("Target attribute not supported. Skipping step 7g.")
 
@@ -404,9 +404,9 @@ class TC_CLDIM_3_3(MatterBaseTest):
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
             if resolution <= 2:
-                asserts.assert_equal(current_state.Position, max_position, "CurrentState Position does not match expected value")
+                asserts.assert_equal(current_state.position, max_position, "CurrentState Position does not match expected value")
             else:
-                asserts.assert_equal(current_state.Position, max_position - resolution,
+                asserts.assert_equal(current_state.position, max_position - resolution,
                                      "CurrentState Position does not match expected value")
         else:
             logging.info("CurrentState attribute not supported. Skipping step 7i.")
@@ -416,7 +416,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if not is_latching_supported:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Latch=True),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -428,7 +428,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
-                        Speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh),
+                        speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -441,7 +441,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if not is_speed_supported:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Speed=4),  # Invalid speed
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(speed=4),  # Invalid speed
                     endpoint=endpoint
                 )
 
@@ -457,7 +457,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         if is_speed_supported:
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(Speed=4),  # Invalid speed
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(speed=4),  # Invalid speed
                     endpoint=endpoint
                 )
 
