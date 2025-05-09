@@ -132,6 +132,9 @@ class Subprocess(threading.Thread):
                 raise TimeoutError("Expected output '%r' not found within %s seconds" % (expected_output, timeout))
             self.expected_output = None
 
+    def set_output_match(self, expected_output: str):
+        self._set_output_match(expected_output)
+
     def send(self, message: str, end: str = "\n",
              expected_output: Optional[Union[str, re.Pattern]] = None,
              timeout: Optional[float] = None):
