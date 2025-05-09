@@ -22522,6 +22522,471 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedJointFabricDatastoreClusterGroupKeySetListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.GroupKeySetListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreGroupKeySetStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreGroupKeySetStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterGroupListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.GroupListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterNodeListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.NodeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterAdminListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.AdminListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterStatusAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.StatusAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.JointFabricDatastoreClusterDatastoreStatusStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.JointFabricDatastoreClusterDatastoreStatusStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterEndpointGroupIDListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.EndpointGroupIDListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterEndpointBindingListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.EndpointBindingListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterNodeKeySetListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.NodeKeySetListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntry> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntry>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterNodeACLListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.NodeACLListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreACLEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreACLEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterNodeEndpointListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.NodeEndpointListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterGeneratedCommandListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterAcceptedCommandListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterEventListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterAttributeListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedJointFabricAdministratorClusterICACCSRResponseCallback implements ChipClusters.JointFabricAdministratorCluster.ICACCSRResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] icaccsr) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo icaccsrResponseValue = new CommandResponseInfo("icaccsr", "byte[]");
+      responseValues.put(icaccsrResponseValue, icaccsr);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterICACResponseCallback implements ChipClusters.JointFabricAdministratorCluster.ICACResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer statusCode) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusCodeResponseValue = new CommandResponseInfo("statusCode", "Integer");
+      responseValues.put(statusCodeResponseValue, statusCode);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterTransferAnchorResponseCallback implements ChipClusters.JointFabricAdministratorCluster.TransferAnchorResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer statusCode) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusCodeResponseValue = new CommandResponseInfo("statusCode", "Integer");
+      responseValues.put(statusCodeResponseValue, statusCode);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedJointFabricAdministratorClusterAdministratorFabricIndexAttributeCallback implements ChipClusters.JointFabricAdministratorCluster.AdministratorFabricIndexAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterGeneratedCommandListAttributeCallback implements ChipClusters.JointFabricAdministratorCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterAcceptedCommandListAttributeCallback implements ChipClusters.JointFabricAdministratorCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterEventListAttributeCallback implements ChipClusters.JointFabricAdministratorCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterAttributeListAttributeCallback implements ChipClusters.JointFabricAdministratorCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
 
   public static class DelegatedTlsCertificateManagementClusterProvisionRootCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.ProvisionRootCertificateResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -25424,6 +25889,14 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.CommissionerControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("commissionerControl", commissionerControlClusterInfo);
 
+    ClusterInfo jointFabricDatastoreClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.JointFabricDatastoreCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("jointFabricDatastore", jointFabricDatastoreClusterInfo);
+
+    ClusterInfo jointFabricAdministratorClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.JointFabricAdministratorCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("jointFabricAdministrator", jointFabricAdministratorClusterInfo);
+
     ClusterInfo tlsCertificateManagementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.TlsCertificateManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("tlsCertificateManagement", tlsCertificateManagementClusterInfo);
@@ -25587,6 +26060,8 @@ public class ClusterInfoMapping {
     destination.get("commodityTariff").combineCommands(source.get("commodityTariff"));
     destination.get("ecosystemInformation").combineCommands(source.get("ecosystemInformation"));
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
+    destination.get("jointFabricDatastore").combineCommands(source.get("jointFabricDatastore"));
+    destination.get("jointFabricAdministrator").combineCommands(source.get("jointFabricAdministrator"));
     destination.get("tlsCertificateManagement").combineCommands(source.get("tlsCertificateManagement"));
     destination.get("tlsClientManagement").combineCommands(source.get("tlsClientManagement"));
     destination.get("meterIdentification").combineCommands(source.get("meterIdentification"));
@@ -32944,6 +33419,599 @@ public class ClusterInfoMapping {
     commissionerControlClusterInteractionInfoMap.put("commissionNode", commissionerControlcommissionNodeInteractionInfo);
 
     commandMap.put("commissionerControl", commissionerControlClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> jointFabricDatastoreClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddKeySetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo jointFabricDatastoreaddKeySetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addKeySet((DefaultClusterCallback) callback
+        , (ChipStructs.JointFabricDatastoreClusterDatastoreGroupKeySetStruct)
+        commandArguments.get("groupKeySet")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddKeySetCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addKeySet", jointFabricDatastoreaddKeySetInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateKeySetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo jointFabricDatastoreupdateKeySetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateKeySet((DefaultClusterCallback) callback
+        , (ChipStructs.JointFabricDatastoreClusterDatastoreGroupKeySetStruct)
+        commandArguments.get("groupKeySet")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateKeySetCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateKeySet", jointFabricDatastoreupdateKeySetInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveKeySetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveKeySetgroupKeySetIDCommandParameterInfo = new CommandParameterInfo("groupKeySetID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveKeySetCommandParams.put("groupKeySetID",jointFabricDatastoreremoveKeySetgroupKeySetIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveKeySetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeKeySet((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupKeySetID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveKeySetCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeKeySet", jointFabricDatastoreremoveKeySetInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupID",jointFabricDatastoreaddGroupgroupIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreaddGroupCommandParams.put("friendlyName",jointFabricDatastoreaddGroupfriendlyNameCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupKeySetIDCommandParameterInfo = new CommandParameterInfo("groupKeySetID", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupKeySetID",jointFabricDatastoreaddGroupgroupKeySetIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupCATCommandParameterInfo = new CommandParameterInfo("groupCAT", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupCAT",jointFabricDatastoreaddGroupgroupCATCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupCATVersionCommandParameterInfo = new CommandParameterInfo("groupCATVersion", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupCATVersion",jointFabricDatastoreaddGroupgroupCATVersionCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupPermissionCommandParameterInfo = new CommandParameterInfo("groupPermission", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupPermission",jointFabricDatastoreaddGroupgroupPermissionCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreaddGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addGroup((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (String)
+        commandArguments.get("friendlyName")
+        , (Integer)
+        commandArguments.get("groupKeySetID")
+        , (Integer)
+        commandArguments.get("groupCAT")
+        , (Integer)
+        commandArguments.get("groupCATVersion")
+        , (Integer)
+        commandArguments.get("groupPermission")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddGroupCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addGroup", jointFabricDatastoreaddGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupID",jointFabricDatastoreupdateGroupgroupIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("friendlyName",jointFabricDatastoreupdateGroupfriendlyNameCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupKeySetIDCommandParameterInfo = new CommandParameterInfo("groupKeySetID", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupKeySetID",jointFabricDatastoreupdateGroupgroupKeySetIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupCATCommandParameterInfo = new CommandParameterInfo("groupCAT", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupCAT",jointFabricDatastoreupdateGroupgroupCATCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupCATVersionCommandParameterInfo = new CommandParameterInfo("groupCATVersion", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupCATVersion",jointFabricDatastoreupdateGroupgroupCATVersionCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupPermissionCommandParameterInfo = new CommandParameterInfo("groupPermission", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupPermission",jointFabricDatastoreupdateGroupgroupPermissionCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreupdateGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateGroup((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (String)
+        commandArguments.get("friendlyName")
+        , (Integer)
+        commandArguments.get("groupKeySetID")
+        , (Integer)
+        commandArguments.get("groupCAT")
+        , (Integer)
+        commandArguments.get("groupCATVersion")
+        , (Integer)
+        commandArguments.get("groupPermission")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateGroupCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateGroup", jointFabricDatastoreupdateGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveGroupCommandParams.put("groupID",jointFabricDatastoreremoveGroupgroupIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeGroup((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveGroupCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeGroup", jointFabricDatastoreremoveGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddAdminCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddAdminnodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddAdminCommandParams.put("nodeID",jointFabricDatastoreaddAdminnodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddAdminfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreaddAdminCommandParams.put("friendlyName",jointFabricDatastoreaddAdminfriendlyNameCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddAdminvendorIDCommandParameterInfo = new CommandParameterInfo("vendorID", Integer.class, Integer.class);
+    jointFabricDatastoreaddAdminCommandParams.put("vendorID",jointFabricDatastoreaddAdminvendorIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddAdminicacCommandParameterInfo = new CommandParameterInfo("icac", byte[].class, byte[].class);
+    jointFabricDatastoreaddAdminCommandParams.put("icac",jointFabricDatastoreaddAdminicacCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreaddAdminInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addAdmin((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (String)
+        commandArguments.get("friendlyName")
+        , (Integer)
+        commandArguments.get("vendorID")
+        , (byte[])
+        commandArguments.get("icac")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddAdminCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addAdmin", jointFabricDatastoreaddAdminInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateAdminCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreupdateAdminnodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreupdateAdminCommandParams.put("nodeID",jointFabricDatastoreupdateAdminnodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateAdminfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreupdateAdminCommandParams.put("friendlyName",jointFabricDatastoreupdateAdminfriendlyNameCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateAdminicacCommandParameterInfo = new CommandParameterInfo("icac", byte[].class, byte[].class);
+    jointFabricDatastoreupdateAdminCommandParams.put("icac",jointFabricDatastoreupdateAdminicacCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreupdateAdminInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateAdmin((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (String)
+        commandArguments.get("friendlyName")
+        , (byte[])
+        commandArguments.get("icac")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateAdminCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateAdmin", jointFabricDatastoreupdateAdminInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveAdminCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveAdminnodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveAdminCommandParams.put("nodeID",jointFabricDatastoreremoveAdminnodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveAdminInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeAdmin((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveAdminCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeAdmin", jointFabricDatastoreremoveAdminInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddPendingNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddPendingNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddPendingNodeCommandParams.put("nodeID",jointFabricDatastoreaddPendingNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddPendingNodefriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreaddPendingNodeCommandParams.put("friendlyName",jointFabricDatastoreaddPendingNodefriendlyNameCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreaddPendingNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addPendingNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (String)
+        commandArguments.get("friendlyName")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddPendingNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addPendingNode", jointFabricDatastoreaddPendingNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastorerefreshNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastorerefreshNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastorerefreshNodeCommandParams.put("nodeID",jointFabricDatastorerefreshNodenodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastorerefreshNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .refreshNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastorerefreshNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("refreshNode", jointFabricDatastorerefreshNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreupdateNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreupdateNodeCommandParams.put("nodeID",jointFabricDatastoreupdateNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateNodefriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreupdateNodeCommandParams.put("friendlyName",jointFabricDatastoreupdateNodefriendlyNameCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreupdateNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (String)
+        commandArguments.get("friendlyName")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateNode", jointFabricDatastoreupdateNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveNodeCommandParams.put("nodeID",jointFabricDatastoreremoveNodenodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeNode", jointFabricDatastoreremoveNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreupdateEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreupdateEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreupdateEndpointForNodeendpointIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreupdateEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreupdateEndpointForNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateEndpointForNodefriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreupdateEndpointForNodeCommandParams.put("friendlyName",jointFabricDatastoreupdateEndpointForNodefriendlyNameCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreupdateEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateEndpointForNode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (Long)
+        commandArguments.get("nodeID")
+        , (String)
+        commandArguments.get("friendlyName")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateEndpointForNode", jointFabricDatastoreupdateEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddGroupIDToEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreaddGroupIDToEndpointForNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupIDToEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreaddGroupIDToEndpointForNodeendpointIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupIDToEndpointForNodegroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams.put("groupID",jointFabricDatastoreaddGroupIDToEndpointForNodegroupIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreaddGroupIDToEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addGroupIDToEndpointForNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (Integer)
+        commandArguments.get("groupID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addGroupIDToEndpointForNode", jointFabricDatastoreaddGroupIDToEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveGroupIDFromEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreremoveGroupIDFromEndpointForNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveGroupIDFromEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreremoveGroupIDFromEndpointForNodeendpointIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveGroupIDFromEndpointForNodegroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams.put("groupID",jointFabricDatastoreremoveGroupIDFromEndpointForNodegroupIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveGroupIDFromEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeGroupIDFromEndpointForNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (Integer)
+        commandArguments.get("groupID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeGroupIDFromEndpointForNode", jointFabricDatastoreremoveGroupIDFromEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddBindingToEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddBindingToEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddBindingToEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreaddBindingToEndpointForNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddBindingToEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreaddBindingToEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreaddBindingToEndpointForNodeendpointIDCommandParameterInfo);
+
+    InteractionInfo jointFabricDatastoreaddBindingToEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addBindingToEndpointForNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (ChipStructs.JointFabricDatastoreClusterDatastoreBindingTargetStruct)
+        commandArguments.get("binding")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddBindingToEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addBindingToEndpointForNode", jointFabricDatastoreaddBindingToEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveBindingFromEndpointForNodelistIDCommandParameterInfo = new CommandParameterInfo("listID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams.put("listID",jointFabricDatastoreremoveBindingFromEndpointForNodelistIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveBindingFromEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreremoveBindingFromEndpointForNodeendpointIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveBindingFromEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreremoveBindingFromEndpointForNodenodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveBindingFromEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeBindingFromEndpointForNode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("listID")
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeBindingFromEndpointForNode", jointFabricDatastoreremoveBindingFromEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddACLToNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddACLToNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddACLToNodeCommandParams.put("nodeID",jointFabricDatastoreaddACLToNodenodeIDCommandParameterInfo);
+
+    InteractionInfo jointFabricDatastoreaddACLToNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addACLToNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (ChipStructs.JointFabricDatastoreClusterDatastoreAccessControlEntryStruct)
+        commandArguments.get("ACLEntry")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddACLToNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addACLToNode", jointFabricDatastoreaddACLToNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveACLFromNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveACLFromNodelistIDCommandParameterInfo = new CommandParameterInfo("listID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveACLFromNodeCommandParams.put("listID",jointFabricDatastoreremoveACLFromNodelistIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveACLFromNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveACLFromNodeCommandParams.put("nodeID",jointFabricDatastoreremoveACLFromNodenodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveACLFromNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeACLFromNode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("listID")
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveACLFromNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeACLFromNode", jointFabricDatastoreremoveACLFromNodeInteractionInfo);
+
+    commandMap.put("jointFabricDatastore", jointFabricDatastoreClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> jointFabricAdministratorClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> jointFabricAdministratorICACCSRRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo jointFabricAdministratorICACCSRRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+          .ICACCSRRequest((ChipClusters.JointFabricAdministratorCluster.ICACCSRResponseCallback) callback
+            );
+        },
+        () -> new DelegatedJointFabricAdministratorClusterICACCSRResponseCallback(),
+        jointFabricAdministratorICACCSRRequestCommandParams
+      );
+    jointFabricAdministratorClusterInteractionInfoMap.put("ICACCSRRequest", jointFabricAdministratorICACCSRRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratoraddICACCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricAdministratoraddICACICACValueCommandParameterInfo = new CommandParameterInfo("ICACValue", byte[].class, byte[].class);
+    jointFabricAdministratoraddICACCommandParams.put("ICACValue",jointFabricAdministratoraddICACICACValueCommandParameterInfo);
+    InteractionInfo jointFabricAdministratoraddICACInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+          .addICAC((ChipClusters.JointFabricAdministratorCluster.ICACResponseCallback) callback
+           , (byte[])
+             commandArguments.get("ICACValue")
+
+            );
+        },
+        () -> new DelegatedJointFabricAdministratorClusterICACResponseCallback(),
+        jointFabricAdministratoraddICACCommandParams
+      );
+    jointFabricAdministratorClusterInteractionInfoMap.put("addICAC", jointFabricAdministratoraddICACInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratoropenJointCommissioningWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowcommissioningTimeoutCommandParameterInfo = new CommandParameterInfo("commissioningTimeout", Integer.class, Integer.class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("commissioningTimeout",jointFabricAdministratoropenJointCommissioningWindowcommissioningTimeoutCommandParameterInfo);
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowPAKEPasscodeVerifierCommandParameterInfo = new CommandParameterInfo("PAKEPasscodeVerifier", byte[].class, byte[].class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("PAKEPasscodeVerifier",jointFabricAdministratoropenJointCommissioningWindowPAKEPasscodeVerifierCommandParameterInfo);
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowdiscriminatorCommandParameterInfo = new CommandParameterInfo("discriminator", Integer.class, Integer.class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("discriminator",jointFabricAdministratoropenJointCommissioningWindowdiscriminatorCommandParameterInfo);
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowiterationsCommandParameterInfo = new CommandParameterInfo("iterations", Long.class, Long.class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("iterations",jointFabricAdministratoropenJointCommissioningWindowiterationsCommandParameterInfo);
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowsaltCommandParameterInfo = new CommandParameterInfo("salt", byte[].class, byte[].class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("salt",jointFabricAdministratoropenJointCommissioningWindowsaltCommandParameterInfo);
+    InteractionInfo jointFabricAdministratoropenJointCommissioningWindowInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+        .openJointCommissioningWindow((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("commissioningTimeout")
+        , (byte[])
+        commandArguments.get("PAKEPasscodeVerifier")
+        , (Integer)
+        commandArguments.get("discriminator")
+        , (Long)
+        commandArguments.get("iterations")
+        , (byte[])
+        commandArguments.get("salt")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricAdministratoropenJointCommissioningWindowCommandParams
+    );
+    jointFabricAdministratorClusterInteractionInfoMap.put("openJointCommissioningWindow", jointFabricAdministratoropenJointCommissioningWindowInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratortransferAnchorRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo jointFabricAdministratortransferAnchorRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+          .transferAnchorRequest((ChipClusters.JointFabricAdministratorCluster.TransferAnchorResponseCallback) callback
+            );
+        },
+        () -> new DelegatedJointFabricAdministratorClusterTransferAnchorResponseCallback(),
+        jointFabricAdministratortransferAnchorRequestCommandParams
+      );
+    jointFabricAdministratorClusterInteractionInfoMap.put("transferAnchorRequest", jointFabricAdministratortransferAnchorRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratortransferAnchorCompleteCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo jointFabricAdministratortransferAnchorCompleteInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+        .transferAnchorComplete((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricAdministratortransferAnchorCompleteCommandParams
+    );
+    jointFabricAdministratorClusterInteractionInfoMap.put("transferAnchorComplete", jointFabricAdministratortransferAnchorCompleteInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratorannounceJointFabricAdministratorCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricAdministratorannounceJointFabricAdministratorendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricAdministratorannounceJointFabricAdministratorCommandParams.put("endpointID",jointFabricAdministratorannounceJointFabricAdministratorendpointIDCommandParameterInfo);
+    InteractionInfo jointFabricAdministratorannounceJointFabricAdministratorInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+        .announceJointFabricAdministrator((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("endpointID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricAdministratorannounceJointFabricAdministratorCommandParams
+    );
+    jointFabricAdministratorClusterInteractionInfoMap.put("announceJointFabricAdministrator", jointFabricAdministratorannounceJointFabricAdministratorInteractionInfo);
+
+    commandMap.put("jointFabricAdministrator", jointFabricAdministratorClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> tlsCertificateManagementClusterInteractionInfoMap = new LinkedHashMap<>();
 
