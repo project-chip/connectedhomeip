@@ -169,18 +169,22 @@ public:
 };
 
 } // namespace MeasurementAccuracyStruct
-namespace DeviceTypeStruct {
+namespace ViewportStruct {
 enum class Fields : uint8_t
 {
-    kDeviceType = 0,
-    kRevision   = 1,
+    kX1 = 0,
+    kY1 = 1,
+    kX2 = 2,
+    kY2 = 3,
 };
 
 struct Type
 {
 public:
-    chip::DeviceTypeId deviceType = static_cast<chip::DeviceTypeId>(0);
-    uint16_t revision             = static_cast<uint16_t>(0);
+    uint16_t x1 = static_cast<uint16_t>(0);
+    uint16_t y1 = static_cast<uint16_t>(0);
+    uint16_t x2 = static_cast<uint16_t>(0);
+    uint16_t y2 = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -191,7 +195,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace DeviceTypeStruct
+} // namespace ViewportStruct
 namespace ApplicationStruct {
 enum class Fields : uint8_t
 {
@@ -322,33 +326,6 @@ public:
 using DecodableType = Type;
 
 } // namespace OperationalStateStruct
-namespace ViewportStruct {
-enum class Fields : uint8_t
-{
-    kX1 = 0,
-    kY1 = 1,
-    kX2 = 2,
-    kY2 = 3,
-};
-
-struct Type
-{
-public:
-    uint16_t x1 = static_cast<uint16_t>(0);
-    uint16_t y1 = static_cast<uint16_t>(0);
-    uint16_t x2 = static_cast<uint16_t>(0);
-    uint16_t y2 = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ViewportStruct
 namespace WebRTCSessionStruct {
 enum class Fields : uint8_t
 {

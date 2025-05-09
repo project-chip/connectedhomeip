@@ -29,6 +29,8 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <cstring>
+#include <cmath>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -840,6 +842,34 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetNightVisionIllum(TriStateAutoEnum aNight
 
 CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewport)
 {
+    // The following validation steps are required
+    // 1. the new viewport is not larger than the sensor max
+    // 2. the new viewport is not snaller than the sensor min
+    // 3. the new viewport has the same aspect ratio as the sensor
+    //
+    uint16_t requestedWidth  = aViewport.x2 - aViewport.x1;
+    uint16_t requestedHeight = aViewport.y2 - aViewport.y1;
+    if ((requestedWidth < mMinViewPort.width) || (requestedHeight < mMinViewPort.height) ||
+        (requestedWidth > mVideoSensorParams.sensorWidth) || (requestedHeight > mVideoSensorParams.sensorHeight))
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: SetViewport with invalid viewport dimensions", mEndpointId);
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    // Get the ARs to no more than 2DP.  Otherwise you get mismatches e.g. 16:9 ratio calculation for 480p isn't the same as
+    // 1080p beyond 2DP.
+    float requestedAR = floorf((static_cast<float>(requestedWidth) / requestedHeight) * 100) / 100;
+    float deviceAR    = floorf((static_cast<float>(mVideoSensorParams.sensorWidth) / mVideoSensorParams.sensorHeight) *
+                               100) / 100;
+
+    // Ensure that the aspect ration of the viewport matches the aspect ratio of the sensor
+    ChipLogDetail(Zcl, "DPTZSetViewpoort. AR of viewport %f, AR of device %f.", requestedAR, deviceAR);
+    
+    if (requestedAR != deviceAR)
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: SetViewport with mismatching aspect ratio.", mEndpointId);
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
     mViewport = aViewport;
 
     StoreViewport(mViewport);

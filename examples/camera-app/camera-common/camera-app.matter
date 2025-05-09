@@ -211,6 +211,31 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum ServerAttributionContextInformation : enum8 {
+  kServerAutomationRule = 11;
+  kServerSchedule = 12;
+  kServerTimer = 13;
+  kSecurity = 14;
+  kDemandResponseEventOrSimilarServiceProviderSignalling = 15;
+  kPhysicalInteractionOnDevice = 16;
+  kInteractionViaAProtocolNotDefinedInThisSpecification = 17;
+}
+
+enum SoftwareVersionCertificationStatusEnum : enum8 {
+  kDevTest = 0;
+  kProvisional = 1;
+  kCertified = 2;
+  kRevoked = 3;
+}
+
+enum SuppliedAttributionContextInformation : enum8 {
+  kDefaultClientAction = 0;
+  kUserInteraction = 1;
+  kClientAutomationRule = 2;
+  kClientSchedule = 3;
+  kClientTimer = 4;
+}
+
 enum TariffPriceTypeEnum : enum8 {
   kStandard = 0;
   kCritical = 1;
@@ -429,7 +454,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -457,7 +482,7 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -2498,10 +2523,15 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     int16u y2 = 3;
   }
 
+  struct DPTZStruct {
+    int16u videoStreamID = 0;
+    ViewportStruct viewport = 1;
+  }
+
   readonly attribute optional MPTZStruct MPTZPosition = 0;
   readonly attribute optional int8u maxPresets = 1;
   readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
-  readonly attribute optional int16u DPTZRelativeMove[] = 3;
+  readonly attribute optional DPTZStruct DPTZStreams[] = 3;
   readonly attribute optional int8u zoomMax = 4;
   readonly attribute optional int16s tiltMin = 5;
   readonly attribute optional int16s tiltMax = 6;
@@ -2553,7 +2583,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 
   /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
   command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
-  /** This command SHALL move the device by the delta values relative to the currently defined position. */
+  /** This command SHALL move the camera by the delta values relative to the currently defined position. */
   command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
   /** This command SHALL move the camera to the positions specified by the Preset passed. */
   command MPTZMoveToPreset(MPTZMoveToPresetRequest): DefaultSuccess = 2;
@@ -2563,7 +2593,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   command MPTZRemovePreset(MPTZRemovePresetRequest): DefaultSuccess = 4;
   /** This command allows for setting the digital viewport for a specific Video Stream. */
   command DPTZSetViewport(DPTZSetViewportRequest): DefaultSuccess = 5;
-  /** This command SHALL change the viewports location by the amount specified in a relative fashion. */
+  /** This command SHALL change the per stream viewport by the amount specified in a relative fashion. */
   command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
 }
 
@@ -2795,6 +2825,45 @@ provisional cluster Chime = 1366 {
   command PlayChimeSound(): DefaultSuccess = 0;
 }
 
+/** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
+internal cluster FaultInjection = 4294048774 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum FaultType : enum8 {
+    kUnspecified = 0;
+    kSystemFault = 1;
+    kInetFault = 2;
+    kChipFault = 3;
+    kCertFault = 4;
+  }
+
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct FailAtFaultRequest {
+    FaultType type = 0;
+    int32u id = 1;
+    int32u numCallsToSkip = 2;
+    int32u numCallsToFail = 3;
+    boolean takeMutex = 4;
+  }
+
+  request struct FailRandomlyAtFaultRequest {
+    FaultType type = 0;
+    int32u id = 1;
+    int8u percentage = 2;
+  }
+
+  /** Configure a fault to be triggered deterministically */
+  command access(invoke: manage) FailAtFault(FailAtFaultRequest): DefaultSuccess = 0;
+  /** Configure a fault to be triggered randomly, with a given probability defined as a percentage */
+  command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 3;
   device type ma_otarequestor = 18, version 1;
@@ -2900,7 +2969,7 @@ endpoint 0 {
   }
 
   server cluster UnitLocalization {
-    persist  attribute temperatureUnit default = 0;
+    callback attribute temperatureUnit;
     ram      attribute featureMap default = 0x1;
     ram      attribute clusterRevision default = 1;
   }
@@ -3171,6 +3240,17 @@ endpoint 0 {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
+
+  server cluster FaultInjection {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command FailAtFault;
+    handle command FailRandomlyAtFault;
+  }
 }
 endpoint 1 {
   device type ma_camera = 322, version 1;
@@ -3292,7 +3372,7 @@ endpoint 1 {
     callback attribute MPTZPosition;
     ram      attribute maxPresets default = 5;
     callback attribute MPTZPresets;
-    callback attribute DPTZRelativeMove;
+    callback attribute DPTZStreams;
     ram      attribute zoomMax default = 100;
     ram      attribute tiltMin default = -90;
     ram      attribute tiltMax default = 90;

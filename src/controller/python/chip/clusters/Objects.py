@@ -423,6 +423,43 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
+        class ServerAttributionContextInformation(MatterIntEnum):
+            kServerAutomationRule = 0x0B
+            kServerSchedule = 0x0C
+            kServerTimer = 0x0D
+            kSecurity = 0x0E
+            kDemandResponseEventOrSimilarServiceProviderSignalling = 0x0F
+            kPhysicalInteractionOnDevice = 0x10
+            kInteractionViaAProtocolNotDefinedInThisSpecification = 0x11
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
+        class SoftwareVersionCertificationStatusEnum(MatterIntEnum):
+            kDevTest = 0x00
+            kProvisional = 0x01
+            kCertified = 0x02
+            kRevoked = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class SuppliedAttributionContextInformation(MatterIntEnum):
+            kDefaultClientAction = 0x00
+            kUserInteraction = 0x01
+            kClientAutomationRule = 0x02
+            kClientSchedule = 0x03
+            kClientTimer = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
+
         class TariffPriceTypeEnum(MatterIntEnum):
             kStandard = 0x00
             kCritical = 0x01
@@ -47263,7 +47300,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="MPTZPosition", Tag=0x00000000, Type=typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct]),
                 ClusterObjectFieldDescriptor(Label="maxPresets", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="MPTZPresets", Tag=0x00000002, Type=typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]]),
-                ClusterObjectFieldDescriptor(Label="DPTZRelativeMove", Tag=0x00000003, Type=typing.Optional[typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="DPTZStreams", Tag=0x00000003, Type=typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.DPTZStruct]]),
                 ClusterObjectFieldDescriptor(Label="zoomMax", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="tiltMin", Tag=0x00000005, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="tiltMax", Tag=0x00000006, Type=typing.Optional[int]),
@@ -47279,7 +47316,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
     MPTZPosition: typing.Optional[CameraAvSettingsUserLevelManagement.Structs.MPTZStruct] = None
     maxPresets: typing.Optional[uint] = None
     MPTZPresets: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]] = None
-    DPTZRelativeMove: typing.Optional[typing.List[uint]] = None
+    DPTZStreams: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.DPTZStruct]] = None
     zoomMax: typing.Optional[uint] = None
     tiltMin: typing.Optional[int] = None
     tiltMax: typing.Optional[int] = None
@@ -47346,6 +47383,19 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             y1: 'uint' = 0
             x2: 'uint' = 0
             y2: 'uint' = 0
+
+        @dataclass
+        class DPTZStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="viewport", Tag=1, Type=CameraAvSettingsUserLevelManagement.Structs.ViewportStruct),
+                    ])
+
+            videoStreamID: 'uint' = 0
+            viewport: 'CameraAvSettingsUserLevelManagement.Structs.ViewportStruct' = field(default_factory=lambda: CameraAvSettingsUserLevelManagement.Structs.ViewportStruct())
 
     class Commands:
         @dataclass
@@ -47528,7 +47578,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             value: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]] = None
 
         @dataclass
-        class DPTZRelativeMove(ClusterAttributeDescriptor):
+        class DPTZStreams(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000552
@@ -47539,9 +47589,9 @@ class CameraAvSettingsUserLevelManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.DPTZStruct]])
 
-            value: typing.Optional[typing.List[uint]] = None
+            value: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.DPTZStruct]] = None
 
         @dataclass
         class ZoomMax(ClusterAttributeDescriptor):

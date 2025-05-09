@@ -14857,7 +14857,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command MPTZRelativeMove
  *
- * This command SHALL move the device by the delta values relative to the currently defined position.
+ * This command SHALL move the camera by the delta values relative to the currently defined position.
  */
 - (void)MPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)MPTZRelativeMoveWithCompletion:(MTRStatusCompletion)completion
@@ -14889,7 +14889,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command DPTZRelativeMove
  *
- * This command SHALL change the viewports location by the amount specified in a relative fashion.
+ * This command SHALL change the per stream viewport by the amount specified in a relative fashion.
  */
 - (void)DPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
@@ -14911,11 +14911,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeMPTZPresetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeDPTZRelativeMoveWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeDPTZRelativeMoveWithParams:(MTRSubscribeParams *)params
-                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeDPTZRelativeMoveWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeDPTZStreamsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeDPTZStreamsWithParams:(MTRSubscribeParams *)params
+                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeDPTZStreamsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeZoomMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeZoomMaxWithParams:(MTRSubscribeParams *)params
@@ -17346,6 +17346,31 @@ typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
     MTRDataTypeRelativePositionTagFrontOf MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x05,
     MTRDataTypeRelativePositionTagBehind MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+typedef NS_ENUM(uint8_t, MTRDataTypeServerAttributionContextInformation) {
+    MTRDataTypeServerAttributionContextInformationServerAutomationRule MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeServerAttributionContextInformationServerSchedule MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeServerAttributionContextInformationServerTimer MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeServerAttributionContextInformationSecurity MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeServerAttributionContextInformationDemandResponseEventOrSimilarServiceProviderSignalling MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeServerAttributionContextInformationPhysicalInteractionOnDevice MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeServerAttributionContextInformationInteractionViaAProtocolNotDefinedInThisSpecification MTR_PROVISIONALLY_AVAILABLE = 0x11,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSoftwareVersionCertificationStatusEnum) {
+    MTRDataTypeSoftwareVersionCertificationStatusEnumDevTest MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeSoftwareVersionCertificationStatusEnumProvisional MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeSoftwareVersionCertificationStatusEnumCertified MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSoftwareVersionCertificationStatusEnumRevoked MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSuppliedAttributionContextInformation) {
+    MTRDataTypeSuppliedAttributionContextInformationDefaultClientAction MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeSuppliedAttributionContextInformationUserInteraction MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeSuppliedAttributionContextInformationClientAutomationRule MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSuppliedAttributionContextInformationClientSchedule MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeSuppliedAttributionContextInformationClientTimer MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeTariffPriceTypeEnum) {
     MTRDataTypeTariffPriceTypeEnumStandard MTR_PROVISIONALLY_AVAILABLE = 0x00,

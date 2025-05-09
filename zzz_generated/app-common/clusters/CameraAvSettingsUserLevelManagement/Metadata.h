@@ -43,14 +43,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace MPTZPresets
-namespace DPTZRelativeMove {
+namespace DPTZStreams {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = DPTZRelativeMove::Id,
+    .attributeId    = DPTZStreams::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-} // namespace DPTZRelativeMove
+} // namespace DPTZStreams
 namespace ZoomMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ZoomMax::Id,

@@ -174,6 +174,9 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
         [sController.controllerDataStore clearAllStoredClusterData];
         NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
         XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+        [sController.controllerDataStore clearDeviceDataForNodeID:@(kDeviceId)];
+        XCTAssertNil([sController.controllerDataStore getStoredDeviceDataForNodeID:@(kDeviceId)]);
     }
 }
 
@@ -3874,6 +3877,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Remove the device, then try again, now with us having stored cluster
     // data.  All the events should still be reported as historical.
     [sController removeDevice:device];
+
+    // Clear out our device data, so we don't have a stored max event number
+    // that filters everything out.
+    [sController.controllerDataStore clearDeviceDataForNodeID:@(kDeviceId)];
 
     eventReportsReceived = 0;
 

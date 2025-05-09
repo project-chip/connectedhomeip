@@ -14859,6 +14859,67 @@ public static class CameraAvSettingsUserLevelManagementClusterViewportStruct {
     return output.toString();
   }
 }
+public static class CameraAvSettingsUserLevelManagementClusterDPTZStruct {
+  public Integer videoStreamID;
+  public ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport;
+  private static final long VIDEO_STREAM_ID_ID = 0L;
+  private static final long VIEWPORT_ID = 1L;
+
+  public CameraAvSettingsUserLevelManagementClusterDPTZStruct(
+    Integer videoStreamID,
+    ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport
+  ) {
+    this.videoStreamID = videoStreamID;
+    this.viewport = viewport;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, new UIntType(videoStreamID)));
+    values.add(new StructElement(VIEWPORT_ID, viewport.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvSettingsUserLevelManagementClusterDPTZStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer videoStreamID = null;
+    ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoStreamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == VIEWPORT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          viewport = ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new CameraAvSettingsUserLevelManagementClusterDPTZStruct(
+      videoStreamID,
+      viewport
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvSettingsUserLevelManagementClusterDPTZStruct {\n");
+    output.append("\tvideoStreamID: ");
+    output.append(videoStreamID);
+    output.append("\n");
+    output.append("\tviewport: ");
+    output.append(viewport);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class WebRTCTransportProviderClusterICEServerStruct {
   public ArrayList<String> urls;
   public Optional<String> username;
