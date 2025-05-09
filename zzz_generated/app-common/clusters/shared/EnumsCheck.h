@@ -7,7 +7,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag val)
 {
     using EnumType = Globals::AreaTypeTag;
@@ -106,13 +105,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag va
     case EnumType::kWard:
     case EnumType::kWorkshop:
     case EnumType::kToilet:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AtomicRequestTypeEnum val)
 {
     using EnumType = Globals::AtomicRequestTypeEnum;
@@ -121,13 +118,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AtomicRequestT
     case EnumType::kBeginWrite:
     case EnumType::kCommitWrite:
     case EnumType::kRollbackWrite:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicationEnum val)
 {
     using EnumType = detail::ChangeIndicationEnum;
@@ -136,13 +131,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicatio
     case EnumType::kOk:
     case EnumType::kWarning:
     case EnumType::kCritical:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::DegradationDirectionEnum val)
 {
     using EnumType = detail::DegradationDirectionEnum;
@@ -150,13 +143,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::DegradationDire
     {
     case EnumType::kUp:
     case EnumType::kDown:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag val)
 {
     using EnumType = Globals::LandmarkTag;
@@ -213,13 +204,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag va
     case EnumType::kLaundryWasher:
     case EnumType::kWindow:
     case EnumType::kWineCooler:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::LevelValueEnum val)
 {
     using EnumType = detail::LevelValueEnum;
@@ -230,13 +219,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::LevelValueEnum 
     case EnumType::kMedium:
     case EnumType::kHigh:
     case EnumType::kCritical:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LocationTag val)
 {
     using EnumType = Globals::LocationTag;
@@ -246,13 +233,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LocationTag va
     case EnumType::kOutdoor:
     case EnumType::kInside:
     case EnumType::kOutside:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementMediumEnum val)
 {
     using EnumType = detail::MeasurementMediumEnum;
@@ -261,13 +246,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementMedi
     case EnumType::kAir:
     case EnumType::kWater:
     case EnumType::kSoil:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementTypeEnum val)
 {
     using EnumType = detail::MeasurementTypeEnum;
@@ -290,13 +273,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementType
     case EnumType::kElectricalEnergy:
     case EnumType::kReactiveEnergy:
     case EnumType::kApparentEnergy:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTypeEnum val)
 {
     using EnumType = Globals::MeasurementTypeEnum;
@@ -320,13 +301,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTyp
     case EnumType::kReactiveEnergy:
     case EnumType::kApparentEnergy:
     case EnumType::kSoilMoisture:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
 {
     using EnumType = detail::MeasurementUnitEnum;
@@ -340,13 +319,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     case EnumType::kNgm3:
     case EnumType::kPm3:
     case EnumType::kBqm3:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag val)
 {
     using EnumType = Globals::PositionTag;
@@ -359,13 +336,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag va
     case EnumType::kMiddle:
     case EnumType::kRow:
     case EnumType::kColumn:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PowerThresholdSourceEnum val)
 {
     using EnumType = Globals::PowerThresholdSourceEnum;
@@ -374,13 +349,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PowerThreshold
     case EnumType::kContract:
     case EnumType::kRegulator:
     case EnumType::kEquipment:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifierTypeEnum val)
 {
     using EnumType = detail::ProductIdentifierTypeEnum;
@@ -391,13 +364,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
     case EnumType::kEan:
     case EnumType::kGtin14:
     case EnumType::kOem:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositionTag val)
 {
     using EnumType = Globals::RelativePositionTag;
@@ -410,13 +381,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
     case EnumType::kAbove:
     case EnumType::kFrontOf:
     case EnumType::kBehind:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamUsageEnum val)
 {
     using EnumType = detail::StreamUsageEnum;
@@ -426,13 +395,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamUsageEnum
     case EnumType::kRecording:
     case EnumType::kAnalysis:
     case EnumType::kLiveView:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TariffPriceTypeEnum val)
 {
     using EnumType = Globals::TariffPriceTypeEnum;
@@ -443,13 +410,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TariffPriceTyp
     case EnumType::kVirtual:
     case EnumType::kIncentive:
     case EnumType::kIncentiveSignal:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TariffUnitEnum val)
 {
     using EnumType = Globals::TariffUnitEnum;
@@ -457,13 +422,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TariffUnitEnum
     {
     case EnumType::kKWh:
     case EnumType::kKVAh:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum val)
 {
     using EnumType = Globals::TestGlobalEnum;
@@ -472,13 +435,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum
     case EnumType::kSomeValue:
     case EnumType::kSomeOtherValue:
     case EnumType::kFinalValue:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ThreeLevelAutoEnum val)
 {
     using EnumType = Globals::ThreeLevelAutoEnum;
@@ -488,13 +449,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ThreeLevelAuto
     case EnumType::kLow:
     case EnumType::kMedium:
     case EnumType::kHigh:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::WebRTCEndReasonEnum val)
 {
     using EnumType = detail::WebRTCEndReasonEnum;
@@ -512,13 +471,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::WebRTCEndReason
     case EnumType::kMediaTimeout:
     case EnumType::kLowPower:
     case EnumType::kUnknownReason:
-
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-
 } // namespace Clusters
 } // namespace app
 } // namespace chip
