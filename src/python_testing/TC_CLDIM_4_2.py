@@ -93,8 +93,8 @@ class TC_CLDIM_4_2(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=2,  # Invalid Direction
-                    NumberOfSteps=1
+                    direction=2,  # Invalid Direction
+                    numberOfSteps=1
                 ),
                 endpoint=endpoint
             )
@@ -110,9 +110,9 @@ class TC_CLDIM_4_2(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                        Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
-                        NumberOfSteps=1,
-                        Speed=4,  # Invalid Speed
+                        direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
+                        numberOfSteps=1,
+                        speed=4,  # Invalid Speed
                     ),
                     endpoint=endpoint
                 )
@@ -127,8 +127,8 @@ class TC_CLDIM_4_2(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
-                    NumberOfSteps=0
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
+                    numberOfSteps=0
                 ),
                 endpoint=endpoint
             )

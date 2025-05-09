@@ -162,15 +162,15 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("2e")
         if attributes.LimitRange.attribute_id in attribute_list:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
-            min_position = limit_range.Min
-            max_position = limit_range.Max
+            min_position = limit_range.min
+            max_position = limit_range.max
 
         # STEP 3a: Send Step command to increase position to MaxPosition
         self.step("3a")
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, NumberOfSteps=65535),
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=65535),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -185,21 +185,21 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-            asserts.assert_equal(current_state.Position, max_position, "CurrentState Position is not at MaxPosition")
+            asserts.assert_equal(current_state.position, max_position, "CurrentState Position is not at MaxPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
+                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
 
         # STEP 4a: Send Step command to decrease position by 2 steps
         self.step("4a")
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, NumberOfSteps=2),
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, numberOfSteps=2),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -210,14 +210,14 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             expected_position = max(max_position - 2 * step_value, min_position)
-            asserts.assert_equal(target.Position, expected_position, "Target Position is not updated correctly")
+            asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(target.Speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.Speed, 3, "Target Speed is outside allowed range")
+                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
+                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
 
         # STEP 4c: Wait for PIXIT.CLDIM.StepMotionDuration * 2 seconds
         self.step("4c")
@@ -228,21 +228,21 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
             expected_position = max(max_position - 2 * step_value, min_position)
-            asserts.assert_equal(current_state.Position, expected_position, "CurrentState Position is not updated correctly")
+            asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
+                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
 
         # STEP 4e: Send Step command to increase position by 2 steps
         self.step("4e")
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, NumberOfSteps=2),
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=2),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -252,14 +252,14 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("4f")
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            asserts.assert_equal(target.Position, max_position, "Target Position is not updated correctly")
+            asserts.assert_equal(target.position, max_position, "Target Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(target.Speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.Speed, 3, "Target Speed is outside allowed range")
+                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
+                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
 
         # STEP 4g: Wait for PIXIT.CLDIM.StepMotionDuration * 2 seconds
         self.step("4g")
@@ -269,14 +269,14 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("4h")
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            asserts.assert_equal(current_state.Position, max_position, "CurrentState Position is not updated correctly")
+            asserts.assert_equal(current_state.position, max_position, "CurrentState Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
+                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
 
         # STEP 5a: If Speed Feature is not supported, skip step 5b to 5e
         self.step("5a")
@@ -292,9 +292,9 @@ class TC_CLDIM_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    NumberOfSteps=1,
-                    Speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
+                    numberOfSteps=1,
+                    speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh
                 ),
                 endpoint=endpoint
             )
@@ -306,12 +306,12 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             expected_position = max_position - step_value
-            asserts.assert_equal(target.Position, expected_position, "Target Position is not updated correctly")
+            asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
-            asserts.assert_equal(target.Speed, 3, "Target Speed is not High")
+            asserts.assert_equal(target.speed, 3, "Target Speed is not High")
 
         # STEP 5d: Wait for PIXIT.CLDIM.StepMotionDuration seconds
         self.step("5d")
@@ -322,12 +322,12 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
             expected_position = max_position - step_value
-            asserts.assert_equal(current_state.Position, expected_position, "CurrentState Position is not updated correctly")
+            asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
-            asserts.assert_equal(current_state.Speed, 3, "CurrentState Speed is not High")
+            asserts.assert_equal(current_state.speed, 3, "CurrentState Speed is not High")
 
         # STEP 6a: If Speed Feature is not supported, skip step 6b to 6e
         self.step("6a")
@@ -343,9 +343,9 @@ class TC_CLDIM_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
-                    NumberOfSteps=1,
-                    Speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
+                    numberOfSteps=1,
+                    speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto
                 ),
                 endpoint=endpoint
             )
@@ -357,12 +357,12 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             expected_position = max_position
-            asserts.assert_equal(target.Position, expected_position, "Target Position is not updated correctly")
+            asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
-            asserts.assert_equal(target.Speed, 0, "Target Speed is not Auto")
+            asserts.assert_equal(target.speed, 0, "Target Speed is not Auto")
 
         # STEP 6d: Wait for PIXIT.CLDIM.StepMotionDuration seconds
         self.step("6d")
@@ -373,12 +373,12 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
             expected_position = max_position
-            asserts.assert_equal(current_state.Position, expected_position, "CurrentState Position is not updated correctly")
+            asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
-            asserts.assert_equal(current_state.Speed, 0, "CurrentState Speed is not Auto")
+            asserts.assert_equal(current_state.speed, 0, "CurrentState Speed is not Auto")
 
         # STEP 7a: Send Step command to decrease position by 1 step
         self.step("7a")
@@ -386,8 +386,8 @@ class TC_CLDIM_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    NumberOfSteps=1
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
+                    numberOfSteps=1
                 ),
                 endpoint=endpoint
             )
@@ -400,8 +400,8 @@ class TC_CLDIM_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    NumberOfSteps=1
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
+                    numberOfSteps=1
                 ),
                 endpoint=endpoint
             )
@@ -414,8 +414,8 @@ class TC_CLDIM_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    NumberOfSteps=1
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
+                    numberOfSteps=1
                 ),
                 endpoint=endpoint
             )
@@ -427,14 +427,14 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             expected_position = max(max_position - 3 * step_value, min_position)
-            asserts.assert_equal(target.Position, expected_position, "Target Position is not updated correctly")
+            asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(target.Speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.Speed, 3, "Target Speed is outside allowed range")
+                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
+                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
 
         # STEP 7e: Wait for PIXIT.CLDIM.StepMotionDuration * 3 seconds
         self.step("7e")
@@ -445,22 +445,22 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
             expected_position = max(max_position - 3 * step_value, min_position)
-            asserts.assert_equal(current_state.Position, expected_position, "CurrentState Position is not updated correctly")
+            asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
+                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
 
         # STEP 8a: Send Step command to decrease position beyond MinPosition
         self.step("8a")
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    NumberOfSteps=65535
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
+                    numberOfSteps=65535
                 ),
                 endpoint=endpoint
             )
@@ -471,14 +471,14 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("8b")
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            asserts.assert_equal(target.Position, min_position, "Target Position is not at MinPosition")
+            asserts.assert_equal(target.position, min_position, "Target Position is not at MinPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(target.Speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.Speed, 3, "Target Speed is outside allowed range")
+                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
+                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
 
         # STEP 8c: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("8c")
@@ -488,22 +488,22 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("8d")
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            asserts.assert_equal(current_state.Position, min_position, "CurrentState Position is not at MinPosition")
+            asserts.assert_equal(current_state.position, min_position, "CurrentState Position is not at MinPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
+                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
 
         # STEP 8e: Send Step command to increase position beyond MaxPosition
         self.step("8e")
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    Direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
-                    NumberOfSteps=65535
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
+                    numberOfSteps=65535
                 ),
                 endpoint=endpoint
             )
@@ -514,14 +514,14 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("8f")
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            asserts.assert_equal(target.Position, max_position, "Target Position is not at MaxPosition")
+            asserts.assert_equal(target.position, max_position, "Target Position is not at MaxPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(target.Latch, False, "Target Latch is not False")
+                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(target.Speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.Speed, 3, "Target Speed is outside allowed range")
+                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
+                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
 
         # STEP 8g: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("8g")
@@ -531,14 +531,14 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("8h")
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            asserts.assert_equal(current_state.Position, max_position, "CurrentState Position is not at MaxPosition")
+            asserts.assert_equal(current_state.position, max_position, "CurrentState Position is not at MaxPosition")
 
             if is_latching_supported:
-                asserts.assert_equal(current_state.Latch, False, "CurrentState Latch is not False")
+                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
             if is_speed_supported:
-                asserts.assert_greater_equal(current_state.Speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.Speed, 3, "CurrentState Speed is outside allowed range")
+                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
+                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
 
 
 if __name__ == "__main__":
