@@ -5,7 +5,7 @@ runs:
   steps:
     - name: Set up IPV6
       if: ${{ runner.os == 'Linux' }}
-      shell: /bin/bash
+      shell: bash
       run: |
          ip netns add peer
 
