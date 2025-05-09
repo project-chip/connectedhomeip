@@ -210,7 +210,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     ReturnErrorOnFailure(GetMinutesPastMidnight(minutesPastMidnightNow_m));
 
     uint32_t now_epoch_s = 0;
-    ReturnErrorOnFailure(GetEpochTS(now_epoch_s));
+    ReturnErrorOnFailure(System::Clock::GetClock_MatterEpochS(now_epoch_s));
 
     DataModel::Nullable<uint32_t> startTime_epoch_s;
     DataModel::Nullable<uint32_t> targetTime_epoch_s;
@@ -448,7 +448,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
 
     // Get current timestamp
     uint32_t currentTimestamp;
-    CHIP_ERROR err = GetEpochTS(currentTimestamp);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
     if (err == CHIP_NO_ERROR)
     {
         // use EpochTS
@@ -457,7 +457,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
     }
     else
     {
-        ChipLogError(AppServer, "GetEpochTS returned error getting timestamp %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "GetClock_MatterEpochS returned error getting timestamp %" CHIP_ERROR_FORMAT, err.Format());
 
         // use systemTime as a fallback
         System::Clock::Milliseconds64 system_time_ms =
@@ -521,7 +521,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
 
     // Get current timestamp
     uint32_t currentTimestamp;
-    CHIP_ERROR err = GetEpochTS(currentTimestamp);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
     if (err == CHIP_NO_ERROR)
     {
         // use EpochTS
@@ -530,7 +530,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
     }
     else
     {
-        ChipLogError(AppServer, "GetEpochTS returned error getting timestamp");
+        ChipLogError(AppServer, "GetClock_MatterEpochS returned error getting timestamp");
 
         // use systemTime as a fallback
         System::Clock::Milliseconds64 system_time_ms =
