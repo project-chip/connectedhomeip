@@ -682,7 +682,10 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
         }
         else
         {
-            err = encoder.Encode(*(uint64_t *) extAddress->m8);
+            // This attribute's value is composed by taking the 8 octets of the extended address EUI-64 and
+            // treating them as a big-endian integer.
+            static_assert(sizeof(extAddress->m8) == sizeof(uint64_t), "Unexpected buffer size");
+            err = encoder.Encode(Encoding::BigEndian::Get64(extAddress->m8));
         }
     }
     break;
