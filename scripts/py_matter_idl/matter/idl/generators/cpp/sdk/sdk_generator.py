@@ -126,8 +126,8 @@ def remove_acronyms_from_enum_constant(s: str) -> str:
     This function undoes that to be compatible with C++ codegen.
     """
     result = ""
-    for (c, prev) in zip(s, 'l' + s):
-        if c.isupper() and prev.isupper():
+    for (c, before, after) in zip(s, 'l' + s, s[1:] + 'U'):
+        if c.isupper() and before.isupper() and after.isupper():
             result += c.lower()
         else:
             result += c
