@@ -258,6 +258,14 @@
 #include <clusters/IlluminanceMeasurement/Commands.ipp>
 #include <clusters/IlluminanceMeasurement/Events.ipp>
 #include <clusters/IlluminanceMeasurement/Structs.ipp>
+#include <clusters/JointFabricAdministrator/Attributes.ipp>
+#include <clusters/JointFabricAdministrator/Commands.ipp>
+#include <clusters/JointFabricAdministrator/Events.ipp>
+#include <clusters/JointFabricAdministrator/Structs.ipp>
+#include <clusters/JointFabricDatastore/Attributes.ipp>
+#include <clusters/JointFabricDatastore/Commands.ipp>
+#include <clusters/JointFabricDatastore/Events.ipp>
+#include <clusters/JointFabricDatastore/Structs.ipp>
 #include <clusters/KeypadInput/Attributes.ipp>
 #include <clusters/KeypadInput/Commands.ipp>
 #include <clusters/KeypadInput/Events.ipp>
@@ -1333,6 +1341,60 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::CommissionerControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::JointFabricDatastore::Id: {
+        switch (aCommand)
+        {
+        case Clusters::JointFabricDatastore::Commands::AddKeySet::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::UpdateKeySet::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::RemoveKeySet::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::AddGroup::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::UpdateGroup::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::RemoveGroup::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::AddAdmin::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::UpdateAdmin::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::RemoveAdmin::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::AddPendingNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::RefreshNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::UpdateNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::RemoveNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::UpdateEndpointForNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::AddGroupIDToEndpointForNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::RemoveGroupIDFromEndpointForNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::AddBindingToEndpointForNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::RemoveBindingFromEndpointForNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::AddACLToNode::Id:
+            return true;
+        case Clusters::JointFabricDatastore::Commands::RemoveACLFromNode::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::JointFabricAdministrator::Id: {
         switch (aCommand)
         {
         default:

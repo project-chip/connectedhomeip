@@ -12,16 +12,12 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 namespace Attributes {
-namespace SupportedContainerFormats {
+namespace SupportedFormats {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedContainerFormats
-
-namespace SupportedIngestMethods {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace SupportedIngestMethods
+} // namespace SupportedFormats
 
 namespace CurrentConnections {
-inline constexpr AttributeId Id = 0x00000002;
+inline constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentConnections
 
 namespace GeneratedCommandList {

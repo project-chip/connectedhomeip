@@ -864,7 +864,7 @@ cluster AccessControl = 31 {
 
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
 cluster Actions = 37 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ActionErrorEnum : enum8 {
     kUnknown = 0;
@@ -911,7 +911,7 @@ cluster Actions = 37 {
 
   struct ActionStruct {
     int16u actionID = 0;
-    char_string<32> name = 1;
+    char_string<128> name = 1;
     ActionTypeEnum type = 2;
     int16u endpointListID = 3;
     CommandBits supportedCommands = 4;
@@ -920,7 +920,7 @@ cluster Actions = 37 {
 
   struct EndpointListStruct {
     int16u endpointListID = 0;
-    char_string<32> name = 1;
+    char_string<128> name = 1;
     EndpointListTypeEnum type = 2;
     endpoint_no endpoints[] = 3;
   }
@@ -1012,29 +1012,29 @@ cluster Actions = 37 {
     int32u duration = 2;
   }
 
-  /** This command triggers an action (state change) on the involved endpoints. */
+  /** This command is used to trigger an instantaneous action. */
   command InstantAction(InstantActionRequest): DefaultSuccess = 0;
-  /** This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current state to the new state. */
+  /** This command is used to trigger an instantaneous action with a transition over a given time. */
   command InstantActionWithTransition(InstantActionWithTransitionRequest): DefaultSuccess = 1;
-  /** This command triggers the commencement of an action on the involved endpoints. */
+  /** This command is used to trigger the commencement of an action. */
   command StartAction(StartActionRequest): DefaultSuccess = 2;
-  /** This command triggers the commencement of an action (with a duration) on the involved endpoints. */
+  /** This command is used to trigger the commencement of an action with a duration. */
   command StartActionWithDuration(StartActionWithDurationRequest): DefaultSuccess = 3;
-  /** This command stops the ongoing action on the involved endpoints. */
+  /** This command is used to stop an action. */
   command StopAction(StopActionRequest): DefaultSuccess = 4;
-  /** This command pauses an ongoing action. */
+  /** This command is used to pause an action. */
   command PauseAction(PauseActionRequest): DefaultSuccess = 5;
-  /** This command pauses an ongoing action with a duration. */
+  /** This command is used to pause an action with a duration. */
   command PauseActionWithDuration(PauseActionWithDurationRequest): DefaultSuccess = 6;
-  /** This command resumes a previously paused action. */
+  /** This command is used to resume an action. */
   command ResumeAction(ResumeActionRequest): DefaultSuccess = 7;
-  /** This command enables a certain action or automation. */
+  /** This command is used to enable an action. */
   command EnableAction(EnableActionRequest): DefaultSuccess = 8;
-  /** This command enables a certain action or automation with a duration. */
+  /** This command is used to enable an action with a duration. */
   command EnableActionWithDuration(EnableActionWithDurationRequest): DefaultSuccess = 9;
-  /** This command disables a certain action or automation. */
+  /** This command is used to disable an action. */
   command DisableAction(DisableActionRequest): DefaultSuccess = 10;
-  /** This command disables a certain action or automation with a duration. */
+  /** This command is used to disable an action with a duration. */
   command DisableActionWithDuration(DisableActionWithDurationRequest): DefaultSuccess = 11;
 }
 
@@ -7017,6 +7017,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kOnScreenDisplay = 0x80;
     kLocalStorage = 0x100;
     kHighDynamicRange = 0x200;
+    kNightVision = 0x400;
   }
 
   struct VideoResolutionStruct {
@@ -7051,6 +7052,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int8u referenceCount = 6;
     boolean encodedPixels = 7;
     boolean hardwareEncoder = 8;
+    optional boolean watermarkEnabled = 9;
+    optional boolean OSDEnabled = 10;
   }
 
   struct SnapshotCapabilitiesStruct {
@@ -7102,7 +7105,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
-  readonly attribute optional boolean nightVisionCapable = 3;
+  readonly attribute optional boolean nightVisionUsesInfrared = 3;
   readonly attribute optional VideoResolutionStruct minViewport = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
   readonly attribute int32u maxContentBufferSize = 6;
