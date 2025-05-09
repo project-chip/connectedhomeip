@@ -23,14 +23,10 @@
 #include <app/util/config.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-// #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
-
 namespace chef {
 namespace pump {
 
-// #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 void postMoveToLevel(chip::EndpointId endpoint, uint8_t level);
-// #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
 
 void postOnOff(chip::EndpointId endpoint, bool value);
 
@@ -38,5 +34,3 @@ void Init();
 
 } // namespace pump
 } // namespace chef
-
-// #endif // MATTER_DM_PLUGIN_ON_OFF_SERVER

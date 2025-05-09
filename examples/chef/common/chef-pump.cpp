@@ -33,6 +33,8 @@ using chip::Protocols::InteractionModel::Status;
 namespace chef {
 namespace pump {
 
+namespace {
+
 constexpr size_t kTemperatureMeasurementCount = MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT;
 DataModel::Nullable<int16_t> TemperatureRangeMin[kTemperatureMeasurementCount];
 DataModel::Nullable<int16_t> TemperatureRangeMax[kTemperatureMeasurementCount];
@@ -152,6 +154,7 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
         MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
     }
 }
+} // namespace
 
 /**
  * @brief Post moveToLevel handler. Updates all setpoint values to match current level.
