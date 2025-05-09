@@ -42,6 +42,8 @@ uint16_t getIndexTemperatureMeasurement(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, TemperatureMeasurement::Id, kTemperatureMeasurementCount);
 }
+int16_t kDefaultMinTemperature = -2500;
+int16_t kDefaultMaxTemperature = 40000;
 
 constexpr size_t kPressureMeasurementCount = MATTER_DM_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT;
 DataModel::Nullable<int16_t> PressureRangeMin[kPressureMeasurementCount];
@@ -50,6 +52,8 @@ uint16_t getIndexPressureMeasurement(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, PressureMeasurement::Id, kPressureMeasurementCount);
 }
+int16_t kDefaultMinPressure = 30;
+int16_t kDefaultMaxPressure = 10000;
 
 constexpr size_t kFlowMeasurementCount = MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT;
 DataModel::Nullable<uint16_t> FlowRangeMin[kFlowMeasurementCount];
@@ -58,6 +62,8 @@ uint16_t getIndexFlowMeasurement(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, FlowMeasurement::Id, kFlowMeasurementCount);
 }
+uint16_t kDefaultMinFlow = 30;
+uint16_t kDefaultMaxFlow = 10000;
 
 /**
  * @brief Sets all setpoints to Max if state is On else NULL.
@@ -236,13 +242,13 @@ void Init()
                     Status::Success ||
                 TemperatureRangeMin[epIndex].IsNull())
             {
-                TemperatureRangeMin[epIndex].SetNonNull(-2500);
+                TemperatureRangeMin[epIndex].SetNonNull(kDefaultMinTemperature);
             }
             if (TemperatureMeasurement::Attributes::MaxMeasuredValue::Get(endpointId, TemperatureRangeMax[epIndex]) !=
                     Status::Success ||
                 TemperatureRangeMax[epIndex].IsNull())
             {
-                TemperatureRangeMax[epIndex].SetNonNull(40000);
+                TemperatureRangeMax[epIndex].SetNonNull(kDefaultMaxTemperature);
             }
         }
 
@@ -254,12 +260,12 @@ void Init()
             if (PressureMeasurement::Attributes::MinMeasuredValue::Get(endpointId, PressureRangeMin[epIndex]) != Status::Success ||
                 PressureRangeMin[epIndex].IsNull())
             {
-                PressureRangeMin[epIndex].SetNonNull(30);
+                PressureRangeMin[epIndex].SetNonNull(kDefaultMinPressure);
             }
             if (PressureMeasurement::Attributes::MaxMeasuredValue::Get(endpointId, PressureRangeMax[epIndex]) != Status::Success ||
                 PressureRangeMax[epIndex].IsNull())
             {
-                PressureRangeMax[epIndex].SetNonNull(10000);
+                PressureRangeMax[epIndex].SetNonNull(kDefaultMaxPressure);
             }
         }
 
@@ -271,12 +277,12 @@ void Init()
             if (FlowMeasurement::Attributes::MinMeasuredValue::Get(endpointId, FlowRangeMin[epIndex]) != Status::Success ||
                 FlowRangeMin[epIndex].IsNull())
             {
-                FlowRangeMin[epIndex].SetNonNull(30);
+                FlowRangeMin[epIndex].SetNonNull(kDefaultMinFlow);
             }
             if (FlowMeasurement::Attributes::MaxMeasuredValue::Get(endpointId, FlowRangeMax[epIndex]) != Status::Success ||
                 FlowRangeMax[epIndex].IsNull())
             {
-                FlowRangeMax[epIndex].SetNonNull(10000);
+                FlowRangeMax[epIndex].SetNonNull(kDefaultMaxFlow);
             }
         }
 
