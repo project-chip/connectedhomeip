@@ -1,0 +1,29 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Generated based on {{input_name}}
+//
+#include <clusters/shared/Enums.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+{% for item in items %}
+static auto __attribute__((unused)) EnsureKnownEnumValue({{item.namespace}}::{{item.enum.name}} val)
+{
+    using EnumType = {{item.namespace}}::{{item.enum.name}};
+    switch (val)
+    {
+    {% for entry in item.enum.entries %}
+        case EnumType::{{entry.name}}:
+    {% endfor %}
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+{% endfor %}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

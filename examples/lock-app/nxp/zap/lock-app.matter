@@ -54,7 +54,7 @@ enum AreaTypeTag : enum8 {
   kLibrary = 51;
   kLivingRoom = 52;
   kLounge = 53;
-  kMediaTVRoom = 54;
+  kMediaTvRoom = 54;
   kMudRoom = 55;
   kMusicRoom = 56;
   kNursery = 57;
@@ -386,8 +386,8 @@ cluster AccessControl = 31 {
   revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
-    kPASE = 1;
-    kCASE = 2;
+    kPase = 1;
+    kCase = 2;
     kGroup = 3;
   }
 
@@ -614,7 +614,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   enum DownloadProtocolEnum : enum8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
-    kHTTPS = 2;
+    kHttps = 2;
     kVendorSpecific = 3;
   }
 
@@ -777,7 +777,7 @@ cluster GeneralCommissioning = 48 {
   revision 1; // NOTE: Default/not specifically set
 
   enum CommissioningErrorEnum : enum8 {
-    kOK = 0;
+    kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -885,12 +885,12 @@ cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : enum8 {
-    k2G4 = 0;
-    k3G65 = 1;
-    k5G = 2;
-    k6G = 3;
-    k60G = 4;
-    k1G = 5;
+    k2g4 = 0;
+    k3g65 = 1;
+    k5g = 2;
+    k6g = 3;
+    k60g = 4;
+    k1g = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -1064,7 +1064,7 @@ cluster DiagnosticLogs = 50 {
 
   enum TransferProtocolEnum : enum8 {
     kResponsePayload = 0;
-    kBDX = 1;
+    kBdx = 1;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1280,7 +1280,7 @@ cluster ThreadNetworkDiagnostics = 53 {
     kUnassigned = 1;
     kSleepyEndDevice = 2;
     kEndDevice = 3;
-    kREED = 4;
+    kReed = 4;
     kRouter = 5;
     kLeader = 6;
   }
@@ -1487,7 +1487,7 @@ cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : enum8 {
-    kOK = 0;
+    kOk = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1714,8 +1714,8 @@ cluster IcdManagement = 70 {
   }
 
   enum OperatingModeEnum : enum8 {
-    kSIT = 0;
-    kLIT = 1;
+    kSit = 0;
+    kLit = 1;
   }
 
   bitmap Feature : bitmap32 {
@@ -1825,8 +1825,8 @@ cluster DoorLock = 257 {
 
   enum CredentialTypeEnum : enum8 {
     kProgrammingPIN = 0;
-    kPIN = 1;
-    kRFID = 2;
+    kPin = 1;
+    kRfid = 2;
     kFingerprint = 3;
     kFingerVein = 4;
     kFace = 5;
@@ -1940,8 +1940,8 @@ cluster DoorLock = 257 {
     kWeekDaySchedule = 3;
     kYearDaySchedule = 4;
     kHolidaySchedule = 5;
-    kPIN = 6;
-    kRFID = 7;
+    kPin = 6;
+    kRfid = 7;
     kFingerprint = 8;
     kFingerVein = 9;
     kFace = 10;
@@ -1983,7 +1983,7 @@ cluster DoorLock = 257 {
     kButton = 5;
     kSchedule = 6;
     kRemote = 7;
-    kRFID = 8;
+    kRfid = 8;
     kBiometric = 9;
     kAliro = 10;
   }

@@ -13,11 +13,12 @@
 # limitations under the License.
 #
 import os
+from dataclasses import dataclass
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.storage import GeneratorStorage
-from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, FieldQuality, Idl,
-                                         Struct)
+from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, Enum, FieldQuality,
+                                         Idl, Struct)
 
 
 def as_privilege(privilege: AccessPrivilege) -> str:
@@ -85,6 +86,36 @@ def response_struct(s: Struct) -> bool:
     return s.code is not None
 
 
+@dataclass
+class EnumEntry:
+    namespace: str
+    enum: Enum
+
+
+def extract_shared_enums(idl: Idl) -> list[EnumEntry]:
+    """
+    Retunrs global/shared enumerations, distinguished by namespace
+    """
+    result = []
+    for g in idl.global_enums:
+        result.append(EnumEntry(namespace="Globals", enum=g))
+
+    # shared enums are unique by name
+    found_enums = set()
+    for c in idl.clusters:
+        for e in c.enums:
+            if not e.is_shared:
+                continue
+            if e.name in found_enums:
+                continue
+
+            result.append(EnumEntry(namespace="detail", enum=e))
+
+    result.sort(key=lambda e: (e.enum.name, e.namespace))
+
+    return result
+
+
 class SdkGenerator(CodeGenerator):
     """
     Generation of cpp code for application implementation for matter.
@@ -113,6 +144,16 @@ class SdkGenerator(CodeGenerator):
             output_file_name="BUILD.gn",
             vars={
                 "clusters": self.idl.clusters,
+                "input_name": self.idl.parse_file_name,
+            },
+        )
+
+        # render shared ...
+        self.internal_render_one_output(
+            template_path="SharedEnumsCheck.jinja",
+            output_file_name="shared/EnumsCheck.h",
+            vars={
+                "items": extract_shared_enums(self.idl),
                 "input_name": self.idl.parse_file_name,
             },
         )

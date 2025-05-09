@@ -2,7 +2,7 @@
 {{#if has_no_clusters}}
 enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
   {{#zcl_enum_items}}
-  k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
+  k{{asUpperCamelCase label}} = {{value}};
   {{/zcl_enum_items}}
 }
 
