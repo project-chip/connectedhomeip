@@ -1600,7 +1600,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
-    
+
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     DataModel::Nullable<GenericTargetStruct> target;
     GenericTargetStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
