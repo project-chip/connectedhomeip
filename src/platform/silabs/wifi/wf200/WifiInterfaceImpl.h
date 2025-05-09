@@ -129,6 +129,13 @@ private:
      *        Once the processing function is reworked, it won't be necessary anymore
      */
     bool HasNotifiedIPv4() { return mHasNotifiedIPv4; }
+
+    /**
+     * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
+     *
+     * @param[in] ip New IPv4 address
+     */
+    void GotIPv4Address(uint32_t ip);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
 
     /**
