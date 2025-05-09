@@ -35,7 +35,6 @@ chip_all_cluster_id_targets = [
   "${chip_root}/zzz_generated/app-common/clusters/ContentAppObserver:ids",
   "${chip_root}/zzz_generated/app-common/clusters/ContentControl:ids",
   "${chip_root}/zzz_generated/app-common/clusters/ContentLauncher:ids",
-  "${chip_root}/zzz_generated/app-common/clusters/DemandResponseLoadControl:ids",
   "${chip_root}/zzz_generated/app-common/clusters/Descriptor:ids",
   "${chip_root}/zzz_generated/app-common/clusters/DeviceEnergyManagement:ids",
   "${chip_root}/zzz_generated/app-common/clusters/DeviceEnergyManagementMode:ids",
