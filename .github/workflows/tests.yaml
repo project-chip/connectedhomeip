@@ -583,6 +583,9 @@ jobs:
                       build \
                       --copy-artifacts-to objdir-clone \
                    "
+                  # TODO: ipynb HARD CODES paths to all-clusters app. create a symlink to them
+                  ln -s out/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test out/linux-x64-all-clusters
+
                   scripts/run_in_python_env.sh out/venv \
                   "jupyter execute docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb \
                   docs/development_controllers/chip-repl/Matter_Basic_Interactions.ipynb \
