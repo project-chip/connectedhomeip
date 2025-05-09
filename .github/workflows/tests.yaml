@@ -479,8 +479,11 @@ jobs:
 
         container:
             image: ghcr.io/project-chip/chip-build:129
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
+            options:
+               --privileged
+               --sysctl net.ipv6.conf.all.disable_ipv6=0
+               --sysctl net.ipv4.conf.all.forwarding=0
+               --sysctl net.ipv6.conf.all.forwarding=0
 
         steps:
             - name: Checkout
@@ -498,10 +501,7 @@ jobs:
                   mkdir objdir-clone || true
 
             - name: Set up a IPV6 known envionment
-              run: |
-                  ip link add name veth0 type veth peer name veth1
-                  ip -6 addr add fd00:0:1:1::1/64 dev veth0
-                  ip link set dev veth0 up
+              uses: ./.github/actions/add-ipv6
 
             - name: Build Python REPL and example apps
               #  TODO: build variants seem to DIFFER and they should be updated to be consistent:
@@ -576,7 +576,7 @@ jobs:
               run: |
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --keep-going'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
                   scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app"
 
             - name: Execute Jupyter Notebooks
