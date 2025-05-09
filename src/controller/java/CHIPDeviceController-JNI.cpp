@@ -1332,6 +1332,19 @@ JNI_METHOD(void, unpairDeviceCallback)(JNIEnv * env, jobject self, jlong handle,
     }
 }
 
+// Method used in case of NFC-based Commissioning without power
+// At end of 1st commissioning phase, the user is asked to install and power ON the device.
+// Present function is used to confirm that this action has been done.
+JNI_METHOD(void, deviceReadyForSecondCommissioningPhase)(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "(JNI) deviceReadyForSecondCommissioningPhase()");
+
+    wrapper->Controller()->DeviceReadyForSecondCommissioningPhase();
+}
+
 JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
