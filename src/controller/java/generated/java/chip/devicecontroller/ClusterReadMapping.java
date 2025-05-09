@@ -18722,17 +18722,6 @@ public class ClusterReadMapping {
           readJointFabricDatastoreAcceptedCommandListCommandParams
         );
         result.put("readAcceptedCommandListAttribute", readJointFabricDatastoreAcceptedCommandListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readJointFabricDatastoreEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readJointFabricDatastoreEventListAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.JointFabricDatastoreCluster) cluster).readEventListAttribute(
-              (ChipClusters.JointFabricDatastoreCluster.EventListAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedJointFabricDatastoreClusterEventListAttributeCallback(),
-          readJointFabricDatastoreEventListCommandParams
-        );
-        result.put("readEventListAttribute", readJointFabricDatastoreEventListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readJointFabricDatastoreAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readJointFabricDatastoreAttributeListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18803,17 +18792,6 @@ public class ClusterReadMapping {
           readJointFabricAdministratorAcceptedCommandListCommandParams
         );
         result.put("readAcceptedCommandListAttribute", readJointFabricAdministratorAcceptedCommandListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readJointFabricAdministratorEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readJointFabricAdministratorEventListAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.JointFabricAdministratorCluster) cluster).readEventListAttribute(
-              (ChipClusters.JointFabricAdministratorCluster.EventListAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedJointFabricAdministratorClusterEventListAttributeCallback(),
-          readJointFabricAdministratorEventListCommandParams
-        );
-        result.put("readEventListAttribute", readJointFabricAdministratorEventListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readJointFabricAdministratorAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readJointFabricAdministratorAttributeListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

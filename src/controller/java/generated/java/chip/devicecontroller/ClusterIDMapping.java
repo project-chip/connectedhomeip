@@ -19100,7 +19100,6 @@ public class ClusterIDMapping {
             NodeEndpointList(13L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -19561,7 +19560,6 @@ public class ClusterIDMapping {
             AdministratorFabricIndex(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
