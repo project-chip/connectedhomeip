@@ -118,10 +118,10 @@ class TC_CLDIM_4_1(MatterBaseTest):
         step_motion_duration = self.matter_test_config.global_test_params['PIXIT.CLDIM.StepMotionDuration']
 
         if full_motion_duration <= 0:
-            asserts.fail("PIXIT.CLDIM.LatchingDuration must be greater than 0")
+            asserts.fail("PIXIT.CLDIM.FullMotionDuration must be greater than 0")
 
         if step_motion_duration <= 0:
-            asserts.fail("PIXIT.CLDIM.LatchingDuration must be greater than 0")
+            asserts.fail("PIXIT.CLDIM.StepMotionDuration must be greater than 0")
 
         endpoint = self.get_endpoint(default=1)
 
