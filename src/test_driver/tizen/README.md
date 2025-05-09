@@ -72,3 +72,26 @@ Then, use the run command and add the `rootshell` keyword to kernel arguments
 passed to QEMU (the string after the `-append` option). This will run QEMU, but
 instead of running the test, it will drop you to the shell. From there, you can
 run the test manually by typing `/mnt/chip/runner.sh`.
+
+## Analyzing core dumps
+
+In order for GDB to work correctly, same sysroot as is present on QEMU must be
+provided.
+
+-   Create sysroot directory
+-   Mount `/opt/tizen-sdk/iot-rootfs.img`
+-   Copy `/usr` from the mounted image to your sysroot directory
+-   Fix potentially broken symlinks in the libraries as needed
+
+Core dumps are generated in the `dump` directory as a zip archive file. After
+extracting it the core dump should be extracted from tar archive file.
+
+Set GDB config
+
+```
+set auto-load safe-path /
+set sysroot /path/to/sysroot/
+```
+
+And then run `gdb-multiarch` specifying `.coredump` file extracted before, your
+GDB config file if present and lastly the executable.
