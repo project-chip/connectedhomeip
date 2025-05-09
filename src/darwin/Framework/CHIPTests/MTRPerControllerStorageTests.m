@@ -2654,7 +2654,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                     MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeGlobalAttributeClusterRevisionID),
                                     // Would be nice if we could get the Descriptor cluster revision
                                     // from somewhere intead of hardcoding it...
-                                    MTRDataKey : unsignedIntValue(2),
+                                    MTRDataKey : unsignedIntValue(3),
                                 },
                                 @{
                                     MTRAttributePathKey : globalAttributePath(@(MTRClusterIDTypeDescriptorID), MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID),
