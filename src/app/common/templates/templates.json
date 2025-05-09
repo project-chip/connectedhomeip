@@ -105,11 +105,6 @@
             "output": "../../clusters/shared/Enums.h"
         },
         {
-            "path": "../../zap-templates/templates/app/shared-cluster-enums-check.zapt",
-            "name": "Shared enumeration check header",
-            "output": "../../clusters/shared/EnumsCheck.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/shared-cluster-structs.zapt",
             "name": "Shared/global structures",
             "output": "../../clusters/shared/Structs.h"
