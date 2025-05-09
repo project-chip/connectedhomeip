@@ -95,9 +95,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fabricIndex);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -157,9 +154,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
             err = DataModel::Decode(reader, fabricIndex);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

@@ -64,9 +64,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, tariffComponentID);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -120,9 +117,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kComponents))
         {
             err = DataModel::Decode(reader, components);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

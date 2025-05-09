@@ -65,6 +65,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeepActive::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
     uint32_t timeoutMs          = static_cast<uint32_t>(0);
@@ -81,9 +82,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::KeepActive::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
     uint32_t timeoutMs          = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeepActive

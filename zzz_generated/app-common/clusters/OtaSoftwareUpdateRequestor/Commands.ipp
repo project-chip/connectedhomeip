@@ -28,6 +28,7 @@ namespace Clusters {
 namespace OtaSoftwareUpdateRequestor {
 namespace Commands {
 namespace AnnounceOTAProvider {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -68,9 +69,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
             err = DataModel::Decode(reader, endpoint);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

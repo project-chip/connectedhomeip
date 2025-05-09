@@ -68,6 +68,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -81,6 +82,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -97,6 +99,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan passphrase;
 
@@ -112,8 +115,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan passphrase;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NetworkPassphraseResponse

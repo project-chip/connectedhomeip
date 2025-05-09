@@ -54,9 +54,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, measurement);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -135,9 +132,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMaxSystime))
         {
             err = DataModel::Decode(reader, maxSystime);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

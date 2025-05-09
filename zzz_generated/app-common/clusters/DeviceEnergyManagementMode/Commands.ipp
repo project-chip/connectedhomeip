@@ -28,6 +28,7 @@ namespace Clusters {
 namespace DeviceEnergyManagementMode {
 namespace Commands {
 namespace ChangeToMode {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -49,15 +50,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToMode.
 namespace ChangeToModeResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -83,9 +82,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kStatusText))
         {
             err = DataModel::Decode(reader, statusText);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

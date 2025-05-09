@@ -54,9 +54,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, peakPeriod);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -90,9 +87,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kRequiredState))
         {
             err = DataModel::Decode(reader, requiredState);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -132,9 +126,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPriceLevel))
         {
             err = DataModel::Decode(reader, priceLevel);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -205,9 +196,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, predicted);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -241,9 +229,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kDayPatternIDs))
         {
             err = DataModel::Decode(reader, dayPatternIDs);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -294,9 +279,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, randomizationType);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -336,9 +318,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, dayEntryIDs);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -377,9 +356,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kDayEntryIDs))
         {
             err = DataModel::Decode(reader, dayEntryIDs);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -425,9 +401,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, blockMode);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -466,9 +439,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kTariffComponentIDs))
         {
             err = DataModel::Decode(reader, tariffComponentIDs);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

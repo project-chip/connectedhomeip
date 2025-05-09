@@ -88,6 +88,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Off::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -101,6 +102,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Off::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -116,6 +118,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::On::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -129,6 +132,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::On::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -144,6 +148,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Toggle::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -157,6 +162,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Toggle::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -174,6 +180,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     EffectIdentifierEnum effectIdentifier = static_cast<EffectIdentifierEnum>(0);
     uint8_t effectVariant                 = static_cast<uint8_t>(0);
@@ -190,9 +197,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     EffectIdentifierEnum effectIdentifier = static_cast<EffectIdentifierEnum>(0);
     uint8_t effectVariant                 = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OffWithEffect
@@ -207,6 +216,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::OnWithRecallGlobalScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -220,6 +230,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::OnWithRecallGlobalScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -238,6 +249,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::OnWithTimedOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<OnOffControlBitmap> onOffControl = static_cast<chip::BitMask<OnOffControlBitmap>>(0);
     uint16_t onTime                                = static_cast<uint16_t>(0);
@@ -255,10 +267,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::OnWithTimedOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<OnOffControlBitmap> onOffControl = static_cast<chip::BitMask<OnOffControlBitmap>>(0);
     uint16_t onTime                                = static_cast<uint16_t>(0);
     uint16_t offWaitTime                           = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OnWithTimedOff

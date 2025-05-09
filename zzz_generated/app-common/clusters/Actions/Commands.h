@@ -120,6 +120,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::InstantAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -136,9 +137,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::InstantAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace InstantAction
@@ -156,6 +159,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::InstantActionWithTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -173,10 +177,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::InstantActionWithTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
     uint16_t transitionTime = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace InstantActionWithTransition
@@ -193,6 +199,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -209,9 +216,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StartAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StartAction
@@ -229,6 +238,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -246,10 +256,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StartActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
     uint32_t duration = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StartActionWithDuration
@@ -266,6 +278,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StopAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -282,9 +295,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StopAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopAction
@@ -301,6 +316,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PauseAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -317,9 +333,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::PauseAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PauseAction
@@ -337,6 +355,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PauseActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -354,10 +373,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::PauseActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
     uint32_t duration = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PauseActionWithDuration
@@ -374,6 +395,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResumeAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -390,9 +412,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ResumeAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ResumeAction
@@ -409,6 +433,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -425,9 +450,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::EnableAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnableAction
@@ -445,6 +472,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -462,10 +490,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::EnableActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
     uint32_t duration = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnableActionWithDuration
@@ -482,6 +512,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DisableAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -498,9 +529,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::DisableAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisableAction
@@ -518,6 +551,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DisableActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -535,10 +569,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::DisableActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
     uint32_t duration = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisableActionWithDuration

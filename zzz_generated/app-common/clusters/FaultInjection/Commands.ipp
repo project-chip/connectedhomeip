@@ -28,6 +28,7 @@ namespace Clusters {
 namespace FaultInjection {
 namespace Commands {
 namespace FailAtFault {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -69,15 +70,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, takeMutex);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace FailAtFault.
 namespace FailRandomlyAtFault {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -108,9 +107,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPercentage))
         {
             err = DataModel::Decode(reader, percentage);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

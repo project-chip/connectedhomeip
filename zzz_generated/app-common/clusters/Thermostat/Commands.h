@@ -105,6 +105,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetpointRaiseLower::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     SetpointRaiseLowerModeEnum mode = static_cast<SetpointRaiseLowerModeEnum>(0);
     int8_t amount                   = static_cast<int8_t>(0);
@@ -121,9 +122,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetpointRaiseLower::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     SetpointRaiseLowerModeEnum mode = static_cast<SetpointRaiseLowerModeEnum>(0);
     int8_t amount                   = static_cast<int8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetpointRaiseLower
@@ -142,6 +145,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetWeeklyScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
     chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
@@ -160,11 +164,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetWeeklyScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
     chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
     DataModel::DecodableList<Structs::WeeklyScheduleTransitionStruct::DecodableType> transitions;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeeklyScheduleResponse
@@ -183,6 +189,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
     chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
@@ -201,11 +208,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
     chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
     DataModel::DecodableList<Structs::WeeklyScheduleTransitionStruct::DecodableType> transitions;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetWeeklySchedule
@@ -222,6 +231,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<ScheduleDayOfWeekBitmap> daysToReturn = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     chip::BitMask<ScheduleModeBitmap> modeToReturn      = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
@@ -238,9 +248,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<ScheduleDayOfWeekBitmap> daysToReturn = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     chip::BitMask<ScheduleModeBitmap> modeToReturn      = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeeklySchedule
@@ -255,6 +267,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -268,6 +281,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ClearWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -284,6 +298,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetActiveScheduleRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan scheduleHandle;
 
@@ -299,8 +314,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetActiveScheduleRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan scheduleHandle;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetActiveScheduleRequest
@@ -316,6 +333,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<chip::ByteSpan> presetHandle;
 
@@ -331,8 +349,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<chip::ByteSpan> presetHandle;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetActivePresetRequest
@@ -350,6 +370,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AtomicResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t statusCode = static_cast<uint8_t>(0);
     DataModel::List<const Globals::Structs::AtomicAttributeStatusStruct::Type> attributeStatus;
@@ -367,10 +388,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AtomicResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t statusCode = static_cast<uint8_t>(0);
     DataModel::DecodableList<Globals::Structs::AtomicAttributeStatusStruct::DecodableType> attributeStatus;
     Optional<uint16_t> timeout;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AtomicResponse
@@ -388,6 +411,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AtomicRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Globals::AtomicRequestTypeEnum requestType = static_cast<Globals::AtomicRequestTypeEnum>(0);
     DataModel::List<const chip::AttributeId> attributeRequests;
@@ -405,10 +429,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AtomicRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Globals::AtomicRequestTypeEnum requestType = static_cast<Globals::AtomicRequestTypeEnum>(0);
     DataModel::DecodableList<chip::AttributeId> attributeRequests;
     Optional<uint16_t> timeout;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AtomicRequest

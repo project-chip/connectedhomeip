@@ -79,6 +79,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
 
@@ -94,8 +95,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetDetailedPriceRequest
@@ -111,6 +114,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> currentPrice;
 
@@ -126,8 +130,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<Structs::CommodityPriceStruct::DecodableType> currentPrice;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetDetailedPriceResponse
@@ -143,6 +149,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
 
@@ -158,8 +165,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetDetailedForecastRequest
@@ -175,6 +184,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::CommodityPriceStruct::Type> priceForecast;
 
@@ -190,8 +200,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType> priceForecast;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetDetailedForecastResponse
