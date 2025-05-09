@@ -864,7 +864,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewpor
 
     // Ensure that the aspect ration of the viewport matches the aspect ratio of the sensor
     ChipLogDetail(Zcl, "DPTZSetViewpoort. AR of viewport %f, AR of device %f.", requestedAR, deviceAR);
-    
+
     if (requestedAR != deviceAR)
     {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: SetViewport with mismatching aspect ratio.", mEndpointId);

@@ -394,7 +394,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(uint16_t 
         return;
     }
 
-    it->viewport = aViewport; 
+    it->viewport = aViewport;
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
@@ -1229,7 +1229,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unknown Video Stream ID provided. ID: %d", mEndpointId,
                      videoStreamID);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-        return;        
+        return;
     }
 
     // Call the delegate

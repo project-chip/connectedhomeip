@@ -63,8 +63,8 @@ void AVSettingsUserLevelManagementDelegate::VideoStreamDeallocated(uint16_t aStr
 
 void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(Structs::ViewportStruct::Type aViewport)
 {
-    // The app needs to invoke this whenever the AV Stream Manager updates the device level default Viewport.  This informs 
-    // the server of the new viewport that shall be appled to all known streams. 
+    // The app needs to invoke this whenever the AV Stream Manager updates the device level default Viewport.  This informs
+    // the server of the new viewport that shall be appled to all known streams.
     this->GetServer()->UpdateMoveCapableVideoStreams(aViewport);
 }
 
@@ -127,11 +127,11 @@ Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoSt
                                                                Structs::ViewportStruct::Type & aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
-    // The application needs to interact with its instance of AVStreamManagement to access the stream, validate 
-    // new dimensions after application of the deltas, and set the new values for the viewport based on the pixel movement 
+    // The application needs to interact with its instance of AVStreamManagement to access the stream, validate
+    // new dimensions after application of the deltas, and set the new values for the viewport based on the pixel movement
     // requested
     // The passed in viewport is empty, and needs to be populated by the delegate with the value of the viewport after
-    // applying all deltas within the constraints of the sensor. 
+    // applying all deltas within the constraints of the sensor.
     //
     aViewport = {0, 0, 1920, 1080};
     return Status::Success;

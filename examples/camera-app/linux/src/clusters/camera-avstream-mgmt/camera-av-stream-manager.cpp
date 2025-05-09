@@ -62,7 +62,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
                 mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(outStreamID);
 
                 // Set the default viewport on the newly allocated stream
-                mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream, 
+                mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream,
                                                                       mCameraDeviceHAL->GetCameraHALInterface().GetViewport());
 
                 // Inform DPTZ that there's an allocated stream

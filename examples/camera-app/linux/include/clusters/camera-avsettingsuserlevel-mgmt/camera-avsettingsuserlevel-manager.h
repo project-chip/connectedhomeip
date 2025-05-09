@@ -59,7 +59,7 @@ public:
                                                          Structs::ViewportStruct::Type & aViewport) override;
 
     void SetCameraDeviceHAL(CameraDeviceInterface * aCameraDevice);
-    
+
     /**
      * DPTZ Stream Indication
      */

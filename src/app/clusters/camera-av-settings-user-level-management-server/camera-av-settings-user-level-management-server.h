@@ -165,20 +165,20 @@ public:
     void SetZoom(Optional<uint8_t> aZoom);
 
     /**
-     * Allows for a delegate or application to provide the ID and default Viewport of an allocated video stream that is capable of digital 
+     * Allows for a delegate or application to provide the ID and default Viewport of an allocated video stream that is capable of digital
      * movement. This should be invoked by a delegate on the conclusion of allocating a video stream via the AV Stream Management cluster.
      */
     void AddMoveCapableVideoStream(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport);
 
     /**
-     * Allows for a delegate or application to update the viewport of an already allocated video stream. 
+     * Allows for a delegate or application to update the viewport of an already allocated video stream.
      * This should be invoked whenever a viewport is updated by DPTZSetVewport or DPTZRelativeMove
      */
     void UpdateMoveCapableVideoStream(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport);
 
     /**
-     * Allows for a delegate or application to update all of the viewports for all of the allocated video streams. 
-     * This should be invoked whenever the device default viewport is updated via a write to Viewport on the 
+     * Allows for a delegate or application to update all of the viewports for all of the allocated video streams.
+     * This should be invoked whenever the device default viewport is updated via a write to Viewport on the
      * AV Stream Management Cluster
      */
     void UpdateMoveCapableVideoStreams(Structs::ViewportStruct::Type aViewport);
@@ -272,7 +272,7 @@ public:
     virtual bool CanChangeMPTZ() = 0;
 
     /**
-     * DPTZ Stream handling. Invoked on the delegate by an app, providing to the delegate the id of an 
+     * DPTZ Stream handling. Invoked on the delegate by an app, providing to the delegate the id of an
      * allocated or deallocated stream, or the viewport when the device level viewport is updated.
      * The delegate shall invoke the appropriate MoveCapableVideoStream methods on its instance of the server
      */
