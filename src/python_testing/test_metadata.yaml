@@ -105,11 +105,55 @@ not_automated:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
 
     # these tests ARE automated however disabled for now because IPV6 issues
-    - name: TC_WEBRTCP_2_2.py
+    - name: TCP_Tests.py
       reason:
           seems to depend on ipv6 working (see
           https://github.com/project-chip/connectedhomeip/issues/38822)
     - name: TC_BRBINFO_4_1.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_CADMIN_1_15.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_CADMIN_1_3_4.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_CADMIN_1_5.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_DA_1_9.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_ICDM_5_1.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_SC_4_3.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_SEPR_2_3.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_WEBRTCP_2_1.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_WEBRTCP_2_2.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_WEBRTCP_2_3.py
+      reason:
+          seems to depend on ipv6 working (see
+          https://github.com/project-chip/connectedhomeip/issues/38822)
+    - name: TC_WEBRTCP_2_4.py
       reason:
           seems to depend on ipv6 working (see
           https://github.com/project-chip/connectedhomeip/issues/38822)
