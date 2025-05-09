@@ -119,6 +119,12 @@ test_sequences = [
             # Send `controller ux ok\n` command to the tv-app subprocess.
             Step(app=App.TV_APP, input_cmd='controller ux ok\n'),
 
+            # Validate that we received the instructions on the tv-app output for sending the `controller ux ok [passcode]` command.
+            Step(app=App.TV_APP, output_msg=['Via Shell Enter: controller ux ok [passcode]']),
+
+            # Send `controller ux ok 20202021\n` command to the tv-app subprocess.
+            Step(app=App.TV_APP, input_cmd='controller ux ok 20202021\n'),
+
             # Validate that pairing succeeded between the tv-casting-app and the tv-app.
             Step(app=App.TV_APP, output_msg=['Secure Pairing Success']),
 

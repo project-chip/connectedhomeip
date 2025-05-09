@@ -70,6 +70,19 @@ Begin commissioning it by running
 
     $ controller ux ok
 
+The TV content app will check if has a hard coded passcode available, and if so,
+attempt commissioning with it. If no passcode is available, it will ask for the
+commissionable node's (commissionee) generated passcode.
+
+```
+CHIP:CTL: ------PROMPT USER: please enter passcode displayed in casting app
+CHIP:CTL: ------Via Shell Enter: controller ux ok [passcode]
+```
+
+Continue commissioning by providing the commissionee passcode
+
+    $ controller ux ok 20202021
+
 -   User Directed Commissioning (UDC)
 
 Print out the cached list of UDC sessions
