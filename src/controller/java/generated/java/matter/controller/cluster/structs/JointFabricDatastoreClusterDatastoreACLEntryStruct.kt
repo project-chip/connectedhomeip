@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +29,7 @@ class JointFabricDatastoreClusterDatastoreACLEntryStruct(
   val listID: UShort,
   val ACLEntry: JointFabricDatastoreClusterDatastoreAccessControlEntryStruct,
   val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreACLEntryStruct {\n")
@@ -58,34 +60,17 @@ class JointFabricDatastoreClusterDatastoreACLEntryStruct(
     private const val TAG_STATUS_ENTRY = 3
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): JointFabricDatastoreClusterDatastoreACLEntryStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): JointFabricDatastoreClusterDatastoreACLEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val listID = tlvReader.getUShort(ContextSpecificTag(TAG_LIST_ID))
-      val ACLEntry =
-        JointFabricDatastoreClusterDatastoreAccessControlEntryStruct.fromTlv(
-          ContextSpecificTag(TAG_ACL_ENTRY),
-          tlvReader,
-        )
-      val statusEntry =
-        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
-          ContextSpecificTag(TAG_STATUS_ENTRY),
-          tlvReader,
-        )
+      val ACLEntry = JointFabricDatastoreClusterDatastoreAccessControlEntryStruct.fromTlv(ContextSpecificTag(TAG_ACL_ENTRY), tlvReader)
+      val statusEntry = JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(ContextSpecificTag(TAG_STATUS_ENTRY), tlvReader)
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreACLEntryStruct(
-        nodeID,
-        listID,
-        ACLEntry,
-        statusEntry,
-        fabricIndex,
-      )
+      return JointFabricDatastoreClusterDatastoreACLEntryStruct(nodeID, listID, ACLEntry, statusEntry, fabricIndex)
     }
   }
 }

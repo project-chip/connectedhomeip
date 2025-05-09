@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class CommodityTariffClusterTariffPeriodStruct(
   val label: String?,
   val dayEntryIDs: List<UInt>,
-  val tariffComponentIDs: List<UInt>,
+  val tariffComponentIDs: List<UInt>
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterTariffPeriodStruct {\n")
@@ -65,30 +66,27 @@ class CommodityTariffClusterTariffPeriodStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterTariffPeriodStruct {
       tlvReader.enterStructure(tlvTag)
-      val label =
-        if (!tlvReader.isNull()) {
-          tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
-          null
-        }
-      val dayEntryIDs =
-        buildList<UInt> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      val tariffComponentIDs =
-        buildList<UInt> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_TARIFF_COMPONENT_I_DS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val label = if (!tlvReader.isNull()) {
+      tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
+      null
+    }
+      val dayEntryIDs = buildList<UInt> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUInt(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      val tariffComponentIDs = buildList<UInt> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_TARIFF_COMPONENT_I_DS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUInt(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return CommodityTariffClusterTariffPeriodStruct(label, dayEntryIDs, tariffComponentIDs)

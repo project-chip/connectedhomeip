@@ -17,21 +17,24 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
-  val groupID: ULong,
-  val friendlyName: String,
-  val groupKeySetID: UInt?,
-  val groupCAT: UInt?,
-  val groupCATVersion: UInt?,
-  val groupPermission: UInt,
-  val fabricIndex: UInt,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct (
+    val groupID: ULong,
+    val friendlyName: String,
+    val groupKeySetID: UInt?,
+    val groupCAT: UInt?,
+    val groupCATVersion: UInt?,
+    val groupPermission: UInt,
+    val fabricIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct {\n")
     append("\tgroupID : $groupID\n")
     append("\tfriendlyName : $friendlyName\n")
@@ -49,20 +52,20 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
       put(ContextSpecificTag(TAG_GROUP_ID), groupID)
       put(ContextSpecificTag(TAG_FRIENDLY_NAME), friendlyName)
       if (groupKeySetID != null) {
-        put(ContextSpecificTag(TAG_GROUP_KEY_SET_ID), groupKeySetID)
-      } else {
-        putNull(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
-      }
+      put(ContextSpecificTag(TAG_GROUP_KEY_SET_ID), groupKeySetID)
+    } else {
+      putNull(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
+    }
       if (groupCAT != null) {
-        put(ContextSpecificTag(TAG_GROUP_CAT), groupCAT)
-      } else {
-        putNull(ContextSpecificTag(TAG_GROUP_CAT))
-      }
+      put(ContextSpecificTag(TAG_GROUP_CAT), groupCAT)
+    } else {
+      putNull(ContextSpecificTag(TAG_GROUP_CAT))
+    }
       if (groupCATVersion != null) {
-        put(ContextSpecificTag(TAG_GROUP_CAT_VERSION), groupCATVersion)
-      } else {
-        putNull(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
-      }
+      put(ContextSpecificTag(TAG_GROUP_CAT_VERSION), groupCATVersion)
+    } else {
+      putNull(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
+    }
       put(ContextSpecificTag(TAG_GROUP_PERMISSION), groupPermission)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -78,48 +81,34 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
     private const val TAG_GROUP_PERMISSION = 5
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val groupID = tlvReader.getULong(ContextSpecificTag(TAG_GROUP_ID))
       val friendlyName = tlvReader.getString(ContextSpecificTag(TAG_FRIENDLY_NAME))
-      val groupKeySetID =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
-          null
-        }
-      val groupCAT =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_CAT))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_GROUP_CAT))
-          null
-        }
-      val groupCATVersion =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
-          null
-        }
+      val groupKeySetID = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
+      null
+    }
+      val groupCAT = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_CAT))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_GROUP_CAT))
+      null
+    }
+      val groupCATVersion = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
+      null
+    }
       val groupPermission = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_PERMISSION))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
-        groupID,
-        friendlyName,
-        groupKeySetID,
-        groupCAT,
-        groupCATVersion,
-        groupPermission,
-        fabricIndex,
-      )
+      return JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(groupID, friendlyName, groupKeySetID, groupCAT, groupCATVersion, groupPermission, fabricIndex)
     }
   }
 }

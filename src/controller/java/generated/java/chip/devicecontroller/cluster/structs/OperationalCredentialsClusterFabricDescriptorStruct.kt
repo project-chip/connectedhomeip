@@ -17,22 +17,24 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class OperationalCredentialsClusterFabricDescriptorStruct(
-  val rootPublicKey: ByteArray,
-  val vendorID: UInt,
-  val fabricID: ULong,
-  val nodeID: ULong,
-  val label: String,
-  val VIDVerificationStatement: Optional<ByteArray>,
-  val fabricIndex: UInt,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class OperationalCredentialsClusterFabricDescriptorStruct (
+    val rootPublicKey: ByteArray,
+    val vendorID: UInt,
+    val fabricID: ULong,
+    val nodeID: ULong,
+    val label: String,
+    val VIDVerificationStatement: Optional<ByteArray>,
+    val fabricIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("OperationalCredentialsClusterFabricDescriptorStruct {\n")
     append("\trootPublicKey : $rootPublicKey\n")
     append("\tvendorID : $vendorID\n")
@@ -53,9 +55,9 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
       put(ContextSpecificTag(TAG_NODE_ID), nodeID)
       put(ContextSpecificTag(TAG_LABEL), label)
       if (VIDVerificationStatement.isPresent) {
-        val optVIDVerificationStatement = VIDVerificationStatement.get()
-        put(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT), optVIDVerificationStatement)
-      }
+      val optVIDVerificationStatement = VIDVerificationStatement.get()
+      put(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT), optVIDVerificationStatement)
+    }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -70,35 +72,23 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
     private const val TAG_VID_VERIFICATION_STATEMENT = 6
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): OperationalCredentialsClusterFabricDescriptorStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OperationalCredentialsClusterFabricDescriptorStruct {
       tlvReader.enterStructure(tlvTag)
       val rootPublicKey = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
       val vendorID = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_ID))
       val fabricID = tlvReader.getULong(ContextSpecificTag(TAG_FABRIC_ID))
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val VIDVerificationStatement =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT)))
-        } else {
-          Optional.empty()
-        }
+      val VIDVerificationStatement = if (tlvReader.isNextTag(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT)))
+    } else {
+      Optional.empty()
+    }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return OperationalCredentialsClusterFabricDescriptorStruct(
-        rootPublicKey,
-        vendorID,
-        fabricID,
-        nodeID,
-        label,
-        VIDVerificationStatement,
-        fabricIndex,
-      )
+      return OperationalCredentialsClusterFabricDescriptorStruct(rootPublicKey, vendorID, fabricID, nodeID, label, VIDVerificationStatement, fabricIndex)
     }
   }
 }

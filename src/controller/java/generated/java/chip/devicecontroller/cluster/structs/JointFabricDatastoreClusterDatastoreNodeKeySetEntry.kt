@@ -17,18 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class JointFabricDatastoreClusterDatastoreNodeKeySetEntry(
-  val nodeID: ULong,
-  val groupKeySetID: UInt,
-  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
-  val fabricIndex: UInt,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class JointFabricDatastoreClusterDatastoreNodeKeySetEntry (
+    val nodeID: ULong,
+    val groupKeySetID: UInt,
+    val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
+    val fabricIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("JointFabricDatastoreClusterDatastoreNodeKeySetEntry {\n")
     append("\tnodeID : $nodeID\n")
     append("\tgroupKeySetID : $groupKeySetID\n")
@@ -54,28 +57,16 @@ class JointFabricDatastoreClusterDatastoreNodeKeySetEntry(
     private const val TAG_STATUS_ENTRY = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): JointFabricDatastoreClusterDatastoreNodeKeySetEntry {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : JointFabricDatastoreClusterDatastoreNodeKeySetEntry {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val groupKeySetID = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
-      val statusEntry =
-        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
-          ContextSpecificTag(TAG_STATUS_ENTRY),
-          tlvReader,
-        )
+      val statusEntry = JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(ContextSpecificTag(TAG_STATUS_ENTRY), tlvReader)
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreNodeKeySetEntry(
-        nodeID,
-        groupKeySetID,
-        statusEntry,
-        fabricIndex,
-      )
+      return JointFabricDatastoreClusterDatastoreNodeKeySetEntry(nodeID, groupKeySetID, statusEntry, fabricIndex)
     }
   }
 }

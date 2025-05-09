@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +28,7 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
   val requestID: ULong,
   val clientNodeID: ULong,
   val statusCode: UByte,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("CommissionerControlClusterCommissioningRequestResultEvent {\n")
@@ -54,24 +56,16 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
     private const val TAG_STATUS_CODE = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CommissionerControlClusterCommissioningRequestResultEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommissionerControlClusterCommissioningRequestResultEvent {
       tlvReader.enterStructure(tlvTag)
       val requestID = tlvReader.getULong(ContextSpecificTag(TAG_REQUEST_ID))
       val clientNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CLIENT_NODE_ID))
       val statusCode = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS_CODE))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return CommissionerControlClusterCommissioningRequestResultEvent(
-        requestID,
-        clientNodeID,
-        statusCode,
-        fabricIndex,
-      )
+      return CommissionerControlClusterCommissioningRequestResultEvent(requestID, clientNodeID, statusCode, fabricIndex)
     }
   }
 }

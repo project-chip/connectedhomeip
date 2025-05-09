@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterMapStruct(val mapID: UInt, val name: String) {
+class ServiceAreaClusterMapStruct(
+  val mapID: UInt,
+  val name: String
+) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterMapStruct {\n")
     append("\tmapID : $mapID\n")
@@ -47,7 +52,7 @@ class ServiceAreaClusterMapStruct(val mapID: UInt, val name: String) {
       tlvReader.enterStructure(tlvTag)
       val mapID = tlvReader.getUInt(ContextSpecificTag(TAG_MAP_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-
+      
       tlvReader.exitContainer()
 
       return ServiceAreaClusterMapStruct(mapID, name)
