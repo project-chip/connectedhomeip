@@ -698,7 +698,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -726,7 +726,7 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -872,7 +872,7 @@ cluster AccessControl = 31 {
 
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
 cluster Actions = 37 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ActionErrorEnum : enum8 {
     kUnknown = 0;
@@ -919,7 +919,7 @@ cluster Actions = 37 {
 
   struct ActionStruct {
     int16u actionID = 0;
-    char_string<32> name = 1;
+    char_string<128> name = 1;
     ActionTypeEnum type = 2;
     int16u endpointListID = 3;
     CommandBits supportedCommands = 4;
@@ -928,7 +928,7 @@ cluster Actions = 37 {
 
   struct EndpointListStruct {
     int16u endpointListID = 0;
-    char_string<32> name = 1;
+    char_string<128> name = 1;
     EndpointListTypeEnum type = 2;
     endpoint_no endpoints[] = 3;
   }
@@ -1021,29 +1021,29 @@ cluster Actions = 37 {
     int32u duration = 2;
   }
 
-  /** This command triggers an action (state change) on the involved endpoints. */
+  /** This command is used to trigger an instantaneous action. */
   command InstantAction(InstantActionRequest): DefaultSuccess = 0;
-  /** This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current state to the new state. */
+  /** This command is used to trigger an instantaneous action with a transition over a given time. */
   command InstantActionWithTransition(InstantActionWithTransitionRequest): DefaultSuccess = 1;
-  /** This command triggers the commencement of an action on the involved endpoints. */
+  /** This command is used to trigger the commencement of an action. */
   command StartAction(StartActionRequest): DefaultSuccess = 2;
-  /** This command triggers the commencement of an action (with a duration) on the involved endpoints. */
+  /** This command is used to trigger the commencement of an action with a duration. */
   command StartActionWithDuration(StartActionWithDurationRequest): DefaultSuccess = 3;
-  /** This command stops the ongoing action on the involved endpoints. */
+  /** This command is used to stop an action. */
   command StopAction(StopActionRequest): DefaultSuccess = 4;
-  /** This command pauses an ongoing action. */
+  /** This command is used to pause an action. */
   command PauseAction(PauseActionRequest): DefaultSuccess = 5;
-  /** This command pauses an ongoing action with a duration. */
+  /** This command is used to pause an action with a duration. */
   command PauseActionWithDuration(PauseActionWithDurationRequest): DefaultSuccess = 6;
-  /** This command resumes a previously paused action. */
+  /** This command is used to resume an action. */
   command ResumeAction(ResumeActionRequest): DefaultSuccess = 7;
-  /** This command enables a certain action or automation. */
+  /** This command is used to enable an action. */
   command EnableAction(EnableActionRequest): DefaultSuccess = 8;
-  /** This command enables a certain action or automation with a duration. */
+  /** This command is used to enable an action with a duration. */
   command EnableActionWithDuration(EnableActionWithDurationRequest): DefaultSuccess = 9;
-  /** This command disables a certain action or automation. */
+  /** This command is used to disable an action. */
   command DisableAction(DisableActionRequest): DefaultSuccess = 10;
-  /** This command disables a certain action or automation with a duration. */
+  /** This command is used to disable an action with a duration. */
   command DisableActionWithDuration(DisableActionWithDurationRequest): DefaultSuccess = 11;
 }
 
@@ -7840,7 +7840,7 @@ endpoint 0 {
   }
 
   server cluster UnitLocalization {
-    persist  attribute temperatureUnit default = 0;
+    callback attribute temperatureUnit;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8146,6 +8146,9 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
+    handle command SetVIDVerificationStatement;
+    handle command SignVIDVerificationRequest;
+    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {

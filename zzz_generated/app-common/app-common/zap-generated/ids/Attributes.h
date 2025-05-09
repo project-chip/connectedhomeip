@@ -49,7 +49,6 @@
 #include <clusters/ContentAppObserver/AttributeIds.h>
 #include <clusters/ContentControl/AttributeIds.h>
 #include <clusters/ContentLauncher/AttributeIds.h>
-#include <clusters/DemandResponseLoadControl/AttributeIds.h>
 #include <clusters/Descriptor/AttributeIds.h>
 #include <clusters/DeviceEnergyManagement/AttributeIds.h>
 #include <clusters/DeviceEnergyManagementMode/AttributeIds.h>

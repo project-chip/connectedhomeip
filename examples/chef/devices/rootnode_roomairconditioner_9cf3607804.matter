@@ -501,7 +501,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -2136,6 +2136,9 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
+    handle command SetVIDVerificationStatement;
+    handle command SignVIDVerificationRequest;
+    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {

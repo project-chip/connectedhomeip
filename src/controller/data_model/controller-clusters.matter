@@ -638,7 +638,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -666,7 +666,7 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -812,7 +812,7 @@ cluster AccessControl = 31 {
 
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
 cluster Actions = 37 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ActionErrorEnum : enum8 {
     kUnknown = 0;
@@ -859,7 +859,7 @@ cluster Actions = 37 {
 
   struct ActionStruct {
     int16u actionID = 0;
-    char_string<32> name = 1;
+    char_string<128> name = 1;
     ActionTypeEnum type = 2;
     int16u endpointListID = 3;
     CommandBits supportedCommands = 4;
@@ -868,7 +868,7 @@ cluster Actions = 37 {
 
   struct EndpointListStruct {
     int16u endpointListID = 0;
-    char_string<32> name = 1;
+    char_string<128> name = 1;
     EndpointListTypeEnum type = 2;
     endpoint_no endpoints[] = 3;
   }
@@ -961,29 +961,29 @@ cluster Actions = 37 {
     int32u duration = 2;
   }
 
-  /** This command triggers an action (state change) on the involved endpoints. */
+  /** This command is used to trigger an instantaneous action. */
   command InstantAction(InstantActionRequest): DefaultSuccess = 0;
-  /** This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current state to the new state. */
+  /** This command is used to trigger an instantaneous action with a transition over a given time. */
   command InstantActionWithTransition(InstantActionWithTransitionRequest): DefaultSuccess = 1;
-  /** This command triggers the commencement of an action on the involved endpoints. */
+  /** This command is used to trigger the commencement of an action. */
   command StartAction(StartActionRequest): DefaultSuccess = 2;
-  /** This command triggers the commencement of an action (with a duration) on the involved endpoints. */
+  /** This command is used to trigger the commencement of an action with a duration. */
   command StartActionWithDuration(StartActionWithDurationRequest): DefaultSuccess = 3;
-  /** This command stops the ongoing action on the involved endpoints. */
+  /** This command is used to stop an action. */
   command StopAction(StopActionRequest): DefaultSuccess = 4;
-  /** This command pauses an ongoing action. */
+  /** This command is used to pause an action. */
   command PauseAction(PauseActionRequest): DefaultSuccess = 5;
-  /** This command pauses an ongoing action with a duration. */
+  /** This command is used to pause an action with a duration. */
   command PauseActionWithDuration(PauseActionWithDurationRequest): DefaultSuccess = 6;
-  /** This command resumes a previously paused action. */
+  /** This command is used to resume an action. */
   command ResumeAction(ResumeActionRequest): DefaultSuccess = 7;
-  /** This command enables a certain action or automation. */
+  /** This command is used to enable an action. */
   command EnableAction(EnableActionRequest): DefaultSuccess = 8;
-  /** This command enables a certain action or automation with a duration. */
+  /** This command is used to enable an action with a duration. */
   command EnableActionWithDuration(EnableActionWithDurationRequest): DefaultSuccess = 9;
-  /** This command disables a certain action or automation. */
+  /** This command is used to disable an action. */
   command DisableAction(DisableActionRequest): DefaultSuccess = 10;
-  /** This command disables a certain action or automation with a duration. */
+  /** This command is used to disable an action with a duration. */
   command DisableActionWithDuration(DisableActionWithDurationRequest): DefaultSuccess = 11;
 }
 
@@ -4886,202 +4886,6 @@ provisional cluster CommodityPrice = 149 {
   command GetDetailedPriceRequest(GetDetailedPriceRequestRequest): GetDetailedPriceResponse = 0;
   /** Upon receipt, this SHALL generate a GetDetailedForecast Response command. */
   command GetDetailedForecastRequest(GetDetailedForecastRequestRequest): GetDetailedForecastResponse = 2;
-}
-
-/** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */
-provisional cluster DemandResponseLoadControl = 150 {
-  revision 4;
-
-  enum CriticalityLevelEnum : enum8 {
-    kUnknown = 0;
-    kGreen = 1;
-    kLevel1 = 2;
-    kLevel2 = 3;
-    kLevel3 = 4;
-    kLevel4 = 5;
-    kLevel5 = 6;
-    kEmergency = 7;
-    kPlannedOutage = 8;
-    kServiceDisconnect = 9;
-  }
-
-  enum HeatingSourceEnum : enum8 {
-    kAny = 0;
-    kElectric = 1;
-    kNonElectric = 2;
-  }
-
-  enum LoadControlEventChangeSourceEnum : enum8 {
-    kAutomatic = 0;
-    kUserAction = 1;
-  }
-
-  enum LoadControlEventStatusEnum : enum8 {
-    kUnknown = 0;
-    kReceived = 1;
-    kInProgress = 2;
-    kCompleted = 3;
-    kOptedOut = 4;
-    kOptedIn = 5;
-    kCanceled = 6;
-    kSuperseded = 7;
-    kPartialOptedOut = 8;
-    kPartialOptedIn = 9;
-    kNoParticipation = 10;
-    kUnavailable = 11;
-    kFailed = 12;
-  }
-
-  bitmap CancelControlBitmap : bitmap16 {
-    kRandomEnd = 0x1;
-  }
-
-  bitmap DeviceClassBitmap : bitmap32 {
-    kHVAC = 0x1;
-    kStripHeater = 0x2;
-    kWaterHeater = 0x4;
-    kPoolPump = 0x8;
-    kSmartAppliance = 0x10;
-    kIrrigationPump = 0x20;
-    kCommercialLoad = 0x40;
-    kResidentialLoad = 0x80;
-    kExteriorLighting = 0x100;
-    kInteriorLighting = 0x200;
-    kEV = 0x400;
-    kGenerationSystem = 0x800;
-    kSmartInverter = 0x1000;
-    kEVSE = 0x2000;
-    kRESU = 0x4000;
-    kEMS = 0x8000;
-    kSEM = 0x10000;
-  }
-
-  bitmap EventControlBitmap : bitmap16 {
-    kRandomStart = 0x1;
-  }
-
-  bitmap EventTransitionControlBitmap : bitmap16 {
-    kRandomDuration = 0x1;
-    kIgnoreOptOut = 0x2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kEnrollmentGroups = 0x1;
-    kTemperatureOffset = 0x2;
-    kTemperatureSetpoint = 0x4;
-    kLoadAdjustment = 0x8;
-    kDutyCycle = 0x10;
-    kPowerSavings = 0x20;
-    kHeatingSource = 0x40;
-  }
-
-  struct HeatingSourceControlStruct {
-    HeatingSourceEnum heatingSource = 0;
-  }
-
-  struct PowerSavingsControlStruct {
-    percent powerSavings = 0;
-  }
-
-  struct DutyCycleControlStruct {
-    percent dutyCycle = 0;
-  }
-
-  struct AverageLoadControlStruct {
-    int8s loadAdjustment = 0;
-  }
-
-  struct TemperatureControlStruct {
-    optional nullable int16u coolingTempOffset = 0;
-    optional nullable int16u heatingtTempOffset = 1;
-    optional nullable temperature coolingTempSetpoint = 2;
-    optional nullable temperature heatingTempSetpoint = 3;
-  }
-
-  struct LoadControlEventTransitionStruct {
-    int16u duration = 0;
-    EventTransitionControlBitmap control = 1;
-    optional TemperatureControlStruct temperatureControl = 2;
-    optional AverageLoadControlStruct averageLoadControl = 3;
-    optional DutyCycleControlStruct dutyCycleControl = 4;
-    optional PowerSavingsControlStruct powerSavingsControl = 5;
-    optional HeatingSourceControlStruct heatingSourceControl = 6;
-  }
-
-  struct LoadControlEventStruct {
-    octet_string<16> eventID = 0;
-    nullable octet_string<16> programID = 1;
-    EventControlBitmap control = 2;
-    DeviceClassBitmap deviceClass = 3;
-    optional int8u enrollmentGroup = 4;
-    CriticalityLevelEnum criticality = 5;
-    nullable epoch_s startTime = 6;
-    LoadControlEventTransitionStruct transitions[] = 7;
-  }
-
-  struct LoadControlProgramStruct {
-    octet_string<16> programID = 0;
-    long_char_string<32> name = 1;
-    nullable int8u enrollmentGroup = 2;
-    nullable int8u randomStartMinutes = 3;
-    nullable int8u randomDurationMinutes = 4;
-  }
-
-  info event LoadControlEventStatusChange = 0 {
-    octet_string eventID = 0;
-    nullable int8u transitionIndex = 1;
-    LoadControlEventStatusEnum status = 2;
-    CriticalityLevelEnum criticality = 3;
-    EventControlBitmap control = 4;
-    optional nullable TemperatureControlStruct temperatureControl = 5;
-    optional nullable AverageLoadControlStruct averageLoadControl = 6;
-    optional nullable DutyCycleControlStruct dutyCycleControl = 7;
-    optional nullable PowerSavingsControlStruct powerSavingsControl = 8;
-    optional nullable HeatingSourceControlStruct heatingSourceControl = 9;
-  }
-
-  readonly attribute LoadControlProgramStruct loadControlPrograms[] = 0;
-  readonly attribute int8u numberOfLoadControlPrograms = 1;
-  readonly attribute LoadControlEventStruct events[] = 2;
-  readonly attribute LoadControlEventStruct activeEvents[] = 3;
-  readonly attribute int8u numberOfEventsPerProgram = 4;
-  readonly attribute int8u numberOfTransitions = 5;
-  attribute access(write: manage) int8u defaultRandomStart = 6;
-  attribute access(write: manage) int8u defaultRandomDuration = 7;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct RegisterLoadControlProgramRequestRequest {
-    LoadControlProgramStruct loadControlProgram = 0;
-  }
-
-  request struct UnregisterLoadControlProgramRequestRequest {
-    octet_string<16> loadControlProgramID = 0;
-  }
-
-  request struct AddLoadControlEventRequestRequest {
-    LoadControlEventStruct event = 0;
-  }
-
-  request struct RemoveLoadControlEventRequestRequest {
-    octet_string<16> eventID = 0;
-    CancelControlBitmap cancelControl = 1;
-  }
-
-  /** Upon receipt, this SHALL insert a new LoadControlProgramStruct into LoadControlPrograms, or if the ProgramID matches an existing LoadControlProgramStruct, then the provider SHALL be updated with the provided values. */
-  command RegisterLoadControlProgramRequest(RegisterLoadControlProgramRequestRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL remove a the LoadControlProgramStruct from LoadControlPrograms with the matching ProgramID. */
-  command UnregisterLoadControlProgramRequest(UnregisterLoadControlProgramRequestRequest): DefaultSuccess = 1;
-  /** On receipt of the AddLoadControlEventsRequest command, the server SHALL add a load control event. */
-  command AddLoadControlEventRequest(AddLoadControlEventRequestRequest): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL remove the LoadControlEventStruct with the matching EventID from LoadEventPrograms. */
-  command RemoveLoadControlEventRequest(RemoveLoadControlEventRequestRequest): DefaultSuccess = 3;
-  /** Upon receipt, this SHALL clear all the load control events. */
-  command ClearLoadControlEventsRequest(): DefaultSuccess = 4;
 }
 
 /** This cluster provides an interface for passing messages to be presented by a device. */
@@ -9752,7 +9556,7 @@ provisional cluster ContentControl = 1295 {
   readonly attribute optional char_string<8> scheduledContentRatingThreshold = 4;
   readonly attribute optional elapsed_s screenDailyTime = 5;
   readonly attribute optional elapsed_s remainingScreenTime = 6;
-  readonly attribute boolean blockUnrated = 7;
+  readonly attribute optional boolean blockUnrated = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -10009,6 +9813,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kOnScreenDisplay = 0x80;
     kLocalStorage = 0x100;
     kHighDynamicRange = 0x200;
+    kNightVision = 0x400;
   }
 
   struct VideoResolutionStruct {
@@ -10043,6 +9848,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int8u referenceCount = 6;
     boolean encodedPixels = 7;
     boolean hardwareEncoder = 8;
+    optional boolean watermarkEnabled = 9;
+    optional boolean OSDEnabled = 10;
   }
 
   struct SnapshotCapabilitiesStruct {
@@ -10094,7 +9901,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
-  readonly attribute optional boolean nightVisionCapable = 3;
+  readonly attribute optional boolean nightVisionUsesInfrared = 3;
   readonly attribute optional VideoResolutionStruct minViewport = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
   readonly attribute int32u maxContentBufferSize = 6;
@@ -10569,10 +10376,9 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidStream = 3;
     kInvalidURL = 4;
     kInvalidZone = 5;
-    kUnsupportedContainerFormat = 6;
-    kUnsupportedIngestMethod = 7;
-    kInvalidTriggerType = 8;
-    kInvalidTransportStatus = 9;
+    kInvalidCombination = 6;
+    kInvalidTriggerType = 7;
+    kInvalidTransportStatus = 8;
   }
 
   shared enum StreamUsageEnum : enum8 {
@@ -10604,14 +10410,6 @@ provisional cluster PushAvStreamTransport = 1365 {
     kMetadata = 0x2;
   }
 
-  bitmap SupportedContainerFormatsBitmap : bitmap8 {
-    kCMAF = 0x1;
-  }
-
-  bitmap SupportedIngestMethodsBitmap : bitmap8 {
-    kCMAFIngest = 0x1;
-  }
-
   struct TransportMotionTriggerTimeControlStruct {
     int16u initialDuration = 0;
     int16u augmentationDuration = 1;
@@ -10620,8 +10418,8 @@ provisional cluster PushAvStreamTransport = 1365 {
   }
 
   struct TransportZoneOptionsStruct {
-    nullable int16u zone = 1;
-    optional int8u sensitivity = 2;
+    nullable int16u zone = 0;
+    optional int8u sensitivity = 1;
   }
 
   struct TransportTriggerOptionsStruct {
@@ -10636,6 +10434,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     int16u chunkDuration = 0;
     optional octet_string<16> CENCKey = 1;
     optional boolean metadataEnabled = 2;
+    optional octet_string<16> CENCKeyID = 3;
   }
 
   struct ContainerOptionsStruct {
@@ -10651,15 +10450,19 @@ provisional cluster PushAvStreamTransport = 1365 {
     long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
-    ContainerFormatEnum containerFormat = 7;
-    ContainerOptionsStruct containerOptions = 8;
-    optional epoch_s expiryTime = 9;
+    ContainerOptionsStruct containerOptions = 7;
+    optional epoch_s expiryTime = 8;
   }
 
   struct TransportConfigurationStruct {
     int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
     optional TransportOptionsStruct transportOptions = 2;
+  }
+
+  struct SupportedFormatStruct {
+    ContainerFormatEnum containerFormat = 0;
+    IngestMethodsEnum ingestMethod = 1;
   }
 
   info event PushTransportBegin = 0 {
@@ -10674,9 +10477,8 @@ provisional cluster PushAvStreamTransport = 1365 {
     optional TriggerActivationReasonEnum activationReason = 2;
   }
 
-  readonly attribute SupportedContainerFormatsBitmap supportedContainerFormats = 0;
-  readonly attribute SupportedIngestMethodsBitmap supportedIngestMethods = 1;
-  readonly attribute TransportConfigurationStruct currentConnections[] = 2;
+  readonly attribute SupportedFormatStruct supportedFormats[] = 0;
+  readonly attribute TransportConfigurationStruct currentConnections[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -10933,7 +10735,7 @@ cluster CommodityTariff = 1792 {
 provisional cluster EcosystemInformation = 1872 {
   revision 1;
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }

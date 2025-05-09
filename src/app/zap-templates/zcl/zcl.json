@@ -48,7 +48,6 @@
         "microwave-oven-mode-cluster.xml",
         "meter-identification-cluster.xml",
         "door-lock-cluster.xml",
-        "drlc-cluster.xml",
         "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-grid-conditions-cluster.xml",
@@ -732,7 +731,7 @@
             "Viewport",
             "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
-            "NightVisionCapable",
+            "NightVisionUsesInfrared",
             "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
@@ -769,7 +768,8 @@
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
-        "Soil Measurement": ["SoilMoistureMeasurementLimits"]
+        "Soil Measurement": ["SoilMoistureMeasurementLimits"],
+        "Unit Localization": ["TemperatureUnit"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

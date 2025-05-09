@@ -25,5 +25,7 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/camera-app/linux/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
+chip_with_nlfaultinjection = true
+
 matter_enable_tracing_support = true
 matter_enable_camera_server = true

@@ -50,7 +50,6 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
-        "drlc-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
         "meter-identification-cluster.xml",
@@ -738,7 +737,7 @@
             "Viewport",
             "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
-            "NightVisionCapable",
+            "NightVisionUsesInfrared",
             "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
@@ -775,7 +774,8 @@
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
-        "Soil Measurement": ["SoilMoistureMeasurementLimits"]
+        "Soil Measurement": ["SoilMoistureMeasurementLimits"],
+        "Unit Localization": ["TemperatureUnit"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

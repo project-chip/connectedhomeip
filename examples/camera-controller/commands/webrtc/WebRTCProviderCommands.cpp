@@ -29,15 +29,13 @@ namespace webrtc {
 
 CHIP_ERROR ConnectCommand::RunCommand()
 {
-    // print to console
-    std::cout << "Run ConnectCommand" << std::endl;
-
+    ChipLogProgress(Camera, "Run ConnectCommand");
     return WebRTCManager::Instance().Connnect(CurrentCommissioner(), mPeerNodeId, mPeerEndpointId);
 }
 
 CHIP_ERROR ProvideOfferCommand::RunCommand()
 {
-    std::cout << "Run ProvideOfferCommand" << std::endl;
+    ChipLogProgress(Camera, "Run ProvideOfferCommand");
 
     app::DataModel::Nullable<uint16_t> webrtcSessionId;
     if (mWebRTCSessionId.HasValue())
@@ -53,6 +51,16 @@ CHIP_ERROR ProvideOfferCommand::RunCommand()
     auto streamUsage = static_cast<app::Clusters::WebRTCTransportProvider::StreamUsageEnum>(mStreamUsage);
 
     return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage);
+}
+
+CHIP_ERROR SolicitOfferCommand::RunCommand()
+{
+    ChipLogProgress(Camera, "Run SolicitOfferCommand");
+
+    // Convert the stream usage into its enum type:
+    auto streamUsage = static_cast<app::Clusters::WebRTCTransportProvider::StreamUsageEnum>(mStreamUsage);
+
+    return WebRTCManager::Instance().SolicitOffer(streamUsage);
 }
 
 } // namespace webrtc

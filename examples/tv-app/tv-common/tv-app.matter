@@ -499,7 +499,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -527,7 +527,7 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -548,7 +548,7 @@ cluster Binding = 30 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -3523,7 +3523,7 @@ provisional cluster ContentControl = 1295 {
   readonly attribute optional char_string<8> scheduledContentRatingThreshold = 4;
   readonly attribute optional elapsed_s screenDailyTime = 5;
   readonly attribute optional elapsed_s remainingScreenTime = 6;
-  readonly attribute boolean blockUnrated = 7;
+  readonly attribute optional boolean blockUnrated = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3703,7 +3703,7 @@ endpoint 0 {
   }
 
   server cluster UnitLocalization {
-    persist  attribute temperatureUnit default = 0;
+    callback attribute temperatureUnit;
     ram      attribute featureMap default = 0x1;
     ram      attribute clusterRevision default = 1;
   }
@@ -3925,6 +3925,9 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
+    handle command SetVIDVerificationStatement;
+    handle command SignVIDVerificationRequest;
+    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {

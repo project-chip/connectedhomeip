@@ -2940,55 +2940,6 @@ static BOOL AttributeIsSpecifiedInCommodityPriceCluster(AttributeId aAttributeId
     }
     }
 }
-static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DemandResponseLoadControl;
-    switch (aAttributeId) {
-    case Attributes::LoadControlPrograms::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfLoadControlPrograms::Id: {
-        return YES;
-    }
-    case Attributes::Events::Id: {
-        return YES;
-    }
-    case Attributes::ActiveEvents::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfEventsPerProgram::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfTransitions::Id: {
-        return YES;
-    }
-    case Attributes::DefaultRandomStart::Id: {
-        return YES;
-    }
-    case Attributes::DefaultRandomDuration::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        // Not a known DemandResponseLoadControl attribute.
-        return NO;
-    }
-    }
-}
 static BOOL AttributeIsSpecifiedInMessagesCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Messages;
@@ -5910,7 +5861,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::VideoSensorParams::Id: {
         return YES;
     }
-    case Attributes::NightVisionCapable::Id: {
+    case Attributes::NightVisionUsesInfrared::Id: {
         return YES;
     }
     case Attributes::MinViewport::Id: {
@@ -6157,10 +6108,7 @@ static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttr
 {
     using namespace Clusters::PushAvStreamTransport;
     switch (aAttributeId) {
-    case Attributes::SupportedContainerFormats::Id: {
-        return YES;
-    }
-    case Attributes::SupportedIngestMethods::Id: {
+    case Attributes::SupportedFormats::Id: {
         return YES;
     }
     case Attributes::CurrentConnections::Id: {
@@ -7019,9 +6967,6 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::CommodityPrice::Id: {
         return AttributeIsSpecifiedInCommodityPriceCluster(aAttributeId);
-    }
-    case Clusters::DemandResponseLoadControl::Id: {
-        return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
     }
     case Clusters::Messages::Id: {
         return AttributeIsSpecifiedInMessagesCluster(aAttributeId);

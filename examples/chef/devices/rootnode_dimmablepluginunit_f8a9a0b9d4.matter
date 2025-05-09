@@ -626,7 +626,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  shared struct DeviceTypeStruct {
+  struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -654,7 +654,7 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -2234,6 +2234,9 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
+    handle command SetVIDVerificationStatement;
+    handle command SignVIDVerificationRequest;
+    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {

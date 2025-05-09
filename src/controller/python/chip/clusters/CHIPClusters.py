@@ -6248,129 +6248,6 @@ class ChipClusters:
             },
         },
     }
-    _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO = {
-        "clusterName": "DemandResponseLoadControl",
-        "clusterId": 0x00000096,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "RegisterLoadControlProgramRequest",
-                "args": {
-                    "loadControlProgram": "LoadControlProgramStruct",
-                },
-            },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "UnregisterLoadControlProgramRequest",
-                "args": {
-                    "loadControlProgramID": "bytes",
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "AddLoadControlEventRequest",
-                "args": {
-                    "event": "LoadControlEventStruct",
-                },
-            },
-            0x00000003: {
-                "commandId": 0x00000003,
-                "commandName": "RemoveLoadControlEventRequest",
-                "args": {
-                    "eventID": "bytes",
-                    "cancelControl": "int",
-                },
-            },
-            0x00000004: {
-                "commandId": 0x00000004,
-                "commandName": "ClearLoadControlEventsRequest",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "LoadControlPrograms",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "NumberOfLoadControlPrograms",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "Events",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "ActiveEvents",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "NumberOfEventsPerProgram",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "NumberOfTransitions",
-                "attributeId": 0x00000005,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "DefaultRandomStart",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000007: {
-                "attributeName": "DefaultRandomDuration",
-                "attributeId": 0x00000007,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
     _MESSAGES_CLUSTER_INFO = {
         "clusterName": "Messages",
         "clusterId": 0x00000097,
@@ -12879,7 +12756,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "NightVisionCapable",
+                "attributeName": "NightVisionUsesInfrared",
                 "attributeId": 0x00000003,
                 "type": "bool",
                 "reportable": True,
@@ -13533,20 +13410,14 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "SupportedContainerFormats",
+                "attributeName": "SupportedFormats",
                 "attributeId": 0x00000000,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "SupportedIngestMethods",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "CurrentConnections",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
             },
@@ -15306,7 +15177,6 @@ class ChipClusters:
         0x00000091: _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         0x00000094: _WATER_HEATER_MANAGEMENT_CLUSTER_INFO,
         0x00000095: _COMMODITY_PRICE_CLUSTER_INFO,
-        0x00000096: _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         0x00000097: _MESSAGES_CLUSTER_INFO,
         0x00000098: _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
         0x00000099: _ENERGY_EVSE_CLUSTER_INFO,
@@ -15448,7 +15318,6 @@ class ChipClusters:
         "ElectricalEnergyMeasurement": _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         "WaterHeaterManagement": _WATER_HEATER_MANAGEMENT_CLUSTER_INFO,
         "CommodityPrice": _COMMODITY_PRICE_CLUSTER_INFO,
-        "DemandResponseLoadControl": _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         "Messages": _MESSAGES_CLUSTER_INFO,
         "DeviceEnergyManagement": _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
         "EnergyEvse": _ENERGY_EVSE_CLUSTER_INFO,
