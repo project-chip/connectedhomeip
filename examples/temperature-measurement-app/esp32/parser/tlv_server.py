@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify, send_from_directory
 import os
 import sys
+
+from flask import Flask, jsonify, request, send_from_directory
 from werkzeug.utils import secure_filename
 
 CHIP_HOME = os.getenv("CHIP_HOME")
@@ -21,10 +22,12 @@ app = Flask(__name__)
 UPLOAD_FOLDER = '/tmp'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
 @app.route('/')
 def index():
     """Serve the HTML page"""
     return send_from_directory('.', 'tlv_viewer.html')
+
 
 @app.route('/parse_tlv', methods=['POST'])
 def parse_tlv():
@@ -64,6 +67,7 @@ def parse_tlv():
         return jsonify(formatted_entries)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
