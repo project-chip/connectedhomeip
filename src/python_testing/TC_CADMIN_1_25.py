@@ -38,9 +38,10 @@ import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.testing.matter_testing import (AttributeMatcher, ClusterAttributeChangeAccumulator, 
-                                        MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeMatcher, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
+                                         async_test_body, default_matter_test_main)
 from mobly import asserts
+
 
 class TC_CADMIN_1_25(MatterBaseTest):
     min_report_interval_sec = 0
@@ -61,8 +62,8 @@ class TC_CADMIN_1_25(MatterBaseTest):
             TestStep(4, "TH_CR1 subscribes to AdminVendorId attribute on DUT_CE",
                      "Verify TH_CR1 receives AdminVendorId subscription notification"),
             TestStep(5, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as `max_window_duration`."),
-            TestStep(6, "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of `max_window_duration`", 
-                    "{resDutSuccess}"),
+            TestStep(6, "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of `max_window_duration`",
+                     "{resDutSuccess}"),
             TestStep(7, "Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR1's fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR1's fabric"),
             TestStep(8, "TH_CR2 starts a commissioning process with DUT_CE", "DUT_CE is commissioned by TH_CR2"),
             TestStep(9, "Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null"),
@@ -72,23 +73,24 @@ class TC_CADMIN_1_25(MatterBaseTest):
                      "Verify TH_CR2 receives AdminFabricIndex subscription notification"),
             TestStep(12, "TH_CR2 subscribes to AdminVendorId attribute on DUT_CE",
                      "Verify TH_CR2 receives AdminVendorId subscription notification"),
-            TestStep(13, "TH_CR1 sends an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of `max_window_duration`", 
-                        "{resDutSuccess}"),
+            TestStep(13, "TH_CR1 sends an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of `max_window_duration`",
+                     "{resDutSuccess}"),
             TestStep(14, "Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR1's fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR1's fabric"),
             TestStep(15, "Verify TH_CR2 receives subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR1's fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR1's fabric"),
             TestStep(16, "TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command",
                      "Verify DUT_CE closes its Commissioning window"),
             TestStep(17, "Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null"),
             TestStep(18, "Verify TH_CR2 receives subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null"),
-            TestStep(19, "TH_CR2 opens a commissioning window on DUT_CE using ECM with commissioning timeout of `max_window_duration`", 
-                        "{resDutSuccess}"),
+            TestStep(19, "TH_CR2 opens a commissioning window on DUT_CE using ECM with commissioning timeout of `max_window_duration`",
+                     "{resDutSuccess}"),
             TestStep(20, "Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR2's fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR2's fabric"),
             TestStep(21, "Verify TH_CR2 receives subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR2's fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR2's fabric"),
             TestStep(22, "TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command",
                      "Verify DUT_CE closes its Commissioning window"),
             TestStep(23, "Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null"),
             TestStep(24, "Verify TH_CR2 receives subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null"),
-            TestStep(25, "TH_CR2 send an OpenCommissioningWindow command to DUT_CE using ECM with a commissioning timeout of `max_window_duration`", "{resDutSuccess}"),
+            TestStep(
+                25, "TH_CR2 send an OpenCommissioningWindow command to DUT_CE using ECM with a commissioning timeout of `max_window_duration`", "{resDutSuccess}"),
             TestStep(26, "Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR2's fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR2's fabric"),
             TestStep(27, "Verify TH_CR2 receives subscription notifications which show WindowStatus value to be 1, AdminFabricIndex value to be the same as the Fabric Index of the Fabrics attribute list entry corresponding to TH_CR2's fabric, AdminVendorId to be the same as the Vendor ID field of Fabrics attribute list entry corresponding to TH_CR2's fabric"),
             TestStep(28, "Before expiration of `max_window_duration` set in step 25, TH_CR1 sends RemoveFabric command to DUT_CE with FabricIndex set to the fabric index of TH_CR2's fabric",
@@ -173,16 +175,16 @@ class TC_CADMIN_1_25(MatterBaseTest):
         window_status_match = AttributeMatcher.from_callable(
             "WindowStatus is 1",
             lambda report: report.value == 1)
-        
+
         fabric_index_match = AttributeMatcher.from_callable(
             f"AdminFabricIndex is {th1_admin_fabric_index}",
             lambda report: report.value == th1_admin_fabric_index)
-        
+
         vendor_id_match = AttributeMatcher.from_callable(
             f"AdminVendorId is {th1_admin_fabric_vendor_id}",
             lambda report: report.value == th1_admin_fabric_vendor_id)
-        
-        # Wait for attribute reports to match 
+
+        # Wait for attribute reports to match
         th1_window_status_accumulator.await_all_expected_report_matches([window_status_match], timeout_sec=10)
         th1_admin_fabric_index_accumulator.await_all_expected_report_matches([fabric_index_match], timeout_sec=10)
         th1_admin_vendor_id_accumulator.await_all_expected_report_matches([vendor_id_match], timeout_sec=10)
@@ -207,11 +209,11 @@ class TC_CADMIN_1_25(MatterBaseTest):
         window_status_0_match = AttributeMatcher.from_callable(
             "WindowStatus is 0",
             lambda report: report.value == 0)
-        
+
         null_match = AttributeMatcher.from_callable(
             "Attribute is null",
             lambda report: str(type(report.value)).find('chip.clusters.Types.Nullable') >= 0)
-        
+
         th1_window_status_accumulator.await_all_expected_report_matches([window_status_0_match], timeout_sec=10)
         th1_admin_fabric_index_accumulator.await_all_expected_report_matches([null_match], timeout_sec=10)
         th1_admin_vendor_id_accumulator.await_all_expected_report_matches([null_match], timeout_sec=10)
@@ -234,7 +236,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(11)
         # TH_CR2 subscribes to AdminFabricIndex attribute on DUT_CE
         th2_admin_fabric_index_accumulator = ClusterAttributeChangeAccumulator(
-            Clusters.AdministratorCommissioning, 
+            Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminFabricIndex)
         await th2_admin_fabric_index_accumulator.start(
             self.th2, self.dut_node_id, 0, fabric_filtered=True,
@@ -244,7 +246,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(12)
         # TH_CR2 subscribes to AdminVendorId attribute on DUT_CE
         th2_admin_vendor_id_accumulator = ClusterAttributeChangeAccumulator(
-            Clusters.AdministratorCommissioning, 
+            Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminVendorId)
         await th2_admin_vendor_id_accumulator.start(
             self.th2, self.dut_node_id, 0, fabric_filtered=True,
@@ -281,7 +283,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         th2_fabric_index_match = AttributeMatcher.from_callable(
             f"AdminFabricIndex is {th1_admin_fabric_index}",
             lambda report: report.value == th1_admin_fabric_index)
-        
+
         th2_vendor_id_match = AttributeMatcher.from_callable(
             f"AdminVendorId is {th1_admin_fabric_vendor_id}",
             lambda report: report.value == th1_admin_fabric_vendor_id)
@@ -335,7 +337,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         th2_fabric_admin_index_match = AttributeMatcher.from_callable(
             f"AdminFabricIndex is {th2_admin_fabric_index}",
             lambda report: report.value == th2_admin_fabric_index)
-        
+
         th2_fabric_vendor_id_match = AttributeMatcher.from_callable(
             f"AdminVendorId is {th2_admin_fabric_vendor_id}",
             lambda report: report.value == th2_admin_fabric_vendor_id)
@@ -417,7 +419,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         th2_window_status_accumulator.await_all_expected_report_matches([window_status_match], timeout_sec=10)
         th2_admin_fabric_index_accumulator.await_all_expected_report_matches([th2_fabric_admin_index_match], timeout_sec=10)
         th2_admin_vendor_id_accumulator.await_all_expected_report_matches([th2_fabric_vendor_id_match], timeout_sec=10)
-        
+
         # Reset TH2 accumulators
         th2_window_status_accumulator.reset()
         th2_admin_fabric_index_accumulator.reset()
@@ -427,7 +429,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         # Before expiration of `max_window_duration` set in step 25,
         # TH_CR1 sends RemoveFabric command to DUT_CE with FabricIndex set to the fabric index of TH_CR2's fabric
         th2_idx = await self.th2.ReadAttribute(
-            nodeid=self.dut_node_id, 
+            nodeid=self.dut_node_id,
             attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
         outer_key = list(th2_idx.keys())[0]
         inner_key = list(th2_idx[outer_key].keys())[0]
@@ -438,23 +440,23 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(29)
         # Verify TH_CR1 receives subscription notifications which show AdminFabricIndex value to be null
         th1_admin_fabric_index_accumulator.await_all_expected_report_matches([null_match], timeout_sec=10)
-        
+
         self.step(30)
         # TH_CR1 reads WindowStatus attribute from DUT_CE
         # verify the value to be 1 indicating the window is still open
         AC_cluster = Clusters.AdministratorCommissioning
         window_status = await self.read_single_attribute_check_success(
-            dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, 
+            dev_ctrl=self.th1, fabric_filtered=False, endpoint=0,
             cluster=AC_cluster, attribute=AC_cluster.Attributes.WindowStatus)
         asserts.assert_equal(
-            window_status, 
+            window_status,
             Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kEnhancedWindowOpen,
             "Commissioning window is expected to be open, but was found to be closed")
 
         self.step(31)
         # TH_CR1 reads AdminVendorID attribute from DUT_CE
         admin_vendor_id = await self.read_single_attribute_check_success(
-            dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, 
+            dev_ctrl=self.th1, fabric_filtered=False, endpoint=0,
             cluster=AC_cluster, attribute=AC_cluster.Attributes.AdminVendorId)
         asserts.assert_equal(
             admin_vendor_id, th2_admin_fabric_vendor_id,
@@ -469,6 +471,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         # Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0, AdminVendorId to be null
         th1_window_status_accumulator.await_all_expected_report_matches([window_status_0_match], timeout_sec=10)
         th1_admin_vendor_id_accumulator.await_all_expected_report_matches([null_match], timeout_sec=10)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
