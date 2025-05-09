@@ -103,7 +103,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 if is_positioning_supported:
                     asserts.assert_true(0 <= current_state.position <= 10000, "Position is not in the expected range")
                 if is_latching_supported:
-                    asserts.assert_is_instance(current_state.Latch, bool, "Latch is not a boolean")
+                    asserts.assert_is_instance(current_state.latch, bool, "Latch is not a boolean")
                 if is_speed_supported:
                     asserts.assert_true(0 <= current_state.speed <= 3, "Speed is not in the expected range")
         else:
@@ -117,7 +117,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 if is_positioning_supported:
                     asserts.assert_true(0 <= target.position <= 10000, "Position is not in the expected range")
                 if is_latching_supported:
-                    asserts.assert_is_instance(target.Latch, bool, "Latch is not a boolean")
+                    asserts.assert_is_instance(target.latch, bool, "Latch is not a boolean")
                 if is_speed_supported:
                     asserts.assert_true(0 <= target.speed <= 3, "Speed is not in the expected range")
         else:
@@ -153,8 +153,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if attributes.UnitRange.attribute_id in attribute_list:
             unit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.UnitRange)
             if unit_range is not NullValue:
-                asserts.assert_true(-32768 <= unit_range.Min <= unit_range.Max - 1, "UnitRange.Min is not in the expected range")
-                asserts.assert_true(unit_range.Min + 1 <= unit_range.Max <= 32767, "UnitRange.Max is not in the expected range")
+                asserts.assert_true(-32768 <= unit_range.min <= unit_range.max - 1, "UnitRange.min is not in the expected range")
+                asserts.assert_true(unit_range.min + 1 <= unit_range.max <= 32767, "UnitRange.max is not in the expected range")
         else:
             logging.info("Test step skipped")
 
@@ -162,10 +162,10 @@ class TC_CLDIM_2_1(MatterBaseTest):
         self.step(9)
         if attributes.LimitRange.attribute_id in attribute_list:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
-            asserts.assert_true(0 <= limit_range.Min <= 10000, "LimitRange.Min is not in the expected range")
-            asserts.assert_true(limit_range.Min % resolution == 0, "LimitRange.Min is not a multiple of Resolution")
-            asserts.assert_true(limit_range.Min <= limit_range.Max <= 10000, "LimitRange.Max is not in the expected range")
-            asserts.assert_true(limit_range.Max % resolution == 0, "LimitRange.Max is not a multiple of Resolution")
+            asserts.assert_true(0 <= limit_range.min <= 10000, "LimitRange.min is not in the expected range")
+            asserts.assert_true(limit_range.min % resolution == 0, "LimitRange.min is not a multiple of Resolution")
+            asserts.assert_true(limit_range.min <= limit_range.max <= 10000, "LimitRange.max is not in the expected range")
+            asserts.assert_true(limit_range.max % resolution == 0, "LimitRange.max is not a multiple of Resolution")
         else:
             logging.info("Test step skipped")
 
