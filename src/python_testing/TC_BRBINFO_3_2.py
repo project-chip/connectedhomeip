@@ -29,7 +29,7 @@
 #       --endpoint 3
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --app-pipe /tmp/chip_all_clusters_fifo_${ALL_CLUSTERS_APP_ID}
+#       --app-pipe /tmp/chip_bridge_fifo_${BRIDGE_APP_ID}
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===

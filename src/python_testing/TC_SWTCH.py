@@ -34,6 +34,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/chip_all_clusters_fifo_${APP_CLUSTERS_APP_ID}
 #     factory-reset: true
 #     quiet: true
 #   run2:
@@ -51,6 +52,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/chip_all_clusters_fifo_${APP_CLUSTERS_APP_ID}
 #     factory-reset: true
 #     quiet: true
 #   run3:

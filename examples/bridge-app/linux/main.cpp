@@ -1085,7 +1085,7 @@ void ApplicationInit()
         }
     }
 
-    const char * app_id = std::getenv("CHIP_BRIDGE_APP_ID");
+    const char * app_id = std::getenv("BRIDGE_APP_ID");
     if (app_id == nullptr)
     {
         app_id = "54321";
