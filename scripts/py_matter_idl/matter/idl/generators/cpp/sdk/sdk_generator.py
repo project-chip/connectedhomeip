@@ -115,7 +115,6 @@ def extract_shared_enums(idl: Idl) -> list[EnumEntry]:
 
     return result
 
-
 class SdkGenerator(CodeGenerator):
     """
     Generation of cpp code for application implementation for matter.

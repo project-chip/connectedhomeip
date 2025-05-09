@@ -54,7 +54,7 @@ enum AreaTypeTag : enum8 {
   kLibrary = 51;
   kLivingRoom = 52;
   kLounge = 53;
-  kMediaTvRoom = 54;
+  kMediaTVRoom = 54;
   kMudRoom = 55;
   kMusicRoom = 56;
   kNursery = 57;
@@ -458,8 +458,8 @@ cluster AccessControl = 31 {
   revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
-    kPase = 1;
-    kCase = 2;
+    kPASE = 1;
+    kCASE = 2;
     kGroup = 3;
   }
 
@@ -686,7 +686,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   enum DownloadProtocolEnum : enum8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
-    kHttps = 2;
+    kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
@@ -832,7 +832,7 @@ cluster GeneralCommissioning = 48 {
   revision 1; // NOTE: Default/not specifically set
 
   enum CommissioningErrorEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -940,12 +940,12 @@ cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : enum8 {
-    k2g4 = 0;
-    k3g65 = 1;
-    k5g = 2;
-    k6g = 3;
-    k60g = 4;
-    k1g = 5;
+    k2G4 = 0;
+    k3G65 = 1;
+    k5G = 2;
+    k6G = 3;
+    k60G = 4;
+    k1G = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -1119,7 +1119,7 @@ cluster DiagnosticLogs = 50 {
 
   enum TransferProtocolEnum : enum8 {
     kResponsePayload = 0;
-    kBdx = 1;
+    kBDX = 1;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1337,7 +1337,7 @@ cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1589,7 +1589,7 @@ cluster HepaFilterMonitoring = 113 {
   revision 1; // NOTE: Default/not specifically set
 
   shared enum ChangeIndicationEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -1600,11 +1600,11 @@ cluster HepaFilterMonitoring = 113 {
   }
 
   shared enum ProductIdentifierTypeEnum : enum8 {
-    kUpc = 0;
-    kGtin8 = 1;
-    kEan = 2;
-    kGtin14 = 3;
-    kOem = 4;
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
   }
 
   bitmap Feature : bitmap32 {
@@ -1640,7 +1640,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   revision 1; // NOTE: Default/not specifically set
 
   shared enum ChangeIndicationEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -1651,11 +1651,11 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   }
 
   shared enum ProductIdentifierTypeEnum : enum8 {
-    kUpc = 0;
-    kGtin8 = 1;
-    kEan = 2;
-    kGtin14 = 3;
-    kOem = 4;
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
   }
 
   bitmap Feature : bitmap32 {
@@ -2174,14 +2174,14 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -2231,14 +2231,14 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -2288,14 +2288,14 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -2345,14 +2345,14 @@ cluster OzoneConcentrationMeasurement = 1045 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -2402,14 +2402,14 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -2459,14 +2459,14 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -2516,14 +2516,14 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -2573,14 +2573,14 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -2630,14 +2630,14 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -2687,14 +2687,14 @@ cluster RadonConcentrationMeasurement = 1071 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {

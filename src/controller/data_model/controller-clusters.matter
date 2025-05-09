@@ -54,7 +54,7 @@ enum AreaTypeTag : enum8 {
   kLibrary = 51;
   kLivingRoom = 52;
   kLounge = 53;
-  kMediaTvRoom = 54;
+  kMediaTVRoom = 54;
   kMudRoom = 55;
   kMusicRoom = 56;
   kNursery = 57;
@@ -693,8 +693,8 @@ cluster AccessControl = 31 {
   revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
-    kPase = 1;
-    kCase = 2;
+    kPASE = 1;
+    kCASE = 2;
     kGroup = 3;
   }
 
@@ -1098,7 +1098,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   enum DownloadProtocolEnum : enum8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
-    kHttps = 2;
+    kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
@@ -1395,7 +1395,7 @@ cluster PowerSource = 47 {
   }
 
   enum BatChargeLevelEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -1409,15 +1409,15 @@ cluster PowerSource = 47 {
 
   enum BatCommonDesignationEnum : enum16 {
     kUnspecified = 0;
-    kAaa = 1;
-    kAa = 2;
+    kAAA = 1;
+    kAA = 2;
     kC = 3;
     kD = 4;
     k4v5 = 5;
     k6v0 = 6;
     k9v0 = 7;
-    k12aa = 8;
-    kAaaa = 9;
+    k12AA = 8;
+    kAAAA = 9;
     kA = 10;
     kB = 11;
     kF = 12;
@@ -1426,9 +1426,9 @@ cluster PowerSource = 47 {
     kSubC = 15;
     kA23 = 16;
     kA27 = 17;
-    kBa5800 = 18;
+    kBA5800 = 18;
     kDuplex = 19;
-    k4sr44 = 20;
+    k4SR44 = 20;
     k523 = 21;
     k531 = 22;
     k15v0 = 23;
@@ -1437,39 +1437,39 @@ cluster PowerSource = 47 {
     k45v0 = 26;
     k67v5 = 27;
     kJ = 28;
-    kCr123a = 29;
-    kCr2 = 30;
-    k2cr5 = 31;
-    kCrP2 = 32;
-    kCrV3 = 33;
-    kSr41 = 34;
-    kSr43 = 35;
-    kSr44 = 36;
-    kSr45 = 37;
-    kSr48 = 38;
-    kSr54 = 39;
-    kSr55 = 40;
-    kSr57 = 41;
-    kSr58 = 42;
-    kSr59 = 43;
-    kSr60 = 44;
-    kSr63 = 45;
-    kSr64 = 46;
-    kSr65 = 47;
-    kSr66 = 48;
-    kSr67 = 49;
-    kSr68 = 50;
-    kSr69 = 51;
-    kSr516 = 52;
-    kSr731 = 53;
-    kSr712 = 54;
-    kLr932 = 55;
+    kCR123A = 29;
+    kCR2 = 30;
+    k2CR5 = 31;
+    kCRP2 = 32;
+    kCRV3 = 33;
+    kSR41 = 34;
+    kSR43 = 35;
+    kSR44 = 36;
+    kSR45 = 37;
+    kSR48 = 38;
+    kSR54 = 39;
+    kSR55 = 40;
+    kSR57 = 41;
+    kSR58 = 42;
+    kSR59 = 43;
+    kSR60 = 44;
+    kSR63 = 45;
+    kSR64 = 46;
+    kSR65 = 47;
+    kSR66 = 48;
+    kSR67 = 49;
+    kSR68 = 50;
+    kSR69 = 51;
+    kSR516 = 52;
+    kSR731 = 53;
+    kSR712 = 54;
+    kLR932 = 55;
     kA5 = 56;
     kA10 = 57;
     kA13 = 58;
     kA312 = 59;
     kA675 = 60;
-    kAc41e = 61;
+    kAC41E = 61;
     k10180 = 62;
     k10280 = 63;
     k10440 = 64;
@@ -1479,7 +1479,7 @@ cluster PowerSource = 47 {
     k14650 = 68;
     k15270 = 69;
     k16340 = 70;
-    kRcr123a = 71;
+    kRCR123A = 71;
     k17500 = 72;
     k17670 = 73;
     k18350 = 74;
@@ -1512,8 +1512,8 @@ cluster PowerSource = 47 {
   }
 
   enum WiredCurrentTypeEnum : enum8 {
-    kAc = 0;
-    kDc = 1;
+    kAC = 0;
+    kDC = 1;
   }
 
   enum WiredFaultEnum : enum8 {
@@ -1604,7 +1604,7 @@ cluster GeneralCommissioning = 48 {
   revision 1; // NOTE: Default/not specifically set
 
   enum CommissioningErrorEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -1712,12 +1712,12 @@ cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : enum8 {
-    k2g4 = 0;
-    k3g65 = 1;
-    k5g = 2;
-    k6g = 3;
-    k60g = 4;
-    k1g = 5;
+    k2G4 = 0;
+    k3G65 = 1;
+    k5G = 2;
+    k6G = 3;
+    k60G = 4;
+    k1G = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -1891,7 +1891,7 @@ cluster DiagnosticLogs = 50 {
 
   enum TransferProtocolEnum : enum8 {
     kResponsePayload = 0;
-    kBdx = 1;
+    kBDX = 1;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2107,7 +2107,7 @@ cluster ThreadNetworkDiagnostics = 53 {
     kUnassigned = 1;
     kSleepyEndDevice = 2;
     kEndDevice = 3;
-    kReed = 4;
+    kREED = 4;
     kRouter = 5;
     kLeader = 6;
   }
@@ -2273,10 +2273,10 @@ cluster WiFiNetworkDiagnostics = 54 {
   enum SecurityTypeEnum : enum8 {
     kUnspecified = 0;
     kNone = 1;
-    kWep = 2;
-    kWpa = 3;
-    kWpa2 = 4;
-    kWpa3 = 5;
+    kWEP = 2;
+    kWPA = 3;
+    kWPA2 = 4;
+    kWPA3 = 5;
   }
 
   enum WiFiVersionEnum : enum8 {
@@ -2339,7 +2339,7 @@ cluster EthernetNetworkDiagnostics = 55 {
     kRate10M = 0;
     kRate100M = 1;
     kRate1G = 2;
-    kRate25g = 3;
+    kRate25G = 3;
     kRate5G = 4;
     kRate10G = 5;
     kRate40G = 6;
@@ -2405,8 +2405,8 @@ cluster TimeSynchronization = 56 {
     kMatterNTPNTS = 12;
     kMixedNTPNTS = 13;
     kCloudSource = 14;
-    kPtp = 15;
-    kGnss = 16;
+    kPTP = 15;
+    kGNSS = 16;
   }
 
   enum TimeZoneDatabaseEnum : enum8 {
@@ -2738,7 +2738,7 @@ cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -3055,8 +3055,8 @@ cluster IcdManagement = 70 {
   }
 
   enum OperatingModeEnum : enum8 {
-    kSit = 0;
-    kLit = 1;
+    kSIT = 0;
+    kLIT = 1;
   }
 
   bitmap Feature : bitmap32 {
@@ -4344,7 +4344,7 @@ cluster HepaFilterMonitoring = 113 {
   revision 1; // NOTE: Default/not specifically set
 
   shared enum ChangeIndicationEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -4355,11 +4355,11 @@ cluster HepaFilterMonitoring = 113 {
   }
 
   shared enum ProductIdentifierTypeEnum : enum8 {
-    kUpc = 0;
-    kGtin8 = 1;
-    kEan = 2;
-    kGtin14 = 3;
-    kOem = 4;
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
   }
 
   bitmap Feature : bitmap32 {
@@ -4395,7 +4395,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   revision 1; // NOTE: Default/not specifically set
 
   shared enum ChangeIndicationEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -4406,11 +4406,11 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   }
 
   shared enum ProductIdentifierTypeEnum : enum8 {
-    kUpc = 0;
-    kGtin8 = 1;
-    kEan = 2;
-    kGtin14 = 3;
-    kOem = 4;
+    kUPC = 0;
+    kGTIN8 = 1;
+    kEAN = 2;
+    kGTIN14 = 3;
+    kOEM = 4;
   }
 
   bitmap Feature : bitmap32 {
@@ -4591,8 +4591,8 @@ cluster ElectricalPowerMeasurement = 144 {
 
   enum PowerModeEnum : enum8 {
     kUnknown = 0;
-    kDc = 1;
-    kAc = 2;
+    kDC = 1;
+    kAC = 2;
   }
 
   bitmap Feature : bitmap32 {
@@ -5014,7 +5014,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   enum ESATypeEnum : enum8 {
-    kEvse = 0;
+    kEVSE = 0;
     kSpaceHeating = 1;
     kWaterHeating = 2;
     kSpaceCooling = 3;
@@ -5456,7 +5456,7 @@ cluster EnergyEvseMode = 157 {
     kManual = 16384;
     kTimeOfUse = 16385;
     kSolarCharging = 16386;
-    kV2x = 16387;
+    kV2X = 16387;
   }
 
   bitmap Feature : bitmap32 {
@@ -5672,8 +5672,8 @@ cluster DoorLock = 257 {
 
   enum CredentialTypeEnum : enum8 {
     kProgrammingPIN = 0;
-    kPin = 1;
-    kRfid = 2;
+    kPIN = 1;
+    kRFID = 2;
     kFingerprint = 3;
     kFingerVein = 4;
     kFace = 5;
@@ -5787,8 +5787,8 @@ cluster DoorLock = 257 {
     kWeekDaySchedule = 3;
     kYearDaySchedule = 4;
     kHolidaySchedule = 5;
-    kPin = 6;
-    kRfid = 7;
+    kPIN = 6;
+    kRFID = 7;
     kFingerprint = 8;
     kFingerVein = 9;
     kFace = 10;
@@ -5830,7 +5830,7 @@ cluster DoorLock = 257 {
     kButton = 5;
     kSchedule = 6;
     kRemote = 7;
-    kRfid = 8;
+    kRFID = 8;
     kBiometric = 9;
     kAliro = 10;
   }
@@ -7758,7 +7758,7 @@ cluster IlluminanceMeasurement = 1024 {
 
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
-    kCmos = 1;
+    kCMOS = 1;
   }
 
   readonly attribute nullable int16u measuredValue = 0;
@@ -7852,7 +7852,7 @@ cluster OccupancySensing = 1030 {
   revision 5;
 
   enum OccupancySensorTypeEnum : enum8 {
-    kPir = 0;
+    kPIR = 0;
     kUltrasonic = 1;
     kPIRAndUltrasonic = 2;
     kPhysicalContact = 3;
@@ -7930,14 +7930,14 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -7987,14 +7987,14 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -8044,14 +8044,14 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -8101,14 +8101,14 @@ cluster OzoneConcentrationMeasurement = 1045 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -8158,14 +8158,14 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -8215,14 +8215,14 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -8272,14 +8272,14 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -8329,14 +8329,14 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -8386,14 +8386,14 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -8443,14 +8443,14 @@ cluster RadonConcentrationMeasurement = 1071 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : bitmap32 {
@@ -8627,11 +8627,11 @@ cluster Channel = 1284 {
     kSatellite = 0;
     kCable = 1;
     kTerrestrial = 2;
-    kOtt = 3;
+    kOTT = 3;
   }
 
   enum LineupInfoTypeEnum : enum8 {
-    kMso = 0;
+    kMSO = 0;
   }
 
   enum StatusEnum : enum8 {
@@ -9005,13 +9005,13 @@ cluster MediaInput = 1287 {
     kAux = 1;
     kCoax = 2;
     kComposite = 3;
-    kHdmi = 4;
+    kHDMI = 4;
     kInput = 5;
     kLine = 6;
     kOptical = 7;
     kVideo = 8;
-    kScart = 9;
-    kUsb = 10;
+    kSCART = 9;
+    kUSB = 10;
     kOther = 11;
   }
 
@@ -9351,8 +9351,8 @@ cluster AudioOutput = 1291 {
   revision 1;
 
   enum OutputTypeEnum : enum8 {
-    kHdmi = 0;
-    kBt = 1;
+    kHDMI = 0;
+    kBT = 1;
     kOptical = 2;
     kHeadphone = 3;
     kInternal = 4;
@@ -9768,12 +9768,12 @@ provisional cluster CameraAvStreamManagement = 1361 {
   revision 1;
 
   enum AudioCodecEnum : enum8 {
-    kOpus = 0;
-    kAacLc = 1;
+    kOPUS = 0;
+    kAACLC = 1;
   }
 
   enum ImageCodecEnum : enum8 {
-    kJpeg = 0;
+    kJPEG = 0;
   }
 
   shared enum StreamUsageEnum : enum8 {
@@ -9797,9 +9797,9 @@ provisional cluster CameraAvStreamManagement = 1361 {
 
   enum VideoCodecEnum : enum8 {
     kH264 = 0;
-    kHevc = 1;
-    kVvc = 2;
-    kAv1 = 3;
+    kHEVC = 1;
+    kVVC = 2;
+    kAV1 = 3;
   }
 
   bitmap Feature : bitmap32 {
@@ -10364,7 +10364,7 @@ provisional cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum ContainerFormatEnum : enum8 {
-    kCmaf = 0;
+    kCMAF = 0;
   }
 
   enum IngestMethodsEnum : enum8 {
@@ -10822,8 +10822,8 @@ provisional cluster JointFabricDatastore = 1874 {
   revision 1;
 
   enum DatastoreAccessControlEntryAuthModeEnum : enum8 {
-    kPase = 1;
-    kCase = 2;
+    kPASE = 1;
+    kCASE = 2;
     kGroup = 3;
   }
 
@@ -11138,7 +11138,7 @@ provisional cluster JointFabricAdministrator = 1875 {
   revision 1;
 
   enum ICACResponseStatusEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidICAC = 2;
   }
@@ -11149,7 +11149,7 @@ provisional cluster JointFabricAdministrator = 1875 {
   }
 
   enum TransferAnchorResponseStatusEnum : enum8 {
-    kOk = 0;
+    kOK = 0;
     kTransferAnchorStatusDatastoreBusy = 1;
     kTransferAnchorStatusNoUserConsent = 2;
   }
