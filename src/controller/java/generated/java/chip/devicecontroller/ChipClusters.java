@@ -301,7 +301,6 @@ public class ChipClusters {
     private static final long IDENTIFY_TYPE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -365,10 +364,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -489,32 +484,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -600,7 +569,6 @@ public class ChipClusters {
     private static final long NAME_SUPPORT_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -838,10 +806,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -922,32 +886,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -1039,7 +977,6 @@ public class ChipClusters {
     private static final long START_UP_ON_OFF_ATTRIBUTE_ID = 16387L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -1179,10 +1116,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -1399,32 +1332,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -1523,7 +1430,6 @@ public class ChipClusters {
     private static final long START_UP_CURRENT_LEVEL_ATTRIBUTE_ID = 16384L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -1835,10 +1741,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -2325,32 +2227,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -2435,7 +2311,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -2455,10 +2330,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -2516,32 +2387,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -2634,7 +2479,6 @@ public class ChipClusters {
     private static final long ENDPOINT_UNIQUE_ID_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -2674,10 +2518,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -2893,32 +2733,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -3004,7 +2818,6 @@ public class ChipClusters {
     private static final long BINDING_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -3028,10 +2841,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -3131,32 +2940,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -3248,7 +3031,6 @@ public class ChipClusters {
     private static final long ARL_ATTRIBUTE_ID = 6L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -3318,10 +3100,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -3596,32 +3374,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -3709,7 +3461,6 @@ public class ChipClusters {
     private static final long SETUP_URL_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -4048,10 +3799,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -4186,32 +3933,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -4320,7 +4041,6 @@ public class ChipClusters {
     private static final long CONFIGURATION_VERSION_ATTRIBUTE_ID = 24L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -4364,10 +4084,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -5078,32 +4794,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -5188,7 +4878,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -5391,10 +5080,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -5449,32 +5134,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -5565,7 +5224,6 @@ public class ChipClusters {
     private static final long UPDATE_STATE_PROGRESS_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -5629,10 +5287,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -5810,32 +5464,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -5922,7 +5550,6 @@ public class ChipClusters {
     private static final long SUPPORTED_LOCALES_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -5946,10 +5573,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -6070,32 +5693,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -6183,7 +5780,6 @@ public class ChipClusters {
     private static final long SUPPORTED_CALENDAR_TYPES_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -6207,10 +5803,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -6366,32 +5958,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -6478,7 +6044,6 @@ public class ChipClusters {
     private static final long SUPPORTED_TEMPERATURE_UNITS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -6502,10 +6067,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -6626,32 +6187,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -6737,7 +6272,6 @@ public class ChipClusters {
     private static final long SOURCES_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -6761,10 +6295,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -6848,32 +6378,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -6992,7 +6496,6 @@ public class ChipClusters {
     private static final long ENDPOINT_LIST_ATTRIBUTE_ID = 31L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -7060,10 +6563,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -7955,32 +7454,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -8075,7 +7548,6 @@ public class ChipClusters {
     private static final long TC_UPDATE_DEADLINE_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -8272,10 +7744,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -8604,32 +8072,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -8725,7 +8167,6 @@ public class ChipClusters {
     private static final long THREAD_VERSION_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -9196,10 +8637,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -9551,32 +8988,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -9661,7 +9072,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -9747,10 +9157,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -9805,32 +9211,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -9926,7 +9306,6 @@ public class ChipClusters {
     private static final long TEST_EVENT_TRIGGERS_ENABLED_ATTRIBUTE_ID = 8L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -10065,10 +9444,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -10362,32 +9737,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -10476,7 +9825,6 @@ public class ChipClusters {
     private static final long CURRENT_HEAP_HIGH_WATERMARK_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -10516,10 +9864,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -10683,32 +10027,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -10858,7 +10176,6 @@ public class ChipClusters {
     private static final long RLOC16_ATTRIBUTE_ID = 64L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -10982,10 +10299,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -12735,32 +12048,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -12858,7 +12145,6 @@ public class ChipClusters {
     private static final long OVERRUN_COUNT_ATTRIBUTE_ID = 12L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -12946,10 +12232,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -13347,32 +12629,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -13466,7 +12722,6 @@ public class ChipClusters {
     private static final long TIME_SINCE_RESET_ATTRIBUTE_ID = 8L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -13514,10 +12769,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -13811,32 +13062,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -13934,7 +13159,6 @@ public class ChipClusters {
     private static final long SUPPORTS_DNS_RESOLVE_ATTRIBUTE_ID = 12L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -14100,10 +13324,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -14501,32 +13721,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -14629,7 +13823,6 @@ public class ChipClusters {
     private static final long CONFIGURATION_VERSION_ATTRIBUTE_ID = 24L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -14677,10 +13870,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -15217,32 +14406,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -15330,7 +14493,6 @@ public class ChipClusters {
     private static final long MULTI_PRESS_MAX_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -15350,10 +14512,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -15491,32 +14649,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -15604,7 +14736,6 @@ public class ChipClusters {
     private static final long ADMIN_VENDOR_ID_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -15695,10 +14826,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -15836,32 +14963,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -15952,7 +15053,6 @@ public class ChipClusters {
     private static final long CURRENT_FABRIC_INDEX_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -16407,10 +15507,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -16633,32 +15729,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -16747,7 +15817,6 @@ public class ChipClusters {
     private static final long MAX_GROUP_KEYS_PER_FABRIC_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -16879,10 +15948,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -17065,32 +16130,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -17176,7 +16215,6 @@ public class ChipClusters {
     private static final long LABEL_LIST_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -17200,10 +16238,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -17287,32 +16321,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -17400,7 +16408,6 @@ public class ChipClusters {
     private static final long LABEL_LIST_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -17424,10 +16431,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -17522,32 +16525,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -17632,7 +16609,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -17652,10 +16628,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -17713,32 +16685,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -17825,7 +16771,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -17845,10 +16790,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -17906,32 +16847,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -18018,7 +16933,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -18038,10 +16952,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -18099,32 +17009,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -18212,7 +17096,6 @@ public class ChipClusters {
     private static final long STATE_VALUE_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -18232,10 +17115,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -18319,32 +17198,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -18441,7 +17294,6 @@ public class ChipClusters {
     private static final long MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -18573,10 +17425,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -18901,32 +17749,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -19014,7 +17836,6 @@ public class ChipClusters {
     private static final long TIMER_STATE_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -19110,10 +17931,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -19251,32 +18068,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -19367,7 +18158,6 @@ public class ChipClusters {
     private static final long OPERATIONAL_ERROR_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -19463,10 +18253,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -19682,32 +18468,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -19794,7 +18554,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -19859,10 +18618,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -19974,32 +18729,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -20086,7 +18815,6 @@ public class ChipClusters {
     private static final long SELECTED_DRYNESS_LEVEL_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -20114,10 +18842,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -20238,32 +18962,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -20354,7 +19052,6 @@ public class ChipClusters {
     private static final long ON_MODE_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -20410,10 +19107,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -20647,32 +19340,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -20759,7 +19426,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -20824,10 +19490,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -20937,32 +19599,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -21051,7 +19687,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -21116,10 +19751,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -21229,32 +19860,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -21345,7 +19950,6 @@ public class ChipClusters {
     private static final long SUPPORTED_RINSES_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -21377,10 +19981,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -21562,32 +20162,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -21674,7 +20248,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -21739,10 +20312,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -21852,32 +20421,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -21966,7 +20509,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -22031,10 +20573,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -22144,32 +20682,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -22262,7 +20774,6 @@ public class ChipClusters {
     private static final long SUPPORTED_TEMPERATURE_LEVELS_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -22310,10 +20821,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -22529,32 +21036,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -22642,7 +21123,6 @@ public class ChipClusters {
     private static final long SUPPORTED_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -22662,10 +21142,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -22803,32 +21279,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -22915,7 +21365,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -22980,10 +21429,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -23095,32 +21540,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -23206,7 +21625,6 @@ public class ChipClusters {
     private static final long AIR_QUALITY_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -23226,10 +21644,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -23313,32 +21727,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -23438,7 +21826,6 @@ public class ChipClusters {
     private static final long EXPIRY_DATE_ATTRIBUTE_ID = 12L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -23474,10 +21861,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -23884,32 +22267,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -23998,7 +22355,6 @@ public class ChipClusters {
     private static final long SUPPORTED_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -24058,10 +22414,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -24225,32 +22577,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -24337,7 +22663,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -24361,10 +22686,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -24476,32 +22797,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -24595,7 +22890,6 @@ public class ChipClusters {
     private static final long WATT_RATING_ATTRIBUTE_ID = 8L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -24675,10 +22969,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -24972,32 +23262,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -25088,7 +23352,6 @@ public class ChipClusters {
     private static final long OPERATIONAL_ERROR_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -25239,10 +23502,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -25455,32 +23714,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -25571,7 +23804,6 @@ public class ChipClusters {
     private static final long OPERATIONAL_ERROR_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -25696,10 +23928,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -25912,32 +24140,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -26024,7 +24226,6 @@ public class ChipClusters {
     private static final long FABRIC_SCENE_INFO_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -26480,10 +24681,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -26597,32 +24794,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -26713,7 +24884,6 @@ public class ChipClusters {
     private static final long REPLACEMENT_PRODUCT_LIST_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -26757,10 +24927,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -26983,32 +25149,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -27101,7 +25241,6 @@ public class ChipClusters {
     private static final long REPLACEMENT_PRODUCT_LIST_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -27145,10 +25284,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -27371,32 +25506,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -27491,7 +25600,6 @@ public class ChipClusters {
     private static final long SENSOR_FAULT_ATTRIBUTE_ID = 7L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -27551,10 +25659,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -27831,32 +25935,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -27952,7 +26030,6 @@ public class ChipClusters {
     private static final long LEVEL_STEP_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -28044,10 +26121,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -28411,32 +26484,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -28540,7 +26587,6 @@ public class ChipClusters {
     private static final long NEUTRAL_CURRENT_ATTRIBUTE_ID = 18L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -28628,10 +26674,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -29185,32 +27227,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -29301,7 +27317,6 @@ public class ChipClusters {
     private static final long CUMULATIVE_ENERGY_RESET_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -29345,10 +27360,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -29564,32 +27575,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -29680,7 +27665,6 @@ public class ChipClusters {
     private static final long BOOST_STATE_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -29736,10 +27720,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -29955,32 +27935,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -30069,7 +28023,6 @@ public class ChipClusters {
     private static final long PRICE_FORECAST_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -30169,10 +28122,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -30336,32 +28285,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -30448,7 +28371,6 @@ public class ChipClusters {
     private static final long ACTIVE_MESSAGE_I_DS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -30540,10 +28462,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -30655,32 +28573,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -30773,7 +28665,6 @@ public class ChipClusters {
     private static final long OPT_OUT_STATE_ATTRIBUTE_ID = 7L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -30977,10 +28868,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -31248,32 +29135,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -31381,7 +29242,6 @@ public class ChipClusters {
     private static final long SESSION_ENERGY_DISCHARGED_ATTRIBUTE_ID = 67L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -31590,10 +29450,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -32278,32 +30134,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -32393,7 +30223,6 @@ public class ChipClusters {
     private static final long CURRENT_LOW_POWER_MODE_SENSITIVITY_ATTRIBUTE_ID = 4L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -32425,10 +30254,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -32636,32 +30461,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -32748,7 +30547,6 @@ public class ChipClusters {
     private static final long ACTIVE_ENDPOINTS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -32776,10 +30574,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -32891,32 +30685,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -33003,7 +30771,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -33068,10 +30835,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -33181,32 +30944,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -33295,7 +31032,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -33360,10 +31096,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -33473,32 +31205,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -33587,7 +31293,6 @@ public class ChipClusters {
     private static final long CURRENT_MODE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -33652,10 +31357,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -33765,32 +31466,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -33880,7 +31555,6 @@ public class ChipClusters {
     private static final long FORECAST_CONDITIONS_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -33912,10 +31586,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -34062,32 +31732,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -34217,7 +31861,6 @@ public class ChipClusters {
     private static final long NUMBER_OF_ALIRO_ENDPOINT_KEYS_SUPPORTED_ATTRIBUTE_ID = 136L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -35076,10 +32719,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -36471,32 +34110,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -36603,7 +34216,6 @@ public class ChipClusters {
     private static final long SAFETY_STATUS_ATTRIBUTE_ID = 26L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -36783,10 +34395,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -37427,32 +35035,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -37542,7 +35124,6 @@ public class ChipClusters {
     private static final long OVERALL_TARGET_ATTRIBUTE_ID = 4L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -37638,10 +35219,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -37831,32 +35408,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -37952,7 +35503,6 @@ public class ChipClusters {
     private static final long MODULATION_TYPE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -38044,10 +35594,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -38393,32 +35939,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -38509,7 +36029,6 @@ public class ChipClusters {
     private static final long PROGRESS_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -38635,10 +36154,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -38854,32 +36369,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -38987,7 +36476,6 @@ public class ChipClusters {
     private static final long CONTROL_MODE_ATTRIBUTE_ID = 33L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -39079,10 +36567,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -39776,32 +37260,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -39946,7 +37404,6 @@ public class ChipClusters {
     private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 82L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -40269,10 +37726,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -42153,32 +39606,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -42275,7 +39702,6 @@ public class ChipClusters {
     private static final long AIRFLOW_DIRECTION_ATTRIBUTE_ID = 11L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -42331,10 +39757,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -42760,32 +40182,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -42873,7 +40269,6 @@ public class ChipClusters {
     private static final long SCHEDULE_PROGRAMMING_VISIBILITY_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -42893,10 +40288,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -43061,32 +40452,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -43223,7 +40588,6 @@ public class ChipClusters {
     private static final long START_UP_COLOR_TEMPERATURE_MIREDS_ATTRIBUTE_ID = 16400L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -43955,10 +41319,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -45487,32 +42847,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -45611,7 +42945,6 @@ public class ChipClusters {
     private static final long LAMP_BURN_HOURS_TRIP_POINT_ATTRIBUTE_ID = 53L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -45651,10 +42984,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -46168,32 +43497,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -46283,7 +43586,6 @@ public class ChipClusters {
     private static final long LIGHT_SENSOR_TYPE_ATTRIBUTE_ID = 4L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -46319,10 +43621,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -46512,32 +43810,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -46626,7 +43898,6 @@ public class ChipClusters {
     private static final long TOLERANCE_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -46658,10 +43929,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -46825,32 +44092,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -46944,7 +44185,6 @@ public class ChipClusters {
     private static final long SCALE_ATTRIBUTE_ID = 20L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -46988,10 +44228,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -47285,32 +44521,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -47399,7 +44609,6 @@ public class ChipClusters {
     private static final long TOLERANCE_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -47431,10 +44640,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -47596,32 +44801,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -47712,7 +44891,6 @@ public class ChipClusters {
     private static final long TOLERANCE_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -47744,10 +44922,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -47909,32 +45083,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -48035,7 +45183,6 @@ public class ChipClusters {
     private static final long PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID = 50L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -48059,10 +45206,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -48576,32 +45719,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -48697,7 +45814,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -48737,10 +45853,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -49084,32 +46196,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -49207,7 +46293,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -49247,10 +46332,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -49594,32 +46675,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -49717,7 +46772,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -49757,10 +46811,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -50104,32 +47154,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -50227,7 +47251,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -50267,10 +47290,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -50614,32 +47633,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -50737,7 +47730,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -50777,10 +47769,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -51124,32 +48112,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -51247,7 +48209,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -51287,10 +48248,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -51634,32 +48591,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -51757,7 +48688,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -51797,10 +48727,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -52144,32 +49070,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -52267,7 +49167,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -52307,10 +49206,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -52654,32 +49549,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -52777,7 +49646,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -52817,10 +49685,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -53164,32 +50028,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -53287,7 +50125,6 @@ public class ChipClusters {
     private static final long LEVEL_VALUE_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -53327,10 +50164,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -53676,32 +50509,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -53788,7 +50595,6 @@ public class ChipClusters {
     private static final long SOIL_MOISTURE_MEASURED_VALUE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -53816,10 +50622,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -53931,32 +50733,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -54043,7 +50819,6 @@ public class ChipClusters {
     private static final long PASSPHRASE_SURROGATE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -54101,10 +50876,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -54216,32 +50987,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -54332,7 +51077,6 @@ public class ChipClusters {
     private static final long PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -54460,10 +51204,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -54679,32 +51419,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -54792,7 +51506,6 @@ public class ChipClusters {
     private static final long THREAD_NETWORK_TABLE_SIZE_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -54888,10 +51601,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -55038,32 +51747,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -55150,7 +51833,6 @@ public class ChipClusters {
     private static final long LINK_LOCAL_ADDRESS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -55170,10 +51852,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -55285,32 +51963,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -55398,7 +52050,6 @@ public class ChipClusters {
     private static final long CURRENT_CHANNEL_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -55647,10 +52298,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -55785,32 +52432,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -55897,7 +52518,6 @@ public class ChipClusters {
     private static final long CURRENT_TARGET_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -55966,10 +52586,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -56081,32 +52697,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -56202,7 +52792,6 @@ public class ChipClusters {
     private static final long AVAILABLE_TEXT_TRACKS_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -56708,10 +53297,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -57054,32 +53639,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -57166,7 +53725,6 @@ public class ChipClusters {
     private static final long CURRENT_INPUT_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -57266,10 +53824,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -57381,32 +53935,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -57491,7 +54019,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -57527,10 +54054,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -57588,32 +54111,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -57700,7 +54197,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -57754,10 +54250,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -57815,32 +54307,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -57929,7 +54395,6 @@ public class ChipClusters {
     private static final long SUPPORTED_STREAMING_PROTOCOLS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -58058,10 +54523,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -58170,32 +54631,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -58282,7 +54717,6 @@ public class ChipClusters {
     private static final long CURRENT_OUTPUT_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -58350,10 +54784,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -58465,32 +54895,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -58577,7 +54981,6 @@ public class ChipClusters {
     private static final long CURRENT_APP_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -58727,10 +55130,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -58839,32 +55238,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -58957,7 +55330,6 @@ public class ChipClusters {
     private static final long ALLOWED_VENDOR_LIST_ATTRIBUTE_ID = 7L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -58985,10 +55357,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -59256,32 +55624,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -59366,7 +55708,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -59462,10 +55803,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -59520,32 +55857,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -59640,7 +55951,6 @@ public class ChipClusters {
     private static final long BLOCK_UNRATED_ATTRIBUTE_ID = 7L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -59870,10 +56180,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -60141,32 +56447,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -60251,7 +56531,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -60326,10 +56605,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -60384,32 +56659,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -60500,7 +56749,6 @@ public class ChipClusters {
     private static final long SENSITIVITY_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -60644,10 +56892,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -60829,32 +57073,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -60980,7 +57198,6 @@ public class ChipClusters {
     private static final long STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID = 40L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -61426,10 +57643,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -62717,32 +58930,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -62836,7 +59023,6 @@ public class ChipClusters {
     private static final long PAN_MAX_ATTRIBUTE_ID = 8L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -63044,10 +59230,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -63341,32 +59523,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -63452,7 +59608,6 @@ public class ChipClusters {
     private static final long CURRENT_SESSIONS_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -63710,10 +59865,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -63801,32 +59952,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -63912,7 +60037,6 @@ public class ChipClusters {
     private static final long CURRENT_SESSIONS_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -64043,10 +60167,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -64132,32 +60252,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -64246,7 +60340,6 @@ public class ChipClusters {
     private static final long CURRENT_CONNECTIONS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -64441,10 +60534,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -64553,32 +60642,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -64666,7 +60729,6 @@ public class ChipClusters {
     private static final long ENABLED_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -64706,10 +60768,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -64865,32 +60923,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -64994,7 +61026,6 @@ public class ChipClusters {
     private static final long DEFAULT_RANDOMIZATION_TYPE_ATTRIBUTE_ID = 18L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -65172,10 +61203,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -65729,32 +61756,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -65841,7 +61842,6 @@ public class ChipClusters {
     private static final long LOCATION_DIRECTORY_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -65869,10 +61869,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -65994,32 +61990,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -66105,7 +62075,6 @@ public class ChipClusters {
     private static final long SUPPORTED_DEVICE_CATEGORIES_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -66226,10 +62195,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -66310,32 +62275,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -66436,7 +62375,6 @@ public class ChipClusters {
     private static final long NODE_ENDPOINT_LIST_ATTRIBUTE_ID = 13L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -67015,10 +62953,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -67474,32 +63408,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -67585,7 +63493,6 @@ public class ChipClusters {
     private static final long ADMINISTRATOR_FABRIC_INDEX_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -67778,10 +63685,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -67862,32 +63765,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -67978,7 +63855,6 @@ public class ChipClusters {
     private static final long PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -68295,10 +64171,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -68459,32 +64331,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -68571,7 +64417,6 @@ public class ChipClusters {
     private static final long PROVISIONED_ENDPOINTS_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -68702,10 +64547,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -68814,32 +64655,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -68929,7 +64744,6 @@ public class ChipClusters {
     private static final long POWER_THRESHOLD_ATTRIBUTE_ID = 4L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -68969,10 +64783,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -69162,32 +64972,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -69275,7 +65059,6 @@ public class ChipClusters {
     private static final long MEASUREMENT_TYPE_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -69307,10 +65090,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -69446,32 +65225,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -69647,7 +65400,6 @@ public class ChipClusters {
     private static final long MEI_INT8U_ATTRIBUTE_ID = 4294070017L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -71006,10 +66758,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -74185,32 +69933,6 @@ public class ChipClusters {
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readAttributeListAttribute(
         AttributeListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
@@ -74295,7 +70017,6 @@ public class ChipClusters {
 
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -74382,10 +70103,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -74440,32 +70157,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(
@@ -74553,7 +70244,6 @@ public class ChipClusters {
     private static final long FLIP_FLOP_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
-    private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
@@ -74627,10 +70317,6 @@ public class ChipClusters {
     }
 
     public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Long> value);
-    }
-
-    public interface EventListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
 
@@ -74723,32 +70409,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEventListAttribute(
-        EventListAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEventListAttribute(
-        EventListAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENT_LIST_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EVENT_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(

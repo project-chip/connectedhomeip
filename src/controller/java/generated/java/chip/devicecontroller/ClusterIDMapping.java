@@ -460,7 +460,6 @@ public class ClusterIDMapping {
             IdentifyType(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -597,7 +596,6 @@ public class ClusterIDMapping {
             NameSupport(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -793,7 +791,6 @@ public class ClusterIDMapping {
             StartUpOnOff(16387L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -947,7 +944,6 @@ public class ClusterIDMapping {
             StartUpCurrentLevel(16384L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -1209,7 +1205,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -1315,7 +1310,6 @@ public class ClusterIDMapping {
             EndpointUniqueID(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -1416,7 +1410,6 @@ public class ClusterIDMapping {
             Binding(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -1523,7 +1516,6 @@ public class ClusterIDMapping {
             Arl(6L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -1647,7 +1639,6 @@ public class ClusterIDMapping {
             SetupURL(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -1989,7 +1980,6 @@ public class ClusterIDMapping {
             ConfigurationVersion(24L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -2094,7 +2084,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -2252,7 +2241,6 @@ public class ClusterIDMapping {
             UpdateStateProgress(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -2375,7 +2363,6 @@ public class ClusterIDMapping {
             SupportedLocales(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -2478,7 +2465,6 @@ public class ClusterIDMapping {
             SupportedCalendarTypes(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -2580,7 +2566,6 @@ public class ClusterIDMapping {
             SupportedTemperatureUnits(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -2681,7 +2666,6 @@ public class ClusterIDMapping {
             Sources(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -2813,7 +2797,6 @@ public class ClusterIDMapping {
             EndpointList(31L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -2926,7 +2909,6 @@ public class ClusterIDMapping {
             TCUpdateDeadline(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -3092,7 +3074,6 @@ public class ClusterIDMapping {
             ThreadVersion(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -3318,7 +3299,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -3445,7 +3425,6 @@ public class ClusterIDMapping {
             TestEventTriggersEnabled(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -3590,7 +3569,6 @@ public class ClusterIDMapping {
             CurrentHeapHighWatermark(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -3757,7 +3735,6 @@ public class ClusterIDMapping {
             Rloc16(64L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -3873,7 +3850,6 @@ public class ClusterIDMapping {
             OverrunCount(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -3986,7 +3962,6 @@ public class ClusterIDMapping {
             TimeSinceReset(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -4100,7 +4075,6 @@ public class ClusterIDMapping {
             SupportsDNSResolve(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -4313,7 +4287,6 @@ public class ClusterIDMapping {
             ConfigurationVersion(24L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -4439,7 +4412,6 @@ public class ClusterIDMapping {
             MultiPressMax(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -4549,7 +4521,6 @@ public class ClusterIDMapping {
             AdminVendorId(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -4692,7 +4663,6 @@ public class ClusterIDMapping {
             CurrentFabricIndex(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -4976,7 +4946,6 @@ public class ClusterIDMapping {
             MaxGroupKeysPerFabric(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -5132,7 +5101,6 @@ public class ClusterIDMapping {
             LabelList(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -5233,7 +5201,6 @@ public class ClusterIDMapping {
             LabelList(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -5333,7 +5300,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -5433,7 +5399,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -5533,7 +5498,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -5634,7 +5598,6 @@ public class ClusterIDMapping {
             StateValue(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -5745,7 +5708,6 @@ public class ClusterIDMapping {
             MaximumCheckInBackOff(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -5902,7 +5864,6 @@ public class ClusterIDMapping {
             TimerState(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -6063,7 +6024,6 @@ public class ClusterIDMapping {
             OperationalError(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -6169,7 +6129,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -6289,7 +6248,6 @@ public class ClusterIDMapping {
             SelectedDrynessLevel(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -6395,7 +6353,6 @@ public class ClusterIDMapping {
             OnMode(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -6515,7 +6472,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -6635,7 +6591,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -6757,7 +6712,6 @@ public class ClusterIDMapping {
             SupportedRinses(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -6859,7 +6813,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -6979,7 +6932,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -7103,7 +7055,6 @@ public class ClusterIDMapping {
             SupportedTemperatureLevels(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -7224,7 +7175,6 @@ public class ClusterIDMapping {
             Supported(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -7327,7 +7277,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -7446,7 +7395,6 @@ public class ClusterIDMapping {
             AirQuality(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -7559,7 +7507,6 @@ public class ClusterIDMapping {
             ExpiryDate(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -7675,7 +7622,6 @@ public class ClusterIDMapping {
             Supported(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -7814,7 +7760,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -7923,7 +7868,6 @@ public class ClusterIDMapping {
             WattRating(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -8065,7 +8009,6 @@ public class ClusterIDMapping {
             OperationalError(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -8177,7 +8120,6 @@ public class ClusterIDMapping {
             OperationalError(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -8284,7 +8226,6 @@ public class ClusterIDMapping {
             FabricSceneInfo(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -8534,7 +8475,6 @@ public class ClusterIDMapping {
             ReplacementProductList(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -8641,7 +8581,6 @@ public class ClusterIDMapping {
             ReplacementProductList(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -8750,7 +8689,6 @@ public class ClusterIDMapping {
             SensorFault(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -8899,7 +8837,6 @@ public class ClusterIDMapping {
             LevelStep(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -9039,7 +8976,6 @@ public class ClusterIDMapping {
             NeutralCurrent(18L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -9146,7 +9082,6 @@ public class ClusterIDMapping {
             CumulativeEnergyReset(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -9254,7 +9189,6 @@ public class ClusterIDMapping {
             BoostState(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -9379,7 +9313,6 @@ public class ClusterIDMapping {
             PriceForecast(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -9518,7 +9451,6 @@ public class ClusterIDMapping {
             ActiveMessageIDs(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -9665,7 +9597,6 @@ public class ClusterIDMapping {
             OptOutState(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -9885,7 +9816,6 @@ public class ClusterIDMapping {
             SessionEnergyDischarged(67L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -10054,7 +9984,6 @@ public class ClusterIDMapping {
             CurrentLowPowerModeSensitivity(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -10156,7 +10085,6 @@ public class ClusterIDMapping {
             ActiveEndpoints(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -10258,7 +10186,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -10378,7 +10305,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -10498,7 +10424,6 @@ public class ClusterIDMapping {
             CurrentMode(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -10619,7 +10544,6 @@ public class ClusterIDMapping {
             ForecastConditions(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -10765,7 +10689,6 @@ public class ClusterIDMapping {
             NumberOfAliroEndpointKeysSupported(136L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -11253,7 +11176,6 @@ public class ClusterIDMapping {
             SafetyStatus(26L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -11433,7 +11355,6 @@ public class ClusterIDMapping {
             OverallTarget(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -11568,7 +11489,6 @@ public class ClusterIDMapping {
             ModulationType(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -11710,7 +11630,6 @@ public class ClusterIDMapping {
             Progress(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -11869,7 +11788,6 @@ public class ClusterIDMapping {
             ControlMode(33L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -12046,7 +11964,6 @@ public class ClusterIDMapping {
             SetpointHoldExpiryTimestamp(82L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -12267,7 +12184,6 @@ public class ClusterIDMapping {
             AirflowDirection(11L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -12388,7 +12304,6 @@ public class ClusterIDMapping {
             ScheduleProgrammingVisibility(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -12540,7 +12455,6 @@ public class ClusterIDMapping {
             StartUpColorTemperatureMireds(16400L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -12996,7 +12910,6 @@ public class ClusterIDMapping {
             LampBurnHoursTripPoint(53L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -13101,7 +13014,6 @@ public class ClusterIDMapping {
             LightSensorType(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -13205,7 +13117,6 @@ public class ClusterIDMapping {
             Tolerance(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -13314,7 +13225,6 @@ public class ClusterIDMapping {
             Scale(20L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -13418,7 +13328,6 @@ public class ClusterIDMapping {
             Tolerance(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -13522,7 +13431,6 @@ public class ClusterIDMapping {
             Tolerance(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -13636,7 +13544,6 @@ public class ClusterIDMapping {
             PhysicalContactUnoccupiedToOccupiedThreshold(50L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -13748,7 +13655,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -13859,7 +13765,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -13970,7 +13875,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -14081,7 +13985,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -14192,7 +14095,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -14303,7 +14205,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -14414,7 +14315,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -14525,7 +14425,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -14636,7 +14535,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -14747,7 +14645,6 @@ public class ClusterIDMapping {
             LevelValue(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -14849,7 +14746,6 @@ public class ClusterIDMapping {
             SoilMoistureMeasuredValue(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -14951,7 +14847,6 @@ public class ClusterIDMapping {
             PassphraseSurrogate(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -15058,7 +14953,6 @@ public class ClusterIDMapping {
             PendingDatasetTimestamp(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -15199,7 +15093,6 @@ public class ClusterIDMapping {
             ThreadNetworkTableSize(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -15355,7 +15248,6 @@ public class ClusterIDMapping {
             LinkLocalAddress(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -15458,7 +15350,6 @@ public class ClusterIDMapping {
             CurrentChannel(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -15668,7 +15559,6 @@ public class ClusterIDMapping {
             CurrentTarget(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -15798,7 +15688,6 @@ public class ClusterIDMapping {
             AvailableTextTracks(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -16034,7 +15923,6 @@ public class ClusterIDMapping {
             CurrentInput(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -16172,7 +16060,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -16273,7 +16160,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -16393,7 +16279,6 @@ public class ClusterIDMapping {
             SupportedStreamingProtocols(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -16531,7 +16416,6 @@ public class ClusterIDMapping {
             CurrentOutput(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -16669,7 +16553,6 @@ public class ClusterIDMapping {
             CurrentApp(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -16831,7 +16714,6 @@ public class ClusterIDMapping {
             AllowedVendorList(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -16931,7 +16813,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -17094,7 +16975,6 @@ public class ClusterIDMapping {
             BlockUnrated(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -17290,7 +17170,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -17412,7 +17291,6 @@ public class ClusterIDMapping {
             Sensitivity(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -17627,7 +17505,6 @@ public class ClusterIDMapping {
             StatusLightBrightness(40L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -17916,7 +17793,6 @@ public class ClusterIDMapping {
             PanMax(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -18143,7 +18019,6 @@ public class ClusterIDMapping {
             CurrentSessions(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -18334,7 +18209,6 @@ public class ClusterIDMapping {
             CurrentSessions(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -18508,7 +18382,6 @@ public class ClusterIDMapping {
             CurrentConnections(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -18721,7 +18594,6 @@ public class ClusterIDMapping {
             Enabled(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -18841,7 +18713,6 @@ public class ClusterIDMapping {
             DefaultRandomizationType(18L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -18979,7 +18850,6 @@ public class ClusterIDMapping {
             LocationDirectory(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -19080,7 +18950,6 @@ public class ClusterIDMapping {
             SupportedDeviceCategories(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -19231,7 +19100,6 @@ public class ClusterIDMapping {
             NodeEndpointList(13L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -19692,7 +19560,6 @@ public class ClusterIDMapping {
             AdministratorFabricIndex(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -19853,7 +19720,6 @@ public class ClusterIDMapping {
             ProvisionedClientCertificates(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -20117,7 +19983,6 @@ public class ClusterIDMapping {
             ProvisionedEndpoints(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -20276,7 +20141,6 @@ public class ClusterIDMapping {
             PowerThreshold(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -20379,7 +20243,6 @@ public class ClusterIDMapping {
             MeasurementType(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -20568,7 +20431,6 @@ public class ClusterIDMapping {
             MeiInt8u(4294070017L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -21072,7 +20934,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
@@ -21209,7 +21070,6 @@ public class ClusterIDMapping {
             FlipFlop(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
-            EventList(65530L),
             AttributeList(65531L),
             FeatureMap(65532L),
             ClusterRevision(65533L),;
