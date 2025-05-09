@@ -110,6 +110,7 @@ def extract_shared_enums(idl: Idl) -> list[EnumEntry]:
                 continue
 
             result.append(EnumEntry(namespace="detail", enum=e))
+            found_enums.add(e.name)
 
     result.sort(key=lambda e: (e.enum.name, e.namespace))
 
