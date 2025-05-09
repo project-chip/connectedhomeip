@@ -31,10 +31,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
-import logging
 import random
-import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
