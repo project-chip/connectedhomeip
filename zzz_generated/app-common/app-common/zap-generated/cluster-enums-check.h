@@ -80,6 +80,8 @@
 #include <clusters/IcdManagement/EnumsCheck.h>
 #include <clusters/Identify/EnumsCheck.h>
 #include <clusters/IlluminanceMeasurement/EnumsCheck.h>
+#include <clusters/JointFabricAdministrator/EnumsCheck.h>
+#include <clusters/JointFabricDatastore/EnumsCheck.h>
 #include <clusters/KeypadInput/EnumsCheck.h>
 #include <clusters/LaundryDryerControls/EnumsCheck.h>
 #include <clusters/LaundryWasherControls/EnumsCheck.h>

@@ -6310,6 +6310,101 @@ static BOOL AttributeIsSpecifiedInCommissionerControlCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL AttributeIsSpecifiedInJointFabricDatastoreCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::JointFabricDatastore;
+    switch (aAttributeId) {
+    case Attributes::AnchorRootCA::Id: {
+        return YES;
+    }
+    case Attributes::AnchorNodeID::Id: {
+        return YES;
+    }
+    case Attributes::AnchorVendorID::Id: {
+        return YES;
+    }
+    case Attributes::FriendlyName::Id: {
+        return YES;
+    }
+    case Attributes::GroupKeySetList::Id: {
+        return YES;
+    }
+    case Attributes::GroupList::Id: {
+        return YES;
+    }
+    case Attributes::NodeList::Id: {
+        return YES;
+    }
+    case Attributes::AdminList::Id: {
+        return YES;
+    }
+    case Attributes::Status::Id: {
+        return YES;
+    }
+    case Attributes::EndpointGroupIDList::Id: {
+        return YES;
+    }
+    case Attributes::EndpointBindingList::Id: {
+        return YES;
+    }
+    case Attributes::NodeKeySetList::Id: {
+        return YES;
+    }
+    case Attributes::NodeACLList::Id: {
+        return YES;
+    }
+    case Attributes::NodeEndpointList::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known JointFabricDatastore attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInJointFabricAdministratorCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::JointFabricAdministrator;
+    switch (aAttributeId) {
+    case Attributes::AdministratorFabricIndex::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known JointFabricAdministrator attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInTLSCertificateManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TlsCertificateManagement;
@@ -7159,6 +7254,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::CommissionerControl::Id: {
         return AttributeIsSpecifiedInCommissionerControlCluster(aAttributeId);
+    }
+    case Clusters::JointFabricDatastore::Id: {
+        return AttributeIsSpecifiedInJointFabricDatastoreCluster(aAttributeId);
+    }
+    case Clusters::JointFabricAdministrator::Id: {
+        return AttributeIsSpecifiedInJointFabricAdministratorCluster(aAttributeId);
     }
     case Clusters::TlsCertificateManagement::Id: {
         return AttributeIsSpecifiedInTLSCertificateManagementCluster(aAttributeId);
