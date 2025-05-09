@@ -211,31 +211,6 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
-enum ServerAttributionContextInformation : enum8 {
-  kServerAutomationRule = 11;
-  kServerSchedule = 12;
-  kServerTimer = 13;
-  kSecurity = 14;
-  kDemandResponseEventOrSimilarServiceProviderSignalling = 15;
-  kPhysicalInteractionOnDevice = 16;
-  kInteractionViaAProtocolNotDefinedInThisSpecification = 17;
-}
-
-enum SoftwareVersionCertificationStatusEnum : enum8 {
-  kDevTest = 0;
-  kProvisional = 1;
-  kCertified = 2;
-  kRevoked = 3;
-}
-
-enum SuppliedAttributionContextInformation : enum8 {
-  kDefaultClientAction = 0;
-  kUserInteraction = 1;
-  kClientAutomationRule = 2;
-  kClientSchedule = 3;
-  kClientTimer = 4;
-}
-
 enum TariffPriceTypeEnum : enum8 {
   kStandard = 0;
   kCritical = 1;

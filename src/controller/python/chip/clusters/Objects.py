@@ -423,43 +423,6 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
-        class ServerAttributionContextInformation(MatterIntEnum):
-            kServerAutomationRule = 0x0B
-            kServerSchedule = 0x0C
-            kServerTimer = 0x0D
-            kSecurity = 0x0E
-            kDemandResponseEventOrSimilarServiceProviderSignalling = 0x0F
-            kPhysicalInteractionOnDevice = 0x10
-            kInteractionViaAProtocolNotDefinedInThisSpecification = 0x11
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0
-
-        class SoftwareVersionCertificationStatusEnum(MatterIntEnum):
-            kDevTest = 0x00
-            kProvisional = 0x01
-            kCertified = 0x02
-            kRevoked = 0x03
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4
-
-        class SuppliedAttributionContextInformation(MatterIntEnum):
-            kDefaultClientAction = 0x00
-            kUserInteraction = 0x01
-            kClientAutomationRule = 0x02
-            kClientSchedule = 0x03
-            kClientTimer = 0x04
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5
-
         class TariffPriceTypeEnum(MatterIntEnum):
             kStandard = 0x00
             kCritical = 0x01
