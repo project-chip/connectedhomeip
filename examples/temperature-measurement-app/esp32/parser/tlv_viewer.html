@@ -235,21 +235,18 @@
                     </tr>
                 </thead>
                 <tbody id="entries-table-body">
-                    <!-- Entries will be populated here -->
                 </tbody>
             </table>
         </div>
 
         <div id="stats" class="tab-content">
             <div class="stats" id="stats-container">
-                <!-- Stats will be populated here -->
             </div>
         </div>
     </div>
 
     <script>
 
-        // TLV type constants (similar to what's in tlv_parser.py)
         const TLV_TYPE = {
             TIMESTAMP: 0,
             LABEL: 1,
@@ -260,7 +257,6 @@
         let overviewChart, pakeChart, sigmaChart, timelineChart;
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Tab switching
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => {
                 tab.addEventListener('click', function () {
@@ -275,7 +271,6 @@
                 });
             });
 
-            // Enhance file input to show selected filename
             const fileInput = document.getElementById('file-input');
             fileInput.addEventListener('change', function () {
                 if (this.files.length > 0) {
@@ -286,7 +281,6 @@
                 }
             });
 
-            // Parse button click handler
             document.getElementById('parse-btn').addEventListener('click', function () {
                 const fileInput = document.getElementById('file-input');
                 const file = fileInput.files[0];
@@ -295,17 +289,14 @@
                 if (file) {
                     console.log("File selected:", file.name);
 
-                    // Create FormData object for file upload
                     const formData = new FormData();
                     formData.append('tlv_file', file);
 
-                    // Show loading indicator
                     const statsContainer = document.getElementById('stats-container');
                     if (statsContainer) {
                         statsContainer.innerHTML = '<div class="loading">Parsing TLV data, please wait...</div>';
                     }
 
-                    // Send to server for parsing
                     fetch('/parse_tlv', {
                         method: 'POST',
                         body: formData
@@ -332,22 +323,17 @@
                 } else if (manualInput) {
                     console.log("Using manual input");
                     try {
-                        // Show loading indicator
                         const statsContainer = document.getElementById('stats-container');
                         if (statsContainer) {
                             statsContainer.innerHTML = '<div class="loading">Processing manual input data, please wait...</div>';
                         }
 
                         try {
-                            // Try parsing as JSON directly
                             const jsonData = JSON.parse(manualInput);
 
-                            // Check if it's an array of objects with the right format
                             if (Array.isArray(jsonData) && jsonData.length > 0) {
-                                // Convert to our expected format if needed
                                 if (typeof jsonData[0].timestamp === 'undefined' &&
                                     typeof jsonData[0][0] !== 'undefined') {
-                                    // This is likely the format from tlv_parser.py's print output
                                     logData = jsonData.map(entry => ({
                                         timestamp: entry[0] || 0,
                                         label: entry[1] || '',
@@ -360,16 +346,13 @@
                                 return;
                             }
                         } catch (jsonError) {
-                            // Not valid JSON, continue with text parsing
                             console.log("Not valid JSON, trying text parsing");
                         }
 
-                        // Try parsing as formatted text
                         logData = parseLogContent(manualInput);
                         if (logData && logData.length > 0) {
                             processData(logData);
                         } else {
-                            // If all parsing methods fail
                             statsContainer.innerHTML = '<div class="error-message">Failed to parse input data. Please check format.</div>';
                         }
                     } catch (error) {
@@ -381,7 +364,6 @@
                 }
             });
 
-            // Toggle between file upload and manual input
             document.getElementById('manual-toggle').addEventListener('click', function () {
                 const manualInputArea = document.getElementById('manual-input-area');
                 if (manualInputArea.style.display === 'none' || !manualInputArea.style.display) {
@@ -396,13 +378,11 @@
             processData(logData);
         });
 
-        // Convert hex string to Uint8Array for binary data processing
         function hexStringToUint8Array(hexString) {
             if (!/^[0-9A-Fa-f]+$/.test(hexString.replace(/\s+/g, ''))) {
                 throw new Error('Input is not a valid hex string');
             }
 
-            // Remove spaces and make pairs
             const cleanedHexString = hexString.replace(/\s+/g, '');
             const result = new Uint8Array(cleanedHexString.length / 2);
 
@@ -413,16 +393,13 @@
             return result;
         }
 
-        // Parse TLV binary data similar to what the Python script does
         function parseTLVBinaryData(binaryData) {
             console.log("Parsing TLV binary data of length:", binaryData.length);
 
             try {
-                // Add container start/end tags as done in tlv_parser.py
-                const containerStart = new Uint8Array([0x17]); // Container start
-                const containerEnd = new Uint8Array([0x18]);   // Container end
+                const containerStart = new Uint8Array([0x17]);
+                const containerEnd = new Uint8Array([0x18]);
 
-                // Create a new array with container tags
                 const wrappedData = new Uint8Array(containerStart.length + binaryData.length + containerEnd.length);
                 wrappedData.set(containerStart);
                 wrappedData.set(binaryData, containerStart.length);
@@ -430,18 +407,16 @@
 
                 console.log("Wrapped data length:", wrappedData.length);
 
-                // Parse TLV structure (simplified since we don't have full TLVReader)
                 const entries = [];
-                let position = 1; // Skip container start tag
+                let position = 1;
 
-                while (position < wrappedData.length - 1) { // Stop before container end
+                while (position < wrappedData.length - 1) {
                     try {
                         const result = parseTLVEntry(wrappedData, position);
                         if (result) {
                             entries.push(result.entry);
                             position = result.nextPosition;
                         } else {
-                            // Skip to next possible entry
                             position++;
                         }
                     } catch (error) {
@@ -458,49 +433,40 @@
             }
         }
 
-        // Parse a single TLV entry (simplified implementation)
         function parseTLVEntry(data, position) {
-            // Basic structure detection
             if (position + 2 >= data.length) {
                 return null;
             }
 
-            // Create an entry for diagnostic data
             const entry = {
                 timestamp: 0,
                 label: "",
                 value: ""
             };
 
-            // Scan for known tag patterns
             let nextPosition = position;
 
-            // Find timestamp, label and value fields
             while (nextPosition < data.length - 2) {
-                const tagType = data[nextPosition] & 0xF; // Lower 4 bits = tag type
-                const tagId = (data[nextPosition] >> 4) & 0xF; // Upper 4 bits = tag ID
+                const tagType = data[nextPosition] & 0xF;
+                const tagId = (data[nextPosition] >> 4) & 0xF;
 
                 nextPosition++;
 
-                // Process known tags (from tlv_parser.py)
                 if (tagId === TLV_TYPE.TIMESTAMP) {
-                    // Parse timestamp (assume uint32)
-                    if (tagType === 2) { // uint16
+                    if (tagType === 2) {
                         entry.timestamp = (data[nextPosition] | (data[nextPosition + 1] << 8));
                         nextPosition += 2;
-                    } else if (tagType === 3) { // uint32
+                    } else if (tagType === 3) {
                         entry.timestamp = (data[nextPosition] |
                             (data[nextPosition + 1] << 8) |
                             (data[nextPosition + 2] << 16) |
                             (data[nextPosition + 3] << 24));
                         nextPosition += 4;
                     } else {
-                        // Skip unknown format
                         nextPosition += 1;
                     }
                 } else if (tagId === TLV_TYPE.LABEL) {
-                    // Parse label (assume string)
-                    if (tagType === 4) { // String
+                    if (tagType === 4) {
                         const strLen = data[nextPosition];
                         nextPosition++;
 
@@ -510,12 +476,10 @@
                             nextPosition += strLen;
                         }
                     } else {
-                        // Skip unknown format
                         nextPosition += 1;
                     }
                 } else if (tagId === TLV_TYPE.VALUE) {
-                    // Parse value (could be string or number)
-                    if (tagType === 4) { // String
+                    if (tagType === 4) {
                         const strLen = data[nextPosition];
                         nextPosition++;
 
@@ -524,24 +488,20 @@
                             entry.value = new TextDecoder().decode(strBytes);
                             nextPosition += strLen;
                         }
-                    } else if (tagType === 0) { // uint8
+                    } else if (tagType === 0) {
                         entry.value = data[nextPosition].toString();
                         nextPosition += 1;
-                    } else if (tagType === 1 || tagType === 2 || tagType === 3) { // uint16, uint32
+                    } else if (tagType === 1 || tagType === 2 || tagType === 3) {
                         entry.value = data[nextPosition].toString();
                         nextPosition += (tagType === 1) ? 1 : (tagType === 2) ? 2 : 4;
                     } else {
-                        // Skip unknown format
                         nextPosition += 1;
                     }
                 } else {
-                    // Unknown tag, skip
                     nextPosition += 1;
                 }
 
-                // Check if we have all essential fields
                 if (entry.timestamp && entry.label) {
-                    // If entry is valid, return it
                     return { entry, nextPosition };
                 }
             }
@@ -549,35 +509,29 @@
             return null;
         }
 
-        // Parse the log file content (for text table format)
         function parseLogContent(content) {
             const parsedData = [];
             const lines = content.split('\n');
 
             console.log("Total lines to parse:", lines.length);
 
-            // Skip header lines and find data rows
             let dataStarted = false;
 
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
 
-                // Check for header row
                 if (line.includes('Timestamp') && line.includes('Label') && line.includes('Value')) {
                     dataStarted = true;
                     console.log("Found header row at line", i);
                     continue;
                 }
 
-                // Skip separator lines and empty lines
                 if (!line.trim() || line.includes('═') || line.includes('╞') || line.includes('╡') ||
                     line.includes('├') || line.includes('┤') || line.includes('┼')) {
                     continue;
                 }
 
-                // Parse data rows once we've found the header
                 if (dataStarted) {
-                    // Split by table column separator
                     const parts = line.split('│').filter(part => part.trim());
 
                     if (parts.length >= 3) {
@@ -603,7 +557,6 @@
             console.log("Successfully parsed entries:", parsedData.length);
 
             if (parsedData.length === 0) {
-                // Try a simpler parsing approach as fallback
                 for (const line of lines) {
                     if (line.trim()) {
                         const parts = line.split('|').map(part => part.trim());
@@ -639,7 +592,6 @@
             createTimelineChart(data);
             populateEntriesTable(data);
 
-            // Set the active tab to Overview initially
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => tab.classList.remove('active'));
             document.querySelector('.tab[data-tab="overview"]').classList.add('active');
@@ -653,7 +605,6 @@
             const statsContainer = document.getElementById('stats-container');
             statsContainer.innerHTML = '';
 
-            // Count PAKE messages
             const pakeMessages = data.filter(item =>
                 item.label.includes('Pake1') ||
                 item.label.includes('Pake2') ||
@@ -661,7 +612,6 @@
             );
             const pakeCount = pakeMessages.length;
 
-            // Count Sigma messages
             const sigmaMessages = data.filter(item =>
                 item.label.includes('Sigma1') ||
                 item.label.includes('Sigma2') ||
@@ -669,12 +619,10 @@
             );
             const sigmaCount = sigmaMessages.length;
 
-            // Timeline duration
             const startTime = Math.min(...data.map(item => item.timestamp));
             const endTime = Math.max(...data.map(item => item.timestamp));
             const duration = endTime - startTime;
 
-            // Count message types
             const messageTypeCounts = {};
             const messagesByType = {};
             data.forEach(item => {
@@ -686,15 +634,12 @@
                 messagesByType[item.label].push(item);
             });
 
-            // Create stat boxes
             const stats = [
                 { label: 'PAKE Messages', value: pakeCount, detailData: pakeMessages, type: 'messages' },
                 { label: 'Sigma Messages', value: sigmaCount, detailData: sigmaMessages, type: 'messages' },
                 { label: 'Timeline Duration', value: `${duration} ms`, detailData: { start: startTime, end: endTime }, type: 'duration' },
-                { label: 'Total Events', value: data.length, detailData: data, type: 'messages' }
             ];
 
-            // Add message type counts to stats
             for (const [label, count] of Object.entries(messageTypeCounts)) {
                 stats.push({
                     label: `${label} Count`,
@@ -704,7 +649,6 @@
                 });
             }
 
-            // Group stats into rows (1 per row)
             for (let i = 0; i < stats.length; i++) {
                 const row = document.createElement('div');
                 row.className = 'stat-row';
@@ -713,16 +657,13 @@
                 const statBox = document.createElement('div');
                 statBox.className = 'stat-box';
 
-                // Create the header
                 const header = document.createElement('div');
                 header.innerHTML = `<h3>${stat.label}</h3><p>${stat.value}</p>`;
                 statBox.appendChild(header);
 
-                // Create the details section (initially hidden)
                 const details = document.createElement('div');
                 details.className = 'stat-details';
 
-                // Add close button
                 const closeButton = document.createElement('button');
                 closeButton.className = 'close-button';
                 closeButton.textContent = 'Close';
@@ -732,7 +673,6 @@
                 });
                 details.appendChild(closeButton);
 
-                // Add details content based on type
                 if (stat.type === 'messages') {
                     const table = document.createElement('table');
                     table.style.width = '100%';
@@ -778,16 +718,13 @@
 
                 statBox.appendChild(details);
 
-                // Toggle details on click
                 statBox.addEventListener('click', () => {
-                    // Close all other active details
                     document.querySelectorAll('.stat-details.active').forEach(el => {
                         if (el !== details) {
                             el.classList.remove('active');
                         }
                     });
 
-                    // Toggle this detail
                     details.classList.toggle('active');
                 });
 
@@ -809,7 +746,6 @@
                 messageTypes[type].timestamps.push(item.timestamp);
             });
 
-            // Prepare chart data
             const labels = Object.keys(messageTypes);
             const values = labels.map(label => messageTypes[label].count);
             const timestamps = labels.map(label => messageTypes[label].timestamps.join(', '));
@@ -860,13 +796,11 @@
         function createTimelineChart(data) {
             const ctx = document.getElementById('timeline-chart').getContext('2d');
             console.log(data);
-            // Filter only PAKE and Sigma messages with integer values
             const filteredData = data.filter(item =>
                 (item.label.includes('Pake') || item.label.includes('Sigma')) &&
                 !isNaN(parseInt(item.value))
             );
 
-            // Group events by timestamp
             const timeEvents = {};
             filteredData.forEach(item => {
                 if (!timeEvents[item.timestamp]) {
@@ -875,10 +809,8 @@
                 timeEvents[item.timestamp].push(item);
             });
 
-            // Prepare datasets
             const timestamps = Object.keys(timeEvents).sort((a, b) => parseInt(a) - parseInt(b));
 
-            // Count cumulative events over time
             let pakeCount = 0;
             let sigmaCount = 0;
             const pakeData = [];

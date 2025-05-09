@@ -3,14 +3,12 @@ import os
 import sys
 from werkzeug.utils import secure_filename
 
-# Set up paths from environment variables
 CHIP_HOME = os.getenv("CHIP_HOME")
 
 if not CHIP_HOME:
     print("Error: Please set the CHIP_HOME environment variable.")
     sys.exit(1)
 
-# Update sys.path for TLVReader import based on CHIP_HOME
 sys.path.insert(0, os.path.join(CHIP_HOME, 'src/controller/python'))
 try:
     from chip.tlv import TLVReader
@@ -46,10 +44,8 @@ def parse_tlv():
         with open(file_path, 'rb') as f:
             binary_data = f.read()
 
-        # Wrap the binary data with container tags
         binary_data = bytes([0x17]) + binary_data + bytes([0x18])
 
-        # Parse using TLVReader from Matter
         t = TLVReader(binary_data)
         data = t.get()
 
@@ -57,7 +53,6 @@ def parse_tlv():
         for tag, entry in data['Any']:
             entries.append(entry)
 
-        # Convert to format needed by the visualization
         formatted_entries = []
         for entry in entries:
             formatted_entries.append({
@@ -71,4 +66,4 @@ def parse_tlv():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True) 
+    app.run(host='0.0.0.0', port=8000, debug=True)
