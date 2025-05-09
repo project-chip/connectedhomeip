@@ -880,73 +880,73 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command InstantAction
  *
- * This command triggers an action (state change) on the involved endpoints.
+ * This command is used to trigger an instantaneous action.
  */
 - (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command InstantActionWithTransition
  *
- * This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current state to the new state.
+ * This command is used to trigger an instantaneous action with a transition over a given time.
  */
 - (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command StartAction
  *
- * This command triggers the commencement of an action on the involved endpoints.
+ * This command is used to trigger the commencement of an action.
  */
 - (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command StartActionWithDuration
  *
- * This command triggers the commencement of an action (with a duration) on the involved endpoints.
+ * This command is used to trigger the commencement of an action with a duration.
  */
 - (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command StopAction
  *
- * This command stops the ongoing action on the involved endpoints.
+ * This command is used to stop an action.
  */
 - (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command PauseAction
  *
- * This command pauses an ongoing action.
+ * This command is used to pause an action.
  */
 - (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command PauseActionWithDuration
  *
- * This command pauses an ongoing action with a duration.
+ * This command is used to pause an action with a duration.
  */
 - (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command ResumeAction
  *
- * This command resumes a previously paused action.
+ * This command is used to resume an action.
  */
 - (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command EnableAction
  *
- * This command enables a certain action or automation.
+ * This command is used to enable an action.
  */
 - (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command EnableActionWithDuration
  *
- * This command enables a certain action or automation with a duration.
+ * This command is used to enable an action with a duration.
  */
 - (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command DisableAction
  *
- * This command disables a certain action or automation.
+ * This command is used to disable an action.
  */
 - (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command DisableActionWithDuration
  *
- * This command disables a certain action or automation with a duration.
+ * This command is used to disable an action with a duration.
  */
 - (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
