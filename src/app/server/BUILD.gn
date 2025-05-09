@@ -57,6 +57,7 @@ static_library("server") {
     "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
+    "JointFabricDatastorage.cpp",
     "Server.cpp",
     "Server.h",
   ]

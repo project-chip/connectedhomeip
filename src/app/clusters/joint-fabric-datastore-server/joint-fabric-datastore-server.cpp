@@ -35,12 +35,14 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace JointFabricDatastoreCluster = chip::app::Clusters::JointFabricDatastore;
 
-class JointFabricDatastoreAttrAccess : public AttributeAccessInterface
+class JointFabricDatastoreAttrAccess : public AttributeAccessInterface, public JointFabricDatastorage::Listener
 {
 public:
     JointFabricDatastoreAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), JointFabricDatastoreCluster::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    void MarkNodeListChanged() override;
 
 private:
     CHIP_ERROR ReadAnchorNodeId(AttributeValueEncoder & aEncoder);
@@ -81,41 +83,94 @@ CHIP_ERROR JointFabricDatastoreAttrAccess::Read(const ConcreteReadAttributePath 
     return CHIP_NO_ERROR;
 }
 
-// TODO
 CHIP_ERROR JointFabricDatastoreAttrAccess::ReadAnchorNodeId(AttributeValueEncoder & aEncoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    NodeId anchorNodeId = Server::GetInstance().GetJointFabricDatastorage().GetAnchorNodeId();
+    ReturnErrorOnFailure(aEncoder.Encode(anchorNodeId));
+    return CHIP_NO_ERROR;
 }
 
-// TODO
 CHIP_ERROR JointFabricDatastoreAttrAccess::ReadAnchorVendorId(AttributeValueEncoder & aEncoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VendorId anchorVendorId = Server::GetInstance().GetJointFabricDatastorage().GetAnchorVendorId();
+    ReturnErrorOnFailure(aEncoder.Encode(anchorVendorId));
+    return CHIP_NO_ERROR;
 }
 
-// TODO
 CHIP_ERROR JointFabricDatastoreAttrAccess::ReadGroupKeySetList(AttributeValueEncoder & aEncoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        auto entries = Server::GetInstance().GetJointFabricDatastorage().GetGroupKeySetList();
+
+        for (auto & entry : entries)
+        {
+            ReturnErrorOnFailure(encoder.Encode(entry));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
-// TODO
 CHIP_ERROR JointFabricDatastoreAttrAccess::ReadAdminList(AttributeValueEncoder & aEncoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        auto entries = Server::GetInstance().GetJointFabricDatastorage().GetAdminEntries();
+
+        for (auto & entry : entries)
+        {
+            ReturnErrorOnFailure(encoder.Encode(entry));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
-// TODO
 CHIP_ERROR JointFabricDatastoreAttrAccess::ReadNodeList(AttributeValueEncoder & aEncoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        auto entries = Server::GetInstance().GetJointFabricDatastorage().GetNodeInformationEntries();
+
+        for (auto & entry : entries)
+        {
+            ReturnErrorOnFailure(encoder.Encode(entry));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
-// TODO
+void JointFabricDatastoreAttrAccess::MarkNodeListChanged()
+{
+    MatterReportingAttributeChangeCallback(kRootEndpointId, JointFabricDatastoreCluster::Id,
+                                           JointFabricDatastoreCluster::Attributes::NodeList::Id);
+}
+
 bool emberAfJointFabricDatastoreClusterAddAdminCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::AddAdmin::DecodableType & commandData)
 {
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    JointFabricDatastorage & JointFabricDatastorage = Server::GetInstance().GetJointFabricDatastorage();
+
+    auto nodeID       = commandData.nodeID;
+    auto friendlyName = commandData.friendlyName;
+    auto vendorID     = commandData.vendorID;
+    auto icac         = commandData.icac;
+
+    JointFabricDatastoreCluster::Structs::DatastoreAdministratorInformationEntryStruct::DecodableType adminInformationEntry = {
+        .nodeID = nodeID, .friendlyName = friendlyName, .vendorID = vendorID, .icac = icac
+    };
+
+    SuccessOrExit(err = JointFabricDatastorage.AddAdmin(adminInformationEntry));
+
+exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
     return true;
 }
 
@@ -127,43 +182,142 @@ bool emberAfJointFabricDatastoreClusterAddGroupCallback(
     return true;
 }
 
-// TODO
 bool emberAfJointFabricDatastoreClusterAddKeySetCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::AddKeySet::DecodableType & commandData)
 {
+    CHIP_ERROR err                                                                              = CHIP_NO_ERROR;
+    JointFabricDatastoreCluster::Structs::DatastoreGroupKeySetStruct::DecodableType groupKeySet = commandData.groupKeySet;
+    JointFabricDatastorage & JointFabricDatastorage = Server::GetInstance().GetJointFabricDatastorage();
+
+    VerifyOrExit(JointFabricDatastorage.IsGroupKeySetEntryPresent(groupKeySet.groupKeySetID) == false,
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    SuccessOrExit(err = JointFabricDatastorage.AddGroupKeySetEntry(groupKeySet));
+
+exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
     return true;
 }
 
-// TODO
 bool emberAfJointFabricDatastoreClusterRemoveNodeCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::RemoveNode::DecodableType & commandData)
 {
+    NodeId nodeId = commandData.nodeID;
+
+    if (commandPath.mEndpointId != kRootEndpointId)
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: invalid endpoint in RemoveNode request");
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return true;
+    }
+
+    CHIP_ERROR err = Server::GetInstance().GetJointFabricDatastorage().RemoveNode(nodeId);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
     return true;
 }
 
-// TODO
 bool emberAfJointFabricDatastoreClusterUpdateNodeCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::UpdateNode::DecodableType & commandData)
 {
+    NodeId nodeId                 = commandData.nodeID;
+    const CharSpan & friendlyName = commandData.friendlyName;
+
+    if (commandPath.mEndpointId != kRootEndpointId)
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: invalid endpoint in UpdateNode request");
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return true;
+    }
+
+    CHIP_ERROR err = Server::GetInstance().GetJointFabricDatastorage().UpdateNode(nodeId, friendlyName);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
     return true;
 }
 
-// TODO
 bool emberAfJointFabricDatastoreClusterRefreshNodeCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::RefreshNode::DecodableType & commandData)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    NodeId nodeId  = commandData.nodeID;
+
+    JointFabricDatastorage & JointFabricDatastorage = Server::GetInstance().GetJointFabricDatastorage();
+
+    if (commandPath.mEndpointId != kRootEndpointId)
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: invalid endpoint in RefreshNode request");
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return true;
+    }
+
+    SuccessOrExit(err = JointFabricDatastorage.RefreshNode(nodeId));
+
+exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
     return true;
 }
 
-// TODO
 bool emberAfJointFabricDatastoreClusterRemoveAdminCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::RemoveAdmin::DecodableType & commandData)
 {
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    auto nodeId                                     = commandData.nodeID;
+    JointFabricDatastorage & JointFabricDatastorage = Server::GetInstance().GetJointFabricDatastorage();
+
+    SuccessOrExit(err = JointFabricDatastorage.RemoveAdmin(nodeId));
+
+exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
     return true;
 }
 
@@ -175,11 +329,29 @@ bool emberAfJointFabricDatastoreClusterRemoveGroupCallback(
     return true;
 }
 
-// TODO
 bool emberAfJointFabricDatastoreClusterUpdateAdminCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::UpdateAdmin::DecodableType & commandData)
 {
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    auto nodeId                                     = commandData.nodeID.Value();
+    auto friendlyName                               = commandData.friendlyName.Value();
+    auto icac                                       = commandData.icac.Value();
+    JointFabricDatastorage & JointFabricDatastorage = Server::GetInstance().GetJointFabricDatastorage();
+
+    SuccessOrExit(err = JointFabricDatastorage.UpdateAdmin(nodeId, friendlyName, icac));
+
+exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
     return true;
 }
 
@@ -199,11 +371,27 @@ bool emberAfJointFabricDatastoreClusterAddACLToNodeCallback(
     return true;
 }
 
-// TODO
 bool emberAfJointFabricDatastoreClusterRemoveKeySetCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::RemoveKeySet::DecodableType & commandData)
 {
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    uint16_t groupKeySetId                          = commandData.groupKeySetID;
+    JointFabricDatastorage & JointFabricDatastorage = Server::GetInstance().GetJointFabricDatastorage();
+
+    SuccessOrExit(err = JointFabricDatastorage.RemoveGroupKeySetEntry(groupKeySetId));
+
+exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
     return true;
 }
 
@@ -215,11 +403,33 @@ bool emberAfJointFabricDatastoreClusterUpdateKeySetCallback(
     return true;
 }
 
-// TODO
 bool emberAfJointFabricDatastoreClusterAddPendingNodeCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::AddPendingNode::DecodableType & commandData)
 {
+    NodeId nodeId                 = commandData.nodeID;
+    const CharSpan & friendlyName = commandData.friendlyName;
+
+    if (commandPath.mEndpointId != kRootEndpointId)
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: invalid endpoint in AddPendingNode request");
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return true;
+    }
+
+    CHIP_ERROR err = Server::GetInstance().GetJointFabricDatastorage().AddPendingNode(commandObj->GetAccessingFabricIndex(), nodeId,
+                                                                                      friendlyName);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "JointFabricDatastoreCluster: failed with error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
     return true;
 }
 
@@ -275,4 +485,6 @@ void MatterJointFabricDatastorePluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initiating Joint Fabric Datastore cluster.");
     AttributeAccessInterfaceRegistry::Instance().Register(&gJointFabricDatastoreAttrAccess);
+
+    Server::GetInstance().GetJointFabricDatastorage().AddListener(gJointFabricDatastoreAttrAccess);
 }
