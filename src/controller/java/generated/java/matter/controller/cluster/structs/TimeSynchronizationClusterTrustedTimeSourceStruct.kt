@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +25,7 @@ import matter.tlv.TlvWriter
 class TimeSynchronizationClusterTrustedTimeSourceStruct(
   val fabricIndex: UByte,
   val nodeID: ULong,
-  val endpoint: UShort
+  val endpoint: UShort,
 ) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterTrustedTimeSourceStruct {\n")
@@ -52,12 +50,15 @@ class TimeSynchronizationClusterTrustedTimeSourceStruct(
     private const val TAG_NODE_ID = 1
     private const val TAG_ENDPOINT = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterTrustedTimeSourceStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): TimeSynchronizationClusterTrustedTimeSourceStruct {
       tlvReader.enterStructure(tlvTag)
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val endpoint = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT))
-      
+
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterTrustedTimeSourceStruct(fabricIndex, nodeID, endpoint)

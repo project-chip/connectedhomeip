@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -26,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class CommodityTariffClusterCalendarPeriodStruct(
   val startDate: UInt?,
-  val dayPatternIDs: List<UInt>
+  val dayPatternIDs: List<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterCalendarPeriodStruct {\n")
@@ -58,20 +57,22 @@ class CommodityTariffClusterCalendarPeriodStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterCalendarPeriodStruct {
       tlvReader.enterStructure(tlvTag)
-      val startDate = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_START_DATE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_START_DATE))
-      null
-    }
-      val dayPatternIDs = buildList<UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_DAY_PATTERN_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val startDate =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_START_DATE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_START_DATE))
+          null
+        }
+      val dayPatternIDs =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_DAY_PATTERN_I_DS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return CommodityTariffClusterCalendarPeriodStruct(startDate, dayPatternIDs)

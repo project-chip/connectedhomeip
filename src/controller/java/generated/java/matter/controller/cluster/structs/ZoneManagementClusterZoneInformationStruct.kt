@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +25,7 @@ import matter.tlv.TlvWriter
 class ZoneManagementClusterZoneInformationStruct(
   val zoneID: UShort,
   val zoneType: UByte,
-  val zoneSource: UByte
+  val zoneSource: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneInformationStruct {\n")
@@ -57,7 +55,7 @@ class ZoneManagementClusterZoneInformationStruct(
       val zoneID = tlvReader.getUShort(ContextSpecificTag(TAG_ZONE_ID))
       val zoneType = tlvReader.getUByte(ContextSpecificTag(TAG_ZONE_TYPE))
       val zoneSource = tlvReader.getUByte(ContextSpecificTag(TAG_ZONE_SOURCE))
-      
+
       tlvReader.exitContainer()
 
       return ZoneManagementClusterZoneInformationStruct(zoneID, zoneType, zoneSource)

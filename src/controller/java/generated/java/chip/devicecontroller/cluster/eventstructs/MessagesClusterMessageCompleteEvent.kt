@@ -17,21 +17,19 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class MessagesClusterMessageCompleteEvent (
-    val messageID: ByteArray,
-    val responseID: Optional<ULong>?,
-    val reply: Optional<String>?,
-    val futureMessagesPreference: UInt?) {
-  override fun toString(): String  = buildString {
+class MessagesClusterMessageCompleteEvent(
+  val messageID: ByteArray,
+  val responseID: Optional<ULong>?,
+  val reply: Optional<String>?,
+  val futureMessagesPreference: UInt?,
+) {
+  override fun toString(): String = buildString {
     append("MessagesClusterMessageCompleteEvent {\n")
     append("\tmessageID : $messageID\n")
     append("\tresponseID : $responseID\n")
@@ -45,26 +43,26 @@ class MessagesClusterMessageCompleteEvent (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_MESSAGE_ID), messageID)
       if (responseID != null) {
-      if (responseID.isPresent) {
-      val optresponseID = responseID.get()
-      put(ContextSpecificTag(TAG_RESPONSE_ID), optresponseID)
-    }
-    } else {
-      putNull(ContextSpecificTag(TAG_RESPONSE_ID))
-    }
+        if (responseID.isPresent) {
+          val optresponseID = responseID.get()
+          put(ContextSpecificTag(TAG_RESPONSE_ID), optresponseID)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_RESPONSE_ID))
+      }
       if (reply != null) {
-      if (reply.isPresent) {
-      val optreply = reply.get()
-      put(ContextSpecificTag(TAG_REPLY), optreply)
-    }
-    } else {
-      putNull(ContextSpecificTag(TAG_REPLY))
-    }
+        if (reply.isPresent) {
+          val optreply = reply.get()
+          put(ContextSpecificTag(TAG_REPLY), optreply)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_REPLY))
+      }
       if (futureMessagesPreference != null) {
-      put(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREFERENCE), futureMessagesPreference)
-    } else {
-      putNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREFERENCE))
-    }
+        put(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREFERENCE), futureMessagesPreference)
+      } else {
+        putNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREFERENCE))
+      }
       endStructure()
     }
   }
@@ -75,39 +73,47 @@ class MessagesClusterMessageCompleteEvent (
     private const val TAG_REPLY = 2
     private const val TAG_FUTURE_MESSAGES_PREFERENCE = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MessagesClusterMessageCompleteEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageCompleteEvent {
       tlvReader.enterStructure(tlvTag)
       val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_ID))
-      val responseID = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_RESPONSE_ID))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_RESPONSE_ID)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_RESPONSE_ID))
-      null
-    }
-      val reply = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_REPLY))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_REPLY)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_REPLY))
-      null
-    }
-      val futureMessagesPreference = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREFERENCE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREFERENCE))
-      null
-    }
-      
+      val responseID =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_RESPONSE_ID))) {
+            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_RESPONSE_ID)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_RESPONSE_ID))
+          null
+        }
+      val reply =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_REPLY))) {
+            Optional.of(tlvReader.getString(ContextSpecificTag(TAG_REPLY)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_REPLY))
+          null
+        }
+      val futureMessagesPreference =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREFERENCE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREFERENCE))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return MessagesClusterMessageCompleteEvent(messageID, responseID, reply, futureMessagesPreference)
+      return MessagesClusterMessageCompleteEvent(
+        messageID,
+        responseID,
+        reply,
+        futureMessagesPreference,
+      )
     }
   }
 }

@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -30,7 +28,7 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
   val listID: UShort,
   val binding: JointFabricDatastoreClusterDatastoreBindingTargetStruct,
   val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct {\n")
@@ -64,18 +62,36 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
     private const val TAG_STATUS_ENTRY = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val endpointID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_ID))
       val listID = tlvReader.getUShort(ContextSpecificTag(TAG_LIST_ID))
-      val binding = JointFabricDatastoreClusterDatastoreBindingTargetStruct.fromTlv(ContextSpecificTag(TAG_BINDING), tlvReader)
-      val statusEntry = JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(ContextSpecificTag(TAG_STATUS_ENTRY), tlvReader)
+      val binding =
+        JointFabricDatastoreClusterDatastoreBindingTargetStruct.fromTlv(
+          ContextSpecificTag(TAG_BINDING),
+          tlvReader,
+        )
+      val statusEntry =
+        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
+          ContextSpecificTag(TAG_STATUS_ENTRY),
+          tlvReader,
+        )
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(nodeID, endpointID, listID, binding, statusEntry, fabricIndex)
+      return JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
+        nodeID,
+        endpointID,
+        listID,
+        binding,
+        statusEntry,
+        fabricIndex,
+      )
     }
   }
 }

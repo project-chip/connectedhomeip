@@ -20,17 +20,16 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class TargetNavigatorClusterTargetUpdatedEvent (
-    val targetList: List<chip.devicecontroller.cluster.structs.TargetNavigatorClusterTargetInfoStruct>,
-    val currentTarget: UInt,
-    val data: ByteArray) {
-  override fun toString(): String  = buildString {
+class TargetNavigatorClusterTargetUpdatedEvent(
+  val targetList:
+    List<chip.devicecontroller.cluster.structs.TargetNavigatorClusterTargetInfoStruct>,
+  val currentTarget: UInt,
+  val data: ByteArray,
+) {
+  override fun toString(): String = buildString {
     append("TargetNavigatorClusterTargetUpdatedEvent {\n")
     append("\ttargetList : $targetList\n")
     append("\tcurrentTarget : $currentTarget\n")
@@ -57,18 +56,24 @@ class TargetNavigatorClusterTargetUpdatedEvent (
     private const val TAG_CURRENT_TARGET = 1
     private const val TAG_DATA = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TargetNavigatorClusterTargetUpdatedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TargetNavigatorClusterTargetUpdatedEvent {
       tlvReader.enterStructure(tlvTag)
-      val targetList = buildList <chip.devicecontroller.cluster.structs.TargetNavigatorClusterTargetInfoStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_TARGET_LIST))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(chip.devicecontroller.cluster.structs.TargetNavigatorClusterTargetInfoStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
+      val targetList =
+        buildList<chip.devicecontroller.cluster.structs.TargetNavigatorClusterTargetInfoStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_TARGET_LIST))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(
+              chip.devicecontroller.cluster.structs.TargetNavigatorClusterTargetInfoStruct.fromTlv(
+                AnonymousTag,
+                tlvReader,
+              )
+            )
+          }
+          tlvReader.exitContainer()
+        }
       val currentTarget = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_TARGET))
       val data = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))
-      
+
       tlvReader.exitContainer()
 
       return TargetNavigatorClusterTargetUpdatedEvent(targetList, currentTarget, data)

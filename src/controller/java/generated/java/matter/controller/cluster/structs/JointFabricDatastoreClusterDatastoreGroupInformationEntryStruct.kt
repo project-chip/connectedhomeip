@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -31,7 +29,7 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
   val groupCAT: UShort?,
   val groupCATVersion: UShort?,
   val groupPermission: UByte,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct {\n")
@@ -80,34 +78,48 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
     private const val TAG_GROUP_PERMISSION = 5
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val groupID = tlvReader.getULong(ContextSpecificTag(TAG_GROUP_ID))
       val friendlyName = tlvReader.getString(ContextSpecificTag(TAG_FRIENDLY_NAME))
-      val groupKeySetID = if (!tlvReader.isNull()) {
-      tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
-      null
-    }
-      val groupCAT = if (!tlvReader.isNull()) {
-      tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_CAT))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_GROUP_CAT))
-      null
-    }
-      val groupCATVersion = if (!tlvReader.isNull()) {
-      tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
-      null
-    }
+      val groupKeySetID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
+          null
+        }
+      val groupCAT =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_CAT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_GROUP_CAT))
+          null
+        }
+      val groupCATVersion =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
+          null
+        }
       val groupPermission = tlvReader.getUByte(ContextSpecificTag(TAG_GROUP_PERMISSION))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(groupID, friendlyName, groupKeySetID, groupCAT, groupCATVersion, groupPermission, fabricIndex)
+      return JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
+        groupID,
+        friendlyName,
+        groupKeySetID,
+        groupCAT,
+        groupCATVersion,
+        groupPermission,
+        fabricIndex,
+      )
     }
   }
 }

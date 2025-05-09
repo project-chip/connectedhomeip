@@ -17,21 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class WebRTCTransportRequestorClusterICEServerStruct (
-    val urls: List<String>,
-    val username: Optional<String>,
-    val credential: Optional<String>,
-    val caid: Optional<UInt>) {
-  override fun toString(): String  = buildString {
+class WebRTCTransportRequestorClusterICEServerStruct(
+  val urls: List<String>,
+  val username: Optional<String>,
+  val credential: Optional<String>,
+  val caid: Optional<UInt>,
+) {
+  override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterICEServerStruct {\n")
     append("\turls : $urls\n")
     append("\tusername : $username\n")
@@ -49,17 +48,17 @@ class WebRTCTransportRequestorClusterICEServerStruct (
       }
       endArray()
       if (username.isPresent) {
-      val optusername = username.get()
-      put(ContextSpecificTag(TAG_USERNAME), optusername)
-    }
+        val optusername = username.get()
+        put(ContextSpecificTag(TAG_USERNAME), optusername)
+      }
       if (credential.isPresent) {
-      val optcredential = credential.get()
-      put(ContextSpecificTag(TAG_CREDENTIAL), optcredential)
-    }
+        val optcredential = credential.get()
+        put(ContextSpecificTag(TAG_CREDENTIAL), optcredential)
+      }
       if (caid.isPresent) {
-      val optcaid = caid.get()
-      put(ContextSpecificTag(TAG_CAID), optcaid)
-    }
+        val optcaid = caid.get()
+        put(ContextSpecificTag(TAG_CAID), optcaid)
+      }
       endStructure()
     }
   }
@@ -70,31 +69,35 @@ class WebRTCTransportRequestorClusterICEServerStruct (
     private const val TAG_CREDENTIAL = 3
     private const val TAG_CAID = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WebRTCTransportRequestorClusterICEServerStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WebRTCTransportRequestorClusterICEServerStruct {
       tlvReader.enterStructure(tlvTag)
-      val urls = buildList<String> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_URLS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getString(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      val username = if (tlvReader.isNextTag(ContextSpecificTag(TAG_USERNAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_USERNAME)))
-    } else {
-      Optional.empty()
-    }
-      val credential = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREDENTIAL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CREDENTIAL)))
-    } else {
-      Optional.empty()
-    }
-      val caid = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CAID))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CAID)))
-    } else {
-      Optional.empty()
-    }
-      
+      val urls =
+        buildList<String> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_URLS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getString(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      val username =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_USERNAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_USERNAME)))
+        } else {
+          Optional.empty()
+        }
+      val credential =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREDENTIAL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CREDENTIAL)))
+        } else {
+          Optional.empty()
+        }
+      val caid =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CAID))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CAID)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return WebRTCTransportRequestorClusterICEServerStruct(urls, username, credential, caid)

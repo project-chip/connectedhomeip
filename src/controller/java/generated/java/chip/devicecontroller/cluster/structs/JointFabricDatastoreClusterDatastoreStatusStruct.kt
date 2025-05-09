@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class JointFabricDatastoreClusterDatastoreStatusStruct (
-    val state: UInt,
-    val updateTimestamp: ULong,
-    val failureCode: UInt,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class JointFabricDatastoreClusterDatastoreStatusStruct(
+  val state: UInt,
+  val updateTimestamp: ULong,
+  val failureCode: UInt,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreStatusStruct {\n")
     append("\tstate : $state\n")
     append("\tupdateTimestamp : $updateTimestamp\n")
@@ -57,16 +54,24 @@ class JointFabricDatastoreClusterDatastoreStatusStruct (
     private const val TAG_FAILURE_CODE = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : JointFabricDatastoreClusterDatastoreStatusStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreStatusStruct {
       tlvReader.enterStructure(tlvTag)
       val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
       val updateTimestamp = tlvReader.getULong(ContextSpecificTag(TAG_UPDATE_TIMESTAMP))
       val failureCode = tlvReader.getUInt(ContextSpecificTag(TAG_FAILURE_CODE))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreStatusStruct(state, updateTimestamp, failureCode, fabricIndex)
+      return JointFabricDatastoreClusterDatastoreStatusStruct(
+        state,
+        updateTimestamp,
+        failureCode,
+        fabricIndex,
+      )
     }
   }
 }

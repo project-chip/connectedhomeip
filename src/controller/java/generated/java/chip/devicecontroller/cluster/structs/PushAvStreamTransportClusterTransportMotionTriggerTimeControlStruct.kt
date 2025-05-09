@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct (
-    val initialDuration: UInt,
-    val augmentationDuration: UInt,
-    val maxDuration: ULong,
-    val blindDuration: UInt) {
-  override fun toString(): String  = buildString {
+class PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(
+  val initialDuration: UInt,
+  val augmentationDuration: UInt,
+  val maxDuration: ULong,
+  val blindDuration: UInt,
+) {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct {\n")
     append("\tinitialDuration : $initialDuration\n")
     append("\taugmentationDuration : $augmentationDuration\n")
@@ -57,16 +54,24 @@ class PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct (
     private const val TAG_MAX_DURATION = 2
     private const val TAG_BLIND_DURATION = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct {
       tlvReader.enterStructure(tlvTag)
       val initialDuration = tlvReader.getUInt(ContextSpecificTag(TAG_INITIAL_DURATION))
       val augmentationDuration = tlvReader.getUInt(ContextSpecificTag(TAG_AUGMENTATION_DURATION))
       val maxDuration = tlvReader.getULong(ContextSpecificTag(TAG_MAX_DURATION))
       val blindDuration = tlvReader.getUInt(ContextSpecificTag(TAG_BLIND_DURATION))
-      
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(initialDuration, augmentationDuration, maxDuration, blindDuration)
+      return PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(
+        initialDuration,
+        augmentationDuration,
+        maxDuration,
+        blindDuration,
+      )
     }
   }
 }

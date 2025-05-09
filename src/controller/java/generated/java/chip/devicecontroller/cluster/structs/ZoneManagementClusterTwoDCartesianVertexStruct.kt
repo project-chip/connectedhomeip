@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ZoneManagementClusterTwoDCartesianVertexStruct (
-    val x: UInt,
-    val y: UInt) {
-  override fun toString(): String  = buildString {
+class ZoneManagementClusterTwoDCartesianVertexStruct(val x: UInt, val y: UInt) {
+  override fun toString(): String = buildString {
     append("ZoneManagementClusterTwoDCartesianVertexStruct {\n")
     append("\tx : $x\n")
     append("\ty : $y\n")
@@ -49,11 +43,11 @@ class ZoneManagementClusterTwoDCartesianVertexStruct (
     private const val TAG_X = 0
     private const val TAG_Y = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ZoneManagementClusterTwoDCartesianVertexStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterTwoDCartesianVertexStruct {
       tlvReader.enterStructure(tlvTag)
       val x = tlvReader.getUInt(ContextSpecificTag(TAG_X))
       val y = tlvReader.getUInt(ContextSpecificTag(TAG_Y))
-      
+
       tlvReader.exitContainer()
 
       return ZoneManagementClusterTwoDCartesianVertexStruct(x, y)

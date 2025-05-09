@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +25,7 @@ import matter.tlv.TlvWriter
 class AudioOutputClusterOutputInfoStruct(
   val index: UByte,
   val outputType: UByte,
-  val name: String
+  val name: String,
 ) {
   override fun toString(): String = buildString {
     append("AudioOutputClusterOutputInfoStruct {\n")
@@ -57,7 +55,7 @@ class AudioOutputClusterOutputInfoStruct(
       val index = tlvReader.getUByte(ContextSpecificTag(TAG_INDEX))
       val outputType = tlvReader.getUByte(ContextSpecificTag(TAG_OUTPUT_TYPE))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      
+
       tlvReader.exitContainer()
 
       return AudioOutputClusterOutputInfoStruct(index, outputType, name)

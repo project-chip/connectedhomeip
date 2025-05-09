@@ -17,22 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct (
-    val nodeID: ULong,
-    val friendlyName: String,
-    val vendorID: UInt,
-    val icac: ByteArray,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
+  val nodeID: ULong,
+  val friendlyName: String,
+  val vendorID: UInt,
+  val icac: ByteArray,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct {\n")
     append("\tnodeID : $nodeID\n")
     append("\tfriendlyName : $friendlyName\n")
@@ -61,17 +58,26 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct (
     private const val TAG_ICAC = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val friendlyName = tlvReader.getString(ContextSpecificTag(TAG_FRIENDLY_NAME))
       val vendorID = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_ID))
       val icac = tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(nodeID, friendlyName, vendorID, icac, fabricIndex)
+      return JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
+        nodeID,
+        friendlyName,
+        vendorID,
+        icac,
+        fabricIndex,
+      )
     }
   }
 }

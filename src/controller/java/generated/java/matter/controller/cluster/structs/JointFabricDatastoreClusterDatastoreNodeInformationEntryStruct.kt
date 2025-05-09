@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +26,7 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
   val nodeID: ULong,
   val friendlyName: String,
   val commissioningStatusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct {\n")
@@ -56,16 +54,28 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
     private const val TAG_COMMISSIONING_STATUS_ENTRY = 3
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val friendlyName = tlvReader.getString(ContextSpecificTag(TAG_FRIENDLY_NAME))
-      val commissioningStatusEntry = JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(ContextSpecificTag(TAG_COMMISSIONING_STATUS_ENTRY), tlvReader)
+      val commissioningStatusEntry =
+        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
+          ContextSpecificTag(TAG_COMMISSIONING_STATUS_ENTRY),
+          tlvReader,
+        )
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(nodeID, friendlyName, commissioningStatusEntry, fabricIndex)
+      return JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
+        nodeID,
+        friendlyName,
+        commissioningStatusEntry,
+        fabricIndex,
+      )
     }
   }
 }

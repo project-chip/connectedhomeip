@@ -17,20 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class TlsCertificateManagementClusterTLSClientCertificateDetailStruct (
-    val ccdid: UInt,
-    val clientCertificate: Optional<ByteArray>,
-    val intermediateCertificates: Optional<List<ByteArray>>) {
-  override fun toString(): String  = buildString {
+class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
+  val ccdid: UInt,
+  val clientCertificate: Optional<ByteArray>,
+  val intermediateCertificates: Optional<List<ByteArray>>,
+) {
+  override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSClientCertificateDetailStruct {\n")
     append("\tccdid : $ccdid\n")
     append("\tclientCertificate : $clientCertificate\n")
@@ -43,17 +42,17 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CCDID), ccdid)
       if (clientCertificate.isPresent) {
-      val optclientCertificate = clientCertificate.get()
-      put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), optclientCertificate)
-    }
-      if (intermediateCertificates.isPresent) {
-      val optintermediateCertificates = intermediateCertificates.get()
-      startArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
-      for (item in optintermediateCertificates.iterator()) {
-        put(AnonymousTag, item)
+        val optclientCertificate = clientCertificate.get()
+        put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), optclientCertificate)
       }
-      endArray()
-    }
+      if (intermediateCertificates.isPresent) {
+        val optintermediateCertificates = intermediateCertificates.get()
+        startArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
+        for (item in optintermediateCertificates.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
+      }
       endStructure()
     }
   }
@@ -63,29 +62,40 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct (
     private const val TAG_CLIENT_CERTIFICATE = 1
     private const val TAG_INTERMEDIATE_CERTIFICATES = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
       tlvReader.enterStructure(tlvTag)
       val ccdid = tlvReader.getUInt(ContextSpecificTag(TAG_CCDID))
-      val clientCertificate = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE)))
-    } else {
-      Optional.empty()
-    }
-      val intermediateCertificates = if (tlvReader.isNextTag(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))) {
-      Optional.of(buildList<ByteArray> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getByteArray(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      
+      val clientCertificate =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE)))
+        } else {
+          Optional.empty()
+        }
+      val intermediateCertificates =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))) {
+          Optional.of(
+            buildList<ByteArray> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getByteArray(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return TlsCertificateManagementClusterTLSClientCertificateDetailStruct(ccdid, clientCertificate, intermediateCertificates)
+      return TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
+        ccdid,
+        clientCertificate,
+        intermediateCertificates,
+      )
     }
   }
 }

@@ -17,24 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ChannelClusterChannelInfoStruct (
-    val majorNumber: UInt,
-    val minorNumber: UInt,
-    val name: Optional<String>,
-    val callSign: Optional<String>,
-    val affiliateCallSign: Optional<String>,
-    val identifier: Optional<String>,
-    val type: Optional<UInt>) {
-  override fun toString(): String  = buildString {
+class ChannelClusterChannelInfoStruct(
+  val majorNumber: UInt,
+  val minorNumber: UInt,
+  val name: Optional<String>,
+  val callSign: Optional<String>,
+  val affiliateCallSign: Optional<String>,
+  val identifier: Optional<String>,
+  val type: Optional<UInt>,
+) {
+  override fun toString(): String = buildString {
     append("ChannelClusterChannelInfoStruct {\n")
     append("\tmajorNumber : $majorNumber\n")
     append("\tminorNumber : $minorNumber\n")
@@ -52,25 +50,25 @@ class ChannelClusterChannelInfoStruct (
       put(ContextSpecificTag(TAG_MAJOR_NUMBER), majorNumber)
       put(ContextSpecificTag(TAG_MINOR_NUMBER), minorNumber)
       if (name.isPresent) {
-      val optname = name.get()
-      put(ContextSpecificTag(TAG_NAME), optname)
-    }
+        val optname = name.get()
+        put(ContextSpecificTag(TAG_NAME), optname)
+      }
       if (callSign.isPresent) {
-      val optcallSign = callSign.get()
-      put(ContextSpecificTag(TAG_CALL_SIGN), optcallSign)
-    }
+        val optcallSign = callSign.get()
+        put(ContextSpecificTag(TAG_CALL_SIGN), optcallSign)
+      }
       if (affiliateCallSign.isPresent) {
-      val optaffiliateCallSign = affiliateCallSign.get()
-      put(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN), optaffiliateCallSign)
-    }
+        val optaffiliateCallSign = affiliateCallSign.get()
+        put(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN), optaffiliateCallSign)
+      }
       if (identifier.isPresent) {
-      val optidentifier = identifier.get()
-      put(ContextSpecificTag(TAG_IDENTIFIER), optidentifier)
-    }
+        val optidentifier = identifier.get()
+        put(ContextSpecificTag(TAG_IDENTIFIER), optidentifier)
+      }
       if (type.isPresent) {
-      val opttype = type.get()
-      put(ContextSpecificTag(TAG_TYPE), opttype)
-    }
+        val opttype = type.get()
+        put(ContextSpecificTag(TAG_TYPE), opttype)
+      }
       endStructure()
     }
   }
@@ -84,39 +82,52 @@ class ChannelClusterChannelInfoStruct (
     private const val TAG_IDENTIFIER = 5
     private const val TAG_TYPE = 6
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChannelClusterChannelInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterChannelInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val majorNumber = tlvReader.getUInt(ContextSpecificTag(TAG_MAJOR_NUMBER))
       val minorNumber = tlvReader.getUInt(ContextSpecificTag(TAG_MINOR_NUMBER))
-      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-    } else {
-      Optional.empty()
-    }
-      val callSign = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CALL_SIGN))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CALL_SIGN)))
-    } else {
-      Optional.empty()
-    }
-      val affiliateCallSign = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN)))
-    } else {
-      Optional.empty()
-    }
-      val identifier = if (tlvReader.isNextTag(ContextSpecificTag(TAG_IDENTIFIER))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IDENTIFIER)))
-    } else {
-      Optional.empty()
-    }
-      val type = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TYPE))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TYPE)))
-    } else {
-      Optional.empty()
-    }
-      
+      val name =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+        } else {
+          Optional.empty()
+        }
+      val callSign =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CALL_SIGN))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CALL_SIGN)))
+        } else {
+          Optional.empty()
+        }
+      val affiliateCallSign =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN)))
+        } else {
+          Optional.empty()
+        }
+      val identifier =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_IDENTIFIER))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IDENTIFIER)))
+        } else {
+          Optional.empty()
+        }
+      val type =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TYPE))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TYPE)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ChannelClusterChannelInfoStruct(majorNumber, minorNumber, name, callSign, affiliateCallSign, identifier, type)
+      return ChannelClusterChannelInfoStruct(
+        majorNumber,
+        minorNumber,
+        name,
+        callSign,
+        affiliateCallSign,
+        identifier,
+        type,
+      )
     }
   }
 }

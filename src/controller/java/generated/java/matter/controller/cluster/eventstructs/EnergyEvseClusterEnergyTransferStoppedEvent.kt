@@ -18,7 +18,6 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -29,7 +28,7 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
   val state: UByte,
   val reason: UByte,
   val energyTransferred: Long,
-  val energyDischarged: Optional<Long>
+  val energyDischarged: Optional<Long>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterEnergyTransferStoppedEvent {\n")
@@ -63,21 +62,28 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
     private const val TAG_ENERGY_TRANSFERRED = 4
     private const val TAG_ENERGY_DISCHARGED = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyEvseClusterEnergyTransferStoppedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEnergyTransferStoppedEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val reason = tlvReader.getUByte(ContextSpecificTag(TAG_REASON))
       val energyTransferred = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_TRANSFERRED))
-      val energyDischarged = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENERGY_DISCHARGED))) {
-        Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_DISCHARGED)))
-      } else {
-        Optional.empty()
-      }
-      
+      val energyDischarged =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENERGY_DISCHARGED))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_DISCHARGED)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterEnergyTransferStoppedEvent(sessionID, state, reason, energyTransferred, energyDischarged)
+      return EnergyEvseClusterEnergyTransferStoppedEvent(
+        sessionID,
+        state,
+        reason,
+        energyTransferred,
+        energyDischarged,
+      )
     }
   }
 }

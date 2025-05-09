@@ -17,20 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ChannelClusterPageTokenStruct (
-    val limit: Optional<UInt>,
-    val after: Optional<String>,
-    val before: Optional<String>) {
-  override fun toString(): String  = buildString {
+class ChannelClusterPageTokenStruct(
+  val limit: Optional<UInt>,
+  val after: Optional<String>,
+  val before: Optional<String>,
+) {
+  override fun toString(): String = buildString {
     append("ChannelClusterPageTokenStruct {\n")
     append("\tlimit : $limit\n")
     append("\tafter : $after\n")
@@ -42,17 +40,17 @@ class ChannelClusterPageTokenStruct (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (limit.isPresent) {
-      val optlimit = limit.get()
-      put(ContextSpecificTag(TAG_LIMIT), optlimit)
-    }
+        val optlimit = limit.get()
+        put(ContextSpecificTag(TAG_LIMIT), optlimit)
+      }
       if (after.isPresent) {
-      val optafter = after.get()
-      put(ContextSpecificTag(TAG_AFTER), optafter)
-    }
+        val optafter = after.get()
+        put(ContextSpecificTag(TAG_AFTER), optafter)
+      }
       if (before.isPresent) {
-      val optbefore = before.get()
-      put(ContextSpecificTag(TAG_BEFORE), optbefore)
-    }
+        val optbefore = before.get()
+        put(ContextSpecificTag(TAG_BEFORE), optbefore)
+      }
       endStructure()
     }
   }
@@ -62,24 +60,27 @@ class ChannelClusterPageTokenStruct (
     private const val TAG_AFTER = 1
     private const val TAG_BEFORE = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChannelClusterPageTokenStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterPageTokenStruct {
       tlvReader.enterStructure(tlvTag)
-      val limit = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LIMIT))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_LIMIT)))
-    } else {
-      Optional.empty()
-    }
-      val after = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AFTER))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_AFTER)))
-    } else {
-      Optional.empty()
-    }
-      val before = if (tlvReader.isNextTag(ContextSpecificTag(TAG_BEFORE))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_BEFORE)))
-    } else {
-      Optional.empty()
-    }
-      
+      val limit =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LIMIT))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_LIMIT)))
+        } else {
+          Optional.empty()
+        }
+      val after =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AFTER))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_AFTER)))
+        } else {
+          Optional.empty()
+        }
+      val before =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BEFORE))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_BEFORE)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return ChannelClusterPageTokenStruct(limit, after, before)

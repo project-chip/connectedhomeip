@@ -20,16 +20,11 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ZoneManagementClusterZoneTriggeredEvent (
-    val zones: List<UInt>,
-    val reason: UInt) {
-  override fun toString(): String  = buildString {
+class ZoneManagementClusterZoneTriggeredEvent(val zones: List<UInt>, val reason: UInt) {
+  override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneTriggeredEvent {\n")
     append("\tzones : $zones\n")
     append("\treason : $reason\n")
@@ -53,17 +48,18 @@ class ZoneManagementClusterZoneTriggeredEvent (
     private const val TAG_ZONES = 0
     private const val TAG_REASON = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ZoneManagementClusterZoneTriggeredEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterZoneTriggeredEvent {
       tlvReader.enterStructure(tlvTag)
-      val zones = buildList <UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ZONES))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
+      val zones =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ZONES))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
       val reason = tlvReader.getUInt(ContextSpecificTag(TAG_REASON))
-      
+
       tlvReader.exitContainer()
 
       return ZoneManagementClusterZoneTriggeredEvent(zones, reason)
