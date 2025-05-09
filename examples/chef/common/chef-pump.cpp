@@ -42,8 +42,8 @@ uint16_t getIndexTemperatureMeasurement(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, TemperatureMeasurement::Id, kTemperatureMeasurementCount);
 }
-int16_t kDefaultMinTemperature = -2500;
-int16_t kDefaultMaxTemperature = 40000;
+int16_t kDefaultMinTemperature = 100;
+int16_t kDefaultMaxTemperature = 9000;
 
 constexpr size_t kPressureMeasurementCount = MATTER_DM_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT;
 DataModel::Nullable<int16_t> PressureRangeMin[kPressureMeasurementCount];
@@ -62,8 +62,8 @@ uint16_t getIndexFlowMeasurement(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, FlowMeasurement::Id, kFlowMeasurementCount);
 }
-uint16_t kDefaultMinFlow = 30;
-uint16_t kDefaultMaxFlow = 10000;
+uint16_t kDefaultMinFlow = 1;
+uint16_t kDefaultMaxFlow = 10;
 
 /**
  * @brief Sets all setpoints to Max if state is On else NULL.
