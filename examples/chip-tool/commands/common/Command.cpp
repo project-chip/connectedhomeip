@@ -710,11 +710,46 @@ size_t Command::AddArgument(const char * name, chip::CharSpan * value, const cha
 size_t Command::AddArgument(const char * name, chip::ByteSpan * value, const char * desc, uint8_t flags)
 {
     Argument arg;
-    arg.type  = ArgumentType::OctetString;
-    arg.name  = name;
-    arg.value = reinterpret_cast<void *>(value);
-    arg.flags = flags;
-    arg.desc  = desc;
+
+    if ((value->size() > kHexStringPrefixLen) && IsHexString((const char *) value->data()))
+    {
+        uint8_t * buffer = nullptr;
+        size_t size;
+
+        CHIP_ERROR err = HexToBytes(
+            chip::CharSpan((const char *) (&value->data()[kHexStringPrefixLen]), (value->size() - kHexStringPrefixLen)),
+            [&buffer](size_t allocSize) {
+                buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(allocSize, sizeof(uint8_t)));
+                return buffer;
+            },
+            &size);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            if (buffer != nullptr)
+            {
+                chip::Platform::MemoryFree(buffer);
+            }
+
+            return 0;
+        }
+
+        chip::ByteSpan newValue = chip::ByteSpan(buffer, size);
+
+        arg.type  = ArgumentType::OctetString;
+        arg.name  = name;
+        arg.value = reinterpret_cast<void *>(&newValue);
+        arg.flags = flags;
+        arg.desc  = desc;
+    }
+    else
+    {
+        arg.type  = ArgumentType::OctetString;
+        arg.name  = name;
+        arg.value = reinterpret_cast<void *>(value);
+        arg.flags = flags;
+        arg.desc  = desc;
+    }
 
     return AddArgumentToList(std::move(arg));
 }
