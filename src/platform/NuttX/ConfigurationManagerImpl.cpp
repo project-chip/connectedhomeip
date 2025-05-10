@@ -52,6 +52,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount;
+    size_t len;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
     err = PosixConfig::EnsureNamespace(PosixConfig::kConfigNamespace_ChipFactory);
@@ -74,6 +75,46 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductId))
     {
         err = StoreProductId(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_SoftwareVersionString))
+    {
+        len = strlen(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+        VerifyOrReturnError(len <= ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        err = StoreSoftwareVersionString(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING, len);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_HardwareVersionString))
+    {
+        len = strlen(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
+        VerifyOrReturnError(len <= ConfigurationManager::kMaxHardwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        err = StoreHardwareVersionString(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING, len);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorName))
+    {
+        len = strlen(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
+        VerifyOrReturnError(len <= ConfigurationManager::kMaxVendorNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        err = StoreVendorName(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME, len);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductName))
+    {
+        len = strlen(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
+        VerifyOrReturnError(len <= ConfigurationManager::kMaxProductNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        err = StoreProductName(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME, len);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_SerialNum))
+    {
+        len = strlen(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+        VerifyOrReturnError(len <= ConfigurationManager::kMaxSerialNumberLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        err = StoreSerialNumber(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, len);
         SuccessOrExit(err);
     }
 
@@ -308,6 +349,49 @@ CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)
 CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
 {
     return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareVersionString(const char * buf, size_t bufSize)
+{
+    VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    return WriteConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, buf, bufSize);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
+{
+    // Read from Posix config.
+    size_t outLen;
+    auto err = ReadConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, buf, bufSize, outLen);
+
+    // If not found use genereic implementation, which gets value from preprocessor variable.
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+        return Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>::GetSoftwareVersionString(buf, bufSize);
+
+    ReturnErrorOnFailure(err);
+
+    // Null terminate buf.
+    VerifyOrReturnError(outLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    buf[outLen] = '\0';
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreHardwareVersionString(const char * buf, size_t bufSize)
+{
+    VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxHardwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    return WriteConfigValueStr(PosixConfig::kConfigKey_HardwareVersionString, buf, bufSize);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreVendorName(const char * buf, size_t bufSize)
+{
+    VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxVendorNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    return WriteConfigValueStr(PosixConfig::kConfigKey_VendorName, buf, bufSize);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreProductName(const char * buf, size_t bufSize)
+{
+    VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxProductNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    return WriteConfigValueStr(PosixConfig::kConfigKey_ProductName, buf, bufSize);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
