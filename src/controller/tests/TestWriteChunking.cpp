@@ -81,6 +81,12 @@ protected:
         kBadValue,
     };
 
+    enum class EncodingMethod
+    {
+        Standard,      // Encoding using WriteClient::EncodeAttribute()
+        PreencodedTLV, // Encoding using WriteClient::PutPreencodedAttribute()
+    };
+
     struct Instructions
     {
         // The paths used in write request
@@ -93,9 +99,37 @@ protected:
         std::vector<bool> expectedStatus;
     };
 
-    void RunTest(Instructions instructions);
-    void RunTest_NonEmptyReplaceAll(Instructions instructions);
+    void RunTest(Instructions instructions, EncodingMethod encodingMethod);
+    void RunTest_NonEmptyReplaceAll(Instructions instructions, EncodingMethod encodingMethod);
+
+    template <class T>
+    void EncodeAttributeListIntoTLV(const DataModel::List<T> & aListAttribute, TLV::ScopedBufferTLVReader & outTlvReader);
 };
+
+// Encodes an attribute of List Data Type into a TLV Reader object for testing WriteClient::PutPreencodedAttribute
+template <class T>
+void TestWriteChunking::EncodeAttributeListIntoTLV(const DataModel::List<T> & aListAttribute,
+                                                   TLV::ScopedBufferTLVReader & outEncodedListTlvReader)
+{
+    // Encode AttributeData into a TLV Array
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
+    buffer.Alloc(aListAttribute.size() * 2 + 2);
+
+    TLV::TLVWriter writer;
+    writer.Init(buffer.Get(), buffer.AllocatedSize());
+    TLV::TLVType outerContainer;
+
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerContainer));
+    for (uint8_t j = 0; j < aListAttribute.size(); j++)
+    {
+        EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), aListAttribute[j]));
+    }
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(outerContainer));
+
+    // Move Encoded TLV Array into TLVReader Object
+    outEncodedListTlvReader.Init(std::move(buffer), writer.GetLengthWritten());
+    outEncodedListTlvReader.Next();
+}
 
 //clang-format off
 
@@ -300,48 +334,67 @@ TEST_F(TestWriteChunking, TestListChunking)
     // to ensure we'll sweep from fitting 2 chunks to 3-4 chunks.
     //
     constexpr size_t minReservationSize = kMaxSecureSduLengthBytes - 75 - 100;
-    for (uint32_t i = 100; i > 0; i--)
+
+    for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        TestWriteCallback writeCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(i));
-
-        gIterationCount = i;
-
-        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                     static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
-
-        ByteSpan list[kTestListLength];
-
-        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        err = writeClient.SendWriteRequest(sessionHandle);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        //
-        // Service the IO + Engine till we get a ReportEnd callback on the client.
-        // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
-        // times this can run without seeing expected results.
-        //
-        for (int j = 0; j < 10 && writeCallback.mOnDoneCount == 0; j++)
+        for (uint32_t i = 100; i > 0; i--)
         {
-            DrainAndServiceIO();
-        }
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            TestWriteCallback writeCallback;
 
-        EXPECT_EQ(writeCallback.mSuccessCount, kTestListLength + 1 /* an extra item for the empty list at the beginning */);
-        EXPECT_EQ(writeCallback.mErrorCount, 0u);
-        EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
+            ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(i));
 
-        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+            gIterationCount = i;
 
-        //
-        // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
-        //
-        if (HasFailure())
-        {
-            break;
+            app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+                                         static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
+
+            ByteSpan list[kTestListLength];
+
+            if (encodingMethod == EncodingMethod::Standard)
+            {
+                err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
+                EXPECT_EQ(err, CHIP_NO_ERROR);
+            }
+            else if (encodingMethod == EncodingMethod::PreencodedTLV)
+            {
+                TLV::ScopedBufferTLVReader encodedListTLV;
+                EncodeAttributeListIntoTLV(DataModel::List<ByteSpan>(list, kTestListLength), encodedListTLV);
+
+                ConcreteDataAttributePath path =
+                    ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
+                EXPECT_EQ(writeClient.PutPreencodedAttribute(path, encodedListTLV), CHIP_NO_ERROR);
+            }
+
+            //
+
+            err = writeClient.SendWriteRequest(sessionHandle);
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+
+            //
+            // Service the IO + Engine till we get a ReportEnd callback on the client.
+            // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
+            // times this can run without seeing expected results.
+            //
+            for (int j = 0; j < 10 && writeCallback.mOnDoneCount == 0; j++)
+            {
+                DrainAndServiceIO();
+            }
+
+            EXPECT_EQ(writeCallback.mSuccessCount, kTestListLength + 1 /* an extra item for the empty list at the beginning */);
+            EXPECT_EQ(writeCallback.mErrorCount, 0u);
+            EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
+
+            EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+            //
+            // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
+            //
+            if (HasFailure())
+            {
+                break;
+            }
         }
     }
     emberAfClearDynamicEndpoint(0);
@@ -377,59 +430,75 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
     // Start with a high reservation (maxReservationSize) to force chunking, then decrease the reservation in 1-byte steps.
     // This increases the buffer space available for encoding, gradually reducing the need for chunking, until chunking would not
     // occur anymore. This helps validate various edge cases.
-    for (uint32_t reservationReduction = 0; reservationReduction < 40; reservationReduction++)
+
+    for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        TestWriteCallback writeCallback;
-
-        ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(reservationReduction));
-
-        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional,
-                                     static_cast<uint16_t>(maxReservationSize - reservationReduction) /* reserved buffer size */);
-
-        ByteSpan list[kTestListLength2];
-
-        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength2));
-
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        // Ensure that chunking actually occurred in the first iteration. We will iteratively chunk less and less, until chunking
-        // would not occur anymore. Thus, this check is only needed at start.
-        if (reservationReduction == 0)
+        for (uint32_t reservationReduction = 0; reservationReduction < 40; reservationReduction++)
         {
-            ASSERT_TRUE(writeClient.IsWriteRequestChunked());
-        }
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            TestWriteCallback writeCallback;
 
-        err = writeClient.SendWriteRequest(sessionHandle);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+            ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(reservationReduction));
 
-        //
-        // Service the IO + Engine till we get a ReportEnd callback on the client.
-        // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
-        // times this can run without seeing expected results.
-        //
-        for (int j = 0; j < 10 && writeCallback.mOnDoneCount == 0; j++)
-        {
-            DrainAndServiceIO();
-        }
+            app::WriteClient writeClient(
+                &GetExchangeManager(), &writeCallback, NullOptional,
+                static_cast<uint16_t>(maxReservationSize - reservationReduction) /* reserved buffer size */);
 
-        // Due to Write Chunking being done dynamically (fitting as many items as possible into an initial ReplaceAll List, before
-        // starting to chunk), it is fragile to try to predict mSuccessCount. It all depends on how much was packed into the initial
-        // ReplaceAll List.
-        // However, we know for sure that writeCallback should NEVER fail.
-        EXPECT_EQ(writeCallback.mErrorCount, 0u);
-        EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
+            ByteSpan list[kTestListLength2];
 
-        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+            if (encodingMethod == EncodingMethod::Standard)
+            {
+                err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength2));
+                EXPECT_EQ(err, CHIP_NO_ERROR);
+            }
+            else if (encodingMethod == EncodingMethod::PreencodedTLV)
+            {
+                TLV::ScopedBufferTLVReader encodedListTLV;
+                EncodeAttributeListIntoTLV(DataModel::List<ByteSpan>(list, kTestListLength2), encodedListTLV);
 
-        //
-        // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
-        //
-        if (HasFailure())
-        {
-            break;
+                ConcreteDataAttributePath path =
+                    ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
+                EXPECT_EQ(writeClient.PutPreencodedAttribute(path, encodedListTLV), CHIP_NO_ERROR);
+            }
+
+            // Ensure that chunking actually occurred in the first iteration. We will iteratively chunk less and less, until
+            // chunking would not occur anymore. Thus, this check is only needed at start.
+            if (reservationReduction == 0)
+            {
+                ASSERT_TRUE(writeClient.IsWriteRequestChunked());
+            }
+
+            err = writeClient.SendWriteRequest(sessionHandle);
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+
+            //
+            // Service the IO + Engine till we get a ReportEnd callback on the client.
+            // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
+            // times this can run without seeing expected results.
+            //
+            for (int j = 0; j < 10 && writeCallback.mOnDoneCount == 0; j++)
+            {
+                DrainAndServiceIO();
+            }
+
+            // Due to Write Chunking being done dynamically (fitting as many items as possible into an initial ReplaceAll List,
+            // before starting to chunk), it is fragile to try to predict mSuccessCount. It all depends on how much was packed into
+            // the initial ReplaceAll List. However, we know for sure that writeCallback should NEVER fail.
+            EXPECT_EQ(writeCallback.mErrorCount, 0u);
+            EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
+
+            EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+            //
+            // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
+            //
+            if (HasFailure())
+            {
+                break;
+            }
         }
     }
+
     emberAfClearDynamicEndpoint(0);
 }
 
@@ -898,8 +967,9 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
 
     emberAfClearDynamicEndpoint(0);
 }
+// for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
 
-void TestWriteChunking::RunTest(Instructions instructions)
+void TestWriteChunking::RunTest(Instructions instructions, EncodingMethod encodingMethod = EncodingMethod::Standard)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     auto sessionHandle = GetSessionBobToAlice();
@@ -958,13 +1028,38 @@ void TestWriteChunking::RunTest(Instructions instructions)
             break;
         }
         case ListData::kList: {
-            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
-                                               DataModel::List<ByteSpan>(list, kTestListLength));
+
+            if (encodingMethod == EncodingMethod::Standard)
+            {
+                err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
+                                                   DataModel::List<ByteSpan>(list, kTestListLength));
+            }
+            else if (encodingMethod == EncodingMethod::PreencodedTLV)
+            {
+                TLV::ScopedBufferTLVReader encodedListTLV;
+                EncodeAttributeListIntoTLV(DataModel::List<ByteSpan>(list, kTestListLength), encodedListTLV);
+
+                ConcreteDataAttributePath path = ConcreteDataAttributePath(p.mEndpointId, p.mClusterId, p.mAttributeId);
+                err                            = writeClient->PutPreencodedAttribute(path, encodedListTLV);
+            }
             break;
         }
         case ListData::kBadValue: {
-            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
-                                               DataModel::List<uint8_t>(badList, kTestListLength));
+
+            if (encodingMethod == EncodingMethod::Standard)
+            {
+                err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
+                                                   DataModel::List<uint8_t>(badList, kTestListLength));
+            }
+            else if (encodingMethod == EncodingMethod::PreencodedTLV)
+            {
+                TLV::ScopedBufferTLVReader encodedListTLV;
+                EncodeAttributeListIntoTLV(DataModel::List<uint8_t>(badList, kTestListLength), encodedListTLV);
+
+                ConcreteDataAttributePath path = ConcreteDataAttributePath(p.mEndpointId, p.mClusterId, p.mAttributeId);
+                err                            = writeClient->PutPreencodedAttribute(path, encodedListTLV);
+            }
+
             break;
         }
         }
@@ -1009,6 +1104,13 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
         .expectedStatus = { true },
     });
+    ChipLogProgress(Zcl, "Test 1bis: we should receive transaction notifications with EncodingMethod PrencodedAttribute");
+    RunTest(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
 
     ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
     RunTest(Instructions{
@@ -1017,12 +1119,30 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus          = { false },
     });
 
+    ChipLogProgress(Zcl, "Test 2bis: we should receive transaction notifications for incomplete list operations");
+    RunTest(
+        Instructions{
+            .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+            .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
+            .expectedStatus          = { false },
+        },
+        EncodingMethod::PreencodedTLV);
+
     ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
     RunTest(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                             ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
         .expectedStatus = { true, true },
     });
+
+    ChipLogProgress(Zcl, "Test 3bis: we should receive transaction notifications for every list in the transaction");
+    RunTest(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
+            .expectedStatus = { true, true },
+        },
+        EncodingMethod::PreencodedTLV);
 
     ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
     RunTest(Instructions{
@@ -1039,6 +1159,23 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true, false },
     });
 
+    ChipLogProgress(Zcl, "Test 4bis: we should receive transaction notifications with the status of each list");
+    RunTest(
+        Instructions{
+            .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                       ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
+            .onListWriteBeginActions =
+                [&](const app::ConcreteAttributePath & aPath) {
+                    if (aPath.mAttributeId == kTestListAttribute2)
+                    {
+                        return Operations::kShutdownWriteClient;
+                    }
+                    return Operations::kNoop;
+                },
+            .expectedStatus = { true, false },
+        },
+        EncodingMethod::PreencodedTLV);
+
     ChipLogProgress(Zcl,
                     "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value before non null values");
@@ -1049,6 +1186,19 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true },
     });
 
+    ChipLogProgress(
+        Zcl,
+        "Test 5bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+        "null value before non null values");
+    RunTest(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+            .data           = { ListData::kNull, ListData::kList },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
+
     ChipLogProgress(Zcl,
                     "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value after non null values");
@@ -1058,6 +1208,19 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .data           = { ListData::kList, ListData::kNull },
         .expectedStatus = { true },
     });
+
+    ChipLogProgress(
+        Zcl,
+        "Test 6bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+        "null value after non null values");
+    RunTest(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+            .data           = { ListData::kList, ListData::kNull },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
 
     ChipLogProgress(Zcl,
                     "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
@@ -1070,12 +1233,35 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true },
     });
 
+    ChipLogProgress(
+        Zcl,
+        "Test 7bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+        "null value between non null values");
+    RunTest(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+            .data           = { ListData::kList, ListData::kNull, ListData::kList },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
+
     ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
     RunTest(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
         .data           = { ListData::kNull },
         .expectedStatus = { true },
     });
+
+    ChipLogProgress(Zcl, "Test 8bis: transactional list callbacks will be called for nullable lists");
+    RunTest(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+            .data           = { ListData::kNull },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
 
     ChipLogProgress(Zcl,
                     "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
@@ -1086,6 +1272,18 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { false },
     });
 
+    ChipLogProgress(
+        Zcl,
+        "Test 9bis: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
+        "during processing the requests");
+    RunTest(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+            .data           = { ListData::kBadValue },
+            .expectedStatus = { false },
+        },
+        EncodingMethod::PreencodedTLV);
+
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
@@ -1095,7 +1293,8 @@ TEST_F(TestWriteChunking, TestTransactionalList)
  * A Variant of RunTest above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
  * happens with the ACL Cluster.
  */
-void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions)
+void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions,
+                                                   EncodingMethod encodingMethod = EncodingMethod::Standard)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     auto sessionHandle = GetSessionBobToAlice();
@@ -1156,13 +1355,38 @@ void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions)
             break;
         }
         case ListData::kList: {
-            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
-                                               DataModel::List<ByteSpan>(list, kTestListLength2));
+
+            if (encodingMethod == EncodingMethod::Standard)
+            {
+                err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
+                                                   DataModel::List<ByteSpan>(list, kTestListLength2));
+            }
+            else if (encodingMethod == EncodingMethod::PreencodedTLV)
+            {
+                TLV::ScopedBufferTLVReader encodedListTLV;
+                EncodeAttributeListIntoTLV(DataModel::List<ByteSpan>(list, kTestListLength2), encodedListTLV);
+
+                ConcreteDataAttributePath path = ConcreteDataAttributePath(p.mEndpointId, p.mClusterId, p.mAttributeId);
+                err                            = writeClient->PutPreencodedAttribute(path, encodedListTLV);
+            }
             break;
         }
         case ListData::kBadValue: {
-            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
-                                               DataModel::List<uint8_t>(badList, kTestListLength2));
+
+            if (encodingMethod == EncodingMethod::Standard)
+            {
+                err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
+                                                   DataModel::List<uint8_t>(badList, kTestListLength2));
+            }
+            else if (encodingMethod == EncodingMethod::PreencodedTLV)
+            {
+                TLV::ScopedBufferTLVReader encodedListTLV;
+                EncodeAttributeListIntoTLV(DataModel::List<uint8_t>(badList, kTestListLength2), encodedListTLV);
+
+                ConcreteDataAttributePath path = ConcreteDataAttributePath(p.mEndpointId, p.mClusterId, p.mAttributeId);
+                err                            = writeClient->PutPreencodedAttribute(path, encodedListTLV);
+            }
+
             break;
         }
         }
@@ -1208,6 +1432,14 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true },
     });
 
+    ChipLogProgress(Zcl, "Test 1bis: we should receive transaction notifications");
+    RunTest_NonEmptyReplaceAll(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
+
     ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
     RunTest_NonEmptyReplaceAll(Instructions{
         .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
@@ -1215,12 +1447,30 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus          = { false },
     });
 
+    ChipLogProgress(Zcl, "Test 2bis: we should receive transaction notifications for incomplete list operations");
+    RunTest_NonEmptyReplaceAll(
+        Instructions{
+            .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+            .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
+            .expectedStatus          = { false },
+        },
+        EncodingMethod::PreencodedTLV);
+
     ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
     RunTest_NonEmptyReplaceAll(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
                             ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id) },
         .expectedStatus = { true, true },
     });
+
+    ChipLogProgress(Zcl, "Test 3bis: we should receive transaction notifications for every list in the transaction");
+    RunTest_NonEmptyReplaceAll(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id) },
+            .expectedStatus = { true, true },
+        },
+        EncodingMethod::PreencodedTLV);
 
     ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
     RunTest_NonEmptyReplaceAll(Instructions{
@@ -1237,6 +1487,23 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true, false },
     });
 
+    ChipLogProgress(Zcl, "Test 4bis: we should receive transaction notifications with the status of each list");
+    RunTest_NonEmptyReplaceAll(
+        Instructions{
+            .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                       ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id) },
+            .onListWriteBeginActions =
+                [&](const app::ConcreteAttributePath & aPath) {
+                    if (aPath.mAttributeId == AccessControl::Attributes::Extension::Id)
+                    {
+                        return Operations::kShutdownWriteClient;
+                    }
+                    return Operations::kNoop;
+                },
+            .expectedStatus = { true, false },
+        },
+        EncodingMethod::PreencodedTLV);
+
     ChipLogProgress(Zcl,
                     "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value before non null values");
@@ -1247,6 +1514,19 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true },
     });
 
+    ChipLogProgress(
+        Zcl,
+        "Test 5bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+        "null value before non null values");
+    RunTest_NonEmptyReplaceAll(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+            .data           = { ListData::kNull, ListData::kList },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
+
     ChipLogProgress(Zcl,
                     "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value after non null values");
@@ -1256,6 +1536,19 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .data           = { ListData::kList, ListData::kNull },
         .expectedStatus = { true },
     });
+
+    ChipLogProgress(
+        Zcl,
+        "Test 6bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+        "null value after non null values");
+    RunTest_NonEmptyReplaceAll(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+            .data           = { ListData::kList, ListData::kNull },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
 
     ChipLogProgress(Zcl,
                     "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
@@ -1268,12 +1561,35 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true },
     });
 
+    ChipLogProgress(
+        Zcl,
+        "Test 7bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+        "null value between non null values");
+    RunTest_NonEmptyReplaceAll(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+            .data           = { ListData::kList, ListData::kNull, ListData::kList },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
+
     ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
     RunTest_NonEmptyReplaceAll(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
         .data           = { ListData::kNull },
         .expectedStatus = { true },
     });
+
+    ChipLogProgress(Zcl, "Test 8bis: transactional list callbacks will be called for nullable lists");
+    RunTest_NonEmptyReplaceAll(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+            .data           = { ListData::kNull },
+            .expectedStatus = { true },
+        },
+        EncodingMethod::PreencodedTLV);
 
     ChipLogProgress(Zcl,
                     "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
@@ -1283,6 +1599,18 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .data           = { ListData::kBadValue },
         .expectedStatus = { false },
     });
+
+    ChipLogProgress(
+        Zcl,
+        "Test 9bis: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
+        "during processing the requests");
+    RunTest_NonEmptyReplaceAll(
+        Instructions{
+            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+            .data           = { ListData::kBadValue },
+            .expectedStatus = { false },
+        },
+        EncodingMethod::PreencodedTLV);
 
     // This TestCase tests corner cases when we Encode many attributes into the same WriteRequest, up to 10 Attributes will be
     // Encoded.
