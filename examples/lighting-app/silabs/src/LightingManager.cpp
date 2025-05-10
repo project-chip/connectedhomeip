@@ -22,9 +22,14 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/TypeTraits.h>
 
 using namespace chip;
+using namespace ::chip::app;
+using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::OnOff;
 using namespace ::chip::DeviceLayer;
 
@@ -60,9 +65,51 @@ CHIP_ERROR LightingManager::Init()
     }
 
     bool currentLedState;
+
     // read current on/off value on endpoint one.
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     OnOffServer::Instance().getOnOffValue(1, &currentLedState);
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    app::DataModel::Nullable<uint8_t> brightness;
+    uint16_t currentx, currenty, currentctmireds;
+    uint8_t currenthue, currentsaturation;
+
+    // Read brightness value
+    if (Clusters::LevelControl::Attributes::CurrentLevel::Get(1, brightness) == Protocols::InteractionModel::Status::Success &&
+        !brightness.IsNull())
+    {
+        mCurrentLevel = brightness.Value();
+    }
+    if (Clusters::ColorControl::Attributes::CurrentX::Get(1, &currentx) == Protocols::InteractionModel::Status::Success &&
+        !currentx.IsNull())
+    {
+        mCurrentX = currentx;
+    }
+    if (Clusters::ColorControl::Attributes::CurrentY::Get(1, &currenty) == Protocols::InteractionModel::Status::Success &&
+        !currenty.IsNull())
+    {
+        mCurrentY = currenty;
+    }
+    if (Clusters::ColorControl::Attributes::CurrentHue::Get(1, &currenthue) == Protocols::InteractionModel::Status::Success &&
+        !currenthue.IsNull())
+    {
+        mCurrentHue = currenthue;
+    }
+    if (Clusters::ColorControl::Attributes::CurrentSaturation::Get(1, &currentsaturation) ==
+            Protocols::InteractionModel::Status::Success &&
+        !currentsaturation.IsNull())
+    {
+        mCurrentSaturation = currentsaturation;
+    }
+    if (Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(1, &currentctmireds) ==
+            Protocols::InteractionModel::Status::Success &&
+        !currentctmireds.IsNull())
+    {
+        mCurrentCTMireds = currentctmireds;
+    }
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     mState                 = currentLedState ? kState_OnCompleted : kState_OffCompleted;
@@ -100,7 +147,7 @@ void LightingManager::SetAutoTurnOffDuration(uint32_t aDurationInSecs)
     mAutoTurnOffDuration = aDurationInSecs;
 }
 
-bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
+bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
 {
     bool action_initiated = false;
     State_t new_state;
@@ -144,6 +191,16 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
         if (mActionInitiated_CB)
         {
             mActionInitiated_CB(aAction, aActor);
+        }
+    }
+
+    if (aAction == LEVEL_ACTION)
+    {
+        action_initiated = true;
+        if (mCurrentLevel != *aValue)
+        {
+            mCurrentLevel = *aValue;
+            AppTask::GetAppTask().PostLightActionRequest(aActor, aAction, aValue);
         }
     }
 
@@ -210,7 +267,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("Auto Turn Off has been triggered!");
 
-    light->InitiateAction(actor, OFF_ACTION);
+    light->InitiateAction(actor, OFF_ACTION, nullptr);
 }
 
 void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
@@ -228,7 +285,7 @@ void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("OffEffect completed");
 
-    light->InitiateAction(actor, OFF_ACTION);
+    light->InitiateAction(actor, OFF_ACTION, nullptr);
 }
 
 void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
@@ -307,3 +364,56 @@ void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
     LightMgr().mOffEffectArmed = true;
     LightMgr().StartTimer(offEffectDuration);
 }
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+bool LightingManager::InitiateLightctrlAction(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value)
+{
+    bool action_initiated = false;
+    VerifyOrReturnError(aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT, action_initiated);
+    RGBLEDWidget::ColorData_t colorData;
+    switch (aAction)
+    {
+    case COLOR_ACTION_XY:
+        colorData.xy = {};
+
+        if (aAttributeId == ColorControl::Attributes::CurrentX::Id)
+        {
+            VerifyOrReturnValue(mCurrentX != *reinterpret_cast<uint16_t *>(value), action_initiated);
+            mCurrentX = *reinterpret_cast<uint16_t *>(value);
+        }
+        else if (aAttributeId == ColorControl::Attributes::CurrentY::Id)
+        {
+            VerifyOrReturnValue(mCurrentY != *reinterpret_cast<uint16_t *>(value), action_initiated);
+            mCurrentY = *reinterpret_cast<uint16_t *>(value);
+        }
+        colorData.xy = { mCurrentX, mCurrentY };
+        break;
+
+    case COLOR_ACTION_HSV:
+        colorData.hsv = {};
+
+        if (aAttributeId == ColorControl::Attributes::CurrentHue::Id)
+        {
+            VerifyOrReturnValue(mCurrentHue != *value, action_initiated);
+            mCurrentHue = *value;
+        }
+        else if (aAttributeId == ColorControl::Attributes::CurrentSaturation::Id)
+        {
+            VerifyOrReturnValue(mCurrentSaturation != *value, action_initiated);
+            mCurrentSaturation = *value;
+        }
+        colorData.hsv = { mCurrentHue, mCurrentSaturation };
+        break;
+    case COLOR_ACTION_CT:
+        VerifyOrReturnValue(mCurrentCTMireds != *(uint16_t *) value, action_initiated);
+        colorData.ct.ctMireds = *(uint16_t *) value;
+        mCurrentCTMireds      = colorData.ct.ctMireds;
+        break;
+
+    default:
+        break;
+    }
+    AppTask::GetAppTask().PostLightControlActionRequest(aActor, aAction, (RGBLEDWidget::ColorData_t *) &colorData);
+    return action_initiated;
+}
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
