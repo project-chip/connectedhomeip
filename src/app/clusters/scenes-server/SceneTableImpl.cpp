@@ -48,7 +48,7 @@ StorageKeyName Serializer::FabricEntryDataKey(FabricIndex fabric, EndpointId end
 
 // Worst case tested: Add Scene Command with EFS using the default SerializeAdd Method. This yielded a serialized scene of 175 bytes
 // when using the OnOff, Level Control and Color Control as well as the maximal name length of 16 bytes. Putting 256 gives some
-// slack in case different clusters are used. Value obtained by using writer.GetLengthWritten at the end of the SceneTableData
+// slack in case different clusters are used. Value obtained by using writer.GetLengthWritten at the end of the Serializer
 // Serialize method.
 template <>
 constexpr size_t Serializer::kEntryMaxBytes()
@@ -83,7 +83,7 @@ namespace {
 /// kGroupId: Tag for GroupID if the Scene is a Group Scene
 /// kSceneId: Tag for the scene ID. Together with kGroupId, forms the SceneStorageId
 /// kName: Tag for the name of the scene
-/// kTransitionTime: Tag for the transition time of the scene in miliseconds
+/// kTransitionTime: Tag for the transition time of the scene in milliseconds
 enum class TagScene : uint8_t
 {
     kGroupId = static_cast<uint8_t>(TagEntry::kFabricTableFirstSpecializationReservedTag),
@@ -93,13 +93,12 @@ enum class TagScene : uint8_t
 };
 } // namespace
 
-using SceneTableData = TableEntryData<SceneStorageId, SceneData, Serializer::kEntryMaxBytes()>;
 using FabricSceneData =
     FabricEntryData<SceneStorageId, SceneData, Serializer::kEntryMaxBytes(), Serializer::kFabricMaxBytes(), kMaxScenesPerFabric>;
 
 template class chip::app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
 
-CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate * storage)
+CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate & storage)
 {
     return FabricTableImpl::Init(storage);
 }
@@ -156,7 +155,6 @@ CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(FabricIndex fabric_index
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricSceneData fabric(mEndpointId, fabric_index, mMaxPerFabric, mMaxPerEndpoint);
-    SceneTableData scene(mEndpointId, fabric_index);
 
     uint8_t scene_count = 0;
     CHIP_ERROR err      = fabric.Load(this->mStorage);
@@ -190,7 +188,6 @@ CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(FabricIndex fabric_inde
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricSceneData fabric(mEndpointId, fabric_index, mMaxPerFabric, mMaxPerEndpoint);
-    SceneTableData scene(mEndpointId, fabric_index);
 
     CHIP_ERROR err = fabric.Load(this->mStorage);
     VerifyOrReturnValue(CHIP_ERROR_NOT_FOUND != err, CHIP_NO_ERROR);
