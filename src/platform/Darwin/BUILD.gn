@@ -60,7 +60,7 @@ static_library("Darwin") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdContexts.cpp",
-    "DnssdHostNameRegistrar.cpp",
+    "DnssdHostNameRegistrar.mm",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "DnssdType.cpp",

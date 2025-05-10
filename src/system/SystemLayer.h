@@ -40,10 +40,10 @@
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <lib/support/IntrusiveList.h>
 #include <system/SocketEvents.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <dispatch/dispatch.h>
@@ -227,6 +227,17 @@ private:
     Layer & operator=(const Layer &) = delete;
 };
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+class LayerDispatch : public Layer
+{
+public:
+    virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue)    = 0;
+    virtual dispatch_queue_t GetDispatchQueue()                      = 0;
+    virtual void HandleDispatchQueueEvents(Clock::Timeout timeout)   = 0;
+    virtual CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) = 0;
+};
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 class LayerFreeRTOS : public Layer
@@ -235,9 +246,13 @@ class LayerFreeRTOS : public Layer
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-class LayerSockets : public Layer
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+class LayerSockets :
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    public LayerDispatch
+#else
+    public Layer
+#endif
 {
 public:
     /**
@@ -343,10 +358,7 @@ public:
     virtual void RemoveLoopHandler(EventLoopHandler & handler) = 0;
 #endif // !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue) = 0;
-    virtual dispatch_queue_t GetDispatchQueue()                   = 0;
-#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
     virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) = 0;
     virtual struct ev_loop * GetLibEvLoop()                 = 0;
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
@@ -356,7 +368,7 @@ protected:
     decltype(EventLoopHandler::mState) & LoopHandlerState(EventLoopHandler & handler) { return handler.mState; }
 };
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace System
 } // namespace chip
