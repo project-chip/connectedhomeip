@@ -126,7 +126,7 @@ not_automated:
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
 
-    - name: TC_DefaultWarnings
+    - name: TC_DefaultWarnings.py
       reason:
           Fails after hard-coded values removed from defaults (seems to fail
           because fixed label is empty). See
