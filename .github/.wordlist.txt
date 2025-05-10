@@ -1297,6 +1297,7 @@ semver
 SendButton
 SendNewInputEvent
 sendto
+SEPR
 seqdiag
 SERIALDEVICE
 serialno

@@ -5,8 +5,7 @@ The Energy Gateway app is intended to act as a `CommodityPrice` and
 electrical price of energy and grid conditions (how many Grams of CO2 per kWh)
 to Energy Smart Appliances (ESAs).
 
-This is primarily intended as an example to allow a reference test application
-that can be used to prove cluster implementation in SVE.
+This is primarily intended as an example reference application.
 
 This document describes how to build and run CHIP Linux Energy Gateway Example
 on Raspberry Pi. This doc is tested on **Ubuntu for Raspberry Pi Server 24.04
