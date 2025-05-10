@@ -1,8 +1,7 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
- *    Copyright (c) 2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -88,17 +87,7 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 static void StopSignalHandler(int signum)
 {
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
-        switch (role)
-        {
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
-            break;
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
-            break;
-        }
-    });
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown();
 }
 #endif
 
@@ -148,8 +137,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    pmWiFiPAF = &WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-    pmWiFiPAF->Init(&DeviceLayer::SystemLayer());
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
 
     struct sigaction sa = {};
     sa.sa_handler       = StopSignalHandler;
@@ -816,18 +804,27 @@ enum nan_service_protocol_type
 };
 #pragma pack(pop)
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParam & InArgs)
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParams & InArgs)
 {
     GAutoPtr<GError> err;
     guint publish_id;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
     unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS;
-    unsigned int freq                             = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
+    unsigned int freq                             = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAULT_CHNL;
     unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
 
     // Add the freq_list:
-    GVariant * freq_array_variant =
-        g_variant_new_fixed_array(G_VARIANT_TYPE_UINT16, InArgs.freq_list.get(), InArgs.freq_list_len, sizeof(guint16));
+    GVariant * freq_array_variant;
+    if (InArgs.freq_list.size() > 0)
+    {
+        freq_array_variant =
+            g_variant_new_fixed_array(G_VARIANT_TYPE_UINT16, InArgs.freq_list.data(), InArgs.freq_list.size(), sizeof(guint16));
+    }
+    else
+    {
+        freq_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_UINT16, &freq, 1, sizeof(guint16));
+    }
+
     if (freq_array_variant == nullptr)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: freq_array_variant is NULL ");
@@ -1350,7 +1347,6 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     dataValue.reset(value);
     auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
-    GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
     /*
         Error Checking
@@ -1363,7 +1359,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, no valid session with discriminator: %u", pPublishSSI->DevInfo);
         return;
     }
-    if ((pPafInfo->id == subscribe_id) && (pPafInfo->peer_id != UINT32_MAX))
+    if ((pPafInfo->id == subscribe_id) && (pPafInfo->peer_id != kUndefinedWiFiPafSessionId))
     {
         // Reentrance, depends on wpa_supplicant behaviors
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, reentrance, subscribe_id: %u ", subscribe_id);
@@ -1562,8 +1558,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
     uint8_t is_active                             = 1;
     unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS;
-    unsigned int freq                             = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
-    unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
+    unsigned int freq    = (mPafSubscribeFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAULT_CHNL : mPafSubscribeFreq;
+    unsigned int ssi_len = sizeof(struct PAFPublishSSI);
     struct PAFPublishSSI PafPublish_ssi;
 
     mAppState                = appState;
@@ -1596,7 +1592,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
     args = g_variant_builder_end(&builder);
     wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr, &err.GetReceiver());
-
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%u], freq: %u", subscribe_id, freq);
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
@@ -1639,13 +1634,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelSubscribe(uint32_t SubscribeId
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel subscribe_id: %d ! ", SubscribeId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface.get(), SubscribeId, nullptr, &err.GetReceiver());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelIncompleteSubscribe()
-{
-    mOnPafSubscribeComplete = nullptr;
-    mOnPafSubscribeError    = nullptr;
     return CHIP_NO_ERROR;
 }
 
@@ -1713,7 +1701,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
     return ret;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(WiFiPAF::PafSessionId_t id, WiFiPAF::WiFiPafRole role)
 {
     switch (role)
     {
@@ -1778,7 +1766,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
             chip::Inet::IPAddress addr;
             if (it.GetAddress(addr) != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Failed to got IP address on interface: %s", ifName);
+                ChipLogError(DeviceLayer, "Failed to get IP address on interface: %s", ifName);
                 continue;
             }
             ChipDeviceEvent event{ .Type                       = DeviceEventType::kInternetConnectivityChange,

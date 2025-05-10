@@ -169,15 +169,14 @@ public:
     CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                  OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
-    CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
     void OnDiscoveryResult(GVariant * obj);
     void OnReplied(GVariant * obj);
     void OnNanReceive(GVariant * obj);
     void OnNanPublishTerminated(guint public_id, gchar * reason);
     void OnNanSubscribeTerminated(guint subscribe_id, gchar * reason);
     CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
-    void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
-    CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
+    void _WiFiPafSetFreq(const uint16_t freq) { mPafSubscribeFreq = freq; }
+    CHIP_ERROR _WiFiPAFShutdown(WiFiPAF::PafSessionId_t id, WiFiPAF::WiFiPafRole role);
 #endif
 
     void PostNetworkConnect();
@@ -260,11 +259,10 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
-    WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
-    uint16_t mApFreq;
-    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
+    uint16_t mPafSubscribeFreq;
+    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParams & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
 #endif
 

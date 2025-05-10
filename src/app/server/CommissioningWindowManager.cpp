@@ -73,8 +73,11 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
-            [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+        if (mAdvertisingOverWiFiPAF)
+        {
+            ChipLogProgress(AppServer, "Cancel Wi-Fi PAF publish");
+            WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().CloseAllConnections();
+        }
 #endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
@@ -328,7 +331,11 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 co
 #else
     SetBLE(false);
 #endif // CONFIG_NETWORK_LAYER_BLE
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    SetAdvertisingOverWiFiPAF(advertisementMode == chip::CommissioningWindowAdvertisement::kAllSupported);
+#else
+    SetAdvertisingOverWiFiPAF(false);
+#endif
     mFailedCommissioningAttempts = 0;
 
     mUseECM = false;
@@ -479,6 +486,13 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
         ReturnErrorOnFailure(err);
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (mAdvertisingOverWiFiPAF)
+    {
+        ChipLogProgress(AppServer, "Starting Wi-Fi PAF publish");
+        DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(true);
+    }
+#endif
 
     if (mUseECM)
     {
@@ -526,6 +540,20 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
         (void) chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (mAdvertisingOverWiFiPAF)
+    {
+        ChipLogProgress(AppServer, "Stopping Wi-Fi PAF publish if connection has not established");
+        WiFiPAF::WiFiPAFSession sessionInfo = { .role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher };
+        WiFiPAF::WiFiPAFLayer & pafLayer    = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+        WiFiPAF::WiFiPAFSession * pSession  = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
+        if ((pSession != nullptr) && (pSession->peer_id == WiFiPAF::kUndefinedWiFiPafSessionId))
+        {
+            // PAF session has not been established
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(false);
+        }
+    }
+#endif
 
     if (mAppDelegate != nullptr)
     {
