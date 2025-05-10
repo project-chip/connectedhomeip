@@ -24,6 +24,15 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/KeyValueStoreManager.h>
+#include <esp_wifi.h>
+#include <esp_timer.h>
+#include "Button.h"
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-server.h>
+
 #define APP_TASK_NAME "APP"
 #define APP_EVENT_QUEUE_SIZE 10
 #define APP_TASK_STACK_SIZE (3072)
@@ -46,6 +55,71 @@ TaskHandle_t sAppTaskHandle;
 } // namespace
 
 AppTask AppTask::sAppTask;
+
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+/* add the timer for checking WiFi state*/
+static esp_timer_handle_t g_checking_state_polling_timer_handle = NULL;
+static void checking_state_polling_cb(void *args)
+{
+    static uint8_t timerCount = 0;
+    static bool lastWiFiStationConnected = true;
+    chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type reason;
+    if (chip::DeviceLayer::ConnectivityMgr().IsWiFiStationConnected()){
+        timerCount = 0;
+        if (false == lastWiFiStationConnected){
+            int WiFiDisconnectFlagValue = 0;
+            //chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get("WiFiDisconnectFlag", &WiFiDisconnectFlagValue);
+            if (WiFiDisconnectFlagValue != 0x11){
+                lastWiFiStationConnected = true;
+                ESP_LOGI(TAG, "WiFi Connected");
+                chip::DeviceLayer::PlatformMgr().LockChipStack();
+                if (ConnectivityMgr().IsWiFiStationProvisioned()){
+                    //chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum> reason;
+                    chip::app::Clusters::GeneralCommissioning::GetNetworkRecoveryReasonValue(reason);
+                    if (!reason.IsNull()){
+                        //chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum> reason;
+                        reason.SetNull();
+                        //chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::Set(kRootEndpointId, reason);
+                        chip::app::Clusters::GeneralCommissioning::SetNetworkRecoveryReasonValue(reason);
+                        if (ConnectivityMgr().IsBLEAdvertising()){
+                            ESP_LOGI(TAG, "Stop WiFi Network Recovery BLE Advertisement");
+                            ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+                        }
+                    }
+                }
+                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+            }
+        } else {
+            //Do nothing
+        }
+    } else {
+        if (lastWiFiStationConnected){
+            //wifi disconnected
+            if (timerCount < 10){
+                timerCount++; //checking ten seconds
+                ESP_LOGI(TAG, "WiFi Disonnected Count: %d",timerCount);
+            } else {
+                lastWiFiStationConnected = false;
+                using chip::DeviceLayer::ConnectivityMgr;
+                chip::DeviceLayer::PlatformMgr().LockChipStack();
+                if (ConnectivityMgr().IsWiFiStationProvisioned()){
+                    ESP_LOGI(TAG, "Start WiFi Network Recovery BLE Advertisement");
+                    chip::app::Clusters::GeneralCommissioning::GetNetworkRecoveryReasonValue(reason);
+                    if (reason.IsNull()){
+                        reason = chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum::kVisibility;
+                        chip::app::Clusters::GeneralCommissioning::SetNetworkRecoveryReasonValue(reason);
+                    }
+                    ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+                }
+                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+            }
+        } else {
+            timerCount = 0;
+        }
+    }
+}
+//end checking WiFi state
+#endif //CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -109,13 +183,23 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     AppLED.Init();
-
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
 
     AppLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
 #endif
 
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+/* add the timer for checking WiFi state*/
+    esp_timer_create_args_t checking_state_polling_timer;
+    checking_state_polling_timer.arg = NULL;
+    checking_state_polling_timer.callback = checking_state_polling_cb;
+    checking_state_polling_timer.dispatch_method = ESP_TIMER_TASK;
+    checking_state_polling_timer.name = "checking_state_polling_timer";
+    esp_timer_create(&checking_state_polling_timer, &g_checking_state_polling_timer_handle);
+    esp_timer_start_periodic(g_checking_state_polling_timer_handle, 1000000U);
+//end
+#endif //CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
     return err;
 }
 
