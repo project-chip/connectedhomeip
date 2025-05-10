@@ -32,10 +32,8 @@
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
 // VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
-const uint16_t kDesiredEndpointVendorId = 65521;
-// EndpointId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection using the
-// Commissioner-Generated passcode commissioning flow
-const uint8_t kDesiredEndpointId = 1;
+const uint16_t kDesiredEndpointVendorId    = 65521; // 0xFFF1
+const uint16_t kDesiredEndpointVendorIdTwo = 65522; // 0xFFF2
 // Indicates that the Commissioner-Generated passcode commissioning flow is in progress.
 bool gCommissionerGeneratedPasscodeFlowRunning = false;
 
@@ -265,46 +263,25 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
     ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler()");
 
     // For a connection failure, called back with an error and nullptr.
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(
-            AppServer,
-            "simple-app-helper.cpp::ConnectionHandler(): Failed to connect to CastingPlayer (ID: %s) with err %" CHIP_ERROR_FORMAT,
-            targetCastingPlayer->GetId(), err.Format()));
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(AppServer,
+                                "simple-app-helper.cpp::ConnectionHandler(): Failed to connect to CastingPlayer (ID: %s, Vendor "
+                                "ID: %d) with err %" CHIP_ERROR_FORMAT,
+                                targetCastingPlayer->GetId(), targetCastingPlayer->GetVendorId(), err.Format()));
 
-    if (gCommissionerGeneratedPasscodeFlowRunning)
-    {
-        ChipLogProgress(AppServer,
-                        "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s) using "
-                        "Commissioner-Generated passcode",
-                        castingPlayer->GetId());
-        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Desired Endpoint ID for demo interactions: 1");
-    }
-    else
-    {
-        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s)",
-                        castingPlayer->GetId());
-        ChipLogProgress(AppServer,
-                        "simple-app-helper.cpp::ConnectionHandler(): Desired Endpoint Vendor ID for demo interactions: %d",
-                        kDesiredEndpointVendorId);
-    }
-
-    ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Getting endpoints available for demo interactions");
+    ChipLogProgress(AppServer,
+                    "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s, Vendor ID: %d)",
+                    castingPlayer->GetId(), targetCastingPlayer->GetVendorId());
+    ChipLogProgress(
+        AppServer,
+        "simple-app-helper.cpp::ConnectionHandler(): Demo interactions, getting endpoints matching Endpoint Vendor ID: %d",
+        kDesiredEndpointVendorId);
     std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
     LogEndpointsDetails(endpoints);
 
     // Find the desired Endpoint and auto-trigger some Matter Casting demo interactions
     auto it = std::find_if(endpoints.begin(), endpoints.end(),
                            [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
-                               if (gCommissionerGeneratedPasscodeFlowRunning)
-                               {
-                                   // For the example Commissioner-Generated passcode commissioning flow, run demo interactions with
-                                   // the Endpoint with ID 1. For this flow, we commissioned with the Target Content Application
-                                   // with Vendor ID 1111. Since this target content application does not report its Endpoint's
-                                   // Vendor IDs, we find the desired endpoint based on the Endpoint ID. See
-                                   // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-                                   return endpoint->GetId() == kDesiredEndpointId;
-                               }
                                return endpoint->GetVendorId() == kDesiredEndpointVendorId;
                            });
     if (it != endpoints.end())
@@ -405,6 +382,11 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         matter::casting::core::IdentificationDeclarationOptions idOptions;
         chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
         targetAppInfo.vendorId = kDesiredEndpointVendorId;
+        // For demonstration purposes add another TargetApp Vendor ID to interact with after commissioning. If the
+        // target content app's allowedVendorList contains the casting client's Vendor ID, then the client will receive
+        // the corresponding bindings and endpoints.
+        chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfoTwo;
+        targetAppInfoTwo.vendorId = kDesiredEndpointVendorIdTwo;
 
         if (argc == 3)
         {
@@ -419,14 +401,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                     "CommandHandler() request %lu commissioner-generated-passcode. Attempting the "
                                     "Commissioner-Generated Passcode commissioning flow",
                                     index);
-                    idOptions.mCommissionerPasscode = true;
-
-                    // For the example Commissioner-Generated passcode commissioning flow, override the default Target Content
-                    // Application Vendor ID, which is configured on the tv-app. This Target Content Application Vendor ID (1111),
-                    // does not implement the AccountLogin cluster, which would otherwise auto commission using the
-                    // Commissionee-Generated passcode upon recieving the IdentificationDeclaration Message. See
-                    // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-                    targetAppInfo.vendorId                    = 1111;
+                    idOptions.mCommissionerPasscode           = true;
                     gCommissionerGeneratedPasscodeFlowRunning = true;
                 }
                 else
@@ -443,6 +418,22 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         if (result != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
+        }
+        result = CHIP_NO_ERROR;
+        result = idOptions.addTargetAppInfo(targetAppInfoTwo);
+        if (result != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfoTwo: %" CHIP_ERROR_FORMAT,
+                         result.Format());
+        }
+
+        if (!gCommissionerGeneratedPasscodeFlowRunning)
+        {
+            uint32_t defaultTestPasscode = 0;
+            chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+            VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
+            ChipLogProgress(AppServer, "CommandHandler() request, tv-casting-app Commissionee Passcode: %u",
+                            static_cast<unsigned>(defaultTestPasscode));
         }
 
         matter::casting::core::ConnectionCallbacks connectionCallbacks;
@@ -572,7 +563,8 @@ CHIP_ERROR PrintAllCommands()
                     "[index] using the Commissionee-Generated passcode commissioning flow. Usage: cast request 0\r\n");
     streamer_printf(sout,
                     "  request <index> commissioner-generated-passcode  Request connecting to discovered Casting Player with "
-                    "[index] using the Commissioner-Generated passcode commissioning flow. Usage: cast request 0 cgp\r\n");
+                    "[index] using the Commissioner-Generated passcode commissioning flow. Usage: cast request 0 "
+                    "commissioner-generated-passcode\r\n");
     streamer_printf(sout,
                     "  setcommissionerpasscode <passcode>               Set the commissioning session's passcode to the "
                     "Commissioner-Generated passcode. Used for the the Commissioner-Generated passcode commissioning flow. Usage: "
@@ -590,7 +582,7 @@ void PrintBindings()
     for (const auto & binding : chip::BindingTable::GetInstance())
     {
         ChipLogProgress(AppServer,
-                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        "PrintBindings() Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));

@@ -107,6 +107,9 @@ class MyPasscodeService : public PasscodeService
     void LookupTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
                                 chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info) override
     {
+        ChipLogProgress(DeviceLayer,
+                        "LookupTargetContentApp() client vendorID=%d productID=%d; TargetAppInfo vendorID=%d productID=%d",
+                        vendorId, productId, info.vendorId, info.productId);
         uint32_t passcode = 0;
         bool foundApp     = ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
         if (!foundApp)
@@ -653,7 +656,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
     }
     else if (vendorId == 65521 && productId == 32769)
     {
-        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2", "20202021",
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2", "0",
                                                     make_default_supported_clusters());
         mContentApps.emplace_back(std::move(ptr));
     }
