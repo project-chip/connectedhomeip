@@ -138,7 +138,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
             value_present_in_supported_locales = random.choice(filtered_supported_locales)
         else:
             logging.info("SupportedLocales attribute has only one element and is the same value as ActiveLocale. Skipping remaining test steps.")
-            self.skip_all_remaining_steps(5)
+            self.mark_all_remaining_steps_skipped(5)
             return
 
         result = await self.write_single_attribute(attribute_value=Clusters.LocalizationConfiguration.Attributes.ActiveLocale(value_present_in_supported_locales), endpoint_id=endpoint, expect_success=True)

@@ -132,7 +132,7 @@ class TC_CGEN_2_8(MatterBaseTest):
         # Step 5: Factory reset is handled by test operator
         self.step(5)
         if not self.check_pics('PICS_USER_PROMPT'):
-            self.skip_all_remaining_steps(6)
+            self.mark_all_remaining_steps_skipped(6)
             return
 
         self.wait_for_user_input(prompt_msg="Manually trigger factory reset on the DUT, then continue")
