@@ -105,8 +105,20 @@ class AccessoryServerBridge():
     def reboot(request):
         register_key = _get_option(request, 'registerKey', _DEFAULT_KEY)
 
-        with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
-            proxy.reboot(register_key)
+        try:
+            with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
+                proxy.reboot(register_key)
+        except xmlrpc.client.Fault as e:
+            # When a reboot happens, the server shuts down and the connection is lost
+            # This can result in an RPC fault (commonly with exit code -11, segmentation fault)
+            # We expect this fault and consider it a normal part of the reboot process
+            # Extract error message to check if it's the expected exit code from reboot/shutdown
+            error_msg = str(e)
+            if "exit code: -11" in error_msg or "Subprocess failed with exit code" in error_msg:
+                # This is expected during reboot - the server is shutting down
+                return
+            # For other faults, re-raise the exception
+            raise
 
     def factoryReset(request):
         register_key = _get_option(request, 'registerKey', _DEFAULT_KEY)
