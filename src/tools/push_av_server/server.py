@@ -31,7 +31,7 @@ from pydantic import BaseModel
 from uvicorn.protocols.http.h11_impl import H11Protocol
 from zeroconf import ServiceInfo, Zeroconf
 
-http_tools_protocol_old__should_upgrade = H11Protocol._should_upgrade
+http_tools_protocol_old__should_upgrade = H11Protocol._should_upgrade_to_ws
 
 
 def http_tools_protocol_new__should_upgrade(self):

@@ -19,7 +19,7 @@
 
 #pragma once
 
-class DefaultTransport : public Transport
+class DefaultTransport : public camera::Transport
 {
 public:
     void SendVideo(const char * data, size_t size, uint16_t videoStreamID) {}

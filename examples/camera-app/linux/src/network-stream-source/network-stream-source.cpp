@@ -27,7 +27,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-constexpr int kVideoBufferSize = 4096;
+constexpr int kVideoBufferSize = 1048576;
 
 void NetworkStreamSource::Init(MediaController * aMediaController, uint16_t aSrcPort, StreamType aStreamType)
 {
@@ -66,6 +66,10 @@ void NetworkStreamSource::ListenForStreamOnSocket()
         ChipLogError(NotSpecified, "Failed to create socket. (err = %s)", strerror(errno));
         return;
     }
+
+    // Increase UDP socket receive buffer size
+    int sockbufsize = 1048576; // 1 MB
+    setsockopt(serverSocket, SOL_SOCKET, SO_RCVBUF, &sockbufsize, sizeof(sockbufsize));
 
     sockaddr_in serverAddress;
     serverAddress.sin_family      = AF_INET;

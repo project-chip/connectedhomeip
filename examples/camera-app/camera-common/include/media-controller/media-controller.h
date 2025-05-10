@@ -20,13 +20,13 @@
 #pragma once
 
 #include <mutex>
-#include <transport.h>
+#include <transport/transport.h>
 #include <vector>
 
 // Connection object to store transport and stream IDs
 struct Connection
 {
-    Transport * transport;
+    camera::Transport * transport;
     uint16_t videoStreamID;
     uint16_t audioStreamID;
 };
@@ -39,10 +39,10 @@ public:
     virtual ~MediaController() {}
     // Transports register themselves with the media-controller for receiving
     // media from stream sources.
-    virtual void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
+    virtual void RegisterTransport(camera::Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
     // Transports must first unregister from the media-controller when they are
     // getting destroyed.
-    virtual void UnregisterTransport(Transport * transport) = 0;
+    virtual void UnregisterTransport(camera::Transport * transport) = 0;
     // Media controller goes through registered transports and dispatches media
     // if the transport is ready.
     virtual void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID) = 0;

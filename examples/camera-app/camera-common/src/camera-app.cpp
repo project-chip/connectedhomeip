@@ -24,6 +24,7 @@ using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
+using namespace chip::app::Clusters::PushAvStreamTransport;
 
 template <typename T>
 using List   = chip::app::DataModel::List<T>;
@@ -40,6 +41,8 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     // Instantiate WebRTCTransport Provider
     mWebRTCTransportProviderPtr =
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
+
+    mPushAvStreamTransportServerPtr = std::make_unique<PushAvStreamTransportServer>(mEndpoint, mCameraDevice->GetPushAVDelegate());
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<CameraAvStreamManagement::Feature> features;
@@ -131,6 +134,8 @@ void CameraApp::InitCameraDeviceClusters()
     mChimeServerPtr->Init();
 
     mAVSettingsUserLevelMgmtServerPtr->Init();
+
+    mPushAvStreamTransportServerPtr->Init();
 
     InitializeCameraAVStreamMgmt();
 }
