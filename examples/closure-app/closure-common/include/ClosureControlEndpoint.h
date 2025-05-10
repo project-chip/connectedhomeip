@@ -35,23 +35,99 @@ namespace Clusters {
 namespace ClosureControl {
 
 /**
- * @class PrintOnlyDelegate
+ * @class ClosureControlDelegate
  * @brief A delegate class that handles Closure Control commands at the application level.
  *
  * This class is responsible for processing Closure Control commands such as Stop, MoveTo, and Calibrate
  * according to specific business logic. It is designed to be used as a delegate for the Closure Control cluster.
  *
- * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
  */
-class PrintOnlyDelegate : public DelegateBase
+class ClosureControlDelegate : public DelegateBase
 {
 public:
-    PrintOnlyDelegate() {}
+    ClosureControlDelegate() {}
+
+    virtual ~ClosureControlDelegate() = default;
+
+    uint32_t mMovingTime                         = 0;
+    uint32_t mCalibratingTime                    = 0;
+    uint32_t mWaitingTime                        = 0;
+    DataModel::Nullable<ElapsedS> mCountDownTime = DataModel::NullNullable;
 
     // Override for the DelegateBase Virtual functions
+
     Protocols::InteractionModel::Status HandleStopCommand() override;
-    Protocols::InteractionModel::Status HandleMoveToCommand() override;
+    Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & tag, const Optional<bool> & latch,
+                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
+
+    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
+
+    bool IsManualLatchingNeeded() override;
+    bool IsReadyToMove() override;
+    ElapsedS GetCalibrationCountdownTime() override;
+    ElapsedS GetMovingCountdownTime() override;
+    ElapsedS GetWaitingForMotionCountdownTime() override;
+
+    // Delegate specific functions and variables
+
+    /**
+     * @brief Function to set the logic object
+     */
+    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
+
+    /**
+     * @brief Function to get the logic object
+     */
+    ClusterLogic * GetLogic() const { return mLogic; }
+
+    /**
+     * @brief Function to get the remaining time of the countdown timer
+     *
+     * @return ElapsedS - Remaining time in seconds
+     *         DataModel::NullNullable if countdown timer is not set
+     */
+    DataModel::Nullable<ElapsedS> GetRemainingTime();
+
+    /**
+     * @brief Handles the countdown timer expiration event
+     */
+    void HandleCountdownTimeExpired();
+
+    /**
+     * @brief Checks if closure has completed prestage or not.
+     *
+     * @return true, if prestage is completed
+     *         false, if prestage is not completed
+     */
+    bool IsPreStageComplete();
+
+    /**
+     * @brief Handles the motion request of Closure
+     * @param [in] latchNeeded - true if latch is needed
+     * @param [in] NewTarget - true if target is changed
+     * @return Protocols::InteractionModel::Status - success or failure
+     */
+    Protocols::InteractionModel::Status HandleMotion();
+
+private:
+    ClusterLogic * mLogic;
+
+    /**
+     * @brief Function to map TargetPositionEnum to Positioning Enum
+     *
+     * @param [in] targetPosition, TargetPositionEnum which need to mapped
+     *
+     * @return PositioningEnum
+     */
+    PositioningEnum GetStatePositionFromTarget(TargetPositionEnum targetPosition);
+
+    /**
+     * @brief Function to populate OverallState object with values from OverallTarget
+     *
+     * @param [in] target, state which need to mapped
+     */
+    void PopulateOverallStateFromTarget(const DataModel::Nullable<GenericOverallTarget> & target, GenericOverallState & state);
 };
 
 /**
@@ -72,7 +148,9 @@ class ClosureControlEndpoint
 public:
     ClosureControlEndpoint(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
-    {}
+    {
+        mDelegate.SetLogic(&mLogic);
+    }
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
@@ -84,14 +162,14 @@ public:
     /**
      * @brief Retrieves the delegate associated with this Closure Control endpoint.
      *
-     * @return Reference to the PrintOnlyDelegate instance.
+     * @return Reference to the ClosureControlDelegate instance.
      */
-    PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+    ClosureControlDelegate & GetDelegate() { return mDelegate; }
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
-    PrintOnlyDelegate mDelegate;
+    ClosureControlDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
 };
