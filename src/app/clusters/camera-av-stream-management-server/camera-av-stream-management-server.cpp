@@ -783,6 +783,48 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     }
 }
 
+void CameraAVStreamMgmtServer::ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled,
+                                                 const Optional<bool> osdEnabled)
+{
+    for (VideoStreamStruct & stream : mAllocatedVideoStreams)
+    {
+        if (stream.videoStreamID == streamID)
+        {
+            if (waterMarkEnabled.HasValue())
+            {
+                stream.watermarkEnabled = waterMarkEnabled;
+            }
+            if (osdEnabled.HasValue())
+            {
+                stream.OSDEnabled = osdEnabled;
+            }
+            ChipLogError(Camera, "Modified video stream with ID: %d", streamID);
+            return;
+        }
+    }
+}
+
+void CameraAVStreamMgmtServer::ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled,
+                                                    const Optional<bool> osdEnabled)
+{
+    for (SnapshotStreamStruct & stream : mAllocatedSnapshotStreams)
+    {
+        if (stream.snapshotStreamID == streamID)
+        {
+            if (waterMarkEnabled.HasValue())
+            {
+                stream.watermarkEnabled = waterMarkEnabled;
+            }
+            if (osdEnabled.HasValue())
+            {
+                stream.OSDEnabled = osdEnabled;
+            }
+            ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
+            return;
+        }
+    }
+}
+
 CHIP_ERROR CameraAVStreamMgmtServer::SetCurrentFrameRate(uint16_t aCurrentFrameRate)
 {
     return SetAttributeIfDifferent(mCurrentFrameRate, aCurrentFrameRate, Attributes::CurrentFrameRate::Id,
@@ -1552,6 +1594,13 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
+    bool streamUsageSupported = std::find_if(mRankedVideoStreamPriorities.begin(), mRankedVideoStreamPriorities.end(),
+                                             [&commandData](const StreamUsageEnum & entry) {
+                                                 return entry == commandData.streamUsage;
+                                             }) != mRankedVideoStreamPriorities.end();
+
+    VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
+
     VerifyOrReturn(commandData.minFrameRate >= 1 && commandData.minFrameRate <= commandData.maxFrameRate &&
                        commandData.maxFrameRate >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
@@ -1590,9 +1639,19 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
     if (status == Status::Success)
     {
-        // Add the allocated videostream object in the AllocatedVideoStreams list.
-        videoStreamArgs.videoStreamID = videoStreamID;
-        AddVideoStream(videoStreamArgs);
+
+        // Check if the streamID matches an existing one in the
+        // mAllocatedVideoStreams.
+        bool streamExists = std::find_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
+                                         [&videoStreamID](const VideoStreamStruct & entry) {
+                                             return entry.videoStreamID == videoStreamID;
+                                         }) != mAllocatedVideoStreams.end();
+        if (!streamExists)
+        {
+            // Add the allocated videostream object in the AllocatedVideoStreams list.
+            videoStreamArgs.videoStreamID = videoStreamID;
+            AddVideoStream(videoStreamArgs);
+        }
 
         response.videoStreamID = videoStreamID;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -1626,6 +1685,11 @@ void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
     // Call the delegate
     status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
 
+    if (status == Status::Success)
+    {
+        ModifyVideoStream(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -1656,6 +1720,13 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
+
+    bool streamUsageSupported = std::find_if(mRankedVideoStreamPriorities.begin(), mRankedVideoStreamPriorities.end(),
+                                             [&commandData](const StreamUsageEnum & entry) {
+                                                 return entry == commandData.streamUsage;
+                                             }) != mRankedVideoStreamPriorities.end();
+
+    VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     VerifyOrReturn(commandData.audioCodec != AudioCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid audio codec", mEndpointId);
@@ -1701,9 +1772,18 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         return;
     }
 
-    // Add the allocated audiostream object in the AllocatedAudioStreams list.
-    audioStreamArgs.audioStreamID = audioStreamID;
-    AddAudioStream(audioStreamArgs);
+    // Check if the streamID matches an existing one in the
+    // mAllocatedAudioStreams.
+    bool streamExists = std::find_if(mAllocatedAudioStreams.begin(), mAllocatedAudioStreams.end(),
+                                     [&audioStreamID](const AudioStreamStruct & entry) {
+                                         return entry.audioStreamID == audioStreamID;
+                                     }) != mAllocatedAudioStreams.end();
+    if (!streamExists)
+    {
+        // Add the allocated audiostream object in the AllocatedAudioStreams list.
+        audioStreamArgs.audioStreamID = audioStreamID;
+        AddAudioStream(audioStreamArgs);
+    }
 
     response.audioStreamID = audioStreamID;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -1774,9 +1854,18 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         return;
     }
 
-    // Add the allocated snapshotstream object in the AllocatedSnapshotStreams list.
-    snapshotStreamArgs.snapshotStreamID = snapshotStreamID;
-    AddSnapshotStream(snapshotStreamArgs);
+    // Check if the streamID matches an existing one in the
+    // mAllocatedSnapshotStreams.
+    bool streamExists = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+                                     [&snapshotStreamID](const SnapshotStreamStruct & entry) {
+                                         return entry.snapshotStreamID == snapshotStreamID;
+                                     }) != mAllocatedSnapshotStreams.end();
+    if (!streamExists)
+    {
+        // Add the allocated snapshotstream object in the AllocatedSnapshotStreams list.
+        snapshotStreamArgs.snapshotStreamID = snapshotStreamID;
+        AddSnapshotStream(snapshotStreamArgs);
+    }
 
     response.snapshotStreamID = snapshotStreamID;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -1804,6 +1893,11 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
 
     // Call the delegate
     status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
+
+    if (status == Status::Success)
+    {
+        ModifySnapshotStream(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
+    }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
