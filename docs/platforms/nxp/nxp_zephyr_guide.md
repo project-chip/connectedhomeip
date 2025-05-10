@@ -1,6 +1,6 @@
-# CHIP NXP Zephyr All-clusters Application
+# Matter NXP Zephyr Application
 
-The all-clusters example implements a server which can be accessed by a CHIP
+The examples provided implement a server which can be accessed by a CHIP
 controller and can accept basic cluster commands.
 
 The example is based on
@@ -49,8 +49,8 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 
 Prerequisites:
 
--   Follow instruction from [BUILDING.md](../../../../docs/guides/BUILDING.md)
-    to setup the Matter environment
+-   Follow instruction from [BUILDING.md](../../guides/BUILDING.md) to setup the
+    Matter environment
 -   Follow instruction from
     [Getting Started Guide](https://docs.zephyrproject.org/4.0.0/develop/getting_started/index.html)
     to setup a Zephyr workspace, however, the west init command to use is as
@@ -208,21 +208,21 @@ the partition address: please refer to `factory_partition` defined in
 #### Manually
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../docs/platforms/nxp/nxp_manufacturing_flow.md)
+[Guide for writing manufacturing data on NXP devices](./nxp_manufacturing_flow.md)
 
 <a name="ota-software-update"></a>
 
 ## OTA Software Update
 
 See
-[Guide for OTA Software Update on NXP devices using Zephyr SDK](../../../../docs/platforms/nxp/nxp_zephyr_ota_software_update.md)
+[Guide for OTA Software Update on NXP devices using Zephyr SDK](./nxp_zephyr_ota_software_update.md)
 
 <a name="testing-the-example"></a>
 
 ## Testing the example
 
 To know how to commission a device over BLE, follow the instructions from
-[chip-tool's README.md 'Commission a device over BLE'](../../../chip-tool/README.md#commission-a-device-over-ble).
+[chip-tool's README.md 'Commission a device over BLE'](../../../examples/chip-tool/README.md#commission-a-device-over-ble).
 
 <a name="using-matter-cli-in-nxp-zephyr-examples"></a>
 
