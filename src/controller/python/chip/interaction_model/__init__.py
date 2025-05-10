@@ -86,6 +86,7 @@ class Status(enum.IntEnum):
     FailsafeRequired = 0xca
     InvalidInState = 0xcb
     NoCommandResponse = 0xcc
+    DynamicConstraintError = 0xcf
     InvalidTransportType = 0xd1
     WriteIgnored = 0xf0
 
