@@ -221,8 +221,8 @@ void ReliableMessageMgr::ExecuteActions()
                         Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination));
         MATTER_LOG_METRIC(Tracing::kMetricDeviceRMPRetryCount, entry->sendCount);
 
-        CalculateNextRetransTime(*entry);
         SendFromRetransTable(entry);
+        CalculateNextRetransTime(*entry);
 
         return Loop::Continue;
     });
