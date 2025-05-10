@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
+import optparse
 import os
 import subprocess
 import sys
 
 
-def main():
+def main(argv):
+    parser = optparse.OptionParser()
+    parser.add_option('--target_cpu_type', type=str, default='x64')
+    parser.add_option('--host_cpu_type', type=str, default='x64')
+    parser.add_option('--host_os_type', type=str, default='linux')
+
+    # get arguments
+    options, _ = parser.parse_args(argv)
+    target_cpu_type = options.target_cpu_type
+    host_cpu_type = options.host_cpu_type
+    host_os_type = options.host_os_type
+
     # Get the script directory
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,7 +30,8 @@ def main():
     # Generate build files in ./build
     cmake_cmd = [
         "cmake",
-        "-B", "build",
+        "-B",
+        f"build-{target_cpu_type}",
         "-DUSE_GNUTLS=0",
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
@@ -26,18 +39,39 @@ def main():
         "-DBUILD_SHARED_LIBS=OFF"
     ]
 
+    should_cross_compile_for_arm = (host_os_type == "linux") and (host_cpu_type == "x64") and target_cpu_type.startswith('arm')
+
+    if should_cross_compile_for_arm:
+        print(f"Cross compiling for Target CPU: {target_cpu_type}")
+        sysroot_aarch64 = SysRootPath('SYSROOT_AARCH64')
+        cmake_cmd.extend([
+            "-G", "Ninja",
+            "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+            "-DCMAKE_SYSTEM_NAME=Linux",
+            "-DCMAKE_SYSTEM_PROCESSOR=aarch64",
+            "-DCMAKE_C_COMPILER=clang",
+            "-DCMAKE_CXX_COMPILER=clang++",
+            "-DCMAKE_C_COMPILER_TARGET=aarch64-linux-gnu",
+            "-DCMAKE_CXX_COMPILER_TARGET=aarch64-linux-gnu",
+            f"-DCMAKE_SYSROOT={sysroot_aarch64}",
+        ])
+
     print(f"Running: {' '.join(cmake_cmd)}")
     result = subprocess.run(cmake_cmd, check=True)
 
     # Change to build directory
-    build_dir = os.path.join(repo_dir, "build")
+    build_dir = os.path.join(repo_dir, f"build-{target_cpu_type}")
     os.chdir(build_dir)
     print(f"Changed directory to: {build_dir}")
 
     # Build with Make
-    make_cmd = ["make", "-j2"]
-    print(f"Running: {' '.join(make_cmd)}")
-    result = subprocess.run(make_cmd, check=True)
+    build_cmd = ["make", f"-j{os.cpu_count()}"]
+    if should_cross_compile_for_arm:
+        # build with ninja
+        build_cmd = ["ninja", "-C", "."]
+
+    print(f"Running: {' '.join(build_cmd)}")
+    result = subprocess.run(build_cmd, check=True)
 
     print("libdatachannel build complete.")
     print(f"Artifacts are located in: {build_dir}")
@@ -45,5 +79,11 @@ def main():
     return 0
 
 
+def SysRootPath(name):
+    if name not in os.environ:
+        raise Exception('Missing environment variable "%s"' % name)
+    return os.environ[name]
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))
