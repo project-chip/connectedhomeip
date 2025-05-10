@@ -50,8 +50,17 @@ public:
 
     // Override for the DelegateBase Virtual functions
     Protocols::InteractionModel::Status HandleStopCommand() override;
-    Protocols::InteractionModel::Status HandleMoveToCommand() override;
+    Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & position,
+                                                            const Optional<bool> & latch,
+                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
+
+    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
+    bool IsReadyToMove() override;
+    bool IsManualLatchingNeeded() override;
+    ElapsedS GetCalibrationCountdownTime() override;
+    ElapsedS GetMovingCountdownTime() override;
+    ElapsedS GetWaitingForMotionCountdownTime() override;
 };
 
 /**
