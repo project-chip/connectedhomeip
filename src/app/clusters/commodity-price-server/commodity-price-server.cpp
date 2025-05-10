@@ -47,9 +47,6 @@ CHIP_ERROR Instance::Init()
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
-    // Ensure mPriceForecast is initialised as an empty list
-    mPriceForecast= DataModel::List<Structs::CommodityPriceStruct::Type>(Span<Structs::CommodityPriceStruct::Type>());
-
     return CHIP_NO_ERROR;
 }
 
@@ -248,6 +245,16 @@ Instance::GetDetailedForecastRequest(BitMask<CommodityPriceDetailBitmap> details
 
     size_t count      = 0;
     size_t bufferSize = mPriceForecast.size();
+
+    if (bufferSize == 0)
+    {   
+        /* Special case when no forcast entries exist - calling calloc(0) returns NULL 
+           and results in an error on some platforms */
+        forecastList = DataModel::List<const Structs::CommodityPriceStruct::Type>(
+        Span<Structs::CommodityPriceStruct::Type>());
+
+        return CHIP_NO_ERROR;
+    }
 
     if (!forecastBuffer.Calloc(bufferSize))
     {
