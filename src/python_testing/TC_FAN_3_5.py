@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${AIR_PURIFIER_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace_file json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -35,194 +35,369 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time
+import math
+from dataclasses import dataclass
+from enum import Enum
+import operator
+from typing import Any
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_infrastructure.chip.testing.matter_testing import (AttributeValueExpected, ClusterAttributeChangeAccumulator,
+                                                                       ComparisonEnum, MatterBaseTest, TestStep, async_test_body,
+                                                                       default_matter_test_main)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
 
+class ActionEnum(Enum):
+    Write = 1
+    Command = 2
+
+class OrderEnum(Enum):
+    Ascending = 1
+    Descending = 2
+
+@dataclass
+class Update:
+    action: ActionEnum
+    attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor = None
+    attribute_value: Any = None
+    step: Clusters.FanControl.Commands.Step = None
+
+
 class TC_FAN_3_5(MatterBaseTest):
+    def desc_TC_FAN_3_5(self) -> str:
+        return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
 
-    async def read_fc_attribute_expect_success(self, endpoint, attribute):
+    # def steps_TC_FAN_3_5(self):
+    #     return [TestStep("1", "[FC] Commissioning already done.", is_commissioning=True),
+    #             TestStep("2", "[FC] TH checks the DUT for support of the Step and MultiSpeed features.",
+    #                      "If the DUT does not support both features, the test is skipped."),
+    #             TestStep("3", "[FC] TH reads from the DUT the SpeedMax attribute.", "Store value for future reference."),
+
+    #             TestStep("4", "[FC] TH subscribes to the FanControl cluster.", "Enables the TH to recei
+    #             ]
+
+    async def read_setting(self, attribute: Any) -> Any:
+        """
+        Asynchronously reads a specified attribute from the FanControl cluster at a given endpoint.
+
+        Args:
+            attribute (Any): The attribute to be read.
+
+        Returns:
+            Any: The value of the specified attribute if the read operation is successful.
+
+        Raises:
+            AssertionError: If the read operation fails.
+        """
         cluster = Clusters.Objects.FanControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    async def read_percent_current(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.PercentCurrent)
+    async def write_setting(self, attribute, value) -> None:
+        """
+        Writes a specified value to a given attribute on the device under test (DUT).
+        It verifies that the write operation is successful by asserting the status of the response.
 
-    async def read_speed_current(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.SpeedCurrent)
+        Args:
+            attribute (Callable): The attribute to be written, represented as a callable that takes the value.
+            value (Any): The value to write to the specified attribute.
 
-    async def read_speed_max(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.SpeedMax)
+        Returns:
+            None
 
-    async def write_percent_setting(self, endpoint, percent_setting):
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.PercentSetting(percent_setting))])
-        asserts.assert_equal(result[0].Status, Status.Success, "PercentSetting write failed")
+        Raises:
+            AssertionError: If the write operation fails or the response status is not successful.
+        """
+        logger.info(f"[FC] Writing to the {attribute.__name__} attribute, value: {value}")
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
+        asserts.assert_equal(result[0].Status, Status.Success, f"[FC] {attribute.__name__} attribute write faield.")
 
-    async def write_speed_setting(self, endpoint, speed_setting):
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.SpeedSetting(speed_setting))])
-        asserts.assert_equal(result[0].Status, Status.Success, "SpeedSetting write failed")
-
-    async def send_step_command(self, endpoint,
-                                direction: Clusters.Objects.FanControl.Enums.StepDirectionEnum,
-                                wrap: bool = False, lowestOff: bool = False, expected_status: Status = Status.Success):
+    async def send_step_command(self, step: Clusters.Objects.FanControl.Commands.Step) -> None:
         try:
-            await self.send_single_cmd(cmd=Clusters.Objects.FanControl.Commands.Step(direction=direction, wrap=wrap, lowestOff=lowestOff), endpoint=endpoint)
+            logger.info(
+                f"[FC] Sending Step command - direction: {step.direction.name}, wrap: {step.wrap}, lowestOff: {step.lowestOff}")
+            await self.send_single_cmd(step, endpoint=self.endpoint)
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
             pass
+
+    def verify_expected_value(self, attribute, expected_value) -> None:
+        """
+        Gets and verifies a given attribute report value against an expected value.
+
+        Args:
+            attribute: The attribute to be verified.
+            expected_value: The expected value of the attribute.
+
+        Raises:
+            AssertionError: If the current attribute value does not match the expected value.
+            AssertionError: If the attribute is not found in the attribute reports.
+        """
+        # Gets and verifies a given attribute report value against an expected value.
+        value_current = self.attribute_subscription.get_last_attribute_report_value(self.endpoint, attribute, self.timeout_sec)
+        if value_current is not None:
+            asserts.assert_equal(value_current, expected_value,
+                                 f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({expected_value})")
+        else:
+            asserts.fail(f"The {attribute.__name__} attribute was not found in the attribute reports")
+
+    async def update_and_verify_attribute_values(self, update: Update, expect_updates: bool, expected_attributes=None) -> None:
+        if expect_updates:
+            self.attribute_subscription.reset()
+
+        if update.action == ActionEnum.Write:
+            await self.write_setting(update.attribute, update.attribute_value)
+        elif update.action == ActionEnum.Command:
+            await self.send_step_command(update.step)
+
+        if expect_updates:
+            self.attribute_subscription.await_all_final_values_reported_threshold(
+                value_expectations=expected_attributes, timeout_sec=self.timeout_sec)
+        else:
+            for expected_attribute in expected_attributes:
+                self.verify_expected_value(expected_attribute.attribute, expected_attribute.threshold_value)
+
+    def compute_percent_setting(self, speed_setting):
+        """
+        Computes the fan's percent based on a given speed setting.
+
+        This method calculates the percentage representation of the current fan speed
+        relative to the maximum speed. The result is rounded down to the nearest integer.
+
+        Args:
+            speed_setting (float): The current speed setting of the fan.
+
+        Returns:
+            int: The corresponding percent value.
+        """
+        return math.floor((speed_setting / self.speed_max) * 100)
+
+    async def subscribe_to_attributes(self) -> None:
+        cluster = Clusters.FanControl
+        attr = cluster.Attributes
+
+        self.subscriptions = [
+            ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
+            ClusterAttributeChangeAccumulator(cluster, attr.SpeedSetting),
+            ClusterAttributeChangeAccumulator(cluster, attr.FanMode)
+        ]
+
+        for sub in self.subscriptions:
+            await sub.start(self.default_controller, self.dut_node_id, self.endpoint)
+
+    def verify_attribute_progression(self, order: OrderEnum) -> None:
+        # Setup
+        comp = operator.le if order == OrderEnum.Ascending else operator.ge
+        comp_str = "greater" if order == OrderEnum.Ascending else "less"
+        shared_str = f"not all attribute values progressed in {order.name.lower()} order (current value {comp_str} than previous value)."
+
+        for sub in self.subscriptions:
+            values = [q.value for q in sub.attribute_queue.queue]
+            correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
+            asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
+
+    def verify_expected_reports(self, order: OrderEnum):
+        percent_setting_report_qty = 0
+        fan_mode_report_qty = 0
+        speed_setting_report_qty = 0
+        fan_mode_values = None
+        speed_setting_values = None
+
+        # - Count the number of each of the subscription reports
+        # - Get the values of the FanMode and SpeedSetting attributes
+        for sub in self.subscriptions:
+            if sub._expected_attribute == Clusters.FanControl.Attributes.PercentSetting:
+                percent_setting_report_qty = len(sub.attribute_queue.queue)
+                sub.log_queue()
+            if sub._expected_attribute == Clusters.FanControl.Attributes.FanMode:
+                fan_mode_report_qty = len(sub.attribute_queue.queue)
+                sub.log_queue()
+                fan_mode_values = [q.value for q in sub.attribute_queue.queue]
+            if sub._expected_attribute == Clusters.FanControl.Attributes.SpeedSetting:
+                speed_setting_report_qty = len(sub.attribute_queue.queue)
+                sub.log_queue()
+                speed_setting_values = [q.value for q in sub.attribute_queue.queue]
+
+        # Get the expected FanMode and SpeedSetting values
+        fan_modes_eval = self.fan_modes[1:] if order == OrderEnum.Ascending else list(reversed(self.fan_modes[:-1]))
+        speed_setting_eval = list(range(1, self.speed_max + 1)) if order == OrderEnum.Ascending else list(range(self.speed_max - 1, -1, -1))
+
+        logging.info(f"[FC] fan_modes_eval: {fan_modes_eval}")
+        logging.info(f"[FC] fan_mode_values: {fan_mode_values}")
+
+        logging.info(f"[FC] speed_setting_eval: {speed_setting_eval}")
+        logging.info(f"[FC] speed_setting_values: {speed_setting_values}")
+
+        # If the number of PercentSetting reports is greater than the number of FanMode reports,
+        # - Verify that all the expected FanMode values are present in the reports
+        if percent_setting_report_qty > fan_mode_report_qty:
+            missing_fan_modes = [mode for mode in fan_modes_eval if mode not in fan_mode_values]
+            asserts.assert_equal(fan_modes_eval, fan_mode_values,
+                                 f"[FC] Some of the expected FanMode values are not present in the reports. Expected: {fan_modes_eval}, missing: {missing_fan_modes}.")
+
+        # If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports,
+        # - Verify that all the expected SpeedSetting values are present in the reports
+        if percent_setting_report_qty >= speed_setting_report_qty:
+            missing_speed_setting = [speed for speed in speed_setting_eval if speed not in speed_setting_values]
+            asserts.assert_equal(speed_setting_eval, speed_setting_values,
+                                 f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_eval}, missing: {missing_speed_setting}.")
+
+        return fan_mode_values, speed_setting_values
+
+    async def get_fan_modes(self, remove_auto: bool = False):
+        # Read FanModeSequence attribute value
+        fan_mode_sequence_attr = Clusters.FanControl.Attributes.FanModeSequence
+        fm_enum = Clusters.FanControl.Enums.FanModeEnum
+        fms_enum = Clusters.FanControl.Enums.FanModeSequenceEnum
+        self.fan_mode_sequence = await self.read_setting(fan_mode_sequence_attr)
+
+        # Verify response contains a FanModeSequenceEnum
+        asserts.assert_is_instance(self.fan_mode_sequence, fms_enum,
+                                   f"[FC] FanModeSequence result isn't of enum type {fms_enum.__name__}")
+
+        fan_modes = None
+        if self.fan_mode_sequence == 0:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh]
+        elif self.fan_mode_sequence == 1:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh]
+        elif self.fan_mode_sequence == 2:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 3:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 4:
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 5:
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh]
+
+        self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
+
+    async def step_command_test(self, percent_setting_sub: ClusterAttributeChangeAccumulator, order: OrderEnum):
+        cluster = Clusters.FanControl
+        attr = cluster.Attributes
+        cmd = cluster.Commands
+        sd_enum = cluster.Enums.StepDirectionEnum
+        fm_enum = cluster.Enums.FanModeEnum
+        
+        # Initialize PercentSetting
+        percent_setting_init = 0 if order == OrderEnum.Ascending else 100
+        await self.write_setting(attr.PercentSetting, percent_setting_init)
+
+        # Read SpeedSetting and FanMode attributes
+        speed_setting = await self.read_setting(attr.SpeedSetting)
+        fan_mode = await self.read_setting(attr.FanMode)
+
+        # Verify SpeedSetting is at the expected value
+        speed_setting_expected = 0 if order == OrderEnum.Ascending else self.speed_max
+        asserts.assert_equal(speed_setting, speed_setting_expected,
+                             f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({self.speed_max})")
+
+        # Verify FanMode is at the expected value
+        fan_mode_expected = fm_enum.kOff if order == OrderEnum.Ascending else fm_enum.kHigh
+        asserts.assert_equal(fan_mode, fan_mode_expected,
+                             f"[FC] FanMode attribute value ({fan_mode}) is not equal to the expected value ({fm_enum.kOn})")
+
+        # Reset subscriptions
+        for sub in self.subscriptions:
+            sub.reset()
+
+        # Setup Step command with:
+        # - direction: Increase/Decrease depending on the test order
+        # - wrap: False
+        # - lowestOff: True
+        step_direction = sd_enum.kIncrease if order == OrderEnum.Ascending else sd_enum.kDecrease
+        step = cmd.Step(direction=step_direction, wrap=False, lowestOff=True)
+
+        # Send Step command until it reaches the min or max
+        # PercentSetting value depending on the test order
+        percent_setting_expected = 100 if order == OrderEnum.Ascending else 0
+        for i in range(100):
+            await self.send_step_command(step)
+            pecent_setting = percent_setting_sub.get_last_attribute_report_value(self.endpoint, attr.PercentSetting, self.timeout_sec)
+            logging.info(f"[FC] [{i}] PercentSetting attribute value: {pecent_setting}")
+
+            # If the expected PercentSetting value is reached, send an additional Step
+            # command to veiryf the PercentSetting value stays at the expected value
+            if pecent_setting == percent_setting_expected:
+                await self.send_step_command(step)
+                percent_setting = await self.read_setting(attr.PercentSetting)
+                asserts.assert_equal(percent_setting, percent_setting_expected,
+                                     f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})")
+                break
+            else:
+                if i == 100:
+                    asserts.fail(f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({pecent_setting}).")
+
+        # Veirfy attribute progression (each successive value is greater or less than the last)
+        self.verify_attribute_progression(order)
+
+        # Veirfy all expected reports after the Step commands are present
+        return self.verify_expected_reports(order)
 
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
 
     @async_test_body
     async def test_TC_FAN_3_5(self):
-        if not self.check_pics("FAN.S.F04"):
-            logger.info("Test skipped because PICS FAN.S.F04 is not set")
+        # Setup
+        self.endpoint = self.get_endpoint(default=1)
+        cluster = Clusters.FanControl
+        attr = cluster.Attributes
+        self.timeout_sec: float = 0.5
+
+        # *** STEP 1 ***
+        # Commissioning already done
+        # self.step("1")
+
+        # *** STEP 2 ***
+        # TH checks the DUT for support of the Step and MultiSpeed features
+        #  - If the DUT does not support both features, the test is skipped
+        # self.step("2")
+        feature_map = await self.read_setting(attr.FeatureMap)
+        self.supports_step = bool(feature_map & cluster.Bitmaps.Feature.kStep)
+        self.supports_multi_speed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
+        if not self.supports_step or not self.supports_multi_speed:
+            logger.info("Both the Step and MultiSpeed features must be supported by the DUT for this test, skipping test.")
             return
 
-        endpoint = self.get_endpoint(default=1)
+        # *** STEP 3 ***
+        # TH reads from the DUT the SpeedMax attribute
+        #  - Store value for future reference
+        # self.step("3")
+        self.speed_max = await self.read_setting(attr.SpeedMax)
 
-        # Part 1
+        # *** STEP 4 ***
+        # TH reads from the DUT the FanModeSequence attribute
+        # to determine the supported FanMode values
+        #  - Store result for future reference
+        # self.step("4")
+        await self.get_fan_modes(remove_auto=True)
 
-        self.print_step(1, "Commissioning, already done")
+        # *** STEP 4 ***
+        # Subscribe to the PercentSetting, FanMode, and SpeedSetting attributes individually
+        # self.step("4")
+        await self.subscribe_to_attributes()
+        percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
 
-        # Part 2
+        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, OrderEnum.Descending)
+        fan_mode_values_asc, speed_setting_values_asc = await self.step_command_test(percent_setting_sub, OrderEnum.Ascending)
 
-        self.print_step("2a", "writes to the DUT the PercentSetting attribute with 50")
-        await self.write_percent_setting(endpoint=endpoint, percent_setting=50)
+        fan_mode_values_desc = fan_mode_values_desc[:-1]
+        speed_setting_values_desc = speed_setting_values_desc[:-1]
+        fan_mode_values_asc = fan_mode_values_asc[:-1]
+        speed_setting_values_asc = speed_setting_values_asc[:-1]
 
-        time.sleep(1)
-
-        self.print_step("2b", "Read from the DUT the PercentCurrent attribute and store")
-        percent_current = await self.read_percent_current(endpoint=endpoint)
-
-        self.print_step("2c", "TH sends Step command to DUT with Direction set to Increase")
-        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease)
-
-        time.sleep(1)
-
-        self.print_step("2d", "Read from the DUT the PercentCurrent attribute and check its higher than the stored value")
-        percent_current_after = await self.read_percent_current(endpoint=endpoint)
-        asserts.assert_greater(percent_current_after, percent_current, "PercentCurrent did not increase")
-
-        # Part 3
-
-        self.print_step("3a", "writes to the DUT the PercentSetting attribute with 50")
-        await self.write_percent_setting(endpoint=endpoint, percent_setting=50)
-
-        time.sleep(1)
-
-        self.print_step("3b", "Read from the DUT the PercentCurrent attribute and store")
-        percent_current = await self.read_percent_current(endpoint=endpoint)
-
-        self.print_step("3c", "TH sends Step command to DUT with Direction set to Decrease")
-        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kDecrease)
-
-        self.print_step("3d", "Read from the DUT the PercentCurrent attribute and check its lower than the stored value")
-        percent_current_after = await self.read_percent_current(endpoint=endpoint)
-        asserts.assert_less(percent_current_after, percent_current, "PercentCurrent did not decrease")
-
-        # Part 4
-        self.print_step("4a", "TH reads from the DUT the SpeedMax attribute")
-        speed_max = await self.read_speed_max(endpoint=endpoint)
-
-        self.print_step("4b", "TH writes to the DUT the SpeedSetting attribute with the value of SpeedMax")
-        await self.write_speed_setting(endpoint=endpoint, speed_setting=speed_max)
-
-        time.sleep(1)
-
-        self.print_step("4c", "TH sends Step command to DUT with Direction set to Increase and Wrap set to False")
-        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=False)
-
-        time.sleep(1)
-
-        self.print_step("4d", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
-        speed_current = await self.read_speed_current(endpoint=endpoint)
-        asserts.assert_equal(speed_current, speed_max, "SpeedCurrent incremented past SpeedMax when wrap was false")
-
-        # Part 5
-        self.print_step("5a", "TH writes to the DUT the SpeedSetting attribute with the value of SpeedMax")
-        await self.write_speed_setting(endpoint=endpoint, speed_setting=speed_max)
-
-        time.sleep(1)
-
-        self.print_step("5b", "TH sends Step command to DUT with Direction set to Increase and Wrap set to True")
-        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=True)
-
-        time.sleep(1)
-
-        self.print_step("5c", "Read from the DUT the SpeedCurrent attribute and check its equal to 1")
-        speed_current = await self.read_speed_current(endpoint=endpoint)
-        asserts.assert_equal(speed_current, 1, "SpeedCurrent did not wrap to 1 when wrap was true")
-
-        # Part 6
-        self.print_step("6a", "TH writes to the DUT the SpeedSetting attribute with the value of SpeedMax")
-        await self.write_speed_setting(endpoint=endpoint, speed_setting=speed_max)
-
-        time.sleep(1)
-
-        self.print_step("6b", "TH sends Step command to DUT with Direction set to Increase, Wrap set to True and LowestOff set to True")
-        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=True, lowestOff=True)
-
-        time.sleep(1)
-
-        self.print_step("6c", "Read from the DUT the SpeedCurrent attribute and check its equal to 0")
-        speed_current = await self.read_speed_current(endpoint=endpoint)
-        asserts.assert_equal(speed_current, 0, "SpeedCurrent did not wrap to 0 when wrap was true and lowestOff was true")
-
-        # Part 7
-        self.print_step("7a", "TH writes to the DUT the SpeedSetting attribute with the value of 1")
-        await self.write_speed_setting(endpoint=endpoint, speed_setting=1)
-
-        time.sleep(1)
-
-        self.print_step("7b", "TH sends Step command to DUT with Direction set to Decrease, Wrap set to False and LowestOff set to False")
-        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kDecrease, wrap=False, lowestOff=False)
-
-        time.sleep(1)
-
-        self.print_step("7c", "Read from the DUT the SpeedCurrent attribute and check its equal to 1")
-        speed_current = await self.read_speed_current(endpoint=endpoint)
-        asserts.assert_equal(speed_current, 1, "SpeedCurrent decremented past 1 when wrap was false and lowestOff was false")
-
-        # Part 8
-        self.print_step("8b", "TH writes to the DUT the SpeedSetting attribute with the value of 1")
-        await self.write_speed_setting(endpoint=endpoint, speed_setting=1)
-
-        time.sleep(1)
-
-        self.print_step("8c", "TH sends Step command to DUT with Direction set to Decrease, Wrap set to True and LowestOff set to False")
-        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kDecrease, wrap=True, lowestOff=False)
-
-        time.sleep(1)
-
-        self.print_step("8d", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
-        speed_current = await self.read_speed_current(endpoint=endpoint)
-        asserts.assert_equal(speed_current, speed_max,
-                             "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was false")
-
-        # Part 9
-        self.print_step("9b", "TH writes to the DUT the SpeedSetting attribute with the value of 0")
-        await self.write_speed_setting(endpoint=endpoint, speed_setting=0)
-
-        time.sleep(1)
-
-        self.print_step("9c", "TH sends Step command to DUT with Direction set to Decrease, Wrap set to True and LowestOff set to True")
-        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kDecrease, wrap=True, lowestOff=True)
-
-        time.sleep(1)
-
-        self.print_step("9d", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
-        speed_current = await self.read_speed_current(endpoint=endpoint)
-        asserts.assert_equal(speed_current, speed_max,
-                             "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was true")
-
+        logger.info(f"[FC] fan_mode_values_desc: {fan_mode_values_desc}")
+        logger.info(f"[FC] speed_setting_values_desc: {speed_setting_values_desc}")
+        logger.info(f"[FC] fan_mode_values_asc: {fan_mode_values_asc}")
+        logger.info(f"[FC] speed_setting_values_asc: {speed_setting_values_asc}")
+        
+        asserts.assert_equal(fan_mode_values_desc, list(reversed(fan_mode_values_asc)),
+                             f"[FC] FanMode attribute values are not equal in ascending and descending order. Descending: {fan_mode_values_desc}, Ascending: {fan_mode_values_asc}.")
+        asserts.assert_equal(speed_setting_values_desc, list(reversed(speed_setting_values_asc)),
+                             f"[FC] SpeedSetting attribute values are not equal in ascending and descending order. Descending: {speed_setting_values_desc}, Ascending: {speed_setting_values_asc}.")
 
 if __name__ == "__main__":
     default_matter_test_main()
