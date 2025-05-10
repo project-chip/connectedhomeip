@@ -8273,8 +8273,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MPTZPresets";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDPTZRelativeMoveID:
-            result = @"DPTZRelativeMove";
+        case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDPTZStreamsID:
+            result = @"DPTZStreams";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeZoomMaxID:

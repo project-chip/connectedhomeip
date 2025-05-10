@@ -1,0 +1,136 @@
+From 4dc80d22bd964c0c3fcd0840b6728b3884d2ff1b Mon Sep 17 00:00:00 2001
+From: Arkadiusz Bokowy <a.bokowy@samsung.com>
+Date: Thu, 28 Sep 2023 13:38:17 +0200
+Subject: [PATCH] Bluetooth: MGMT: Synchronize scan start and LE Meta events
+
+It is possible that the Bluetooth management will receive scan enabled
+signal and LE meta events one by another without any delay. Since the
+start discovery procedure is performed in an asynchronous manner, it is
+possible that these HCI events will be processed concurrently by two
+different worker threads. In such case, it is possible that the LE meta
+event, which reports new device, will be discarded, because discovering
+is still in the starting state.
+
+The problem is most prominent with the btvirt userspace tool, which
+sends LE Meta events just after reporting scan as enabled. Testing
+scenario:
+
+  1. Create two HCI interfaces:
+  > btvirt -l2
+
+  2. Setup BLE advertisement on hci1:
+  > bluetoothctl
+  >> select 00:AA:01:00:00:00
+  >> menu advertise
+  >> uuids 03B80E5A-EDE8-4B33-A751-6CE34EC4C700
+  >> discoverable on
+  >> back
+  >> advertise peripheral
+
+  3. Start scanning on hci2:
+  > bluetoothctl
+  >> select 00:AA:01:01:00:01
+  >> scan le
+  // From time to time, new device is not reported
+
+This patch adds synchronization for start discovery procedure and device
+found reporting by the Bluetooth management. In case of discovering
+being in the starting state, the worker which processes LE Meta event
+will wait for the cmd_sync_work on which the start discovery procedure
+is queued.
+
+Signed-off-by: Arkadiusz Bokowy <a.bokowy@samsung.com>
+---
+ include/net/bluetooth/hci_core.h |  5 +++++
+ include/net/bluetooth/hci_sync.h |  1 +
+ net/bluetooth/hci_sync.c         |  7 +++++++
+ net/bluetooth/mgmt.c             | 17 +++++++++++++++--
+ 4 files changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f36c1fd5d64e..456bbdf56246 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -916,6 +916,11 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
+ 
+ bool hci_discovery_active(struct hci_dev *hdev);
+ 
++static inline bool hci_discovery_starting(struct hci_dev *hdev)
++{
++	return hdev->discovery.state == DISCOVERY_STARTING;
++}
++
+ void hci_discovery_set_state(struct hci_dev *hdev, int state);
+ 
+ static inline int inquiry_cache_empty(struct hci_dev *hdev)
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index 6efbc2152146..67cf6689a692 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -43,6 +43,7 @@ void hci_cmd_sync_init(struct hci_dev *hdev);
+ void hci_cmd_sync_clear(struct hci_dev *hdev);
+ void hci_cmd_sync_cancel(struct hci_dev *hdev, int err);
+ void __hci_cmd_sync_cancel(struct hci_dev *hdev, int err);
++void hci_cmd_sync_flush(struct hci_dev *hdev);
+ 
+ int hci_cmd_sync_submit(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 			void *data, hci_cmd_sync_work_destroy_t destroy);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 3640d73f9595..58905a5b7b1e 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -681,6 +681,13 @@ void hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
+ }
+ EXPORT_SYMBOL(hci_cmd_sync_cancel);
+ 
++/* Wait for all pending HCI commands to complete.
++ */
++void hci_cmd_sync_flush(struct hci_dev *hdev)
++{
++	flush_work(&hdev->cmd_sync_work);
++}
++
+ /* Submit HCI command to be run in as cmd_sync_work:
+  *
+  * - hdev must _not_ be unregistered
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ba2e00646e8e..fc494348f2f7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -10374,18 +10374,31 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ {
+ 	struct sk_buff *skb;
+ 	struct mgmt_ev_device_found *ev;
+-	bool report_device = hci_discovery_active(hdev);
++	bool report_device;
+ 
+ 	if (hci_dev_test_flag(hdev, HCI_MESH) && link_type == LE_LINK)
+ 		mesh_device_found(hdev, bdaddr, addr_type, rssi, flags,
+ 				  eir, eir_len, scan_rsp, scan_rsp_len,
+ 				  instant);
+ 
++	/* Discovery start procedure is perfomed on a workqueue in an
++	 * asynchronous manner. This procedure is finished when the scan
++	 * enabled signal is received from the controller. Just after
++	 * this signal, the controller might send another event (e.g. LE
++	 * Meta). In such case, we need to make sure that the discovery
++	 * procedure is finished, because otherwise we might omit some
++	 * scan results.
++	 */
++	if (hci_discovery_starting(hdev))
++		hci_cmd_sync_flush(hdev);
++
++	report_device = hci_discovery_active(hdev);
++
+ 	/* Don't send events for a non-kernel initiated discovery. With
+ 	 * LE one exception is if we have pend_le_reports > 0 in which
+ 	 * case we're doing passive scanning and want these events.
+ 	 */
+-	if (!hci_discovery_active(hdev)) {
++	if (!report_device) {
+ 		if (link_type == ACL_LINK)
+ 			return;
+ 		if (link_type == LE_LINK && !list_empty(&hdev->pend_le_reports))
+-- 
+2.34.1
+
