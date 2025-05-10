@@ -21,6 +21,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/Span.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <stdlib.h>
@@ -42,80 +43,25 @@ DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
     return sInstance;
 }
 
+// !!!!!!!!!!!!!!!!!!!!!!!! WARNING WARNING WARNING !!!!!!!!!!!!!!!!!!!!
+// WARNING: DO NOT USE THESE DEFAULT IMPLEMENTATIONS WITH DEFAULT VALUES
+// IN PRODUCTION PRODUCTS WITHOUT AUDITING THEM! See
+// `AllClustersExampleDeviceInforProviderImpl.cpp` for an example provider
+// that has constant values. Here, all providers have empty implementations
+// to force empty lists which prevent bad values from leaking into products
+// like happened before Matter 1.5. If you really are using these clusters,
+// then please re-implement the provider as needed.
+//
+// The FixedLabel, LocalizationConfigurationand and Time Format localization
+// clusters, if used, should have values that have been vetted
+// for correctness in the product !!! DO NOT USE SAMPLE DEFAULTS IN PRODUCTS.
+// !!!!!!!!!!!!!!!!!!!!!!!! WARNING WARNING WARNING !!!!!!!!!!!!!!!!!!!!
+
 DeviceInfoProvider::FixedLabelIterator * DeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
 {
-    return chip::Platform::New<FixedLabelIteratorImpl>(endpoint);
-}
-
-DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
-{
-    mIndex = 0;
-}
-
-size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
-{
-    // A hardcoded labelList on all endpoints.
-    return 4;
-}
-
-bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
-{
-    bool retval = true;
-
-    // A hardcoded list for testing only
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    const char * labelPtr = nullptr;
-    const char * valuePtr = nullptr;
-
-    VerifyOrReturnError(mIndex < 4, false);
-
-    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%u at endpoint:%d", static_cast<unsigned>(mIndex), mEndpoint);
-
-    switch (mIndex)
-    {
-    case 0:
-        labelPtr = "room";
-        valuePtr = "bedroom 2";
-        break;
-    case 1:
-        labelPtr = "orientation";
-        valuePtr = "North";
-        break;
-    case 2:
-        labelPtr = "floor";
-        valuePtr = "2";
-        break;
-    case 3:
-        labelPtr = "direction";
-        valuePtr = "up";
-        break;
-    default:
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        break;
-    }
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(std::strlen(labelPtr) <= kMaxLabelNameLength, false);
-        VerifyOrReturnError(std::strlen(valuePtr) <= kMaxLabelValueLength, false);
-
-        Platform::CopyString(mFixedLabelNameBuf, labelPtr);
-        Platform::CopyString(mFixedLabelValueBuf, valuePtr);
-
-        output.label = CharSpan::fromCharString(mFixedLabelNameBuf);
-        output.value = CharSpan::fromCharString(mFixedLabelValueBuf);
-
-        mIndex++;
-
-        retval = true;
-    }
-    else
-    {
-        retval = false;
-    }
-
-    return retval;
+    // We don't include fixed label data in this sample one. Returning nullptr returns empty list.
+    (void) endpoint;
+    return nullptr;
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
@@ -224,71 +170,21 @@ DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSu
 size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
     // Hardcoded list of locales
-    // {("en-US"), ("de-DE"), ("fr-FR"), ("en-GB"), ("es-ES"), ("zh-CN"), ("it-IT"), ("ja-JP")}
+    // {("en-US")}
 
-    return 8;
+    return kNumSupportedLocales;
 }
 
 bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
-    bool retval = true;
-
     // Hardcoded list of locales
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    static const char * kAllSupportedLocales[kNumSupportedLocales] = { "en-US" };
 
-    const char * activeLocalePtr = nullptr;
+    VerifyOrReturnError(mIndex < kNumSupportedLocales, false);
+    output = CharSpan::fromCharString(kAllSupportedLocales[mIndex]);
+    mIndex++;
 
-    VerifyOrReturnError(mIndex < 8, false);
-
-    switch (mIndex)
-    {
-    case 0:
-        activeLocalePtr = "en-US";
-        break;
-    case 1:
-        activeLocalePtr = "de-DE";
-        break;
-    case 2:
-        activeLocalePtr = "fr-FR";
-        break;
-    case 3:
-        activeLocalePtr = "en-GB";
-        break;
-    case 4:
-        activeLocalePtr = "es-ES";
-        break;
-    case 5:
-        activeLocalePtr = "zh-CN";
-        break;
-    case 6:
-        activeLocalePtr = "it-IT";
-        break;
-    case 7:
-        activeLocalePtr = "ja-JP";
-        break;
-    default:
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        break;
-    }
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(std::strlen(activeLocalePtr) <= kMaxActiveLocaleLength, false);
-
-        Platform::CopyString(mActiveLocaleBuf, kMaxActiveLocaleLength + 1, activeLocalePtr);
-
-        output = CharSpan::fromCharString(mActiveLocaleBuf);
-
-        mIndex++;
-
-        retval = true;
-    }
-    else
-    {
-        retval = false;
-    }
-
-    return retval;
+    return true;
 }
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
@@ -299,75 +195,21 @@ DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::Ite
 size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 {
     // Hardcoded list of strings
-    // {("kBuddhist"), ("kChinese"), ("kCoptic"), ("kEthiopian"), ("kGregorian"), ("kHebrew"), ("kIndian"), ("kJapanese"),
-    //  ("kKorean"), ("kPersian"), ("kTaiwanese"), ("kIslamic")}
+    // {("kGregorian")}
 
-    return 12;
+    return kNumSupportedCalendarTypes;
 }
 
 bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
-    bool retval = true;
+    static const CalendarType kAllSupportedCalendarTypes[kNumSupportedCalendarTypes] = {
+        app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian
+    };
 
-    // Hardcoded list of Strings that are valid values for the Calendar Types.
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrReturnError(mIndex < 12, false);
-
-    switch (mIndex)
-    {
-    case 0:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
-        break;
-    case 1:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kChinese;
-        break;
-    case 2:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kCoptic;
-        break;
-    case 3:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kEthiopian;
-        break;
-    case 4:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian;
-        break;
-    case 5:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kHebrew;
-        break;
-    case 6:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kIndian;
-        break;
-    case 7:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese;
-        break;
-    case 8:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kKorean;
-        break;
-    case 9:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kPersian;
-        break;
-    case 10:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kTaiwanese;
-        break;
-    case 11:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kIslamic;
-        break;
-    default:
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        break;
-    }
-
-    if (err == CHIP_NO_ERROR)
-    {
-        mIndex++;
-        retval = true;
-    }
-    else
-    {
-        retval = false;
-    }
-
-    return retval;
+    VerifyOrReturnError(mIndex < kNumSupportedCalendarTypes, false);
+    output = kAllSupportedCalendarTypes[mIndex];
+    mIndex++;
+    return true;
 }
 
 } // namespace DeviceLayer

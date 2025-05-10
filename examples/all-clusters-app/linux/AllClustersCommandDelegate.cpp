@@ -31,6 +31,7 @@
 #include <platform/PlatformManager.h>
 
 #include "ButtonEventsSimulator.h"
+#include "meter-identification-instance.h"
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
@@ -554,6 +555,17 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SetRefrigeratorDoorStatus")
     {
         SetRefrigeratorDoorStatusHandler(self->mJsonValue);
+    }
+    else if (name == "SimulateConfigurationVersionChange")
+    {
+        uint32_t configurationVersion = 0;
+        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        configurationVersion++;
+
+        if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
+        }
     }
     else
     {
