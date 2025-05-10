@@ -563,7 +563,15 @@ CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath,
     ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+    if (mExchangeCtx.Get() && mExchangeCtx.Get()->HasSessionHandle())
+    {
+        ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields),
+                                                 mExchangeCtx.Get()->GetSessionHandle()->GetFabricIndex()));
+    }
+    else
+    {
+        ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+    }
     FinishCommandParameters finishCommandParams(aAddRequestDataParams);
     ReturnErrorOnFailure(FinishCommand(finishCommandParams));
     rollback.DisableAutomaticRollback();

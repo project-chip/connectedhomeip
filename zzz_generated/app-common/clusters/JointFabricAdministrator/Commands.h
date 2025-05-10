@@ -103,6 +103,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ICACCSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -116,6 +117,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ICACCSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -132,6 +134,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ICACCSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan icaccsr;
 
@@ -147,8 +150,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ICACCSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan icaccsr;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ICACCSRResponse
@@ -164,6 +169,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddICAC::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan ICACValue;
 
@@ -179,8 +185,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddICAC::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan ICACValue;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddICAC
@@ -196,6 +204,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ICACResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     ICACResponseStatusEnum statusCode = static_cast<ICACResponseStatusEnum>(0);
 
@@ -211,8 +220,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ICACResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     ICACResponseStatusEnum statusCode = static_cast<ICACResponseStatusEnum>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ICACResponse
@@ -232,6 +243,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::OpenJointCommissioningWindow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
     chip::ByteSpan PAKEPasscodeVerifier;
@@ -251,12 +263,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::OpenJointCommissioningWindow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
     chip::ByteSpan PAKEPasscodeVerifier;
     uint16_t discriminator = static_cast<uint16_t>(0);
     uint32_t iterations    = static_cast<uint32_t>(0);
     chip::ByteSpan salt;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OpenJointCommissioningWindow
@@ -271,6 +285,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TransferAnchorRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -284,6 +299,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::TransferAnchorRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -300,6 +316,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TransferAnchorResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     TransferAnchorResponseStatusEnum statusCode = static_cast<TransferAnchorResponseStatusEnum>(0);
 
@@ -315,8 +332,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::TransferAnchorResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     TransferAnchorResponseStatusEnum statusCode = static_cast<TransferAnchorResponseStatusEnum>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TransferAnchorResponse
@@ -331,6 +350,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TransferAnchorComplete::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -344,6 +364,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::TransferAnchorComplete::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -360,6 +381,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AnnounceJointFabricAdministrator::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
 
@@ -375,8 +397,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceJointFabricAdministrator::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AnnounceJointFabricAdministrator

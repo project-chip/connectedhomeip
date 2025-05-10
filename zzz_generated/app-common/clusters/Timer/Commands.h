@@ -79,6 +79,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTimer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t newTime = static_cast<uint32_t>(0);
 
@@ -94,8 +95,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetTimer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t newTime = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetTimer
@@ -110,6 +113,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetTimer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -123,6 +127,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ResetTimer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -139,6 +144,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t additionalTime = static_cast<uint32_t>(0);
 
@@ -154,8 +160,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t additionalTime = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddTime
@@ -171,6 +179,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ReduceTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t timeReduction = static_cast<uint32_t>(0);
 
@@ -186,8 +195,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ReduceTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t timeReduction = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ReduceTime

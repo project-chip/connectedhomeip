@@ -28,6 +28,7 @@ namespace Clusters {
 namespace DiagnosticLogs {
 namespace Commands {
 namespace RetrieveLogsRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -59,15 +60,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transferFileDesignator);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace RetrieveLogsRequest.
 namespace RetrieveLogsResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -103,9 +102,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kTimeSinceBoot))
         {
             err = DataModel::Decode(reader, timeSinceBoot);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

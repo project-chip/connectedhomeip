@@ -69,6 +69,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ReviewFabricRestrictions::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::List<const Structs::CommissioningAccessRestrictionEntryStruct::Type> arl;
 
@@ -84,9 +85,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ReviewFabricRestrictions::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::DecodableList<Structs::CommissioningAccessRestrictionEntryStruct::DecodableType> arl;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ReviewFabricRestrictions
 namespace ReviewFabricRestrictionsResponse {
@@ -101,6 +104,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ReviewFabricRestrictionsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint64_t token = static_cast<uint64_t>(0);
 
@@ -116,8 +120,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ReviewFabricRestrictionsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint64_t token = static_cast<uint64_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ReviewFabricRestrictionsResponse

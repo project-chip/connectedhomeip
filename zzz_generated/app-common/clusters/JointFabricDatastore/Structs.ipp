@@ -59,9 +59,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, failureCode);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -122,9 +119,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fabricIndex);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -184,9 +178,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
             err = DataModel::Decode(reader, fabricIndex);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -253,9 +244,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fabricIndex);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -300,9 +288,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -346,9 +331,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kCluster))
         {
             err = DataModel::Decode(reader, cluster);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -420,9 +402,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fabricIndex);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -461,9 +440,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kDeviceType))
         {
             err = DataModel::Decode(reader, deviceType);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -508,9 +484,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kTargets))
         {
             err = DataModel::Decode(reader, targets);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -577,9 +550,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fabricIndex);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -644,9 +614,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
             err = DataModel::Decode(reader, fabricIndex);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -723,9 +690,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fabricIndex);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -795,9 +759,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupKeyMulticastPolicy);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -857,9 +818,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
             err = DataModel::Decode(reader, fabricIndex);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

@@ -66,6 +66,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
     Optional<bool> wrap;
@@ -83,10 +84,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
     Optional<bool> wrap;
     Optional<bool> lowestOff;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Step

@@ -54,9 +54,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, y);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -101,9 +98,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, color);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -142,9 +136,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kZoneSource))
         {
             err = DataModel::Decode(reader, zoneSource);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -194,9 +185,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kSensitivity))
         {
             err = DataModel::Decode(reader, sensitivity);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

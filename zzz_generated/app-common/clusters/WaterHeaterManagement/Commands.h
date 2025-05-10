@@ -69,6 +69,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::WaterHeaterBoostInfoStruct::Type boostInfo;
 
@@ -84,8 +85,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::WaterHeaterBoostInfoStruct::DecodableType boostInfo;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Boost
@@ -100,6 +103,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CancelBoost::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -113,6 +117,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CancelBoost::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

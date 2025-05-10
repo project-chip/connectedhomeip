@@ -28,6 +28,7 @@ namespace Clusters {
 namespace ThreadNetworkDiagnostics {
 namespace Commands {
 namespace ResetCounts {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };

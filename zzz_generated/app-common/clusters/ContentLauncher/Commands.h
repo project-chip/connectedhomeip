@@ -78,6 +78,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::ContentSearchStruct::Type search;
     bool autoPlay = static_cast<bool>(0);
@@ -97,12 +98,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::ContentSearchStruct::DecodableType search;
     bool autoPlay = static_cast<bool>(0);
     Optional<chip::CharSpan> data;
     Optional<Structs::PlaybackPreferencesStruct::DecodableType> playbackPreferences;
     Optional<bool> useCurrentContext;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchContent
@@ -120,6 +123,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LaunchURL::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan contentURL;
     Optional<chip::CharSpan> displayString;
@@ -137,10 +141,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchURL::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan contentURL;
     Optional<chip::CharSpan> displayString;
     Optional<Structs::BrandingInformationStruct::DecodableType> brandingInformation;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURL
@@ -157,6 +163,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
@@ -173,9 +180,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse

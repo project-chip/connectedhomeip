@@ -99,6 +99,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTargetsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
 
@@ -114,8 +115,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetTargetsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> chargingTargetSchedules;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetTargetsResponse
@@ -130,6 +133,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Disable::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -143,6 +147,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Disable::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -161,6 +166,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableCharging::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<uint32_t> chargingEnabledUntil;
     int64_t minimumChargeCurrent = static_cast<int64_t>(0);
@@ -178,10 +184,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::EnableCharging::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<uint32_t> chargingEnabledUntil;
     int64_t minimumChargeCurrent = static_cast<int64_t>(0);
     int64_t maximumChargeCurrent = static_cast<int64_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnableCharging
@@ -198,6 +206,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableDischarging::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<uint32_t> dischargingEnabledUntil;
     int64_t maximumDischargeCurrent = static_cast<int64_t>(0);
@@ -214,9 +223,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::EnableDischarging::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<uint32_t> dischargingEnabledUntil;
     int64_t maximumDischargeCurrent = static_cast<int64_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnableDischarging
@@ -231,6 +242,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartDiagnostics::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -244,6 +256,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StartDiagnostics::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -260,6 +273,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTargets::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
 
@@ -275,8 +289,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetTargets::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> chargingTargetSchedules;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetTargets
@@ -291,6 +307,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTargets::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -304,6 +321,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetTargets::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -319,6 +337,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearTargets::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -332,6 +351,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ClearTargets::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

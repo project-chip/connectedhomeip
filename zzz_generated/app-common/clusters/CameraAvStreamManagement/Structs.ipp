@@ -54,9 +54,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, height);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -151,9 +148,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, referenceCount);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -233,9 +227,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, OSDEnabled);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -285,9 +276,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, requiresHardwareEncoder);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -326,9 +314,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMinBitRate))
         {
             err = DataModel::Decode(reader, minBitRate);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -373,9 +358,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kSupportedBitDepths))
         {
             err = DataModel::Decode(reader, supportedBitDepths);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -441,9 +423,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, referenceCount);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -487,9 +466,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMaxHDRFPS))
         {
             err = DataModel::Decode(reader, maxHDRFPS);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

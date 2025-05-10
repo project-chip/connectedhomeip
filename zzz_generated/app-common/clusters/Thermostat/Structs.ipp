@@ -74,9 +74,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, heatingSetpoint);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -130,9 +127,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kBuiltIn))
         {
             err = DataModel::Decode(reader, builtIn);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -188,9 +182,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, builtIn);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -229,9 +220,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPresetTypeFeatures))
         {
             err = DataModel::Decode(reader, presetTypeFeatures);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -272,9 +260,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, scheduleTypeFeatures);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -313,9 +298,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kCoolSetpoint))
         {
             err = DataModel::Decode(reader, coolSetpoint);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

@@ -93,6 +93,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpOrOpen::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -106,6 +107,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UpOrOpen::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -121,6 +123,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DownOrClose::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -134,6 +137,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::DownOrClose::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -149,6 +153,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StopMotion::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -162,6 +167,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StopMotion::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -178,6 +184,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftValue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t liftValue = static_cast<uint16_t>(0);
 
@@ -193,8 +200,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftValue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t liftValue = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GoToLiftValue
@@ -210,6 +219,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::Percent100ths liftPercent100thsValue = static_cast<chip::Percent100ths>(0);
 
@@ -225,8 +235,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::Percent100ths liftPercent100thsValue = static_cast<chip::Percent100ths>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GoToLiftPercentage
@@ -242,6 +254,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltValue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t tiltValue = static_cast<uint16_t>(0);
 
@@ -257,8 +270,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltValue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t tiltValue = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GoToTiltValue
@@ -274,6 +289,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::Percent100ths tiltPercent100thsValue = static_cast<chip::Percent100ths>(0);
 
@@ -289,8 +305,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::Percent100ths tiltPercent100thsValue = static_cast<chip::Percent100ths>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GoToTiltPercentage

@@ -74,9 +74,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, targetReheat);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }

@@ -88,6 +88,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RegisterClient::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     uint64_t monitoredSubject  = static_cast<uint64_t>(0);
@@ -107,13 +108,15 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RegisterClient::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     uint64_t monitoredSubject  = static_cast<uint64_t>(0);
     chip::ByteSpan key;
     Optional<chip::ByteSpan> verificationKey;
     ClientTypeEnum clientType = static_cast<ClientTypeEnum>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace RegisterClient
 namespace RegisterClientResponse {
@@ -128,6 +131,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RegisterClientResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t ICDCounter = static_cast<uint32_t>(0);
 
@@ -143,8 +147,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RegisterClientResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t ICDCounter = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RegisterClientResponse
@@ -161,6 +167,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UnregisterClient::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     Optional<chip::ByteSpan> verificationKey;
@@ -177,10 +184,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UnregisterClient::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     Optional<chip::ByteSpan> verificationKey;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace UnregisterClient
 namespace StayActiveRequest {
@@ -195,6 +204,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StayActiveRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
 
@@ -210,8 +220,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StayActiveRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StayActiveRequest
@@ -227,6 +239,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
 
@@ -242,8 +255,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StayActiveResponse
