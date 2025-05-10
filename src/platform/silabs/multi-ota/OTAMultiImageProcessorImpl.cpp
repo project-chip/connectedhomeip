@@ -22,22 +22,28 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
+
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#ifdef SLI_SI91X_MCU_INTERFACE
+#include "sl_si91x_driver.h"
+#include "sl_si91x_hal_soc_soft_reset.h"
+#else // This is not needed for the 917 SoC; it is required for EFR host applications
+#include "btl_interface.h"
+#include "em_bus.h" // For CORE_CRITICAL_SECTION
+#endif              // SLI_SI91X_MCU_INTERFACE
+#ifdef __cplusplus
+}
+#endif
 
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
 static chip::OTAMultiImageProcessorImpl gImageProcessor;
-
-#if SL_WIFI
-#include <platform/silabs/wifi/ncp/spi_multiplex.h>
-#endif // SL_WIFI
-
-extern "C" {
-#include "btl_interface.h"
-#include "sl_core.h"
-}
 
 namespace chip {
 
@@ -59,7 +65,6 @@ void OTAMultiImageProcessorImpl::Clear()
     mParams.totalFileBytes  = 0;
     mParams.downloadedBytes = 0;
     mCurrentProcessor       = nullptr;
-
     ReleaseBlock();
 }
 
@@ -115,7 +120,9 @@ void OTAMultiImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload: started");
 
+#ifndef SLI_SI91X_MCU_INTERFACE // This is not needed for the 917 SoC; it is required for EFR host applications
     CORE_CRITICAL_SECTION(bootloader_init();)
+#endif
 
     imageProcessor->mParams.downloadedBytes = 0;
 
@@ -202,6 +209,11 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
 
 CHIP_ERROR OTAMultiImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcessor * processor)
 {
+    if (!OTATlvProcessor::IsValidTag(tag))
+    {
+        ChipLogError(SoftwareUpdate, "Invalid processor tag: %lu", tag);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     auto pair = mProcessorMap.find(tag);
     if (pair != mProcessorMap.end())
     {
@@ -419,10 +431,14 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 
     imageProcessor->mAccumulator.Clear();
 
-    ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
+    ChipLogProgress(SoftwareUpdate, "HandleApply: Finished and Soft Reset initiated");
 
     // This reboots the device
+#ifdef SLI_SI91X_MCU_INTERFACE // 917 SoC reboot
+    chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset();
+#else // EFR reboot
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
+#endif
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ReleaseBlock()

@@ -13,11 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
-import("${chip_root}/src/platform/device.gni")
-
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/silabs/wifi/args.gni")
 import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
@@ -77,13 +75,6 @@ static_library("SiWx917") {
     "SiWxPlatformInterface.h",
   ]
 
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "${silabs_platform_dir}/OTAImageProcessorImpl.h",
-      "OTAImageProcessorImpl.cpp",
-    ]
-  }
-
   public_deps = [
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/platform:platform_base",
@@ -93,6 +84,25 @@ static_library("SiWx917") {
     "${chip_root}/src/platform/logging:headers",
     "${sl_provision_root}:headers",
   ]
+
+  if (chip_enable_multi_ota_requestor) {
+    sources += [
+      "${silabs_platform_dir}/multi-ota/OTAFactoryDataProcessor.cpp",
+      "${silabs_platform_dir}/multi-ota/OTAFactoryDataProcessor.h",
+      "${silabs_platform_dir}/multi-ota/OTAHooks.cpp",
+      "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.cpp",
+      "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.h",
+      "${silabs_platform_dir}/multi-ota/OTATlvProcessor.cpp",
+      "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
+      "${silabs_platform_dir}/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.cpp",
+      "${silabs_platform_dir}/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h",
+    ]
+  } else if (chip_enable_ota_requestor) {
+    sources += [
+      "${silabs_platform_dir}/OTAImageProcessorImpl.h",
+      "OTAImageProcessorImpl.cpp",
+    ]
+  }
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {

@@ -26,16 +26,12 @@ using namespace ::chip::DeviceLayer::Silabs;
 
 CHIP_ERROR OTAFactoryDataProcessor::Init()
 {
-    mAccumulator.Init(mLength);
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTAFactoryDataProcessor::Clear()
-{
-    OTATlvProcessor::ClearInternal();
-    mAccumulator.Clear();
-    mPayload.Clear();
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    mAccumulator.Init(sizeof(mLength));
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
+    mUnalignmentNum = 0;
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     return CHIP_NO_ERROR;
 }
