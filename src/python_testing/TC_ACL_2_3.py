@@ -66,56 +66,7 @@ class TC_ACL_2_3(MatterBaseTest):
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
         return current_fabric_index
 
-    def desc_TC_ACL_2_3(self) -> str:
-        return "[TC-ACL-2.3] Multiple fabrics test"
-
-    def steps_TC_ACL_2_3(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "TH1 commissions DUT using admin node ID",
-                     is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
-                     "Result is SUCCESS, value is stored as F1"),
-            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
-                     "Result is SUCCESS, value is an empty list"),
-            TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_EMPTY",
-                     "Result is SUCCESS"),
-            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
-                     "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_EMPTY, fabric index is F1"),
-            TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_SINGLE",
-                     "Result is SUCCESS"),
-            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
-                     "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_SINGLE, fabric index is F1"),
-            TestStep(8, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_FULL",
-                     "Result is SUCCESS"),
-            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
-                     "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_FULL, fabric index is F1"),
-            TestStep(10, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_LENGTH",
-                     "Result is CONSTRAINT_ERROR (0x87)"),
-            TestStep(11, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_STRUCT",
-                     "Result is CONSTRAINT_ERROR (0x87)"),
-            TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_LIST",
-                     "Result is CONSTRAINT_ERROR (0x87)"),
-            TestStep(13, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_ELEM",
-                     "Result is CONSTRAINT_ERROR (0x87)"),
-            TestStep(14, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_OVERFLOW",
-                     "Result is CONSTRAINT_ERROR (0x87)"),
-            TestStep(15, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_UNDERFLOW",
-                     "Result is CONSTRAINT_ERROR (0x87)"),
-            TestStep(16, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_NONE",
-                     "Result is CONSTRAINT_ERROR (0x87)"),
-            TestStep(17, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements struct data field: D_OK_EMPTY, D_OK_SINGLE",
-                     "Result is CONSTRAINT_ERROR (0x87) for the entire list, even the first valid struct should be rejected"),
-            TestStep(18, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
-                     "Result is Success, AccessControlExtensionStruct containing 1 element; which is the last successfully written extension from Test Step 8; value is struct with data field: D_OK_FULL, fabric index is F1"),
-            TestStep(19, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list",
-                     "Result is SUCCESS"),
-            TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
-                     "Result is Success, value is an empty list"),
-        ]
-        return steps
-
-    @async_test_body
-    async def test_TC_ACL_2_3(self):
+    async def internal_test_TC_ACL_2_3(self, force_legacy_encoding: bool):
         self.step(1)
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
@@ -292,7 +243,8 @@ class TC_ACL_2_3(MatterBaseTest):
         extensions_list11 = [extension11, extension12]
         result11 = await self.th1.WriteAttribute(
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list11))]
+            [(0, ac_extension_attr(value=extensions_list11))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result11)}")
         asserts.assert_equal(
@@ -304,10 +256,16 @@ class TC_ACL_2_3(MatterBaseTest):
         # Read AccessControlExtension attribute for TH1 value is D_OK_FULL
         ac_extension_value4 = await self.read_single_attribute_check_success(endpoint=0, cluster=ac_cluster, attribute=ac_extension_attr)
         logging.info(f"AccessControlExtension: {str(ac_extension_value4)}")
-        asserts.assert_equal(
-            ac_extension_value4[0].data,
-            D_OK_FULL,
-            "AccessControlExtension is D_OK_FULL from test step 8 as last successfully written extension")
+        if force_legacy_encoding:
+            asserts.assert_equal(
+                ac_extension_value4[0].data,
+                D_OK_EMPTY,
+                "AccessControlExtension is D_OK_EMPTY from test step 17 as last successfully written extension if older list method")
+        else:
+            asserts.assert_equal(
+                ac_extension_value4[0].data,
+                D_OK_FULL,
+                "AccessControlExtension is D_OK_FULL from test step 8 as last successfully written extension if new list method")
 
         self.step(19)
         # Write AccessControlExtension attribute for TH1 value is an empty list
@@ -325,6 +283,67 @@ class TC_ACL_2_3(MatterBaseTest):
         ac_extension_value5 = await self.read_single_attribute_check_success(endpoint=0, cluster=ac_cluster, attribute=ac_extension_attr)
         logging.info(f"AccessControlExtension: {str(ac_extension_value5)}")
         asserts.assert_equal(ac_extension_value5, [], "AccessControlExtension is empty list")
+
+        self.step(21)
+        # Rerunning test with new list method
+        if force_legacy_encoding:
+            logging.info("Rerunning test with new list method")
+
+    def desc_TC_ACL_2_3(self) -> str:
+        return "[TC-ACL-2.3] Multiple fabrics test"
+
+    def steps_TC_ACL_2_3(self) -> list[TestStep]:
+        steps = [
+            TestStep(1, "TH1 commissions DUT using admin node ID",
+                     is_commissioning=True),
+            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
+                     "Result is SUCCESS, value is stored as F1"),
+            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
+                     "Result is SUCCESS, value is an empty list"),
+            TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_EMPTY",
+                     "Result is SUCCESS"),
+            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
+                     "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_EMPTY, fabric index is F1"),
+            TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_SINGLE",
+                     "Result is SUCCESS"),
+            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
+                     "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_SINGLE, fabric index is F1"),
+            TestStep(8, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_FULL",
+                     "Result is SUCCESS"),
+            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
+                     "Result is SUCCESS, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_OK_FULL, fabric index is F1"),
+            TestStep(10, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_LENGTH",
+                     "Result is CONSTRAINT_ERROR (0x87)"),
+            TestStep(11, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_STRUCT",
+                     "Result is CONSTRAINT_ERROR (0x87)"),
+            TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_LIST",
+                     "Result is CONSTRAINT_ERROR (0x87)"),
+            TestStep(13, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_ELEM",
+                     "Result is CONSTRAINT_ERROR (0x87)"),
+            TestStep(14, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_OVERFLOW",
+                     "Result is CONSTRAINT_ERROR (0x87)"),
+            TestStep(15, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_UNDERFLOW",
+                     "Result is CONSTRAINT_ERROR (0x87)"),
+            TestStep(16, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element struct data field: D_BAD_NONE",
+                     "Result is CONSTRAINT_ERROR (0x87)"),
+            TestStep(17, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements struct data field: D_OK_EMPTY, D_OK_SINGLE",
+                     "Result is CONSTRAINT_ERROR (0x87) for the entire list, even the first valid struct should be rejected"),
+            TestStep(18, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
+                     "Result is Success, AccessControlExtensionStruct containing 1 element. When using legacy encoding, value is struct with data field: D_OK_EMPTY from test step 17. When using new list method, value is struct with data field: D_OK_FULL from test step 8, as the last successfully written extension."),
+            TestStep(19, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list",
+                     "Result is SUCCESS"),
+            TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
+                     "Result is Success, value is an empty list"),
+            TestStep(21, "Rerunning test with new list method",
+                     "Rerunning test with new list method"),
+        ]
+        return steps
+
+    @async_test_body
+    async def test_TC_ACL_2_3(self):
+        await self.internal_test_TC_ACL_2_3(force_legacy_encoding=True)
+        self.current_step_index = 0
+        await self.internal_test_TC_ACL_2_3(force_legacy_encoding=False)
 
 
 if __name__ == "__main__":
