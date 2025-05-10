@@ -80,7 +80,7 @@
         "Test_TC_LVL_9_1"
     ],
     "LocalizationConfiguration": [],
-    "TimeFormatLocalization": ["Test_TC_LTIME_1_2", "Test_TC_LTIME_3_1"],
+    "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
     "UserLabel": [
         "Test_TC_ULABEL_2_1",
         "Test_TC_ULABEL_2_2",
