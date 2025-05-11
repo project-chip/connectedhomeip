@@ -20,92 +20,49 @@ inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 namespace MeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MinMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MinMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MaxMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MaxMeasuredValue
 namespace PeakMeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PeakMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PeakMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace PeakMeasuredValue
 namespace PeakMeasuredValueWindow {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PeakMeasuredValueWindow::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PeakMeasuredValueWindow::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace PeakMeasuredValueWindow
 namespace AverageMeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AverageMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(AverageMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace AverageMeasuredValue
 namespace AverageMeasuredValueWindow {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AverageMeasuredValueWindow::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(AverageMeasuredValueWindow::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
 } // namespace AverageMeasuredValueWindow
 namespace Uncertainty {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Uncertainty::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Uncertainty::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace Uncertainty
 namespace MeasurementUnit {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeasurementUnit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasurementUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MeasurementUnit
 namespace MeasurementMedium {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeasurementMedium::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasurementMedium::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MeasurementMedium
 namespace LevelValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LevelValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace LevelValue
 
 } // namespace Attributes

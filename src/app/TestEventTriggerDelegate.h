@@ -20,8 +20,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/Span.h>
-#include <stddef.h>
-#include <stdint.h>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace chip {
 
@@ -29,6 +30,7 @@ class TestEventTriggerHandler : public IntrusiveListNodeBase<IntrusiveMode::Auto
 {
 public:
     virtual ~TestEventTriggerHandler() = default;
+
     /**
      * Handles the test event trigger based on `eventTrigger` provided.
      *
@@ -38,10 +40,10 @@ public:
      */
     virtual CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) = 0;
 
-    uint64_t clearEndpointInEventTrigger(uint64_t eventTrigger)
+    static constexpr uint64_t clearEndpointInEventTrigger(uint64_t eventTrigger)
     {
-        uint64_t endpointMask = 0x0000FFFF00000000;
-        return eventTrigger & ~endpointMask;
+        constexpr uint64_t kEndpointMask = 0x0000FFFF00000000;
+        return eventTrigger & ~kEndpointMask;
     }
 };
 
