@@ -1,0 +1,18 @@
+name: Set up an IPV6 environment
+description: Creates a socket pair with a "peer" network namespace that supports IPV6
+runs:
+  using: "composite"
+  steps:
+    - name: Set up IPV6
+      if: ${{ runner.os == 'Linux' }}
+      shell: bash
+      run: |
+         ip netns add peer
+
+         ip link add name veth0 type veth peer name veth0-peer
+         ip -6 addr add fd00:0:1:1::1/64 dev veth0
+         ip link set dev veth0 up
+
+         ip link set veth0-peer netns peer
+         ip netns exec peer ip -6 addr add fd00:0:1:1::2/64 dev veth0-peer
+         ip netns exec peer ip link set dev veth0-peer up
