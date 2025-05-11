@@ -85,7 +85,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_LTIME_3_1(self):
-        self.endpoint = self.get_endpoint(0)
+        self.endpoint = self.get_endpoint(default=0)
         self.cluster = Clusters.TimeFormatLocalization
         hour_format_values = [0, 1, 255]
 
