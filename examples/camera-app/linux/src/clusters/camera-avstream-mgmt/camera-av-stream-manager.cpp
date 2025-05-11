@@ -44,15 +44,13 @@ void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDe
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
-    outStreamID               = kInvalidStreamID;
-    bool foundAvailableStream = false;
+    outStreamID                  = kInvalidStreamID;
+    bool unallocatedStreamExists = false;
 
     for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.IsCompatible(allocateArgs))
         {
-            foundAvailableStream = true;
-
             outStreamID = stream.videoStreamParams.videoStreamID;
             if (!stream.isAllocated)
             {
@@ -74,11 +72,16 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
             {
                 ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
             }
+
             return Status::Success;
+        }
+        if (!stream.isAllocated)
+        {
+            unallocatedStreamExists = true;
         }
     }
 
-    if (!foundAvailableStream)
+    if (!unallocatedStreamExists)
     {
         return Status::ResourceExhausted;
     }
@@ -90,12 +93,11 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
                                                                              const chip::Optional<bool> waterMarkEnabled,
                                                                              const chip::Optional<bool> osdEnabled)
 {
-    bool foundStream = false;
     for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
-            foundStream = true;
+            // TODO: Link with HAL APIs to return error
             if (waterMarkEnabled.HasValue())
             {
                 stream.videoStreamParams.watermarkEnabled = waterMarkEnabled;
@@ -109,25 +111,17 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
         }
     }
 
-    if (!foundStream)
-    {
-        ChipLogError(Camera, "Allocated video stream with ID: %d not found", streamID);
-        return Status::NotFound;
-    }
+    ChipLogError(Camera, "Allocated video stream with ID: %d not found", streamID);
 
-    // TODO: Link with HAL APIs to return error
-    return Status::Failure;
+    return Status::NotFound;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate(const uint16_t streamID)
 {
-    bool foundStream = false;
     for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
-            foundStream = true;
-
             if (stream.videoStreamParams.referenceCount > 0)
             {
                 ChipLogError(Camera, "Video stream with ID: %d still in use", streamID);
@@ -140,31 +134,25 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
 
             mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamDeallocated(streamID);
 
-            break;
+            return Status::Success;
         }
     }
 
-    if (!foundStream)
-    {
-        ChipLogError(Camera, "Allocated video stream with ID: %d not found", streamID);
-        return Status::NotFound;
-    }
+    ChipLogError(Camera, "Allocated video stream with ID: %d not found", streamID);
 
-    return Status::Success;
+    return Status::NotFound;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(const AudioStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
-    outStreamID               = kInvalidStreamID;
-    bool foundAvailableStream = false;
+    outStreamID                  = kInvalidStreamID;
+    bool unallocatedStreamExists = false;
 
     for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
     {
         if (stream.IsCompatible(allocateArgs))
         {
-            foundAvailableStream = true;
-
             outStreamID = stream.audioStreamParams.audioStreamID;
             if (!stream.isAllocated)
             {
@@ -181,9 +169,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
             }
             return Status::Success;
         }
+        if (!stream.isAllocated)
+        {
+            unallocatedStreamExists = true;
+        }
     }
 
-    if (!foundAvailableStream)
+    if (!unallocatedStreamExists)
     {
         return Status::ResourceExhausted;
     }
@@ -193,13 +185,10 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
 
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate(const uint16_t streamID)
 {
-    bool foundStream = false;
     for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
     {
         if (stream.audioStreamParams.audioStreamID == streamID && stream.isAllocated)
         {
-            foundStream = true;
-
             if (stream.audioStreamParams.referenceCount > 0)
             {
                 ChipLogError(Camera, "Audio stream with ID: %d still in use", streamID);
@@ -209,31 +198,26 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
             mCameraDeviceHAL->GetCameraHALInterface().StopAudioStream(streamID);
 
             stream.isAllocated = false;
-            break;
+
+            return Status::Success;
         }
     }
 
-    if (!foundStream)
-    {
-        ChipLogError(Camera, "Allocated audio stream with ID: %d not found", streamID);
-        return Status::NotFound;
-    }
+    ChipLogError(Camera, "Allocated audio stream with ID: %d not found", streamID);
 
-    return Status::Success;
+    return Status::NotFound;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
-    outStreamID               = kInvalidStreamID;
-    bool foundAvailableStream = false;
+    outStreamID                  = kInvalidStreamID;
+    bool unallocatedStreamExists = false;
 
     for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
     {
         if (stream.IsCompatible(allocateArgs))
         {
-            foundAvailableStream = true;
-
             outStreamID = stream.snapshotStreamParams.snapshotStreamID;
             if (!stream.isAllocated)
             {
@@ -250,9 +234,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
             }
             return Status::Success;
         }
+        if (!stream.isAllocated)
+        {
+            unallocatedStreamExists = true;
+        }
     }
 
-    if (!foundAvailableStream)
+    if (!unallocatedStreamExists)
     {
         return Status::ResourceExhausted;
     }
@@ -264,12 +252,11 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
                                                                                 const chip::Optional<bool> waterMarkEnabled,
                                                                                 const chip::Optional<bool> osdEnabled)
 {
-    bool foundStream = false;
     for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
     {
         if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {
-            foundStream = true;
+            // TODO: Link with HAL APIs to return error
             if (waterMarkEnabled.HasValue())
             {
                 stream.snapshotStreamParams.watermarkEnabled = waterMarkEnabled;
@@ -283,25 +270,17 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
         }
     }
 
-    if (!foundStream)
-    {
-        ChipLogError(Camera, "Allocated snapshot stream with ID: %d not found", streamID);
-        return Status::NotFound;
-    }
+    ChipLogError(Camera, "Allocated snapshot stream with ID: %d not found", streamID);
 
-    // TODO: Link with HAL APIs to return error
-    return Status::Failure;
+    return Status::NotFound;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDeallocate(const uint16_t streamID)
 {
-    bool foundStream = false;
     for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
     {
         if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {
-            foundStream = true;
-
             if (stream.snapshotStreamParams.referenceCount > 0)
             {
                 ChipLogError(Camera, "Snapshot stream with ID: %d still in use", streamID);
@@ -311,17 +290,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
             mCameraDeviceHAL->GetCameraHALInterface().StopSnapshotStream(streamID);
 
             stream.isAllocated = false;
-            break;
+
+            return Status::Success;
         }
     }
 
-    if (!foundStream)
-    {
-        ChipLogError(Camera, "Allocated snapshot stream with ID: %d not found", streamID);
-        return Status::NotFound;
-    }
+    ChipLogError(Camera, "Allocated snapshot stream with ID: %d not found", streamID);
 
-    return Status::Success;
+    return Status::NotFound;
 }
 
 void CameraAVStreamManager::OnRankedStreamPrioritiesChanged()
