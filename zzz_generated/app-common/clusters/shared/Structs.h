@@ -473,10 +473,10 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
-    bool measured                       = static_cast<bool>(0);
-    int64_t minMeasuredValue            = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
+    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
+    bool measured                                = static_cast<bool>(0);
+    int64_t minMeasuredValue                     = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
     DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
 
     static constexpr bool kIsFabricScoped = false;
@@ -487,10 +487,10 @@ public:
 struct DecodableType
 {
 public:
-    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
-    bool measured                       = static_cast<bool>(0);
-    int64_t minMeasuredValue            = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
+    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
+    bool measured                                = static_cast<bool>(0);
+    int64_t minMeasuredValue                     = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
     DataModel::DecodableList<Globals::Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

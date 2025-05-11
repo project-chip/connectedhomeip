@@ -36,8 +36,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, maxEncodedPixelRate);
     case Attributes::VideoSensorParams::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, videoSensorParams);
-    case Attributes::NightVisionCapable::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nightVisionCapable);
+    case Attributes::NightVisionUsesInfrared::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, nightVisionUsesInfrared);
     case Attributes::MinViewport::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, minViewport);
     case Attributes::RateDistortionTradeOffPoints::TypeInfo::GetAttributeId():
