@@ -19,147 +19,154 @@
 #pragma once
 
 #include <clusters/shared/Enums.h>
+#include <cstdint>
 
-#include <clusters/AccessControl/Enums.h>
-#include <clusters/AccountLogin/Enums.h>
-#include <clusters/Actions/Enums.h>
-#include <clusters/ActivatedCarbonFilterMonitoring/Enums.h>
-#include <clusters/AdministratorCommissioning/Enums.h>
-#include <clusters/AirQuality/Enums.h>
-#include <clusters/ApplicationBasic/Enums.h>
-#include <clusters/ApplicationLauncher/Enums.h>
-#include <clusters/AudioOutput/Enums.h>
-#include <clusters/BallastConfiguration/Enums.h>
-#include <clusters/BasicInformation/Enums.h>
-#include <clusters/Binding/Enums.h>
-#include <clusters/BooleanState/Enums.h>
-#include <clusters/BooleanStateConfiguration/Enums.h>
-#include <clusters/BridgedDeviceBasicInformation/Enums.h>
-#include <clusters/CameraAvSettingsUserLevelManagement/Enums.h>
-#include <clusters/CameraAvStreamManagement/Enums.h>
-#include <clusters/CarbonDioxideConcentrationMeasurement/Enums.h>
-#include <clusters/CarbonMonoxideConcentrationMeasurement/Enums.h>
-#include <clusters/Channel/Enums.h>
-#include <clusters/Chime/Enums.h>
-#include <clusters/ClosureControl/Enums.h>
-#include <clusters/ClosureDimension/Enums.h>
-#include <clusters/ColorControl/Enums.h>
-#include <clusters/CommissionerControl/Enums.h>
-#include <clusters/CommodityMetering/Enums.h>
-#include <clusters/CommodityPrice/Enums.h>
-#include <clusters/CommodityTariff/Enums.h>
-#include <clusters/ContentAppObserver/Enums.h>
-#include <clusters/ContentControl/Enums.h>
-#include <clusters/ContentLauncher/Enums.h>
-#include <clusters/Descriptor/Enums.h>
-#include <clusters/DeviceEnergyManagement/Enums.h>
-#include <clusters/DeviceEnergyManagementMode/Enums.h>
-#include <clusters/DiagnosticLogs/Enums.h>
-#include <clusters/DishwasherAlarm/Enums.h>
-#include <clusters/DishwasherMode/Enums.h>
-#include <clusters/DoorLock/Enums.h>
-#include <clusters/EcosystemInformation/Enums.h>
-#include <clusters/ElectricalEnergyMeasurement/Enums.h>
-#include <clusters/ElectricalGridConditions/Enums.h>
-#include <clusters/ElectricalPowerMeasurement/Enums.h>
-#include <clusters/EnergyEvse/Enums.h>
-#include <clusters/EnergyEvseMode/Enums.h>
-#include <clusters/EnergyPreference/Enums.h>
-#include <clusters/EthernetNetworkDiagnostics/Enums.h>
-#include <clusters/FanControl/Enums.h>
-#include <clusters/FaultInjection/Enums.h>
-#include <clusters/FixedLabel/Enums.h>
-#include <clusters/FlowMeasurement/Enums.h>
-#include <clusters/FormaldehydeConcentrationMeasurement/Enums.h>
-#include <clusters/GeneralCommissioning/Enums.h>
-#include <clusters/GeneralDiagnostics/Enums.h>
-#include <clusters/GroupKeyManagement/Enums.h>
-#include <clusters/Groups/Enums.h>
-#include <clusters/HepaFilterMonitoring/Enums.h>
-#include <clusters/IcdManagement/Enums.h>
-#include <clusters/Identify/Enums.h>
-#include <clusters/IlluminanceMeasurement/Enums.h>
-#include <clusters/JointFabricAdministrator/Enums.h>
-#include <clusters/JointFabricDatastore/Enums.h>
-#include <clusters/KeypadInput/Enums.h>
-#include <clusters/LaundryDryerControls/Enums.h>
-#include <clusters/LaundryWasherControls/Enums.h>
-#include <clusters/LaundryWasherMode/Enums.h>
-#include <clusters/LevelControl/Enums.h>
-#include <clusters/LocalizationConfiguration/Enums.h>
-#include <clusters/LowPower/Enums.h>
-#include <clusters/MediaInput/Enums.h>
-#include <clusters/MediaPlayback/Enums.h>
-#include <clusters/Messages/Enums.h>
-#include <clusters/MeterIdentification/Enums.h>
-#include <clusters/MicrowaveOvenControl/Enums.h>
-#include <clusters/MicrowaveOvenMode/Enums.h>
-#include <clusters/ModeSelect/Enums.h>
-#include <clusters/NetworkCommissioning/Enums.h>
-#include <clusters/NitrogenDioxideConcentrationMeasurement/Enums.h>
-#include <clusters/OccupancySensing/Enums.h>
-#include <clusters/OnOff/Enums.h>
-#include <clusters/OperationalCredentials/Enums.h>
-#include <clusters/OperationalState/Enums.h>
-#include <clusters/OtaSoftwareUpdateProvider/Enums.h>
-#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
-#include <clusters/OvenCavityOperationalState/Enums.h>
-#include <clusters/OvenMode/Enums.h>
-#include <clusters/OzoneConcentrationMeasurement/Enums.h>
-#include <clusters/Pm10ConcentrationMeasurement/Enums.h>
-#include <clusters/Pm1ConcentrationMeasurement/Enums.h>
-#include <clusters/Pm25ConcentrationMeasurement/Enums.h>
-#include <clusters/PowerSource/Enums.h>
-#include <clusters/PowerSourceConfiguration/Enums.h>
-#include <clusters/PowerTopology/Enums.h>
-#include <clusters/PressureMeasurement/Enums.h>
-#include <clusters/ProxyConfiguration/Enums.h>
-#include <clusters/ProxyDiscovery/Enums.h>
-#include <clusters/ProxyValid/Enums.h>
-#include <clusters/PulseWidthModulation/Enums.h>
-#include <clusters/PumpConfigurationAndControl/Enums.h>
-#include <clusters/PushAvStreamTransport/Enums.h>
-#include <clusters/RadonConcentrationMeasurement/Enums.h>
-#include <clusters/RefrigeratorAlarm/Enums.h>
-#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/Enums.h>
-#include <clusters/RelativeHumidityMeasurement/Enums.h>
-#include <clusters/RvcCleanMode/Enums.h>
-#include <clusters/RvcOperationalState/Enums.h>
-#include <clusters/RvcRunMode/Enums.h>
-#include <clusters/SampleMei/Enums.h>
-#include <clusters/ScenesManagement/Enums.h>
-#include <clusters/ServiceArea/Enums.h>
-#include <clusters/SmokeCoAlarm/Enums.h>
-#include <clusters/SoftwareDiagnostics/Enums.h>
-#include <clusters/SoilMeasurement/Enums.h>
-#include <clusters/Switch/Enums.h>
-#include <clusters/TargetNavigator/Enums.h>
-#include <clusters/TemperatureControl/Enums.h>
-#include <clusters/TemperatureMeasurement/Enums.h>
-#include <clusters/Thermostat/Enums.h>
-#include <clusters/ThermostatUserInterfaceConfiguration/Enums.h>
-#include <clusters/ThreadBorderRouterManagement/Enums.h>
-#include <clusters/ThreadNetworkDiagnostics/Enums.h>
-#include <clusters/ThreadNetworkDirectory/Enums.h>
-#include <clusters/TimeFormatLocalization/Enums.h>
-#include <clusters/TimeSynchronization/Enums.h>
-#include <clusters/Timer/Enums.h>
-#include <clusters/TlsCertificateManagement/Enums.h>
-#include <clusters/TlsClientManagement/Enums.h>
-#include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Enums.h>
-#include <clusters/UnitLocalization/Enums.h>
-#include <clusters/UnitTesting/Enums.h>
-#include <clusters/UserLabel/Enums.h>
-#include <clusters/ValveConfigurationAndControl/Enums.h>
-#include <clusters/WakeOnLan/Enums.h>
-#include <clusters/WaterHeaterManagement/Enums.h>
-#include <clusters/WaterHeaterMode/Enums.h>
-#include <clusters/WebRTCTransportProvider/Enums.h>
-#include <clusters/WebRTCTransportRequestor/Enums.h>
-#include <clusters/WiFiNetworkDiagnostics/Enums.h>
-#include <clusters/WiFiNetworkManagement/Enums.h>
-#include <clusters/WindowCovering/Enums.h>
-#include <clusters/ZoneManagement/Enums.h>
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ColorControl {
 
-// Included at the end, so all our definitions above are available.
-#include <app/common/CompatEnumNames.h>
+// Enum for ColorLoopActionEnum
+enum class ColorLoopActionEnum : uint8_t
+{
+    kDeactivate                            = 0x00,
+    kActivateFromColorLoopStartEnhancedHue = 0x01,
+    kActivateFromEnhancedCurrentHue        = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for ColorLoopDirectionEnum
+enum class ColorLoopDirectionEnum : uint8_t
+{
+    kDecrement = 0x00,
+    kIncrement = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ColorModeEnum
+enum class ColorModeEnum : uint8_t
+{
+    kCurrentHueAndCurrentSaturation = 0x00,
+    kCurrentXAndCurrentY            = 0x01,
+    kColorTemperatureMireds         = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for DirectionEnum
+enum class DirectionEnum : uint8_t
+{
+    kShortest = 0x00,
+    kLongest  = 0x01,
+    kUp       = 0x02,
+    kDown     = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for DriftCompensationEnum
+enum class DriftCompensationEnum : uint8_t
+{
+    kNone                                  = 0x00,
+    kOtherOrUnknown                        = 0x01,
+    kTemperatureMonitoring                 = 0x02,
+    kOpticalLuminanceMonitoringAndFeedback = 0x03,
+    kOpticalColorMonitoringAndFeedback     = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for EnhancedColorModeEnum
+enum class EnhancedColorModeEnum : uint8_t
+{
+    kCurrentHueAndCurrentSaturation         = 0x00,
+    kCurrentXAndCurrentY                    = 0x01,
+    kColorTemperatureMireds                 = 0x02,
+    kEnhancedCurrentHueAndCurrentSaturation = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for MoveModeEnum
+enum class MoveModeEnum : uint8_t
+{
+    kStop = 0x00,
+    kUp   = 0x01,
+    kDown = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for StepModeEnum
+enum class StepModeEnum : uint8_t
+{
+    kUp   = 0x01,
+    kDown = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for ColorCapabilitiesBitmap
+enum class ColorCapabilitiesBitmap : uint16_t
+{
+    kHueSaturation    = 0x1,
+    kEnhancedHue      = 0x2,
+    kColorLoop        = 0x4,
+    kXy               = 0x8,
+    kColorTemperature = 0x10,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kHueAndSaturation = 0x1,
+    kEnhancedHue      = 0x2,
+    kColorLoop        = 0x4,
+    kXy               = 0x8,
+    kColorTemperature = 0x10,
+};
+
+// Bitmap for OptionsBitmap
+enum class OptionsBitmap : uint8_t
+{
+    kExecuteIfOff = 0x1,
+};
+
+// Bitmap for UpdateFlagsBitmap
+enum class UpdateFlagsBitmap : uint8_t
+{
+    kUpdateAction    = 0x1,
+    kUpdateDirection = 0x2,
+    kUpdateTime      = 0x4,
+    kUpdateStartHue  = 0x8,
+};
+} // namespace ColorControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip

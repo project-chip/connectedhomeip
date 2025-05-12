@@ -19,147 +19,103 @@
 #pragma once
 
 #include <clusters/shared/Enums.h>
+#include <cstdint>
 
-#include <clusters/AccessControl/Enums.h>
-#include <clusters/AccountLogin/Enums.h>
-#include <clusters/Actions/Enums.h>
-#include <clusters/ActivatedCarbonFilterMonitoring/Enums.h>
-#include <clusters/AdministratorCommissioning/Enums.h>
-#include <clusters/AirQuality/Enums.h>
-#include <clusters/ApplicationBasic/Enums.h>
-#include <clusters/ApplicationLauncher/Enums.h>
-#include <clusters/AudioOutput/Enums.h>
-#include <clusters/BallastConfiguration/Enums.h>
-#include <clusters/BasicInformation/Enums.h>
-#include <clusters/Binding/Enums.h>
-#include <clusters/BooleanState/Enums.h>
-#include <clusters/BooleanStateConfiguration/Enums.h>
-#include <clusters/BridgedDeviceBasicInformation/Enums.h>
-#include <clusters/CameraAvSettingsUserLevelManagement/Enums.h>
-#include <clusters/CameraAvStreamManagement/Enums.h>
-#include <clusters/CarbonDioxideConcentrationMeasurement/Enums.h>
-#include <clusters/CarbonMonoxideConcentrationMeasurement/Enums.h>
-#include <clusters/Channel/Enums.h>
-#include <clusters/Chime/Enums.h>
-#include <clusters/ClosureControl/Enums.h>
-#include <clusters/ClosureDimension/Enums.h>
-#include <clusters/ColorControl/Enums.h>
-#include <clusters/CommissionerControl/Enums.h>
-#include <clusters/CommodityMetering/Enums.h>
-#include <clusters/CommodityPrice/Enums.h>
-#include <clusters/CommodityTariff/Enums.h>
-#include <clusters/ContentAppObserver/Enums.h>
-#include <clusters/ContentControl/Enums.h>
-#include <clusters/ContentLauncher/Enums.h>
-#include <clusters/Descriptor/Enums.h>
-#include <clusters/DeviceEnergyManagement/Enums.h>
-#include <clusters/DeviceEnergyManagementMode/Enums.h>
-#include <clusters/DiagnosticLogs/Enums.h>
-#include <clusters/DishwasherAlarm/Enums.h>
-#include <clusters/DishwasherMode/Enums.h>
-#include <clusters/DoorLock/Enums.h>
-#include <clusters/EcosystemInformation/Enums.h>
-#include <clusters/ElectricalEnergyMeasurement/Enums.h>
-#include <clusters/ElectricalGridConditions/Enums.h>
-#include <clusters/ElectricalPowerMeasurement/Enums.h>
-#include <clusters/EnergyEvse/Enums.h>
-#include <clusters/EnergyEvseMode/Enums.h>
-#include <clusters/EnergyPreference/Enums.h>
-#include <clusters/EthernetNetworkDiagnostics/Enums.h>
-#include <clusters/FanControl/Enums.h>
-#include <clusters/FaultInjection/Enums.h>
-#include <clusters/FixedLabel/Enums.h>
-#include <clusters/FlowMeasurement/Enums.h>
-#include <clusters/FormaldehydeConcentrationMeasurement/Enums.h>
-#include <clusters/GeneralCommissioning/Enums.h>
-#include <clusters/GeneralDiagnostics/Enums.h>
-#include <clusters/GroupKeyManagement/Enums.h>
-#include <clusters/Groups/Enums.h>
-#include <clusters/HepaFilterMonitoring/Enums.h>
-#include <clusters/IcdManagement/Enums.h>
-#include <clusters/Identify/Enums.h>
-#include <clusters/IlluminanceMeasurement/Enums.h>
-#include <clusters/JointFabricAdministrator/Enums.h>
-#include <clusters/JointFabricDatastore/Enums.h>
-#include <clusters/KeypadInput/Enums.h>
-#include <clusters/LaundryDryerControls/Enums.h>
-#include <clusters/LaundryWasherControls/Enums.h>
-#include <clusters/LaundryWasherMode/Enums.h>
-#include <clusters/LevelControl/Enums.h>
-#include <clusters/LocalizationConfiguration/Enums.h>
-#include <clusters/LowPower/Enums.h>
-#include <clusters/MediaInput/Enums.h>
-#include <clusters/MediaPlayback/Enums.h>
-#include <clusters/Messages/Enums.h>
-#include <clusters/MeterIdentification/Enums.h>
-#include <clusters/MicrowaveOvenControl/Enums.h>
-#include <clusters/MicrowaveOvenMode/Enums.h>
-#include <clusters/ModeSelect/Enums.h>
-#include <clusters/NetworkCommissioning/Enums.h>
-#include <clusters/NitrogenDioxideConcentrationMeasurement/Enums.h>
-#include <clusters/OccupancySensing/Enums.h>
-#include <clusters/OnOff/Enums.h>
-#include <clusters/OperationalCredentials/Enums.h>
-#include <clusters/OperationalState/Enums.h>
-#include <clusters/OtaSoftwareUpdateProvider/Enums.h>
-#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
-#include <clusters/OvenCavityOperationalState/Enums.h>
-#include <clusters/OvenMode/Enums.h>
-#include <clusters/OzoneConcentrationMeasurement/Enums.h>
-#include <clusters/Pm10ConcentrationMeasurement/Enums.h>
-#include <clusters/Pm1ConcentrationMeasurement/Enums.h>
-#include <clusters/Pm25ConcentrationMeasurement/Enums.h>
-#include <clusters/PowerSource/Enums.h>
-#include <clusters/PowerSourceConfiguration/Enums.h>
-#include <clusters/PowerTopology/Enums.h>
-#include <clusters/PressureMeasurement/Enums.h>
-#include <clusters/ProxyConfiguration/Enums.h>
-#include <clusters/ProxyDiscovery/Enums.h>
-#include <clusters/ProxyValid/Enums.h>
-#include <clusters/PulseWidthModulation/Enums.h>
-#include <clusters/PumpConfigurationAndControl/Enums.h>
-#include <clusters/PushAvStreamTransport/Enums.h>
-#include <clusters/RadonConcentrationMeasurement/Enums.h>
-#include <clusters/RefrigeratorAlarm/Enums.h>
-#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/Enums.h>
-#include <clusters/RelativeHumidityMeasurement/Enums.h>
-#include <clusters/RvcCleanMode/Enums.h>
-#include <clusters/RvcOperationalState/Enums.h>
-#include <clusters/RvcRunMode/Enums.h>
-#include <clusters/SampleMei/Enums.h>
-#include <clusters/ScenesManagement/Enums.h>
-#include <clusters/ServiceArea/Enums.h>
-#include <clusters/SmokeCoAlarm/Enums.h>
-#include <clusters/SoftwareDiagnostics/Enums.h>
-#include <clusters/SoilMeasurement/Enums.h>
-#include <clusters/Switch/Enums.h>
-#include <clusters/TargetNavigator/Enums.h>
-#include <clusters/TemperatureControl/Enums.h>
-#include <clusters/TemperatureMeasurement/Enums.h>
-#include <clusters/Thermostat/Enums.h>
-#include <clusters/ThermostatUserInterfaceConfiguration/Enums.h>
-#include <clusters/ThreadBorderRouterManagement/Enums.h>
-#include <clusters/ThreadNetworkDiagnostics/Enums.h>
-#include <clusters/ThreadNetworkDirectory/Enums.h>
-#include <clusters/TimeFormatLocalization/Enums.h>
-#include <clusters/TimeSynchronization/Enums.h>
-#include <clusters/Timer/Enums.h>
-#include <clusters/TlsCertificateManagement/Enums.h>
-#include <clusters/TlsClientManagement/Enums.h>
-#include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Enums.h>
-#include <clusters/UnitLocalization/Enums.h>
-#include <clusters/UnitTesting/Enums.h>
-#include <clusters/UserLabel/Enums.h>
-#include <clusters/ValveConfigurationAndControl/Enums.h>
-#include <clusters/WakeOnLan/Enums.h>
-#include <clusters/WaterHeaterManagement/Enums.h>
-#include <clusters/WaterHeaterMode/Enums.h>
-#include <clusters/WebRTCTransportProvider/Enums.h>
-#include <clusters/WebRTCTransportRequestor/Enums.h>
-#include <clusters/WiFiNetworkDiagnostics/Enums.h>
-#include <clusters/WiFiNetworkManagement/Enums.h>
-#include <clusters/WindowCovering/Enums.h>
-#include <clusters/ZoneManagement/Enums.h>
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace GeneralDiagnostics {
 
-// Included at the end, so all our definitions above are available.
-#include <app/common/CompatEnumNames.h>
+// Enum for BootReasonEnum
+enum class BootReasonEnum : uint8_t
+{
+    kUnspecified             = 0x00,
+    kPowerOnReboot           = 0x01,
+    kBrownOutReset           = 0x02,
+    kSoftwareWatchdogReset   = 0x03,
+    kHardwareWatchdogReset   = 0x04,
+    kSoftwareUpdateCompleted = 0x05,
+    kSoftwareReset           = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Enum for HardwareFaultEnum
+enum class HardwareFaultEnum : uint8_t
+{
+    kUnspecified            = 0x00,
+    kRadio                  = 0x01,
+    kSensor                 = 0x02,
+    kResettableOverTemp     = 0x03,
+    kNonResettableOverTemp  = 0x04,
+    kPowerSource            = 0x05,
+    kVisualDisplayFault     = 0x06,
+    kAudioOutputFault       = 0x07,
+    kUserInterfaceFault     = 0x08,
+    kNonVolatileMemoryError = 0x09,
+    kTamperDetected         = 0x0A,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 11,
+};
+
+// Enum for InterfaceTypeEnum
+enum class InterfaceTypeEnum : uint8_t
+{
+    kUnspecified = 0x00,
+    kWiFi        = 0x01,
+    kEthernet    = 0x02,
+    kCellular    = 0x03,
+    kThread      = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for NetworkFaultEnum
+enum class NetworkFaultEnum : uint8_t
+{
+    kUnspecified      = 0x00,
+    kHardwareFailure  = 0x01,
+    kNetworkJammed    = 0x02,
+    kConnectionFailed = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for RadioFaultEnum
+enum class RadioFaultEnum : uint8_t
+{
+    kUnspecified   = 0x00,
+    kWiFiFault     = 0x01,
+    kCellularFault = 0x02,
+    kThreadFault   = 0x03,
+    kNFCFault      = 0x04,
+    kBLEFault      = 0x05,
+    kEthernetFault = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kDataModelTest = 0x1,
+};
+} // namespace GeneralDiagnostics
+} // namespace Clusters
+} // namespace app
+} // namespace chip

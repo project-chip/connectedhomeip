@@ -19,147 +19,305 @@
 #pragma once
 
 #include <clusters/shared/Enums.h>
+#include <cstdint>
 
-#include <clusters/AccessControl/Enums.h>
-#include <clusters/AccountLogin/Enums.h>
-#include <clusters/Actions/Enums.h>
-#include <clusters/ActivatedCarbonFilterMonitoring/Enums.h>
-#include <clusters/AdministratorCommissioning/Enums.h>
-#include <clusters/AirQuality/Enums.h>
-#include <clusters/ApplicationBasic/Enums.h>
-#include <clusters/ApplicationLauncher/Enums.h>
-#include <clusters/AudioOutput/Enums.h>
-#include <clusters/BallastConfiguration/Enums.h>
-#include <clusters/BasicInformation/Enums.h>
-#include <clusters/Binding/Enums.h>
-#include <clusters/BooleanState/Enums.h>
-#include <clusters/BooleanStateConfiguration/Enums.h>
-#include <clusters/BridgedDeviceBasicInformation/Enums.h>
-#include <clusters/CameraAvSettingsUserLevelManagement/Enums.h>
-#include <clusters/CameraAvStreamManagement/Enums.h>
-#include <clusters/CarbonDioxideConcentrationMeasurement/Enums.h>
-#include <clusters/CarbonMonoxideConcentrationMeasurement/Enums.h>
-#include <clusters/Channel/Enums.h>
-#include <clusters/Chime/Enums.h>
-#include <clusters/ClosureControl/Enums.h>
-#include <clusters/ClosureDimension/Enums.h>
-#include <clusters/ColorControl/Enums.h>
-#include <clusters/CommissionerControl/Enums.h>
-#include <clusters/CommodityMetering/Enums.h>
-#include <clusters/CommodityPrice/Enums.h>
-#include <clusters/CommodityTariff/Enums.h>
-#include <clusters/ContentAppObserver/Enums.h>
-#include <clusters/ContentControl/Enums.h>
-#include <clusters/ContentLauncher/Enums.h>
-#include <clusters/Descriptor/Enums.h>
-#include <clusters/DeviceEnergyManagement/Enums.h>
-#include <clusters/DeviceEnergyManagementMode/Enums.h>
-#include <clusters/DiagnosticLogs/Enums.h>
-#include <clusters/DishwasherAlarm/Enums.h>
-#include <clusters/DishwasherMode/Enums.h>
-#include <clusters/DoorLock/Enums.h>
-#include <clusters/EcosystemInformation/Enums.h>
-#include <clusters/ElectricalEnergyMeasurement/Enums.h>
-#include <clusters/ElectricalGridConditions/Enums.h>
-#include <clusters/ElectricalPowerMeasurement/Enums.h>
-#include <clusters/EnergyEvse/Enums.h>
-#include <clusters/EnergyEvseMode/Enums.h>
-#include <clusters/EnergyPreference/Enums.h>
-#include <clusters/EthernetNetworkDiagnostics/Enums.h>
-#include <clusters/FanControl/Enums.h>
-#include <clusters/FaultInjection/Enums.h>
-#include <clusters/FixedLabel/Enums.h>
-#include <clusters/FlowMeasurement/Enums.h>
-#include <clusters/FormaldehydeConcentrationMeasurement/Enums.h>
-#include <clusters/GeneralCommissioning/Enums.h>
-#include <clusters/GeneralDiagnostics/Enums.h>
-#include <clusters/GroupKeyManagement/Enums.h>
-#include <clusters/Groups/Enums.h>
-#include <clusters/HepaFilterMonitoring/Enums.h>
-#include <clusters/IcdManagement/Enums.h>
-#include <clusters/Identify/Enums.h>
-#include <clusters/IlluminanceMeasurement/Enums.h>
-#include <clusters/JointFabricAdministrator/Enums.h>
-#include <clusters/JointFabricDatastore/Enums.h>
-#include <clusters/KeypadInput/Enums.h>
-#include <clusters/LaundryDryerControls/Enums.h>
-#include <clusters/LaundryWasherControls/Enums.h>
-#include <clusters/LaundryWasherMode/Enums.h>
-#include <clusters/LevelControl/Enums.h>
-#include <clusters/LocalizationConfiguration/Enums.h>
-#include <clusters/LowPower/Enums.h>
-#include <clusters/MediaInput/Enums.h>
-#include <clusters/MediaPlayback/Enums.h>
-#include <clusters/Messages/Enums.h>
-#include <clusters/MeterIdentification/Enums.h>
-#include <clusters/MicrowaveOvenControl/Enums.h>
-#include <clusters/MicrowaveOvenMode/Enums.h>
-#include <clusters/ModeSelect/Enums.h>
-#include <clusters/NetworkCommissioning/Enums.h>
-#include <clusters/NitrogenDioxideConcentrationMeasurement/Enums.h>
-#include <clusters/OccupancySensing/Enums.h>
-#include <clusters/OnOff/Enums.h>
-#include <clusters/OperationalCredentials/Enums.h>
-#include <clusters/OperationalState/Enums.h>
-#include <clusters/OtaSoftwareUpdateProvider/Enums.h>
-#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
-#include <clusters/OvenCavityOperationalState/Enums.h>
-#include <clusters/OvenMode/Enums.h>
-#include <clusters/OzoneConcentrationMeasurement/Enums.h>
-#include <clusters/Pm10ConcentrationMeasurement/Enums.h>
-#include <clusters/Pm1ConcentrationMeasurement/Enums.h>
-#include <clusters/Pm25ConcentrationMeasurement/Enums.h>
-#include <clusters/PowerSource/Enums.h>
-#include <clusters/PowerSourceConfiguration/Enums.h>
-#include <clusters/PowerTopology/Enums.h>
-#include <clusters/PressureMeasurement/Enums.h>
-#include <clusters/ProxyConfiguration/Enums.h>
-#include <clusters/ProxyDiscovery/Enums.h>
-#include <clusters/ProxyValid/Enums.h>
-#include <clusters/PulseWidthModulation/Enums.h>
-#include <clusters/PumpConfigurationAndControl/Enums.h>
-#include <clusters/PushAvStreamTransport/Enums.h>
-#include <clusters/RadonConcentrationMeasurement/Enums.h>
-#include <clusters/RefrigeratorAlarm/Enums.h>
-#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/Enums.h>
-#include <clusters/RelativeHumidityMeasurement/Enums.h>
-#include <clusters/RvcCleanMode/Enums.h>
-#include <clusters/RvcOperationalState/Enums.h>
-#include <clusters/RvcRunMode/Enums.h>
-#include <clusters/SampleMei/Enums.h>
-#include <clusters/ScenesManagement/Enums.h>
-#include <clusters/ServiceArea/Enums.h>
-#include <clusters/SmokeCoAlarm/Enums.h>
-#include <clusters/SoftwareDiagnostics/Enums.h>
-#include <clusters/SoilMeasurement/Enums.h>
-#include <clusters/Switch/Enums.h>
-#include <clusters/TargetNavigator/Enums.h>
-#include <clusters/TemperatureControl/Enums.h>
-#include <clusters/TemperatureMeasurement/Enums.h>
-#include <clusters/Thermostat/Enums.h>
-#include <clusters/ThermostatUserInterfaceConfiguration/Enums.h>
-#include <clusters/ThreadBorderRouterManagement/Enums.h>
-#include <clusters/ThreadNetworkDiagnostics/Enums.h>
-#include <clusters/ThreadNetworkDirectory/Enums.h>
-#include <clusters/TimeFormatLocalization/Enums.h>
-#include <clusters/TimeSynchronization/Enums.h>
-#include <clusters/Timer/Enums.h>
-#include <clusters/TlsCertificateManagement/Enums.h>
-#include <clusters/TlsClientManagement/Enums.h>
-#include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Enums.h>
-#include <clusters/UnitLocalization/Enums.h>
-#include <clusters/UnitTesting/Enums.h>
-#include <clusters/UserLabel/Enums.h>
-#include <clusters/ValveConfigurationAndControl/Enums.h>
-#include <clusters/WakeOnLan/Enums.h>
-#include <clusters/WaterHeaterManagement/Enums.h>
-#include <clusters/WaterHeaterMode/Enums.h>
-#include <clusters/WebRTCTransportProvider/Enums.h>
-#include <clusters/WebRTCTransportRequestor/Enums.h>
-#include <clusters/WiFiNetworkDiagnostics/Enums.h>
-#include <clusters/WiFiNetworkManagement/Enums.h>
-#include <clusters/WindowCovering/Enums.h>
-#include <clusters/ZoneManagement/Enums.h>
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
 
-// Included at the end, so all our definitions above are available.
-#include <app/common/CompatEnumNames.h>
+// Enum for ACCapacityFormatEnum
+enum class ACCapacityFormatEnum : uint8_t
+{
+    kBTUh = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Enum for ACCompressorTypeEnum
+enum class ACCompressorTypeEnum : uint8_t
+{
+    kUnknown = 0x00,
+    kT1      = 0x01,
+    kT2      = 0x02,
+    kT3      = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for ACLouverPositionEnum
+enum class ACLouverPositionEnum : uint8_t
+{
+    kClosed        = 0x01,
+    kOpen          = 0x02,
+    kQuarter       = 0x03,
+    kHalf          = 0x04,
+    kThreeQuarters = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for ACRefrigerantTypeEnum
+enum class ACRefrigerantTypeEnum : uint8_t
+{
+    kUnknown = 0x00,
+    kR22     = 0x01,
+    kR410a   = 0x02,
+    kR407c   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for ACTypeEnum
+enum class ACTypeEnum : uint8_t
+{
+    kUnknown          = 0x00,
+    kCoolingFixed     = 0x01,
+    kHeatPumpFixed    = 0x02,
+    kCoolingInverter  = 0x03,
+    kHeatPumpInverter = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for ControlSequenceOfOperationEnum
+enum class ControlSequenceOfOperationEnum : uint8_t
+{
+    kCoolingOnly                 = 0x00,
+    kCoolingWithReheat           = 0x01,
+    kHeatingOnly                 = 0x02,
+    kHeatingWithReheat           = 0x03,
+    kCoolingAndHeating           = 0x04,
+    kCoolingAndHeatingWithReheat = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+
+// Enum for PresetScenarioEnum
+enum class PresetScenarioEnum : uint8_t
+{
+    kOccupied     = 0x01,
+    kUnoccupied   = 0x02,
+    kSleep        = 0x03,
+    kWake         = 0x04,
+    kVacation     = 0x05,
+    kGoingToSleep = 0x06,
+    kUserDefined  = 0xFE,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for SetpointChangeSourceEnum
+enum class SetpointChangeSourceEnum : uint8_t
+{
+    kManual   = 0x00,
+    kSchedule = 0x01,
+    kExternal = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for SetpointRaiseLowerModeEnum
+enum class SetpointRaiseLowerModeEnum : uint8_t
+{
+    kHeat = 0x00,
+    kCool = 0x01,
+    kBoth = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for StartOfWeekEnum
+enum class StartOfWeekEnum : uint8_t
+{
+    kSunday    = 0x00,
+    kMonday    = 0x01,
+    kTuesday   = 0x02,
+    kWednesday = 0x03,
+    kThursday  = 0x04,
+    kFriday    = 0x05,
+    kSaturday  = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Enum for SystemModeEnum
+enum class SystemModeEnum : uint8_t
+{
+    kOff           = 0x00,
+    kAuto          = 0x01,
+    kCool          = 0x03,
+    kHeat          = 0x04,
+    kEmergencyHeat = 0x05,
+    kPrecooling    = 0x06,
+    kFanOnly       = 0x07,
+    kDry           = 0x08,
+    kSleep         = 0x09,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for TemperatureSetpointHoldEnum
+enum class TemperatureSetpointHoldEnum : uint8_t
+{
+    kSetpointHoldOff = 0x00,
+    kSetpointHoldOn  = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ThermostatRunningModeEnum
+enum class ThermostatRunningModeEnum : uint8_t
+{
+    kOff  = 0x00,
+    kCool = 0x03,
+    kHeat = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Bitmap for ACErrorCodeBitmap
+enum class ACErrorCodeBitmap : uint32_t
+{
+    kCompressorFail    = 0x1,
+    kRoomSensorFail    = 0x2,
+    kOutdoorSensorFail = 0x4,
+    kCoilSensorFail    = 0x8,
+    kFanFail           = 0x10,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kHeating                     = 0x1,
+    kCooling                     = 0x2,
+    kOccupancy                   = 0x4,
+    kScheduleConfiguration       = 0x8,
+    kSetback                     = 0x10,
+    kAutoMode                    = 0x20,
+    kLocalTemperatureNotExposed  = 0x40,
+    kMatterScheduleConfiguration = 0x80,
+    kPresets                     = 0x100,
+};
+
+// Bitmap for HVACSystemTypeBitmap
+enum class HVACSystemTypeBitmap : uint8_t
+{
+    kCoolingStage      = 0x3,
+    kHeatingStage      = 0xC,
+    kHeatingIsHeatPump = 0x10,
+    kHeatingUsesFuel   = 0x20,
+};
+
+// Bitmap for OccupancyBitmap
+enum class OccupancyBitmap : uint8_t
+{
+    kOccupied = 0x1,
+};
+
+// Bitmap for PresetTypeFeaturesBitmap
+enum class PresetTypeFeaturesBitmap : uint16_t
+{
+    kAutomatic     = 0x1,
+    kSupportsNames = 0x2,
+};
+
+// Bitmap for ProgrammingOperationModeBitmap
+enum class ProgrammingOperationModeBitmap : uint8_t
+{
+    kScheduleActive = 0x1,
+    kAutoRecovery   = 0x2,
+    kEconomy        = 0x4,
+};
+
+// Bitmap for RelayStateBitmap
+enum class RelayStateBitmap : uint16_t
+{
+    kHeat       = 0x1,
+    kCool       = 0x2,
+    kFan        = 0x4,
+    kHeatStage2 = 0x8,
+    kCoolStage2 = 0x10,
+    kFanStage2  = 0x20,
+    kFanStage3  = 0x40,
+};
+
+// Bitmap for RemoteSensingBitmap
+enum class RemoteSensingBitmap : uint8_t
+{
+    kLocalTemperature   = 0x1,
+    kOutdoorTemperature = 0x2,
+    kOccupancy          = 0x4,
+};
+
+// Bitmap for ScheduleDayOfWeekBitmap
+enum class ScheduleDayOfWeekBitmap : uint8_t
+{
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
+    kAway      = 0x80,
+};
+
+// Bitmap for ScheduleModeBitmap
+enum class ScheduleModeBitmap : uint8_t
+{
+    kHeatSetpointPresent = 0x1,
+    kCoolSetpointPresent = 0x2,
+};
+
+// Bitmap for ScheduleTypeFeaturesBitmap
+enum class ScheduleTypeFeaturesBitmap : uint16_t
+{
+    kSupportsPresets   = 0x1,
+    kSupportsSetpoints = 0x2,
+    kSupportsNames     = 0x4,
+    kSupportsOff       = 0x8,
+};
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip
