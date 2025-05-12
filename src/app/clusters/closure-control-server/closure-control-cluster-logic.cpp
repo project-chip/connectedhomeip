@@ -210,7 +210,7 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
         {
             SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
         }
-        else 
+        else
         {
             // Reset the countdown time to 0 when the main state is not in motion or calibration.
             SetCountdownTimeFromCluster(DataModel::Nullable<ElapsedS>(0));
@@ -482,7 +482,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     // Set MainState and OverallTarget only if the delegate call to HandleMoveToCommand is successful
     Status status = mDelegate.HandleMoveToCommand(position, latch, speed);
     VerifyOrReturnValue(status == Status::Success, status);
-    
+
     if (mDelegate.IsReadyToMove())
     {
         VerifyOrReturnError(SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,

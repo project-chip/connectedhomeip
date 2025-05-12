@@ -214,7 +214,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_Stopped)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -224,7 +224,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_Stopped)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kStopped);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_FALSE(countdownTime.IsNull());
@@ -240,7 +240,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_Moving)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -249,7 +249,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_Moving)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kMoving);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_FALSE(countdownTime.IsNull());
@@ -266,7 +266,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_WaitingForMotion)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -275,7 +275,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_WaitingForMotion)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kWaitingForMotion);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_FALSE(countdownTime.IsNull());
@@ -292,7 +292,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_Error)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -301,7 +301,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_Error)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kError);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_FALSE(countdownTime.IsNull());
@@ -317,7 +317,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_SetupRequired)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -326,7 +326,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_SetupRequired)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kSetupRequired);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_FALSE(countdownTime.IsNull());
@@ -342,7 +342,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_CalibratingValid)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -351,7 +351,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_CalibratingValid)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kCalibrating);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_FALSE(countdownTime.IsNull());
@@ -368,7 +368,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_CalibratingInvalid)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -377,7 +377,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_CalibratingInvalid)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kStopped);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_TRUE(countdownTime.IsNull());
@@ -391,7 +391,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_ProtectedValid)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -400,7 +400,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_ProtectedValid)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kProtected);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_FALSE(countdownTime.IsNull());
@@ -416,7 +416,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_ProtectedInvalid)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -425,7 +425,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_ProtectedInvalid)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kStopped);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_TRUE(countdownTime.IsNull());
@@ -439,7 +439,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_DisengagedValid)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -448,7 +448,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_DisengagedValid)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kDisengaged);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_FALSE(countdownTime.IsNull());
@@ -464,7 +464,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_DisengagedInvalid)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -473,7 +473,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_DisengagedInvalid)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kStopped);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_TRUE(countdownTime.IsNull());
@@ -487,7 +487,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_UnknownEnumValue)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
 
-    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);   
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
@@ -496,7 +496,7 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_UnknownEnumValue)
     MainStateEnum readValue = MainStateEnum::kUnknownEnumValue;
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(readValue, MainStateEnum::kStopped);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_TRUE(countdownTime.IsNull());
@@ -554,13 +554,13 @@ TEST_F(TestClosureControlClusterLogic, GetSetMainState_ValidChange)
     EXPECT_EQ(logic->GetMainState(readValue), CHIP_NO_ERROR);
 
     EXPECT_EQ(readValue, MainStateEnum::kMoving);
-    
+
     DataModel::Nullable<ElapsedS> countdownTime = DataModel::NullNullable;
     EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_NO_ERROR);
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_GT(countdownTime.Value(), 0u);
     EXPECT_LE(countdownTime.Value(), 30u);
-    
+
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
     EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::CountdownTime::Id));
 }
