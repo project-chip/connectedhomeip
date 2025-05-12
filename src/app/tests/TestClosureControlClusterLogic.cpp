@@ -213,7 +213,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_Stopped)
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
-
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
@@ -238,7 +237,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_Moving)
 {
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
-
 
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
@@ -265,7 +263,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_WaitingForMotion)
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
-
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
@@ -291,7 +288,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_Error)
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
-
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
@@ -316,7 +312,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_SetupRequired)
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
-
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
@@ -340,7 +335,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_CalibratingValid)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kCalibration);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
-
 
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
@@ -367,7 +361,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_CalibratingInvalid)
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
-
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
@@ -389,7 +382,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_ProtectedValid)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kProtection);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
-
 
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
@@ -415,7 +407,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_ProtectedInvalid)
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
-
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
@@ -437,7 +428,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_DisengagedValid)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kManuallyOperable);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
-
 
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
@@ -463,7 +453,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_DisengagedInvalid)
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
-
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
@@ -485,7 +474,6 @@ TEST_F(TestClosureControlClusterLogic, SetMainState_UnknownEnumValue)
 {
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
-
 
     EXPECT_EQ(logic->SetCountdownTimeFromDelegate(DataModel::NullNullable), CHIP_NO_ERROR);
     mockContext.ResetDirtyFlag();
