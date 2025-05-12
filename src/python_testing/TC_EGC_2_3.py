@@ -62,7 +62,8 @@ class EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
 
     def steps_EGC_2_3(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EGC.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EGC.TESTEVENTTRIGGER for Forecast Conditions Update Test Event",
