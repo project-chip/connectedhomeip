@@ -366,7 +366,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
         ReturnErrorOnFailure(builder.Append(AttributeEntryFrom(path, attribute)));
     }
 
-    for (auto & attribute : GlobalAttributesNotInMetadata)
+    for (auto & attributeId : GlobalAttributesNotInMetadata)
     {
 
         // This "GlobalListEntry" is specific for metadata that ember does not include
@@ -376,10 +376,10 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
         //   - lists of elements
         //   - read-only, with read privilege view
         //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
-        DataModel::AttributeEntry globalListEntry(attribute, DataModel::AttributeQualityFlags::kListAttribute,
+        DataModel::AttributeEntry globalListEntry(attributeId, DataModel::AttributeQualityFlags::kListAttribute,
                                                   Access::Privilege::kView, std::nullopt);
 
-        ReturnErrorOnFailure(builder.Append(globalListEntry));
+        ReturnErrorOnFailure(builder.Append(std::move(globalListEntry)));
     }
 
     return CHIP_NO_ERROR;
