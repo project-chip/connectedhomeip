@@ -124,15 +124,13 @@ TEST_F(TestStatusReport, TestMakeBusyStatusReport)
     EXPECT_EQ(reportToParse.GetGeneralCode(), generalCode);
     EXPECT_EQ(reportToParse.GetProtocolId(), protocolId);
     EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);
-
-    const System::PacketBufferHandle & rcvData = reportToParse.GetProtocolData();
-    ASSERT_FALSE(rcvData.IsNull());
-    EXPECT_EQ(rcvData->DataLength(), sizeof(minimumWaitTime));
-
-    uint16_t readMinimumWaitTime = 0;
-    Encoding::LittleEndian::Reader reader(rcvData->Start(), rcvData->DataLength());
-    EXPECT_EQ(reader.Read16(&readMinimumWaitTime).StatusCode(), CHIP_NO_ERROR);
-    EXPECT_EQ(System::Clock::Milliseconds16(readMinimumWaitTime), minimumWaitTime);
+    EXPECT_TRUE(reportToParse.IsBusy());
+    auto tmpMinimumWaitTime = reportToParse.GetMinimumWaitTime();
+    EXPECT_TRUE(tmpMinimumWaitTime.has_value());
+    if (tmpMinimumWaitTime.has_value())
+    {
+        EXPECT_EQ(tmpMinimumWaitTime.value(), minimumWaitTime);
+    }
 }
 
 // Test Suite

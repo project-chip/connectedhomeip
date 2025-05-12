@@ -22,7 +22,7 @@ namespace Structs {
 {{#if has_more_than_one_cluster}}
 namespace {{asUpperCamelCase name}} = Clusters::detail::Structs::{{asUpperCamelCase name}};
 {{else}}
-{{> cluster_objects_struct header=true}}
+{{> cluster_objects_struct cluster=../name header=true}}
 {{/if}}
 {{/zcl_structs}}
 } // namespace Structs

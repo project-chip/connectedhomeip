@@ -33,6 +33,26 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="RollbackWrite" value="0x02"/>
   </enum>
 
+  <enum name="MeasurementTypeEnum" type="enum16">
+    <item name="Unspecified" value="0x0000"/>
+    <item name="Voltage" value="0x0001"/>
+    <item name="ActiveCurrent" value="0x0002"/>
+    <item name="ReactiveCurrent" value="0x0003"/>
+    <item name="ApparentCurrent" value="0x0004"/>
+    <item name="ActivePower" value="0x0005"/>
+    <item name="ReactivePower" value="0x0006"/>
+    <item name="ApparentPower" value="0x0007"/>
+    <item name="RMSVoltage" value="0x0008"/>
+    <item name="RMSCurrent" value="0x0009"/>
+    <item name="RMSPower" value="0x000A"/>
+    <item name="Frequency" value="0x000B"/>
+    <item name="PowerFactor" value="0x000C"/>
+    <item name="NeutralCurrent" value="0x000D"/>
+    <item name="ElectricalEnergy" value="0x000E"/>
+    <item name="ReactiveEnergy" value="0x000F"/>
+    <item name="ApparentEnergy" value="0x0010"/>
+    <item name="SoilMoisture" value="0x0011"/>
+  </enum>
 
   <enum name="PowerThresholdSourceEnum" type="enum8">
     <item name="Contract" value="0x00"/>
@@ -58,17 +78,6 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="Low" value="0x01"/>
     <item name="Medium" value="0x02"/>
     <item name="High" value="0x03"/>
-  </enum>
-
-  <enum name="StreamUsageEnum" type="enum8">
-    <cluster code="0x0551"/>
-    <cluster code="0x0553"/>
-    <cluster code="0x0554"/>
-    <cluster code="0x0555"/>
-    <item name="Internal" value="0x00"/>
-    <item name="Recording" value="0x01"/>
-    <item name="Analysis" value="0x02"/>
-    <item name="LiveView" value="0x03"/>
   </enum>
   <!--
     These are test global items (no cluster attached) for testing only.

@@ -109,11 +109,11 @@ class TC_OPSTATE_BASE():
                 app_pid = get_pid("chip-all-clusters-app")
                 if app_pid is None:
                     asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-            self.app_pipe = self.app_pipe + str(app_pid)
+            self.app_pid = app_pid
 
     def send_raw_manual_or_pipe_command(self, command: dict, msg: str):
         if self.is_ci:
-            self.write_to_app_pipe(command)
+            self.write_to_app_pipe(command, app_pipe_prefix=self.app_pipe, app_pid=self.app_pid)
             time.sleep(0.1)
         else:
             prompt = msg if msg is not None else "Press Enter when ready."
@@ -220,9 +220,8 @@ class TC_OPSTATE_BASE():
                  TestStep(2, "TH reads from the DUT the ClusterRevision attribute"),
                  TestStep(3, "TH reads from the DUT the FeatureMap attribute"),
                  TestStep(4, "TH reads from the DUT the AttributeList attribute"),
-                 TestStep(5, "TH reads from the DUT the EventList attribute"),
-                 TestStep(6, "TH reads from the DUT the AcceptedCommandList attribute"),
-                 TestStep(7, "TH reads from the DUT the GeneratedCommandList attribute")
+                 TestStep(5, "TH reads from the DUT the AcceptedCommandList attribute"),
+                 TestStep(6, "TH reads from the DUT the GeneratedCommandList attribute")
                  ]
         return steps
 
@@ -230,7 +229,6 @@ class TC_OPSTATE_BASE():
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
         commands = cluster.Commands
-        events = cluster.Events
 
         self.init_test()
 
@@ -271,22 +269,8 @@ class TC_OPSTATE_BASE():
                                                   attribute=attributes.AttributeList,
                                                   expected_contains=expected_value)
 
-        # STEP 5: TH reads from the DUT the EventList attribute
+        # STEP 5: TH reads from the DUT the AcceptedCommandList attribute
         self.step(5)
-        if self.pics_guard(self.check_pics("PICS_EVENT_LIST_ENABLED")):
-            expected_value = [
-                events.OperationalError.event_id,
-            ]
-
-            if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.E01")):
-                expected_value.append(events.OperationCompletion.event_id)
-
-            await self.read_and_expect_array_contains(endpoint=endpoint,
-                                                      attribute=attributes.EventList,
-                                                      expected_contains=expected_value)
-
-        # STEP 6: TH reads from the DUT the AcceptedCommandList attribute
-        self.step(6)
         expected_value = []
 
         if ((await self.command_guard(endpoint=endpoint, command=commands.Pause)) or
@@ -308,8 +292,8 @@ class TC_OPSTATE_BASE():
                                                   attribute=attributes.AcceptedCommandList,
                                                   expected_contains=expected_value)
 
-        # STEP 7: TH reads from the DUT the AcceptedCommandList attribute
-        self.step(7)
+        # STEP 6: TH reads from the DUT the GeneratedCommandList attribute
+        self.step(6)
         expected_value = []
 
         if ((await self.command_guard(endpoint=endpoint, command=commands.Pause)) or
