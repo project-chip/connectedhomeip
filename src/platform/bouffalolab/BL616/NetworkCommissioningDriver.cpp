@@ -213,7 +213,7 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
         {
             memcpy(mScanSSID, ssid.data(), ssid.size());
             mScanSSIDlength = ssid.size();
-            mpScanCallback = callback;
+            mpScanCallback  = callback;
         }
         else
         {
