@@ -1621,13 +1621,6 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    bool streamUsageSupported = std::find_if(mRankedVideoStreamPriorities.begin(), mRankedVideoStreamPriorities.end(),
-                                             [&commandData](const StreamUsageEnum & entry) {
-                                                 return entry == commandData.streamUsage;
-                                             }) != mRankedVideoStreamPriorities.end();
-
-    VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
-
     VerifyOrReturn(commandData.minFrameRate >= 1 && commandData.minFrameRate <= commandData.maxFrameRate &&
                        commandData.maxFrameRate >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
@@ -1644,6 +1637,13 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn(commandData.minFragmentLen <= commandData.maxFragmentLen &&
                        commandData.maxFragmentLen <= kMaxFragmentLenMaxValue,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    bool streamUsageSupported = std::find_if(mRankedVideoStreamPriorities.begin(), mRankedVideoStreamPriorities.end(),
+                                             [&commandData](const StreamUsageEnum & entry) {
+                                                 return entry == commandData.streamUsage;
+                                             }) != mRankedVideoStreamPriorities.end();
+
+    VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     VideoStreamStruct videoStreamArgs;
     videoStreamArgs.videoStreamID    = 0;
@@ -1748,13 +1748,6 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    bool streamUsageSupported = std::find_if(mRankedVideoStreamPriorities.begin(), mRankedVideoStreamPriorities.end(),
-                                             [&commandData](const StreamUsageEnum & entry) {
-                                                 return entry == commandData.streamUsage;
-                                             }) != mRankedVideoStreamPriorities.end();
-
-    VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
-
     VerifyOrReturn(commandData.audioCodec != AudioCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid audio codec", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
@@ -1779,6 +1772,13 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid channel count", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
+
+    bool streamUsageSupported = std::find_if(mRankedVideoStreamPriorities.begin(), mRankedVideoStreamPriorities.end(),
+                                             [&commandData](const StreamUsageEnum & entry) {
+                                                 return entry == commandData.streamUsage;
+                                             }) != mRankedVideoStreamPriorities.end();
+
+    VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     AudioStreamStruct audioStreamArgs;
     audioStreamArgs.audioStreamID  = 0;
