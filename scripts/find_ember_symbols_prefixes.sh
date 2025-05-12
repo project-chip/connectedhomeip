@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script checks for the use of 'ember' and 'emAf' symbols in the codebase.
-# It takes exclusion folders as arguments.
+# It takes exclusion folders as arguments and can also read exclusions from a file.
 
 # Function to check for 'ember' and 'emAf' symbols
 check_symbols() {
@@ -12,10 +12,23 @@ check_symbols() {
             exclusions+=(":(exclude)$2")
             shift 2
             ;;
+        --skip-from-file)
+            if [[ -f "$2" ]]; then
+                while IFS= read -r line || [[ -n "$line" ]]; do
+                    # Skip empty lines and comments
+                    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+                    exclusions+=(":(exclude)$line")
+                done <"$2"
+            else
+                echo "Warning: File '$2' not found, continuing without these exclusions"
+            fi
+            shift 2
+            ;;
         --help)
-            echo "Usage: $0 [--skip-subtree <dir>]"
-            echo "  --skip-subtree <dir>  Skip the specified subtree or file from the search (can be used multiple times for different trees/files)"
-            echo "  --help            Display this help message"
+            echo "Usage: $0 [--skip-subtree <dir>] [--skip-from-file <file>]"
+            echo "  --skip-subtree <dir>     Skip the specified subtree or file from the search (can be used multiple times)"
+            echo "  --skip-from-file <file>  Read paths to exclude from the specified file (one path per line)"
+            echo "  --help                   Display this help message"
             exit 0
             ;;
         *)
