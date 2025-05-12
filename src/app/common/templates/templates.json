@@ -173,13 +173,13 @@
             "output": "../../clusters/{name:touppercamelcase}/Commands.ipp"
         },
         {
-            "path": "../../zap-templates/templates/app/cluster-enums.h.zapt",
+            "path": "../../zap-templates/templates/app/cluster-enums-individual.h.zapt",
             "name": "Cluster-specific enumerations header",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Enums.h"
         },
         {
-            "path": "../../zap-templates/templates/app/cluster-enums-check.h.zapt",
+            "path": "../../zap-templates/templates/app/cluster-enums-check-individual.h.zapt",
             "name": "Cluster-specific enumerations header",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/EnumsCheck.h"
