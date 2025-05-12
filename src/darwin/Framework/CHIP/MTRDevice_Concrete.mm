@@ -518,9 +518,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
 
+    __block id testDelegate = nil;
 #ifdef DEBUG
     // Save the first delegate for testing
-    __block id testDelegate = nil;
     for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
         testDelegate = delegateInfo.delegate;
         break;
@@ -542,7 +542,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Clear this device from subscription pool and persist cached data to storage as needed.
     std::lock_guard lock(_lock);
-    [self _clearSubscriptionPoolWork];
+    [self _clearSubscriptionPoolWorkWithProvidedDelegate:testDelegate];
     [self _doPersistClusterData];
 }
 
@@ -1382,15 +1382,28 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_clearSubscriptionPoolWork
 {
+    [self _clearSubscriptionPoolWorkWithProvidedDelegate:nil];
+}
+
+// We provide a delegate to notify if we are doing
+// _clearSubscriptionPoolWorkWithProvidedDelegate after clearing our delegates
+// in dealloc.
+- (void)_clearSubscriptionPoolWorkWithProvidedDelegate:(nullable id)providedDelegate
+{
     os_unfair_lock_assert_owner(&self->_lock);
     MTRAsyncWorkCompletionBlock completion = self->_subscriptionPoolWorkCompletionBlock;
     if (completion) {
 #ifdef DEBUG
-        [self _callDelegatesWithBlock:^(id testDelegate) {
+        auto notificationBlock = ^(id testDelegate) {
             if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionPoolWorkComplete:)]) {
                 [testDelegate unitTestSubscriptionPoolWorkComplete:self];
             }
-        }];
+        };
+        if (providedDelegate != nil) {
+            notificationBlock(providedDelegate);
+        } else {
+            [self _callDelegatesWithBlock:notificationBlock];
+        }
 #endif
         self->_subscriptionPoolWorkCompletionBlock = nil;
         completion(MTRAsyncWorkComplete);

@@ -30,6 +30,13 @@ using namespace chip;
 using namespace chip::app;
 using namespace std::chrono_literals;
 
+namespace {
+
+// Constants
+constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
+
+} // namespace
+
 WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate) {}
 
 WebRTCManager::~WebRTCManager()
@@ -169,7 +176,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     });
 
     // Create a data channel for this offerer
-    mDataChannel = mPeerConnection->createDataChannel("test");
+    mDataChannel = mPeerConnection->createDataChannel(kWebRTCDataChannelName);
 
     if (mDataChannel)
     {

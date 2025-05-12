@@ -356,7 +356,10 @@ jobs:
             BUILD_TYPE: telink
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        # TODO: disabled due to flakes. Enable back when flakes are root caused and fixed
+        #       https://github.com/project-chip/connectedhomeip/issues/38882
+        # if: github.actor != 'restyled-io[bot]'
+        if: false
 
         container:
             image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:129

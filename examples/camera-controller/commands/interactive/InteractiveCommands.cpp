@@ -171,6 +171,25 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         Logging::SetLogRedirectCallback(LoggingCallback);
     }
 
+    bool startWebSocketServer = mStartWebSocketServer.ValueOr(false);
+    if (startWebSocketServer)
+    {
+        InteractiveServerCommand * command =
+            static_cast<InteractiveServerCommand *>(CommandMgr().GetCommandByName("interactive", "server"));
+        if (command == nullptr)
+        {
+            ChipLogError(NotSpecified, "Interactive server command not found.");
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        CHIP_ERROR err = command->RunCommand();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to run interactive server command: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
+        }
+    }
+
     std::thread readCommands(ReadCommandThread);
     readCommands.detach();
 
@@ -457,6 +476,7 @@ bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
     gInteractiveServerResult.Setup(isAsyncReport, timeout);
     VerifyOrReturnValue(!isAsyncReport, true);
 
+    ChipLogProgress(NotSpecified, "OnWebSocketMessageReceived: %s", msg);
     auto shouldStop = ParseCommand(msg, &gInteractiveServerResult.mStatus);
     mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
