@@ -49,7 +49,7 @@ from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 cluster = Clusters.ElectricalGridConditions
 
 
-class EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
+class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
     """Implementation of test case TC_EGC_2_1."""
 
     def desc_TC_EGC_2_1(self) -> str:
