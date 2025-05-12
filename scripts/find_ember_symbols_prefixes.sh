@@ -15,7 +15,6 @@ check_symbols() {
         --skip-from-file)
             if [[ -f "$2" ]]; then
                 while IFS= read -r line || [[ -n "$line" ]]; do
-                    # Skip empty lines and comments
                     [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
                     exclusions+=(":(exclude)$line")
                 done <"$2"
