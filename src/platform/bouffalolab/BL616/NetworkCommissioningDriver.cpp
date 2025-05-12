@@ -235,19 +235,23 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
         else
         {
             wifi_mgmr_scan_item_t * pScanResult = NULL;
-            uint32_t                scanResultNum = 0;
+            uint32_t scanResultNum              = 0;
 
-            if (mScanSSIDlength) {
-                for (uint32_t i = 0; i < nums; i ++) {
-                    if (mScanSSIDlength == pScanList[i].ssid_len && memcmp(pScanList[i].ssid, mScanSSID, mScanSSIDlength) == 0) {
-                        pScanResult = pScanList;
+            if (mScanSSIDlength)
+            {
+                for (uint32_t i = 0; i < nums; i++)
+                {
+                    if (mScanSSIDlength == pScanList[i].ssid_len && memcmp(pScanList[i].ssid, mScanSSID, mScanSSIDlength) == 0)
+                    {
+                        pScanResult   = pScanList;
                         scanResultNum = 1;
                         break;
                     }
                 }
             }
-            else {
-                pScanResult = pScanList;
+            else
+            {
+                pScanResult   = pScanList;
                 scanResultNum = nums;
             }
 
