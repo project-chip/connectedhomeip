@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,10 +55,23 @@ protected:
     TestPersistentStorageDelegate mPersistentStorageDelegate{};
 };
 
+TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesDistinctRandomNodeIds)
+{
+    NodeId node_id_1{};
+    NodeId node_id_2{};
+
+    ASSERT_EQ(node_id_1, node_id_2); // should be both 0 since type of NodeId is uint64_t
+
+    ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&node_id_1);
+    ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&node_id_2);
+
+    ASSERT_NE(node_id_1, node_id_2);
+}
+
 TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesRandomNodeId)
 {
     auto prev_node_id = mNodeId;
-    auto r            = ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(std::addressof(mNodeId));
+    auto r            = ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&mNodeId);
 
     ASSERT_EQ(prev_node_id, kNodeId);
     ASSERT_EQ(r, CHIP_NO_ERROR);
@@ -72,20 +85,17 @@ TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesNOCChainAfte
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     noc.Calloc(Controller::kMaxCHIPDERCertLength);
-    auto noc_boolean_result = noc.operator bool();
+    ASSERT_TRUE(noc.Get());
 
     Platform::ScopedMemoryBuffer<uint8_t> icac;
     icac.Calloc(Controller::kMaxCHIPDERCertLength);
-    auto icac_boolean_result = icac.operator bool();
+    ASSERT_TRUE(icac.Get());
 
     Platform::ScopedMemoryBuffer<uint8_t> rcac;
     rcac.Calloc(Controller::kMaxCHIPDERCertLength);
-    auto rcac_boolean_result = rcac.operator bool();
+    ASSERT_TRUE(rcac.Get());
 
     ASSERT_EQ(ephemeral_r, CHIP_NO_ERROR);
-    ASSERT_TRUE(noc_boolean_result);
-    ASSERT_TRUE(rcac_boolean_result);
-    ASSERT_TRUE(icac_boolean_result);
 
     MutableByteSpan nocSpan(noc.Get(), Controller::kMaxCHIPDERCertLength);
     MutableByteSpan icacSpan(icac.Get(), Controller::kMaxCHIPDERCertLength);
@@ -108,14 +118,14 @@ TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesNOCChainAfte
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     noc.Calloc(Controller::kMaxCHIPDERCertLength);
+    ASSERT_TRUE(noc.Get());
+
     MutableByteSpan nocSpan(noc.Get(), Controller::kMaxCHIPDERCertLength);
 
-    std::array<uint8_t, Controller::kMaxCHIPDERCertLength> icacArray = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
-                                                                         0x02, 0x02, 0x02, 0x02, 0x02 };
+    std::array<uint8_t, Controller::kMaxCHIPDERCertLength> icacArray{};
     MutableByteSpan icacSpan(icacArray);
 
-    std::array<uint8_t, Controller::kMaxCHIPDERCertLength> rcacArray = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03,
-                                                                         0x03, 0x03, 0x03, 0x03, 0x03, 0x03 };
+    std::array<uint8_t, Controller::kMaxCHIPDERCertLength> rcacArray{};
     MutableByteSpan rcacSpan(rcacArray);
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcacSpan.size(), static_cast<size_t>(UINT16_MAX)));
 
