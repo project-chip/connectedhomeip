@@ -18,11 +18,13 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/tls-certificate-management-server/CertificateTable.h>
 #include <app/reporting/reporting.h>
+#include <clusters/TlsClientManagement/Commands.h>
+#include <clusters/TlsClientManagement/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -43,7 +45,7 @@ public:
      * @param certificateTable A reference to the certificate table for looking up certiciates
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate, CertificateTable & certificateTable);
+    TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate, Tls::CertificateTable & certificateTable);
     ~TlsClientManagementServer();
 
     /**
@@ -51,6 +53,12 @@ public:
      * @return Returns an error  if the CommandHandler or AttributeHandler registration fails.
      */
     CHIP_ERROR Init();
+
+    /**
+     * Shuts down the TLS Client Management server instance.
+     * @return Returns an error if the destruction fails.
+     */
+    CHIP_ERROR Finish();
 
     // Attribute Setters
 
@@ -74,7 +82,7 @@ public:
 
 private:
     TlsClientManagementDelegate & mDelegate;
-    CertificateTable & mCertificateTable;
+    Tls::CertificateTable & mCertificateTable;
 
     // Attribute local storage
     uint8_t mMaxProvisioned;
@@ -85,6 +93,9 @@ private:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
+    void HandleProvisionEndpoint(HandlerContext & ctx, const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & req);
+    void HandleFindEndpoint(HandlerContext & ctx, const TlsClientManagement::Commands::FindEndpoint::DecodableType & req);
+    void HandleRemoveEndpoint(HandlerContext & ctx, const TlsClientManagement::Commands::RemoveEndpoint::DecodableType & req);
 
     // Helpers
     // Loads all the persistent attributes from the KVS.
@@ -100,6 +111,8 @@ private:
 class TlsClientManagementDelegate
 {
 public:
+    using EndpointStructType = TlsClientManagement::Structs::TLSEndpointStruct::DecodableType;
+
     TlsClientManagementDelegate() = default;
 
     virtual ~TlsClientManagementDelegate() = default;
@@ -111,7 +124,7 @@ public:
      * @param[out] endpoint The endpoint at the given index in the list.
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the preset types list.
      */
-    virtual CHIP_ERROR GetProvisionedEndpointByIndex(size_t index, Structs::TLSEndpointStruct::Type & endpoint) = 0;
+    virtual CHIP_ERROR GetProvisionedEndpointByIndex(size_t index, EndpointStructType& endpoint) = 0;
 
     /**
      * @brief Finds the TLSEndpointStruct with the given EndpointID
@@ -120,7 +133,7 @@ public:
      * @param[out] endpoint The endpoint at the given index in the list.
      * @return NOT_FOUND if no mapping is found.
      */
-    virtual CHIP_ERROR FindProvisionedEndpointByID(uint16_t endpointID, Structs::TLSEndpointStruct::Type & endpoint) = 0;
+    virtual Protocols::InteractionModel::Status FindProvisionedEndpointByID(uint16_t endpointID, EndpointStructType & endpoint) = 0;
 
     /**
      * @brief Appends a TLSEndpointStruct to the provisioned endpoints list maintained by the delegate.
@@ -133,7 +146,7 @@ public:
      * @return CHIP_NO_ERROR if the endpoint was appended to the list successfully.
      * @return CHIP_ERROR if there was an error adding the endpoint to the list.
      */
-    virtual CHIP_ERROR AppendToProvisionedEndpointList(const Structs::TLSEndpointStruct::Type & endpoint, uint16_t & endpointID) = 0;
+    virtual Protocols::InteractionModel::Status ProvisionEndpoint(const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & endpoint, uint16_t & endpointID) = 0;
 
     /**
      * @brief Removes the TLSEndpointStruct with the given EndpointID
@@ -141,7 +154,7 @@ public:
      * @param[in] endpointID The ID of the endpoint to remove.
      * @return NOT_FOUND if no mapping is found.
      */
-    virtual CHIP_ERROR RemoveProvisionedEndpointByID(uint16_t endpointID) = 0;
+    virtual Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(uint16_t endpointID) = 0;
 
 protected:
     friend class TlsClientManagementServer;
