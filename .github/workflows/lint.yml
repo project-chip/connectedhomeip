@@ -272,8 +272,7 @@ jobs:
               if: always()
               run: |
                   scripts/find_ember_symbols_prefixes.sh \
-                  --skip-subtree .github/workflows/lint.yml \
-                  --skip-subtree .github/workflows/.wordlist.txt \
+                  --skip-subtree .github/ \
                   --skip-subtree src/app/util \
                   --skip-subtree zzz_generated/app-common/app-common/zap-generated \
                   --skip-subtree src/app/zap-templates/templates \
@@ -284,6 +283,7 @@ jobs:
                   --skip-subtree examples \
                   --skip-subtree docs \
                   --skip-subtree src/app/tests
+                  --skip-from-file scripts/ember_exclusions.txt
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
