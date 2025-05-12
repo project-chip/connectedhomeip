@@ -207,14 +207,18 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
     {
         mpScanCallback = nullptr;
 
-        memcpy(mScanSSID, ssid.data(), ssid.size());
-        mScanSSIDlength = ssid.size();
-        if (0 == wifi_start_scan(ssid.data(), ssid.size()))
+        if (ssid.size() <= DeviceLayer::Internal::kMaxWiFiSSIDLength 
+            && 0 == wifi_start_scan(ssid.data(), ssid.size()))
         {
+            memcpy(mScanSSID, ssid.data(), ssid.size());
+            mScanSSIDlength = ssid.size();
             mpScanCallback = callback;
+
+            ChipLogError(NetworkProvisioning, "mScanSSID=%s, %d", ssid.data(), ssid.size());
         }
         else
         {
+            mScanSSIDlength = 0;
             callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         }
     }
