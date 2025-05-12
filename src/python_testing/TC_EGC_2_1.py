@@ -62,7 +62,8 @@ class EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
 
     def steps_EGC_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     is_commissioning=True),
             TestStep("2", "TH reads from the DUT the LocalGenerationAvailable attribute.",
                      "Verify that the DUT response contains either null or a bool value."),
             TestStep("3", "TH reads from the DUT the CurrentConditions attribute.",
