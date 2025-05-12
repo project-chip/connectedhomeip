@@ -81,30 +81,25 @@ CHIP_ERROR LightingManager::Init()
     {
         mCurrentLevel = brightness.Value();
     }
-    if (Clusters::ColorControl::Attributes::CurrentX::Get(1, &currentx) == Protocols::InteractionModel::Status::Success &&
-        !currentx.IsNull())
+    if (Clusters::ColorControl::Attributes::CurrentX::Get(1, &currentx) == Protocols::InteractionModel::Status::Success)
     {
         mCurrentX = currentx;
     }
-    if (Clusters::ColorControl::Attributes::CurrentY::Get(1, &currenty) == Protocols::InteractionModel::Status::Success &&
-        !currenty.IsNull())
+    if (Clusters::ColorControl::Attributes::CurrentY::Get(1, &currenty) == Protocols::InteractionModel::Status::Success)
     {
         mCurrentY = currenty;
     }
-    if (Clusters::ColorControl::Attributes::CurrentHue::Get(1, &currenthue) == Protocols::InteractionModel::Status::Success &&
-        !currenthue.IsNull())
+    if (Clusters::ColorControl::Attributes::CurrentHue::Get(1, &currenthue) == Protocols::InteractionModel::Status::Success)
     {
         mCurrentHue = currenthue;
     }
     if (Clusters::ColorControl::Attributes::CurrentSaturation::Get(1, &currentsaturation) ==
-            Protocols::InteractionModel::Status::Success &&
-        !currentsaturation.IsNull())
+        Protocols::InteractionModel::Status::Success)
     {
         mCurrentSaturation = currentsaturation;
     }
     if (Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(1, &currentctmireds) ==
-            Protocols::InteractionModel::Status::Success &&
-        !currentctmireds.IsNull())
+        Protocols::InteractionModel::Status::Success)
     {
         mCurrentCTMireds = currentctmireds;
     }

@@ -62,7 +62,7 @@ void RGBLEDWidget::SetColorFromHSV(uint8_t hue, uint8_t saturation)
     RGBLEDWidget::HsvColor_t hsv;
     hsv.h = hue;
     hsv.s = saturation;
-    hsv.v = mLevel;
+    hsv.v = GetLevel();
     ChipLogProgress(Zcl, "SetColorFromHSV : %u|%u", hsv.h, hsv.s);
     RGBLEDWidget::RgbColor_t rgb = RGBLEDWidget::HsvToRgb(hsv);
     SetColor(rgb.r, rgb.g, rgb.b);
