@@ -50,5 +50,5 @@ check_symbols() {
     fi
 }
 
-# Main script execution
+# Main script execution here
 check_symbols "$@"
