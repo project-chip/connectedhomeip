@@ -22,51 +22,6 @@ Git: 0.7-summer-2025-ncr-68-gebfcd02e9
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="Cameras"/>
-  <enum name="WebRTCEndReasonEnum" type="enum8">
-    <cluster code="0x0553"/>
-    <cluster code="0x0554"/>
-    <item name="IceFailed" value="0x00"/>
-    <item name="IceTimeout" value="0x01"/>
-    <item name="UserHangup" value="0x02"/>
-    <item name="UserBusy" value="0x03"/>
-    <item name="Replaced" value="0x04"/>
-    <item name="NoUserMedia" value="0x05"/>
-    <item name="InviteTimeout" value="0x06"/>
-    <item name="AnsweredElsewhere" value="0x07"/>
-    <item name="OutOfResources" value="0x08"/>
-    <item name="MediaTimeout" value="0x09"/>
-    <item name="LowPower" value="0x0A"/>
-    <item name="UnknownReason" value="0x0B"/>
-  </enum>
-
-  <struct name="ICECandidateStruct" apiMaturity="provisional">
-    <cluster code="0x0553"/>
-    <cluster code="0x0554"/>
-    <item fieldId="0" name="Candidate" type="char_string"/>
-    <item fieldId="1" name="SDPMid" type="char_string" isNullable="true" minLength="1"/>
-    <item fieldId="2" name="SDPMLineIndex" type="int16u" isNullable="true"/>
-  </struct>
-
-  <struct name="ICEServerStruct" apiMaturity="provisional">
-    <cluster code="0x0553"/>
-    <cluster code="0x0554"/>
-    <item fieldId="0" name="URLs" array="true" type="char_string" length="10"/>
-    <item fieldId="1" name="Username" type="long_char_string" optional="true" length="508"/>
-    <item fieldId="2" name="Credential" type="long_char_string" optional="true" length="512"/>
-    <item fieldId="3" name="CAID" type="int16u" optional="true"/>
-  </struct>
-
-  <struct name="WebRTCSessionStruct" apiMaturity="provisional" isFabricScoped="true">
-    <cluster code="0x0553"/>
-    <cluster code="0x0554"/>
-    <item fieldId="0" name="ID" type="int16u"/>
-    <item fieldId="1" name="PeerNodeID" type="node_id"/>
-    <item fieldId="2" name="PeerEndpointID" type="endpoint_no"/>
-    <item fieldId="3" name="StreamUsage" type="StreamUsageEnum" min="0x00" max="0x03"/>
-    <item fieldId="4" name="VideoStreamID" type="int16u" isNullable="true"/>
-    <item fieldId="5" name="AudioStreamID" type="int16u" isNullable="true"/>
-    <item fieldId="6" name="MetadataEnabled" type="boolean" optional="true"/>
-  </struct>
 
   <cluster apiMaturity="provisional">
     <domain>Cameras</domain>
