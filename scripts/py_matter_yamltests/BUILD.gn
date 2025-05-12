@@ -38,15 +38,25 @@ pw_python_package("matter-yamltests") {
     "matter/yamltests/parser_config.py",
     "matter/yamltests/pics_checker.py",
     "matter/yamltests/pseudo_clusters/__init__.py",
+    "matter/yamltests/pseudo_clusters/clusters/__init__.py",
+    "matter/yamltests/pseudo_clusters/clusters/accessory_server_bridge.py",
+    "matter/yamltests/pseudo_clusters/clusters/commissioner_commands.py",
     "matter/yamltests/pseudo_clusters/clusters/delay_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/discovery_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/equality_commands.py",
     "matter/yamltests/pseudo_clusters/clusters/log_commands.py",
     "matter/yamltests/pseudo_clusters/clusters/system_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/webrtc.py",
     "matter/yamltests/pseudo_clusters/pseudo_cluster.py",
     "matter/yamltests/pseudo_clusters/pseudo_clusters.py",
-    "matter/yamltests/py.typed",
     "matter/yamltests/runner.py",
     "matter/yamltests/websocket_runner.py",
     "matter/yamltests/yaml_loader.py",
+  ]
+
+  inputs = [
+    # Marker file to indicate to mypy that this package is type-annotated.
+    "matter/yamltests/py.typed",
   ]
 
   python_deps = [ "${chip_root}/scripts/py_matter_idl:matter-idl" ]
