@@ -206,19 +206,17 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
     if (callback != nullptr)
     {
         mpScanCallback = nullptr;
+        memset(mScanSSID, 0, sizeof(mScanSSID));
+        mScanSSIDlength = 0;
 
-        if (ssid.size() <= DeviceLayer::Internal::kMaxWiFiSSIDLength 
-            && 0 == wifi_start_scan(ssid.data(), ssid.size()))
+        if (ssid.size() < sizeof(mScanSSID) && 0 == wifi_start_scan(ssid.data(), ssid.size()))
         {
             memcpy(mScanSSID, ssid.data(), ssid.size());
             mScanSSIDlength = ssid.size();
             mpScanCallback = callback;
-
-            ChipLogError(NetworkProvisioning, "mScanSSID=%s, %d", ssid.data(), ssid.size());
         }
         else
         {
-            mScanSSIDlength = 0;
             callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         }
     }
@@ -247,7 +245,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
                 {
                     if (mScanSSIDlength == pScanList[i].ssid_len && memcmp(pScanList[i].ssid, mScanSSID, mScanSSIDlength) == 0)
                     {
-                        pScanResult   = pScanList;
+                        pScanResult   = &pScanList[i];
                         scanResultNum = 1;
                         break;
                     }
