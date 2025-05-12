@@ -44,7 +44,6 @@ static uint32_t app_pds_wakeup_pin                  = -1;
 
 extern "C" void btble_pds_fastboot_done_callback(void);
 
-
 extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime)
 {
     uint64_t sleep_before = bl_rtc_get_timestamp_ms();
