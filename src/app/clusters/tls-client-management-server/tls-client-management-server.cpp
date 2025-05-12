@@ -20,23 +20,30 @@
  * @brief Implementation for the TlsClientManagement Server Cluster
  ***************************************************************************/
 
-#include "tls-client-managemnet-server.h"
+#include "tls-client-management-server.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/server/Server.h>
+#include <clusters/TlsClientManagement/Attributes.h>
+#include <clusters/TlsClientManagement/Commands.h>
+#include <clusters/TlsClientManagement/Structs.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Tls;
 using namespace chip::app::Clusters::TlsClientManagement;
+using namespace chip::app::Clusters::TlsClientManagement::Structs;
 using namespace chip::app::Clusters::TlsClientManagement::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 TlsClientManagementServer::TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate, CertificateTable & certificateTable) :
     AttributeAccessInterface(MakeOptional(endpointId), TlsClientManagement::Id),
-    CommandHandlerInterface(MakeOptional(endpointId), TlsClientManagement::Id), mDelegate(delegate), mCertificateTable(certificateTable), mMaxProvisioned(0),
+    CommandHandlerInterface(MakeOptional(endpointId), TlsClientManagement::Id), mDelegate(delegate), mCertificateTable(certificateTable), mMaxProvisioned(0)
 {
     mDelegate.SetTlsClientManagementServer(this);
 }
@@ -53,10 +60,20 @@ TlsClientManagementServer::~TlsClientManagementServer()
 
 CHIP_ERROR TlsClientManagementServer::Init()
 {
+    mCertificateTable.Init(Server::GetInstance().GetPersistentStorage());
+
     LoadPersistentAttributes();
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+
+    return CHIP_NO_ERROR;
+}
+
+
+CHIP_ERROR TlsClientManagementServer::Finish()
+{
+    mCertificateTable.Finish();
     return CHIP_NO_ERROR;
 }
 
@@ -65,8 +82,8 @@ void TlsClientManagementServer::LoadPersistentAttributes()
     // Load MaxProvisioned
     uint8_t storedMaxProvisioned = 5;
     CHIP_ERROR err               = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(GetEndpointId(), TlsClientManagement::Id, MaxProvisioned::Id), storedActiveTlsClientManagementID);
-    if (err == CHIP_NO_ERROR)
+        ConcreteAttributePath(GetEndpointId(), TlsClientManagement::Id, MaxProvisioned::Id), storedMaxProvisioned);
+    if (err != CHIP_NO_ERROR)
     {
         mMaxProvisioned = storedMaxProvisioned;
     }
@@ -74,8 +91,8 @@ void TlsClientManagementServer::LoadPersistentAttributes()
     {
         // otherwise defaults
         ChipLogDetail(
-            Zcl, "TlsClientManagement: Unable to load the ActiveTlsClientManagementID attribute from the KVS. Defaulting to %u",
-            mActiveTlsClientManagementID);
+            Zcl, "TlsClientManagement: Unable to load the MaxProvisioned attribute from the KVS. Defaulting to %u",
+            mMaxProvisioned);
     }
 }
 
@@ -87,15 +104,13 @@ CHIP_ERROR TlsClientManagementServer::Read(const ConcreteReadAttributePath & aPa
     switch (aPath.mAttributeId)
     {
     case MaxProvisioned::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mMaxProvisioned));
-        break;
+        return aEncoder.Encode(mMaxProvisioned);
     case ProvisionedEndpoints::Id:
         TlsClientManagementServer * server = this;
         CHIP_ERROR err =
             aEncoder.EncodeList([server](const auto & encoder) -> CHIP_ERROR { return server->EncodeProvisionedEndpoints(encoder); });
         return err;
     }
-    break;
 
     return CHIP_NO_ERROR;
 }
@@ -111,7 +126,7 @@ TlsClientManagementServer::EncodeProvisionedEndpoints(const AttributeValueEncode
 {
     for (uint8_t i = 0; true; i++)
     {
-        TLSEndpointStruct endpoint;
+        TLSEndpointStruct::Type endpoint;
 
         auto err = mDelegate.GetProvisionedEndpointByIndex(i, endpoint);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -169,21 +184,55 @@ void TlsClientManagementServer::InvokeCommand(HandlerContext & ctx)
 {
     switch (ctx.mRequestPath.mCommandId)
     {
-    case Commands::PlayTlsClientManagementSound::Id:
-        CommandHandlerInterface::HandleCommand<Commands::PlayTlsClientManagementSound::DecodableType>(
-            ctx, [this](HandlerContext & innerCtx, const auto & req) { HandlePlayTlsClientManagementSound(innerCtx, req); });
+    case Commands::ProvisionEndpoint::Id:
+        CommandHandlerInterface::HandleCommand<Commands::ProvisionEndpoint::DecodableType>(
+            ctx, [this](HandlerContext & innerCtx, const auto & req) { HandleProvisionEndpoint(innerCtx, req); });
+        break;
+    case Commands::FindEndpoint::Id:
+        CommandHandlerInterface::HandleCommand<Commands::FindEndpoint::DecodableType>(
+            ctx, [this](HandlerContext & innerCtx, const auto & req) { HandleFindEndpoint(innerCtx, req); });
+        break;
+    case Commands::RemoveEndpoint::Id:
+        CommandHandlerInterface::HandleCommand<Commands::RemoveEndpoint::DecodableType>(
+            ctx, [this](HandlerContext & innerCtx, const auto & req) { HandleRemoveEndpoint(innerCtx, req); });
         break;
     }
 }
 
-void TlsClientManagementServer::HandlePlayTlsClientManagementSound(
-    HandlerContext & ctx, const Commands::PlayTlsClientManagementSound::DecodableType & req)
+
+void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx, const Commands::ProvisionEndpoint::DecodableType & req)
 {
+    ChipLogDetail(Zcl, "TlsClientManagement: ProvisionEndpoint");
 
-    ChipLogDetail(Zcl, "TlsClientManagement: PlayTlsClientManagementSound");
+    Commands::ProvisionEndpointResponse::Type response;
+    Status status = mDelegate.ProvisionEndpoint(req, response.endpointID);
 
-    // call the delegate to play the chime
-    Status status = mDelegate.PlayTlsClientManagementSound();
+    if (status == Protocols::InteractionModel::Status::Success) {
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    } else {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        }
+}
+
+void TlsClientManagementServer::HandleFindEndpoint(HandlerContext & ctx, const Commands::FindEndpoint::DecodableType & req)
+{
+    ChipLogDetail(Zcl, "TlsClientManagement: FindEndpoint");
+
+    Commands::FindEndpointResponse::Type response;
+    Status status = mDelegate.FindProvisionedEndpointByID(req.endpointID, response.endpoint);
+
+    if (status == Protocols::InteractionModel::Status::Success) {
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    } else {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        }
+}
+
+void TlsClientManagementServer::HandleRemoveEndpoint(HandlerContext & ctx, const Commands::RemoveEndpoint::DecodableType & req)
+{
+    ChipLogDetail(Zcl, "TlsClientManagement: RemoveEndpoint");
+
+    Status status = mDelegate.RemoveProvisionedEndpointByID(req.endpointID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 

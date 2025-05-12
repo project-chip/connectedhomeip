@@ -769,7 +769,8 @@
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
         "Soil Measurement": ["SoilMoistureMeasurementLimits"],
-        "Unit Localization": ["TemperatureUnit"]
+        "Unit Localization": ["TemperatureUnit"],
+        "TLS Client Management": ["MaxProvisioned"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

@@ -461,18 +461,14 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
 };
 
 template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::Init(PersistentStorageDelegate * storage)
+CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::Init(PersistentStorageDelegate& storage)
 {
     using Serializer = DefaultSerializer<StorageId, StorageData>;
-    if (storage == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
 
     // Verify the initialized parameter respects the maximum allowed values for entry capacity
     VerifyOrReturnError(mMaxPerFabric <= Serializer::kMaxPerFabric() && mMaxPerEndpoint <= Serializer::kMaxPerEndpoint(),
                         CHIP_ERROR_INVALID_INTEGER_VALUE);
-    this->mStorage = storage;
+    this->mStorage = &storage;
     return CHIP_NO_ERROR;
 }
 

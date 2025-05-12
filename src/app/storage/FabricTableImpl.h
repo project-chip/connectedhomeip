@@ -41,7 +41,7 @@ class FabricTableImpl
 public:
     virtual ~FabricTableImpl() { Finish(); };
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage);
+    CHIP_ERROR Init(PersistentStorageDelegate & storage);
     void Finish();
 
     // Entry count
