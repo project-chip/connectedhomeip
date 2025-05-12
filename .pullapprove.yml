@@ -238,6 +238,33 @@ groups:
       request: 0 # Do not auto-add
 
   ############################################################
+  #  Path specific review requirments. A PR must meet the
+  #  review requirements corresponding each path in the
+  #  in the CUSTOM_REVIEW_PATHS list that it touches. If it
+  #  touches a region not covered by any custom review paths, 
+  #  base condition is required.
+  ############################################################
+  custom_review_paths: &CUSTOM_REVIEW_PATHS
+    - chef: &CHEF "examples/chef"
+  
+  ############################################################
+  #  Review requirements for PRs touching examples/chef.
+  #  One Googler requirement is sufficient.
+  ############################################################
+  chef-required-reviewers:
+    type: required
+    conditions:
+      - any(f.startswith(*CHEF) for f in files)
+    requirements:
+      - len(groups.approved.include('shared-reviewers-google')) >= 1 or len(groups.approved.include('shared-reviewers-*')) >= 2  
+    reviews:
+      required: 0
+    labels:
+      approved_chef: "review - approved: chef"
+      pending_chef: "review - pending: chef"
+      rejected_chef: "review - changed requested: chef"
+
+  ############################################################
   #  Base Required Reviewers
   ############################################################
   required-reviewers:
@@ -247,6 +274,9 @@ groups:
       This is the main group of required reviews for general pull
       requests.
     type: required
+    conditions:
+      # If PR touches a region not covered by any custom review paths, base condition is required.
+      - not all(any(f.startswith(p) for p in *CUSTOM_REVIEW_PATHS) for f in files)
     requirements:
       - len(groups.approved.include('shared-reviewers-*')) >= 2
     reviews:
