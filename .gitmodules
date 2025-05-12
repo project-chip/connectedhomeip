@@ -329,4 +329,7 @@
 	url = https://github.com/Infineon/optiga-trust-m.git
 	branch = matter_support
 	platforms = infineon
-
+[submodule "third_party/senscomm/scm1612s/wise-sdk"]
+	path = third_party/senscomm/scm1612s/wise-sdk
+	url = git@github.com:Senscomm/wise-sdk.git
+	platforms = senscomm

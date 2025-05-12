@@ -302,6 +302,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=mt793x",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+    } else if (chip_device_platform == "scm1612s") {
+      device_layer_target_define = "SCM1612S"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=senscomm/scm1612s",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
     } else if (chip_device_platform == "openiotsdk") {
       device_layer_target_define = "OPEN_IOT_SDK"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=openiotsdk" ]
@@ -350,6 +356,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "OPEN_IOT_SDK",
       "ASR",
       "STM32",
+      "SCM1612S",
     ]
     foreach(possible_device_layer_target_define,
             possible_device_layer_target_defines) {
@@ -577,6 +584,8 @@ if (chip_device_platform != "none") {
       _platform_target = "Beken"
     } else if (chip_device_platform == "mt793x") {
       _platform_target = "mt793x"
+    } else if (chip_device_platform == "scm1612s") {
+      _platform_target = "senscomm/scm1612s"
     } else if (chip_device_platform == "openiotsdk") {
       _platform_target = "openiotsdk"
     } else if (chip_device_platform == "asr") {

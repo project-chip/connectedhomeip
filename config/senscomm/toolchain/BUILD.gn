@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_toolchain/generate_toolchain.gni")
 
 declare_args() {
+  senscomm_ar = ""
+  senscomm_cc = ""
+  senscomm_cxx = ""
+
   # Generate Linker map files. Can skip since they can
   # be quite large.
   #
@@ -23,7 +29,7 @@ declare_args() {
   chip_generate_link_map_file = true
 }
 
-template("gcc_toolchain") {
+template("scm_toolchain") {
   invoker_toolchain_args = invoker.toolchain_args
 
   _toolchain = {
@@ -60,9 +66,23 @@ template("gcc_toolchain") {
     defaults = {
       forward_variables_from(invoker_toolchain_args, "*")
     }
+
+    # This is not possible with gnu_toolchain of gcc_toolchain.gni.
+    forward_variables_from(invoker, [ "link_whole_archive" ])
   }
 
   generate_toolchains("gcc_toolchains") {
     toolchains = [ _toolchain ]
   }
+}
+
+scm_toolchain("senscomm") {
+  ar = senscomm_ar
+  cc = senscomm_cc
+  cxx = senscomm_cxx
+  toolchain_args = {
+    current_os = "freertos"
+    is_clang = false
+  }
+  link_whole_archive = true
 }

@@ -1,0 +1,163 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/scm1612s.gni")
+import("${scm1612s_sdk_build_root}/scm1612s_sdk.gni")
+
+declare_args() {
+  # Build target to use for scm1612s SDK. Use this to set global SDK defines.
+  scm1612s_target_project = ""
+}
+
+assert(scm1612s_target_project != "", "scm1612s_target_project must be specified")
+
+crtbegin_dir = exec_script("find_gcc_lib_dir.py",
+        [ "riscv32-elf-gcc" ],
+        "value")
+crtbegin_o = "${crtbegin_dir}/crtbegin.o"
+crtend_o = "${crtbegin_dir}/crtend.o"
+
+# Add includes, cflags, asmflags, etc in config
+config("scm1612s_sdk_config") {
+    include_dirs = [
+        "${scm1612s_sdk_root}/include",
+        "${scm1612s_sdk_root}/include/generated",
+        "${scm1612s_sdk_root}/include/hal/ndsv5",
+        "${scm1612s_sdk_root}/include/cli",
+        "${scm1612s_sdk_root}/include/freebsd",
+        "${scm1612s_sdk_root}/include/FreeRTOS",
+        "${scm1612s_sdk_root}/hal/soc/scm2010",
+        "${scm1612s_sdk_root}/hal/soc/scm2010/freertos",
+        "${scm1612s_sdk_root}/hal/soc/scm2010/freertos/V10.2.1",
+        "${scm1612s_sdk_root}/lib/lwip/src/include",
+        "${scm1612s_sdk_root}/lib/lwip/ports/freertos/include",
+        "${scm1612s_sdk_root}/lib/mbedtls-2.28.10/include",
+    ]
+
+    cflags = []
+    cflags += [ "-matomic" ]
+    cflags += [ "-mno-execit" ]
+    cflags += [ "-mcmodel=medany" ]
+    cflags += [ "-fno-builtin" ]
+    cflags += [ "--specs=nosys.specs" ]
+    #cflags += [ "-v" ] #debug
+    cflags += [
+      "-Wno-error=absolute-value",
+      "-Wno-unused-but-set-variable",
+      "-Wno-unused-variable",
+      "-Wno-unused-function",
+      "-Wno-conversion",
+      "-Wno-sign-compare",
+      "-Wno-clobbered",
+      "-Wno-implicit-fallthrough",
+      "-fno-optimize-strlen",
+    ]
+    cflags += [
+      "-Wno-format-nonliteral",
+      "-Wno-error=shadow",
+      "-Wno-error=type-limits",
+    ]
+    cflags += [ "-D__WISE__" ]
+    cflags += [ "-D__USE_NATIVE_HEADER__" ] # Don't refer to standard headers within wise-sdk
+    cflags += [ "-include" + rebase_path("${scm1612s_sdk_root}/include/generated/autoconf.h", root_build_dir) ]
+    cflags += [ "-include" + rebase_path("${scm1612s_sdk_root}/include/rom/fixedconf.h", root_build_dir) ]
+
+    ldflags = []
+    #ldflags += ["-v"] #debug
+    ldflags += [ "-T" + rebase_path("${scm1612s_sdk_root}/wise.lds", root_build_dir) ]
+    ldflags += [ "-T" + rebase_path("${scm1612s_sdk_root}/hal/soc/scm2010/wise.rom_v2.ld", root_build_dir) ]
+    #ldflags += [ "-Wl,-nostdlib" ]
+    ldflags += [ "-nostartfiles" ]
+    ldflags += [ "-Wl,--mno-execit" ]
+    ldflags += [ "-Wl,--no-relax" ]
+    ldflags += [ "-Wl,-Bstatic" ]
+    ldflags += [ "-matomic" ]
+    ldflags += [ "-Wl,--no-dynamic-linker" ]
+    # Link options that provide a replacement for dynamic memory operations in standard
+    # library with the FreeRTOS malloc in platform code.
+    ldflags += [
+      "-Wl,--wrap=malloc",
+      "-Wl,--wrap=free",
+      "-Wl,--wrap=realloc",
+      "-Wl,--wrap=calloc",
+      "-Wl,--wrap=printf",
+      "-Wl,--wrap=vprintf",
+      "-Wl,--wrap=sprintf",
+    ]
+    ldflags += [
+      "-Wl," + crtbegin_o,
+      "-Wl," + crtend_o,
+    ]
+    # Pull out static libs (.a files) from SDK
+    libs = []
+    libs += [ "${scm1612s_sdk_root}/kernel/kernel.a" ]
+    libs += [ "${scm1612s_sdk_root}/api/api.a" ]
+    #libs += [ "${scm1612s_sdk_root}/app/app.a" ]
+    libs += [ "${scm1612s_sdk_root}/kernel/FreeRTOS/kernel-FreeRTOS.a" ]
+    libs += [ "${scm1612s_sdk_root}/kernel/FreeRTOS-ext/kernel-FreeRTOS-ext.a" ]
+    libs += [ "${scm1612s_sdk_root}/kernel/cmsis-freertos/kernel-cmsis-freertos.a" ]
+    libs += [ "${scm1612s_sdk_root}/kernel/freebsd/kernel-freebsd.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/arch/ndsv5/hal-arch-ndsv5.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/soc/scm2010/hal-soc-scm2010.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/board/scm2010-evb-qfn40/hal-board-scm2010-evb-qfn40.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/spi-flash/hal-drivers-spi-flash.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/wlan/hal-drivers-wlan.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/wlan/senscomm/prv/hal-drivers-wlan-senscomm-prv.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/rf/hal-drivers-rf.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/watchdog/hal-drivers-watchdog.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/cli/lib-cli.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/stdlib-ext/lib-stdlib-ext.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/proc/lib-proc.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/serial/lib-serial.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/net/lib-net.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/fs/lib-fs.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/lwip/lib-lwip.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/net80211/lib-net80211.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/ifconfig/lib-ifconfig.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/libifconfig/lib-libifconfig.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/cjson/lib-cjson.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/hostap/wpa_supplicant/lib-hostap-wpa_supplicant.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/mbedtls-2.28.10/library/lib-mbedtls-2.28.10-library.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/ble/nimble_port/lib-ble-nimble_port.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/ble/nimble_host/lib-ble-nimble_host.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/tinycrypt/lib-tinycrypt.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/scm_mcuboot/lib-scm_mcuboot.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/net/freebsd/mbuf/lib-net-freebsd-mbuf.a" ]
+    libs += [ "${scm1612s_sdk_root}/lib/net/freebsd/lib-net-freebsd.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/core/hal-core.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/proc/hal-proc.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/core/hal-drivers-core.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/fs/hal-fs.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/fs/patch/hal-fs-patch.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/serial/hal-drivers-serial.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/rtc/hal-drivers-rtc.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/clk/hal-drivers-clk.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/pinctrl/hal-drivers-pinctrl.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/ble/hal-drivers-ble.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/ble/priv/hal-drivers-ble-priv.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/crypto/hal-drivers-crypto.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/efuse/hal-drivers-efuse.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/systimer/hal-drivers-systimer.a" ]
+    libs += [ "${scm1612s_sdk_root}/hal/drivers/pta/hal-drivers-pta.a" ]
+}
+
+#source_set("syscalls_stub") {
+#  sources = [ "syscalls_stubs.cpp" ]
+#}
+
+group("scm1612s_build") {
+  public_configs = [ ":scm1612s_sdk_config" ]
+  public_deps = [ scm1612s_target_project ]
+#  deps = [ ":syscalls_stub" ]
+}
