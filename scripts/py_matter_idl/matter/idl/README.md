@@ -30,10 +30,11 @@ cluster AccessControl = 31 {
   // Constants allow a `spec_name` extra attribute to clarify the name source of
   // the constant in cases where name generation logic depends on acronym
   // expansion or not (e.g. special characters, spaces, full uppercase/digit logic)
-  enum AuthMode : ENUM8 {
-    kPase = 1;
-    kCase = 2 [spec_name = "CASE"];
+  enum SomeEnum : ENUM8 {
+    kPASE = 1 [spec_name = "PASE"];
+    kCASE = 2 [spec_name = "CASE"];
     kGroup = 3;
+    kMediaTVRoom = 54 [spec_name = "Media/TV Room"];
   }
 
   // structures may be fabric scoped by tagging them as 'fabric_scoped'
