@@ -1,17 +1,17 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | tests                                   |           0 |
+| darwin                                  |           0 |
 | build-example-nxp                       |         100 |
-| build-example-mw320                     |         100 |
 | build-chef-ci-examples-on-all-platforms |         100 |
 | documentation-build                     |         100 |
 | build-example-ti-cc32xx                 |         100 |
-| build-example-linux-arm                 |         100 |
+| build-example-mw320                     |         100 |
 | qemu                                    |         100 |
 | cancel-workflows-on-failing-ci          |         100 |
-| recent-fail-summary                     |         100 |
-| darwin                                  |         100 |
+| build-example-linux-arm                 |         100 |
 | build-example-qpg                       |         100 |
+| recent-fail-summary                     |         100 |
 | build-example-tizen                     |         100 |
 | build-example-efr32                     |         100 |
 | build-example-esp32                     |         100 |
@@ -21,6 +21,7 @@
 | build-example-nrf-connect-sdk           |         100 |
 | build-example-stm32                     |         100 |
 | build-example-bouffalolab               |         100 |
+| mypy-type-validation                    |         100 |
 | darwin-tests                            |         100 |
 | unit-integration-tests                  |         100 |
 | build-example-telink                    |         100 |
