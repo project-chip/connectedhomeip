@@ -15,8 +15,9 @@
  *    limitations under the License.
  */
 
+#include "InterfacesMonitor.h"
+
 #include <lib/support/CodeUtils.h>
-#include <platform/Darwin/inet/InterfacesMonitor.h>
 
 namespace chip {
 namespace Inet {

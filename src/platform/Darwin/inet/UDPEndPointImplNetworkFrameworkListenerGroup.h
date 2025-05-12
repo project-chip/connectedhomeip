@@ -15,13 +15,9 @@
  *    limitations under the License.
  */
 
-#include <Network/Network.h>
-#include <inet/InetConfig.h>
-#include <platform/Darwin/inet/InterfacesMonitor.h>
+#include "InterfacesMonitor.h"
 
-#include <inet/IANAConstants.h>
-#include <inet/IPAddress.h>
-#include <lib/core/CHIPError.h>
+#include <inet/InetConfig.h>
 
 namespace chip {
 namespace Inet {

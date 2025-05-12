@@ -27,7 +27,7 @@
 
 #include "UDPEndPointImplNetworkFramework.h"
 
-#include <inet/Darwin/UDPEndPointImplNetworkFrameworkDebug.h>
+#include "UDPEndPointImplNetworkFrameworkDebug.h"
 
 #include <lib/support/CHIPMemString.h>
 
