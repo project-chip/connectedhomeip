@@ -20,30 +20,20 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace FlipFlop {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = FlipFlop::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(FlipFlop::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace FlipFlop
 
 } // namespace Attributes
 
 namespace Commands {
 namespace Ping {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Ping::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Ping::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace Ping
 namespace AddArguments {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AddArguments::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddArguments::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace AddArguments
 
 } // namespace Commands

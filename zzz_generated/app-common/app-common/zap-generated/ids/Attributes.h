@@ -77,6 +77,8 @@
 #include <clusters/IcdManagement/AttributeIds.h>
 #include <clusters/Identify/AttributeIds.h>
 #include <clusters/IlluminanceMeasurement/AttributeIds.h>
+#include <clusters/JointFabricAdministrator/AttributeIds.h>
+#include <clusters/JointFabricDatastore/AttributeIds.h>
 #include <clusters/KeypadInput/AttributeIds.h>
 #include <clusters/LaundryDryerControls/AttributeIds.h>
 #include <clusters/LaundryWasherControls/AttributeIds.h>

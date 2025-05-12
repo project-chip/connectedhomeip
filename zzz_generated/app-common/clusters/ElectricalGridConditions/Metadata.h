@@ -20,28 +20,19 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace LocalGenerationAvailable {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LocalGenerationAvailable::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(LocalGenerationAvailable::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          Access::Privilege::kOperate);
 } // namespace LocalGenerationAvailable
 namespace CurrentConditions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentConditions::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentConditions::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace CurrentConditions
 namespace ForecastConditions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ForecastConditions::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ForecastConditions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ForecastConditions
 
 } // namespace Attributes

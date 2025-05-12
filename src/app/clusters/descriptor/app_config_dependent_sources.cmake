@@ -16,6 +16,5 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/descriptor.cpp"
-    "${CLUSTER_DIR}/descriptor.h"
+  "${CLUSTER_DIR}/descriptor.cpp"
 )

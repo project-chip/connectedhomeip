@@ -77,6 +77,8 @@
 #include <clusters/IcdManagement/EventIds.h>
 #include <clusters/Identify/EventIds.h>
 #include <clusters/IlluminanceMeasurement/EventIds.h>
+#include <clusters/JointFabricAdministrator/EventIds.h>
+#include <clusters/JointFabricDatastore/EventIds.h>
 #include <clusters/KeypadInput/EventIds.h>
 #include <clusters/LaundryDryerControls/EventIds.h>
 #include <clusters/LaundryWasherControls/EventIds.h>

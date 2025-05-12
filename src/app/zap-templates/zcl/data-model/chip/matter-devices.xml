@@ -2838,6 +2838,19 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-joint-fabric-administrator</name>
+        <domain>CHIP</domain>
+        <typeName>Joint Fabric Administrator</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0130</deviceId>
+        <class>Utility</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Joint Fabric Datastore" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Joint Fabric Administrator" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>Cooktop</name>
         <domain>CHIP</domain>
         <typeName>Cooktop</typeName>

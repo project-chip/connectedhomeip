@@ -20,12 +20,8 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace AirQuality {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AirQuality::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(AirQuality::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace AirQuality
 
 } // namespace Attributes

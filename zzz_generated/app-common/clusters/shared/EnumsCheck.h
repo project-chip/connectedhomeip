@@ -23,6 +23,155 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicationEnum val)
+{
+    using EnumType = detail::ChangeIndicationEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+    case EnumType::kWarning:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::DegradationDirectionEnum val)
+{
+    using EnumType = detail::DegradationDirectionEnum;
+    switch (val)
+    {
+    case EnumType::kUp:
+    case EnumType::kDown:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::LevelValueEnum val)
+{
+    using EnumType = detail::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementMediumEnum val)
+{
+    using EnumType = detail::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementTypeEnum val)
+{
+    using EnumType = detail::MeasurementTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kVoltage:
+    case EnumType::kActiveCurrent:
+    case EnumType::kReactiveCurrent:
+    case EnumType::kApparentCurrent:
+    case EnumType::kActivePower:
+    case EnumType::kReactivePower:
+    case EnumType::kApparentPower:
+    case EnumType::kRMSVoltage:
+    case EnumType::kRMSCurrent:
+    case EnumType::kRMSPower:
+    case EnumType::kFrequency:
+    case EnumType::kPowerFactor:
+    case EnumType::kNeutralCurrent:
+    case EnumType::kElectricalEnergy:
+    case EnumType::kReactiveEnergy:
+    case EnumType::kApparentEnergy:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
+{
+    using EnumType = detail::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifierTypeEnum val)
+{
+    using EnumType = detail::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamUsageEnum val)
+{
+    using EnumType = detail::StreamUsageEnum;
+    switch (val)
+    {
+    case EnumType::kInternal:
+    case EnumType::kRecording:
+    case EnumType::kAnalysis:
+    case EnumType::kLiveView:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::WebRTCEndReasonEnum val)
+{
+    using EnumType = detail::WebRTCEndReasonEnum;
+    switch (val)
+    {
+    case EnumType::kIceFailed:
+    case EnumType::kIceTimeout:
+    case EnumType::kUserHangup:
+    case EnumType::kUserBusy:
+    case EnumType::kReplaced:
+    case EnumType::kNoUserMedia:
+    case EnumType::kInviteTimeout:
+    case EnumType::kAnsweredElsewhere:
+    case EnumType::kOutOfResources:
+    case EnumType::kMediaTimeout:
+    case EnumType::kLowPower:
+    case EnumType::kUnknownReason:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag val)
 {
     using EnumType = Globals::AreaTypeTag;
@@ -139,31 +288,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AtomicRequestT
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicationEnum val)
-{
-    using EnumType = detail::ChangeIndicationEnum;
-    switch (val)
-    {
-    case EnumType::kOk:
-    case EnumType::kWarning:
-    case EnumType::kCritical:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::DegradationDirectionEnum val)
-{
-    using EnumType = detail::DegradationDirectionEnum;
-    switch (val)
-    {
-    case EnumType::kUp:
-    case EnumType::kDown:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag val)
 {
     using EnumType = Globals::LandmarkTag;
@@ -225,21 +349,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag va
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::LevelValueEnum val)
-{
-    using EnumType = detail::LevelValueEnum;
-    switch (val)
-    {
-    case EnumType::kUnknown:
-    case EnumType::kLow:
-    case EnumType::kMedium:
-    case EnumType::kHigh:
-    case EnumType::kCritical:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LocationTag val)
 {
     using EnumType = Globals::LocationTag;
@@ -249,46 +358,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LocationTag va
     case EnumType::kOutdoor:
     case EnumType::kInside:
     case EnumType::kOutside:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementMediumEnum val)
-{
-    using EnumType = detail::MeasurementMediumEnum;
-    switch (val)
-    {
-    case EnumType::kAir:
-    case EnumType::kWater:
-    case EnumType::kSoil:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementTypeEnum val)
-{
-    using EnumType = detail::MeasurementTypeEnum;
-    switch (val)
-    {
-    case EnumType::kUnspecified:
-    case EnumType::kVoltage:
-    case EnumType::kActiveCurrent:
-    case EnumType::kReactiveCurrent:
-    case EnumType::kApparentCurrent:
-    case EnumType::kActivePower:
-    case EnumType::kReactivePower:
-    case EnumType::kApparentPower:
-    case EnumType::kRMSVoltage:
-    case EnumType::kRMSCurrent:
-    case EnumType::kRMSPower:
-    case EnumType::kFrequency:
-    case EnumType::kPowerFactor:
-    case EnumType::kNeutralCurrent:
-    case EnumType::kElectricalEnergy:
-    case EnumType::kReactiveEnergy:
-    case EnumType::kApparentEnergy:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -317,24 +386,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTyp
     case EnumType::kReactiveEnergy:
     case EnumType::kApparentEnergy:
     case EnumType::kSoilMoisture:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
-{
-    using EnumType = detail::MeasurementUnitEnum;
-    switch (val)
-    {
-    case EnumType::kPpm:
-    case EnumType::kPpb:
-    case EnumType::kPpt:
-    case EnumType::kMgm3:
-    case EnumType::kUgm3:
-    case EnumType::kNgm3:
-    case EnumType::kPm3:
-    case EnumType::kBqm3:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -370,21 +421,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PowerThreshold
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifierTypeEnum val)
-{
-    using EnumType = detail::ProductIdentifierTypeEnum;
-    switch (val)
-    {
-    case EnumType::kUpc:
-    case EnumType::kGtin8:
-    case EnumType::kEan:
-    case EnumType::kGtin14:
-    case EnumType::kOem:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositionTag val)
 {
     using EnumType = Globals::RelativePositionTag;
@@ -397,20 +433,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
     case EnumType::kAbove:
     case EnumType::kFrontOf:
     case EnumType::kBehind:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamUsageEnum val)
-{
-    using EnumType = detail::StreamUsageEnum;
-    switch (val)
-    {
-    case EnumType::kInternal:
-    case EnumType::kRecording:
-    case EnumType::kAnalysis:
-    case EnumType::kLiveView:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -465,28 +487,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ThreeLevelAuto
     case EnumType::kLow:
     case EnumType::kMedium:
     case EnumType::kHigh:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::WebRTCEndReasonEnum val)
-{
-    using EnumType = detail::WebRTCEndReasonEnum;
-    switch (val)
-    {
-    case EnumType::kIceFailed:
-    case EnumType::kIceTimeout:
-    case EnumType::kUserHangup:
-    case EnumType::kUserBusy:
-    case EnumType::kReplaced:
-    case EnumType::kNoUserMedia:
-    case EnumType::kInviteTimeout:
-    case EnumType::kAnsweredElsewhere:
-    case EnumType::kOutOfResources:
-    case EnumType::kMediaTimeout:
-    case EnumType::kLowPower:
-    case EnumType::kUnknownReason:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
