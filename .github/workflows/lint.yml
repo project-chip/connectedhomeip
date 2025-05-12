@@ -282,7 +282,7 @@ jobs:
                   --skip-subtree src/app/clusters \
                   --skip-subtree examples \
                   --skip-subtree docs \
-                  --skip-subtree src/app/tests
+                  --skip-subtree src/app/tests \
                   --skip-from-file scripts/ember_exclusions.txt
 
             # git grep exits with 0 if it finds a match, but we want
