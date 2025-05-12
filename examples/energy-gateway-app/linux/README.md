@@ -321,7 +321,7 @@ i.e.
 
 -   Step 7: (In chip-repl) Send `GetDetailedPriceRequest()`
 
-```python
+```
 In [15]: await devCtrl.SendCommand(200, 1, chip.clusters.CommodityPrice.Commands.GetDetailedPriceRequest(3))
 Out[15]:
 
@@ -362,7 +362,7 @@ GetDetailedPriceResponse(
 -   Step 9: (In chip-repl) Read `PriceForecast` attributes (see the values have
     changed)
 
-```python
+```
     await devCtrl.ReadAttribute(200,[(1,chip.clusters.CommodityPrice.Attributes.PriceForecast)])
     Out[21]:
 
@@ -440,7 +440,7 @@ i.e. details = 1 (Description ONLY) details = 2 (Components ONLY) details = 3
 
 -   Step 10b: Send the `GetDetailedForecastRequest()` command:
 
-```python
+```
     await devCtrl.SendCommand(200, 1, chip.clusters.CommodityPrice.Commands.GetDetailedForecastRequest(3))
     Out[24]:
 
