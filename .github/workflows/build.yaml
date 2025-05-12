@@ -365,7 +365,6 @@ jobs:
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
                   python -m ensurepip --upgrade
-                  python -m pip install coverage
                   python -m pip install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
                   python -m pip install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
                   python -m pip install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
@@ -375,8 +374,7 @@ jobs:
               run: |
                   source pyenv/bin/activate
                   cd src/controller/python/test/unit_tests/
-                  python -m coverage run -m unittest -v
-                  coverage xml
+                  python3 -m unittest -v
             - name: Clean previous outputs
               run: rm -rf out pyenv
             - name: Run Python Setup Payload Generator Test
@@ -389,13 +387,7 @@ jobs:
                   python -m pip install -r scripts/setup/requirements.setuppayload.txt
                   python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
             - name: Run revocation set generation tests
-              run: |
-                  scripts/run_in_build_env.sh 'python3 -m coverage run -m unittest -v credentials/generate_revocation_set.py'
-                  coverage xml
-            - name: Upload coverage reports to Codecov with GitHub Action
-              uses: codecov/codecov-action@v5
-              env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+              run: scripts/run_in_build_env.sh 'python3 -m unittest -v credentials/generate_revocation_set.py'
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
@@ -539,17 +531,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}                
 
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh --yaml
-
-            - name: Convert output file
-              run: |
-                python -m pip install lcov-cobertura
-                lcov_cobertura out/coverage/coverage/lcov_final.info
-
-            - name: Upload coverage reports to Codecov with GitHub Action
-              uses: codecov/codecov-action@v5
-              env:
-                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
