@@ -6321,6 +6321,8 @@ class GeneralCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="TCAcknowledgements", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="TCAcknowledgementsRequired", Tag=0x00000008, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="TCUpdateDeadline", Tag=0x00000009, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="recoveryIdentifier", Tag=0x0000000B, Type=typing.Optional[bytes]),
+                ClusterObjectFieldDescriptor(Label="networkRecoveryReason", Tag=0x0000000C, Type=typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -6338,6 +6340,8 @@ class GeneralCommissioning(Cluster):
     TCAcknowledgements: typing.Optional[uint] = None
     TCAcknowledgementsRequired: typing.Optional[bool] = None
     TCUpdateDeadline: typing.Union[None, Nullable, uint] = None
+    recoveryIdentifier: typing.Optional[bytes] = None
+    networkRecoveryReason: typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -6360,6 +6364,18 @@ class GeneralCommissioning(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8
 
+        class NetworkRecoveryReasonEnum(MatterIntEnum):
+            kUnspecified = 0x00
+            kRoute = 0x01
+            kIcd = 0x02
+            kAuth = 0x03
+            kVisibility = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
+
         class RegulatoryLocationTypeEnum(MatterIntEnum):
             kIndoor = 0x00
             kOutdoor = 0x01
@@ -6373,6 +6389,7 @@ class GeneralCommissioning(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kTermsAndConditions = 0x1
+            kNetworkRecovery = 0x2
 
     class Structs:
         @dataclass
@@ -6688,6 +6705,38 @@ class GeneralCommissioning(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
             value: typing.Union[None, Nullable, uint] = None
+
+        @dataclass
+        class RecoveryIdentifier(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bytes])
+
+            value: typing.Optional[bytes] = None
+
+        @dataclass
+        class NetworkRecoveryReason(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum])
+
+            value: typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

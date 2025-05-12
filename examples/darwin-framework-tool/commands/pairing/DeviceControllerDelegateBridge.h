@@ -33,5 +33,6 @@
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error;
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error nodeID:(NSNumber *)nodeID metrics:(MTRMetrics *)metrics;
 - (void)controller:(MTRDeviceController *)controller commissioneeHasReceivedNetworkCredentials:(NSNumber *)nodeID;
+- (void)controller:(MTRDeviceController *)controller networkRecoverComplete:(NSError *)error nodeID:(NSNumber *)nodeID;
 
 @end

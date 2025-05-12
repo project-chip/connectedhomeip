@@ -72,7 +72,18 @@ CHIP_ERROR NetworkRecover::Discover(uint16_t timeout)
 CHIP_ERROR NetworkRecover::Recover(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb)
 {
     mRemoteId = remoteId;
-    mWiFiCreds.SetValue(wiFiCreds);
+    
+    VerifyOrReturnError(mSsidBuffer.Alloc(wiFiCreds.ssid.size()), CHIP_ERROR_NO_MEMORY);
+    memcpy(mSsidBuffer.Get(), wiFiCreds.ssid.data(), wiFiCreds.ssid.size());
+
+    VerifyOrReturnError(mCredBuffer.Alloc(wiFiCreds.credentials.size()), CHIP_ERROR_NO_MEMORY);
+    memcpy(mCredBuffer.Get(), wiFiCreds.credentials.data(), wiFiCreds.credentials.size());
+
+    WiFiCredentials copiedCreds(ByteSpan(mSsidBuffer.Get(), wiFiCreds.ssid.size()),
+                                 ByteSpan(mCredBuffer.Get(), wiFiCreds.credentials.size()));
+
+    
+    mWiFiCreds.SetValue(copiedCreds);
     mBreadcrumb              = breadcrumb;
     mNetworkRecoverBehaviour = NetworkRecoverBehaviour::kRecover;
     ReturnErrorOnFailureWithMetric(kMetricNetworkRecover, StartDiscoverOverBle(recoveryId));

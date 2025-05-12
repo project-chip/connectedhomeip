@@ -1187,6 +1187,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::C
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::NetworkRecoveryReasonEnum val)
+{
+    using EnumType = GeneralCommissioning::NetworkRecoveryReasonEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kRoute:
+    case EnumType::kIcd:
+    case EnumType::kAuth:
+    case EnumType::kVisibility:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::RegulatoryLocationTypeEnum val)
 {
     using EnumType = GeneralCommissioning::RegulatoryLocationTypeEnum;

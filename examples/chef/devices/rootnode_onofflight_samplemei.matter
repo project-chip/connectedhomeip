@@ -1045,6 +1045,14 @@ cluster GeneralCommissioning = 48 {
     kTCMinVersionNotMet = 7;
   }
 
+  enum NetworkRecoveryReasonEnum : enum8 {
+    kUnspecified = 0;
+    kRoute = 1;
+    kICD = 2;
+    kAuth = 3;
+    kVisibility = 4;
+  }
+
   enum RegulatoryLocationTypeEnum : enum8 {
     kIndoor = 0;
     kOutdoor = 1;
@@ -1053,6 +1061,7 @@ cluster GeneralCommissioning = 48 {
 
   bitmap Feature : bitmap32 {
     kTermsAndConditions = 0x1;
+    kNetworkRecovery = 0x2;
   }
 
   struct BasicCommissioningInfo {
@@ -1070,6 +1079,8 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 11;
+  provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

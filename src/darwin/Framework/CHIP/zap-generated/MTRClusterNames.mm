@@ -1431,6 +1431,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"TCUpdateDeadline";
             break;
 
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeRecoveryIdentifierID:
+            result = @"RecoveryIdentifier";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeNetworkRecoveryReasonID:
+            result = @"NetworkRecoveryReason";
+            break;
+
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

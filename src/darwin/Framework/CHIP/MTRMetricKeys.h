@@ -25,6 +25,8 @@ namespace DarwinFramework {
 // Tracks overall commissioning via one of the setup APIs
 constexpr Tracing::MetricKey kMetricDeviceCommissioning = "dwnfw_device_commissioning";
 
+constexpr Tracing::MetricKey kMetricDeviceRecovering = "dwnfw_device_recovering";
+
 // Tracks portion related to starting setup with a payload
 constexpr Tracing::MetricKey kMetricSetupWithPayload = "dwnfw_setup_with_payload";
 

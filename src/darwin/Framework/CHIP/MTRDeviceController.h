@@ -366,6 +366,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                 error:(NSError * __autoreleasing *)error
     MTR_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
+- (BOOL)discoverRecoverableNodes:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue timeout:(uint16_t)second;
+- (BOOL)recoverDevice:(uint64_t)deviceID
+   recoveryIdentifier:(uint64_t)recoveryIdentifier
+             wifiSSID:(NSString*)ssid
+      wifiCredentials:(NSString*)credentials
+                error:(NSError * __autoreleasing *)error
+    MTR_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
+        watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (BOOL)commissionDevice:(uint64_t)deviceId
      commissioningParams:(MTRCommissioningParameters *)commissioningParams
                    error:(NSError * __autoreleasing *)error

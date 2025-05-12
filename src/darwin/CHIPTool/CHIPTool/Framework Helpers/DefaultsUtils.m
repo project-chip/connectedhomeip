@@ -25,8 +25,8 @@ NSString * const MTRNextAvailableDeviceIDKey = @"nextDeviceID";
 NSString * const kFabricIdKey = @"fabricId";
 NSString * const kDevicePairedKey = @"Paired";
 
-NSString * const MTRProductNameKey = @"name";
-NSString * const MTROnOffKey = @"onOff";
+NSString * const kRecoveryIdentifierKey = @"RecoveryIdentifier";
+NSString * const kDeviceNameKey = @"DeviceName";
 
 id MTRGetDomainValueForKey(NSString * domain, NSString * key)
 {
@@ -206,6 +206,31 @@ void MTRUnpairDeviceWithID(uint64_t deviceId)
             }];
     });
 }
+
+uint64_t MTRGetRecoveryIdentifier(uint64_t deviceId)
+{
+    NSNumber * recoveryIdentifier = MTRGetDomainValueForKey(MTRToolDefaultsDomain, KeyForRecoveryIdentifier(deviceId));
+    return [recoveryIdentifier unsignedLongLongValue];
+}
+
+void MTRSetRecoveryIdentifier(uint64_t deviceId, uint64_t recoveryIdentifier)
+{
+    MTRSetDomainValueForKey(MTRToolDefaultsDomain, KeyForRecoveryIdentifier(deviceId), [NSNumber numberWithUnsignedLongLong:recoveryIdentifier]);
+}
+
+NSString * KeyForRecoveryIdentifier(uint64_t deviceId) { return [NSString stringWithFormat:@"%@%llu", kRecoveryIdentifierKey, deviceId]; }
+
+NSString * MTRGetDeviceName(uint64_t deviceId)
+{
+    return MTRGetDomainValueForKey(MTRToolDefaultsDomain, KeyForDeviceName(deviceId));
+}
+
+void MTRSetDeviceName(uint64_t deviceId, NSString * name)
+{
+    MTRSetDomainValueForKey(MTRToolDefaultsDomain, KeyForDeviceName(deviceId), name);
+}
+
+NSString * KeyForDeviceName(uint64_t deviceId) { return [NSString stringWithFormat:@"%@%llu", kDeviceNameKey, deviceId]; }
 
 @implementation CHIPToolPersistentStorageDelegate
 
