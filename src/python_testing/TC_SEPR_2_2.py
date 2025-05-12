@@ -70,7 +70,8 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
     def steps_TC_SEPR_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
         steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     is_commissioning=True),
             TestStep("2", "Set up a subscription to all CommodityPrice cluster events"),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
