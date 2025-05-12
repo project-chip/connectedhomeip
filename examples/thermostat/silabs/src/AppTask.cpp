@@ -79,7 +79,6 @@ CHIP_ERROR AppTask::AppInit()
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
 #ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Thermostat-App");
     GetLCD().SetCustomUI(ThermostatUI::DrawUI);
 #endif
 

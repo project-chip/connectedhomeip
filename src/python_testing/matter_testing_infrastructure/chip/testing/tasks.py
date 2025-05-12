@@ -154,7 +154,7 @@ class Subprocess(threading.Thread):
         self.p.terminate()
         self.join()
 
-    def wait(self, timeout: Optional[float] = None) -> int:
+    def wait(self, timeout: Optional[float] = None) -> Optional[int]:
         """Wait for the subprocess to finish."""
         self.join(timeout)
         return self.returncode

@@ -141,7 +141,7 @@ packaging==23.0
     #   ghapi
     #   idf-component-manager
     #   west
-pandas==2.1.4 ; platform_machine != "aarch64" and platform_machine != "arm64"
+pandas==2.2.3 ; platform_machine != "aarch64" and platform_machine != "arm64"
     # via -r requirements.memory.txt
 parso==0.8.3
     # via jedi

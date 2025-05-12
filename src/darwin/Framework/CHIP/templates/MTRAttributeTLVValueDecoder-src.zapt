@@ -73,6 +73,7 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
         {{/if}}
         {{/zcl_attributes_server}}
         default: {
+            // Not a known {{asUpperCamelCase name preserveAcronyms=true}} attribute.
             break;
         }
     }

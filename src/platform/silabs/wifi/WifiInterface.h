@@ -16,11 +16,15 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDServerConfig.h>
+
 #include <array>
 #include <cmsis_os2.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Span.h>
+#include <platform/silabs/wifi/WifiStateProvider.h>
+#include <platform/silabs/wifi/icd/PowerSaveInterface.h>
 #include <platform/silabs/wifi/wfx_msgs.h>
 #include <sl_cmsis_os2_common.h>
 #include <sl_status.h>
@@ -71,6 +75,7 @@ typedef struct wfx_wifi_scan_result
     uint8_t bssid[kWifiMacAddressLength];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
+    chip::app::Clusters::NetworkCommissioning::WiFiBandEnum wiFiBand;
 } wfx_wifi_scan_result_t;
 using ScanCallback = void (*)(wfx_wifi_scan_result_t *);
 
@@ -107,7 +112,7 @@ namespace Silabs {
  * @brief Public Interface for the Wi-Fi platform APIs
  *
  */
-class WifiInterface
+class WifiInterface : public WifiStateProvider, public PowerSaveInterface
 {
 public:
     enum class WifiEvent : uint8_t
@@ -248,30 +253,6 @@ public:
     virtual void ConfigureStationMode() = 0;
 
     /**
-     * @brief Returns the state of the Wi-Fi connection
-     *
-     * @return true, if the Wi-Fi device is connected to an AP
-     *         false, otherwise
-     */
-    virtual bool IsStationConnected() = 0;
-
-    /**
-     * @brief Returns the state of the Wi-Fi Station configuration of the Wi-Fi device
-     *
-     * @return true, if the Wi-Fi Station mode is enabled
-     *         false, otherwise
-     */
-    virtual bool IsStationModeEnabled() = 0;
-
-    /**
-     * @brief Returns the state of the Wi-Fi station initialization
-     *
-     * @return true, if the initialization was successful
-     *         false, otherwise
-     */
-    virtual bool IsStationReady() = 0;
-
-    /**
      * @brief Triggers the device to disconnect from the connected Wi-Fi network
      *
      * @note The disconnection is not immediate. It can take a certain amount of time for the device to be in a disconnected state
@@ -340,15 +321,6 @@ public:
     virtual CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials) = 0;
 
     /**
-     * @brief Returns the state of the Wi-Fi network provisionning
-     *        Does the device has Wi-Fi credentials or not
-     *
-     * @return true, the device has Wi-Fi credentials
-     *         false, otherwise
-     */
-    virtual bool IsWifiProvisioned() = 0;
-
-    /**
      * @brief Triggers a connection attempt the Access Point who's crendetials match the ones store with the SetWifiCredentials API.
      *        The function triggers an async connection attempt. The upper layers are notified trought a platform event if the
      *        connection attempt was successful or not.
@@ -362,53 +334,24 @@ public:
      */
     virtual CHIP_ERROR ConnectToAccessPoint(void) = 0;
 
-/* Function to update */
-
-// TODO: Harmonize the Power Save function inputs for all platforms
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-    virtual CHIP_ERROR ConfigurePowerSave(rsi_power_save_profile_mode_t sl_si91x_ble_state,
-                                          sl_si91x_performance_profile_t sl_si91x_wifi_state, uint32_t listenInterval) = 0;
-#else
-    virtual CHIP_ERROR ConfigurePowerSave() = 0;
-#endif /* (SLI_SI91X_MCU_INTERFACE | EXP_BOARD) */
-
-    /**
-     * @brief Configures the broadcast filter.
-     *
-     * @param[in] enableBroadcastFilter Boolean to enable or disable the broadcast filter.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR, the counters were succesfully reset to 0.
-     *                    CHIP_ERROR_INTERNAL, if there was an error when configuring the broadcast filter
-     */
-    virtual CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter) = 0;
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-    /**
-     * @brief Returns IP assignment status
-     *
-
-     * @return true, Wi-Fi station has an IPv4 address
-     *         false, otherwise
-     */
-    virtual bool HasAnIPv4Address() = 0;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
-    /**
-     * @brief Returns IP assignment status
-     *
-
-     * @return true, Wi-Fi station has an IPv6 address
-     *         false, otherwise
-     */
-    virtual bool HasAnIPv6Address() = 0;
-
     /**
      * @brief Cancels the on-going network scan operation.
      *        If one isn't in-progress, function doesn't do anything
      */
     virtual void CancelScanNetworks() = 0;
+
+    /**
+     *  @brief Provide all the frequency bands supported by the Wi-Fi interface.
+     *
+     *  The default implementation returns the 2.4 GHz band support.
+     *
+     *  @return a bitmask of supported Wi-Fi bands where each bit is associated with a WiFiBandEnum value.
+     */
+    virtual uint32_t GetSupportedWiFiBandsMask() const
+    {
+        // Default to 2.4G support only
+        return static_cast<uint32_t>(1UL << chip::to_underlying(chip::app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
+    }
 
 protected:
     /**

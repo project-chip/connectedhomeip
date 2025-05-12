@@ -55,12 +55,10 @@ public:
     bool IsWifiProvisioned() override;
     CHIP_ERROR ConnectToAccessPoint(void) override;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    CHIP_ERROR ConfigurePowerSave() override;
     CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter) override;
+    CHIP_ERROR ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval) override;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
     bool HasAnIPv4Address() override;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
     bool HasAnIPv6Address() override;
     void CancelScanNetworks() override;
 

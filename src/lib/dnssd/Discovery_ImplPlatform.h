@@ -85,9 +85,10 @@ private:
                               size_t subTypeSize, const OperationalAdvertisingParameters & params);
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
                               size_t subTypeSize, const CommissionAdvertisingParameters & params);
+    // ipv4Enabled will be ignored if we don't actually support IPv4.
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
                               size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
-                              DnssdServiceProtocol procotol, PeerId peerId);
+                              DnssdServiceProtocol procotol, PeerId peerId, bool ipv4Enabled);
 
     static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
                                     CHIP_ERROR error);

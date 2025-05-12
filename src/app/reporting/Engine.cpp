@@ -79,10 +79,10 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
     // privilege and default to kView (this is correct for global attributes and a reasonable check
     // for others)
     Privilege requiredPrivilege = Privilege::kView;
-    if (info.has_value() && info->readPrivilege.has_value())
+    if (info.has_value())
     {
-        // attribute exists and is readable, set the correct read privilege
-        requiredPrivilege = *info->readPrivilege;
+        // if attribute exists and is readable, set the correct read privilege; otherwise, set default value
+        requiredPrivilege = info->GetReadPrivilege().value_or(requiredPrivilege);
     }
 
     CHIP_ERROR err = GetAccessControl().Check(subjectDescriptor, requestPath, requiredPrivilege);
@@ -108,7 +108,7 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
         //             this SHOULD be done here when info does not have a value. This was not done as a first pass to
         //             minimize amount of delta in the initial PR.
         //           - "write-only" attributes should return UNSUPPORTED_READ (this is done here)
-        if (info.has_value() && !info->readPrivilege.has_value())
+        if (info.has_value() && !info->GetReadPrivilege().has_value())
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
         }
@@ -1216,9 +1216,3 @@ void Engine::MarkDirty(const AttributePathParams & path)
 } // namespace reporting
 } // namespace app
 } // namespace chip
-
-// TODO: MatterReportingAttributeChangeCallback should just live in libCHIP, It does not depend on any
-// app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
-{}

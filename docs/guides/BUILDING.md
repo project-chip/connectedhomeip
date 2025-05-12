@@ -92,7 +92,7 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following command:
 
 ```
-sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+sudo apt-get install git gcc g++ pkg-config cmake libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
      python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
      default-jre
@@ -131,7 +131,7 @@ Complete the following steps:
 1. Install some Raspberry Pi specific dependencies:
 
     ```
-    sudo apt-get install pi-bluetooth avahi-utils
+    sudo apt-get install bluez pi-bluetooth avahi-utils
     ```
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
@@ -161,7 +161,7 @@ during the Matter commissioning process.
     ```ini
     [Service]
     ExecStart=
-    ExecStart=/usr/lib/bluetooth/bluetoothd -E -P battery
+    ExecStart=/usr/libexec/bluetooth/bluetoothd -E -P battery
     ```
 
 1. Restart the Bluetooth service by running the following command:
@@ -213,7 +213,7 @@ up in `$PATH`.
 
 ZAP releases are copied to CIPD by an automated bot. You can check if a release
 was copied by looking at tags created for
-[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/zap)
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/3pp/zap)
 in various platforms.
 
 ### Custom ZAP
@@ -393,8 +393,17 @@ executed manually.
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
 ```
 
-NOTE: `asan` is enabled by default in FuzzTest, so please do not add it in
-build_examples.py invocation.
+> [!NOTE]  
+> `asan` is enabled by default in FuzzTest, so please do not add it in
+> `build_examples.py` invocation.
+
+> [!TIP]
+>
+> -   It is possible to build `FuzzTests` with Coverage instrumentation, by
+>     appending `-coverage` to the target, e.g.
+>     `linux-x64-tests-clang-pw-fuzztest-coverage`
+> -   Details:
+>     [Coverage Report Generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#coverage-report-generation)
 
 Tests will be located in:
 `out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where
@@ -403,9 +412,9 @@ Tests will be located in:
 -   Details on How To Run Fuzz Tests in
     [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
 
-FAQ: In the event of a build failure related to missing files or dependencies
-for pw_fuzzer, check the
-[FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
+-   FAQ: In the event of a build failure related to missing files or
+    dependencies for pw_fuzzer, check the
+    [FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
 
 ## Build custom configuration
 

@@ -15,6 +15,7 @@ cluster {{asUpperCamelCase name}} = {{!}}
 
   {{/global_attribute_default}}
   {{#zcl_enums}}
+  {{#if has_more_than_one_cluster~}} shared {{/if~}}
   enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
     {{#zcl_enum_items}}
     k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
@@ -23,6 +24,7 @@ cluster {{asUpperCamelCase name}} = {{!}}
 
   {{/zcl_enums}}
   {{#zcl_bitmaps}}
+  {{#if has_more_than_one_cluster~}} shared {{/if~}}
   bitmap {{asUpperCamelCase name preserveAcronyms=true}} : bitmap{{multiply size 8}} {
     {{#zcl_bitmap_items}}
     k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};
@@ -66,7 +68,6 @@ cluster {{asUpperCamelCase name}} = {{!}}
                    hence the exclusion above and re-add here.}}
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;

@@ -98,7 +98,9 @@ Davis, CA 95616, USA
       <field id="1" name="Label" type="string">
         <quality persistence="fixed"/>
         <optionalConform/>
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
@@ -110,7 +112,12 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
-      <constraint type="countBetween" from="2" to="10"/>
+      <constraint>
+        <countBetween>
+          <from value="2"/>
+          <to value="10"/>
+        </countBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="CurrentEnergyBalance" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -126,7 +133,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
-      <constraint type="allowed" value="2"/>
+      <constraint>
+        <allowed value="2"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="LowPowerModeSensitivities" type="list">
       <entry type="BalanceStruct"/>
@@ -135,7 +144,12 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="LPMS"/>
       </mandatoryConform>
-      <constraint type="countBetween" from="2" to="10"/>
+      <constraint>
+        <countBetween>
+          <from value="2"/>
+          <to value="10"/>
+        </countBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="CurrentLowPowerModeSensitivity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>

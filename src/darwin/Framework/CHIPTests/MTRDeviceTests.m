@@ -32,18 +32,15 @@
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
+#import "MTRTestCase.h"
+#import "MTRTestControllerDelegate.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
-#import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
 #import <os/lock.h>
-
-// system dependencies
-#import <XCTest/XCTest.h>
-
-// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
 
 static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -81,54 +78,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
     return mConnectedDevice;
 }
 
-@interface MTRDeviceTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, strong) XCTestExpectation * expectation;
-@end
-
-@implementation MTRDeviceTestDeviceControllerDelegate
-- (id)initWithExpectation:(XCTestExpectation *)expectation
-{
-    self = [super init];
-    if (self) {
-        _expectation = expectation;
-    }
-    return self;
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-
-    NSError * getDeviceError = nil;
-    __auto_type * device = [controller deviceBeingCommissionedWithNodeID:@(kDeviceId) error:&getDeviceError];
-    XCTAssertNil(getDeviceError);
-    XCTAssertNotNil(device);
-
-    // Now check that getting with some other random id fails.
-    device = [controller deviceBeingCommissionedWithNodeID:@(kDeviceId + 1) error:&getDeviceError];
-    XCTAssertNil(device);
-    XCTAssertNotNil(getDeviceError);
-
-    __auto_type * params = [[MTRCommissioningParameters alloc] init];
-    params.countryCode = @("au");
-
-    NSError * commissionError = nil;
-    [sController commissionNodeWithID:@(kDeviceId) commissioningParams:params error:&commissionError];
-    XCTAssertNil(commissionError);
-
-    // Keep waiting for controller:commissioningComplete:
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
-}
-
-@end
-
-@interface MTRDeviceTests : XCTestCase
+@interface MTRDeviceTests : MTRTestCase
 
 @end
 
@@ -138,6 +88,13 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 
 + (void)setUp
 {
+    [super setUp];
+
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+
     XCTestExpectation * pairingExpectation = [[XCTestExpectation alloc] initWithDescription:@"Pairing Complete"];
 
     slocalTestStorageEnabledBeforeUnitTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
@@ -168,8 +125,9 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 
     sController = controller;
 
-    MTRDeviceTestDeviceControllerDelegate * deviceControllerDelegate =
-        [[MTRDeviceTestDeviceControllerDelegate alloc] initWithExpectation:pairingExpectation];
+    MTRTestControllerDelegate * deviceControllerDelegate =
+        [[MTRTestControllerDelegate alloc] initWithExpectation:pairingExpectation newNodeID:@(kDeviceId)];
+    deviceControllerDelegate.countryCode = @("au");
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
     [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
@@ -190,8 +148,6 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 
 + (void)tearDown
 {
-    ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), nil, kTimeoutInSeconds);
-
     // Restore testing setting to previous state, and remove all persisted attributes
     MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = slocalTestStorageEnabledBeforeUnitTest;
     [sController.controllerDataStore clearAllStoredClusterData];
@@ -218,6 +174,9 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
         [sController.controllerDataStore clearAllStoredClusterData];
         NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
         XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+        [sController.controllerDataStore clearDeviceDataForNodeID:@(kDeviceId)];
+        XCTAssertNil([sController.controllerDataStore getStoredDeviceDataForNodeID:@(kDeviceId)]);
     }
 }
 
@@ -3350,7 +3309,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
 
-- (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
+- (NSData *)_encodeEncodable:(id<NSSecureCoding>)encodable
 {
     // We know all our encodables are in fact NSObject.
     NSObject * obj = (NSObject *) encodable;
@@ -3358,6 +3317,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSError * encodeError;
     NSData * encodedData = [NSKeyedArchiver archivedDataWithRootObject:encodable requiringSecureCoding:YES error:&encodeError];
     XCTAssertNil(encodeError, @"Failed to encode %@", NSStringFromClass(obj.class));
+    return encodedData;
+}
+
+- (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
+{
+    NSData * encodedData = [self _encodeEncodable:encodable];
+
+    // We know all our encodables are in fact NSObject.
+    NSObject * obj = (NSObject *) encodable;
 
     NSError * decodeError;
     id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
@@ -3365,6 +3333,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue([decodedValue isKindOfClass:obj.class], @"Expected %@ but got %@", NSStringFromClass(obj.class), NSStringFromClass([decodedValue class]));
 
     XCTAssertEqualObjects(obj, decodedValue, @"Decoding for %@ did not round-trip correctly", NSStringFromClass([obj class]));
+}
+
+- (void)_ensureDecodeFails:(id<NSSecureCoding>)encodable
+{
+    NSData * encodedData = [self _encodeEncodable:encodable];
+
+    // We know all our encodables are in fact NSObject.
+    NSObject * obj = (NSObject *) encodable;
+
+    NSError * decodeError;
+    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodedValue);
+    XCTAssertNotNil(decodeError);
 }
 
 - (void)test032_MTRPathClassesEncoding
@@ -3842,36 +3823,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
     XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
-    // Set up a subscription via mConnectedDevice that will send us continuous
-    // reports.
-    XCTestExpectation * firstSubscriptionExpectation = [self expectationWithDescription:@"First subscription established"];
-
-    MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(0)];
-    params.resubscribeAutomatically = NO;
-
-    [mConnectedDevice subscribeToAttributesWithEndpointID:@(0)
-        clusterID:@(MTRClusterIDTypeBasicInformationID)
-        attributeID:@(0)
-        params:params
-        queue:queue
-        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
-        }
-        subscriptionEstablished:^() {
-            [firstSubscriptionExpectation fulfill];
-        }];
-
-    [self waitForExpectations:@[ firstSubscriptionExpectation ] timeout:kTimeoutInSeconds];
-
-    // Now set up our MTRDevice and do a subscribe.  Make sure all the events we
+    // Set up our MTRDevice and do a subscribe.  Make sure all the events we
     // get are marked "historical".
-    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
-    XCTestExpectation * secondSubscriptionExpectation = [self expectationWithDescription:@"Second subscription established"];
-    XCTestExpectation * gotFirstReportsExpectation = [self expectationWithDescription:@"First Attribute and Event reports have been received"];
-
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
-    delegate.onReachable = ^() {
-        [secondSubscriptionExpectation fulfill];
-    };
 
     __block unsigned eventReportsReceived = 0;
     delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
@@ -3882,38 +3836,59 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
     };
 
-    delegate.onReportEnd = ^() {
-        [gotFirstReportsExpectation fulfill];
-    };
+    XCTestExpectation * firstDeviceDeallocExpectation = [self expectationWithDescription:@"First device deallocated"];
+    @autoreleasepool {
+        __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+        XCTestExpectation * firstSubscriptionExpectation = [self expectationWithDescription:@"First subscription established"];
+        XCTestExpectation * gotFirstReportsExpectation = [self expectationWithDescription:@"First Attribute and Event reports have been received"];
 
-    [device setDelegate:delegate queue:queue];
+        delegate.onReachable = ^() {
+            [firstSubscriptionExpectation fulfill];
+        };
 
-    [self waitForExpectations:@[ secondSubscriptionExpectation, gotFirstReportsExpectation ] timeout:60];
+        delegate.onReportEnd = ^() {
+            [gotFirstReportsExpectation fulfill];
+        };
 
-    // Must have gotten some events (at least StartUp!)
-    XCTAssertTrue(eventReportsReceived > 0);
+        delegate.onSubscriptionCallbackDelete = ^{
+            [firstDeviceDeallocExpectation fulfill];
+        };
 
-    // Remove the device, then try again, now with us having stored cluster
-    // data.  All the events should still be reported as historical.
-    [sController removeDevice:device];
+        [device setDelegate:delegate queue:queue];
+
+        [self waitForExpectations:@[ firstSubscriptionExpectation, gotFirstReportsExpectation ] timeout:60];
+
+        // Must have gotten some events (at least StartUp!)
+        XCTAssertTrue(eventReportsReceived > 0);
+    }
+
+    // Wait for the device to dealloc before we clear storage, since it might
+    // write to storage as it shuts down.
+    [self waitForExpectations:@[ firstDeviceDeallocExpectation ] timeout:kTimeoutInSeconds];
+
+    // Clear out our device data, so we don't have a stored max event number
+    // that filters everything out.
+    [sController.controllerDataStore clearDeviceDataForNodeID:@(kDeviceId)];
 
     eventReportsReceived = 0;
 
-    device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
-    XCTestExpectation * thirdSubscriptionExpectation = [self expectationWithDescription:@"Third subscription established"];
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    XCTestExpectation * secondSubscriptionExpectation = [self expectationWithDescription:@"Second subscription established"];
     XCTestExpectation * gotSecondReportsExpectation = [self expectationWithDescription:@"Second Attribute and Event reports have been received"];
 
     delegate.onReachable = ^() {
-        [thirdSubscriptionExpectation fulfill];
+        [secondSubscriptionExpectation fulfill];
     };
 
     delegate.onReportEnd = ^() {
         [gotSecondReportsExpectation fulfill];
     };
 
+    delegate.onSubscriptionCallbackDelete = nil;
+
     [device setDelegate:delegate queue:queue];
 
-    [self waitForExpectations:@[ thirdSubscriptionExpectation, gotSecondReportsExpectation ] timeout:60];
+    [self waitForExpectations:@[ secondSubscriptionExpectation, gotSecondReportsExpectation ] timeout:60];
 
     // Must have gotten some events (at least StartUp!)
     XCTAssertTrue(eventReportsReceived > 0);
@@ -6021,6 +5996,121 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // 2 commands actually run, so use double the timeout.
     [self waitForExpectations:@[ updateFabricLabelExpectingWrongValueExpectation ] timeout:(2 * kTimeoutInSeconds)];
+}
+
+- (void)test046_MTRCommandWithRequiredResponseEncoding
+{
+    // Basic test with no command fields or required response.
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * onCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil];
+    [self doEncodeDecodeRoundTrip:onCommand];
+
+    // Test with both command fields and an interesting required response.
+    //
+    // NSSecureCoding tracks object identity, so we need to create new objects
+    // for every instance of a thing we decode/encode with a given coder to make
+    // sure all codepaths are exercised. Use a block that returns a new
+    // dictionary each time to handle this.
+    __auto_type structureWithAllTypes = ^{
+        return @{
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[
+                @{
+                    MTRContextTagKey : @(0),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRSignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(1),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(2),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(3),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUTF8StringValueType,
+                        MTRValueKey : @("abc"),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(4),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTROctetStringValueType,
+                        MTRValueKey : [[NSData alloc] initWithBase64EncodedString:@"APJj" options:0],
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(5),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRFloatValueType,
+                        MTRValueKey : @(1.0),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(6),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRDoubleValueType,
+                        MTRValueKey : @(5.0),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(7),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRNullValueType,
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(8),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRArrayValueType,
+                        MTRValueKey : @[
+                            @{
+                                MTRDataKey : @ {
+                                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                                    MTRValueKey : @(9),
+                                },
+                            },
+                        ],
+                    }
+                },
+            ],
+        };
+    };
+
+    // Invalid commandFields (not a dictionary)
+    onCommand.commandFields = (id) @[];
+    [self _ensureDecodeFails:onCommand];
+
+    // Invalid required response (not a dictionary)
+    onCommand.commandFields = nil;
+    onCommand.requiredResponse = (id) @[];
+    [self _ensureDecodeFails:onCommand];
+
+    // Invalid required response (key is not NSNumber)
+    onCommand.requiredResponse = @{
+        @("abc") : structureWithAllTypes(),
+    };
+    [self _ensureDecodeFails:onCommand];
+
+    onCommand.commandFields = structureWithAllTypes();
+    onCommand.requiredResponse = @{
+        @(1) : structureWithAllTypes(),
+        @(13) : structureWithAllTypes(),
+    };
+    [self doEncodeDecodeRoundTrip:onCommand];
 }
 
 @end

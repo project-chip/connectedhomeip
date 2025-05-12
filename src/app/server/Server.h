@@ -458,6 +458,8 @@ private:
     void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event);
     void CheckServerReadyEvent();
 
+    void PostFactoryResetEvent();
+
     static void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

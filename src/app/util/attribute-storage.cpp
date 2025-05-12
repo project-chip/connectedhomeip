@@ -216,8 +216,23 @@ void emberAfEndpointConfigure()
         emAfEndpoints[ep].dataVersions     = currentDataVersions;
         emAfEndpoints[ep].parentEndpointId = fixedParentEndpoints[ep];
 
+        constexpr const DeviceTypeId kRootnodeId   = 0x0016;
+        constexpr const DeviceTypeId kAggregatorId = 0x000E;
+        constexpr const DeviceTypeId kBridgedNode  = 0x0013;
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
-        emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
+        for (const auto & deviceType : emAfEndpoints[ep].deviceTypeList)
+        {
+            // Default composition for all device types is set to tree. Except rootnode, aggregator and
+            // bridgednode, which are full-family. Clients can manually override these defaults using
+            // SetFlatCompositionForEndpoint / SetTreeCompositionForEndpoint at application init.
+            // TODO: This information should come from the schema XML, not be hardcoded.
+            if ((deviceType.deviceTypeId == kRootnodeId) || (deviceType.deviceTypeId == kAggregatorId) ||
+                (deviceType.deviceTypeId == kBridgedNode))
+            {
+                emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
+                break;
+            }
+        }
 
         // Increment currentDataVersions by 1 (slot) for every server cluster
         // this endpoint has.
@@ -266,6 +281,14 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
                                      const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
                                      EndpointId parentEndpointId)
+{
+    return emberAfSetDynamicEndpointWithEpUniqueId(index, id, ep, dataVersionStorage, deviceTypeList, {}, parentEndpointId);
+}
+
+CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
+                                                   const Span<DataVersion> & dataVersionStorage,
+                                                   Span<const EmberAfDeviceType> deviceTypeList, CharSpan endpointUniqueId,
+                                                   EndpointId parentEndpointId)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -321,6 +344,19 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     emAfEndpoints[index].deviceTypeList = deviceTypeList;
     emAfEndpoints[index].endpointType   = ep;
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    MutableCharSpan targetSpan(emAfEndpoints[index].endpointUniqueId);
+    if (CopyCharSpanToMutableCharSpan(endpointUniqueId, targetSpan) != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    // Ensure that the size of emAfEndpoints[index].endpointUniqueId fits within uint8_t
+    static_assert(sizeof(emAfEndpoints[0].endpointUniqueId) <= UINT8_MAX,
+                  "The size of emAfEndpoints[index].endpointUniqueId must fit within uint8_t");
+
+    emAfEndpoints[index].endpointUniqueIdSize = static_cast<uint8_t>(targetSpan.size());
+#endif
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     emAfEndpoints[index].parentEndpointId = parentEndpointId;
@@ -1079,7 +1115,20 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     tag = emAfEndpoints[endpointIndex].tagList[index];
     return CHIP_NO_ERROR;
 }
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdMutSpan)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
 
+    if (endpointIndex == 0xFFFF)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId, emAfEndpoints[endpointIndex].endpointUniqueIdSize);
+    return CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
+}
+#endif
 CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDeviceType> deviceTypeList)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
@@ -1410,7 +1459,6 @@ CHIP_ERROR SetFlatCompositionForEndpoint(EndpointId endpoint)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isTreeComposition);
     emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
     return CHIP_NO_ERROR;
 }
@@ -1423,7 +1471,6 @@ CHIP_ERROR SetTreeCompositionForEndpoint(EndpointId endpoint)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isFlatComposition);
-    emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isTreeComposition);
     return CHIP_NO_ERROR;
 }
 
@@ -1444,7 +1491,7 @@ bool IsTreeCompositionForEndpoint(EndpointId endpoint)
     {
         return false;
     }
-    return emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isTreeComposition);
+    return !emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isFlatComposition);
 }
 
 EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
@@ -1454,11 +1501,7 @@ EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
     {
         return EndpointComposition::kFullFamily;
     }
-    if (emAfEndpoints[endpointIndex].bitmask.Has(EmberAfEndpointOptions::isTreeComposition))
-    {
-        return EndpointComposition::kTree;
-    }
-    return EndpointComposition::kInvalid;
+    return EndpointComposition::kTree;
 }
 
 } // namespace app

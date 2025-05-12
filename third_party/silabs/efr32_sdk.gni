@@ -130,7 +130,10 @@ declare_args() {
 if (slc_generate || slc_reuse_files) {
   silabs_gen_folder = slc_gen_path
 } else {
-  print("Using pre-generate files")
+  if (!chip_build_all_platform_tests) {
+    # We can't print to the console when running our tests in the CSA CI otherwise CI fails.
+    print("Using pre-generate files")
+  }
   silabs_gen_folder = sl_pre_gen_path
 }
 
@@ -360,6 +363,7 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",

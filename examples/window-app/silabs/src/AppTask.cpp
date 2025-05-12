@@ -50,10 +50,6 @@ CHIP_ERROR AppTask::AppInit()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(WindowManager::ButtonEventHandler);
 
-#ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Window-App");
-#endif
-
     err = WindowManager::sWindow.Init();
 
     if (err != CHIP_NO_ERROR)
@@ -89,7 +85,9 @@ void AppTask::AppTaskMain(void * pvParameter)
     SILABS_LOG("App Task started");
 
     WindowManager::sWindow.UpdateLED();
+#ifdef DISPLAY_ENABLED
     WindowManager::sWindow.UpdateLCD();
+#endif // DISPLAY_ENABLED
 
     while (true)
     {

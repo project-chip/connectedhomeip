@@ -1187,3 +1187,8 @@ void MatterUnitTestingPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
+
+void MatterUnitTestingPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}

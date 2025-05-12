@@ -33,7 +33,7 @@ declare_args() {
   chip_system_config_provide_statistics = true
 
   # Use OpenThread TCP/UDP stack directly
-  chip_system_config_use_open_thread_inet_endpoints = false
+  chip_system_config_use_openthread_inet_endpoints = false
 }
 
 declare_args() {
@@ -56,7 +56,7 @@ declare_args() {
 declare_args() {
   # Event loop type.
   if (chip_system_config_use_lwip ||
-      chip_system_config_use_open_thread_inet_endpoints) {
+      chip_system_config_use_openthread_inet_endpoints) {
     chip_system_config_event_loop = "FreeRTOS"
   } else {
     chip_system_config_event_loop = "Select"

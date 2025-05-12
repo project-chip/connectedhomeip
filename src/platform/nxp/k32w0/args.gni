@@ -56,7 +56,7 @@ chip_mdns = "platform"
 #chip_automation_logging = true
 #chip_error_logging = true
 
-chip_system_config_use_open_thread_inet_endpoints = true
+chip_system_config_use_openthread_inet_endpoints = true
 chip_with_lwip = false
 
 mbedtls_target = "${nxp_sdk_build_root}/${nxp_sdk_name}:mbedtls"

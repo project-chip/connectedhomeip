@@ -253,6 +253,15 @@ out of convenience.
     fixing a typo in an ID still requires some description on how you checked
     that the new ID takes effect.
 
+> [!TIP]
+>
+> When working on a pull request for Matter SDK refrain from using the "Update
+> branch" feature in the GitHub UI too often. Updating the PR branch in this way
+> triggers the CI workflows cancellation and restart. This feature should be
+> used only when a PR has not been worked on for a long time and a lot of
+> divergence has accumulated. Your PR branch being out of sync with master is
+> not a blocker for merging an approved PR.
+
 ### Review Requirements
 
 #### Documentation Best Practices
