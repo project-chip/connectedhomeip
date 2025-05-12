@@ -341,7 +341,7 @@
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
         "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
-        "TLS_CLIENT_MANAGEMENT_CLUSTER": [],
+        "TLS_CLIENT_MANAGEMENT_CLUSTER": ["tls-client-management-server"],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
