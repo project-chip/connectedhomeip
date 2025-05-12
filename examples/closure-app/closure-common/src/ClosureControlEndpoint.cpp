@@ -55,8 +55,7 @@ Status PrintOnlyDelegate::HandleStopCommand()
 CHIP_ERROR PrintOnlyDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
 {
     // This function should return the current error at the specified index.
-    // For now, we will make error aa kUnknownEnumValue value and return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.
-    closureError = ClosureErrorEnum::kUnknownEnumValue;
+    // For now, we dont have a ErrorList implemented, so will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 

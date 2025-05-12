@@ -334,10 +334,6 @@ private:
      * @brief Function validates if the requested overallState positioning is supported by the closure.
      *        Function validates against the FeatureMap conformance to validate support.
      *
-     *        - FullyClosed, FullyOpened, PartiallyOpened and OpenedAtSignature always return true since they are mandatory.
-     *        - OpenedForPedestrian returns true if the Pedestrian feature is supported, false otherwise.
-     *        - OpenedForVentilation returns true if the Ventilation feature is supported, false otherwise.
-     *
      * @param positioning requested Positioning to validate
      *
      * @return true if the requested Positioning is supported
@@ -348,10 +344,6 @@ private:
     /**
      * @brief Function validates if the requested OverallTarget positioning is supported by the closure.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
-     *
-     *        - CloseInFull, OpenInFull and Signature always return true since they are mandatory.
-     *        - Pedestrian returns true if the Pedestrian feature is supported, false otherwise.
-     *        - Ventilation returns true if the Ventilation feature is supported, false otherwise.
      *
      * @param positioning requested Positioning to validate
      *
@@ -371,8 +363,7 @@ private:
      * @brief Updates the countdown time from cluster logic.
      *        This method should be invoked whenever the cluster logic needs to update the countdown time.
      *        This includes:
-     *         - When the tracked operation changes due to an update in the MainState attribute, or
-     *         - When there is any adjustment in the estimated time remaining due to the server's control logic insights
+     *         - When the tracked operation changes due to an update in the MainState attribute
      *
      * @param[in] countdownTime - Updated countdown time to be reported.
      *

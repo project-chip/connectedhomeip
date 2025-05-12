@@ -160,6 +160,7 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     bool markDirty = false;
 
     // TODO: Delegate specific handling logic will be added if needed after after spec issue resolution.
+    //       https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11603
 
     auto predicate = [](const decltype(mState.mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
     markDirty      = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
@@ -209,6 +210,11 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
         {
             SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
         }
+        else 
+        {
+            // Reset the countdown time to 0 when the main state is not in motion or calibration.
+            SetCountdownTimeFromCluster(DataModel::Nullable<ElapsedS>(0));
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -225,7 +231,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     {
         const GenericOverallState & incomingOverallState = overallState.Value();
 
-        // Validate the incoming Positioning value and featureMap conformance.
+        // Validate the incoming Positioning value and FeatureMap conformance.
         if (incomingOverallState.positioning.HasValue())
         {
             // If the positioning member is present in the incoming OverallState, we need to check if the Positioning
@@ -242,7 +248,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
             }
         }
 
-        // Validate the incoming Latch featureMap conformance.
+        // Validate the incoming Latch FeatureMap conformance.
         if (incomingOverallState.latch.HasValue())
         {
             // If the latch member is present in the incoming OverallState, we need to check if the MotionLatching
@@ -250,7 +256,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
             VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         }
 
-        // Validate the incoming Speed value and featureMap conformance.
+        // Validate the incoming Speed value and FeatureMap conformance.
         if (incomingOverallState.speed.HasValue())
         {
             // If the speed member is present in the incoming OverallState, we need to check if the Speed feature is
@@ -265,7 +271,7 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
             }
         }
 
-        // Validate the incoming SecureState featureMap conformance.
+        // Validate the incoming SecureState FeatureMap conformance.
         if (incomingOverallState.secureState.HasValue())
         {
             // If the secureState member is present in the OverallState, we need to check if the Speed feature is
@@ -292,7 +298,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     {
         const GenericOverallTarget & incomingOverallTarget = overallTarget.Value();
 
-        // Validate the incoming Position value and featureMap conformance.
+        // Validate the incoming Position value and FeatureMap conformance.
         if (incomingOverallTarget.position.HasValue())
         {
             // If the position member is present in the incoming OverallTarget, we need to check if the Position
@@ -307,7 +313,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        // Validate the incoming Latch featureMap conformance.
+        // Validate the incoming Latch FeatureMap conformance.
         if (incomingOverallTarget.latch.HasValue())
         {
             // If the latch member is present in the incoming OverallTarget, we need to check if the MotionLatching
@@ -315,7 +321,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
             VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         }
 
-        // Validate the incoming Speed value and featureMap conformance.
+        // Validate the incoming Speed value and FeatureMap conformance.
         if (incomingOverallTarget.speed.HasValue())
         {
             // If the speed member is present in the incoming OverallTarget, we need to check if the Speed feature is
@@ -444,10 +450,10 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
 
     if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
     {
-        // If manual intervention is required to latch, respond with INVALID_ACTION
+        // If manual intervention is required to latch, respond with INVALID_IN_STATE
         if (mDelegate.IsManualLatchingNeeded())
         {
-            return Status::InvalidAction;
+            return Status::InvalidInState;
         }
 
         target.latch = latch;
@@ -472,6 +478,10 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
                             state == MainStateEnum::kStopped,
                         Status::InvalidInState);
 
+    // Set MainState and OverallTarget only if the delegate call to HandleMoveToCommand is successful
+    Status status = mDelegate.HandleMoveToCommand(position, latch, speed);
+    VerifyOrReturnValue(status == Status::Success, status);
+    
     if (mDelegate.IsReadyToMove())
     {
         VerifyOrReturnError(SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
@@ -482,10 +492,6 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
         VerifyOrReturnError(SetMainState(MainStateEnum::kWaitingForMotion) == CHIP_NO_ERROR, Status::Failure,
                             ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to kWaitingForMotion"));
     }
-
-    // Set OverallTarget only if the delegate call to HandleMoveToCommand is successful
-    Status status = mDelegate.HandleMoveToCommand(position, latch, speed);
-    VerifyOrReturnValue(status == Status::Success, status);
 
     VerifyOrReturnError(SetOverallTarget(DataModel::MakeNullable(target)) == CHIP_NO_ERROR, Status::Failure);
 
