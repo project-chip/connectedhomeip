@@ -6462,7 +6462,7 @@
               "code": 8,
               "mfgCode": null,
               "side": "server",
-              "type": "DatastoreStatusStruct",
+              "type": "DatastoreStatusEntryStruct",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
