@@ -14,6 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
 # Activating connectedhomeip build environment
 source scripts/activate.sh
 
