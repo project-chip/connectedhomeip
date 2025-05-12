@@ -205,19 +205,24 @@ Taking lighting app with `littlefs` supported as example :
 
 # Partition table
 
-`Bouffalo Lab` provides reference partition table files for each platform under `examples/platform/bouffalolab/<platforms>/flash_config`.
+`Bouffalo Lab` provides reference partition table files for each platform under
+`examples/platform/bouffalolab/<platforms>/flash_config`.
 
 Final products may have different flash layout requirements, such as:
 
-- Firmware size requimrents;
-- Over-the-air upgrade support with or without compressed image;
-- Supports more Matter fabrics;
-- Custom application partitions;
-- And other specific needs.
+-   Firmware size requirements;
+-   Over-the-air upgrade support with or without compressed image;
+-   Supports more Matter fabrics;
+-   Custom application partitions;
+-   And other specific needs.
 
-Developers should design the flash layout accordingly for their final products. For guidance, refer to the ‌ flash tool documentation or contact `Bouffalo Lab` for support.
+Developers should design the flash layout accordingly for their final products.
+For guidance, refer to the ‌ flash tool documentation or contact `Bouffalo Lab`
+for support.
 
-> ‌**Note:**‌ The partition table is typically ‌not editable over-the-air. Ensure sufficient margin in the initial design to accommodate future requirements.
+> ‌**Note:**‌ The partition table is typically ‌not editable over-the-air.
+> Ensure sufficient margin in the initial design to accommodate future
+> requirements.
 
 # Download image
 
