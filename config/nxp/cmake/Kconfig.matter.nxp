@@ -1,0 +1,332 @@
+#
+#   Copyright (c) 2024-2025 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+if CHIP
+
+config CHIP_NXP_PLATFORM
+	bool
+	default y
+	help
+	  States that the configuration uses Matter NXP platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for NXP platform related purposes.
+
+config CHIP_DEVICE_VENDOR_NAME
+	default "NXP Semiconductors"
+
+config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+	bool "Include default device information provider build"
+	default y
+
+config CHIP_DEBUG_SYMBOLS
+	bool "Generate debug symbols"
+	default y
+	help
+	  Enables building the application with debug symbols.
+
+config CHIP_STRIP_SYMBOLS
+	bool "Strip symbols"
+	help
+	  Remove all symbol table and relocation information from the binary.
+
+config CHIP_FACTORY_DATA
+	bool "Factory data provider"
+	help
+	  Enables the default NXP factory data provider implementation that
+	  supports reading the factory data encoded in the KLV format from the
+	  flash memory partition. This option requires a fixed partition named
+	  "factory_partition" declared on the device tree. Factory data partition
+	  can be generated during build process, see CHIP_FACTORY_DATA_BUILD Kconfig.
+
+config CHIP_FACTORY_DATA_CUSTOM_BACKEND
+	bool "Custom factory data provider"
+	depends on !CHIP_FACTORY_DATA
+	help
+	  Enables user's custom factory data provider implementation. This option
+	  cannot be used with the CHIP_FACTORY_DATA, which enables the default NXP
+	  factory data provider implementation.
+
+config CHIP_FACTORY_DATA_BUILD
+	bool "Generate factory data contents"
+	imply CHIP_FACTORY_DATA
+	help
+	  Enables generation of the factory data contents during the building. This
+	  option requires a fixed partition named "factory_partition" declared on the
+	  device tree.
+
+config CHIP_FACTORY_DATA_VERSION
+	int
+	default 1
+	help
+	  Provides the version of the generated factory data parameter set. This is
+	  a hidden configuration option that the user cannot change. You can use
+	  this value in the factory data provider implementation to verify that the
+	  factory data saved in the flash memory has the expected version.
+
+config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
+	int "Maximum length of rotating device ID unique ID in bytes"
+	default 16
+	depends on CHIP_FACTORY_DATA
+	help
+	  Maximum acceptable length of rotating device ID unique ID in bytes.
+
+config CHIP_DEVICE_USE_TEST_PAIRING_CODE
+	string "Use a default pairing code"
+	default "CHIPUS"
+	depends on !CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+	help
+		Use a default pairing code if one hasn't been provisioned in flash.
+		(Macro value is in quotes.)
+
+if CHIP_FACTORY_DATA
+
+config CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY
+	string "AES128 key used to encrypt factory data."
+	default "2B7E151628AED2A6ABF7158809CF4F3C"
+	help
+	  AES128 key used to encrypt factory data.
+	  (Macro value is in quotes.)
+
+config CHIP_ENCRYPTED_FACTORY_DATA
+	bool "Encrypt factory data with AES128 ECB."
+	default y
+	help
+	  If enabled, the factory data partition will be encrypted with AES128 ECB.
+
+config CHIP_DEVICE_PRODUCT_URL
+	string "Product URL"
+	help
+	  Provides the URL to the product page. The URL is exposed as an attribute
+	  of the Basic Information cluster.
+	  (Macro value is in quotes.)
+
+config CHIP_DEVICE_PRODUCT_LABEL
+	string "Product label"
+	help
+	  Provides the product label. The label is exposed as an attribute
+	  of the Basic Information cluster.
+	  (Macro value is in quotes.)
+
+config CHIP_DEVICE_PART_NUMBER
+	string "Part number"
+	help
+	  Provides the part number. The part number is exposed as an attribute
+	  of the Basic Information cluster.
+	  (Macro value is in quotes.)
+
+config CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+	bool "Load real factory data"
+	default y
+	help
+	  Allows to load the factory data provisioned in flash.
+
+config CHIP_ENABLE_EL2GO_FACTORY_DATA
+	bool "Secure DAC private key storage using El2Go provisioning"
+	help
+		Enable DAC private key storage using El2Go provisioning.
+
+config CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA
+	bool "Secure whole factory data"
+	help
+		This mode allows to protect the matter factory dataset with a AES key protected in the secure element.
+
+endif
+
+if CHIP_FACTORY_DATA_BUILD
+
+# Factory data definitions
+config CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES
+	bool "Generate onboarding codes during the generation of a factory data set"
+	help
+	  Enables generation of onboarding codes (manual pairing code and QR code)
+	  during the generation of a factory data set. You can provide the
+	  onboarding codes a Matter controller to commission a device to a Matter
+	  network.
+
+# Select source of the certificates
+choice CHIP_FACTORY_DATA_CERT_SOURCE
+	prompt "Attestation certificate file source"
+	default CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+
+	config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+		bool "Use pre-generated development certificates"
+		help
+		  Uses pre-generated certificate files from the
+		  credentials/development/attestation/ directory that match the
+		  configured Product ID. This can be used for development purpose.
+
+	config CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED
+		bool "Auto-generate certificates"
+		help
+		  Generates new certificates instead of using pre-generated ones. The
+		  certificates are generated on every build.
+
+	config CHIP_FACTORY_DATA_CERT_SOURCE_USER
+		bool "Use user-provided certificate files"
+		help
+		  Uses user-provided certificate files. The user needs to specify the
+		  absolute paths to all necessary files.
+
+endchoice
+
+if CHIP_FACTORY_DATA_CERT_SOURCE_USER
+
+config CHIP_FACTORY_DATA_USER_CERTS_CD_CERT
+	string "Path to the CD certificate (DER format)"
+	help
+	  Provides the absolute path to the CD certificate file in the DER format.
+
+config CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT
+	string "Path to the DAC certificate (DER format)"
+	help
+	  Provides the absolute path to the DAC certificate file in the DER format.
+
+config CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY
+	string "Path to the DAC private key (DER format)"
+	help
+	  Provides the absolute path to the DAC keypair file in the DER format. Both
+	  public and private keys must be present (the private key will be extracted
+	  automatically).
+
+config CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT
+	string "Path to the PAI certificate (DER format)"
+	help
+	  Provides the absolute path to the PAI certificate in the DER format.
+endif
+
+# Configs for SPAKE2+ generation
+config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
+	bool "Generate SPAKE2+ verifier"
+	help
+	  Enables the generation of the SPAKE2+ verifier for the configured SPAKE2+
+	  passcode, iteration count and salt.
+
+config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
+	bool "Generate Rotating device ID unique ID"
+	default y
+	help
+	  Enables the generation of a random Rotating device ID unique ID.
+
+endif #CHIP_FACTORY_DATA_BUILD
+
+config CHIP_FACTORY_RESET_ERASE_NVS
+	bool
+	default y
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+	bool "Disable some detailed logs to decrease flash usage"
+	help
+	  Disables some log levels for specific Matter log modules that provide
+	  information that is too detailed to be used in most cases. You can find
+	  full configuration enabled by this option in the
+	  platform/nxp/CHIPPlatformConfig.h file.
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+	int "OTA Requestor image buffer size"
+	default 256
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Configures the size of the buffer used by OTA Requestor when downloading
+	  and writing a new firmware image to flash.
+
+config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+	bool "Auto-reboot when firmware update is applied"
+	default y
+	depends on CHIP_OTA_REQUESTOR
+	imply REBOOT
+	help
+	  Reboots the device automatically after downloading a new firmware update
+	  to swap the old and the new firmware images. The reboot happens only when
+	  a user consents to apply the firmware update.
+
+choice CHIP_OTA_REQUEST_UPGRADE_TYPE
+	prompt "Type of the upgrade to apply on new images"
+	default CHIP_OTA_REQUEST_UPGRADE_TEST
+	depends on CHIP_OTA_REQUESTOR
+
+	config CHIP_OTA_REQUEST_UPGRADE_PERMANENT
+		bool "Mark the image as permanent"
+		help
+		  The upgrade will be permanent on the next reboot.
+		  No coming back to the old image.
+
+	config CHIP_OTA_REQUEST_UPGRADE_TEST
+		bool "Mark the image as a test"
+		help
+		  The upgrade will be marked as a test.
+		  Image will be run on the next reboot, if confirmed it
+		  becomes permanent, otherwise the new image is reverted.
+
+endchoice
+
+config NXP_USE_SMU2_STATIC
+	bool "Use SMU2"
+	depends on CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+	  Enable app usage of SMU2.
+
+config NXP_USE_SMU2_DYNAMIC
+	bool "Use SMU2"
+	depends on CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+	  Enable app usage of extra SMU2 after commissioning.
+
+config NXP_USE_LOW_POWER
+	bool "Enable low power support"
+	help
+	  Enables low power support
+
+config NXP_USE_PLAIN_DAC_KEY
+	bool "Store DAC private key in plaintext"
+	help
+	  Store DAC private key in plaintext.
+
+config CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+	int "Timeout (ms) for switching from fast to slow advertising"
+	default 30000
+	help
+	  The amount of time in miliseconds after which BLE should change its advertisements
+	  from fast interval to slow interval.
+
+config CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
+	int "BLE advertising timeout"
+	default 900000
+	help
+	  The amount of time in miliseconds after which BLE advertisement should be disabled, counting 
+	  from the moment of slow advertisement commencement.
+
+config CHIP_DEVICE_CONFIG_ENABLE_SED
+	bool "SED"
+	help
+		Enable Sleepy End Device configuration.
+
+if NET_L2_OPENTHREAD
+
+config CHIP_SECONDARY_NETWORK_IF
+	bool "Secondary Network Interface"
+	help
+	  Enable a secondary network commissioning interface.
+
+config CHIP_THREAD_NETWORK_ENDPOINT_ID
+	int "Thread Network Endpoint ID"
+	default 2 if CHIP_SECONDARY_NETWORK_IF
+	default 0
+	help
+	  Specify the endpoint ID of the Thread network.
+
+endif # NET_L2_OPENTHREAD
+
+endif # CHIP
