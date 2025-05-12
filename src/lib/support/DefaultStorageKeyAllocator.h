@@ -265,6 +265,45 @@ public:
     // Terms and Conditions Acceptance Key
     // Stores the terms and conditions acceptance including terms and conditions revision, TLV encoded
     static StorageKeyName TermsAndConditionsAcceptance() { return StorageKeyName::FromConst("g/tc"); }
+
+    // TLS Clusters Certs Keys
+
+    // Number of root certs stored in table for a given endpoint, across all fabrics.
+    static StorageKeyName TlsRootCertEndpointCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/tlsr/e/%x", endpoint); }
+
+    // Stores information about root certs for the given fabric & endpoint
+    static StorageKeyName TlsRootCertFabricDataKey(FabricIndex fabric, EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlsr", fabric, endpoint);
+    }
+
+    // Stores the root cert payload for the given fabric & endpoint
+    static StorageKeyName TlsRootCertEntityKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlsr/%x", fabric, endpoint, idx);
+    }
+
+    // Number of client certs stored in table for a given endpoint, across all fabrics.
+    static StorageKeyName TlsClientCertEndpointCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/tlsc/e/%x", endpoint); }
+
+    // Stores information about client certs for the given fabric & endpoint
+    static StorageKeyName TlsClientCertFabricDataKey(FabricIndex fabric, EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlsc", fabric, endpoint);
+    }
+
+    // Stores the client cert payload for the given fabric & endpoint
+    // (excepting intermediate cert, see TlsClientCertEntityIntermediateKey)
+    static StorageKeyName TlsClientCertEntityKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlsc/%x", fabric, endpoint, idx);
+    }
+
+    // Stores an intermediate cert payload for a client cert for the given fabric & endpoint
+    static StorageKeyName TlsClientCertEntityIntermediateKey(FabricIndex fabric, EndpointId endpoint, uint16_t entity_idx, uint8_t intermediate_idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlsc/%x/%x", fabric, endpoint, entity_idx, intermediate_idx);
+    }
 };
 
 } // namespace chip
