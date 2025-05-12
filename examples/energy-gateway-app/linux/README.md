@@ -232,7 +232,7 @@ This allows you to get current and forecast energy prices.
 The response in the default app is a null `CurrentPrice` and an empty
 `PriceForecast` attribute:
 
-```python
+```
     Out[11]:
 
     {
@@ -283,7 +283,7 @@ The response in the default app is a null `CurrentPrice` and an empty
 -   Step 6: (In chip-repl) Re-Read `CurrentPrice` attribute (see the values have
     changed)
 
-```python
+```
     await devCtrl.ReadAttribute(200,[(1,chip.clusters.CommodityPrice.Attributes.CurrentPrice)])
     Out[18]:
 
@@ -522,7 +522,7 @@ assumes you have already commissioned the app (see above).
 
 -   Step 1: (In chip-repl) Read `Electrical Grid Conditions` attributes
 
-```python
+```
     # Read from NodeID 200, Endpoint 1, all attributes on ElectricalGridConditions cluster
     await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions)])
 Out[2]:
@@ -569,7 +569,7 @@ The response in the default app is a null `CurrentConditions` and an empty
 -   Step 3: (In chip-repl) Re-Read `CurrentConditions` attribute (see the values
     have changed)
 
-```python
+```
     await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.CurrentConditions)])
     Out[7]:
 
@@ -602,7 +602,7 @@ The response in the default app is a null `CurrentConditions` and an empty
 -   Step 5: (In chip-repl) Re-Read `ForecastConditions` attribute (see the
     values have changed)
 
-```python
+```
     await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.ForecastConditions)])
     Out[9]:
 
