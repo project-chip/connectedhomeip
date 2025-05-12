@@ -31,24 +31,6 @@ extern "C" {
 #define DHCP_TIMEOUT ((uint8_t) 4)
 #define DHCP_LINK_DOWN ((uint8_t) 5)
 
-/************************** Station Static Default ****************************/
-#define STA_IP_ADDR0_DEFAULT ((uint8_t) 192) ///< Static IP: IP address value 0
-#define STA_IP_ADDR1_DEFAULT ((uint8_t) 168) ///< Static IP: IP address value 1
-#define STA_IP_ADDR2_DEFAULT ((uint8_t) 0)   ///< Static IP: IP address value 2
-#define STA_IP_ADDR3_DEFAULT ((uint8_t) 1)   ///< Static IP: IP address value 3
-
-/*NETMASK*/
-#define STA_NETMASK_ADDR0_DEFAULT ((uint8_t) 255) ///< Static IP: Netmask value 0
-#define STA_NETMASK_ADDR1_DEFAULT ((uint8_t) 255) ///< Static IP: Netmask value 1
-#define STA_NETMASK_ADDR2_DEFAULT ((uint8_t) 255) ///< Static IP: Netmask value 2
-#define STA_NETMASK_ADDR3_DEFAULT ((uint8_t) 0)   ///< Static IP: Netmask value 3
-
-/*Gateway Address*/
-#define STA_GW_ADDR0_DEFAULT ((uint8_t) 0) ///< Static IP: Gateway value 0
-#define STA_GW_ADDR1_DEFAULT ((uint8_t) 0) ///< Static IP: Gateway value 1
-#define STA_GW_ADDR2_DEFAULT ((uint8_t) 0) ///< Static IP: Gateway value 2
-#define STA_GW_ADDR3_DEFAULT ((uint8_t) 0) ///< Static IP: Gateway value 3
-
 /*****************************************************************************
  * @fn  void dhcpclient_set_link_state(int link_up)
  * @brief
