@@ -136,6 +136,7 @@ async def commission_device(
         PairingStatus object which can evaluated in conditional statements
         if the commissioning process completes successfully PairingStatus is evaluated to True else False along
         with storing the reason for pairing failure by storing the exception raised during commissioning process.
+
     """
 
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
