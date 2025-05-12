@@ -161,7 +161,7 @@ during the Matter commissioning process.
     ```ini
     [Service]
     ExecStart=
-    ExecStart=/usr/lib/bluetooth/bluetoothd -E -P battery
+    ExecStart=/usr/libexec/bluetooth/bluetoothd -E -P battery
     ```
 
 1. Restart the Bluetooth service by running the following command:
