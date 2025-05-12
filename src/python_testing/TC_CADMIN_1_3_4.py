@@ -53,7 +53,7 @@ from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.tlv import TLVReader
 from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+                                                                       default_matter_test_main, run_with_error_check)
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
@@ -210,14 +210,13 @@ class TC_CADMIN(MatterBaseTest):
             params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
 
             self.step(13)
-            # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12
-            try:
-                await self.th1.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
-            except ChipStackError as e:
-                asserts.assert_equal(e.err,  0x0000007E,
-                                     "Expected to return Trying to add NOC for fabric that already exists")
+            await run_with_error_check(
+                self.th1.CommissionOnNetwork,
+                nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234,
+                exception_type=ChipStackError,
+                assert_func=lambda e: asserts.assert_equal(e.err, 0x0000007E,
+                                                           "Expected to return Trying to add NOC for fabric that already exists")
+            )
             """
             expected error:
                 [2024-10-08 11:57:43.144125][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Device returned status 9 on receiving the NOC
