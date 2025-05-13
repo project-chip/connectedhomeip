@@ -116,10 +116,9 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
     uint32_t keyId;
-    SilabsConfig::ReadConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, keyId);
+    Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKey(keyId);
     chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key(keyId);
     key.Decrypt(block, mIVOffset);
-
     return CHIP_NO_ERROR;
 }
 

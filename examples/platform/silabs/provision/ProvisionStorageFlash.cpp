@@ -732,10 +732,42 @@ CHIP_ERROR Storage::GetProvisionRequest(bool & value)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
+{
+    // Tinycrypt doesn't support the key ID, so we need to store the key as a binary blob
+    return Flash::Set(Parameters::ID::kOtaTlvEncryptionKey, value.data(), value.size());
+}
+
+CHIP_ERROR Storage::GetOtaTlvEncryptionKey(uint32_t & keyId)
+{
+    // Tinycrypt doesn't support the key ID
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR Storage::GetOtaTlvEncryptionKey(MutableByteSpan & keySpan)
+{
+    size_t keyLen = 0;
+    ReturnErrorOnFailure(Flash::Get(Parameters::ID::kOtaTlvEncryptionKey, keySpan.data(), keySpan.size(), keyLen));
+    keySpan.reduce_size(keyLen);
+    return CHIP_NO_ERROR;
+}
+#else  // MBEDTLS_USE_PSA_CRYPTO
 CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+
+CHIP_ERROR Storage::GetOtaTlvEncryptionKey(uint32_t & keyId)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR Storage::GetOtaTlvEncryptionKey(uint8_t * key, size_t max, size_t & keyLen)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
 #if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
