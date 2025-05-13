@@ -206,10 +206,9 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
     if (callback != nullptr)
     {
         mpScanCallback = nullptr;
-        memset(mScanSSID, 0, sizeof(mScanSSID));
         mScanSSIDlength = 0;
 
-        if (ssid.size() < sizeof(mScanSSID) && 0 == wifi_start_scan(ssid.data(), ssid.size()))
+        if (ssid.size() <= sizeof(mScanSSID) && 0 == wifi_start_scan(ssid.data(), ssid.size()))
         {
             memcpy(mScanSSID, ssid.data(), ssid.size());
             mScanSSIDlength = ssid.size();
