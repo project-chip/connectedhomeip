@@ -2197,7 +2197,7 @@ class CommissionDeviceTest(MatterBaseTest):
             raise signals.TestAbortAll("Failed to commission node(s)")
 
 
-async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackError, assert_func=None, error_msg="Unexpected success", **kwargs):
+async def run_with_error_check(coroutine_func, *args, exception_type=Exception, assert_func=None, error_msg="Unexpected success", **kwargs):
     '''
     Explanation:
 
@@ -2222,8 +2222,8 @@ async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackEr
 
         - coroutine_func: Is the function you want to run in the try block (e.g self.TH2.ReadAttribute)
         - *args: Captures positional arguments (e.g self.dut_node_id)
-        - **kwargs: Captures named arguments (e.g nodeid=self.dut_node_id. In this case the argument is named nodeid)
-        - exception_type: Name of the exception (e.g ChipStackError)
+        - **kwargs: Captures named arguments (e.g nodeid=self.dut_node_id. In this case the argument is named with nodeid)
+        - excection_type: Name of the exception (e.g ChipStackError)
         - assert_func: Assertion function (e.g assert_func=lambda e: asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission"))
         - error_msg: Error message
 
@@ -2236,7 +2236,7 @@ async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackEr
             await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=False, autoResubscribe=False)
             asserts.fail("Incorrectly subscribed to attribute with invalid permissions")
         except ChipStackError as e:
-            asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission")
+            asserts.assert_equal(e.err, ERROR_CODE, "Incorrect error message received from subscription with no permission")
 
     (4) AFTER:
         await run_with_error_check(
@@ -2249,7 +2249,7 @@ async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackEr
             autoResubscribe=False,                                                                      # Function's parameter
             exception_type=ChipStackError,                                                              # Exception type
             assert_func=lambda e: asserts.assert_equal(                                                 # Assertion function
-                e.err, 0x580, "Incorrect error message received from subscription with no permission"
+                e.err, ERROR_CODE, "Incorrect error message received from subscription with no permission"
             ),
             error_msg="Incorrectly subscribed to attribute with invalid permissions"                    # Error message
         )
