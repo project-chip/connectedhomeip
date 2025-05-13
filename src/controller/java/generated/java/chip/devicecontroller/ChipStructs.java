@@ -17559,26 +17559,22 @@ public static class JointFabricDatastoreClusterDatastoreStatusEntryStruct {
     return output.toString();
   }
 }
-public static class JointFabricDatastoreClusterDatastoreNodeKeySetEntry {
+public static class JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct {
   public Long nodeID;
   public Integer groupKeySetID;
   public ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry;
-  public Integer fabricIndex;
   private static final long NODE_ID_ID = 0L;
   private static final long GROUP_KEY_SET_ID_ID = 1L;
   private static final long STATUS_ENTRY_ID = 2L;
-  private static final long FABRIC_INDEX_ID = 254L;
 
-  public JointFabricDatastoreClusterDatastoreNodeKeySetEntry(
+  public JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(
     Long nodeID,
     Integer groupKeySetID,
-    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry,
-    Integer fabricIndex
+    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry
   ) {
     this.nodeID = nodeID;
     this.groupKeySetID = groupKeySetID;
     this.statusEntry = statusEntry;
-    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -17586,19 +17582,17 @@ public static class JointFabricDatastoreClusterDatastoreNodeKeySetEntry {
     values.add(new StructElement(NODE_ID_ID, new UIntType(nodeID)));
     values.add(new StructElement(GROUP_KEY_SET_ID_ID, new UIntType(groupKeySetID)));
     values.add(new StructElement(STATUS_ENTRY_ID, statusEntry.encodeTlv()));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
 
-  public static JointFabricDatastoreClusterDatastoreNodeKeySetEntry decodeTlv(BaseTLVType tlvValue) {
+  public static JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
     Long nodeID = null;
     Integer groupKeySetID = null;
     ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry = null;
-    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -17615,25 +17609,19 @@ public static class JointFabricDatastoreClusterDatastoreNodeKeySetEntry {
           StructType castingValue = element.value(StructType.class);
           statusEntry = ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct.decodeTlv(castingValue);
         }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
       }
     }
-    return new JointFabricDatastoreClusterDatastoreNodeKeySetEntry(
+    return new JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(
       nodeID,
       groupKeySetID,
-      statusEntry,
-      fabricIndex
+      statusEntry
     );
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("JointFabricDatastoreClusterDatastoreNodeKeySetEntry {\n");
+    output.append("JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct {\n");
     output.append("\tnodeID: ");
     output.append(nodeID);
     output.append("\n");
@@ -17643,9 +17631,6 @@ public static class JointFabricDatastoreClusterDatastoreNodeKeySetEntry {
     output.append("\tstatusEntry: ");
     output.append(statusEntry);
     output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
-    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
@@ -17654,22 +17639,18 @@ public static class JointFabricDatastoreClusterDatastoreNodeInformationEntryStru
   public Long nodeID;
   public String friendlyName;
   public ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct commissioningStatusEntry;
-  public Integer fabricIndex;
   private static final long NODE_ID_ID = 1L;
   private static final long FRIENDLY_NAME_ID = 2L;
   private static final long COMMISSIONING_STATUS_ENTRY_ID = 3L;
-  private static final long FABRIC_INDEX_ID = 254L;
 
   public JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
     Long nodeID,
     String friendlyName,
-    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct commissioningStatusEntry,
-    Integer fabricIndex
+    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct commissioningStatusEntry
   ) {
     this.nodeID = nodeID;
     this.friendlyName = friendlyName;
     this.commissioningStatusEntry = commissioningStatusEntry;
-    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -17677,7 +17658,6 @@ public static class JointFabricDatastoreClusterDatastoreNodeInformationEntryStru
     values.add(new StructElement(NODE_ID_ID, new UIntType(nodeID)));
     values.add(new StructElement(FRIENDLY_NAME_ID, new StringType(friendlyName)));
     values.add(new StructElement(COMMISSIONING_STATUS_ENTRY_ID, commissioningStatusEntry.encodeTlv()));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -17689,7 +17669,6 @@ public static class JointFabricDatastoreClusterDatastoreNodeInformationEntryStru
     Long nodeID = null;
     String friendlyName = null;
     ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct commissioningStatusEntry = null;
-    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -17706,18 +17685,12 @@ public static class JointFabricDatastoreClusterDatastoreNodeInformationEntryStru
           StructType castingValue = element.value(StructType.class);
           commissioningStatusEntry = ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct.decodeTlv(castingValue);
         }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
       }
     }
     return new JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
       nodeID,
       friendlyName,
-      commissioningStatusEntry,
-      fabricIndex
+      commissioningStatusEntry
     );
   }
 
@@ -17734,9 +17707,6 @@ public static class JointFabricDatastoreClusterDatastoreNodeInformationEntryStru
     output.append("\tcommissioningStatusEntry: ");
     output.append(commissioningStatusEntry);
     output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
-    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
@@ -17746,25 +17716,21 @@ public static class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStru
   public Integer endpointID;
   public Integer groupID;
   public ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry;
-  public Integer fabricIndex;
   private static final long NODE_ID_ID = 0L;
   private static final long ENDPOINT_ID_ID = 1L;
   private static final long GROUP_ID_ID = 2L;
   private static final long STATUS_ENTRY_ID = 3L;
-  private static final long FABRIC_INDEX_ID = 254L;
 
   public JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
     Long nodeID,
     Integer endpointID,
     Integer groupID,
-    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry,
-    Integer fabricIndex
+    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry
   ) {
     this.nodeID = nodeID;
     this.endpointID = endpointID;
     this.groupID = groupID;
     this.statusEntry = statusEntry;
-    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -17773,7 +17739,6 @@ public static class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStru
     values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
     values.add(new StructElement(GROUP_ID_ID, new UIntType(groupID)));
     values.add(new StructElement(STATUS_ENTRY_ID, statusEntry.encodeTlv()));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -17786,7 +17751,6 @@ public static class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStru
     Integer endpointID = null;
     Integer groupID = null;
     ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry = null;
-    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -17808,19 +17772,13 @@ public static class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStru
           StructType castingValue = element.value(StructType.class);
           statusEntry = ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct.decodeTlv(castingValue);
         }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
       }
     }
     return new JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
       nodeID,
       endpointID,
       groupID,
-      statusEntry,
-      fabricIndex
+      statusEntry
     );
   }
 
@@ -17839,9 +17797,6 @@ public static class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStru
     output.append("\n");
     output.append("\tstatusEntry: ");
     output.append(statusEntry);
-    output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -18035,28 +17990,24 @@ public static class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStru
   public Integer listID;
   public ChipStructs.JointFabricDatastoreClusterDatastoreBindingTargetStruct binding;
   public ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry;
-  public Integer fabricIndex;
   private static final long NODE_ID_ID = 0L;
   private static final long ENDPOINT_ID_ID = 1L;
   private static final long LIST_ID_ID = 2L;
   private static final long BINDING_ID = 3L;
   private static final long STATUS_ENTRY_ID = 4L;
-  private static final long FABRIC_INDEX_ID = 254L;
 
   public JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
     Long nodeID,
     Integer endpointID,
     Integer listID,
     ChipStructs.JointFabricDatastoreClusterDatastoreBindingTargetStruct binding,
-    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry,
-    Integer fabricIndex
+    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry
   ) {
     this.nodeID = nodeID;
     this.endpointID = endpointID;
     this.listID = listID;
     this.binding = binding;
     this.statusEntry = statusEntry;
-    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -18066,7 +18017,6 @@ public static class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStru
     values.add(new StructElement(LIST_ID_ID, new UIntType(listID)));
     values.add(new StructElement(BINDING_ID, binding.encodeTlv()));
     values.add(new StructElement(STATUS_ENTRY_ID, statusEntry.encodeTlv()));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -18080,7 +18030,6 @@ public static class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStru
     Integer listID = null;
     ChipStructs.JointFabricDatastoreClusterDatastoreBindingTargetStruct binding = null;
     ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry = null;
-    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -18107,11 +18056,6 @@ public static class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStru
           StructType castingValue = element.value(StructType.class);
           statusEntry = ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct.decodeTlv(castingValue);
         }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
       }
     }
     return new JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
@@ -18119,8 +18063,7 @@ public static class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStru
       endpointID,
       listID,
       binding,
-      statusEntry,
-      fabricIndex
+      statusEntry
     );
   }
 
@@ -18142,9 +18085,6 @@ public static class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStru
     output.append("\n");
     output.append("\tstatusEntry: ");
     output.append(statusEntry);
-    output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -18322,25 +18262,21 @@ public static class JointFabricDatastoreClusterDatastoreACLEntryStruct {
   public Integer listID;
   public ChipStructs.JointFabricDatastoreClusterDatastoreAccessControlEntryStruct ACLEntry;
   public ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry;
-  public Integer fabricIndex;
   private static final long NODE_ID_ID = 0L;
   private static final long LIST_ID_ID = 1L;
   private static final long ACL_ENTRY_ID = 2L;
   private static final long STATUS_ENTRY_ID = 3L;
-  private static final long FABRIC_INDEX_ID = 254L;
 
   public JointFabricDatastoreClusterDatastoreACLEntryStruct(
     Long nodeID,
     Integer listID,
     ChipStructs.JointFabricDatastoreClusterDatastoreAccessControlEntryStruct ACLEntry,
-    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry,
-    Integer fabricIndex
+    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry
   ) {
     this.nodeID = nodeID;
     this.listID = listID;
     this.ACLEntry = ACLEntry;
     this.statusEntry = statusEntry;
-    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -18349,7 +18285,6 @@ public static class JointFabricDatastoreClusterDatastoreACLEntryStruct {
     values.add(new StructElement(LIST_ID_ID, new UIntType(listID)));
     values.add(new StructElement(ACL_ENTRY_ID, ACLEntry.encodeTlv()));
     values.add(new StructElement(STATUS_ENTRY_ID, statusEntry.encodeTlv()));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -18362,7 +18297,6 @@ public static class JointFabricDatastoreClusterDatastoreACLEntryStruct {
     Integer listID = null;
     ChipStructs.JointFabricDatastoreClusterDatastoreAccessControlEntryStruct ACLEntry = null;
     ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry = null;
-    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -18384,19 +18318,13 @@ public static class JointFabricDatastoreClusterDatastoreACLEntryStruct {
           StructType castingValue = element.value(StructType.class);
           statusEntry = ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct.decodeTlv(castingValue);
         }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
       }
     }
     return new JointFabricDatastoreClusterDatastoreACLEntryStruct(
       nodeID,
       listID,
       ACLEntry,
-      statusEntry,
-      fabricIndex
+      statusEntry
     );
   }
 
@@ -18416,9 +18344,6 @@ public static class JointFabricDatastoreClusterDatastoreACLEntryStruct {
     output.append("\tstatusEntry: ");
     output.append(statusEntry);
     output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
-    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
@@ -18428,25 +18353,21 @@ public static class JointFabricDatastoreClusterDatastoreAdministratorInformation
   public String friendlyName;
   public Integer vendorID;
   public byte[] icac;
-  public Integer fabricIndex;
   private static final long NODE_ID_ID = 1L;
   private static final long FRIENDLY_NAME_ID = 2L;
   private static final long VENDOR_ID_ID = 3L;
   private static final long ICAC_ID = 4L;
-  private static final long FABRIC_INDEX_ID = 254L;
 
   public JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
     Long nodeID,
     String friendlyName,
     Integer vendorID,
-    byte[] icac,
-    Integer fabricIndex
+    byte[] icac
   ) {
     this.nodeID = nodeID;
     this.friendlyName = friendlyName;
     this.vendorID = vendorID;
     this.icac = icac;
-    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -18455,7 +18376,6 @@ public static class JointFabricDatastoreClusterDatastoreAdministratorInformation
     values.add(new StructElement(FRIENDLY_NAME_ID, new StringType(friendlyName)));
     values.add(new StructElement(VENDOR_ID_ID, new UIntType(vendorID)));
     values.add(new StructElement(ICAC_ID, new ByteArrayType(icac)));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -18468,7 +18388,6 @@ public static class JointFabricDatastoreClusterDatastoreAdministratorInformation
     String friendlyName = null;
     Integer vendorID = null;
     byte[] icac = null;
-    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -18490,19 +18409,13 @@ public static class JointFabricDatastoreClusterDatastoreAdministratorInformation
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           icac = castingValue.value(byte[].class);
         }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
       }
     }
     return new JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
       nodeID,
       friendlyName,
       vendorID,
-      icac,
-      fabricIndex
+      icac
     );
   }
 
@@ -18522,9 +18435,6 @@ public static class JointFabricDatastoreClusterDatastoreAdministratorInformation
     output.append("\ticac: ");
     output.append(Arrays.toString(icac));
     output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
-    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
@@ -18536,14 +18446,12 @@ public static class JointFabricDatastoreClusterDatastoreGroupInformationEntryStr
   public @Nullable Integer groupCAT;
   public @Nullable Integer groupCATVersion;
   public Integer groupPermission;
-  public Integer fabricIndex;
   private static final long GROUP_ID_ID = 0L;
   private static final long FRIENDLY_NAME_ID = 1L;
   private static final long GROUP_KEY_SET_ID_ID = 2L;
   private static final long GROUP_CAT_ID = 3L;
   private static final long GROUP_CAT_VERSION_ID = 4L;
   private static final long GROUP_PERMISSION_ID = 5L;
-  private static final long FABRIC_INDEX_ID = 254L;
 
   public JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
     Long groupID,
@@ -18551,8 +18459,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupInformationEntryStr
     @Nullable Integer groupKeySetID,
     @Nullable Integer groupCAT,
     @Nullable Integer groupCATVersion,
-    Integer groupPermission,
-    Integer fabricIndex
+    Integer groupPermission
   ) {
     this.groupID = groupID;
     this.friendlyName = friendlyName;
@@ -18560,7 +18467,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupInformationEntryStr
     this.groupCAT = groupCAT;
     this.groupCATVersion = groupCATVersion;
     this.groupPermission = groupPermission;
-    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -18571,7 +18477,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupInformationEntryStr
     values.add(new StructElement(GROUP_CAT_ID, groupCAT != null ? new UIntType(groupCAT) : new NullType()));
     values.add(new StructElement(GROUP_CAT_VERSION_ID, groupCATVersion != null ? new UIntType(groupCATVersion) : new NullType()));
     values.add(new StructElement(GROUP_PERMISSION_ID, new UIntType(groupPermission)));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -18586,7 +18491,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupInformationEntryStr
     @Nullable Integer groupCAT = null;
     @Nullable Integer groupCATVersion = null;
     Integer groupPermission = null;
-    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -18618,11 +18522,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupInformationEntryStr
           UIntType castingValue = element.value(UIntType.class);
           groupPermission = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
       }
     }
     return new JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
@@ -18631,8 +18530,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupInformationEntryStr
       groupKeySetID,
       groupCAT,
       groupCATVersion,
-      groupPermission,
-      fabricIndex
+      groupPermission
     );
   }
 
@@ -18657,9 +18555,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupInformationEntryStr
     output.append("\n");
     output.append("\tgroupPermission: ");
     output.append(groupPermission);
-    output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -18826,97 +18721,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     output.append("\n");
     output.append("\tgroupKeyMulticastPolicy: ");
     output.append(groupKeyMulticastPolicy);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class JointFabricDatastoreClusterDatastoreStatusStruct {
-  public Integer state;
-  public Long updateTimestamp;
-  public Integer failureCode;
-  public Integer fabricIndex;
-  private static final long STATE_ID = 0L;
-  private static final long UPDATE_TIMESTAMP_ID = 1L;
-  private static final long FAILURE_CODE_ID = 2L;
-  private static final long FABRIC_INDEX_ID = 254L;
-
-  public JointFabricDatastoreClusterDatastoreStatusStruct(
-    Integer state,
-    Long updateTimestamp,
-    Integer failureCode,
-    Integer fabricIndex
-  ) {
-    this.state = state;
-    this.updateTimestamp = updateTimestamp;
-    this.failureCode = failureCode;
-    this.fabricIndex = fabricIndex;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(STATE_ID, new UIntType(state)));
-    values.add(new StructElement(UPDATE_TIMESTAMP_ID, new UIntType(updateTimestamp)));
-    values.add(new StructElement(FAILURE_CODE_ID, new UIntType(failureCode)));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
-
-    return new StructType(values);
-  }
-
-  public static JointFabricDatastoreClusterDatastoreStatusStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer state = null;
-    Long updateTimestamp = null;
-    Integer failureCode = null;
-    Integer fabricIndex = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == STATE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          state = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == UPDATE_TIMESTAMP_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          updateTimestamp = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == FAILURE_CODE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          failureCode = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new JointFabricDatastoreClusterDatastoreStatusStruct(
-      state,
-      updateTimestamp,
-      failureCode,
-      fabricIndex
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("JointFabricDatastoreClusterDatastoreStatusStruct {\n");
-    output.append("\tstate: ");
-    output.append(state);
-    output.append("\n");
-    output.append("\tupdateTimestamp: ");
-    output.append(updateTimestamp);
-    output.append("\n");
-    output.append("\tfailureCode: ");
-    output.append(failureCode);
-    output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
