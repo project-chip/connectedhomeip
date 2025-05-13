@@ -2260,7 +2260,9 @@ async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackEr
         await coroutine_func(*args, **kwargs)
         asserts.fail(error_msg)
     except exception_type as e:
-        if assert_func:
+        if assert_func is None:
+            asserts.fail(f"Exception caught: {e}, but no assertion function was provided to validate it")
+        else:
             assert_func(e)
 
 
