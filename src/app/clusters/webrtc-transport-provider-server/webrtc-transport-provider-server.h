@@ -23,13 +23,14 @@
 #include <string>
 #include <vector>
 
+using ICEServerDecodableStruct = chip::app::Clusters::Global::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Global::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Global::Structs::ICECandidateStruct::Type;
+
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
-
-using ICEServerDecodableStruct = Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = Structs::WebRTCSessionStruct::Type;
 
 /**
  * @brief
@@ -50,7 +51,6 @@ public:
         Optional<DataModel::Nullable<uint16_t>> audioStreamId;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
-        Optional<BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
         NodeId peerNodeId;
         FabricIndex fabricIndex;
         EndpointId originatingEndpointId;
@@ -164,7 +164,7 @@ public:
      *   - CHIP_NO_ERROR on success
      *   - An error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) = 0;
+    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) = 0;
 
     /**
      * @brief

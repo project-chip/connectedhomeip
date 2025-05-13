@@ -115,12 +115,13 @@ public:
      *
      * @param webRTCSessionId   The unique identifier for the WebRTC session to which these
      *                          ICE candidates apply.
-     * @param ICECandidates     A list of ICE candidate strings. Each string typically follows
-     *                          the "candidate:" syntax defined in the ICE specification.
+     * @param ICECandidates     A list of ICE candidate structs.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID,
+                                     chip::app::DataModel::List<const ICECandidateStruct> ICECandidates);
 
     /**
      * @brief Notify WebRTCProviderClient that the Offer command has been received.

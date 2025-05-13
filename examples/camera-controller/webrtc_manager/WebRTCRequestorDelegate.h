@@ -31,7 +31,8 @@ public:
 
     CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
-    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) override;
+    CHIP_ERROR HandleICECandidates(uint16_t sessionId,
+                                   const std::vector<ICECandidateStruct> & candidates) override;
 
     CHIP_ERROR HandleEnd(uint16_t sessionId,
                          chip::app::Clusters::WebRTCTransportRequestor::WebRTCEndReasonEnum reasonCode) override;

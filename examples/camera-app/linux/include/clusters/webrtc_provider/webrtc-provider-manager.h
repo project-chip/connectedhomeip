@@ -28,6 +28,9 @@
 
 #include <unordered_map>
 
+using ICEServerDecodableStruct = chip::app::Clusters::Global::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Global::Structs::WebRTCSessionStruct::Type;
+
 namespace Camera {
 
 class WebRTCProviderManager : public chip::app::Clusters::WebRTCTransportProvider::Delegate
@@ -55,9 +58,10 @@ public:
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
-    CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) override;
+    CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId,
+        const std::vector<ICECandidateStruct> & candidates) override;
 
-    CHIP_ERROR HandleEndSession(uint16_t sessionId, chip::app::Clusters::WebRTCTransportProvider::WebRTCEndReasonEnum reasonCode,
+    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
                                 chip::app::DataModel::Nullable<uint16_t> videoStreamID,
                                 chip::app::DataModel::Nullable<uint16_t> audioStreamID) override;
 
@@ -119,7 +123,7 @@ private:
 
     // Each string in this vector represents a local ICE candidate used to facilitate the negotiation
     // of peer-to-peer connections through NATs (Network Address Translators) and firewalls.
-    std::vector<std::string> mLocalCandidates;
+    std::vector<ICECandidateStruct> mLocalCandidates;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
