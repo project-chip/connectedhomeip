@@ -164,7 +164,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
         ASSERT_EQ(commands.size(), 1u);
         ASSERT_EQ(commands[0].commandId, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
-        ASSERT_EQ(commands[0].GetInvokePrivilege(), SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.GetInvokePrivilege());
+        ASSERT_EQ(commands[0].GetInvokePrivilege(),
+                  SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.GetInvokePrivilege());
 
         ASSERT_EQ(diag.GetFeatureMap(), BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks });
 
@@ -213,7 +214,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
         ASSERT_EQ(commands.size(), 1u);
         ASSERT_EQ(commands[0].commandId, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
-        ASSERT_EQ(commands[0].GetInvokePrivilege(), SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.GetInvokePrivilege());
+        ASSERT_EQ(commands[0].GetInvokePrivilege(),
+                  SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.GetInvokePrivilege());
 
         ASSERT_EQ(diag.GetFeatureMap(), BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks });
 
