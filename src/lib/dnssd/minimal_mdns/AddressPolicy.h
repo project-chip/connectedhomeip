@@ -47,6 +47,7 @@ AddressPolicy * GetAddressPolicy();
 
 /// Update the global address policy.
 ///
+/// If no default address policy is set at compile time, this function
 /// MUST be called before any minmdns functionality is used (e.g. server
 /// startup)
 void SetAddressPolicy(AddressPolicy * policy);
