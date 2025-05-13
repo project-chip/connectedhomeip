@@ -13,7 +13,9 @@
 # limitations under the License.
 #
 import os
+import re
 from dataclasses import dataclass
+from typing import Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.storage import GeneratorStorage
@@ -100,7 +102,12 @@ def extract_shared_enums(idl: Idl) -> list[EnumEntry]:
     for g in idl.global_enums:
         result.append(EnumEntry(namespace="Globals", enum=g))
 
-    # shared enums are unique by name
+    # Code generation relies that shared enums are unique by name.
+    # XMLs could be written to duplicate things, however that would break our codegen
+    # significantly as we use a single namespace for shared things: `details` and
+    # name clashes would not work.
+    #
+    # For now rely that the names are unique.
     found_enums = set()
     for c in idl.clusters:
         for e in c.enums:
@@ -117,38 +124,16 @@ def extract_shared_enums(idl: Idl) -> list[EnumEntry]:
     return result
 
 
-# Enum names assumed "good" from an acronym standpoint
-_KNOWN_ENUM_NAMES = {
-    "kKVAh",
-    "kRMSVoltage",
-    "kRMSCurrent",
-    "kRMSPower",
-}
+def enum_constant_from_spec_name(spec_name: Optional[str]) -> Optional[str]:
+    if spec_name is None:
+        return None
 
-
-def remove_acronyms_from_enum_constant(s: str) -> str:
-    """
-    Matter IDL generates enum constants with "preserveAcronyms" so things like
-    TV, OK, CASE, PASE are kept as UPPERCASE instead of being Firstupperonly like
-    Tv, Ok, Case, Pase
-
-    This function undoes that to be compatible with C++ codegen.
-    """
-
-    # Acronyms are hard to undo (we are missing space info). General approach is to consider
-    # xyzABCDother as "ABC acronym" (i.e. look for things that are preceeded and trailed by
-    # uppercase/digits and assume those are acronyms)
-    #
-    # This does not always work, so some things are hardcoded
-    if s in _KNOWN_ENUM_NAMES:
-        return s
-
-    result = ""
-    for c, before, after in zip(s, "l" + s, s[1:] + "U"):
-        if c.isupper() and before.isupper() and (after.isupper() or after.isdigit()):
-            result += c.lower()
-        else:
-            result += c
+    # C++ uses asUpperCampeCase names, without acronym preservation. Logic is:
+    #   - split by words
+    #   - CamelCase words
+    result = "k"
+    for word in re.split(r"[- _/\\]", spec_name):
+        result += word[0].upper() + word[1:].lower()
 
     return result
 
@@ -172,9 +157,7 @@ class SdkGenerator(CodeGenerator):
             extract_command_quality_flags
         )
         self.jinja_env.filters["name_for_id_usage"] = name_for_id_usage
-        self.jinja_env.filters["remove_acronyms_from_enum_constant"] = (
-            remove_acronyms_from_enum_constant
-        )
+        self.jinja_env.filters["enum_constant_from_spec_name"] = enum_constant_from_spec_name
         self.jinja_env.tests["global_attribute"] = global_attribute
         self.jinja_env.tests["response_struct"] = response_struct
 
