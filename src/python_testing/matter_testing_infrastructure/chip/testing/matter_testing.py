@@ -2197,7 +2197,7 @@ class CommissionDeviceTest(MatterBaseTest):
             raise signals.TestAbortAll("Failed to commission node(s)")
 
 
-async def run_with_error_check(coroutine_func, *args, exception_type=Exception, assert_func=None, error_msg="Unexpected success", **kwargs):
+async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackError, assert_func=None, error_msg="Unexpected success", **kwargs):
     '''
     Explanation:
 
