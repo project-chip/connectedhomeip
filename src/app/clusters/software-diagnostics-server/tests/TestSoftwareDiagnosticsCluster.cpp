@@ -37,11 +37,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
-bool EqualAttributeEntries(const AttributeEntry & a, const AttributeEntry & b)
-{
-    return (a.attributeId == b.attributeId) && (a.flags == b.flags) && (a.readPrivilege == b.readPrivilege) &&
-        (a.writePrivilege == b.writePrivilege);
-}
 // Comparse two attribute entries as "sets of attributes" and ensures that the content is identical
 bool EqualAttributeSets(Span<const AttributeEntry> a, Span<const AttributeEntry> b)
 {
@@ -100,7 +95,7 @@ bool EqualAttributeSets(Span<const AttributeEntry> a, Span<const AttributeEntry>
             return false;
         }
 
-        if (!EqualAttributeEntries(*it.second, *other->second))
+        if (*it.second != *other->second)
         {
 
             ChipLogError(Test, "Different content (different flags?): 0x%08X", static_cast<int>(it.first));
@@ -169,7 +164,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
         ASSERT_EQ(commands.size(), 1u);
         ASSERT_EQ(commands[0].commandId, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
-        ASSERT_EQ(commands[0].invokePrivilege, SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.invokePrivilege);
+        ASSERT_EQ(commands[0].GetInvokePrivilege(), SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.GetInvokePrivilege());
 
         ASSERT_EQ(diag.GetFeatureMap(), BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks });
 
@@ -218,7 +213,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
         ASSERT_EQ(commands.size(), 1u);
         ASSERT_EQ(commands[0].commandId, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
-        ASSERT_EQ(commands[0].invokePrivilege, SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.invokePrivilege);
+        ASSERT_EQ(commands[0].GetInvokePrivilege(), SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.GetInvokePrivilege());
 
         ASSERT_EQ(diag.GetFeatureMap(), BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks });
 
