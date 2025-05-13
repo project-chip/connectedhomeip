@@ -54,7 +54,7 @@ enum AreaTypeTag : enum8 {
   kLibrary = 51;
   kLivingRoom = 52;
   kLounge = 53;
-  kMediaTVRoom = 54;
+  kMediaTVRoom = 54 [spec_name = "Media/TV Room"];
   kMudRoom = 55;
   kMusicRoom = 56;
   kNursery = 57;
@@ -455,8 +455,8 @@ cluster AccessControl = 31 {
   revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
-    kPASE = 1;
-    kCASE = 2;
+    kPASE = 1 [spec_name = "PASE"];
+    kCASE = 2 [spec_name = "CASE"];
     kGroup = 3;
   }
 
@@ -681,7 +681,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   enum DownloadProtocolEnum : enum8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
-    kHTTPS = 2;
+    kHTTPS = 2 [spec_name = "HTTPS"];
     kVendorSpecific = 3;
   }
 
@@ -825,7 +825,7 @@ cluster GeneralCommissioning = 48 {
   revision 1; // NOTE: Default/not specifically set
 
   enum CommissioningErrorEnum : enum8 {
-    kOK = 0;
+    kOK = 0 [spec_name = "OK"];
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -932,12 +932,12 @@ cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : enum8 {
-    k2G4 = 0;
-    k3G65 = 1;
-    k5G = 2;
-    k6G = 3;
-    k60G = 4;
-    k1G = 5;
+    k2G4 = 0 [spec_name = "2G4"];
+    k3G65 = 1 [spec_name = "3G65"];
+    k5G = 2 [spec_name = "5G"];
+    k6G = 3 [spec_name = "6G"];
+    k60G = 4 [spec_name = "60G"];
+    k1G = 5 [spec_name = "1G"];
   }
 
   bitmap Feature : bitmap32 {
@@ -957,11 +957,11 @@ cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurityBitmap : bitmap8 {
     kUnencrypted = 0x1;
-    kWEP = 0x2;
-    kWPAPersonal = 0x4;
-    kWPA2Personal = 0x8;
-    kWPA3Personal = 0x10;
-    kWPA3MatterPDC = 0x20;
+    kWEP = 0x2 [spec_name = "WEP"];
+    kWPAPersonal = 0x4 [spec_name = "WPA-PERSONAL"];
+    kWPA2Personal = 0x8 [spec_name = "WPA2-PERSONAL"];
+    kWPA3Personal = 0x10 [spec_name = "WPA3-PERSONAL"];
+    kWPA3MatterPDC = 0x20 [spec_name = "WPA3-Matter-PDC"];
   }
 
   struct NetworkInfoStruct {
@@ -1110,7 +1110,7 @@ cluster DiagnosticLogs = 50 {
 
   enum TransferProtocolEnum : enum8 {
     kResponsePayload = 0;
-    kBDX = 1;
+    kBDX = 1 [spec_name = "BDX"];
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1361,7 +1361,7 @@ cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : enum8 {
-    kOK = 0;
+    kOK = 0 [spec_name = "OK"];
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1581,7 +1581,7 @@ cluster HepaFilterMonitoring = 113 {
   revision 1; // NOTE: Default/not specifically set
 
   shared enum ChangeIndicationEnum : enum8 {
-    kOK = 0;
+    kOK = 0 [spec_name = "OK"];
     kWarning = 1;
     kCritical = 2;
   }
@@ -1592,11 +1592,11 @@ cluster HepaFilterMonitoring = 113 {
   }
 
   shared enum ProductIdentifierTypeEnum : enum8 {
-    kUPC = 0;
-    kGTIN8 = 1;
-    kEAN = 2;
-    kGTIN14 = 3;
-    kOEM = 4;
+    kUPC = 0 [spec_name = "UPC"];
+    kGTIN8 = 1 [spec_name = "GTIN-8"];
+    kEAN = 2 [spec_name = "EAN"];
+    kGTIN14 = 3 [spec_name = "GTIN-14"];
+    kOEM = 4 [spec_name = "OEM"];
   }
 
   bitmap Feature : bitmap32 {
@@ -1631,7 +1631,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   revision 1; // NOTE: Default/not specifically set
 
   shared enum ChangeIndicationEnum : enum8 {
-    kOK = 0;
+    kOK = 0 [spec_name = "OK"];
     kWarning = 1;
     kCritical = 2;
   }
@@ -1642,11 +1642,11 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   }
 
   shared enum ProductIdentifierTypeEnum : enum8 {
-    kUPC = 0;
-    kGTIN8 = 1;
-    kEAN = 2;
-    kGTIN14 = 3;
-    kOEM = 4;
+    kUPC = 0 [spec_name = "UPC"];
+    kGTIN8 = 1 [spec_name = "GTIN-8"];
+    kEAN = 2 [spec_name = "EAN"];
+    kGTIN14 = 3 [spec_name = "GTIN-14"];
+    kOEM = 4 [spec_name = "OEM"];
   }
 
   bitmap Feature : bitmap32 {

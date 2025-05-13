@@ -54,7 +54,7 @@ enum AreaTypeTag : enum8 {
   kLibrary = 51;
   kLivingRoom = 52;
   kLounge = 53;
-  kMediaTVRoom = 54;
+  kMediaTVRoom = 54 [spec_name = "Media/TV Room"];
   kMudRoom = 55;
   kMusicRoom = 56;
   kNursery = 57;
@@ -404,8 +404,8 @@ cluster AccessControl = 31 {
   revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
-    kPASE = 1;
-    kCASE = 2;
+    kPASE = 1 [spec_name = "PASE"];
+    kCASE = 2 [spec_name = "CASE"];
     kGroup = 3;
   }
 
@@ -617,22 +617,6 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
   revision 1; // NOTE: Default/not specifically set
@@ -688,7 +672,7 @@ cluster PowerSource = 47 {
   }
 
   enum BatChargeLevelEnum : enum8 {
-    kOK = 0;
+    kOK = 0 [spec_name = "OK"];
     kWarning = 1;
     kCritical = 2;
   }
@@ -702,15 +686,15 @@ cluster PowerSource = 47 {
 
   enum BatCommonDesignationEnum : enum16 {
     kUnspecified = 0;
-    kAAA = 1;
-    kAA = 2;
+    kAAA = 1 [spec_name = "AAA"];
+    kAA = 2 [spec_name = "AA"];
     kC = 3;
     kD = 4;
     k4v5 = 5;
     k6v0 = 6;
     k9v0 = 7;
-    k12AA = 8;
-    kAAAA = 9;
+    k12AA = 8 [spec_name = "1_2AA"];
+    kAAAA = 9 [spec_name = "AAAA"];
     kA = 10;
     kB = 11;
     kF = 12;
@@ -719,9 +703,9 @@ cluster PowerSource = 47 {
     kSubC = 15;
     kA23 = 16;
     kA27 = 17;
-    kBA5800 = 18;
+    kBA5800 = 18 [spec_name = "BA5800"];
     kDuplex = 19;
-    k4SR44 = 20;
+    k4SR44 = 20 [spec_name = "4SR44"];
     k523 = 21;
     k531 = 22;
     k15v0 = 23;
@@ -730,39 +714,39 @@ cluster PowerSource = 47 {
     k45v0 = 26;
     k67v5 = 27;
     kJ = 28;
-    kCR123A = 29;
-    kCR2 = 30;
-    k2CR5 = 31;
-    kCRP2 = 32;
-    kCRV3 = 33;
-    kSR41 = 34;
-    kSR43 = 35;
-    kSR44 = 36;
-    kSR45 = 37;
-    kSR48 = 38;
-    kSR54 = 39;
-    kSR55 = 40;
-    kSR57 = 41;
-    kSR58 = 42;
-    kSR59 = 43;
-    kSR60 = 44;
-    kSR63 = 45;
-    kSR64 = 46;
-    kSR65 = 47;
-    kSR66 = 48;
-    kSR67 = 49;
-    kSR68 = 50;
-    kSR69 = 51;
-    kSR516 = 52;
-    kSR731 = 53;
-    kSR712 = 54;
-    kLR932 = 55;
+    kCR123A = 29 [spec_name = "CR123A"];
+    kCR2 = 30 [spec_name = "CR2"];
+    k2CR5 = 31 [spec_name = "2CR5"];
+    kCRP2 = 32 [spec_name = "CR_P2"];
+    kCRV3 = 33 [spec_name = "CR_V3"];
+    kSR41 = 34 [spec_name = "SR41"];
+    kSR43 = 35 [spec_name = "SR43"];
+    kSR44 = 36 [spec_name = "SR44"];
+    kSR45 = 37 [spec_name = "SR45"];
+    kSR48 = 38 [spec_name = "SR48"];
+    kSR54 = 39 [spec_name = "SR54"];
+    kSR55 = 40 [spec_name = "SR55"];
+    kSR57 = 41 [spec_name = "SR57"];
+    kSR58 = 42 [spec_name = "SR58"];
+    kSR59 = 43 [spec_name = "SR59"];
+    kSR60 = 44 [spec_name = "SR60"];
+    kSR63 = 45 [spec_name = "SR63"];
+    kSR64 = 46 [spec_name = "SR64"];
+    kSR65 = 47 [spec_name = "SR65"];
+    kSR66 = 48 [spec_name = "SR66"];
+    kSR67 = 49 [spec_name = "SR67"];
+    kSR68 = 50 [spec_name = "SR68"];
+    kSR69 = 51 [spec_name = "SR69"];
+    kSR516 = 52 [spec_name = "SR516"];
+    kSR731 = 53 [spec_name = "SR731"];
+    kSR712 = 54 [spec_name = "SR712"];
+    kLR932 = 55 [spec_name = "LR932"];
     kA5 = 56;
     kA10 = 57;
     kA13 = 58;
     kA312 = 59;
     kA675 = 60;
-    kAC41E = 61;
+    kAC41E = 61 [spec_name = "AC41E"];
     k10180 = 62;
     k10280 = 63;
     k10440 = 64;
@@ -772,7 +756,7 @@ cluster PowerSource = 47 {
     k14650 = 68;
     k15270 = 69;
     k16340 = 70;
-    kRCR123A = 71;
+    kRCR123A = 71 [spec_name = "RCR123A"];
     k17500 = 72;
     k17670 = 73;
     k18350 = 74;
@@ -805,8 +789,8 @@ cluster PowerSource = 47 {
   }
 
   enum WiredCurrentTypeEnum : enum8 {
-    kAC = 0;
-    kDC = 1;
+    kAC = 0 [spec_name = "AC"];
+    kDC = 1 [spec_name = "DC"];
   }
 
   enum WiredFaultEnum : enum8 {
@@ -896,7 +880,7 @@ cluster GeneralCommissioning = 48 {
   revision 1; // NOTE: Default/not specifically set
 
   enum CommissioningErrorEnum : enum8 {
-    kOK = 0;
+    kOK = 0 [spec_name = "OK"];
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -1003,12 +987,12 @@ cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : enum8 {
-    k2G4 = 0;
-    k3G65 = 1;
-    k5G = 2;
-    k6G = 3;
-    k60G = 4;
-    k1G = 5;
+    k2G4 = 0 [spec_name = "2G4"];
+    k3G65 = 1 [spec_name = "3G65"];
+    k5G = 2 [spec_name = "5G"];
+    k6G = 3 [spec_name = "6G"];
+    k60G = 4 [spec_name = "60G"];
+    k1G = 5 [spec_name = "1G"];
   }
 
   bitmap Feature : bitmap32 {
@@ -1028,11 +1012,11 @@ cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurityBitmap : bitmap8 {
     kUnencrypted = 0x1;
-    kWEP = 0x2;
-    kWPAPersonal = 0x4;
-    kWPA2Personal = 0x8;
-    kWPA3Personal = 0x10;
-    kWPA3MatterPDC = 0x20;
+    kWEP = 0x2 [spec_name = "WEP"];
+    kWPAPersonal = 0x4 [spec_name = "WPA-PERSONAL"];
+    kWPA2Personal = 0x8 [spec_name = "WPA2-PERSONAL"];
+    kWPA3Personal = 0x10 [spec_name = "WPA3-PERSONAL"];
+    kWPA3MatterPDC = 0x20 [spec_name = "WPA3-Matter-PDC"];
   }
 
   struct NetworkInfoStruct {
@@ -1181,7 +1165,7 @@ cluster DiagnosticLogs = 50 {
 
   enum TransferProtocolEnum : enum8 {
     kResponsePayload = 0;
-    kBDX = 1;
+    kBDX = 1 [spec_name = "BDX"];
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1432,7 +1416,7 @@ cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : enum8 {
-    kOK = 0;
+    kOK = 0 [spec_name = "OK"];
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1698,7 +1682,7 @@ cluster IlluminanceMeasurement = 1024 {
 
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
-    kCMOS = 1;
+    kCMOS = 1 [spec_name = "CMOS"];
   }
 
   readonly attribute nullable int16u measuredValue = 0;
@@ -1787,7 +1771,7 @@ cluster OccupancySensing = 1030 {
   revision 5;
 
   enum OccupancySensorTypeEnum : enum8 {
-    kPIR = 0;
+    kPIR = 0 [spec_name = "PIR"];
     kUltrasonic = 1;
     kPIRAndUltrasonic = 2;
     kPhysicalContact = 3;
@@ -1809,7 +1793,7 @@ cluster OccupancySensing = 1030 {
   }
 
   bitmap OccupancySensorTypeBitmap : bitmap8 {
-    kPIR = 0x1;
+    kPIR = 0x1 [spec_name = "PIR"];
     kUltrasonic = 0x2;
     kPhysicalContact = 0x4;
   }
@@ -1864,14 +1848,14 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -1920,14 +1904,14 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -1976,14 +1960,14 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -2032,14 +2016,14 @@ cluster OzoneConcentrationMeasurement = 1045 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -2088,14 +2072,14 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -2144,14 +2128,14 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -2200,14 +2184,14 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -2256,14 +2240,14 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -2312,14 +2296,14 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -2368,14 +2352,14 @@ cluster RadonConcentrationMeasurement = 1071 {
   }
 
   shared enum MeasurementUnitEnum : enum8 {
-    kPPM = 0;
-    kPPB = 1;
-    kPPT = 2;
-    kMGM3 = 3;
-    kUGM3 = 4;
-    kNGM3 = 5;
-    kPM3 = 6;
-    kBQM3 = 7;
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
   }
 
   bitmap Feature : bitmap32 {
@@ -2459,16 +2443,6 @@ endpoint 0 {
     callback attribute configurationVersion default = 1;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 5;
-  }
-
-  server cluster LocalizationConfiguration {
-    ram      attribute activeLocale;
-    callback attribute supportedLocales;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralCommissioning {
