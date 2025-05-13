@@ -115,10 +115,6 @@ void ConnectivityManagerImpl::ReportEthernetName()
         mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(interfaceName, interfaceNameLen)),
                                                          NullOptional);
     }
-    else
-    {
-        ChipLogError(DeviceLayer, "STILL NULL POINTER");
-    }
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
