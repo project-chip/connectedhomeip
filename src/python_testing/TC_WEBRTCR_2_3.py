@@ -117,8 +117,8 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
             await websocket.send(command)
 
             # Receive response
-            response = await websocket.recv()
-            logging.info(f"Received response: {response}")
+            await websocket.recv()
+            logging.info(f"Received response")
 
     @async_test_body
     async def test_TC_WebRTCRequestor_2_3(self):
