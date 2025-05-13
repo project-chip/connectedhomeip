@@ -93,109 +93,86 @@ inline constexpr DataModel::AttributeEntry
 
 namespace Commands {
 namespace AddKeySet {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(AddKeySet::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddKeySet::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace AddKeySet
 namespace UpdateKeySet {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(UpdateKeySet::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(UpdateKeySet::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace UpdateKeySet
 namespace RemoveKeySet {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(RemoveKeySet::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveKeySet::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace RemoveKeySet
 namespace AddGroup {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(AddGroup::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddGroup::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace AddGroup
 namespace UpdateGroup {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(UpdateGroup::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(UpdateGroup::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace UpdateGroup
 namespace RemoveGroup {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(RemoveGroup::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveGroup::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace RemoveGroup
 namespace AddAdmin {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(AddAdmin::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddAdmin::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace AddAdmin
 namespace UpdateAdmin {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(UpdateAdmin::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(UpdateAdmin::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace UpdateAdmin
 namespace RemoveAdmin {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(RemoveAdmin::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveAdmin::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace RemoveAdmin
 namespace AddPendingNode {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(AddPendingNode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddPendingNode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace AddPendingNode
 namespace RefreshNode {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(RefreshNode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RefreshNode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace RefreshNode
 namespace UpdateNode {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(UpdateNode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(UpdateNode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace UpdateNode
 namespace RemoveNode {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(RemoveNode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveNode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace RemoveNode
 namespace UpdateEndpointForNode {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(UpdateEndpointForNode::Id,
-                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+    kMetadataEntry(UpdateEndpointForNode::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace UpdateEndpointForNode
 namespace AddGroupIDToEndpointForNode {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(AddGroupIDToEndpointForNode::Id,
-                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+    kMetadataEntry(AddGroupIDToEndpointForNode::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace AddGroupIDToEndpointForNode
 namespace RemoveGroupIDFromEndpointForNode {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(RemoveGroupIDFromEndpointForNode::Id,
-                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveGroupIDFromEndpointForNode::Id,
+                                                                BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace RemoveGroupIDFromEndpointForNode
 namespace AddBindingToEndpointForNode {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(AddBindingToEndpointForNode::Id,
-                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+    kMetadataEntry(AddBindingToEndpointForNode::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace AddBindingToEndpointForNode
 namespace RemoveBindingFromEndpointForNode {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(RemoveBindingFromEndpointForNode::Id,
-                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveBindingFromEndpointForNode::Id,
+                                                                BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace RemoveBindingFromEndpointForNode
 namespace AddACLToNode {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(AddACLToNode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddACLToNode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace AddACLToNode
 namespace RemoveACLFromNode {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(RemoveACLFromNode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kAdminister);
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveACLFromNode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace RemoveACLFromNode
 
 } // namespace Commands
