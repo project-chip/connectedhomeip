@@ -199,12 +199,13 @@ class TC_FAN_3_5(MatterBaseTest):
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
             asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
 
-    def verify_expected_reports(self, order: OrderEnum):
+    def verify_expected_reports(self, step: Clusters.FanControl.Commands.Step) -> tuple:
         percent_setting_report_qty = 0
         fan_mode_report_qty = 0
         speed_setting_report_qty = 0
         fan_mode_values = None
         speed_setting_values = None
+        sd_enum = Clusters.FanControl.Enums.StepDirectionEnum
 
         # - Count the number of each of the subscription reports
         # - Get the values of the FanMode and SpeedSetting attributes
@@ -222,9 +223,9 @@ class TC_FAN_3_5(MatterBaseTest):
                 speed_setting_values = [q.value for q in sub.attribute_queue.queue]
 
         # Get the expected FanMode and SpeedSetting values
-        pop_num = 1
-        fan_modes_eval = self.fan_modes[1:] if order == OrderEnum.Ascending else list(reversed(self.fan_modes[:-pop_num]))
-        speed_setting_eval = list(range(1, self.speed_max + 1)) if order == OrderEnum.Ascending else list(range(self.speed_max - 1, -1, -1))
+        trim = slice(1, None) if step.lowestOff else slice(1, -1)
+        fan_modes_eval = self.fan_modes[1:] if step.direction == sd_enum.kIncrease else list(reversed(self.fan_modes))[trim]
+        speed_setting_eval = list(range(1, self.speed_max + 1)) if step.direction == sd_enum.kIncrease else list(range(self.speed_max, -1, -1))[trim]
 
         logging.info(f"[FC] fan_modes_eval: {fan_modes_eval}")
         logging.info(f"[FC] fan_mode_values: {fan_mode_values}")
@@ -275,12 +276,13 @@ class TC_FAN_3_5(MatterBaseTest):
 
         self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
-    async def step_command_test(self, percent_setting_sub: ClusterAttributeChangeAccumulator, order: OrderEnum):
+    async def step_command_test(self, percent_setting_sub: ClusterAttributeChangeAccumulator, step: Clusters.FanControl.Commands.Step):
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         cmd = cluster.Commands
         sd_enum = cluster.Enums.StepDirectionEnum
         fm_enum = cluster.Enums.FanModeEnum
+        order = OrderEnum.Descending if step.direction == sd_enum.kDecrease else OrderEnum.Ascending
         
         # Initialize PercentSetting
         percent_setting_init = 0 if order == OrderEnum.Ascending else 100
@@ -304,8 +306,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # - direction: Increase/Decrease depending on the test order
         # - wrap: False
         # - lowestOff: True
-        step_direction = sd_enum.kIncrease if order == OrderEnum.Ascending else sd_enum.kDecrease
-        step = cmd.Step(direction=step_direction, wrap=False, lowestOff=True)
+
 
         # Send Step command until it reaches the min or max
         # PercentSetting value depending on the test order
@@ -321,6 +322,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 if order == OrderEnum.Descending:
                     if i == 0:
                         self.percent_setting_per_step = percent_setting_init - percent_setting
+                        # percent_setting_expected = self.percent_setting_per_step
 
             # If the expected PercentSetting value is reached, send an additional Step
             # command to veiryf the PercentSetting value stays at the expected value
@@ -338,7 +340,7 @@ class TC_FAN_3_5(MatterBaseTest):
         self.verify_attribute_progression(order)
 
         # Veirfy all expected reports after the Step commands are present
-        return self.verify_expected_reports(order)
+        return self.verify_expected_reports(step)
 
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
@@ -349,6 +351,8 @@ class TC_FAN_3_5(MatterBaseTest):
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attr = cluster.Attributes
+        cmd = cluster.Commands
+        sd_enum = cluster.Enums.StepDirectionEnum
         self.timeout_sec: float = 0.5
         self.percent_setting_per_step = None
 
@@ -386,8 +390,21 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.subscribe_to_attributes()
         percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
 
-        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, OrderEnum.Descending)
-        fan_mode_values_asc, speed_setting_values_asc = await self.step_command_test(percent_setting_sub, OrderEnum.Ascending)
+        step = cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True)
+        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, step)
+
+        step = cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False)
+        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, step)
+
+        step = cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True)
+        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, step)
+        
+        step = cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False)
+        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, step)
+        
+        
+        
+        # fan_mode_values_asc, speed_setting_values_asc = await self.step_command_test(percent_setting_sub, step)
 
         # pop_num = 1
         # fan_mode_values_desc = fan_mode_values_desc[:-pop_num]
