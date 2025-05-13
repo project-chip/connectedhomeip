@@ -1,4 +1,6 @@
 {{> header}}
+// This file is generated from cluster-structs.ipp.zapt
+
 #include <clusters/{{asUpperCamelCase name}}/Structs.h>
 
 #include <app/data-model/WrappedStructEncoder.h>

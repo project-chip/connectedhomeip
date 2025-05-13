@@ -1,4 +1,6 @@
 {{> header}}
+// This file is generated from cluster-events.ipp.zapt
+
 #include <clusters/{{asUpperCamelCase name}}/Events.h>
 
 #include <app/data-model/Decode.h>

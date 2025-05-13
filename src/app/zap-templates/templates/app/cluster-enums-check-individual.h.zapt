@@ -1,4 +1,6 @@
 {{> header}}
+// This file is generated from cluster-enums-check-individual.h.zapt
+
 #pragma once
 
 #include <clusters/{{asUpperCamelCase name}}/Enums.h>

@@ -3,6 +3,7 @@
 /**
  *  @file
  *    This file contains declarations for accessors around clusters attributes.
+ *    This file is generated from Accessors.h.zapt 
  */
 
 #pragma once

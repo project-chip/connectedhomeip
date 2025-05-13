@@ -1,4 +1,6 @@
 {{> header}}
+// This file is generated from shared-cluster-structs.h.zapt
+
 #pragma once
 
 #include <app/data-model/DecodableList.h>
