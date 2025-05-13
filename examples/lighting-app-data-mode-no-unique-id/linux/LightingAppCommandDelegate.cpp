@@ -254,7 +254,7 @@ void LightingAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
         softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
     }
 
-    Clusters::Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
+    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
 
 void LightingAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
