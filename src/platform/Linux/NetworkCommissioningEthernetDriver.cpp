@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/ConnectivityUtils.h>
@@ -32,14 +33,7 @@ namespace NetworkCommissioning {
 
 CHIP_ERROR LinuxEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
-    ///ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
-    uint8_t interfaceName[kMaxNetworkIDLen];
-    uint8_t interfaceNameLen = 0;
-    ConnectivityUtils::GetEthInterfaceName(SafePointerCast<char *>(interfaceName), sizeof(interfaceName));
-    interfaceNameLen = static_cast<uint8_t>(strlen(SafePointerCast<char *>(interfaceName), sizeof(interfaceName)));
-    networkStatusChangeCallback(
-        Status::kSuccess, MakeOptional(ByteSpan(interfaceName, interfaceNameLen)), NullOptional
-    );
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
     return CHIP_NO_ERROR;
 }
 
@@ -51,8 +45,9 @@ NetworkIterator * LinuxEthernetDriver::GetNetworks()
     return ret;
 }
 
-void LinuxEthernetDriver::Shutdown() {
-    //ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
+void LinuxEthernetDriver::Shutdown()
+{
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
 }
 
 } // namespace NetworkCommissioning

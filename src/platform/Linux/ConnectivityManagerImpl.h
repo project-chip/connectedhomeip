@@ -178,7 +178,6 @@ private:
 
 public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
-    void UpdateEthernetNetworkStatus();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
@@ -278,6 +277,7 @@ private:
     // ===== Private members reserved for use by this class only.
 
     char mEthIfName[Inet::InterfaceId::kMaxIfNameLength];
+    void ReportEthernetName();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;

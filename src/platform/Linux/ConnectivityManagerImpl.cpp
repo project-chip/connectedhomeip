@@ -19,6 +19,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/SafePointerCast.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DeviceControlServer.h>
@@ -119,6 +120,24 @@ static void StopSignalHandler(int signum)
 }
 #endif
 
+void ConnectivityManagerImpl::ReportEthernetName()
+{
+    if (mpStatusChangeCallback != nullptr)
+    {
+        ChipLogError(DeviceLayer, "WILL WORK?");
+        uint8_t interfaceName[kMaxNetworkIDLen];
+        uint8_t interfaceNameLen =
+            static_cast<uint8_t>(strnlen(SafePointerCast<char *>(mEthIfName), Inet::InterfaceId::kMaxIfNameLength));
+        memcpy(interfaceName, mEthIfName, interfaceNameLen);
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(interfaceName, interfaceNameLen)),
+                                                         NullOptional);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "STILL NULL POINTER");
+    }
+}
+
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -131,6 +150,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { ReportEthernetName(); });
     }
     else
     {
@@ -415,10 +435,6 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
     mWiFiAPIdleTimeout = val;
     DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveAPState(); });
-}
-
-void ConnectivityManagerImpl::UpdateEthernetNetworkStatus() {
-    
 }
 
 void ConnectivityManagerImpl::UpdateNetworkStatus()
