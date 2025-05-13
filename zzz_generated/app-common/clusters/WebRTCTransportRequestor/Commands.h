@@ -88,7 +88,7 @@ public:
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     chip::CharSpan sdp;
-    Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
+    Optional<DataModel::List<const Globals::Structs::ICEServerStruct::Type>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -107,7 +107,7 @@ public:
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     chip::CharSpan sdp;
-    Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
+    Optional<DataModel::DecodableList<Globals::Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -167,7 +167,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    DataModel::List<const chip::CharSpan> ICECandidates;
+    DataModel::List<const Globals::Structs::ICECandidateStruct::Type> ICECandidates;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -184,8 +184,12 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
+<<<<<<< HEAD
     DataModel::DecodableList<chip::CharSpan> ICECandidates;
 
+=======
+    DataModel::DecodableList<Globals::Structs::ICECandidateStruct::DecodableType> ICECandidates;
+>>>>>>> 33022a5847 (Codegen files for zap-regen)
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ICECandidates
@@ -204,8 +208,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    uint16_t webRTCSessionID   = static_cast<uint16_t>(0);
-    WebRTCEndReasonEnum reason = static_cast<WebRTCEndReasonEnum>(0);
+    uint16_t webRTCSessionID            = static_cast<uint16_t>(0);
+    Globals::WebRTCEndReasonEnum reason = static_cast<Globals::WebRTCEndReasonEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -221,9 +225,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
     static constexpr bool kIsFabricScoped = false;
 
+<<<<<<< HEAD
     uint16_t webRTCSessionID   = static_cast<uint16_t>(0);
     WebRTCEndReasonEnum reason = static_cast<WebRTCEndReasonEnum>(0);
 
+=======
+    uint16_t webRTCSessionID            = static_cast<uint16_t>(0);
+    Globals::WebRTCEndReasonEnum reason = static_cast<Globals::WebRTCEndReasonEnum>(0);
+>>>>>>> 33022a5847 (Codegen files for zap-regen)
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace End

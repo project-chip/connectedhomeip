@@ -220,10 +220,9 @@ struct TypeInfo
 namespace SupportedStreamUsages {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::Globals::StreamUsageEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::StreamUsageEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::StreamUsageEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamUsages::Id; }
@@ -276,10 +275,9 @@ struct TypeInfo
 namespace RankedVideoStreamPrioritiesList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::Globals::StreamUsageEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::StreamUsageEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::StreamUsageEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RankedVideoStreamPrioritiesList::Id; }

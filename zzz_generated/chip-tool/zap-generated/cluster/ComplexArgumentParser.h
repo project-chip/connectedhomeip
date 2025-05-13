@@ -47,6 +47,16 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Struct
 
 static void Finalize(chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::ICEServerStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::ICEServerStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type & request,
                         Json::Value & value);
 
@@ -61,6 +71,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Struct
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ModeTagStruct::Type & request,
                         Json::Value & value);
@@ -97,11 +112,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::ErrorStateStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ICEServerStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::detail::Structs::ICEServerStruct::Type & request);
-
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::LabelStruct::Type & request, Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::LabelStruct::Type & request);
@@ -111,10 +121,17 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::OperationalStateStruct::Type & request);
 
+<<<<<<< HEAD
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::WebRTCSessionStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::WebRTCSessionStruct::Type & request);
+=======
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ViewportStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::detail::Structs::ViewportStruct::Type & request);
+>>>>>>> 33022a5847 (Codegen files for zap-regen)
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request,
                         Json::Value & value);
