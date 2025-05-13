@@ -35,7 +35,7 @@ bool ChipDeviceEventHandler::sUdcInProgress = false;
 
 void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() called");
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() called with event type: %u", event->Type);
 
     // Make sure we have not disconnected from the TargetCastingPlayer when handling incoming messages.
     // Sometimes the tv-app will still send messages after we clean up the TargetCastingPlayer.
