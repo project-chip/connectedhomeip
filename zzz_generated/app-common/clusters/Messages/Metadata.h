@@ -20,38 +20,31 @@ inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 namespace Messages {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Messages::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Messages::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Messages
 namespace ActiveMessageIDs {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActiveMessageIDs::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ActiveMessageIDs::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ActiveMessageIDs
 
 } // namespace Attributes
 
 namespace Commands {
 namespace PresentMessagesRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = PresentMessagesRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(PresentMessagesRequest::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
 } // namespace PresentMessagesRequest
 namespace CancelMessagesRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CancelMessagesRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(CancelMessagesRequest::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
 } // namespace CancelMessagesRequest
 
 } // namespace Commands

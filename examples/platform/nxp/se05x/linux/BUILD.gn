@@ -75,7 +75,7 @@ source_set("app-main") {
 
   public_deps = [
     ":ota-test-event-trigger",
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/src/app/server",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",

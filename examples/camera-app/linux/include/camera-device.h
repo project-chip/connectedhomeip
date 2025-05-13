@@ -115,7 +115,9 @@ public:
 
     VideoSensorParamsStruct & GetVideoSensorParams() override;
 
-    bool GetNightVisionCapable() override;
+    bool GetCameraSupportsNightVision() override;
+
+    bool GetNightVisionUsesInfrared() override;
 
     VideoResolutionStruct & GetMinViewport() override;
 

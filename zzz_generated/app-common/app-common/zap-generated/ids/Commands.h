@@ -77,6 +77,8 @@
 #include <clusters/IcdManagement/CommandIds.h>
 #include <clusters/Identify/CommandIds.h>
 #include <clusters/IlluminanceMeasurement/CommandIds.h>
+#include <clusters/JointFabricAdministrator/CommandIds.h>
+#include <clusters/JointFabricDatastore/CommandIds.h>
 #include <clusters/KeypadInput/CommandIds.h>
 #include <clusters/LaundryDryerControls/CommandIds.h>
 #include <clusters/LaundryWasherControls/CommandIds.h>
