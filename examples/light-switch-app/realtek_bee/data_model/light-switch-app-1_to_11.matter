@@ -891,7 +891,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CommissioningErrorEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -2823,7 +2823,7 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2857,7 +2857,7 @@ endpoint 2 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2890,7 +2890,7 @@ endpoint 3 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2923,7 +2923,7 @@ endpoint 4 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2956,7 +2956,7 @@ endpoint 5 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2989,7 +2989,7 @@ endpoint 6 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3022,7 +3022,7 @@ endpoint 7 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3055,7 +3055,7 @@ endpoint 8 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3088,7 +3088,7 @@ endpoint 9 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3121,7 +3121,7 @@ endpoint 10 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3161,7 +3161,7 @@ endpoint 11 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3194,7 +3194,7 @@ endpoint 12 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3227,7 +3227,7 @@ endpoint 13 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
