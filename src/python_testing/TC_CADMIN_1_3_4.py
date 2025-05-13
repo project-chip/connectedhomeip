@@ -53,7 +53,7 @@ from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.tlv import TLVReader
 from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+                                         default_matter_test_main)
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
