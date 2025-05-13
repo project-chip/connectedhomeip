@@ -18,6 +18,8 @@
 
 import asyncio
 import logging
+import platform
+import shutil
 import subprocess
 
 import chip.clusters as Clusters
@@ -30,29 +32,90 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-async def connect_host_wifi(ssid, passphrase, max_retries):
+async def connect_wifi_linux(ssid, password):
+    logger.info(f" --- connect_wifi_linux: SSID: {ssid} - Password: {password}")
+    if not shutil.which("nmcli"):
+        logger.error("'nmcli' is not installed. Install with: sudo apt install network-manager")
+        return
+    try:
+        # Verify if it is connected already
+        result = subprocess.run(
+            ["nmcli", "-t", "-f", "ACTIVE,SSID", "dev", "wifi"],
+            capture_output=True, text=True
+        )
+        if result.returncode == 0:
+            active_networks = [line for line in result.stdout.splitlines() if line.startswith("yes:")]
+            if any(ssid in line for line in active_networks):
+                logger.info(f" --- connect_wifi_linux: Already connected to {ssid}")
+                return
+        logger.info(f" --- connect_wifi_linux: Connecting to '{ssid}'...")
+        result = subprocess.run(
+            ["nmcli", "dev", "wifi", "connect", ssid, "password", password],
+            capture_output=True, text=True
+        )
+        await asyncio.sleep(5)
+    except Exception as e:
+        logger.error(f" --- connect_wifi_linux: Exception while trying to connect to {ssid}: {e}")
+    finally:
+        return result
+
+
+async def connect_wifi_mac(ssid, password):
+    if not shutil.which("networksetup"):
+        logger.error(" --- connect_wifi_mac: 'networksetup' is not present. Please install 'networksetup'.")
+        return
+    try:
+        # Get the Wi-Fi interface
+        interface_result = subprocess.run(
+            ["/usr/sbin/networksetup", "-listallhardwareports"],
+            capture_output=True, text=True
+        )
+        interface = "en0"   # 'en0' is by default in many cases
+        for block in interface_result.stdout.split("\n\n"):
+            if "Wi-Fi" in block:
+                for line in block.splitlines():
+                    if "Device" in line:
+                        interface = line.split(":")[1].strip()
+                        break
+        logger.debug(f" --- connect_wifi_mac: Using interface: {interface}")
+        result = subprocess.run([
+            "networksetup",
+            "-setairportnetwork", interface, ssid, password
+        ], check=True, capture_output=True, text=True)
+        await asyncio.sleep(5)
+    except subprocess.CalledProcessError as e:
+        logger.error(f" --- connect_wifi_mac: Error connecting with networksetup: {e.stderr.strip()}")
+    except Exception as e:
+        logger.error(f"[ --- connect_wifi_mac: Exception while trying to connect to {ssid}: {e}")
+    finally:
+        return result
+
+
+async def connect_host_wifi(ssid, password, max_retries):
+    os_name = platform.system()
+    logger.info(f" --- connect_host_wifi: OS detected: {os_name}")
     # We try to connect the TH to the second network a few times, to avoid network unstability
     retry = 1
     while retry <= max_retries:
         logger.debug(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{max_retries}")
         try:
-            conn = subprocess.run([
-                "networksetup",
-                "-setairportnetwork", "en0", ssid, passphrase
-            ], check=True, capture_output=True)
-            logger.debug(f" --- connect_host_wifi: networksetup return_code: {conn.returncode}")
+            if os_name == "Linux":
+                conn = await connect_wifi_linux(ssid, password)
+            elif os_name == "Darwin":
+                conn = await connect_wifi_mac(ssid, password)
+            else:
+                logger.error(" --- connect_host_wifi: OS not supported.")
+            logger.debug(f" --- connect_host_wifi: Connection return code: {conn.returncode}")
             if conn.returncode == 0:
                 logger.debug(f" --- connect_host_wifi: Connected to {ssid}")
-                # await asyncio.sleep(60)
                 break
         except subprocess.CalledProcessError as e:
-            logger.debug(f" --- connect_host_wifi: networksetup return_code: {conn.returncode} / stderr: {conn.stderr}")
-            logger.error(f" --- connect_host_wifi: Error connecting to networksetup: {e.stderr.decode()}")
+            logger.error(f" --- connect_host_wifi: Exception when trying to connect to {ssid} stderr: {conn.stderr.decode()}")
         finally:
             retry += 1
 
 
-async def change_networks(object, controller, node_id, cluster, ssid, passphrase, breadcrumb):
+async def change_networks(object, cluster, ssid, password, breadcrumb):
     # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
     # so they loose connection between each other. Thus, ConnectNetwork throws an exception
     try:
@@ -70,7 +133,7 @@ async def change_networks(object, controller, node_id, cluster, ssid, passphrase
     logger.debug(" --- change_networks: Waiting 10 seconds for DUT to switch networks")
     await asyncio.sleep(10)
     await asyncio.wait_for(
-        connect_host_wifi(ssid=ssid, passphrase=passphrase, max_retries=4),
+        connect_host_wifi(ssid=ssid, password=password, max_retries=4),
         timeout=60
     )
     try:
@@ -268,7 +331,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 node_id=node_id,
                 cluster=cnet,
                 ssid=wifi_2nd_ap_ssid.encode(),
-                passphrase=wifi_2nd_ap_credentials.encode(),
+                password=wifi_2nd_ap_credentials.encode(),
                 breadcrumb=2
             ),
             timeout=60
@@ -421,7 +484,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 node_id=node_id,
                 cluster=cnet,
                 ssid=wifi_2nd_ap_ssid.encode(),
-                passphrase=wifi_2nd_ap_credentials.encode(),
+                password=wifi_2nd_ap_credentials.encode(),
                 breadcrumb=3
             ),
             timeout=60
