@@ -17,6 +17,7 @@
 
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
+#include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 
