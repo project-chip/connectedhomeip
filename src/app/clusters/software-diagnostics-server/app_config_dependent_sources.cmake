@@ -19,3 +19,11 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/SoftwareDiagnosticsTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/software-diagnostics-server.cpp"
 )
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+￼  ${APP_TARGET}
+￼  PRIVATE
+￼    "${CLUSTER_DIR}/software-fault-listener.cpp"
+￼    "${CLUSTER_DIR}/software-fault-listener.h"
+)
