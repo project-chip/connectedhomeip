@@ -398,6 +398,12 @@ void AndroidDeviceControllerWrapper::Shutdown()
 {
     VerifyOrReturn(mIsInitialized);
     getICDClientStorage()->Shutdown();
+    FabricIndex fabricIndex = Controller().GetFabricIndex();
+    FabricTable * fabricTable = DeviceControllerFactory::GetInstance().GetSystemState()->Fabrics();
+    if (fabricIndex != kUndefinedFabricIndex && fabricTable != nullptr)
+    {
+        fabricTable->Delete(fabricIndex);
+    }
     mController->Shutdown();
     DeviceControllerFactory::GetInstance().Shutdown();
 
