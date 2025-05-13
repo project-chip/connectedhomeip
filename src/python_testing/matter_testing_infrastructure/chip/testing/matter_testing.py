@@ -2222,7 +2222,7 @@ async def run_with_error_check(coroutine_func, *args, exception_type=Exception, 
 
         - coroutine_func: Is the function you want to run in the try block (e.g self.TH2.ReadAttribute)
         - *args: Captures positional arguments (e.g self.dut_node_id)
-        - **kwargs: Captures named arguments (e.g nodeid=self.dut_node_id. In this case the argument is named with nodeid)
+        - **kwargs: Captures named arguments (e.g nodeid=self.dut_node_id. In this case the argument is named nodeid)
         - exception_type: Name of the exception (e.g ChipStackError)
         - assert_func: Assertion function (e.g assert_func=lambda e: asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission"))
         - error_msg: Error message
