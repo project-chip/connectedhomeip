@@ -222,6 +222,80 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::ICECandidateStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Candidate", indent + 1, value.candidate);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Candidate'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SDPMid", indent + 1, value.SDPMid);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SDPMid'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SDPMLineIndex", indent + 1, value.SDPMLineIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SDPMLineIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("URLs", indent + 1, value.URLs);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'URLs'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Username", indent + 1, value.username);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Username'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Credential", indent + 1, value.credential);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Credential'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Caid", indent + 1, value.caid);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Caid'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -312,6 +386,79 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MyEnum'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Id", indent + 1, value.id);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Id'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PeerNodeID", indent + 1, value.peerNodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeerNodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PeerEndpointID", indent + 1, value.peerEndpointID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeerEndpointID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StreamUsage", indent + 1, value.streamUsage);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StreamUsage'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("VideoStreamID", indent + 1, value.videoStreamID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VideoStreamID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AudioStreamID", indent + 1, value.audioStreamID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AudioStreamID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MetadataEnabled", indent + 1, value.metadataEnabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MetadataEnabled'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
             return err;
         }
     }
@@ -601,47 +748,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::detail::Structs::ICEServerStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Urls", indent + 1, value.urls);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Urls'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Username", indent + 1, value.username);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Username'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Credential", indent + 1, value.credential);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Credential'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Caid", indent + 1, value.caid);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Caid'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::LabelStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -692,6 +798,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+<<<<<<< HEAD
                                      const chip::app::Clusters::detail::Structs::WebRTCSessionStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -700,26 +807,51 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Id'");
+=======
+                                     const chip::app::Clusters::detail::Structs::ViewportStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("X1", indent + 1, value.x1);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X1'");
+>>>>>>> 33022a5847 (Codegen files for zap-regen)
             return err;
         }
     }
     {
+<<<<<<< HEAD
         CHIP_ERROR err = LogValue("PeerNodeID", indent + 1, value.peerNodeID);
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeerNodeID'");
+=======
+        CHIP_ERROR err = LogValue("Y1", indent + 1, value.y1);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y1'");
+>>>>>>> 33022a5847 (Codegen files for zap-regen)
             return err;
         }
     }
     {
+<<<<<<< HEAD
         CHIP_ERROR err = LogValue("PeerEndpointID", indent + 1, value.peerEndpointID);
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeerEndpointID'");
+=======
+        CHIP_ERROR err = LogValue("X2", indent + 1, value.x2);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X2'");
+>>>>>>> 33022a5847 (Codegen files for zap-regen)
             return err;
         }
     }
     {
+<<<<<<< HEAD
         CHIP_ERROR err = LogValue("StreamUsage", indent + 1, value.streamUsage);
         if (err != CHIP_NO_ERROR)
         {
@@ -756,6 +888,12 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+=======
+        CHIP_ERROR err = LogValue("Y2", indent + 1, value.y2);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y2'");
+>>>>>>> 33022a5847 (Codegen files for zap-regen)
             return err;
         }
     }
@@ -20638,7 +20776,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("HDRModeEnabled", 1, value);
         }
         case CameraAvStreamManagement::Attributes::SupportedStreamUsages::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::StreamUsageEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedStreamUsages", 1, value);
         }
@@ -20664,7 +20802,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AllocatedSnapshotStreams", 1, value);
         }
         case CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::StreamUsageEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RankedVideoStreamPrioritiesList", 1, value);
         }
@@ -20891,9 +21029,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case WebRTCTransportProvider::Attributes::CurrentSessions::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::WebRTCTransportProvider::Structs::WebRTCSessionStruct::DecodableType>
-                value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentSessions", 1, value);
         }
@@ -20929,9 +21065,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case WebRTCTransportRequestor::Attributes::CurrentSessions::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::WebRTCTransportRequestor::Structs::WebRTCSessionStruct::DecodableType>
-                value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentSessions", 1, value);
         }
