@@ -2309,7 +2309,7 @@ endpoint 0 {
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0001;
+    callback attribute clusterRevision default = 0x0001;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
