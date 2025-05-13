@@ -76,7 +76,7 @@ void Instance::Shutdown()
 // This function is intended for the application to set the soil measurement accuracy limits to the proper values during init.
 // Given the limits are fixed, it is not intended to be changes at runtime and the application should call this function only once
 // during init, where changes should not be reported. In case this does have to change during runtime, the application should call
-// this function with reportChange set to true to notify the change. Please not that in such a case, the application should also
+// this function with reportChange set to true to notify the change. Please note that in such a case, the application should also
 // take care of the ConfigurationVersion attribute to ensure the value is updated.
 CHIP_ERROR
 Instance::SetSoilMeasurementAccuracy(const Globals::Structs::MeasurementAccuracyStruct::Type & measurementLimits, bool reportChange)
