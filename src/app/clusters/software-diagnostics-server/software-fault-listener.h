@@ -43,7 +43,7 @@ public:
     /// Set the global software fault listener, returns the old value
     static void SetGlobalListener(SoftwareFaultListener * newValue);
 
-    /// Convenience method of "call softare fault detect if globa listener is not null"
+    /// Convenience method of "call software fault detect if global listener is not null"
     static void
     GlobalNotifySoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
     {
