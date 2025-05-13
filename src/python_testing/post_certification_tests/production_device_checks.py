@@ -96,7 +96,7 @@ class Hooks():
     def stop(self, duration: int):
         pass
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         self.current_test = name
         pass
 
