@@ -2308,7 +2308,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2597,7 +2597,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dishwasher = 117, version 1;
+  device type ma_dishwasher = 117, version 2;
 
 
   server cluster Identify {

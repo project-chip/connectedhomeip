@@ -1810,7 +1810,7 @@ cluster CommissionerControl = 1873 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
 
   binding cluster AccessControl;
 
@@ -2128,7 +2128,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_aggregator = 14, version 1;
+  device type ma_aggregator = 14, version 2;
 
 
   server cluster Identify {
