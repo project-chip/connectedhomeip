@@ -139,9 +139,6 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
 
-    // By spec, MetadataOptions SHALL be set to 0 and reserved for future use
-    outSession.metadataOptions.ClearAll();
-
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
     {
@@ -220,9 +217,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     outSession.peerNodeID  = args.peerNodeId;
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
-
-    // By spec, MetadataOptions SHALL be set to 0 and reserved for future use
-    outSession.metadataOptions.ClearAll();
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
@@ -312,7 +306,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)
+CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates)
 {
     ChipLogProgress(Camera, "HandleProvideICECandidates called with sessionId: %u", sessionId);
 
@@ -337,8 +331,18 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
 
     for (const auto & candidate : candidates)
     {
-        ChipLogProgress(Camera, "Applying candidate: %s", candidate.c_str());
-        mPeerConnection->addRemoteCandidate(candidate);
+        // ChipLogProgress(Camera, "Applying candidate: %s", candidate.candidate);
+        if (candidate.SDPMid.IsNull())
+        {
+            mPeerConnection->addRemoteCandidate(
+                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end())));
+        }
+        else
+        {
+            mPeerConnection->addRemoteCandidate(
+                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end()),
+                               std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end())));
+        }
     }
 
     return CHIP_NO_ERROR;
