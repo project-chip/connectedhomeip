@@ -27,5 +27,5 @@ source_set("software-fault-listener") {
 }
 
 group("software-diagnostics-server") {
-  deps = [ ":software-fault-listener" ]
+  public_deps = [ ":software-fault-listener" ]
 }
