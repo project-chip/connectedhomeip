@@ -120,8 +120,7 @@ public:
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID,
-                                     chip::app::DataModel::List<const ICECandidateStruct> ICECandidates);
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID, chip::app::DataModel::List<const ICECandidateStruct> ICECandidates);
 
     /**
      * @brief Notify WebRTCProviderClient that the Offer command has been received.
