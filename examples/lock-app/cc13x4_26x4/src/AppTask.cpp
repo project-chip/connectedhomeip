@@ -785,7 +785,7 @@ void AppTask::uiInit(void)
     Button_init();
 
     Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED  | Button_EV_DOUBLECLICKED ;
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED | Button_EV_DOUBLECLICKED;
     buttonParams.longPressDuration = 1000U; // ms
     sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
     Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
