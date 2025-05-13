@@ -260,28 +260,28 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
         if (incomingOverallState.speed.HasValue())
             VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            if (!incomingOverallState.speed.Value().IsNull())
-            {
-                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
-                                        Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                                    CHIP_ERROR_INVALID_ARGUMENT);
-            }
-        }
-
-        // Validate the incoming SecureState FeatureMap conformance.
-        if (incomingOverallState.secureState.HasValue())
+        if (!incomingOverallState.speed.Value().IsNull())
         {
-            // If the secureState member is present in the OverallState, we need to check if the Speed feature is
-            // supported by the closure. If the Speed feature is not supported, return an error.
-            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
-                                CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
+                                    Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
 
-    mState.mOverallState = overallState;
-    mMatterContext.MarkDirty(Attributes::OverallState::Id);
+    // Validate the incoming SecureState FeatureMap conformance.
+    if (incomingOverallState.secureState.HasValue())
+    {
+        // If the secureState member is present in the OverallState, we need to check if the Speed feature is
+        // supported by the closure. If the Speed feature is not supported, return an error.
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    }
+}
 
-    return CHIP_NO_ERROR;
+mState.mOverallState = overallState;
+mMatterContext.MarkDirty(Attributes::OverallState::Id);
+
+return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget)
