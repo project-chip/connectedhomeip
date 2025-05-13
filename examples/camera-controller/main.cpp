@@ -22,7 +22,6 @@
 #include <commands/interactive/Commands.h>
 #include <commands/pairing/Commands.h>
 #include <commands/webrtc/Commands.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <webrtc_manager/WebRTCManager.h>
 #include <zap-generated/cluster/Commands.h>
 
@@ -36,15 +35,15 @@ using namespace chip;
 
 namespace {
 
+void StopMainEventLoop()
+{
+    PushCommand("quit()");
+}
+
 void StopSignalHandler(int signum)
 {
     ChipLogProgress(NotSpecified, "SIGTERM received, exiting...");
-
-    DeviceLayer::PlatformMgr().Shutdown();
-    Platform::MemoryShutdown();
-
-    // Close stdin to unblock any pending reads and allow the command loop to exit
-    close(STDIN_FILENO);
+    StopMainEventLoop();
 }
 
 } // namespace
@@ -57,7 +56,7 @@ int main(int argc, char * argv[])
     // Set up signal handler for SIGTERM
     struct sigaction sa = {};
     sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = SA_RESETHAND;
+    sa.sa_flags         = 0;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 
