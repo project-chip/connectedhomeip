@@ -616,7 +616,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     // ChipLogByteSpan(DeviceLayer, ByteSpan(signature.data(), signature.size() < kDebugLength ? signature.size() : kDebugLength));
     return err;
 }
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // SLI_SI91X_MCU_INTERFACE && SL_MBEDTLS_USE_TINYCRYPT
 
 //
 // Other
