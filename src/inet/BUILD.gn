@@ -179,6 +179,20 @@ static_library("inet") {
     public_deps += [ ":inet_zephyr_socket" ]
   }
 
+  if (chip_system_config_use_network_framework) {
+    sources += [
+      "${chip_root}/src/platform/Darwin/inet/InterfacesMonitor.h",
+      "Darwin/UDPEndPointImplNetworkFrameworkConnection.h",
+      "Darwin/UDPEndPointImplNetworkFrameworkConnection.mm",
+      "Darwin/UDPEndPointImplNetworkFrameworkDebug.h",
+      "Darwin/UDPEndPointImplNetworkFrameworkDebug.mm",
+      "Darwin/UDPEndPointImplNetworkFrameworkListener.h",
+      "Darwin/UDPEndPointImplNetworkFrameworkListener.mm",
+      "Darwin/UDPEndPointImplNetworkFrameworkListenerGroup.h",
+      "Darwin/UDPEndPointImplNetworkFrameworkListenerGroup.mm",
+    ]
+  }
+
   if (chip_with_nlfaultinjection) {
     sources += [
       "InetFaultInjection.cpp",
