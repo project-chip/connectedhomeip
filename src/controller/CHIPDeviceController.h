@@ -793,6 +793,8 @@ public:
      */
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
+    void DeviceReadyForSecondCommissioningPhase(void);
+
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
     DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
 
@@ -834,6 +836,17 @@ public:
                                          /* fireAndForget = */ true);
     }
 
+    bool isNFCCommissioning(void)
+    {
+        return mNFCCommissioning;
+    }
+
+    bool isNFCCommissioningWithoutPower(void)
+    {
+        return mNFCCommissioningWithoutPower;
+    }
+
+
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
 
@@ -841,6 +854,10 @@ private:
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
     Optional<System::Clock::Timeout> mCommissioningStepTimeout; // Note: For multi-interaction steps this is per interaction
+
+    bool mNFCCommissioning = false;
+    bool mNFCCommissioningWithoutPower = false;
+
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()
 
@@ -1066,6 +1083,7 @@ private:
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParsePowerSource(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     static CHIP_ERROR

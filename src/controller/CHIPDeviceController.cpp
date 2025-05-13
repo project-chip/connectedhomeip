@@ -703,6 +703,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, co
                                                        Optional<Dnssd::CommonResolutionData> resolutionData)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
+    mNFCCommissioning = false;
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
                                        resolutionData);
 }
@@ -722,6 +723,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    mNFCCommissioning = (params.GetPeerAddress().GetTransportType() == Transport::Type::kNfc);
 
     // TODO(#13940): We need to specify the peer address for BLE transport in bindings.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
@@ -2067,6 +2070,18 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
 }
 
+void DeviceCommissioner::DeviceReadyForSecondCommissioningPhase(void)
+{
+    ChipLogProgress(Controller, "DeviceCommissioner::DeviceReadyForSecondCommissioningPhase");
+
+    // This method is meaningful only for the state kWaitDeviceInstallation
+    VerifyOrReturn(mCommissioningStage == kWaitDeviceInstallation);
+
+    // Device is ready for 2nd phase on the operational network.
+    // We can advance to next step
+    CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
 void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
@@ -2338,6 +2353,11 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                 Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
 
+        // Read the Status from power source cluster.
+        // It allows to know if we are in a case of NFC-based Commissioning without power
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::PowerSource::Id,
+                                                Clusters::PowerSource::Attributes::Status::Id));
+
         // Extra paths requested via CommissioningParameters
         for (auto const & path : params.GetExtraReadPaths())
         {
@@ -2384,6 +2404,7 @@ void DeviceCommissioner::FinishReadingCommissioningInfo()
     AccumulateErrors(err, ParseTimeSyncInfo(info));
     AccumulateErrors(err, ParseFabrics(info));
     AccumulateErrors(err, ParseICDInfo(info));
+    AccumulateErrors(err, ParsePowerSource(info));
 
     if (mPairingDelegate != nullptr && err == CHIP_NO_ERROR)
     {
@@ -2663,6 +2684,50 @@ CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo & info)
 
     return return_err;
 }
+
+CHIP_ERROR DeviceCommissioner::ParsePowerSource(ReadCommissioningInfo & info)
+{
+    using namespace chip::app::Clusters::PowerSource;
+    using namespace chip::app::Clusters::PowerSource::Attributes;
+
+    CHIP_ERROR err;
+
+    // Read Status of power source Cluster
+    err = mAttributeCache->Get<Status::TypeInfo>(kRootEndpointId, info.power.status);
+    if (err == CHIP_NO_ERROR)
+    {
+        mNFCCommissioningWithoutPower = (mNFCCommissioning && (info.power.status == app::Clusters::PowerSource::PowerSourceStatusEnum::kUnavailable)) ? true : false;
+
+        switch(info.power.status)
+        {
+            case app::Clusters::PowerSource::PowerSourceStatusEnum::kUnspecified:
+                ChipLogProgress(Controller, "PowerSourceStatus: Unspecified");
+                break;
+            case app::Clusters::PowerSource::PowerSourceStatusEnum::kActive:
+                ChipLogProgress(Controller, "PowerSourceStatus: Active");
+                break;
+            case app::Clusters::PowerSource::PowerSourceStatusEnum::kStandby:
+                ChipLogProgress(Controller, "PowerSourceStatus: Standby");
+                break;
+            case app::Clusters::PowerSource::PowerSourceStatusEnum::kUnavailable:
+                ChipLogProgress(Controller, "PowerSourceStatus: Power not available");
+                break;
+            default:
+                ChipLogError(Controller, "Invalid PowerSourceStatusEnum value: %d", to_underlying(info.power.status));
+                break;
+        }
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Power source status not found");
+        // This key is optional so not an error
+        err = CHIP_NO_ERROR;
+        mNFCCommissioningWithoutPower = false;
+    }
+
+    return err;
+}
+
 
 CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
 {
@@ -3622,6 +3687,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         CommissioningStageComplete(CHIP_NO_ERROR);
         return;
     }
+
+    case CommissioningStage::kWaitDeviceInstallation: {
+        // Nothing to do. Wait until the user confirms that the device has been installed and powered up.
+        return;
+    }
+
     case CommissioningStage::kFindOperationalForStayActive:
     case CommissioningStage::kFindOperationalForCommissioningComplete: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.

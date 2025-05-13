@@ -66,6 +66,8 @@ enum CommissioningStage : uint8_t
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
     kEvictPreviousCaseSessions,  ///< Evict previous stale case sessions from a commissioned device with this node ID before
+    kWaitDeviceInstallation,     ///< Wait until the user has installed and powered the device. Step used in case of
+                                 ///< NFC Commissioning without power
     kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
                                    ///< StayActive command
     kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
@@ -750,6 +752,12 @@ struct GeneralCommissioningInfo
     ;
 };
 
+struct PowerSourceClusterInfo
+{
+    app::Clusters::PowerSource::PowerSourceStatusEnum status =
+        app::Clusters::PowerSource::PowerSourceStatusEnum::kUnspecified;
+};
+
 // ICDManagementClusterInfo is populated when the controller reads information from
 // the ICD Management cluster, and is used to communicate that information.
 struct ICDManagementClusterInfo
@@ -785,6 +793,7 @@ struct ReadCommissioningInfo
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
+    PowerSourceClusterInfo power;
     bool requiresUTC                  = false;
     bool requiresTimeZone             = false;
     bool requiresDefaultNTP           = false;
@@ -848,6 +857,7 @@ public:
      * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kEvictPreviousCaseSessions: None
+     * kWaitDeviceInstallation: None
      * kFindOperationalForStayActive OperationalNodeFoundData
      * kFindOperationalForCommissioningComplete: OperationalNodeFoundData
      * kICDSendStayActive: CommissioningErrorInfo if there is an error
