@@ -24,10 +24,6 @@
 #include "general-commissioning-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <clusters/GeneralCommissioning/Attributes.h>
-#include <clusters/GeneralCommissioning/Commands.h>
-#include <clusters/GeneralCommissioning/Metadata.h>
-#include <clusters/GeneralCommissioning/Structs.h>
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
@@ -37,6 +33,10 @@
 #include <app/reporting/reporting.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <clusters/GeneralCommissioning/Attributes.h>
+#include <clusters/GeneralCommissioning/Commands.h>
+#include <clusters/GeneralCommissioning/Metadata.h>
+#include <clusters/GeneralCommissioning/Structs.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
