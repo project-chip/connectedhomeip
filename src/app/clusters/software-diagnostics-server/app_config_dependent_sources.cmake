@@ -18,5 +18,4 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/SoftwareDiagnosticsTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/software-diagnostics-server.cpp"
-    "${CLUSTER_DIR}/software-diagnostics-server.h"
 )
