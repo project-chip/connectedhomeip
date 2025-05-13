@@ -43,6 +43,7 @@ public:
      * if the AttributeHandler registration fails.
      */
     CHIP_ERROR Init();
+    void Shutdown();
 
     CHIP_ERROR SetSoilMeasurementAccuracy(const Globals::Structs::MeasurementAccuracyStruct::Type & accuracy, bool reportChange);
 

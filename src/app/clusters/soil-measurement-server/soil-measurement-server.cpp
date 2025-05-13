@@ -52,7 +52,7 @@ Instance::Instance(EndpointId aEndpointId) :
 
 Instance::~Instance()
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    Shutdown();
 }
 
 CHIP_ERROR Instance::Init()
@@ -66,6 +66,11 @@ CHIP_ERROR Instance::Init()
     mSoilMeasurementData.soilMoistureMeasuredValue.SetNull();
 
     return CHIP_NO_ERROR;
+}
+
+void Instance::Shutdown()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 // This function is intended for the application to set the soil measurement accuracy limits to the proper values during init.

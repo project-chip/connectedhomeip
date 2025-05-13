@@ -22,20 +22,20 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
 
-Instance * gSoilMeasurementInstance = nullptr;
+namespace {
+static std::unique_ptr<Instance> gSoilMeasurementInstance;
+} // namespace
 
 Instance * SoilMeasurement::GetInstance()
 {
-    return gSoilMeasurementInstance;
+    return gSoilMeasurementInstance.get();
 }
 
 void SoilMeasurement::Shutdown()
 {
-    if (gSoilMeasurementInstance != nullptr)
-    {
-        delete gSoilMeasurementInstance;
-        gSoilMeasurementInstance = nullptr;
-    }
+    VerifyOrDie(gSoilMeasurementInstance);
+    gSoilMeasurementInstance->Shutdown();
+    gSoilMeasurementInstance.reset(nullptr);
 }
 
 void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
@@ -43,18 +43,9 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(!gSoilMeasurementInstance);
 
-    gSoilMeasurementInstance = new Instance(endpointId);
+    gSoilMeasurementInstance = std::make_unique<Instance>(endpointId);
     if (gSoilMeasurementInstance)
     {
         gSoilMeasurementInstance->Init();
     }
-}
-
-void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpointId)
-{
-    if (gSoilMeasurementInstance)
-    {
-        SoilMeasurement::Shutdown();
-    }
-    gSoilMeasurementInstance = nullptr;
 }
