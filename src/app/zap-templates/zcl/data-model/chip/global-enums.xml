@@ -73,6 +73,13 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="kVAh" value="0x01"/>
   </enum>
 
+  <enum name="StreamUsageEnum" type="enum8">
+    <item name="Internal" value="0x00"/>
+    <item name="Recording" value="0x01"/>
+    <item name="Analysis" value="0x02"/>
+    <item name="LiveView" value="0x03"/>
+  </enum>
+
   <enum name="ThreeLevelAutoEnum" type="enum8">
     <item name="Auto" value="0x00"/>
     <item name="Low" value="0x01"/>
