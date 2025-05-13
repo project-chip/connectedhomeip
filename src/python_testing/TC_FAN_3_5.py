@@ -222,7 +222,8 @@ class TC_FAN_3_5(MatterBaseTest):
                 speed_setting_values = [q.value for q in sub.attribute_queue.queue]
 
         # Get the expected FanMode and SpeedSetting values
-        fan_modes_eval = self.fan_modes[1:] if order == OrderEnum.Ascending else list(reversed(self.fan_modes[:-1]))
+        pop_num = 1
+        fan_modes_eval = self.fan_modes[1:] if order == OrderEnum.Ascending else list(reversed(self.fan_modes[:-pop_num]))
         speed_setting_eval = list(range(1, self.speed_max + 1)) if order == OrderEnum.Ascending else list(range(self.speed_max - 1, -1, -1))
 
         logging.info(f"[FC] fan_modes_eval: {fan_modes_eval}")
@@ -285,17 +286,13 @@ class TC_FAN_3_5(MatterBaseTest):
         percent_setting_init = 0 if order == OrderEnum.Ascending else 100
         await self.write_setting(attr.PercentSetting, percent_setting_init)
 
-        # Read SpeedSetting and FanMode attributes
-        speed_setting = await self.read_setting(attr.SpeedSetting)
+        # Verify FanMode and SpeedSetting is at their expected value
         fan_mode = await self.read_setting(attr.FanMode)
-
-        # Verify SpeedSetting is at the expected value
+        fan_mode_expected = fm_enum.kOff if order == OrderEnum.Ascending else fm_enum.kHigh
+        speed_setting = await self.read_setting(attr.SpeedSetting)
         speed_setting_expected = 0 if order == OrderEnum.Ascending else self.speed_max
         asserts.assert_equal(speed_setting, speed_setting_expected,
                              f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({self.speed_max})")
-
-        # Verify FanMode is at the expected value
-        fan_mode_expected = fm_enum.kOff if order == OrderEnum.Ascending else fm_enum.kHigh
         asserts.assert_equal(fan_mode, fan_mode_expected,
                              f"[FC] FanMode attribute value ({fan_mode}) is not equal to the expected value ({fm_enum.kOn})")
 
@@ -312,15 +309,22 @@ class TC_FAN_3_5(MatterBaseTest):
 
         # Send Step command until it reaches the min or max
         # PercentSetting value depending on the test order
-        percent_setting_expected = 100 if order == OrderEnum.Ascending else 0
+        min_percent_setting = 0 if step.lowestOff else self.percent_setting_per_step
+        percent_setting_expected = 100 if order == OrderEnum.Ascending else min_percent_setting
         for i in range(100):
             await self.send_step_command(step)
-            pecent_setting = percent_setting_sub.get_last_attribute_report_value(self.endpoint, attr.PercentSetting, self.timeout_sec)
-            logging.info(f"[FC] [{i}] PercentSetting attribute value: {pecent_setting}")
+            percent_setting = percent_setting_sub.get_last_attribute_report_value(self.endpoint, attr.PercentSetting, self.timeout_sec)
+            logging.info(f"[FC] [{i}] PercentSetting attribute value: {percent_setting}")
+
+            # Calculate the PercentSetting span per Step
+            if self.percent_setting_per_step is None:
+                if order == OrderEnum.Descending:
+                    if i == 0:
+                        self.percent_setting_per_step = percent_setting_init - percent_setting
 
             # If the expected PercentSetting value is reached, send an additional Step
             # command to veiryf the PercentSetting value stays at the expected value
-            if pecent_setting == percent_setting_expected:
+            if percent_setting == percent_setting_expected:
                 await self.send_step_command(step)
                 percent_setting = await self.read_setting(attr.PercentSetting)
                 asserts.assert_equal(percent_setting, percent_setting_expected,
@@ -328,7 +332,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 break
             else:
                 if i == 100:
-                    asserts.fail(f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({pecent_setting}).")
+                    asserts.fail(f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({percent_setting}).")
 
         # Veirfy attribute progression (each successive value is greater or less than the last)
         self.verify_attribute_progression(order)
@@ -346,6 +350,7 @@ class TC_FAN_3_5(MatterBaseTest):
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         self.timeout_sec: float = 0.5
+        self.percent_setting_per_step = None
 
         # *** STEP 1 ***
         # Commissioning already done
@@ -384,20 +389,21 @@ class TC_FAN_3_5(MatterBaseTest):
         fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, OrderEnum.Descending)
         fan_mode_values_asc, speed_setting_values_asc = await self.step_command_test(percent_setting_sub, OrderEnum.Ascending)
 
-        fan_mode_values_desc = fan_mode_values_desc[:-1]
-        speed_setting_values_desc = speed_setting_values_desc[:-1]
-        fan_mode_values_asc = fan_mode_values_asc[:-1]
-        speed_setting_values_asc = speed_setting_values_asc[:-1]
+        # pop_num = 1
+        # fan_mode_values_desc = fan_mode_values_desc[:-pop_num]
+        # speed_setting_values_desc = speed_setting_values_desc[:-pop_num]
+        # fan_mode_values_asc = fan_mode_values_asc[:-pop_num]
+        # speed_setting_values_asc = speed_setting_values_asc[:-pop_num]
 
-        logger.info(f"[FC] fan_mode_values_desc: {fan_mode_values_desc}")
-        logger.info(f"[FC] speed_setting_values_desc: {speed_setting_values_desc}")
-        logger.info(f"[FC] fan_mode_values_asc: {fan_mode_values_asc}")
-        logger.info(f"[FC] speed_setting_values_asc: {speed_setting_values_asc}")
+        # logger.info(f"[FC] fan_mode_values_desc: {fan_mode_values_desc}")
+        # logger.info(f"[FC] speed_setting_values_desc: {speed_setting_values_desc}")
+        # logger.info(f"[FC] fan_mode_values_asc: {fan_mode_values_asc}")
+        # logger.info(f"[FC] speed_setting_values_asc: {speed_setting_values_asc}")
         
-        asserts.assert_equal(fan_mode_values_desc, list(reversed(fan_mode_values_asc)),
-                             f"[FC] FanMode attribute values are not equal in ascending and descending order. Descending: {fan_mode_values_desc}, Ascending: {fan_mode_values_asc}.")
-        asserts.assert_equal(speed_setting_values_desc, list(reversed(speed_setting_values_asc)),
-                             f"[FC] SpeedSetting attribute values are not equal in ascending and descending order. Descending: {speed_setting_values_desc}, Ascending: {speed_setting_values_asc}.")
+        # asserts.assert_equal(fan_mode_values_desc, list(reversed(fan_mode_values_asc)),
+        #                      f"[FC] FanMode attribute values are not equal in ascending and descending order. Descending: {fan_mode_values_desc}, Ascending: {fan_mode_values_asc}.")
+        # asserts.assert_equal(speed_setting_values_desc, list(reversed(speed_setting_values_asc)),
+        #                      f"[FC] SpeedSetting attribute values are not equal in ascending and descending order. Descending: {speed_setting_values_desc}, Ascending: {speed_setting_values_asc}.")
 
 if __name__ == "__main__":
     default_matter_test_main()

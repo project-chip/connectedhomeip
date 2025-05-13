@@ -737,12 +737,11 @@ class ClusterAttributeChangeAccumulator:
             if isinstance(attr_val.value, Enum):
                 enum_class_name = type(attr_val.value).__name__
                 enum_item_name = attr_val.value.name
-                val_str = f"{enum_class_name}.{enum_item_name}:{attr_val.value}"
+                val_str = f"{enum_class_name}.{enum_item_name}: {attr_val.value}"
             else:
                 val_str = attr_val.value
 
             if attr_val == self._q.queue[-1]:
-                logging.info(f"[FC] {attr_val}")
                 str += f"{attr_val.attribute.__name__}={val_str}"
             else:
                 str += f"{attr_val.attribute.__name__}={val_str}, "
