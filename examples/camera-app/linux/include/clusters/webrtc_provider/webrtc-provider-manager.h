@@ -28,8 +28,8 @@
 
 #include <unordered_map>
 
-using ICEServerDecodableStruct = chip::app::Clusters::Global::Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = chip::app::Clusters::Global::Structs::WebRTCSessionStruct::Type;
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
 
 namespace Camera {
 
@@ -48,24 +48,21 @@ public:
 
     void SetMediaController(MediaController * mediaController);
 
-    CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args,
-                                  chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession,
+    CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
 
     CHIP_ERROR
-    HandleProvideOffer(const ProvideOfferRequestArgs & args,
-                       chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession) override;
+    HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) override;
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
-    CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId,
-        const std::vector<ICECandidateStruct> & candidates) override;
+    CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) override;
 
     CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
                                 chip::app::DataModel::Nullable<uint16_t> videoStreamID,
                                 chip::app::DataModel::Nullable<uint16_t> audioStreamID) override;
 
-    CHIP_ERROR ValidateStreamUsage(chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage,
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
 

@@ -163,7 +163,8 @@ CHIP_ERROR WebRTCProviderClient::ProvideAnswer(uint16_t webRTCSessionId, const s
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, DataModel::List<const ICECandidateStruct> ICECandidates)
+CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID,
+                                                      DataModel::List<const ICECandidateStruct> ICECandidates)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 

@@ -23,9 +23,11 @@
 #include <string>
 #include <vector>
 
-using ICEServerDecodableStruct = chip::app::Clusters::Global::Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = chip::app::Clusters::Global::Structs::WebRTCSessionStruct::Type;
-using ICECandidateStruct       = chip::app::Clusters::Global::Structs::ICECandidateStruct::Type;
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
 namespace chip {
 namespace app {
