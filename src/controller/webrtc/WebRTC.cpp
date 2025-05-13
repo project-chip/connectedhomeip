@@ -127,8 +127,16 @@ void InitialisePeerConnection(void * Client)
     });
 }
 
-// Function to destroy a WebRTC client
-void DestroyClient(void * Client) {}
+// API to destroy WebRTC client
+void DestroyClient(void * Client) {
+    if (Client == nullptr) {
+        ChipLogError(NotSpecified, "Client is null");
+	return;
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    delete rtcClient;
+}
 
 // API to close the peer connection and free up resources
 void ClosePeerConnection(void * Client)
@@ -147,7 +155,6 @@ void ClosePeerConnection(void * Client)
     }
 
     rtcClient->pc->close();
-    delete rtcClient;
 }
 
 // Function to get statistics from the peer connection
