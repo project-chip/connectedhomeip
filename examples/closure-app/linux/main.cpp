@@ -42,16 +42,16 @@ ClosureDimensionEndpoint ep3(3);
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
-constexpr const uint8_t kNamespaceClosure   = 0x44;
-constexpr const uint8_t kTagClosureCovering = 0x00;
+constexpr uint8_t kNamespaceClosure   = 0x44;
+constexpr uint8_t kTagClosureCovering = 0x00;
 // Derived from
 // https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure-Covering.adoc
-constexpr const uint8_t kNamespaceCovering   = 0x46;
-constexpr const uint8_t kTagCoveringVenetian = 0x03;
+constexpr uint8_t kNamespaceCovering   = 0x46;
+constexpr uint8_t kTagCoveringVenetian = 0x03;
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-ClosurePanel.adoc
-constexpr const uint8_t kNamespaceClosurePanel = 0x45;
-constexpr const uint8_t kTagClosurePanelLift   = 0x00;
-constexpr const uint8_t kTagClosurePanelTilt   = 0x01;
+constexpr uint8_t kNamespaceClosurePanel = 0x45;
+constexpr uint8_t kTagClosurePanelLift   = 0x00;
+constexpr uint8_t kTagClosurePanelTilt   = 0x01;
 
 // Define the list of semantic tags for the endpoint
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp1TagList[] = {
