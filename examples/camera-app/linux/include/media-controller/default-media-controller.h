@@ -31,10 +31,10 @@ public:
     virtual ~DefaultMediaController() {}
     // Transports register themselves with the media-controller for receiving
     // media from stream sources.
-    void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) override;
+    void RegisterTransport(camera::Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) override;
     // Transports must first unregister from the media-controller when they are
     // getting destroyed.
-    void UnregisterTransport(Transport * transport) override;
+    void UnregisterTransport(camera::Transport * transport) override;
     // Media controller goes through registered transports and dispatches media
     // if the transport is ready.
     void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID) override;

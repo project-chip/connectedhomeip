@@ -28,4 +28,7 @@ chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 chip_with_nlfaultinjection = true
 
 matter_enable_tracing_support = true
+
 matter_enable_camera_server = true
+
+treat_warnings_as_errors = false

@@ -20,10 +20,11 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <media-controller.h>
+#include "transport/transport.h"
 
-using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
 using chip::app::Clusters::CameraAvStreamManagement::RateDistortionTradeOffStruct;
@@ -125,6 +126,8 @@ public:
 
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
+    // Getter for PushAV Delegate
+    virtual chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate & GetPushAVDelegate() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
@@ -274,6 +277,8 @@ public:
         virtual int16_t GetTiltMin() = 0;
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;
+
+        virtual void RegisterTransport(camera::Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;

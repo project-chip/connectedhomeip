@@ -27,6 +27,9 @@
 // Media Transports would be registered with the Media controller and indicated
 // by the CanSend<Video/Audio> when they are ready for data transfer.
 // Before being destroyed, they must be unregistered from the Media controller.
+
+namespace camera {
+
 class Transport
 {
 public:
@@ -47,3 +50,5 @@ public:
 
     virtual ~Transport() = default;
 };
+
+}
