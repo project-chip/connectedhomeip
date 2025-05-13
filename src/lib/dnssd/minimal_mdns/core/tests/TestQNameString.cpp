@@ -43,4 +43,4 @@ TEST_F(TestQNameString, Construction)
         EXPECT_NE(heapQName.c_str(), "");
     }
 }
-} // namespace 
+} // namespace
