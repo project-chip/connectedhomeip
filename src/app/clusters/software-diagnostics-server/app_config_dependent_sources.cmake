@@ -26,4 +26,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/software-diagnostics-cluster.h"
     "${CLUSTER_DIR}/software-diagnostics-logic.cpp"
     "${CLUSTER_DIR}/software-diagnostics-logic.h"
+    "${CLUSTER_DIR}/software-fault-listener.cpp"
+    "${CLUSTER_DIR}/software-fault-listener.h"
 )
