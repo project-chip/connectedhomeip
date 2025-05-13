@@ -2218,7 +2218,7 @@ async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackEr
 
     Helper function:
 
-        await run_with_error_check(coroutine_func, *args, exception_type=Exception, assert_func=None, error_msg="Unexpected success", **kwargs)
+        await run_with_error_check(coroutine_func, *args, exception_type=ChipStackError, assert_func=None, error_msg="Unexpected success", **kwargs)
 
         - coroutine_func: Is the function you want to run in the try block (e.g self.TH2.ReadAttribute)
         - *args: Captures positional arguments (e.g self.dut_node_id)
