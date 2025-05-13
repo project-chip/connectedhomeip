@@ -53,6 +53,8 @@ cluster = Clusters.Thermostat
 
 
 class TC_TSTAT_4_2(MatterBaseTest):
+    async def read_tstat_attribute_expect_success(self, attribute):
+        return await self.read_single_attribute_check_success(endpoint=None, cluster=cluster, attribute=attribute)
 
     def check_atomic_response(self, response: object, expected_status: Status = Status.Success,
                               expected_overall_status: Status = Status.Success,
@@ -110,11 +112,11 @@ class TC_TSTAT_4_2(MatterBaseTest):
             return availableScenarios[0]
         return None
 
-    def make_preset(self, presetScenario,  coolSetpoint, heatSetpoint, presetHandle=NullValue, name=None, builtIn=False):
+    def make_preset(self, presetScenario,  coolSetpoint, heatSetpoint, presetHandle=NullValue, name=None, builtIn=False, supportsCool=True, supportsHeat=True):
         preset = cluster.Structs.PresetStruct(presetHandle=presetHandle, presetScenario=presetScenario, builtIn=builtIn)
-        if self.check_pics("TSTAT.S.F00"):
+        if supportsHeat:
             preset.heatingSetpoint = heatSetpoint
-        if self.check_pics("TSTAT.S.F01"):
+        if supportsCool:
             preset.coolingSetpoint = coolSetpoint
         if name is not None:
             preset.name = name
@@ -281,15 +283,18 @@ class TC_TSTAT_4_2(MatterBaseTest):
         minCoolSetpointLimit = 1600
         maxCoolSetpointLimit = 3200
 
-        supportsHeat = self.check_pics("TSTAT.S.F00")
-        supportsCool = self.check_pics("TSTAT.S.F01")
+        Presets_attr_support = await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.Presets)
+        AtomicRequest_cmd_support = await self.command_guard(endpoint=endpoint, command=cluster.Commands.AtomicRequest)
+        supportsHeat = await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kHeating)
+        supportsCool = await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kCooling)
+        supportsPresets_feat = await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPresets)
 
         if supportsHeat:
             # If the server supports MinHeatSetpointLimit & MaxHeatSetpointLimit, use those
-            if self.check_pics("TSTAT.S.A0015") and self.check_pics("TSTAT.S.A0016"):
+            if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.MinHeatSetpointLimit) and await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.MaxHeatSetpointLimit):
                 minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
                 maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
-            elif self.check_pics("TSTAT.S.A0003") and self.check_pics("TSTAT.S.A0004"):
+            elif await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.AbsMinHeatSetpointLimit) and await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.AbsMaxHeatSetpointLimit):
                 # Otherwise, if the server supports AbsMinHeatSetpointLimit & AbsMaxHeatSetpointLimit, use those
                 minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinHeatSetpointLimit)
                 maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxHeatSetpointLimit)
@@ -298,10 +303,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         if supportsCool:
             # If the server supports MinCoolSetpointLimit & MaxCoolSetpointLimit, use those
-            if self.check_pics("TSTAT.S.A0017") and self.check_pics("TSTAT.S.A0018"):
+            if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.MinCoolSetpointLimit) and await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.MaxCoolSetpointLimit):
                 minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
                 maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
-            elif self.check_pics("TSTAT.S.A0005") and self.check_pics("TSTAT.S.A0006"):
+            elif await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.AbsMinCoolSetpointLimit) and await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.AbsMaxCoolSetpointLimit):
                 # Otherwise, if the server supports AbsMinCoolSetpointLimit & AbsMaxCoolSetpointLimit, use those
                 minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinCoolSetpointLimit)
                 maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxCoolSetpointLimit)
@@ -311,7 +316,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         # Servers that do not support occupancy are always "occupied"
         occupied = True
 
-        supportsOccupancy = self.check_pics("TSTAT.S.F02")
+        supportsOccupancy = await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kOccupancy)
         if supportsOccupancy:
             occupied = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Occupancy) & 1
 
@@ -332,7 +337,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
 
         self.step("2")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050")):
+        if supportsPresets_feat and Presets_attr_support:
 
             # Read the numberOfPresets supported.
             numberOfPresetsSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfPresets)
@@ -350,7 +355,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.write_presets(endpoint=endpoint, presets=current_presets, expected_status=Status.InvalidInState)
 
         self.step("3")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -361,7 +366,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 for preset in test_presets:
                     preset.builtIn = NullValue
 
-                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint,
+                                    supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 await self.send_atomic_request_begin_command()
 
@@ -385,7 +391,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 3 since there was no available preset scenario to append")
 
         self.step("4")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -398,7 +404,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 if len(builtInPresets) > 0:
                     builtInPresets[0].builtIn = NullValue
 
-                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint,
+                                    supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -420,7 +427,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 4 since there were no built-in presets")
 
         self.step("5")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             # Write to the presets attribute after removing a built in preset from the list. Remove the first entry.
             test_presets = current_presets.copy()
@@ -443,7 +450,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 5 since there were no built-in presets")
 
         self.step("6")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             notBuiltInPresets = list(preset for preset in current_presets if preset.builtIn is False)
             if len(notBuiltInPresets) > 0:
@@ -489,7 +496,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(activePresetHandle, NullValue, "Active preset handle was not cleared as expected")
 
         self.step("7")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             # Write to the presets attribute after setting the builtIn flag to False for a built-in preset.
             test_presets = copy.deepcopy(current_presets)
@@ -511,7 +518,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 7 since there was no built-in presets")
 
         self.step("8")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -523,7 +530,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after adding a preset with builtIn set to True
-                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint, builtIn=True))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint,
+                                    builtIn=True, supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
 
@@ -534,7 +542,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 8 since there was no available preset scenario to append")
 
         self.step("9")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -542,7 +550,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Write to the presets attribute after adding a preset with a preset handle that doesn't exist in Presets attribute
             test_presets = copy.deepcopy(current_presets)
             test_presets.append(self.make_preset(cluster.Enums.PresetScenarioEnum.kWake, coolSetpoint,
-                                heatSetpoint,  presetHandle=random.randbytes(16), name="Wake",  builtIn=True))
+                                heatSetpoint,  presetHandle=random.randbytes(16), name="Wake",  builtIn=True, supportsCool=supportsCool, supportsHeat=supportsHeat))
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.NotFound)
 
@@ -550,7 +558,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("10")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -564,7 +572,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Write to the presets attribute after adding a duplicate preset
                 test_presets.append(self.make_preset(availableScenario, coolSetpoint,
-                                    heatSetpoint, presetHandle=duplicatePreset.presetHandle))
+                                    heatSetpoint, presetHandle=duplicatePreset.presetHandle, supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
 
@@ -575,7 +583,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 10 since there was no available preset scenario to duplicate")
 
         self.step("11")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             test_presets = copy.deepcopy(current_presets)
 
@@ -597,7 +605,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 11 since there were no presets that were not built-in")
 
         self.step("12")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             availableScenarios = list(presetType.presetScenario for presetType in presetTypes if (presetType.presetTypeFeatures & cluster.Bitmaps.PresetTypeFeaturesBitmap.kSupportsNames) == 0 and presetScenarioCounts.get(
                 presetType.presetScenario, 0) <= presetType.numberOfPresets)
@@ -606,7 +614,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             presets_without_name_support = list(preset for preset in test_presets if preset.presetScenario in availableScenarios)
 
             if len(presets_without_name_support) == 0 and len(availableScenarios) > 0:
-                new_preset = self.make_preset(availableScenarios[0], coolSetpoint, heatSetpoint, builtIn=True)
+                new_preset = self.make_preset(availableScenarios[0], coolSetpoint, heatSetpoint,
+                                              builtIn=True, supportsCool=supportsCool, supportsHeat=supportsHeat)
                 test_presets.append(new_preset)
                 presets_without_name_support = [new_preset]
 
@@ -627,7 +636,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 12 since there was no available preset scenario without name support")
 
         self.step("13")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
@@ -635,7 +644,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Write to the presets attribute with a new valid preset added
                 test_presets = copy.deepcopy(current_presets)
-                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint))
+                test_presets.append(self.make_preset(availableScenario, coolSetpoint, heatSetpoint,
+                                    supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -652,7 +662,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 13 since there was no available preset scenario to add")
 
         self.step("14")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
+
             await self.send_atomic_request_begin_command()
             # Send the AtomicRequest begin command from separate controller, which should receive busy
             status = await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller, expected_overall_status=Status.Failure, expected_preset_status=Status.Busy)
@@ -661,7 +672,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("15")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
+
             # Send the AtomicRequest begin command from the secondary controller
             await self.send_atomic_request_begin_command()
 
@@ -671,7 +683,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("16")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and AtomicRequest_cmd_support:
 
             # Send the AtomicRequest begin command from the secondary controller
             await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller)
@@ -686,7 +698,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("17")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and self.check_pics("TSTAT.S.Cfe.Rsp"):
 
             # Find a preset scenario not present in PresetTypes to run this test.
             supportedScenarios = set(presetType.presetScenario for presetType in presetTypes)
@@ -694,7 +706,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 presetScenario for presetScenario in cluster.Enums.PresetScenarioEnum if presetScenario not in supportedScenarios)
             if len(unavailableScenarios) > 0:
                 test_presets = current_presets.copy()
-                test_presets.append(self.make_preset(unavailableScenarios[0], coolSetpoint, heatSetpoint, name="Preset"))
+                test_presets.append(self.make_preset(
+                    unavailableScenarios[0], coolSetpoint, heatSetpoint, name="Preset", supportsCool=supportsCool, supportsHeat=supportsHeat))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -708,7 +721,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     "Couldn't run test step 17 since all preset scenarios in PresetScenarioEnum are supported by this Thermostat")
 
         self.step("18")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supportsPresets_feat and Presets_attr_support and self.check_pics("TSTAT.S.Cfe.Rsp"):
 
             ScenarioHeadroom = namedtuple("ScenarioHeadroom", "presetScenario remaining")
             # Generate list of tuples of scenarios and number of remaining presets per scenario allowed
@@ -749,7 +762,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                             presetsAddedForScenario = presetsAddedForScenario + 1
 
                     while presetsAddedForScenario < presetType.numberOfPresets:
-                        testPresets.append(self.make_preset(scenario, coolSetpoint, heatSetpoint))
+                        testPresets.append(self.make_preset(scenario, coolSetpoint, heatSetpoint,
+                                           supportsCool=supportsCool, supportsHeat=supportsHeat))
                         presetsAddedForScenario = presetsAddedForScenario + 1
 
                 # Send the AtomicRequest begin command
