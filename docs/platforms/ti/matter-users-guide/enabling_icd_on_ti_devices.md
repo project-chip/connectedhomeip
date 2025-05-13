@@ -35,7 +35,8 @@ chip_persist_subscriptions = true
 Subscription timeout resumption allows devices to attempt re-establishing
 subscriptions that may have expired. This feature is disabled out of box.
 
-To enable Dynamic SIT/LIT Support (DSLS), set the following parameter to true (LIT must be enabled first):
+To enable Dynamic SIT/LIT Support (DSLS), set the following parameter to true
+(LIT must be enabled first):
 
 ```
 chip_enable_icd_dsls = true
