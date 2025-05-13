@@ -107,7 +107,6 @@ void ConnectivityManagerImpl::ReportEthernetName()
 {
     if (mpStatusChangeCallback != nullptr)
     {
-        ChipLogError(DeviceLayer, "WILL WORK?");
         uint8_t interfaceName[kMaxNetworkIDLen];
         uint8_t interfaceNameLen =
             static_cast<uint8_t>(strnlen(SafePointerCast<char *>(mEthIfName), Inet::InterfaceId::kMaxIfNameLength));
