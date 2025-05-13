@@ -30,31 +30,6 @@ using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
-#endif
-
-CHIP_ERROR OTATlvProcessor::Init()
-{
-    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(GetAccumulatorLength());
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    mUnalignmentNum = 0;
-#endif
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTATlvProcessor::Clear()
-{
-    OTATlvProcessor::ClearInternal();
-    mAccumulator.Clear();
-    mDescriptorProcessed = false;
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    mUnalignmentNum = 0;
-#endif
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 {
     CHIP_ERROR status     = CHIP_NO_ERROR;
