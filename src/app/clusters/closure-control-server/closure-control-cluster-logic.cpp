@@ -258,30 +258,33 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
 
         // Validate the incoming Speed value and FeatureMap conformance.
         if (incomingOverallState.speed.HasValue())
+        {
+            // If the speed member is present in the incoming OverallState, we need to check if the Speed feature is
+            // supported by the closure. If the Speed feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        if (!incomingOverallState.speed.Value().IsNull())
+            if (!incomingOverallState.speed.Value().IsNull())
+            {
+                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
+                                        Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+            }
+        }
+
+        // Validate the incoming SecureState FeatureMap conformance.
+        if (incomingOverallState.secureState.HasValue())
         {
-            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
-                                    Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+            // If the secureState member is present in the OverallState, we need to check if the Speed feature is
+            // supported by the closure. If the Speed feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
+                                CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         }
     }
 
-    // Validate the incoming SecureState FeatureMap conformance.
-    if (incomingOverallState.secureState.HasValue())
-    {
-        // If the secureState member is present in the OverallState, we need to check if the Speed feature is
-        // supported by the closure. If the Speed feature is not supported, return an error.
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
-                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    }
-}
+    mState.mOverallState = overallState;
+    mMatterContext.MarkDirty(Attributes::OverallState::Id);
 
-mState.mOverallState = overallState;
-mMatterContext.MarkDirty(Attributes::OverallState::Id);
-
-return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget)
