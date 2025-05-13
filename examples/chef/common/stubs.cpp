@@ -6,6 +6,10 @@
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
+/**
+ * TODO: Remove this comment.
+ */
+
 using chip::app::DataModel::Nullable;
 
 using namespace chef;
