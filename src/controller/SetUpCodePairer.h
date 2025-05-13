@@ -42,6 +42,8 @@
 #include <controller/DeviceDiscoveryDelegate.h>
 
 #include <deque>
+#include <optional>
+#include <vector>
 
 namespace chip {
 namespace Controller {
@@ -52,12 +54,13 @@ class SetUpCodePairerParameters : public RendezvousParameters
 {
 public:
     SetUpCodePairerParameters() = default;
-    SetUpCodePairerParameters(const Dnssd::CommonResolutionData & data, size_t index);
+    SetUpCodePairerParameters(const Dnssd::CommonResolutionData & data, std::optional<uint16_t> longDiscriminator, size_t index);
 #if CONFIG_NETWORK_LAYER_BLE
-    SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj, bool connected = true);
+    SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj, std::optional<uint16_t> longDiscriminator, bool connected = true);
 #endif // CONFIG_NETWORK_LAYER_BLE
     char mHostName[Dnssd::kHostNameMaxLength + 1] = {};
     Inet::InterfaceId mInterfaceId;
+    std::optional<uint16_t> mLongDiscriminator = std::nullopt;
 };
 
 enum class SetupCodePairerBehaviour : uint8_t
@@ -104,14 +107,14 @@ private:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
-    CHIP_ERROR Connect(SetupPayload & paload);
-    CHIP_ERROR StartDiscoveryOverBLE(SetupPayload & payload);
+    CHIP_ERROR Connect();
+    CHIP_ERROR StartDiscoveryOverBLE();
     CHIP_ERROR StopDiscoveryOverBLE();
-    CHIP_ERROR StartDiscoveryOverDNSSD(SetupPayload & payload);
+    CHIP_ERROR StartDiscoveryOverDNSSD();
     CHIP_ERROR StopDiscoveryOverDNSSD();
-    CHIP_ERROR StartDiscoveryOverSoftAP(SetupPayload & payload);
+    CHIP_ERROR StartDiscoveryOverSoftAP();
     CHIP_ERROR StopDiscoveryOverSoftAP();
-    CHIP_ERROR StartDiscoveryOverWiFiPAF(SetupPayload & payload);
+    CHIP_ERROR StartDiscoveryOverWiFiPAF();
     CHIP_ERROR StopDiscoveryOverWiFiPAF();
 
     // Returns whether we have kicked off a new connection attempt.
@@ -160,16 +163,19 @@ private:
         kTransportTypeCount,
     };
 
-    void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::CommonResolutionData & resolutionData);
+    void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::CommonResolutionData & resolutionData,
+                                              std::optional<uint16_t> matchedLongDiscriminator);
 
     static void OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context);
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
-    void OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj);
+    void OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, std::optional<uint16_t> matchedLongDiscriminator);
     void OnBLEDiscoveryError(CHIP_ERROR err);
     /////////// BLEConnectionDelegate Callbacks /////////
     static void OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
+    static void OnDiscoveredDeviceWithDiscriminatorOverBleSuccess(void * appState, uint16_t matchedLongDiscriminator,
+                                                                  BLE_CONNECTION_OBJECT connObj);
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
 #endif // CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -182,20 +188,17 @@ private:
     bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const;
     static bool IdIsPresent(uint16_t vendorOrProductID);
 
-    Dnssd::DiscoveryFilter mCurrentFilter;
-    // The vendor id and product id from the SetupPayload.  They may be 0, which
-    // indicates "not available" (e.g. because the SetupPayload came from a
-    // short manual code).  In that case we should not filter on those values.
+    bool ShouldDiscoverUsing(RendezvousInformationFlag commissioningChannel) const;
+
+    // kNotAvailable represents unavailable vendor/product ID values in setup payloads.
     static constexpr uint16_t kNotAvailable = 0;
-    uint16_t mPayloadVendorID               = kNotAvailable;
-    uint16_t mPayloadProductID              = kNotAvailable;
 
     DeviceCommissioner * mCommissioner       = nullptr;
     System::Layer * mSystemLayer             = nullptr;
     chip::NodeId mRemoteId                   = kUndefinedNodeId;
-    uint32_t mSetUpPINCode                   = 0;
     SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
     DiscoveryType mDiscoveryType             = DiscoveryType::kAll;
+    std::vector<SetupPayload> mSetupPayloads;
 
     // While we are trying to pair, we intercept the DevicePairingDelegate
     // notifications from mCommissioner.  We want to make sure we send them on

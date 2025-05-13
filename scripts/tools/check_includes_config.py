@@ -164,8 +164,10 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/dnssd/minimal_mdns/ResponseSender.h': {'list'},
 
     # Not really for embedded consumers; uses std::deque to keep track
-    # of a list of discovered things.
-    'src/controller/SetUpCodePairer.h': {'deque'},
+    # of a list of discovered things and std::vector to keep track of
+    # lists of setup payloads and discriminators.
+    'src/controller/SetUpCodePairer.h': {'deque', 'vector'},
+    'src/controller/SetUpCodePairer.cpp': {'vector'},
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
 
