@@ -1350,46 +1350,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::JointFabricDatastore::Id: {
         switch (aCommand)
         {
-        case Clusters::JointFabricDatastore::Commands::AddKeySet::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::UpdateKeySet::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::RemoveKeySet::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::AddGroup::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::UpdateGroup::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::RemoveGroup::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::AddAdmin::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::UpdateAdmin::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::RemoveAdmin::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::AddPendingNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::RefreshNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::UpdateNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::RemoveNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::UpdateEndpointForNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::AddGroupIDToEndpointForNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::RemoveGroupIDFromEndpointForNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::AddBindingToEndpointForNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::RemoveBindingFromEndpointForNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::AddACLToNode::Id:
-            return true;
-        case Clusters::JointFabricDatastore::Commands::RemoveACLFromNode::Id:
-            return true;
         default:
             return false;
         }

@@ -29,7 +29,6 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
   val groupCAT: UShort?,
   val groupCATVersion: UShort?,
   val groupPermission: UByte,
-  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct {\n")
@@ -39,7 +38,6 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
     append("\tgroupCAT : $groupCAT\n")
     append("\tgroupCATVersion : $groupCATVersion\n")
     append("\tgroupPermission : $groupPermission\n")
-    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -64,7 +62,6 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
         putNull(ContextSpecificTag(TAG_GROUP_CAT_VERSION))
       }
       put(ContextSpecificTag(TAG_GROUP_PERMISSION), groupPermission)
-      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -76,7 +73,6 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
     private const val TAG_GROUP_CAT = 3
     private const val TAG_GROUP_CAT_VERSION = 4
     private const val TAG_GROUP_PERMISSION = 5
-    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -107,7 +103,6 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
           null
         }
       val groupPermission = tlvReader.getUByte(ContextSpecificTag(TAG_GROUP_PERMISSION))
-      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -118,7 +113,6 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
         groupCAT,
         groupCATVersion,
         groupPermission,
-        fabricIndex,
       )
     }
   }

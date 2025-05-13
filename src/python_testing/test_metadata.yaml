@@ -58,10 +58,6 @@ not_automated:
       reason:
           Currently isn't enabled because we don't have any examples with
           conformant PICS
-    - name: TC_TMP_2_1.py
-      reason:
-          src/python_testing/test_testing/test_TC_TMP_2_1.py is the Unit test of
-          this test
     - name: TC_OCC_3_1.py
       reason:
           There are CI issues for the test cases that implements manually
@@ -125,6 +121,10 @@ not_automated:
     - name: TC_AVSUMTestBase.py
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
+    - name: TC_LTIME_3_1.py
+      reason:
+          Flaky/failing (maybe after removing defaults)
+          https://github.com/project-chip/connectedhomeip/issues/38860
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

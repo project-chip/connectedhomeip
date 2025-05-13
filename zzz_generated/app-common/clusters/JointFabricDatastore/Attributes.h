@@ -154,9 +154,9 @@ struct TypeInfo
 namespace Status {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusStruct::Type;
-    using DecodableType    = chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusStruct::DecodableType &;
+    using Type             = chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type;
+    using DecodableType    = chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -197,11 +197,11 @@ namespace NodeKeySetList {
 struct TypeInfo
 {
     using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntry::Type>;
+        chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type>;
     using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntry::DecodableType>;
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntry::DecodableType> &;
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NodeKeySetList::Id; }
