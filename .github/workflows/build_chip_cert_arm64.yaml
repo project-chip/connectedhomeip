@@ -1,0 +1,45 @@
+name: Build chip-cert
+
+on:
+  push:
+    branches:
+      - chip-cert-arm-ci
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+  cancel-in-progress: true
+
+
+jobs:
+  chip_cert:
+    name: chip_cert
+    runs-on: ubuntu-24.04-arm
+    if: github.actor != 'restyled-io[bot]'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
+      - name: Check code path
+        run: |
+          pwd && \
+          sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+               libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
+               python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
+               default-jre
+
+      - name: Build
+        run: |
+          source scripts/activate.sh && \
+          gn gen out/host && \
+          ninja -C out/host chip-cert && \
+          ls -lah out/host
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chip-cert
+          path: ./out/host/chip-cert
