@@ -24,8 +24,35 @@
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestProviderChangeListener.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <app/server-cluster/testing/TestAttributePersistenceProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+// namespace chip {
+// class TestAttributePersistentProvider: protected app::StorageDelegateWrapper, public app::AttributePersistenceProvider
+// {
+// public:
+//     TestAttributePersistentProvider() = default;
+
+//     CHIP_ERROR Init(PersistentStorageDelegate * storage) { return app::StorageDelegateWrapper::Init(storage); }
+
+//     // AttributePersistenceProvider implementation.
+//     CHIP_ERROR WriteValue(const app::ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
+//     CHIP_ERROR ReadValue(const app::ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue) override;
+// private:
+//     CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aExpectedSize, MutableByteSpan & aValue);
+// };
+// } // namespace chip
+
+// namespace chip {
+//     CHIP_ERROR TestAttributePersistentProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
+//     {
+//         return CHIP_NO_ERROR;
+//     }
+//     CHIP_ERROR TestAttributePersistentProvider::ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
+//     {
+//         return CHIP_NO_ERROR;
+//     }
+// }
 namespace chip {
 namespace Test {
 
@@ -74,7 +101,7 @@ public:
 
     LogOnlyEvents & EventsGenerator() { return mTestEventsGenerator; }
     TestProviderChangeListener & ChangeListener() { return mTestDataModelChangeListener; }
-    TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage; }
+    TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage.GetPersistenceStorageDelegate(); }
     app::DataModel::InteractionModelContext & ImContext() { return mTestContext; }
 
 private:
@@ -82,7 +109,7 @@ private:
     LogOnlyEvents mTestEventsGenerator;
     TestProviderChangeListener mTestDataModelChangeListener;
     EmptyProvider mTestProvider;
-    TestPersistentStorageDelegate mTestStorage;
+    TestAttributePersistenceProvider mTestStorage;
 
     app::DataModel::InteractionModelContext mTestContext;
 
