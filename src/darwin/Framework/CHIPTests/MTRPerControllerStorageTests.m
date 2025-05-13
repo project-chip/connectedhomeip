@@ -2961,7 +2961,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testSubscriptionPool
 {
-    XCTSkip("Skipping due to flakyness/failing.  ADD ISSUE INFO HERE IF CI SUCCEEDS");
+    XCTSkip("Skipping due to flakyness/failing.  https://github.com/project-chip/connectedhomeip/issues/38825");
 
     // QRCodes generated for discriminators 1111~1115 and passcodes 1001~1005
     NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
@@ -2987,7 +2987,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testSubscriptionPoolManyDevices
 {
-    XCTSkip("Skipping due to flakyness/failing.  ADD ISSUE INFO HERE IF CI SUCCEEDS");
+    XCTSkip("Skipping due to flakyness/failing.  https://github.com/project-chip/connectedhomeip/issues/38825");
 
     // QRCodes generated for discriminators 1111~1150 and passcodes 1001~1050
     NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
