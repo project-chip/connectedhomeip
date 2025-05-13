@@ -68,6 +68,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 namespace DatastoreNodeKeySetEntryStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+namespace DatastoreNodeKeySetEntryStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
@@ -97,6 +99,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kStatusEntry))
         {
             err = DataModel::Decode(reader, statusEntry);
+        }
+        else
+        {
         }
 
         ReturnErrorOnFailure(err);
@@ -136,6 +141,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kCommissioningStatusEntry))
         {
             err = DataModel::Decode(reader, commissioningStatusEntry);
+        }
+        else
+        {
         }
 
         ReturnErrorOnFailure(err);
@@ -180,6 +188,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kStatusEntry))
         {
             err = DataModel::Decode(reader, statusEntry);
+        }
+        else
+        {
         }
 
         ReturnErrorOnFailure(err);
@@ -318,6 +329,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
+        else
+        {
+        }
 
         ReturnErrorOnFailure(err);
     }
@@ -445,6 +459,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
+        else
+        {
+        }
 
         ReturnErrorOnFailure(err);
     }
@@ -488,6 +505,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kIcac))
         {
             err = DataModel::Decode(reader, icac);
+        }
+        else
+        {
         }
 
         ReturnErrorOnFailure(err);
@@ -542,6 +562,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kGroupPermission))
         {
             err = DataModel::Decode(reader, groupPermission);
+        }
+        else
+        {
         }
 
         ReturnErrorOnFailure(err);
