@@ -492,7 +492,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
                 PLAT_LOG("Enabled LIT in DSLS");
             }
         }
-#endif        
+#endif
         break;
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
