@@ -157,16 +157,6 @@ enum LandmarkTag : enum8 {
   kWineCooler = 50;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
->>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
-=======
->>>>>>> 30979fee8d (Rebase with latest skeleton code)
 enum LocationTag : enum8 {
   kIndoor = 0;
   kOutdoor = 1;
@@ -195,16 +185,6 @@ enum MeasurementTypeEnum : enum16 {
   kSoilMoisture = 17;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 2f1934c3f5 (Closure app changes)
-=======
->>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
->>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
-=======
->>>>>>> 30979fee8d (Rebase with latest skeleton code)
 enum PositionTag : enum8 {
   kLeft = 0;
   kRight = 1;
@@ -294,29 +274,6 @@ struct MeasurementAccuracyStruct {
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-struct PowerThresholdStruct {
-  optional power_mw powerThreshold = 0;
-  optional power_mva apparentPowerThreshold = 1;
-  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
-}
-
-struct PriceStruct {
-  money amount = 0;
-  CurrencyStruct currency = 1;
-}
-
-struct TestGlobalStruct {
-  char_string<128> name = 0;
-  nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
->>>>>>> 2f1934c3f5 (Closure app changes)
->>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
-=======
->>>>>>> 30979fee8d (Rebase with latest skeleton code)
 }
 
 struct LocationDescriptorStruct {
@@ -325,14 +282,6 @@ struct LocationDescriptorStruct {
   nullable AreaTypeTag areaType = 2;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
-=======
->>>>>>> 30979fee8d (Rebase with latest skeleton code)
 struct PowerThresholdStruct {
   optional power_mw powerThreshold = 0;
   optional power_mva apparentPowerThreshold = 1;
@@ -343,24 +292,6 @@ struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
   optional nullable TestGlobalEnum myEnum = 2;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-struct PriceStruct {
-  money amount = 0;
-  CurrencyStruct currency = 1;
-}
-
-=======
->>>>>>> eb52279043 (Updated Closure control app and dimension app business logic and server logic)
-struct AtomicAttributeStatusStruct {
-  attrib_id attributeID = 0;
-  status statusCode = 1;
->>>>>>> 2f1934c3f5 (Closure app changes)
->>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
-=======
->>>>>>> 30979fee8d (Rebase with latest skeleton code)
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -892,48 +823,6 @@ cluster OtaSoftwareUpdateRequestor = 42 {
 
   /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for the units in which values are conveyed in communication to a
-      user. As such, Nodes that visually or audibly convey measurable values to the user need a
-      mechanism by which they can be configured to use a user’s preferred unit. */
-cluster UnitLocalization = 45 {
-  revision 2;
-
-  enum TempUnitEnum : enum8 {
-    kFahrenheit = 0;
-    kCelsius = 1;
-    kKelvin = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kTemperatureUnit = 0x1;
-  }
-
-  attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
-  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
@@ -2918,19 +2807,6 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    ram      attribute clusterRevision default = 0x0005;
-=======
-=======
->>>>>>> bf3d80f04c (Updated Closure control app and dimension app business logic and server logic)
-<<<<<<< HEAD
-=======
-    ram      attribute clusterRevision default = 4;
-=======
-=======
->>>>>>> 30979fee8d (Rebase with latest skeleton code)
     ram      attribute clusterRevision default = 6;
 
     handle command Identify;
@@ -2943,8 +2819,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
->>>>>>> 0cc5cc838d (Closure app changes)
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroupResponse;
     handle command AddGroup;
