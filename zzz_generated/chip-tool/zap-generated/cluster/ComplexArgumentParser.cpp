@@ -7955,7 +7955,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::JointFabricDatastore::
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntry::Type & request,
+                             chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -7964,10 +7964,10 @@ ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("DatastoreNodeKeySetEntry.nodeID", "nodeID", value.isMember("nodeID")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DatastoreNodeKeySetEntry.groupKeySetID", "groupKeySetID",
+        ComplexArgumentParser::EnsureMemberExist("DatastoreNodeKeySetEntryStruct.nodeID", "nodeID", value.isMember("nodeID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DatastoreNodeKeySetEntryStruct.groupKeySetID", "groupKeySetID",
                                                                   value.isMember("groupKeySetID")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DatastoreNodeKeySetEntry.statusEntry", "statusEntry",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DatastoreNodeKeySetEntryStruct.statusEntry", "statusEntry",
                                                                   value.isMember("statusEntry")));
 
     char labelWithMember[kMaxLabelLength];
@@ -7983,22 +7983,15 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.statusEntry, value["statusEntry"]));
     valueCopy.removeMember("statusEntry");
 
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntry::Type & request)
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.nodeID);
     ComplexArgumentParser::Finalize(request.groupKeySetID);
     ComplexArgumentParser::Finalize(request.statusEntry);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(
@@ -8032,13 +8025,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(
         ComplexArgumentParser::Setup(labelWithMember, request.commissioningStatusEntry, value["commissioningStatusEntry"]));
     valueCopy.removeMember("commissioningStatusEntry");
 
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8048,7 +8034,6 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.nodeID);
     ComplexArgumentParser::Finalize(request.friendlyName);
     ComplexArgumentParser::Finalize(request.commissioningStatusEntry);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(
@@ -8086,13 +8071,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.statusEntry, value["statusEntry"]));
     valueCopy.removeMember("statusEntry");
 
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8103,7 +8081,6 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.endpointID);
     ComplexArgumentParser::Finalize(request.groupID);
     ComplexArgumentParser::Finalize(request.statusEntry);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR
@@ -8246,13 +8223,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.statusEntry, value["statusEntry"]));
     valueCopy.removeMember("statusEntry");
 
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8264,7 +8234,6 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.listID);
     ComplexArgumentParser::Finalize(request.binding);
     ComplexArgumentParser::Finalize(request.statusEntry);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR
@@ -8391,13 +8360,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.statusEntry, value["statusEntry"]));
     valueCopy.removeMember("statusEntry");
 
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8407,7 +8369,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::JointFabricDatastore::
     ComplexArgumentParser::Finalize(request.listID);
     ComplexArgumentParser::Finalize(request.ACLEntry);
     ComplexArgumentParser::Finalize(request.statusEntry);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(
@@ -8446,13 +8407,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.icac, value["icac"]));
     valueCopy.removeMember("icac");
 
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8463,7 +8417,6 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.friendlyName);
     ComplexArgumentParser::Finalize(request.vendorID);
     ComplexArgumentParser::Finalize(request.icac);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(
@@ -8513,13 +8466,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.groupPermission, value["groupPermission"]));
     valueCopy.removeMember("groupPermission");
 
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8532,7 +8478,6 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.groupCAT);
     ComplexArgumentParser::Finalize(request.groupCATVersion);
     ComplexArgumentParser::Finalize(request.groupPermission);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR
@@ -8618,52 +8563,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::JointFabricDatastore::
     ComplexArgumentParser::Finalize(request.epochKey2);
     ComplexArgumentParser::Finalize(request.epochStartTime2);
     ComplexArgumentParser::Finalize(request.groupKeyMulticastPolicy);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DatastoreStatusStruct.state", "state", value.isMember("state")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DatastoreStatusStruct.updateTimestamp", "updateTimestamp",
-                                                                  value.isMember("updateTimestamp")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DatastoreStatusStruct.failureCode", "failureCode",
-                                                                  value.isMember("failureCode")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "state");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.state, value["state"]));
-    valueCopy.removeMember("state");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "updateTimestamp");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.updateTimestamp, value["updateTimestamp"]));
-    valueCopy.removeMember("updateTimestamp");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "failureCode");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.failureCode, value["failureCode"]));
-    valueCopy.removeMember("failureCode");
-
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.state);
-    ComplexArgumentParser::Finalize(request.updateTimestamp);
-    ComplexArgumentParser::Finalize(request.failureCode);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
