@@ -61,16 +61,16 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 
 try:
     from chip.testing.basic_composition import BasicCompositionTests
+    from chip.testing.commissioning import connect_over_pase
     from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
                                              run_tests_no_exit)
-    from chip.testing.commissioning import connect_over_pase
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from chip.testing.basic_composition import BasicCompositionTests
+    from chip.testing.commissioning import connect_over_pase
     from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
                                              run_tests_no_exit)
-    from chip.testing.commissioning import connect_over_pase
 
 try:
     import fetch_paa_certs_from_dcl
