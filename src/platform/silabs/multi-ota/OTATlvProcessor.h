@@ -87,12 +87,12 @@ public:
     void Clear();
     CHIP_ERROR Accumulate(ByteSpan & block);
 
+protected:
     inline uint8_t * data() { return mBuffer.Get(); }
-    inline uint32_t GetThreshold() { return mThreshold; }
+    inline uint32_t GetThreshold() const { return mThreshold; }
 
-private:
-    uint32_t mThreshold;
-    uint32_t mBufferOffset;
+    uint32_t mThreshold    = 0;
+    uint32_t mBufferOffset = 0;
     Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
 
