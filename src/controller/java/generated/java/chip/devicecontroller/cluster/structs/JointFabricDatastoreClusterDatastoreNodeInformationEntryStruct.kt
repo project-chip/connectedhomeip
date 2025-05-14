@@ -26,14 +26,12 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
   val nodeID: ULong,
   val friendlyName: String,
   val commissioningStatusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
-  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct {\n")
     append("\tnodeID : $nodeID\n")
     append("\tfriendlyName : $friendlyName\n")
     append("\tcommissioningStatusEntry : $commissioningStatusEntry\n")
-    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -43,7 +41,6 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
       put(ContextSpecificTag(TAG_NODE_ID), nodeID)
       put(ContextSpecificTag(TAG_FRIENDLY_NAME), friendlyName)
       commissioningStatusEntry.toTlv(ContextSpecificTag(TAG_COMMISSIONING_STATUS_ENTRY), this)
-      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -52,7 +49,6 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
     private const val TAG_NODE_ID = 1
     private const val TAG_FRIENDLY_NAME = 2
     private const val TAG_COMMISSIONING_STATUS_ENTRY = 3
-    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -66,7 +62,6 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
           ContextSpecificTag(TAG_COMMISSIONING_STATUS_ENTRY),
           tlvReader,
         )
-      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -74,7 +69,6 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
         nodeID,
         friendlyName,
         commissioningStatusEntry,
-        fabricIndex,
       )
     }
   }
