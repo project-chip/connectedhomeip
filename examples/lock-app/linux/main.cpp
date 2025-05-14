@@ -41,8 +41,7 @@ void ApplicationInit()
         app_id = "54321";
     }
 
-    std::string app_id_str = app_id;
-    std::string path       = kChipEventFifoPathPrefix + app_id_str;
+    std::string path = kChipEventFifoPathPrefix + std::string(app_id);
     if (sChipNamedPipeCommands.Start(path, &sLockAppCommandDelegate) != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
