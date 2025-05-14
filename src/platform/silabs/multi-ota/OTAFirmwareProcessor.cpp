@@ -117,7 +117,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.data())));
+    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.GetData())));
 
     mDescriptorProcessed = true;
     mAccumulator.Clear();
