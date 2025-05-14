@@ -69,30 +69,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace DatastoreStatusEntryStruct
 
-namespace DatastoreNodeKeySetEntry {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+namespace DatastoreNodeKeySetEntryStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
     encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
     encoder.Encode(to_underlying(Fields::kGroupKeySetID), groupKeySetID);
     encoder.Encode(to_underlying(Fields::kStatusEntry), statusEntry);
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
     return encoder.Finalize();
 }
 
@@ -118,10 +101,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
-        }
         else
         {
         }
@@ -130,32 +109,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace DatastoreNodeKeySetEntry
+} // namespace DatastoreNodeKeySetEntryStruct
 
 namespace DatastoreNodeInformationEntryStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
     encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
     encoder.Encode(to_underlying(Fields::kFriendlyName), friendlyName);
     encoder.Encode(to_underlying(Fields::kCommissioningStatusEntry), commissioningStatusEntry);
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
     return encoder.Finalize();
 }
 
@@ -181,10 +143,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, commissioningStatusEntry);
         }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
-        }
         else
         {
         }
@@ -196,30 +154,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace DatastoreNodeInformationEntryStruct
 
 namespace DatastoreEndpointGroupIDEntryStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
     encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
     encoder.Encode(to_underlying(Fields::kEndpointID), endpointID);
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kStatusEntry), statusEntry);
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
     return encoder.Finalize();
 }
 
@@ -248,10 +189,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kStatusEntry))
         {
             err = DataModel::Decode(reader, statusEntry);
-        }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
@@ -358,31 +295,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace DatastoreBindingTargetStruct
 
 namespace DatastoreEndpointBindingEntryStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
     encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
     encoder.Encode(to_underlying(Fields::kEndpointID), endpointID);
     encoder.Encode(to_underlying(Fields::kListID), listID);
     encoder.Encode(to_underlying(Fields::kBinding), binding);
     encoder.Encode(to_underlying(Fields::kStatusEntry), statusEntry);
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
     return encoder.Finalize();
 }
 
@@ -415,10 +335,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kStatusEntry))
         {
             err = DataModel::Decode(reader, statusEntry);
-        }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
@@ -520,30 +436,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace DatastoreAccessControlEntryStruct
 
 namespace DatastoreACLEntryStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
     encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
     encoder.Encode(to_underlying(Fields::kListID), listID);
     encoder.Encode(to_underlying(Fields::kACLEntry), ACLEntry);
     encoder.Encode(to_underlying(Fields::kStatusEntry), statusEntry);
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
     return encoder.Finalize();
 }
 
@@ -573,10 +472,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
-        }
         else
         {
         }
@@ -588,30 +483,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace DatastoreACLEntryStruct
 
 namespace DatastoreAdministratorInformationEntryStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
     encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
     encoder.Encode(to_underlying(Fields::kFriendlyName), friendlyName);
     encoder.Encode(to_underlying(Fields::kVendorID), vendorID);
     encoder.Encode(to_underlying(Fields::kIcac), icac);
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
     return encoder.Finalize();
 }
 
@@ -641,10 +519,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, icac);
         }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
-        }
         else
         {
         }
@@ -656,32 +530,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace DatastoreAdministratorInformationEntryStruct
 
 namespace DatastoreGroupInformationEntryStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kFriendlyName), friendlyName);
     encoder.Encode(to_underlying(Fields::kGroupKeySetID), groupKeySetID);
     encoder.Encode(to_underlying(Fields::kGroupCAT), groupCAT);
     encoder.Encode(to_underlying(Fields::kGroupCATVersion), groupCATVersion);
     encoder.Encode(to_underlying(Fields::kGroupPermission), groupPermission);
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
     return encoder.Finalize();
 }
 
@@ -718,10 +575,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kGroupPermission))
         {
             err = DataModel::Decode(reader, groupPermission);
-        }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
@@ -804,69 +657,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace DatastoreGroupKeySetStruct
-
-namespace DatastoreStatusStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
-    encoder.Encode(to_underlying(Fields::kState), state);
-    encoder.Encode(to_underlying(Fields::kUpdateTimestamp), updateTimestamp);
-    encoder.Encode(to_underlying(Fields::kFailureCode), failureCode);
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        uint8_t __context_tag = 0;
-        CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        if (__context_tag == to_underlying(Fields::kState))
-        {
-            err = DataModel::Decode(reader, state);
-        }
-        else if (__context_tag == to_underlying(Fields::kUpdateTimestamp))
-        {
-            err = DataModel::Decode(reader, updateTimestamp);
-        }
-        else if (__context_tag == to_underlying(Fields::kFailureCode))
-        {
-            err = DataModel::Decode(reader, failureCode);
-        }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace DatastoreStatusStruct
 } // namespace Structs
 } // namespace JointFabricDatastore
 } // namespace Clusters
