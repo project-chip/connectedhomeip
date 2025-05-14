@@ -72,17 +72,17 @@ constexpr uint8_t kMaxZoomValue = 75;
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
-    chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
-    chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
-    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate();
+    chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
+    chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
 
-    MediaController & GetMediaController();
+    MediaController & GetMediaController() override;
 
     CameraDevice();
     ~CameraDevice();
 
-    CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() { return *this; }
+    CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() override { return *this; }
 
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
@@ -155,7 +155,7 @@ public:
      * @param stream   the currently allocated video stream on which the viewport is being set
      * @param viewport the viewport to be set on the stream
      */
-    CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewport);
+    CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewport) override;
 
     // Currently, defaulting to not supporting speaker.
     bool HasSpeaker() override { return false; }
@@ -182,22 +182,22 @@ public:
     uint8_t GetMicrophoneVolume() override { return mMicrophoneVol; }
 
     // Get the microphone max and min levels.
-    uint8_t GetMicrophoneMaxLevel() override { return kMicrophoneMaxLevel; }
-    uint8_t GetMicrophoneMinLevel() override { return kMicrophoneMinLevel; }
+    uint8_t GetMicrophoneMaxLevel() override { return mMicrophoneMaxLevel; }
+    uint8_t GetMicrophoneMinLevel() override { return mMicrophoneMinLevel; }
 
-    int16_t GetPanMin();
+    int16_t GetPanMin() override;
 
-    int16_t GetPanMax();
+    int16_t GetPanMax() override;
 
-    int16_t GetTiltMin();
+    int16_t GetTiltMin() override;
 
-    int16_t GetTiltMax();
+    int16_t GetTiltMax() override;
 
-    uint8_t GetZoomMax();
+    uint8_t GetZoomMax() override;
 
-    CameraError SetPan(int16_t aPan);
-    CameraError SetTilt(int16_t aTilt);
-    CameraError SetZoom(uint8_t aZoom);
+    CameraError SetPan(int16_t aPan) override;
+    CameraError SetTilt(int16_t aTilt) override;
+    CameraError SetZoom(uint8_t aZoom) override;
 
     std::vector<VideoStream> & GetAvailableVideoStreams() override { return videoStreams; }
 
@@ -233,17 +233,17 @@ private:
 
     DefaultMediaController mMediaController;
 
-    uint16_t mPan  = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultPan;
-    uint16_t mTilt = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultTilt;
-    int8_t mZoom   = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
+    int16_t mPan  = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultPan;
+    int16_t mTilt = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultTilt;
+    uint8_t mZoom = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
     chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 320, 585, 2240, 1665 };
     uint16_t mCurrentVideoFrameRate                                         = 0;
     bool mHDREnabled                                                        = false;
     bool mMicrophoneMuted                                                   = false;
+    uint8_t mMicrophoneVol                                                  = kMicrophoneMinLevel;
     uint8_t mMicrophoneMinLevel                                             = kMicrophoneMinLevel;
     uint8_t mMicrophoneMaxLevel                                             = kMicrophoneMaxLevel;
-    uint8_t mMicrophoneVol                                                  = kMicrophoneMinLevel;
 
     std::vector<StreamUsageEnum> mRankedStreamPriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 };

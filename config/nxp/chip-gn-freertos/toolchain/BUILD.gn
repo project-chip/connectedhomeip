@@ -12,17 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/software-diagnostics-server.cpp"
-)
+import("//build_overrides/build.gni")
 
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/software-fault-listener.cpp"
-    "${CLUSTER_DIR}/software-fault-listener.h"
-)
+import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
+
+declare_args() {
+  nxp_ar = ""
+  nxp_cc = ""
+  nxp_cxx = ""
+}
+
+gcc_toolchain("nxpFreeRTOS") {
+  ar = nxp_ar
+  cc = nxp_cc
+  cxx = nxp_cxx
+
+  toolchain_args = {
+    current_os = "freertos"
+    is_clang = false
+  }
+}

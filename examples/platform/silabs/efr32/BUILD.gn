@@ -121,7 +121,10 @@ config("efr32-common-config") {
 }
 
 source_set("efr32-common") {
-  deps = [ "${silabs_common_plat_dir}/provision:storage" ]
+  deps = [
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
+    "${silabs_common_plat_dir}/provision:storage",
+  ]
   defines = []
   public_deps = []
   public_configs = [
