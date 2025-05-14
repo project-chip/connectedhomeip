@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,25 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[metadata]
-name = matter-yamltests
-version = 1.0.0
-author = Project CHIP Authors
-description = Parse matter YAML test files
-classifiers =
-    Intended Audience :: Developers
-    License :: OSI Approved :: Apache Software License
-    Programming Language :: Python :: 3
+import("//build_overrides/build.gni")
 
-[options]
-packages = find_namespace:
-include_package_data = True
-install_requires=
-    lark
-    matter-idl
-    pyyaml
-    websockets
+import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
 
-[options.package_data]
-* =
-    *.typed
+declare_args() {
+  nxp_ar = ""
+  nxp_cc = ""
+  nxp_cxx = ""
+}
+
+gcc_toolchain("nxpFreeRTOS") {
+  ar = nxp_ar
+  cc = nxp_cc
+  cxx = nxp_cxx
+
+  toolchain_args = {
+    current_os = "freertos"
+    is_clang = false
+  }
+}
