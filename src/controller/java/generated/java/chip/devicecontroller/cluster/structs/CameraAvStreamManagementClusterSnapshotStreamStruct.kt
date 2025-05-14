@@ -17,26 +17,28 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CameraAvStreamManagementClusterSnapshotStreamStruct(
-  val snapshotStreamID: UInt,
-  val imageCodec: UInt,
-  val frameRate: UInt,
-  val minResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-  val maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-  val quality: UInt,
-  val referenceCount: UInt,
-  val encodedPixels: Boolean,
-  val hardwareEncoder: Boolean,
-  val watermarkEnabled: Optional<Boolean>,
-  val OSDEnabled: Optional<Boolean>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class CameraAvStreamManagementClusterSnapshotStreamStruct (
+    val snapshotStreamID: UInt,
+    val imageCodec: UInt,
+    val frameRate: UInt,
+    val minResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+    val maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+    val quality: UInt,
+    val referenceCount: UInt,
+    val encodedPixels: Boolean,
+    val hardwareEncoder: Boolean,
+    val watermarkEnabled: Optional<Boolean>,
+    val OSDEnabled: Optional<Boolean>) {
+  override fun toString(): String  = buildString {
     append("CameraAvStreamManagementClusterSnapshotStreamStruct {\n")
     append("\tsnapshotStreamID : $snapshotStreamID\n")
     append("\timageCodec : $imageCodec\n")
@@ -65,13 +67,13 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
       put(ContextSpecificTag(TAG_ENCODED_PIXELS), encodedPixels)
       put(ContextSpecificTag(TAG_HARDWARE_ENCODER), hardwareEncoder)
       if (watermarkEnabled.isPresent) {
-        val optwatermarkEnabled = watermarkEnabled.get()
-        put(ContextSpecificTag(TAG_WATERMARK_ENABLED), optwatermarkEnabled)
-      }
+      val optwatermarkEnabled = watermarkEnabled.get()
+      put(ContextSpecificTag(TAG_WATERMARK_ENABLED), optwatermarkEnabled)
+    }
       if (OSDEnabled.isPresent) {
-        val optOSDEnabled = OSDEnabled.get()
-        put(ContextSpecificTag(TAG_OSD_ENABLED), optOSDEnabled)
-      }
+      val optOSDEnabled = OSDEnabled.get()
+      put(ContextSpecificTag(TAG_OSD_ENABLED), optOSDEnabled)
+    }
       endStructure()
     }
   }
@@ -89,56 +91,31 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
     private const val TAG_WATERMARK_ENABLED = 9
     private const val TAG_OSD_ENABLED = 10
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CameraAvStreamManagementClusterSnapshotStreamStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvStreamManagementClusterSnapshotStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val snapshotStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_SNAPSHOT_STREAM_ID))
       val imageCodec = tlvReader.getUInt(ContextSpecificTag(TAG_IMAGE_CODEC))
       val frameRate = tlvReader.getUInt(ContextSpecificTag(TAG_FRAME_RATE))
-      val minResolution =
-        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
-          ContextSpecificTag(TAG_MIN_RESOLUTION),
-          tlvReader,
-        )
-      val maxResolution =
-        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
-          ContextSpecificTag(TAG_MAX_RESOLUTION),
-          tlvReader,
-        )
+      val minResolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_MIN_RESOLUTION), tlvReader)
+      val maxResolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_MAX_RESOLUTION), tlvReader)
       val quality = tlvReader.getUInt(ContextSpecificTag(TAG_QUALITY))
       val referenceCount = tlvReader.getUInt(ContextSpecificTag(TAG_REFERENCE_COUNT))
       val encodedPixels = tlvReader.getBoolean(ContextSpecificTag(TAG_ENCODED_PIXELS))
       val hardwareEncoder = tlvReader.getBoolean(ContextSpecificTag(TAG_HARDWARE_ENCODER))
-      val watermarkEnabled =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATERMARK_ENABLED))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_WATERMARK_ENABLED)))
-        } else {
-          Optional.empty()
-        }
-      val OSDEnabled =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OSD_ENABLED))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OSD_ENABLED)))
-        } else {
-          Optional.empty()
-        }
-
+      val watermarkEnabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATERMARK_ENABLED))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_WATERMARK_ENABLED)))
+    } else {
+      Optional.empty()
+    }
+      val OSDEnabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_OSD_ENABLED))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OSD_ENABLED)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterSnapshotStreamStruct(
-        snapshotStreamID,
-        imageCodec,
-        frameRate,
-        minResolution,
-        maxResolution,
-        quality,
-        referenceCount,
-        encodedPixels,
-        hardwareEncoder,
-        watermarkEnabled,
-        OSDEnabled,
-      )
+      return CameraAvStreamManagementClusterSnapshotStreamStruct(snapshotStreamID, imageCodec, frameRate, minResolution, maxResolution, quality, referenceCount, encodedPixels, hardwareEncoder, watermarkEnabled, OSDEnabled)
     }
   }
 }

@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +28,7 @@ class CommodityTariffClusterTariffInformationStruct(
   val tariffLabel: String?,
   val providerName: String?,
   val currency: Optional<CommodityTariffClusterCurrencyStruct>?,
-  val blockMode: UByte?,
+  val blockMode: UByte?
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterTariffInformationStruct {\n")
@@ -53,9 +54,9 @@ class CommodityTariffClusterTariffInformationStruct(
       }
       if (currency != null) {
         if (currency.isPresent) {
-          val optcurrency = currency.get()
-          optcurrency.toTlv(ContextSpecificTag(TAG_CURRENCY), this)
-        }
+        val optcurrency = currency.get()
+        optcurrency.toTlv(ContextSpecificTag(TAG_CURRENCY), this)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_CURRENCY))
       }
@@ -76,52 +77,38 @@ class CommodityTariffClusterTariffInformationStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterTariffInformationStruct {
       tlvReader.enterStructure(tlvTag)
-      val tariffLabel =
-        if (!tlvReader.isNull()) {
-          tlvReader.getString(ContextSpecificTag(TAG_TARIFF_LABEL))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TARIFF_LABEL))
-          null
-        }
-      val providerName =
-        if (!tlvReader.isNull()) {
-          tlvReader.getString(ContextSpecificTag(TAG_PROVIDER_NAME))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_PROVIDER_NAME))
-          null
-        }
-      val currency =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENCY))) {
-            Optional.of(
-              CommodityTariffClusterCurrencyStruct.fromTlv(
-                ContextSpecificTag(TAG_CURRENCY),
-                tlvReader,
-              )
-            )
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CURRENCY))
-          null
-        }
-      val blockMode =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_BLOCK_MODE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_BLOCK_MODE))
-          null
-        }
-
+      val tariffLabel = if (!tlvReader.isNull()) {
+      tlvReader.getString(ContextSpecificTag(TAG_TARIFF_LABEL))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TARIFF_LABEL))
+      null
+    }
+      val providerName = if (!tlvReader.isNull()) {
+      tlvReader.getString(ContextSpecificTag(TAG_PROVIDER_NAME))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_PROVIDER_NAME))
+      null
+    }
+      val currency = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENCY))) {
+      Optional.of(CommodityTariffClusterCurrencyStruct.fromTlv(ContextSpecificTag(TAG_CURRENCY), tlvReader))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_CURRENCY))
+      null
+    }
+      val blockMode = if (!tlvReader.isNull()) {
+      tlvReader.getUByte(ContextSpecificTag(TAG_BLOCK_MODE))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_BLOCK_MODE))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return CommodityTariffClusterTariffInformationStruct(
-        tariffLabel,
-        providerName,
-        currency,
-        blockMode,
-      )
+      return CommodityTariffClusterTariffInformationStruct(tariffLabel, providerName, currency, blockMode)
     }
   }
 }

@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +28,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
   val chunkDuration: UShort,
   val CENCKey: Optional<ByteArray>,
   val metadataEnabled: Optional<Boolean>,
-  val CENCKeyID: Optional<ByteArray>,
+  val CENCKeyID: Optional<ByteArray>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n")
@@ -64,39 +65,28 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     private const val TAG_METADATA_ENABLED = 2
     private const val TAG_CENC_KEY_ID = 3
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): PushAvStreamTransportClusterCMAFContainerOptionsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val chunkDuration = tlvReader.getUShort(ContextSpecificTag(TAG_CHUNK_DURATION))
-      val CENCKey =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY)))
-        } else {
-          Optional.empty()
-        }
-      val metadataEnabled =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_ENABLED))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED)))
-        } else {
-          Optional.empty()
-        }
-      val CENCKeyID =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY_ID))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY_ID)))
-        } else {
-          Optional.empty()
-        }
-
+      val CENCKey = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY)))
+    } else {
+      Optional.empty()
+    }
+      val metadataEnabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_ENABLED))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED)))
+    } else {
+      Optional.empty()
+    }
+      val CENCKeyID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY_ID))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY_ID)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterCMAFContainerOptionsStruct(
-        chunkDuration,
-        CENCKey,
-        metadataEnabled,
-        CENCKeyID,
-      )
+      return PushAvStreamTransportClusterCMAFContainerOptionsStruct(chunkDuration, CENCKey, metadataEnabled, CENCKeyID)
     }
   }
 }

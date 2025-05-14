@@ -20,11 +20,15 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ClosureControlClusterOperationalErrorEvent(val errorState: List<UInt>) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ClosureControlClusterOperationalErrorEvent (
+    val errorState: List<UInt>) {
+  override fun toString(): String  = buildString {
     append("ClosureControlClusterOperationalErrorEvent {\n")
     append("\terrorState : $errorState\n")
     append("}\n")
@@ -45,17 +49,16 @@ class ClosureControlClusterOperationalErrorEvent(val errorState: List<UInt>) {
   companion object {
     private const val TAG_ERROR_STATE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureControlClusterOperationalErrorEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ClosureControlClusterOperationalErrorEvent {
       tlvReader.enterStructure(tlvTag)
-      val errorState =
-        buildList<UInt> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ERROR_STATE))
-          while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val errorState = buildList <UInt> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_ERROR_STATE))
+      while(!tlvReader.isEndOfContainer()) {
+        this.add(tlvReader.getUInt(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return ClosureControlClusterOperationalErrorEvent(errorState)
