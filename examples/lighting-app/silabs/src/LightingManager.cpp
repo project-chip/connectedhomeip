@@ -361,7 +361,7 @@ void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
 }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-bool LightingManager::InitiateLightctrlAction(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value)
+bool LightingManager::InitiateLightCtrlAction(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value)
 {
     bool action_initiated = false;
     VerifyOrReturnError(aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT, action_initiated);
