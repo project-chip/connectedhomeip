@@ -1,64 +1,91 @@
-#
-#    Copyright (c) 2025 Project CHIP Authors
-#
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#
-#        http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
-#
-
 import ctypes
-from enum import Enum, auto
-from typing import Optional
+from enum import IntEnum
+from typing import Dict, List, Optional, Tuple
+from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments
+from enum import IntEnum
+import ctypes
 
-from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
+
+# Only ChipFaults (defined in src/lib/support/CHIPFaultInjection.h) are implemented, Implement others as needed
+class FaultType(IntEnum):
+    Unspecified = 0,
+    SystemFault = 1,
+    InetFault = 2,
+    ChipFault = 3,
 
 
 def _GetNlFaultInjectionLibraryHandle() -> ctypes.CDLL:
-    """ Get the native library handle with tracing methods initialized.
-
-      Retrieves the CHIP native library handle and attaches signatures to
-      native methods.
-      """
-
-    # Getting a handle without requiring init, as nlfaultinjection methods
-    # do not require chip stack startup
+    """Get the native library handle with fault injection methods initialized."""
     handle = GetLibraryHandle(HandleFlags(0))
 
-    # Uses one of the type decorators as an indicator for everything being
-    # initialized.
-    if not handle.pychip_tracing_start_json_file.argtypes:
+    if not handle.pychip_faultinjection_get_num_faults.argtypes:
         setter = NativeLibraryHandleMethodArguments(handle)
+
+        setter.Set('pychip_faultinjection_get_fault_names', ctypes.POINTER(ctypes.c_char_p), None)
+        setter.Set('pychip_faultinjection_get_num_faults', ctypes.c_uint32, None)
 
         setter.Set('pychip_faultinjection_fail_at_fault', ctypes.c_uint32, [
                    ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_bool])
 
+        setter.Set('pychip_faultinjection_get_fault_counter', ctypes.c_uint32, [
+                   ctypes.c_uint32])
+
+        setter.Set('pychip_faultinjection_reset_fault_counters', None, None)
+
     return handle
 
 
-class FaultIDs(Enum):
-    JSON = auto()
-    PERFETTO = auto()
+def _generate_fault_enum_from_c(enum_name: str = "CHIPFaultId") -> IntEnum:
+    """Generate a Python IntEnum from the sFaultNames[] array defined in src/lib/support/CHIPFaultInjection.cpp """
 
-
-def FailAtFault(faultID, numCallsToSkip, numCallsToFail, takeMutex):
-    """
-    Initiate tracing to the specified destination.
-
-    Note that only one active trace can exist of a given type (i.e. cannot trace both
-    to files and logs/system).
-    """
     handle = _GetNlFaultInjectionLibraryHandle()
 
-    nlfaultinjectionReturnCode = 0
-    nlfaultinjectionReturnCode = handle.pychip_faultinjection_fail_at_fault(faultID, numCallsToSkip, numCallsToFail, takeMutex)
+    count = handle.pychip_faultinjection_get_num_faults()
+    array_ptr = handle.pychip_faultinjection_get_fault_names()
+
+    names = []
+    for i in range(count):
+        c_str = array_ptr[i]
+        if c_str is None:
+            raise ValueError(
+                f"sFaultNames[{i}] is NULL —> check that all fault ids defined in enum 'Id' in src/lib/support/CHIPFaultInjection.h" +
+                "are present in sFaultNames[] array defined in src/lib/support/CHIPFaultInjection.cpp ")
+        names.append(c_str.decode())
+
+    enum_dict = {name: i for i, name in enumerate(names)}
+
+    return IntEnum(enum_name, enum_dict)
+
+
+# This Enum is dynamically generated, it will have the same names as the sFaultNames[] array defined in src/lib/support/CHIPFaultInjection.cpp
+CHIPFaultId = _generate_fault_enum_from_c()
+
+
+def FailAtFault(faultID, numCallsToSkip: int, numCallsToFail: int, takeMutex: bool = True):
+    """ Configure a fault to be triggered
+    This should only be used to inject faults locally into the Client being run by the script. Otherwise to inject Faults over the data model, use the FailAtFault variant in clusters/Objects.py"""
+    handle = _GetNlFaultInjectionLibraryHandle()
+
+    nlfaultinjectionReturnCode = handle.pychip_faultinjection_fail_at_fault(
+        faultID, numCallsToSkip, numCallsToFail, takeMutex)
 
     if nlfaultinjectionReturnCode != 0:
-        raise Exception
+        raise Exception(f"Fault injection failed with return code: {nlfaultinjectionReturnCode}")
+
+
+def GetFaultCounter(faultID):
+    """ Returns the number of times a specific fault was checked during execution.
+
+    This is useful for verifying that the code path containing the fault injection was actually executed,
+    Note: The count includes all checks, even if the fault was not triggered.
+      """
+
+    handle = _GetNlFaultInjectionLibraryHandle()
+    return handle.pychip_faultinjection_get_fault_counter(faultID)
+
+
+def ResetFaultCounters():
+    """ Resets the counter that checks the number of times a specific fault was checked """
+
+    handle = _GetNlFaultInjectionLibraryHandle()
+    handle.pychip_faultinjection_reset_fault_counters()

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,94 +16,37 @@
  *    limitations under the License.
  */
 
-#include <controller/python/chip/native/ChipMainLoopWork.h>
-
 #include <lib/support/CHIPFaultInjection.h>
-
-namespace {
-// chip::Tracing::Json::JsonBackend gJsonBackend;
-
-// chip::Tracing::Perfetto::FileTraceOutput gPerfettoFileOutput;
-// chip::Tracing::Perfetto::PerfettoBackend gPerfettoBackend;
-
-} // namespace
 
 // #if CHIP_WITH_NLFAULTINJECTION
 
-// Returns 0 if pass, -ve if failed
 extern "C" int32_t pychip_faultinjection_fail_at_fault(uint32_t faultID, uint32_t numCallsToSkip, uint32_t numCallsToFail,
                                                        bool takeMutex)
 {
+    // Only ChipFaults (defined in src/lib/support/CHIPFaultInjection.h) are implemented, Implement others by adding calls to thier
+    // fault injection managers (SystemFauls and InetFaults)
     return chip::FaultInjection::GetManager().FailAtFault(faultID, numCallsToSkip, numCallsToFail, takeMutex);
-    // return chip::FaultInjection::GetManager().FailAtFault(chip::FaultInjection::kFault_CASEInvalidDesintationID, 0, 1);
 }
 
-// extern "C" int32_t pychip_faultinjection_delete_Session_Resumption(uint32_t fabricIndex)
-// {
-//     chip::Server::GetInstance().GetSessionResumptionStorage()->DeleteAll(fabricIndex);
-// }
-
-/*
-extern "C" void pychip_tracing_start_json_log()
+extern "C" uint32_t pychip_faultinjection_get_fault_counter(uint32_t faultID)
 {
-    chip::MainLoopWork::ExecuteInMainLoop([] {
-        gJsonBackend.CloseFile(); // just in case, ensure no file output
-        chip::Tracing::Register(gJsonBackend);
-    });
+
+    return chip::FaultInjection::GetFaultCounter(faultID);
 }
 
-extern "C" PyChipError pychip_tracing_start_json_file(const char * file_name)
+extern "C" void pychip_faultinjection_reset_fault_counters(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    chip::MainLoopWork::ExecuteInMainLoop([&err, file_name] {
-        err = gJsonBackend.OpenFile(file_name);
-        if (err != CHIP_NO_ERROR)
-        {
-            return;
-        }
-        chip::Tracing::Register(gJsonBackend);
-    });
-
-    return ToPyChipError(err);
+    return chip::FaultInjection::GetManager().ResetFaultCounters();
 }
 
-extern "C" void pychip_tracing_start_perfetto_system()
+extern "C" const char * const * pychip_faultinjection_get_fault_names()
 {
-    chip::MainLoopWork::ExecuteInMainLoop([] {
-        chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
-        chip::Tracing::Perfetto::RegisterEventTrackingStorage();
-        chip::Tracing::Register(gPerfettoBackend);
-    });
+    return chip::FaultInjection::sFaultNames;
 }
 
-extern "C" PyChipError pychip_tracing_start_perfetto_file(const char * file_name)
+extern "C" int pychip_faultinjection_get_num_faults()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::MainLoopWork::ExecuteInMainLoop([&err, file_name] {
-        chip::Tracing::Perfetto::Initialize(perfetto::kInProcessBackend);
-        chip::Tracing::Perfetto::RegisterEventTrackingStorage();
-
-        err = gPerfettoFileOutput.Open(file_name);
-        if (err != CHIP_NO_ERROR)
-        {
-            return;
-        }
-        chip::Tracing::Register(gPerfettoBackend);
-    });
-
-    return ToPyChipError(err);
+    return chip::FaultInjection::kNumChipFaultsFromEnum;
 }
-
-extern "C" void pychip_tracing_stop()
-{
-    chip::MainLoopWork::ExecuteInMainLoop([] {
-        chip::Tracing::Perfetto::FlushEventTrackingStorage();
-        gPerfettoFileOutput.Close();
-        chip::Tracing::Unregister(gPerfettoBackend);
-        chip::Tracing::Unregister(gJsonBackend);
-    });
-}
-*/
 
 // #endif // CHIP_WITH_NLFAULTINJECTION
