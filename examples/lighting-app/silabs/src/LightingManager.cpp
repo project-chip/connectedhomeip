@@ -369,40 +369,44 @@ bool LightingManager::InitiateLightCtrlAction(int32_t aActor, Action_t aAction, 
     switch (aAction)
     {
     case COLOR_ACTION_XY:
-        colorData.xy = {};
+        colorData.xy = { mCurrentX, mCurrentY };
 
         if (aAttributeId == ColorControl::Attributes::CurrentX::Id)
         {
-            VerifyOrReturnValue(mCurrentX != *reinterpret_cast<uint16_t *>(value), action_initiated);
-            mCurrentX = *reinterpret_cast<uint16_t *>(value);
+            VerifyOrReturnValue(colorData.xy.y != *reinterpret_cast<uint16_t *>(value), action_initiated);
+            colorData.xy.y   = *reinterpret_cast<uint16_t *>(value);
+            action_initiated = true;
         }
         else if (aAttributeId == ColorControl::Attributes::CurrentY::Id)
         {
-            VerifyOrReturnValue(mCurrentY != *reinterpret_cast<uint16_t *>(value), action_initiated);
-            mCurrentY = *reinterpret_cast<uint16_t *>(value);
+            VerifyOrReturnValue(colorData.xy.y != *reinterpret_cast<uint16_t *>(value), action_initiated);
+            colorData.xy.y   = *reinterpret_cast<uint16_t *>(value);
+            action_initiated = true;
         }
-        colorData.xy = { mCurrentX, mCurrentY };
         break;
 
     case COLOR_ACTION_HSV:
-        colorData.hsv = {};
+        colorData.hsv = { mCurrentHue, mCurrentSaturation };
 
         if (aAttributeId == ColorControl::Attributes::CurrentHue::Id)
         {
-            VerifyOrReturnValue(mCurrentHue != *value, action_initiated);
-            mCurrentHue = *value;
+            VerifyOrReturnValue(colorData.hsv.h != *value, action_initiated);
+            colorData.hsv.h  = *value;
+            action_initiated = true;
         }
         else if (aAttributeId == ColorControl::Attributes::CurrentSaturation::Id)
         {
-            VerifyOrReturnValue(mCurrentSaturation != *value, action_initiated);
-            mCurrentSaturation = *value;
+            VerifyOrReturnValue(colorData.hsv.s != *value, action_initiated);
+            colorData.hsv.s  = *value;
+            action_initiated = true;
         }
-        colorData.hsv = { mCurrentHue, mCurrentSaturation };
         break;
+
     case COLOR_ACTION_CT:
-        VerifyOrReturnValue(mCurrentCTMireds != *(uint16_t *) value, action_initiated);
+        colorData.ct.ctMireds = mCurrentCTMireds;
+        VerifyOrReturnValue(colorData.ct.ctMireds != *(uint16_t *) value, action_initiated);
         colorData.ct.ctMireds = *(uint16_t *) value;
-        mCurrentCTMireds      = colorData.ct.ctMireds;
+        action_initiated      = true;
         break;
 
     default:
