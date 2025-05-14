@@ -334,6 +334,29 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertIdlEqual(actual, expected)
 
+    def test_cluster_enum_with_spec_name(self):
+        actual = parseText("""
+            client cluster WithEnums = 0xab {
+                enum TestEnum : ENUM16 {
+                    A = 0x123 [ spec_name = "foo/bar" ];
+                    B = 0x234 [spec_name = "B_"];
+                }
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(name="WithEnums",
+                    code=0xab,
+                    enums=[
+                        Enum(name="TestEnum", base_type="ENUM16",
+                             entries=[
+                                 ConstantEntry(name="A", code=0x123,
+                                               specification_name="foo/bar"),
+                                 ConstantEntry(name="B", code=0x234,
+                                               specification_name="B_"),
+                             ])],
+                    )])
+        self.assertIdlEqual(actual, expected)
+
     def test_event_field_api_maturity(self):
         actual = parseText("""
             server cluster MaturityTest = 1 {
@@ -407,6 +430,32 @@ class TestParser(unittest.TestCase):
                                        name="kInternal", code=0x2, api_maturity=ApiMaturity.INTERNAL),
                                    ConstantEntry(
                                        name="kProvisional", code=0x4, api_maturity=ApiMaturity.PROVISIONAL),
+                               ])],
+                    )])
+        self.assertIdlEqual(actual, expected)
+
+    def test_bitmap_constant_spec_name(self):
+        actual = parseText("""
+            client cluster Test = 0xab {
+                bitmap TestBitmap : BITMAP32 {
+                    kStable = 0x1 [spec_name="STABLE"];
+                    internal kInternal = 0x2;
+                    provisional kProvisional = 0x4 [ spec_name = "Pr" ];
+                }
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(name="Test",
+                    code=0xab,
+                    bitmaps=[
+                        Bitmap(name="TestBitmap", base_type="BITMAP32",
+                               entries=[
+                                   ConstantEntry(
+                                       name="kStable", code=0x1, specification_name="STABLE"),
+                                   ConstantEntry(
+                                       name="kInternal", code=0x2, api_maturity=ApiMaturity.INTERNAL),
+                                   ConstantEntry(
+                                       name="kProvisional", code=0x4, api_maturity=ApiMaturity.PROVISIONAL, specification_name="Pr"),
                                ])],
                     )])
         self.assertIdlEqual(actual, expected)

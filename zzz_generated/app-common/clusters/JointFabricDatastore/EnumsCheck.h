@@ -69,7 +69,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::D
     switch (val)
     {
     case EnumType::kTrustFirst:
-    case EnumType::kCacheAndSync:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

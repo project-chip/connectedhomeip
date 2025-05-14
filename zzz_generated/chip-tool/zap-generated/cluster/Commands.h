@@ -30479,7 +30479,7 @@ void registerClusterJointFabricDatastore(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type>>>(
             Id, "admin-list", Attributes::AdminList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusStruct::Type>>(
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type>>(
             Id, "status", Attributes::Status::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type>>>(
@@ -30487,8 +30487,8 @@ void registerClusterJointFabricDatastore(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>>>(
             Id, "endpoint-binding-list", Attributes::EndpointBindingList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntry::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type>>>(
             Id, "node-key-set-list", Attributes::NodeKeySetList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>>>(

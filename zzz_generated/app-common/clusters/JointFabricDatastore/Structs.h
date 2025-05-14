@@ -60,13 +60,12 @@ public:
 using DecodableType = Type;
 
 } // namespace DatastoreStatusEntryStruct
-namespace DatastoreNodeKeySetEntry {
+namespace DatastoreNodeKeySetEntryStruct {
 enum class Fields : uint8_t
 {
     kNodeID        = 0,
     kGroupKeySetID = 1,
     kStatusEntry   = 2,
-    kFabricIndex   = 254,
 };
 
 struct Type
@@ -75,33 +74,23 @@ public:
     chip::NodeId nodeID    = static_cast<chip::NodeId>(0);
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
     Structs::DatastoreStatusEntryStruct::Type statusEntry;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 using DecodableType = Type;
 
-} // namespace DatastoreNodeKeySetEntry
+} // namespace DatastoreNodeKeySetEntryStruct
 namespace DatastoreNodeInformationEntryStruct {
 enum class Fields : uint8_t
 {
     kNodeID                   = 1,
     kFriendlyName             = 2,
     kCommissioningStatusEntry = 3,
-    kFabricIndex              = 254,
 };
 
 struct Type
@@ -110,21 +99,12 @@ public:
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
     chip::CharSpan friendlyName;
     Structs::DatastoreStatusEntryStruct::Type commissioningStatusEntry;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 using DecodableType = Type;
@@ -137,7 +117,6 @@ enum class Fields : uint8_t
     kEndpointID  = 1,
     kGroupID     = 2,
     kStatusEntry = 3,
-    kFabricIndex = 254,
 };
 
 struct Type
@@ -147,21 +126,12 @@ public:
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
     chip::GroupId groupID       = static_cast<chip::GroupId>(0);
     Structs::DatastoreStatusEntryStruct::Type statusEntry;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 using DecodableType = Type;
@@ -229,7 +199,6 @@ enum class Fields : uint8_t
     kListID      = 2,
     kBinding     = 3,
     kStatusEntry = 4,
-    kFabricIndex = 254,
 };
 
 struct Type
@@ -240,21 +209,12 @@ public:
     uint16_t listID             = static_cast<uint16_t>(0);
     Structs::DatastoreBindingTargetStruct::Type binding;
     Structs::DatastoreStatusEntryStruct::Type statusEntry;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 using DecodableType = Type;
@@ -328,7 +288,6 @@ enum class Fields : uint8_t
     kListID      = 1,
     kACLEntry    = 2,
     kStatusEntry = 3,
-    kFabricIndex = 254,
 };
 
 struct Type
@@ -338,19 +297,10 @@ public:
     uint16_t listID     = static_cast<uint16_t>(0);
     Structs::DatastoreAccessControlEntryStruct::Type ACLEntry;
     Structs::DatastoreStatusEntryStruct::Type statusEntry;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -360,15 +310,10 @@ public:
     uint16_t listID     = static_cast<uint16_t>(0);
     Structs::DatastoreAccessControlEntryStruct::DecodableType ACLEntry;
     Structs::DatastoreStatusEntryStruct::DecodableType statusEntry;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace DatastoreACLEntryStruct
@@ -379,7 +324,6 @@ enum class Fields : uint8_t
     kFriendlyName = 2,
     kVendorID     = 3,
     kIcac         = 4,
-    kFabricIndex  = 254,
 };
 
 struct Type
@@ -389,21 +333,12 @@ public:
     chip::CharSpan friendlyName;
     chip::VendorId vendorID = static_cast<chip::VendorId>(0);
     chip::ByteSpan icac;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 using DecodableType = Type;
@@ -418,7 +353,6 @@ enum class Fields : uint8_t
     kGroupCAT        = 3,
     kGroupCATVersion = 4,
     kGroupPermission = 5,
-    kFabricIndex     = 254,
 };
 
 struct Type
@@ -430,21 +364,12 @@ public:
     DataModel::Nullable<uint16_t> groupCAT;
     DataModel::Nullable<uint16_t> groupCATVersion;
     DatastoreAccessControlEntryPrivilegeEnum groupPermission = static_cast<DatastoreAccessControlEntryPrivilegeEnum>(0);
-    chip::FabricIndex fabricIndex                            = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 using DecodableType = Type;
@@ -487,41 +412,6 @@ public:
 using DecodableType = Type;
 
 } // namespace DatastoreGroupKeySetStruct
-namespace DatastoreStatusStruct {
-enum class Fields : uint8_t
-{
-    kState           = 0,
-    kUpdateTimestamp = 1,
-    kFailureCode     = 2,
-    kFabricIndex     = 254,
-};
-
-struct Type
-{
-public:
-    DatastoreStateEnum state      = static_cast<DatastoreStateEnum>(0);
-    uint32_t updateTimestamp      = static_cast<uint32_t>(0);
-    uint8_t failureCode           = static_cast<uint8_t>(0);
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
-};
-
-using DecodableType = Type;
-
-} // namespace DatastoreStatusStruct
 } // namespace Structs
 } // namespace JointFabricDatastore
 } // namespace Clusters

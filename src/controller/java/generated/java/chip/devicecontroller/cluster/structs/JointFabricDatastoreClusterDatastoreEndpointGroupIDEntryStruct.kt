@@ -27,7 +27,6 @@ class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
   val endpointID: UInt,
   val groupID: UInt,
   val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
-  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct {\n")
@@ -35,7 +34,6 @@ class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
     append("\tendpointID : $endpointID\n")
     append("\tgroupID : $groupID\n")
     append("\tstatusEntry : $statusEntry\n")
-    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -46,7 +44,6 @@ class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
       put(ContextSpecificTag(TAG_ENDPOINT_ID), endpointID)
       put(ContextSpecificTag(TAG_GROUP_ID), groupID)
       statusEntry.toTlv(ContextSpecificTag(TAG_STATUS_ENTRY), this)
-      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -56,7 +53,6 @@ class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
     private const val TAG_ENDPOINT_ID = 1
     private const val TAG_GROUP_ID = 2
     private const val TAG_STATUS_ENTRY = 3
-    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -71,7 +67,6 @@ class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
           ContextSpecificTag(TAG_STATUS_ENTRY),
           tlvReader,
         )
-      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -80,7 +75,6 @@ class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
         endpointID,
         groupID,
         statusEntry,
-        fabricIndex,
       )
     }
   }
