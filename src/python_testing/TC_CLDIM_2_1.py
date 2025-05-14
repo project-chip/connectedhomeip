@@ -142,7 +142,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
 
         # STEP 7: Read Unit attribute
         self.step(7)
-        unit = -1 # Unknown value
+        unit = -1  # Unknown value
         if attributes.Unit.attribute_id in attribute_list:
             unit = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Unit)
             asserts.assert_true(0 <= unit <= 1, "Unit is not in the expected range")
@@ -163,7 +163,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 if unit == 1:
                     asserts.assert_true(-360 <= unit_range.min <= 359, "UnitRange.min is not in the expected range")
                     asserts.assert_true(unit_range.min <= unit_range.max <= 360, "UnitRange.max is not in the expected range")
-                    asserts.assert_true(1 <= unit_range.max - unit_range.min <= 360, "UnitRange.max - UnitRange.min is not in the expected range")
+                    asserts.assert_true(1 <= unit_range.max - unit_range.min <= 360,
+                                        "UnitRange.max - UnitRange.min is not in the expected range")
         else:
             logging.info("Test step skipped")
 
