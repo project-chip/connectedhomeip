@@ -142,12 +142,13 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info('Precondition 2: DUT has a Network Commissioning cluster on the correct endpoint.')
 
         # Assign required PIXITs
-        endpoint = self.user_params.get('PIXIT.CNET.ENDPOINT_THREAD')
-        thread_dataset_1 = self.user_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
+        endpoint = self.get_endpoint()
+        thread_dataset_1 = self.matter_test_config.thread_operational_dataset
+        # thread_dataset_1 = self.user_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
         thread_dataset_2 = self.user_params.get('PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET')
 
         # Validate required PIXIT
-        asserts.assert_true(endpoint is not None, "Missing required PIXIT: PIXIT.CNET.ENDPOINT_THREAD")
+        # asserts.assert_true(endpoint is not None, "Missing required PIXIT: PIXIT.CNET.ENDPOINT_THREAD")
         asserts.assert_true(thread_dataset_1 is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET")
         asserts.assert_true(thread_dataset_2 is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
 
@@ -156,7 +157,8 @@ class TC_CNET_4_12(MatterBaseTest):
                     f'PIXIT.CNET.ENDPOINT_THREAD = {endpoint}, '
                     f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
                     f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2}')
-        thread_dataset_1_bytes = bytes.fromhex(thread_dataset_1)
+        # thread_dataset_1_bytes = bytes.fromhex(thread_dataset_1)
+        thread_dataset_1_bytes = thread_dataset_1
         thread_dataset_2_bytes = bytes.fromhex(thread_dataset_2)
 
         # All required PIXITs are present and assigned,  Thread dataset as bytes
@@ -258,10 +260,14 @@ class TC_CNET_4_12(MatterBaseTest):
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
         logger.info(f'Step #6: Networks attribute: {networks}')
-        logger.info(f'Step #3: Networks attribute: {networks.networkID}')
-        # Assert that the networkID matches the expected Thread network ID
-        asserts.assert_equal(networks.networkID, thread_network_id_bytes_th2,
-                             'networkID does not match the expected Thread network ID.')
+
+        network_ids = [n.networkID for n in networks]
+        logger.info(f"Step #6: Found networkIDs: {network_ids}")
+        asserts.assert_in(
+            thread_network_id_bytes_th2,
+            network_ids,
+            f"Expected networkID {thread_network_id_bytes_th2} not found in networks."
+        )
         # TODO: Update test plan to verify that the Networks attribute list has an entry NetworkID=th_xpan_2 insted of th_xpan_1
 
         self.step(7)
