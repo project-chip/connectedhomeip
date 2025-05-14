@@ -47,9 +47,9 @@ public:
 
 private:
     // Values of basic information cluster attributes that may be set from the command-line.
-    const char * mpVendorName = nullptr;
-    const char * mpProductName = nullptr;
-    const char * mpSerialNumber = nullptr;
+    const char * mpVendorName            = nullptr;
+    const char * mpProductName           = nullptr;
+    const char * mpSerialNumber          = nullptr;
     const char * mpHardwareVersionString = nullptr;
     const char * mpSoftwareVersionString = nullptr;
 };

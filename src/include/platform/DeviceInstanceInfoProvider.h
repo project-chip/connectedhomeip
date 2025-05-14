@@ -209,10 +209,7 @@ public:
      * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if the buffer was too small to fit string and null
      * terminating. or another CHIP_ERROR from the underlying implementation if access fails.
      */
-    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief Set a Vendor Name that will be returned by GetVendorName.
@@ -220,10 +217,7 @@ public:
      * @param[in] buf Buffer containing the string.
      * @returns CHIP_NO_ERROR on success.
      */
-    virtual CHIP_ERROR SetVendorName(const char * buf)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR SetVendorName(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief Set a Product Name that will be returned by GetProductName.
@@ -231,10 +225,7 @@ public:
      * @param[in] buf Buffer containing the string.
      * @returns CHIP_NO_ERROR on success.
      */
-    virtual CHIP_ERROR SetProductName(const char * buf)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR SetProductName(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief Set a Serial Number that will be returned by GetSerialNumber.
@@ -242,10 +233,7 @@ public:
      * @param[in] buf Buffer containing the string.
      * @returns CHIP_NO_ERROR on success.
      */
-    virtual CHIP_ERROR SetSerialNumber(const char * buf)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR SetSerialNumber(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief Set a Hardware Version String that will be returned by GetHardwareVersionString.
@@ -253,10 +241,7 @@ public:
      * @param[in] buf Buffer containing the string.
      * @returns CHIP_NO_ERROR on success.
      */
-    virtual CHIP_ERROR SetHardwareVersionString(const char * buf)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR SetHardwareVersionString(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief Set a Software Version String that will be returned by GetSoftwareVersionString.
@@ -264,10 +249,7 @@ public:
      * @param[in] buf Buffer containing the string.
      * @returns CHIP_NO_ERROR on success.
      */
-    virtual CHIP_ERROR SetSoftwareVersionString(const char * buf)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR SetSoftwareVersionString(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 /**

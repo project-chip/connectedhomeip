@@ -597,10 +597,12 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         GetDeviceInstanceInfoProvider()->SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value().c_str());
 
     if (LinuxDeviceOptions::GetInstance().softwareVersionString.HasValue())
-        GetDeviceInstanceInfoProvider()->SetSoftwareVersionString(LinuxDeviceOptions::GetInstance().softwareVersionString.Value().c_str());
+        GetDeviceInstanceInfoProvider()->SetSoftwareVersionString(
+            LinuxDeviceOptions::GetInstance().softwareVersionString.Value().c_str());
 
     if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
-        GetDeviceInstanceInfoProvider()->SetHardwareVersionString(LinuxDeviceOptions::GetInstance().hardwareVersionString.Value().c_str());
+        GetDeviceInstanceInfoProvider()->SetHardwareVersionString(
+            LinuxDeviceOptions::GetInstance().hardwareVersionString.Value().c_str());
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -818,9 +820,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     signal(SIGTERM, StopSignalHandler);
     // NOLINTEND(bugprone-signal-handler)
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif
