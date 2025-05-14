@@ -82,7 +82,7 @@ CHIP_ERROR OTAFactoryDataProcessor::FinalizeAction()
 CHIP_ERROR OTAFactoryDataProcessor::DecodeTlv()
 {
     TLV::TLVReader tlvReader;
-    tlvReader.Init(mAccumulator.data(), mLength);
+    tlvReader.Init(mAccumulator.GetData(), mLength);
     ReturnErrorOnFailure(tlvReader.Next(TLV::TLVType::kTLVType_Structure, TLV::AnonymousTag()));
 
     TLV::TLVType outerType;
