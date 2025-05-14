@@ -1052,8 +1052,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         Send an out-of-band command to a Matter app.
         Args:
             command_dict (dict): dictionary with the command and data.
-            app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). If None
-            takes the value from the CI argument --app-pipe. Raises FileNotFoundError if pipe file is not found.
+            app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
+            FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
 
         This method uses the following environment variables:
 
@@ -1067,8 +1067,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 1: If you do not have a key, create one using ssh-keygen
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
-
         """
+        # If is not empty from the args, verify if the fifo file exists.
+        if app_pipe is not None and not os.path.exists(app_pipe):
+            logging.error("Named pipe %r does NOT exist" % app_pipe)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
         if app_pipe is None:
             app_pipe = self.matter_test_config.app_pipe
