@@ -124,6 +124,15 @@ class TC_FAN_3_5(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
             pass
 
+    async def send_on_off_command(self, cmd: Clusters.ClusterObjects.ClusterCommand) -> None:
+        try:
+            logger.info(
+                f"[FC] Sending OnOff command: {cmd}")
+            await self.send_single_cmd(cmd, endpoint=self.endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
+            pass
+
     def verify_expected_value(self, attribute, expected_value) -> None:
         """
         Gets and verifies a given attribute report value against an expected value.
@@ -263,7 +272,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #   as per the Step command direction to later verify that they're the same
         #   when the Step command is executed in the opposite direction.
         # - We remove the last element of each list as it represents the initialization
-        #   value of the sequence from the opposite direction which is not considered
+        #   value of the sequence from the opposite direction, which is not considered
         #   in the reports.
         if step.direction == sd_enum.kDecrease and step.lowestOff:
             self.baseline_percent_setting_desc = percent_setting_values_produced[:-1]
@@ -458,9 +467,16 @@ class TC_FAN_3_5(MatterBaseTest):
         # self.step("1")
 
         # *** STEP 2 ***
+        # If the DUT has the OnOff cluster, turn it on
+        # self.step("2")
+        has_on_off_cluster = await self.cluster_guard(endpoint=self.endpoint, cluster=Clusters.OnOff, skip_step=False)
+        if has_on_off_cluster:
+            await self.send_on_off_command(Clusters.OnOff.Commands.On())
+
+        # *** STEP 3 ***
         # TH checks the DUT for support of the Step and MultiSpeed features
         #  - If the DUT does not support both features, the test is skipped
-        # self.step("2")
+        # self.step("3")
         feature_map = await self.read_setting(attr.FeatureMap)
         self.supports_step = bool(feature_map & cluster.Bitmaps.Feature.kStep)
         self.supports_multi_speed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
@@ -468,22 +484,22 @@ class TC_FAN_3_5(MatterBaseTest):
             logger.info("Both the Step and MultiSpeed features must be supported by the DUT for this test, skipping test.")
             return
 
-        # *** STEP 3 ***
+        # *** STEP 4 ***
         # TH reads from the DUT the SpeedMax attribute
         #  - Store value for future reference
-        # self.step("3")
+        # self.step("4")
         self.speed_max = await self.read_setting(attr.SpeedMax)
 
-        # *** STEP 4 ***
+        # *** STEP 5 ***
         # TH reads from the DUT the FanModeSequence attribute
         # to determine the supported FanMode values
         #  - Store result for future reference
-        # self.step("4")
+        # self.step("5")
         await self.get_fan_modes(remove_auto=True)
 
-        # *** STEP 4 ***
+        # *** STEP 6 ***
         # Subscribe to the PercentSetting, FanMode, and SpeedSetting attributes individually
-        # self.step("4")
+        # self.step("6")
         await self.subscribe_to_attributes()
 
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True))
@@ -494,6 +510,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False))
 
+        await self.send_on_off_command(Clusters.OnOff.Commands.Off())
         logging.info(f"[FC]")
         logging.info(f"[FC] WRAP TESTING")
         logging.info(f"[FC]")
