@@ -1,9 +1,8 @@
 import ctypes
 from enum import IntEnum
 from typing import Dict, List, Optional, Tuple
+
 from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments
-from enum import IntEnum
-import ctypes
 
 
 # Only ChipFaults (defined in src/lib/support/CHIPFaultInjection.h) are implemented, Implement others as needed
