@@ -52,7 +52,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
 
-    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
+    SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 #endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 }
 
