@@ -31,16 +31,6 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
 
-// Define the endpoint ID for the Closure
-constexpr chip::EndpointId kClosureEndpoint       = 1;
-constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
-constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
-
-// Closure Endpoints
-ClosureControlEndpoint ep1(1);
-ClosureDimensionEndpoint ep2(2);
-ClosureDimensionEndpoint ep3(3);
-
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
 constexpr uint8_t kNamespaceClosure   = 0x44;
@@ -83,10 +73,10 @@ void ClosureManager::Init()
 {
     DeviceLayer::PlatformMgr().LockChipStack();
 
-    // Closure endpoints initilization
-    ep1.Init();
-    ep2.Init();
-    ep3.Init();
+    // Closure endpoints initialization
+    kEp1.Init();
+    kEp2.Init();
+    kEp3.Init();
 
     // Set Taglist for Closure endpoints
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEp1TagList));

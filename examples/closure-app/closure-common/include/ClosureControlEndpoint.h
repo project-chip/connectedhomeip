@@ -49,11 +49,6 @@ public:
 
     virtual ~ClosureControlDelegate() = default;
 
-    uint32_t mMovingTime                         = 0;
-    uint32_t mCalibratingTime                    = 0;
-    uint32_t mWaitingTime                        = 0;
-    DataModel::Nullable<ElapsedS> mCountDownTime = DataModel::NullNullable;
-
     // Override for the DelegateBase Virtual functions
 
     Protocols::InteractionModel::Status HandleStopCommand() override;
@@ -110,8 +105,36 @@ public:
      */
     Protocols::InteractionModel::Status HandleMotion();
 
+    // Getter for mMovingTime
+    uint32_t GetMovingTime() const { return mMovingTime; }
+
+    // Setter for mMovingTime
+    void SetMovingTime(uint32_t movingTime) { mMovingTime = movingTime; }
+
+    // Getter for mCalibratingTime
+    uint32_t GetCalibratingTime() const { return mCalibratingTime; }
+
+    // Setter for mCalibratingTime
+    void SetCalibratingTime(uint32_t calibratingTime) { mCalibratingTime = calibratingTime; }
+
+    // Getter for mWaitingTime
+    uint32_t GetWaitingTime() const { return mWaitingTime; }
+
+    // Setter for mWaitingTime
+    void SetWaitingTime(uint32_t waitingTime) { mWaitingTime = waitingTime; }
+
+    // Getter for mCountDownTime
+    DataModel::Nullable<ElapsedS> GetCountDownTime() const { return mCountDownTime; }
+
+    // Setter for mCountDownTime
+    void SetCountDownTime(uint32_t value) { mCountDownTime.SetNonNull(value); }
+
 private:
     ClusterLogic * mLogic;
+    uint32_t mMovingTime                         = 0;
+    uint32_t mCalibratingTime                    = 0;
+    uint32_t mWaitingTime                        = 0;
+    DataModel::Nullable<ElapsedS> mCountDownTime = DataModel::NullNullable;
 
     /**
      * @brief Function to map TargetPositionEnum to Positioning Enum

@@ -50,7 +50,7 @@ private:
     static constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
     static constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
 
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint kEp1{ kClosureEndpoint };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint kEp2{ kClosurePanel1Endpoint };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint kEp3{ kClosurePanel2Endpoint };
 };
