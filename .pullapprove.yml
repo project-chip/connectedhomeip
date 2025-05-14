@@ -58,7 +58,7 @@ overrides:
   ############################################################
   #  Pullapprove failed.
   ############################################################
-  - if: 1
+  - if: "1 > 0"
     status: failure
     explanation: "PR does not meet any pullapprove requirements."
 
