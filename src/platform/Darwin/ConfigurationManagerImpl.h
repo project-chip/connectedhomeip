@@ -44,11 +44,6 @@ class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImp
 public:
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
-    CHIP_ERROR StoreSoftwareVersionString(const char * buf, size_t bufSize);
-    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
-    CHIP_ERROR StoreHardwareVersionString(const char * buf, size_t bufSize);
-    CHIP_ERROR StoreVendorName(const char * buf, size_t bufSize);
-    CHIP_ERROR StoreProductName(const char * buf, size_t bufSize);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR GetWiFiNetworkInformations(WiFiNetworkInfos & infos);

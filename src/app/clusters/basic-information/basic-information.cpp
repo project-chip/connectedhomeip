@@ -164,7 +164,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case SoftwareVersionString::Id: {
         constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength;
         char softwareVersionString[kMaxLen + 1] = { 0 };
-        status = ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString));
+        status = GetDeviceInstanceInfoProvider()->GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString));
         status = EncodeStringOnSuccess(status, aEncoder, softwareVersionString, kMaxLen);
         break;
     }

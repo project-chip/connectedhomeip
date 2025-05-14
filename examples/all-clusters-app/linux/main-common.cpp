@@ -202,6 +202,10 @@ public:
     {
         return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
     }
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override
+    {
+        return mDefaultProvider->GetSoftwareVersionString(buf, bufSize);
+    }
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
     {
         return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);

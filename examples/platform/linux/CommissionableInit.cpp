@@ -99,36 +99,6 @@ CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, Li
         configManager.StoreProductId(options.payload.productID);
     }
 
-    if (options.softwareVersionString.HasValue())
-    {
-        ReturnErrorOnFailure(configManager.StoreSoftwareVersionString(options.softwareVersionString.Value().c_str(),
-                                                                      options.softwareVersionString.Value().length()));
-    }
-
-    if (options.hardwareVersionString.HasValue())
-    {
-        ReturnErrorOnFailure(configManager.StoreHardwareVersionString(options.hardwareVersionString.Value().c_str(),
-                                                                      options.hardwareVersionString.Value().length()));
-    }
-
-    if (options.vendorName.HasValue())
-    {
-        ReturnErrorOnFailure(
-            configManager.StoreVendorName(options.vendorName.Value().c_str(), options.vendorName.Value().length()));
-    }
-
-    if (options.productName.HasValue())
-    {
-        ReturnErrorOnFailure(
-            configManager.StoreProductName(options.productName.Value().c_str(), options.productName.Value().length()));
-    }
-
-    if (options.serialNumber.HasValue())
-    {
-        ReturnErrorOnFailure(
-            configManager.StoreSerialNumber(options.serialNumber.Value().c_str(), options.serialNumber.Value().length()));
-    }
-
     return CHIP_NO_ERROR;
 }
 

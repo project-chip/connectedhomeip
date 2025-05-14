@@ -586,6 +586,22 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+    // Command line arguments to set attributes of the basic information cluster.
+    if (LinuxDeviceOptions::GetInstance().vendorName.HasValue())
+        GetDeviceInstanceInfoProvider()->SetVendorName(LinuxDeviceOptions::GetInstance().vendorName.Value().c_str());
+
+    if (LinuxDeviceOptions::GetInstance().productName.HasValue())
+        GetDeviceInstanceInfoProvider()->SetProductName(LinuxDeviceOptions::GetInstance().productName.Value().c_str());
+
+    if (LinuxDeviceOptions::GetInstance().serialNumber.HasValue())
+        GetDeviceInstanceInfoProvider()->SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value().c_str());
+
+    if (LinuxDeviceOptions::GetInstance().softwareVersionString.HasValue())
+        GetDeviceInstanceInfoProvider()->SetSoftwareVersionString(LinuxDeviceOptions::GetInstance().softwareVersionString.Value().c_str());
+
+    if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
+        GetDeviceInstanceInfoProvider()->SetHardwareVersionString(LinuxDeviceOptions::GetInstance().hardwareVersionString.Value().c_str());
+
 exit:
     if (err != CHIP_NO_ERROR)
     {

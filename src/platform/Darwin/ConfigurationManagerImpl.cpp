@@ -153,8 +153,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 #if CHIP_DISABLE_PLATFORM_KVS
     return CHIP_NO_ERROR;
 #else  // CHIP_DISABLE_PLATFORM_KVS
-    size_t len;
-
     // Initialize the generic implementation base class.
     ReturnErrorOnFailure(Internal::GenericConfigurationManagerImpl<PosixConfig>::Init());
 
@@ -166,41 +164,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductId))
     {
         ReturnErrorOnFailure(StoreProductId(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID));
-    }
-
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_SoftwareVersionString))
-    {
-        len = strlen(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-        VerifyOrReturnError(len <= ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(StoreSoftwareVersionString(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING, len));
-    }
-
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_HardwareVersionString))
-    {
-        len = strlen(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
-        VerifyOrReturnError(len <= ConfigurationManager::kMaxHardwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(StoreHardwareVersionString(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING, len));
-    }
-
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorName))
-    {
-        len = strlen(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
-        VerifyOrReturnError(len <= ConfigurationManager::kMaxVendorNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(StoreVendorName(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME, len));
-    }
-
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductName))
-    {
-        len = strlen(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
-        VerifyOrReturnError(len <= ConfigurationManager::kMaxProductNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(StoreProductName(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME, len));
-    }
-
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_SerialNum))
-    {
-        len = strlen(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
-        VerifyOrReturnError(len <= ConfigurationManager::kMaxSerialNumberLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(StoreSerialNumber(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, len));
     }
 
     uint32_t rebootCount;
@@ -290,69 +253,6 @@ CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #else  // CHIP_DISABLE_PLATFORM_KVS
     return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
-#endif // CHIP_DISABLE_PLATFORM_KVS
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareVersionString(const char * buf, size_t bufSize)
-{
-#if CHIP_DISABLE_PLATFORM_KVS
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#else  // CHIP_DISABLE_PLATFORM_KVS
-    VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    return WriteConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, buf, bufSize);
-#endif // CHIP_DISABLE_PLATFORM_KVS
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
-{
-#if CHIP_DISABLE_PLATFORM_KVS
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#else  // CHIP_DISABLE_PLATFORM_KVS
-    // Read from Posix config.
-    size_t outLen;
-    auto err = ReadConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, buf, bufSize, outLen);
-
-    // If not found use genereic implementation, which gets value from preprocessor variable.
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-        return Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>::GetSoftwareVersionString(buf, bufSize);
-
-    ReturnErrorOnFailure(err);
-
-    // Null terminate buf.
-    VerifyOrReturnError(outLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    buf[outLen] = '\0';
-
-    return CHIP_NO_ERROR;
-#endif // CHIP_DISABLE_PLATFORM_KVS
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreHardwareVersionString(const char * buf, size_t bufSize)
-{
-#if CHIP_DISABLE_PLATFORM_KVS
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#else  // CHIP_DISABLE_PLATFORM_KVS
-    VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxHardwareVersionStringLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    return WriteConfigValueStr(PosixConfig::kConfigKey_HardwareVersionString, buf, bufSize);
-#endif // CHIP_DISABLE_PLATFORM_KVS
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreVendorName(const char * buf, size_t bufSize)
-{
-#if CHIP_DISABLE_PLATFORM_KVS
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#else  // CHIP_DISABLE_PLATFORM_KVS
-    VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxVendorNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    return WriteConfigValueStr(PosixConfig::kConfigKey_VendorName, buf, bufSize);
-#endif // CHIP_DISABLE_PLATFORM_KVS
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreProductName(const char * buf, size_t bufSize)
-{
-#if CHIP_DISABLE_PLATFORM_KVS
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#else  // CHIP_DISABLE_PLATFORM_KVS
-    VerifyOrReturnError(bufSize <= ConfigurationManager::kMaxProductNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    return WriteConfigValueStr(PosixConfig::kConfigKey_ProductName, buf, bufSize);
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
 
