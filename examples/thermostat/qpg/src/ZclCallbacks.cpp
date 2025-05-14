@@ -32,8 +32,12 @@
 #include <assert.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h"
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+
 using namespace ::chip;
 using namespace chip::app::Clusters;
+using namespace ::chip::app::Clusters::DiagnosticLogs;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -45,16 +49,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         if (attributeId == ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id)
         {
-            ChipLogProgress(Zcl, " set TemperatureDisplayMode: %u", *value);
-            // check the output temperature accordingly
-            ThermostaticRadiatorValveMgr().DisplayTemperature();
+            ChipLogDetail(Zcl, " set TemperatureDisplayMode: %u", *value);
         }
     }
 }
 
 void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
-
+    
     // Temp. code for testing purpose, need to be updated
     const auto logOnFailure = [](Protocols::InteractionModel::Status status, const char * attributeName) {
         if (status != Protocols::InteractionModel::Status::Success)
@@ -64,4 +66,12 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     };
 
     logOnFailure(Thermostat::Attributes::FeatureMap::Set(endpoint, 0x23), "feature map");
+}
+
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
+{
+    ChipLogProgress(NotSpecified, "Setting log provider.");
+
+    auto & logProvider = LogProvider::GetInstance();
+    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
