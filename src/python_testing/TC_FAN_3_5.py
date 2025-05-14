@@ -199,13 +199,15 @@ class TC_FAN_3_5(MatterBaseTest):
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
             asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
 
-    def verify_expected_reports(self, step: Clusters.FanControl.Commands.Step) -> tuple:
+    def verify_expected_reports(self, step: Clusters.FanControl.Commands.Step, percent_setting_init) -> tuple:
         percent_setting_report_qty = 0
         fan_mode_report_qty = 0
         speed_setting_report_qty = 0
         fan_mode_values = None
         speed_setting_values = None
-        sd_enum = Clusters.FanControl.Enums.StepDirectionEnum
+        cluster = Clusters.FanControl
+        sd_enum = cluster.Enums.StepDirectionEnum
+        fm_enum = cluster.Enums.FanModeEnum
 
         # - Count the number of each of the subscription reports
         # - Get the values of the FanMode and SpeedSetting attributes
@@ -216,38 +218,44 @@ class TC_FAN_3_5(MatterBaseTest):
             if sub._expected_attribute == Clusters.FanControl.Attributes.FanMode:
                 fan_mode_report_qty = len(sub.attribute_queue.queue)
                 sub.log_queue()
-                fan_mode_values = [q.value for q in sub.attribute_queue.queue]
+                fan_mode_values_produced = [q.value for q in sub.attribute_queue.queue]
             if sub._expected_attribute == Clusters.FanControl.Attributes.SpeedSetting:
                 speed_setting_report_qty = len(sub.attribute_queue.queue)
                 sub.log_queue()
-                speed_setting_values = [q.value for q in sub.attribute_queue.queue]
+                speed_setting_values_produced = [q.value for q in sub.attribute_queue.queue]
 
-        # Get the expected FanMode and SpeedSetting values
-        trim = slice(1, None) if step.lowestOff else slice(1, -1)
-        fan_modes_eval = self.fan_modes[1:] if step.direction == sd_enum.kIncrease else list(reversed(self.fan_modes))[trim]
-        speed_setting_eval = list(range(1, self.speed_max + 1)) if step.direction == sd_enum.kIncrease else list(range(self.speed_max, -1, -1))[trim]
+        # Get the expected FanMode and SpeedSetting values to verify all are present
+        increase_step = step.direction == sd_enum.kIncrease
+        speed_max_range = range(0, self.speed_max + 1)
+        fan_mode_remove = fm_enum.kOff if percent_setting_init == 0 else fm_enum.kHigh
+        speed_setting_remove = 0 if percent_setting_init == 0 else self.speed_max
+        trim = slice(None, -1) if (step.direction == sd_enum.kDecrease and not step.lowestOff) else slice(None)
+        fan_modes_prep = [x for x in self.fan_modes if x != fan_mode_remove]
+        speed_setting_prep = [x for x in speed_max_range if x != speed_setting_remove]
+        fan_modes_expected = fan_modes_prep[trim] if increase_step else list(reversed(fan_modes_prep))[trim]
+        speed_setting_expected = speed_setting_prep[trim] if increase_step else list(reversed(speed_setting_prep))[trim]
 
-        logging.info(f"[FC] fan_modes_eval: {fan_modes_eval}")
-        logging.info(f"[FC] fan_mode_values: {fan_mode_values}")
+        logging.info(f"[FC] fan_modes_expected: {fan_modes_expected}")
+        logging.info(f"[FC] fan_mode_values_produced: {fan_mode_values_produced}")
 
-        logging.info(f"[FC] speed_setting_eval: {speed_setting_eval}")
-        logging.info(f"[FC] speed_setting_values: {speed_setting_values}")
+        logging.info(f"[FC] speed_setting_expected: {speed_setting_expected}")
+        logging.info(f"[FC] speed_setting_values_produced: {speed_setting_values_produced}")
 
         # If the number of PercentSetting reports is greater than the number of FanMode reports,
         # - Verify that all the expected FanMode values are present in the reports
         if percent_setting_report_qty > fan_mode_report_qty:
-            missing_fan_modes = [mode for mode in fan_modes_eval if mode not in fan_mode_values]
-            asserts.assert_equal(fan_modes_eval, fan_mode_values,
-                                 f"[FC] Some of the expected FanMode values are not present in the reports. Expected: {fan_modes_eval}, missing: {missing_fan_modes}.")
+            missing_fan_modes = [mode for mode in fan_modes_expected if mode not in fan_mode_values_produced]
+            asserts.assert_equal(fan_modes_expected, fan_mode_values_produced,
+                                 f"[FC] Some of the expected FanMode values are not present in the reports. Expected: {fan_modes_expected}, missing: {missing_fan_modes}.")
 
         # If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports,
         # - Verify that all the expected SpeedSetting values are present in the reports
         if percent_setting_report_qty >= speed_setting_report_qty:
-            missing_speed_setting = [speed for speed in speed_setting_eval if speed not in speed_setting_values]
-            asserts.assert_equal(speed_setting_eval, speed_setting_values,
-                                 f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_eval}, missing: {missing_speed_setting}.")
+            missing_speed_setting = [speed for speed in speed_setting_expected if speed not in speed_setting_values_produced]
+            asserts.assert_equal(speed_setting_expected, speed_setting_values_produced,
+                                 f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_expected}, missing: {missing_speed_setting}.")
 
-        return fan_mode_values, speed_setting_values
+        return fan_mode_values_produced, speed_setting_values_produced
 
     async def get_fan_modes(self, remove_auto: bool = False):
         # Read FanModeSequence attribute value
@@ -340,7 +348,7 @@ class TC_FAN_3_5(MatterBaseTest):
         self.verify_attribute_progression(order)
 
         # Veirfy all expected reports after the Step commands are present
-        return self.verify_expected_reports(step)
+        return self.verify_expected_reports(step, percent_setting_init)
 
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
