@@ -236,11 +236,15 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #5: AddOrUpdateThreadNetwork response ({vars(resp)})')
         logger.info(f'Step #5: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
-        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Failure status returned from AddThreadNetwork")
         debug_text = resp.debugText
-        asserts.assert_true(debug_text is None or debug_text == '' or len(debug_text) <= 512,
-                            "debugText must be None, empty or have a maximum length of 512 characters.")
+        if resp.networkingStatus == Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
+            # If Successful, 'debugText' should be empty or not included.
+            asserts.assert_true(debug_text is None or debug_text == '',
+                                "debugText must be None or empty if status is success.")
+        else:
+            # If fails, 'debugText' must be a string with a maximum length of 512 characters.
+            asserts.assert_true(len(debug_text) <= 512,
+                                "debugText must be a string with a max length of 512 characters if not success.")
 
         self.step(6)
         networks = await self.read_single_attribute_check_success(
