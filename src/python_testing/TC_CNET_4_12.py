@@ -82,20 +82,19 @@ class TC_CNET_4_12(MatterBaseTest):
     def default_timeout(self) -> int:
         return 900
 
-    def def_TC_CNET_4_12(self):
+    def desc_TC_CNET_4_12(self):
         return '[TC-CNET-4.12] [Thread] Verification for ConnectNetwork Command [DUT-Server]'
 
     def pics_TC_CNET_4_12(self):
         """Return the PICS definitions associated with this test."""
         pics = [
-            "CNET.S"
+            "CNET.S.F01"
         ]
         return pics
 
     def steps_TC_CNET_4_12(self) -> list[TestStep]:
         steps = [
-            TestStep('precondition-1', 'DUT supports CNET.S.F01(TH)'),
-            TestStep('precondition-2', 'DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2', is_commissioning=True),
+            TestStep("precondition", "TH is commissioned", is_commissioning=True),
             TestStep(1, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900'),
             TestStep(2, 'TH reads Networks attribute from the DUT and saves the number of entries as NumNetworks'),
             TestStep(3, 'TH saves the index of the Networks list entry from step 2 as Userth_netidx'),
@@ -134,53 +133,42 @@ class TC_CNET_4_12(MatterBaseTest):
     async def test_TC_CNET_4_12(self):
 
         # Pre-Conditions
-        self.step('precondition-1')
-        logger.info('Precondition 1: DUT supports CNET.S.F01(TH)')
+        # Commissioning is already done
+        self.step("precondition")
 
-        self.step('precondition-2')
-        # By running this test from the terminal, it commissions the device.
-        logger.info('Precondition 2: DUT has a Network Commissioning cluster on the correct endpoint.')
-
-        # Assign required PIXITs
+        # Assign required endpoint and Threads dataset
         endpoint = self.get_endpoint()
         thread_dataset_1 = self.matter_test_config.thread_operational_dataset
         # thread_dataset_1 = self.user_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
         thread_dataset_2 = self.user_params.get('PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET')
 
-        # Validate required PIXIT
-        # asserts.assert_true(endpoint is not None, "Missing required PIXIT: PIXIT.CNET.ENDPOINT_THREAD")
-        asserts.assert_true(thread_dataset_1 is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET")
-        asserts.assert_true(thread_dataset_2 is not None, "Missing required PIXIT: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
+        # Validate required endpoint and Threads dataset
+        asserts.assert_true(endpoint is not None, "Missing required endpoint")
+        asserts.assert_true(thread_dataset_1 is not None, "Missing required THREAD_1ST: THREAD_1ST_OPERATIONALDATASET")
+        asserts.assert_true(thread_dataset_2 is not None, "Missing required THREAD_2ND: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
 
-        # All required PIXITs are present and assigned,  Thread dataset as str
-        logger.info('Precondition 2: All required PIXITs are present and assigned, Thread dataset as str: '
-                    f'PIXIT.CNET.ENDPOINT_THREAD = {endpoint}, '
-                    f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
+        # All required endpoint and Threads dataset are set and assigned, Thread dataset as str
+        logger.info('Precondition: All required arguments are set and assigned, Thread dataset as str: '
+                    f'THREADS_ENDPOINT = {endpoint}, '
+                    f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
                     f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2}')
         # thread_dataset_1_bytes = bytes.fromhex(thread_dataset_1)
         thread_dataset_1_bytes = thread_dataset_1
         thread_dataset_2_bytes = bytes.fromhex(thread_dataset_2)
 
-        # All required PIXITs are present and assigned,  Thread dataset as bytes
-        logger.info('Precondition 2: All required PIXITs are present and assigned, Thread dataset as bytes: '
-                    f'PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1_bytes}, '
+        # All required arguments are set and assigned, Thread dataset as bytes
+        logger.info('Precondition: All required arguments are set and assigned, Thread dataset as bytes: '
+                    f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1_bytes}, '
                     f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2_bytes}')
 
         # Validate the operational dataset structure (for both datasets)
-        logger.info("Precondition 2: Validating THREAD operational datasets")
+        logger.info("Precondition: Validating THREAD operational datasets")
 
         thread_network_id_bytes_th1 = await self.validate_thread_dataset(thread_dataset_1_bytes, "THREAD_1ST_OPERATIONALDATASET")
         thread_network_id_bytes_th2 = await self.validate_thread_dataset(thread_dataset_2_bytes, "THREAD_2ND_OPERATIONALDATASET")
         logger.info('Precondition 2: NetworkID : '
                     f'NetworkID_THREAD_1ST_OPERATIONALDATASET = {thread_network_id_bytes_th1}, '
                     f'NetworkID_THREAD_2ND_OPERATIONALDATASET = {thread_network_id_bytes_th2}')
-
-        # The FeatureMap attribute value is 2
-        feature_map = await self.read_single_attribute_check_success(
-            cluster=self.CLUSTER_CNET,
-            attribute=self.CLUSTER_CNET.Attributes.FeatureMap)
-        logger.info(f'Pre-Conditions #3: The FeatureMap attribute value is: {feature_map}')
-        asserts.assert_true(feature_map == 2, msg="Verify that feature_map is equal to 1")
 
         # Steps
         self.step(1)
