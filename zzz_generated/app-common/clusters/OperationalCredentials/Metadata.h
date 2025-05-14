@@ -20,126 +20,80 @@ inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace NOCs {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = NOCs::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kAdminister,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NOCs::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kAdminister, std::nullopt);
 } // namespace NOCs
 namespace Fabrics {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Fabrics::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Fabrics::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Fabrics
 namespace SupportedFabrics {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedFabrics::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedFabrics::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace SupportedFabrics
 namespace CommissionedFabrics {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CommissionedFabrics::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CommissionedFabrics::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace CommissionedFabrics
 namespace TrustedRootCertificates {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TrustedRootCertificates::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TrustedRootCertificates::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TrustedRootCertificates
 namespace CurrentFabricIndex {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentFabricIndex::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentFabricIndex::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace CurrentFabricIndex
 
 } // namespace Attributes
 
 namespace Commands {
 namespace AttestationRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AttestationRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AttestationRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace AttestationRequest
 namespace CertificateChainRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CertificateChainRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(CertificateChainRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace CertificateChainRequest
 namespace CSRRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CSRRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CSRRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace CSRRequest
 namespace AddNOC {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AddNOC::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddNOC::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace AddNOC
 namespace UpdateNOC {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = UpdateNOC::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(UpdateNOC::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kAdminister);
 } // namespace UpdateNOC
 namespace UpdateFabricLabel {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = UpdateFabricLabel::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(UpdateFabricLabel::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kAdminister);
 } // namespace UpdateFabricLabel
 namespace RemoveFabric {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = RemoveFabric::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveFabric::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
 } // namespace RemoveFabric
 namespace AddTrustedRootCertificate {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AddTrustedRootCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(AddTrustedRootCertificate::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace AddTrustedRootCertificate
 namespace SetVIDVerificationStatement {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = SetVIDVerificationStatement::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(SetVIDVerificationStatement::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kAdminister);
 } // namespace SetVIDVerificationStatement
 namespace SignVIDVerificationRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = SignVIDVerificationRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(SignVIDVerificationRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace SignVIDVerificationRequest
 
 } // namespace Commands

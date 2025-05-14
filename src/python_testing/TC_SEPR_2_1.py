@@ -71,7 +71,8 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
     def steps_TC_SEPR_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
         steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     is_commissioning=True),
             TestStep("2", "TH reads from the DUT the TariffUnit attribute.",
                      "Verify that the DUT response contains a TariffUnitEnum value."),
             TestStep("3", "TH reads from the DUT the Currency attribute.",
