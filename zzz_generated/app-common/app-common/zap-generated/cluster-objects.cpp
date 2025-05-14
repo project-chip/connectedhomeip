@@ -258,6 +258,14 @@
 #include <clusters/IlluminanceMeasurement/Commands.ipp>
 #include <clusters/IlluminanceMeasurement/Events.ipp>
 #include <clusters/IlluminanceMeasurement/Structs.ipp>
+#include <clusters/JointFabricAdministrator/Attributes.ipp>
+#include <clusters/JointFabricAdministrator/Commands.ipp>
+#include <clusters/JointFabricAdministrator/Events.ipp>
+#include <clusters/JointFabricAdministrator/Structs.ipp>
+#include <clusters/JointFabricDatastore/Attributes.ipp>
+#include <clusters/JointFabricDatastore/Commands.ipp>
+#include <clusters/JointFabricDatastore/Events.ipp>
+#include <clusters/JointFabricDatastore/Structs.ipp>
 #include <clusters/KeypadInput/Attributes.ipp>
 #include <clusters/KeypadInput/Commands.ipp>
 #include <clusters/KeypadInput/Events.ipp>
@@ -1333,6 +1341,20 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::CommissionerControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::JointFabricDatastore::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::JointFabricAdministrator::Id: {
         switch (aCommand)
         {
         default:

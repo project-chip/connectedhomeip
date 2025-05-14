@@ -76,7 +76,7 @@ from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
 try:
-    from matter_yamltests.hooks import TestRunnerHooks
+    from matter.yamltests.hooks import TestRunnerHooks
 except ImportError:
     class TestRunnerHooks:
         pass
@@ -1105,7 +1105,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 app_pipe.write(json.dumps(command_dict) + "\n")
 
             # TODO(#31239): remove the need for sleep
-            sleep(0.001)
+            # This was tested with matter.js as being reliable enough
+            sleep(0.05)
         else:
             logging.info(f"Using DUT IP address: {dut_ip}")
 

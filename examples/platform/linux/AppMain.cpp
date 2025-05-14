@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <string>
+
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -44,6 +46,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/RuntimeOptionsProvider.h>
 
+#include <AllClustersExampleDeviceInfoProviderImpl.h>
 #include <DeviceInfoProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -71,7 +74,7 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_DIAGNOSTIC_TRIGGER
-#include <event-triggers/SoftwareDiagnosticsTestEventTriggerHandler.h>
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER
 #include <app/clusters/wifi-network-diagnostics-server/WiFiDiagnosticsTestEventTriggerHandler.h>
@@ -301,6 +304,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleDeviceInfoProvider;
 
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -424,7 +428,9 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    bool isAllClustersVariant = (std::string(argv[0]).find("all-clusters") != std::string::npos);
+
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
 #else  // CONFIG_NETWORK_LAYER_BLE
@@ -490,6 +496,16 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
+
+    // We need to set DeviceInfoProvider before Server::Init to set up the storage of DeviceInfoProvider properly.
+    if (isAllClustersVariant)
+    {
+        DeviceLayer::SetDeviceInfoProvider(&gAllClustersExampleDeviceInfoProvider);
+    }
+    else
+    {
+        DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    }
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -720,9 +736,6 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
-    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
     chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
 
@@ -796,11 +809,31 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     //       registered with sigaction() call and TSAN is enabled. The problem seems to be
     //       related with the dispatch_semaphore_wait() function in the RunEventLoop() method.
     //       If this call is commented out, the signal handler is called as expected...
-#if defined(__APPLE__)
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_queue_t workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+
+    dispatch_source_t sourceSigInt = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGINT, 0, workQueue);
+    dispatch_source_set_event_handler(sourceSigInt, ^{
+        StopSignalHandler(SIGINT);
+        dispatch_release(sourceSigInt);
+    });
+    dispatch_resume(sourceSigInt);
+    signal(SIGINT, SIG_IGN);
+
+    dispatch_source_t sourceSigTerm = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGTERM, 0, workQueue);
+    dispatch_source_set_event_handler(sourceSigTerm, ^{
+        StopSignalHandler(SIGTERM);
+        dispatch_release(sourceSigTerm);
+    });
+    dispatch_resume(sourceSigTerm);
+    signal(SIGTERM, SIG_IGN);
+#else
     // NOLINTBEGIN(bugprone-signal-handler)
     signal(SIGINT, StopSignalHandler);
     signal(SIGTERM, StopSignalHandler);
     // NOLINTEND(bugprone-signal-handler)
+#endif
 #else
     struct sigaction sa                        = {};
     sa.sa_handler                              = StopSignalHandler;

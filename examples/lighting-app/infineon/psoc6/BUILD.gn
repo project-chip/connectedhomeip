@@ -126,7 +126,7 @@ psoc6_executable("lighting_app") {
     ":lighting_app_sdk_sources",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lighting-app/lighting-common",
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
