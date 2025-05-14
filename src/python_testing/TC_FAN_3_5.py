@@ -188,11 +188,14 @@ class TC_FAN_3_5(MatterBaseTest):
         for sub in self.subscriptions:
             await sub.start(self.default_controller, self.dut_node_id, self.endpoint)
 
-    def verify_attribute_progression(self, order: OrderEnum) -> None:
+    def verify_attribute_progression(self, step: Clusters.FanControl.Commands.Step) -> None:
+        sd_enum = Clusters.FanControl.Enums.StepDirectionEnum
+        order_str = "ascending" if step.direction == sd_enum.kIncrease else "descending"
+
         # Setup
-        comp = operator.le if order == OrderEnum.Ascending else operator.ge
-        comp_str = "greater" if order == OrderEnum.Ascending else "less"
-        shared_str = f"not all attribute values progressed in {order.name.lower()} order (current value {comp_str} than previous value)."
+        comp = operator.le if step.direction == sd_enum.kIncrease else operator.ge
+        comp_str = "greater" if step.direction == sd_enum.kIncrease else "less"
+        shared_str = f"not all attribute values progressed in {order_str} order (current value {comp_str} than previous value)."
 
         for sub in self.subscriptions:
             values = [q.value for q in sub.attribute_queue.queue]
@@ -282,10 +285,10 @@ class TC_FAN_3_5(MatterBaseTest):
 
         self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
-    async def wrap_test(self, step: Clusters.FanControl.Commands.Step, percent_setting_expected, fan_mode_expected = None, speed_setting_expected = None) -> None:
+    async def wrap_veirfy(self, step: Clusters.FanControl.Commands.Step, percent_setting_expected, fan_mode_expected = None, speed_setting_expected = None) -> None:
         cluster = Clusters.FanControl
         attr = cluster.Attributes
-        
+
         await self.send_step_command(step)
 
         percent_setting = await self.read_setting(attr.PercentSetting)
@@ -302,98 +305,118 @@ class TC_FAN_3_5(MatterBaseTest):
             asserts.assert_equal(speed_setting, speed_setting_expected,
                                     f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({speed_setting_expected}).")        
 
-    async def step_command_test(self, percent_setting_sub: ClusterAttributeChangeAccumulator, step: Clusters.FanControl.Commands.Step, wrap_test: bool = False):
+
+    async def initialize_and_verify_attribtutes(self, step: Clusters.FanControl.Commands.Step) -> None:
         cluster = Clusters.FanControl
         attr = cluster.Attributes
-        cmd = cluster.Commands
         sd_enum = cluster.Enums.StepDirectionEnum
         fm_enum = cluster.Enums.FanModeEnum
-        order = OrderEnum.Descending if step.direction == sd_enum.kDecrease else OrderEnum.Ascending
 
         # Initialize PercentSetting
         percent_setting_max = 100
-        percent_setting_init = 0 if order == OrderEnum.Ascending else percent_setting_max
-        if wrap_test:
+        percent_setting_init = 0 if step.direction == sd_enum.kIncrease else percent_setting_max
+        if step.wrap:
             if step.direction == sd_enum.kDecrease:
                 percent_setting_init = self.percent_setting_per_step
             else:
                 percent_setting_init = percent_setting_max
         await self.write_setting(attr.PercentSetting, percent_setting_init)
 
-        # Skip verifications only when testing wrap and step direction is decrease as
-        # the expected FanMode and SpeenSetting values cannot be known because there's
-        # no direct mapping between the step command and the mentioned attributes.
-        # Otherwise, verify FanMode and SpeedSetting are at their expected values
-        if not (wrap_test and step.direction == sd_enum.kDecrease):
-            fan_mode = await self.read_setting(attr.FanMode)
-            fan_mode_expected = fm_enum.kHigh if percent_setting_init == percent_setting_max else fm_enum.kOff
-            speed_setting = await self.read_setting(attr.SpeedSetting)
-            speed_setting_expected = self.speed_max if percent_setting_init == percent_setting_max else 0
+        # Verify PercentSetting initialization value
+        percent_setting = await self.read_setting(attr.PercentSetting)
+        percent_setting_expected = percent_setting_init
+        asserts.assert_equal(percent_setting, percent_setting_expected,
+                            f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})")
 
-            asserts.assert_equal(fan_mode, fan_mode_expected,
-                                f"[FC] FanMode attribute value ({fan_mode}) is not equal to the expected value ({fm_enum.kOn})")
-            asserts.assert_equal(speed_setting, speed_setting_expected,
-                                f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({speed_setting_expected})")
+        # As there's no direct relationship between the Step command and the speed-oriented attributes
+        # (PercentSetting, FanMode, and SpeenSetting) due to it being implementation specific, when testing the
+        # Step command with Wrap=True, Direction=Decrease, and initializing PercentSetting at 100, the expected
+        # FanMode and SpeedSetting values are unknown. In this particular scenario, we skip their verification.
+        # 
+        # For all other scenarios, verify FanMode and SpeedSetting are at their expected values
+        if not step.wrap:
+            if not step.direction == sd_enum.kDecrease:
+                fan_mode = await self.read_setting(attr.FanMode)
+                fan_mode_expected = fm_enum.kHigh if percent_setting_init == percent_setting_max else fm_enum.kOff
+                speed_setting = await self.read_setting(attr.SpeedSetting)
+                speed_setting_expected = self.speed_max if percent_setting_init == percent_setting_max else 0
+
+                asserts.assert_equal(fan_mode, fan_mode_expected,
+                                    f"[FC] FanMode attribute value ({fan_mode}) is not equal to the expected value ({fan_mode_expected})")
+                asserts.assert_equal(speed_setting, speed_setting_expected,
+                                    f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({speed_setting_expected})")
+        
+        return percent_setting_init
+
+    async def wrap_test(self, step: Clusters.FanControl.Commands.Step):
+        cluster = Clusters.FanControl
+        fm_enum = cluster.Enums.FanModeEnum
+        sd_enum = cluster.Enums.StepDirectionEnum
+
+        # Initialize and verify attributes
+        await self.initialize_and_verify_attribtutes(step)
 
         # Reset subscriptions
-        for sub in self.subscriptions:
-            sub.reset()
+        for sub in self.subscriptions: sub.reset()
 
-        # Setup Step command with:
-        # - direction: Increase/Decrease depending on the test order
-        # - wrap: False
-        # - lowestOff: True
+        logging.info(f"[FC]")
+        if step.direction == sd_enum.kDecrease and step.lowestOff:
+            logging.info(f"[FC] step.direction == sd_enum.kDecrease and step.lowestOff")
+            await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
+            await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
+        elif step.direction == sd_enum.kDecrease and not step.lowestOff:
+            logging.info(f"[FC] step.direction == sd_enum.kDecrease and not step.lowestOff")
+            await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
+        elif step.direction == sd_enum.kIncrease and step.lowestOff:
+            logging.info(f"[FC] step.direction == sd_enum.kIncrease and step.lowestOff")
+            await self.wrap_veirfy(step, percent_setting_expected=0)
+        elif step.direction == sd_enum.kIncrease and not step.lowestOff:
+            logging.info(f"[FC] step.direction == sd_enum.kIncrease and not step.lowestOff")
+            await self.wrap_veirfy(step, percent_setting_expected=self.percent_setting_per_step)
 
-        if wrap_test:
-            logging.info(f"[FC]")
-            if step.direction == sd_enum.kDecrease and step.lowestOff:
-                logging.info(f"[FC] step.direction == sd_enum.kDecrease and step.lowestOff")
-                await self.wrap_test(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
-                await self.wrap_test(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
-            elif step.direction == sd_enum.kDecrease and not step.lowestOff:
-                logging.info(f"[FC] step.direction == sd_enum.kDecrease and not step.lowestOff")
-                await self.wrap_test(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
-            elif step.direction == sd_enum.kIncrease and step.lowestOff:
-                logging.info(f"[FC] step.direction == sd_enum.kIncrease and step.lowestOff")
-                await self.wrap_test(step, percent_setting_expected=0)
-            elif step.direction == sd_enum.kIncrease and not step.lowestOff:
-                logging.info(f"[FC] step.direction == sd_enum.kIncrease and not step.lowestOff")
-                await self.wrap_test(step, percent_setting_expected=self.percent_setting_per_step)
-        else:
-            # Send Step command until it reaches the min or max
-            # PercentSetting value depending on the test order
-            min_percent_setting = 0 if step.lowestOff else self.percent_setting_per_step
-            percent_setting_expected = 100 if order == OrderEnum.Ascending else min_percent_setting
-            for i in range(100):
+    async def lowest_off_test(self, step: Clusters.FanControl.Commands.Step):
+        cluster = Clusters.FanControl
+        attr = cluster.Attributes
+        sd_enum = cluster.Enums.StepDirectionEnum
+        percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
+
+        # Initialize and verify attributes
+        percent_setting_init = await self.initialize_and_verify_attribtutes(step)
+
+        # Reset subscriptions
+        for sub in self.subscriptions: sub.reset()
+
+        min_percent_setting = 0 if step.lowestOff else self.percent_setting_per_step
+        percent_setting_expected = 100 if step.direction == sd_enum.kIncrease else min_percent_setting
+
+        for i in range(100):
+            await self.send_step_command(step)
+            percent_setting = percent_setting_sub.get_last_attribute_report_value(self.endpoint, attr.PercentSetting, self.timeout_sec)
+            logging.info(f"[FC] [{i}] PercentSetting attribute value: {percent_setting}")
+
+            # Calculate the PercentSetting range per Step
+            if self.percent_setting_per_step is None:
+                if step.direction == sd_enum.kDecrease:
+                    if i == 0:
+                        self.percent_setting_per_step = percent_setting_init - percent_setting
+
+            # If the expected PercentSetting value is reached, send an additional Step
+            # command to veiryf the PercentSetting value stays at the expected value
+            if percent_setting == percent_setting_expected:
                 await self.send_step_command(step)
-                percent_setting = percent_setting_sub.get_last_attribute_report_value(self.endpoint, attr.PercentSetting, self.timeout_sec)
-                logging.info(f"[FC] [{i}] PercentSetting attribute value: {percent_setting}")
-
-                # Calculate the PercentSetting span per Step
-                if self.percent_setting_per_step is None:
-                    if order == OrderEnum.Descending:
-                        if i == 0:
-                            self.percent_setting_per_step = percent_setting_init - percent_setting
-
-                # If the expected PercentSetting value is reached, send an additional Step
-                # command to veiryf the PercentSetting value stays at the expected value
-                if percent_setting == percent_setting_expected:
-                    await self.send_step_command(step)
-                    percent_setting = await self.read_setting(attr.PercentSetting)
-                    asserts.assert_equal(percent_setting, percent_setting_expected,
-                                        f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})")
-                    break
-                else:
-                    if i == 100:
-                        asserts.fail(f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({percent_setting}).")
+                percent_setting = await self.read_setting(attr.PercentSetting)
+                asserts.assert_equal(percent_setting, percent_setting_expected,
+                                    f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})")
+                break
+            else:
+                if i == 100:
+                    asserts.fail(f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({percent_setting}).")
 
         # Veirfy attribute progression (each successive value is greater or less than the last)
-        if not wrap_test:
-            self.verify_attribute_progression(order)
+        self.verify_attribute_progression(step)
 
         # Veirfy all expected reports after the Step commands are present
-        if not wrap_test:
-            return self.verify_expected_reports(step, percent_setting_init)
+        return self.verify_expected_reports(step, percent_setting_init)
 
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
@@ -441,38 +464,37 @@ class TC_FAN_3_5(MatterBaseTest):
         # Subscribe to the PercentSetting, FanMode, and SpeedSetting attributes individually
         # self.step("4")
         await self.subscribe_to_attributes()
-        percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
 
         step = cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True)
-        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, step)
+        fan_mode_values_desc, speed_setting_values_desc = await self.lowest_off_test(step)
 
         step = cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False)
-        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, step)
+        fan_mode_values_desc, speed_setting_values_desc = await self.lowest_off_test(step)
 
         step = cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True)
-        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, step)
-        
+        fan_mode_values_desc, speed_setting_values_desc = await self.lowest_off_test(step)
+
         step = cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False)
-        fan_mode_values_desc, speed_setting_values_desc = await self.step_command_test(percent_setting_sub, step)
-        
+        fan_mode_values_desc, speed_setting_values_desc = await self.lowest_off_test(step)
+
         logging.info(f"[FC]")
         logging.info(f"[FC] WRAP TESTING")
         logging.info(f"[FC]")
-        
-        step = cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True)
-        await self.step_command_test(percent_setting_sub, step, wrap_test=True)
-        
-        step = cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False)
-        await self.step_command_test(percent_setting_sub, step, wrap_test=True)
-        
-        step = cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True)
-        await self.step_command_test(percent_setting_sub, step, wrap_test=True)
-        
-        step = cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False)
-        await self.step_command_test(percent_setting_sub, step, wrap_test=True)
 
-        
-        # fan_mode_values_asc, speed_setting_values_asc = await self.step_command_test(percent_setting_sub, step)
+        step = cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True)
+        await self.wrap_test(step)
+
+        step = cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False)
+        await self.wrap_test(step)
+
+        step = cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True)
+        await self.wrap_test(step)
+
+        step = cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False)
+        await self.wrap_test(step)
+
+
+        # fan_mode_values_asc, speed_setting_values_asc = await self.lowest_off_test(percent_setting_sub, step)
 
         # pop_num = 1
         # fan_mode_values_desc = fan_mode_values_desc[:-pop_num]
