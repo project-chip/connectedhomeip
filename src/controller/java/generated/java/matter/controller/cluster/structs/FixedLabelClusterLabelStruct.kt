@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class FixedLabelClusterLabelStruct(val label: String, val value: String) {
+class FixedLabelClusterLabelStruct(
+  val label: String,
+  val value: String
+) {
   override fun toString(): String = buildString {
     append("FixedLabelClusterLabelStruct {\n")
     append("\tlabel : $label\n")
@@ -47,7 +52,7 @@ class FixedLabelClusterLabelStruct(val label: String, val value: String) {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
-
+      
       tlvReader.exitContainer()
 
       return FixedLabelClusterLabelStruct(label, value)

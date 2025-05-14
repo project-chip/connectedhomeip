@@ -17,19 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class JointFabricDatastoreClusterDatastoreBindingTargetStruct(
-  val node: Optional<ULong>,
-  val group: Optional<UInt>,
-  val endpoint: Optional<UInt>,
-  val cluster: Optional<ULong>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class JointFabricDatastoreClusterDatastoreBindingTargetStruct (
+    val node: Optional<ULong>,
+    val group: Optional<UInt>,
+    val endpoint: Optional<UInt>,
+    val cluster: Optional<ULong>) {
+  override fun toString(): String  = buildString {
     append("JointFabricDatastoreClusterDatastoreBindingTargetStruct {\n")
     append("\tnode : $node\n")
     append("\tgroup : $group\n")
@@ -42,21 +44,21 @@ class JointFabricDatastoreClusterDatastoreBindingTargetStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (node.isPresent) {
-        val optnode = node.get()
-        put(ContextSpecificTag(TAG_NODE), optnode)
-      }
+      val optnode = node.get()
+      put(ContextSpecificTag(TAG_NODE), optnode)
+    }
       if (group.isPresent) {
-        val optgroup = group.get()
-        put(ContextSpecificTag(TAG_GROUP), optgroup)
-      }
+      val optgroup = group.get()
+      put(ContextSpecificTag(TAG_GROUP), optgroup)
+    }
       if (endpoint.isPresent) {
-        val optendpoint = endpoint.get()
-        put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
-      }
+      val optendpoint = endpoint.get()
+      put(ContextSpecificTag(TAG_ENDPOINT), optendpoint)
+    }
       if (cluster.isPresent) {
-        val optcluster = cluster.get()
-        put(ContextSpecificTag(TAG_CLUSTER), optcluster)
-      }
+      val optcluster = cluster.get()
+      put(ContextSpecificTag(TAG_CLUSTER), optcluster)
+    }
       endStructure()
     }
   }
@@ -67,36 +69,29 @@ class JointFabricDatastoreClusterDatastoreBindingTargetStruct(
     private const val TAG_ENDPOINT = 3
     private const val TAG_CLUSTER = 4
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): JointFabricDatastoreClusterDatastoreBindingTargetStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : JointFabricDatastoreClusterDatastoreBindingTargetStruct {
       tlvReader.enterStructure(tlvTag)
-      val node =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
-        } else {
-          Optional.empty()
-        }
-      val group =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_GROUP)))
-        } else {
-          Optional.empty()
-        }
-      val endpoint =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT)))
-        } else {
-          Optional.empty()
-        }
-      val cluster =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLUSTER))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER)))
-        } else {
-          Optional.empty()
-        }
-
+      val node = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
+    } else {
+      Optional.empty()
+    }
+      val group = if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_GROUP)))
+    } else {
+      Optional.empty()
+    }
+      val endpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT)))
+    } else {
+      Optional.empty()
+    }
+      val cluster = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLUSTER))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return JointFabricDatastoreClusterDatastoreBindingTargetStruct(node, group, endpoint, cluster)
