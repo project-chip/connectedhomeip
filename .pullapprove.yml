@@ -49,18 +49,11 @@ overrides:
     explanation: "PR has been fast tracked, bypassing reviews"
 
   ############################################################
-  #  Sufficient review requirement met.
+  # Pullapprove pending if review requirements are not met.
   ############################################################
-  - if: "len(groups.approved.include('shared-reviewers-*')) >= 2"
-    status: success
-    explanation: "PR has got required reviews."
-
-  ############################################################
-  #  Pullapprove failed.
-  ############################################################
-  - if: "1 > 0"
-    status: failure
-    explanation: "PR does not meet any pullapprove requirements."
+  - if: "len(groups.approved.include('shared-reviewers-*')) < 2"
+    status: pending
+    explanation: "PR does not have the required reviews."
 
 ############################################################
 #  Notifications
