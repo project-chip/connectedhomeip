@@ -87,6 +87,8 @@ public:
     void Clear();
     CHIP_ERROR Accumulate(ByteSpan & block);
 
+    uint8_t * GetData() { return data(); }
+
 protected:
     inline uint8_t * data() { return mBuffer.Get(); }
     inline uint32_t GetThreshold() const { return mThreshold; }

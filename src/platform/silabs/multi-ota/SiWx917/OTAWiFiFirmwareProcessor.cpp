@@ -106,7 +106,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.data())));
+    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.GetData())));
 
     mDescriptorProcessed = true;
     mAccumulator.Clear();

@@ -152,7 +152,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ProcessPayload(ByteSpan & block)
         if (!mCurrentProcessor)
         {
             ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-            ByteSpan tlvHeader{ mAccumulator.data(), sizeof(OTATlvHeader) };
+            ByteSpan tlvHeader{ mAccumulator.GetData(), sizeof(OTATlvHeader) };
             ReturnErrorOnFailure(SelectProcessor(tlvHeader));
             ReturnErrorOnFailure(mCurrentProcessor->Init());
         }
