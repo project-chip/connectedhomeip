@@ -178,8 +178,9 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case SoftwareVersionString::Id: {
         constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength;
         char softwareVersionString[kMaxLen + 1] = { 0 };
-        status = deviceInfoProvider->GetSoftwareVersionString(MutableCharSpan(softwareVersionString, kMaxLen + 1));
-        status = EncodeStringOnSuccess(status, aEncoder, softwareVersionString, kMaxLen);
+        MutableCharSpan buf(softwareVersionString, kMaxLen + 1);
+        status = deviceInfoProvider->GetSoftwareVersionString(buf);
+        status = EncodeStringOnSuccess(status, aEncoder, buf.data(), kMaxLen);
         break;
     }
 
