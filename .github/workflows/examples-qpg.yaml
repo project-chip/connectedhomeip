@@ -62,10 +62,10 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target qpg-qpg6105-lock \
-                        --target qpg-qpg6105-light \
-                        --target qpg-qpg6105-light-switch \
-                        --target qpg-qpg6105-thermostat \
+                        --target qpg-qpg6200-lock \
+                        --target qpg-qpg6200-light \
+                        --target qpg-qpg6200-light-switch \
+                        --target qpg-qpg6200-thermostat \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
