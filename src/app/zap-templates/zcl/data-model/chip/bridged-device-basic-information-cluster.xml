@@ -128,6 +128,12 @@ Git: 0.7-summer-2025-ncr-23-g816a9defd
     <attribute side="server" code="20" name="ProductAppearance" define="PRODUCT_APPEARANCE" type="ProductAppearanceStruct" optional="true">
       <optionalConform/>
     </attribute>
+    <attribute code="0x0017" side="server" name="DeviceLocation" define="DEVICE_LOCATION" type="LocationDescriptorStruct" default="MS" optional="true">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <attribute code="0x0018" side="server" name="ConfigurationVersion" define="CONFIGURATION_VERSION" type="int32u" min="1" default="1" optional="true">
       <otherwiseConform>
         <provisionalConform/>
