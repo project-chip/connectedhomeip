@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,35 +14,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandResponseHelper.h>
-#include <platform/GeneralFaults.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace SoftwareDiagnostics {
+namespace {
+SoftwareFaultListener * gListener = nullptr;
+} // namespace
 
-/**
- * @brief software-diagnostics-server class
- */
-class SoftwareDiagnosticsServer
+SoftwareFaultListener * SoftwareFaultListener::GetGlobalListener()
 {
-public:
-    static SoftwareDiagnosticsServer & Instance();
+    return gListener;
+}
 
-    /**
-     * @brief
-     *   Called when a software fault that has taken place on the Node.
-     */
-    void OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault);
+void SoftwareFaultListener::SetGlobalListener(SoftwareFaultListener * newValue)
+{
+    gListener = newValue;
+}
 
-private:
-    static SoftwareDiagnosticsServer instance;
-};
-
+} // namespace SoftwareDiagnostics
 } // namespace Clusters
 } // namespace app
 } // namespace chip
