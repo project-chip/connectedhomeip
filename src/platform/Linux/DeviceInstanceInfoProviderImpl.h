@@ -33,7 +33,7 @@ public:
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetSoftwareVersionString(MutableCharSpan & softwareVersionString) override;
 
     CHIP_ERROR SetVendorName(const char * buf) override;
     CHIP_ERROR SetProductName(const char * buf) override;

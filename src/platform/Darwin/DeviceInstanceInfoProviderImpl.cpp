@@ -90,18 +90,18 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetHardwareVersionString(char * buf, 
     return Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>::GetHardwareVersionString(buf, bufSize);
 }
 
-CHIP_ERROR DeviceInstanceInfoProviderImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetSoftwareVersionString(MutableCharSpan & softwareVersionString)
 {
     // First check if it was set from the command line.
     if (mpSoftwareVersionString)
     {
-        VerifyOrReturnError(bufSize > strlen(mpSoftwareVersionString), CHIP_ERROR_BUFFER_TOO_SMALL);
-        strcpy(buf, mpSoftwareVersionString);
+        VerifyOrReturnError(softwareVersionString.size() > strlen(mpSoftwareVersionString), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(softwareVersionString.data(), mpSoftwareVersionString);
         return CHIP_NO_ERROR;
     }
 
     // If not found, get from configuration manager, which gets it from a preprocessor variable.
-    return Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>::GetSoftwareVersionString(buf, bufSize);
+    return Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>::GetSoftwareVersionString(softwareVersionString);
 }
 
 CHIP_ERROR DeviceInstanceInfoProviderImpl::SetVendorName(const char * buf)
