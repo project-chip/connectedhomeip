@@ -110,13 +110,9 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif // HAVE_NSTASK
 }
 
-+ (MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload nodeID:(NSNumber *)nodeID
++ (void)commissionAppWithController:(MTRDeviceController *)controller payload:(NSString *)payload
+                             nodeID:(NSNumber *)nodeID
 {
-    BOOL started = [self startAppWithName:name arguments:arguments payload:payload];
-    XCTAssertTrue(started);
-
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
-
     XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"Wait for commissioning to complete"];
 
     MTRTestControllerDelegate * delegate = [[MTRTestControllerDelegate alloc] initWithExpectation:expectation newNodeID:nodeID];
@@ -132,6 +128,25 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     XCTAssertNil(error);
 
     XCTAssertEqual([XCTWaiter waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds], XCTWaiterResultCompleted);
+}
+
+- (void)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments controller:(MTRDeviceController *)controller payload:(NSString *)payload
+                              nodeID:(NSNumber *)nodeID
+{
+    BOOL started = [self startAppWithName:name arguments:arguments payload:payload];
+    XCTAssertTrue(started);
+
+    [self.class commissionAppWithController:controller payload:payload nodeID:nodeID];
+}
+
++ (MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload nodeID:(NSNumber *)nodeID
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+
+    BOOL started = [self startAppWithName:name arguments:arguments payload:payload];
+    XCTAssertTrue(started);
+
+    [self commissionAppWithController:controller payload:payload nodeID:nodeID];
 
     return controller;
 }
