@@ -419,7 +419,7 @@ class DeviceMappingTest(MatterBaseTest):
         if args.dm_xml:
             xml_clusters, problems = build_xml_clusters(Path(f"{args.dm_xml}/clusters"))
         else:
-            xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
+            xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
 
         # Run device mapping function
         await DeviceMapping(self.default_controller, self.dut_node_id, outputPathStr)
