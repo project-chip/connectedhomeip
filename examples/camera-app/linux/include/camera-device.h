@@ -182,8 +182,8 @@ public:
     uint8_t GetMicrophoneVolume() override { return mMicrophoneVol; }
 
     // Get the microphone max and min levels.
-    uint8_t GetMicrophoneMaxLevel() override { return kMicrophoneMaxLevel; }
-    uint8_t GetMicrophoneMinLevel() override { return kMicrophoneMinLevel; }
+    uint8_t GetMicrophoneMaxLevel() override { return mMicrophoneMaxLevel; }
+    uint8_t GetMicrophoneMinLevel() override { return mMicrophoneMinLevel; }
 
     int16_t GetPanMin() override;
 
@@ -242,6 +242,8 @@ private:
     bool mHDREnabled                                                        = false;
     bool mMicrophoneMuted                                                   = false;
     uint8_t mMicrophoneVol                                                  = kMicrophoneMinLevel;
+    uint8_t mMicrophoneMinLevel                                             = kMicrophoneMinLevel;
+    uint8_t mMicrophoneMaxLevel                                             = kMicrophoneMaxLevel;
 
     std::vector<StreamUsageEnum> mRankedStreamPriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 };
