@@ -510,7 +510,6 @@ class TC_FAN_3_5(MatterBaseTest):
 
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False))
 
-        await self.send_on_off_command(Clusters.OnOff.Commands.Off())
         logging.info(f"[FC]")
         logging.info(f"[FC] WRAP TESTING")
         logging.info(f"[FC]")
