@@ -33,7 +33,7 @@ config("config") {
   ]
 }
 
-executable("chip-closure-app") {
+executable("closure-app") {
   configs += [ ":config" ]
 
   sources = [
@@ -53,9 +53,9 @@ executable("chip-closure-app") {
 }
 
 group("linux") {
-  deps = [ ":chip-closure-app" ]
+  deps = [ ":closure-app" ]
 }
 
 group("default") {
-  deps = [ ":chip-closure-app" ]
+  deps = [ ":linux" ]
 }
