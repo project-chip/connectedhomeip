@@ -273,6 +273,9 @@ def cmd_list(context):
     '--chip-tool-with-python',
     help='what python script to use for running yaml tests using chip-tool as controller')
 @click.option(
+    '--closure-app',
+    help='what closure app to use')
+@click.option(
     '--pics-file',
     type=click.Path(exists=True),
     default="src/app/tests/suites/certification/ci-pics-values",
