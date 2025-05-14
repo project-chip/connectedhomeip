@@ -7041,6 +7041,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Air Quality Sensor";
     case 0x0000002D:
         return "Air Purifier";
+    case 0x00000040:
+        return "Irrigation System";
     case 0x00000041:
         return "Water Freeze Detector";
     case 0x00000042:
