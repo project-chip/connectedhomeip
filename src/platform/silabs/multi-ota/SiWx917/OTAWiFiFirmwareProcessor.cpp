@@ -35,12 +35,10 @@ namespace chip {
 CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
     sl_status_t status = SL_STATUS_OK;
-    // Store the header of the OTA file
-    static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
-    // Used to transfer other block to processor
-    static uint8_t writeDataBuffer[kBlockSize] __attribute__((aligned(4))) = { 0 };
 
-    ChipLogProgress(SoftwareUpdate, "ProcessInternal WiFi Block processing");
+    ChipLogProgress(SoftwareUpdate, "Process WiFi Block");
+    // The first block is expected to be the OTA descriptor.
+    // `ProcessDescriptor` handles it and sets `mDescriptorProcessed` to avoid reprocessing.
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
@@ -75,19 +73,29 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 
     if (mFWchunktype == SL_FWUP_RPS_HEADER)
     {
-        memcpy(&writeBuffer, block.data(), kAlignmentBytes);
-        // Send RPS header which is received as first chunk
-        status       = sl_si91x_fwup_start(writeBuffer);
-        status       = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
+        // Validate block size
+        VerifyOrReturnError(block.size() >= kAlignmentBytes, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(SoftwareUpdate, "Block too small for RPS header"));
+
+        // Use spans to reference header and content directly
+        ByteSpan rpsHeaderSpan(block.data(), kAlignmentBytes);
+        ByteSpan rpsContentSpan(block.data() + kAlignmentBytes, block.size() - kAlignmentBytes);
+
+        // Send RPS header
+        status       = sl_si91x_fwup_start(rpsHeaderSpan.data());
+        status       = sl_si91x_fwup_load(rpsHeaderSpan.data(), rpsHeaderSpan.size());
         mFWchunktype = SL_FWUP_RPS_CONTENT;
-        memcpy(&writeDataBuffer, block.data() + kAlignmentBytes, (block.size() - kAlignmentBytes));
-        status = sl_si91x_fwup_load(writeDataBuffer, (block.size() - kAlignmentBytes));
+
+        // Send the rest of the block as content, if any
+        if (rpsContentSpan.size() > 0)
+        {
+            status = sl_si91x_fwup_load(rpsContentSpan.data(), rpsContentSpan.size());
+        }
     }
     else if (mFWchunktype == SL_FWUP_RPS_CONTENT)
     {
-        memcpy(&writeDataBuffer, block.data(), block.size());
         // Send RPS content
-        status = sl_si91x_fwup_load(writeDataBuffer, block.size());
+        status = sl_si91x_fwup_load(block.data(), block.size());
         // When TA received all the blocks it will return SL_STATUS_SI91X_FW_UPDATE_DONE status
         VerifyOrReturnError(status == SL_STATUS_OK || status == SL_STATUS_SI91X_FW_UPDATE_DONE, CHIP_ERROR_INTERNAL,
                             ChipLogError(SoftwareUpdate, "sl_si91x_fwup_load() failed  0x%lx", static_cast<uint32_t>(status)));

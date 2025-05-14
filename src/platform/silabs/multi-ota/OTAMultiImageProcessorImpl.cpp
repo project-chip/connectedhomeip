@@ -209,7 +209,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
 
 CHIP_ERROR OTAMultiImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcessor * processor)
 {
-    if (!OTATlvProcessor::IsValidTag(tag))
+    if (!processor->IsValidTag(static_cast<OTAProcessorTag>(tag)))
     {
         ChipLogError(SoftwareUpdate, "Invalid processor tag: %lu", tag);
         return CHIP_ERROR_INVALID_ARGUMENT;
