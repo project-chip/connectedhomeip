@@ -18,6 +18,7 @@
 
 #include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
@@ -38,7 +39,7 @@ constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x
 CHIP_ERROR OTATlvProcessor::Init()
 {
     VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(sizeof(Descriptor));
+    mAccumulator.Init(GetAccumulatorSize());
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     mUnalignmentNum = 0;
 #endif
@@ -97,10 +98,12 @@ bool OTATlvProcessor::IsError(CHIP_ERROR & status)
     return status != CHIP_NO_ERROR && status != CHIP_ERROR_BUFFER_TOO_SMALL && status != CHIP_OTA_FETCH_ALREADY_SCHEDULED;
 }
 
-bool OTATlvProcessor::IsValidTag(uint32_t tag)
+bool OTATlvProcessor::IsValidTag(OTAProcessorTag tag)
 {
-    return tag >= static_cast<uint32_t>(OTAProcessorTag::kApplicationProcessor) &&
-        tag <= static_cast<uint32_t>(OTAProcessorTag::kMaxValue);
+    auto value = chip::to_underlying(tag);
+
+    return value >= chip::to_underlying(OTAProcessorTag::kApplicationProcessor) &&
+        value <= chip::to_underlying(OTAProcessorTag::kMaxValue);
 }
 
 void OTADataAccumulator::Init(uint32_t threshold)
