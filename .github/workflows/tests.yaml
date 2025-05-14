@@ -247,6 +247,7 @@ jobs:
                         --target linux-x64-microwave-oven-${BUILD_VARIANT} \
                         --target linux-x64-rvc-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
+                        --target linux-x64-closure \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -270,6 +271,7 @@ jobs:
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --closure-app ./out/linux-x64-closure/closure-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -312,6 +314,7 @@ jobs:
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --closure-app ./out/linux-x64-closure/closure-app \
                   "
             - name: Run Tests using chip-repl (including slow)
               if: github.event_name == 'push'
@@ -332,6 +335,7 @@ jobs:
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --closure-app ./out/linux-x64-closure/closure-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v4
@@ -554,7 +558,7 @@ jobs:
                   echo "FABRIC_BRIDGE_APP: out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
-                  echo "CLOSURE_APP: out/linux-x64-closure/chip-closure-app" >> /tmp/test_env.yaml
+                  echo "CLOSURE_APP: out/linux-x64-closure/closure-app" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: out/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
