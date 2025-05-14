@@ -208,7 +208,7 @@
             "SpecificationVersion",
             "MaxPathsPerInvoke"
         ],
-        "Bridged Device Basic Information": ["ProductAppearance"],
+        "Bridged Device Basic Information": ["ProductAppearance", "DeviceLocation"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
         "Closure Dimension": [
