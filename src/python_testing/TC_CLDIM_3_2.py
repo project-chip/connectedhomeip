@@ -142,7 +142,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
                 endpoint=endpoint
             )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidAction, "Unexpected status returned")
+            asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
 
         # STEP 3c: Manually latch the device
         self.step("3c")
