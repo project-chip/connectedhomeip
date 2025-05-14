@@ -1074,18 +1074,19 @@ def casting_test(test, log_directory, tv_app, tv_casting_app, runner):
     cmd = ";".join(["set -e", "source scripts/activate.sh", script])
     subprocess.run(["bash", "-c", cmd], check=True)
 
+
 @cli.command()
 def prereq():
-   """
-   Install/force some prerequisites inside the build environment.
+    """
+    Install/force some prerequisites inside the build environment.
 
-   Work in progress, however generally we have:
-     - libdatachannel requires cmake 3.5
-   """
+    Work in progress, however generally we have:
+      - libdatachannel requires cmake 3.5
+    """
 
-   # Camera app needs cmake 3.5 and 4.0 removed compatibility. Force cmake 3.*
-   cmd = ";".join(["set -e", "source scripts/activate.sh", "pip install 'cmake>=3,<4'"])
-   subprocess.run(["bash", "-c", cmd], check=True)
+    # Camera app needs cmake 3.5 and 4.0 removed compatibility. Force cmake 3.*
+    cmd = ";".join(["set -e", "source scripts/activate.sh", "pip install 'cmake>=3,<4'"])
+    subprocess.run(["bash", "-c", cmd], check=True)
 
 
 @cli.command()
