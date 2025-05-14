@@ -24,18 +24,6 @@ namespace chip {
 
 using namespace ::chip::DeviceLayer::Silabs;
 
-CHIP_ERROR OTAFactoryDataProcessor::Init()
-{
-
-    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(sizeof(mLength));
-#if SL_MATTER_ENABLE_OTA_ENCRYPTION
-    mUnalignmentNum = 0;
-#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;

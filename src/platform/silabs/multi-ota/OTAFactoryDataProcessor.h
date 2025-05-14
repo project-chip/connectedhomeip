@@ -64,7 +64,6 @@ class OTAFactoryDataProcessor : public OTATlvProcessor
 public:
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
-    CHIP_ERROR Init() override;
 
 private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
@@ -75,6 +74,8 @@ private:
     OTAFactoryPayload mPayload;
     OTADataAccumulator mAccumulator;
     uint8_t * mFactoryData = nullptr;
-};
 
+protected:
+    uint32_t GetAccumulatorSize() const override { return sizeof(mLength); }
+};
 } // namespace chip

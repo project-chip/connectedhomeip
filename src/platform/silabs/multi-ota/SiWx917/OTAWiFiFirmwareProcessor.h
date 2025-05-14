@@ -49,6 +49,11 @@ private:
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
+
+    /**
+     * This function accumulates the descriptor data from the provided block,
+     * invokes the registered descriptor processing callback with the accumulated data
+     */
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 };
 
