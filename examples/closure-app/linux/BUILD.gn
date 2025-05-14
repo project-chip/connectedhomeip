@@ -22,11 +22,6 @@ import("${build_root}/config/linux/pkg_config.gni")
 assert(chip_build_tools)
 
 config("config") {
-  cflags = [
-    "-Wconversion",
-    "-Wno-shadow",
-  ]
-
   include_dirs = [
     "include",
     "${chip_root}/examples/closure-app/closure-common/include",

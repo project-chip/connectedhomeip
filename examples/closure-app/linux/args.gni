@@ -25,4 +25,4 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/closure-app/linux/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
-matter_enable_tracing_support = true
+matter_enable_tracing_support = false
