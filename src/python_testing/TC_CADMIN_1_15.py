@@ -122,6 +122,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CADMIN_1_15(self):
+        self.step(1)
         # Establishing TH1 controller
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
@@ -136,37 +137,37 @@ class TC_CADMIN_1_15(MatterBaseTest):
         th3_fabric_admin = th3_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th2.fabricId + 1)
         self.th3 = th3_fabric_admin.NewController(nodeId=3, useTestCommissioner=True)
 
-        self.step(1)
+        self.step(2)
         GC_cluster = Clusters.GeneralCommissioning
         attribute = GC_cluster.Attributes.BasicCommissioningInfo
         duration = await self.read_single_attribute_check_success(endpoint=0, cluster=GC_cluster, attribute=attribute)
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
-        self.step(2)
+        self.step(3)
         fabrics = await self.get_fabrics(th=self.th1)
         initial_number_of_fabrics = len(fabrics)
 
-        self.step(3)
+        self.step(4)
         params = await self.OpenCommissioningWindow(th=self.th1, expectedErrCode=0x00)
         setupPinCode = params.setupPinCode
 
-        self.step(4)
+        self.step(5)
         await self.CommissionAttempt(setupPinCode, thnum=2, th=self.th2)
 
-        self.step(5)
+        self.step(6)
         params2 = await self.OpenCommissioningWindow(th=self.th1, expectedErrCode=0x00)
         setupPinCode2 = params2.setupPinCode
 
-        self.step(6)
+        self.step(7)
         await self.CommissionAttempt(setupPinCode2, thnum=3, th=self.th3)
 
-        self.step(7)
+        self.step(8)
         fabrics = await self.get_fabrics(th=self.th2)
         if len(fabrics) != initial_number_of_fabrics + 2:
             # len of fabrics is expected to be 3, if 3 not found then we assert failure here
             asserts.fail("Expected number of fabrics not correct")
 
-        self.step(8)
+        self.step(9)
         # Gathering instance names associated with compressed fabrics for each TH in order to verify there are 3 operational service records for DUT.
         mdns = MdnsDiscovery()
         compressed_fabric_ids = {
@@ -191,14 +192,14 @@ class TC_CADMIN_1_15(MatterBaseTest):
             f"Expected 3 instances but got {len(op_services)}"
         )
 
-        self.step(9)
+        self.step(10)
         fabric_idx_cr2 = await self.read_currentfabricindex(th=self.th2)
 
-        self.step(10)
+        self.step(11)
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2)
         await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
-        self.step(11)
+        self.step(12)
         # Verifies TH_CR2 is unable to read the Basic Information Cluster’s NodeLabel attribute of DUT_CE as no longer on network
         try:
             await self.read_single_attribute_check_success(
@@ -213,7 +214,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
             asserts.assert_equal(e.err, 0x00000032,
                                  "Expected to timeout as DUT_CE is no longer on network")
 
-        self.step(12)
+        self.step(13)
         fabrics2 = await self.get_fabrics(th=self.th1)
         fabric_indexes = [fabric.fabricIndex for fabric in fabrics2]
         if len(fabrics2) != initial_number_of_fabrics + 1:
@@ -223,14 +224,14 @@ class TC_CADMIN_1_15(MatterBaseTest):
         if fabric_idx_cr2 in fabric_indexes:
             asserts.fail("fabricIndexes should consist of indexes 1 and 3 at this point")
 
-        self.step(13)
+        self.step(14)
         params3 = await self.OpenCommissioningWindow(self.th1, expectedErrCode=0x00)
         setupPinCode3 = params3.setupPinCode
 
-        self.step(14)
+        self.step(15)
         await self.CommissionAttempt(setupPinCode3, thnum=2, th=self.th2)
 
-        self.step(15)
+        self.step(16)
         fabrics3 = await self.get_fabrics(th=self.th2)
         fabric_indexes2 = [fabric.fabricIndex for fabric in fabrics3]
         if len(fabrics3) != initial_number_of_fabrics + 2:
@@ -240,21 +241,21 @@ class TC_CADMIN_1_15(MatterBaseTest):
         if fabric_idx_cr2 in fabric_indexes2:
             asserts.fail("fabricIndexes should not consist of fabric_idx_cr2, but it appears it was")
 
-        self.step(16)
+        self.step(17)
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=self.th2)
 
-        self.step(17)
+        self.step(18)
         fabric_idx_cr3 = await self.read_currentfabricindex(th=self.th3)
 
-        self.step(18)
+        self.step(19)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
 
-        self.step(19)
+        self.step(20)
         removeFabricCmd3 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr3)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd3)
 
-        self.step(20)
+        self.step(21)
         fabrics4 = await self.get_fabrics(th=self.th1)
         if len(fabrics4) > initial_number_of_fabrics:
             asserts.fail(

@@ -84,31 +84,32 @@ class TC_CADMIN_1_19(MatterBaseTest):
         # Establishing TH1
         self.th1 = self.default_controller
 
+        self.step(2)
         GC_cluster = Clusters.GeneralCommissioning
         attribute = GC_cluster.Attributes.BasicCommissioningInfo
         duration = await self.read_single_attribute_check_success(endpoint=0, cluster=GC_cluster, attribute=attribute)
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
-        self.step(2)
+        self.step(3)
         fabrics = await self.support.get_fabrics(th=self.th1)
         initial_number_of_fabrics = len(fabrics)
 
-        self.step(3)
+        self.step(4)
         OC_cluster = Clusters.OperationalCredentials
         max_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.SupportedFabrics)
         asserts.assert_greater(max_fabrics, initial_number_of_fabrics,
                                "max fabrics must be greater than initial fabrics, please remove one non-test-harness fabric and try test again")
 
-        self.step(4)
+        self.step(5)
         fabric_idxs = []
         for fid in range(0, max_fabrics - initial_number_of_fabrics):
             # Make sure that current test step is 5, resets here after each loop
-            self.current_step_index = 4
+            self.current_step_index = 5
 
-            self.step("4a")
+            self.step("5a")
             params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=self.max_window_duration, node_id=self.dut_node_id)
 
-            self.step("4b")
+            self.step("5b")
             fids_ca = self.certificate_authority_manager.NewCertificateAuthority(caIndex=fid)
             fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=fid + 1)
             fids = fids_fa.NewController(nodeId=fid + 1)
@@ -117,21 +118,21 @@ class TC_CADMIN_1_19(MatterBaseTest):
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
 
-            self.step("4c")
+            self.step("5c")
             fabric_idxs.append(await self.read_single_attribute_check_success(dev_ctrl=fids, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CurrentFabricIndex))
 
-            self.step("4d")
+            self.step("5d")
             fids.Shutdown()
 
-        self.step(5)
+        self.step(6)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster
         current_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CommissionedFabrics)
         asserts.assert_equal(current_fabrics, max_fabrics, "Expected number of fabrics not correct")
 
-        self.step(6)
+        self.step(7)
         params = await self.open_commissioning_window(dev_ctrl=self.th1, node_id=self.dut_node_id)
 
-        self.step(7)
+        self.step(8)
         # TH creates a controller on a new fabric and attempts to commission DUT_CE using that controller
         next_fabric = current_fabrics + 1
         fids_ca2 = self.certificate_authority_manager.NewCertificateAuthority(caIndex=next_fabric)
@@ -150,12 +151,12 @@ class TC_CADMIN_1_19(MatterBaseTest):
             asserts.assert_equal(e.err,  0x0000000B,
                                  "Expected to return table is full since max number of fabrics has been created already")
 
-        self.step(8)
+        self.step(9)
         for fab_idx in fabric_idxs:
             removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fab_idx)
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
-        self.step(9)
+        self.step(10)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.
         current_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CommissionedFabrics)
         asserts.assert_equal(current_fabrics, initial_number_of_fabrics, "Expected number of fabrics not correct")
