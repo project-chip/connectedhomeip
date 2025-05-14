@@ -20,70 +20,40 @@ inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace HeaterTypes {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = HeaterTypes::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(HeaterTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace HeaterTypes
 namespace HeatDemand {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = HeatDemand::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(HeatDemand::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace HeatDemand
 namespace TankVolume {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TankVolume::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TankVolume::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace TankVolume
 namespace EstimatedHeatRequired {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = EstimatedHeatRequired::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(EstimatedHeatRequired::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace EstimatedHeatRequired
 namespace TankPercentage {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TankPercentage::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TankPercentage::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace TankPercentage
 namespace BoostState {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = BoostState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(BoostState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace BoostState
 
 } // namespace Attributes
 
 namespace Commands {
 namespace Boost {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Boost::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Boost::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kManage);
 } // namespace Boost
 namespace CancelBoost {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CancelBoost::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CancelBoost::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kManage);
 } // namespace CancelBoost
 
 } // namespace Commands
