@@ -7,10 +7,10 @@ for Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
--   [CHIP Linux Closure Example App](#chip-linux-closure-example-app)
-    -   [Building](#building)
-    -   [Commandline arguments](#commandline-arguments)
-    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+- [CHIP Linux Closure Example App](#chip-linux-closure-example-app)
+  - [Building](#building)
+  - [Commandline arguments](#commandline-arguments)
+  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
 
 <hr>
 
@@ -60,4 +60,35 @@ for Raspberry Pi Desktop 20.10 (aarch64)**
 
 ## Running the Complete Example on Raspberry Pi 4
 
-TBD
+>     gn gen out/debug
+>     ninja -C out/debug
+
+-   Prerequisites
+
+    1. A Raspberry Pi 4 board
+    2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement,
+       which will block Matter from connecting via BLE. On Ubuntu server, you
+       need to install `pi-bluetooth` via APT.
+    3. Ubuntu 20.04 or newer image for ARM64 platform.
+
+-   Building
+
+    Follow [Building](#building) section of this document.
+
+-   Running
+
+    -   [Optional] Plug USB Bluetooth dongle
+
+        -   Plug USB Bluetooth dongle and find its bluetooth controller selector
+            as described in
+            [Linux BLE Settings](/platforms/linux/ble_settings.md).
+
+    -   Run Linux Air Quality Example App
+
+              $ cd ~/connectedhomeip/examples/closure-app/linux
+              $ sudo out/debug/closure-app --ble-controller [bluetooth controller number]
+              # In this example, the device we want to use is hci1
+              $ sudo out/debug/closure-app --ble-controller 1
+
+    -   Test the device using ChipDeviceController on your laptop / workstation
+        etc.
