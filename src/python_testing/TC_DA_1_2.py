@@ -43,7 +43,6 @@ import re
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.commissioning import connect_over_pase
 from chip.testing.conversions import hex_from_bytes
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from chip.tlv import TLVReader
@@ -192,7 +191,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         do_test_over_pase = self.user_params.get("use_pase_only", False)
         if do_test_over_pase:
             setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
-            await connect_over_pase(self.default_controller, self.dut_node_id, setupCode)
+            await self.default_controller.FindOrEstablishPASESession(setupCode, self.dut_node_id)
 
         # Commissioning - done
         self.step(0)

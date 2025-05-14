@@ -211,8 +211,3 @@ async def commission_devices(
         commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
 
     return all(commissioned)
-
-
-def connect_over_pase(dev_ctrl: ChipDeviceCtrl.ChipDeviceController, dut_node_id: int, setupCode: str):
-    """Establishes the PASE session to the DUT using the setup code."""
-    dev_ctrl.FindOrEstablishPASESession(setupCode, dut_node_id)

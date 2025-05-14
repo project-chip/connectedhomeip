@@ -61,14 +61,12 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 
 try:
     from chip.testing.basic_composition import BasicCompositionTests
-    from chip.testing.commissioning import connect_over_pase
     from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
                                              run_tests_no_exit)
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from chip.testing.basic_composition import BasicCompositionTests
-    from chip.testing.commissioning import connect_over_pase
     from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
                                              run_tests_no_exit)
 
@@ -130,7 +128,7 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def test_TestEventTriggersCheck(self):
         setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
-        await connect_over_pase(self.default_controller, self.dut_node_id, setupCode)
+        await self.default_controller.FindOrEstablishPASESession(setupCode, self.dut_node_id)
         gd = Clusters.GeneralDiagnostics
         ret = await self.read_single_attribute_check_success(cluster=gd, attribute=gd.Attributes.TestEventTriggersEnabled)
         asserts.assert_equal(ret, 0, "TestEventTriggers are still on")
@@ -140,7 +138,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
         setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
-        await connect_over_pase(self.default_controller, self.dut_node_id, setupCode)
+        await self.default_controller.FindOrEstablishPASESession(setupCode, self.dut_node_id)
         bi = Clusters.BasicInformation
         self.vid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.VendorID)
         self.pid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.ProductID)
