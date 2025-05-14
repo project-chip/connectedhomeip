@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("qpg_sdk.gni")
+import("//build_overrides/chip.gni")
 
-#arm_arch = "armv7e-m"
-arm_abi = "aapcs"
-arm_cpu = "cortex-m4"
+source_set("qpg_diagnostic_logs") {
+  sources = [
+    "DiagnosticLogsProviderDelegateImpl.cpp",
+    "DiagnosticLogsProviderDelegateImpl.h",
+  ]
+
+  include_dirs = [ "${chip_root}/src" ]
+}
