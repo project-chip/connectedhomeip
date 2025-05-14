@@ -54,7 +54,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        3
       ],
       "deviceIdentifiers": [
         22
@@ -1090,7 +1090,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
@@ -2305,7 +2305,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "6",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3438,7 +3438,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "6",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -6529,7 +6529,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "6",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -7008,7 +7008,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "6",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -7487,7 +7487,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "6",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

@@ -10861,7 +10861,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRJointFabricDatastoreClusterDatastoreNodeKeySetEntry
+@implementation MTRJointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -10871,27 +10871,24 @@ NS_ASSUME_NONNULL_BEGIN
         _groupKeySetID = @(0);
 
         _statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
-
-        _fabricIndex = @(0);
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRJointFabricDatastoreClusterDatastoreNodeKeySetEntry alloc] init];
+    auto other = [[MTRJointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct alloc] init];
 
     other.nodeID = self.nodeID;
     other.groupKeySetID = self.groupKeySetID;
     other.statusEntry = self.statusEntry;
-    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; groupKeySetID:%@; statusEntry:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _nodeID, _groupKeySetID, _statusEntry, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; groupKeySetID:%@; statusEntry:%@; >", NSStringFromClass([self class]), _nodeID, _groupKeySetID, _statusEntry];
     return descriptionString;
 }
 
@@ -10907,8 +10904,6 @@ NS_ASSUME_NONNULL_BEGIN
         _friendlyName = @"";
 
         _commissioningStatusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
-
-        _fabricIndex = @(0);
     }
     return self;
 }
@@ -10920,14 +10915,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.nodeID = self.nodeID;
     other.friendlyName = self.friendlyName;
     other.commissioningStatusEntry = self.commissioningStatusEntry;
-    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; friendlyName:%@; commissioningStatusEntry:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _nodeID, _friendlyName, _commissioningStatusEntry, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; friendlyName:%@; commissioningStatusEntry:%@; >", NSStringFromClass([self class]), _nodeID, _friendlyName, _commissioningStatusEntry];
     return descriptionString;
 }
 
@@ -10945,8 +10939,6 @@ NS_ASSUME_NONNULL_BEGIN
         _groupID = @(0);
 
         _statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
-
-        _fabricIndex = @(0);
     }
     return self;
 }
@@ -10959,14 +10951,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.endpointID = self.endpointID;
     other.groupID = self.groupID;
     other.statusEntry = self.statusEntry;
-    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; endpointID:%@; groupID:%@; statusEntry:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _nodeID, _endpointID, _groupID, _statusEntry, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; endpointID:%@; groupID:%@; statusEntry:%@; >", NSStringFromClass([self class]), _nodeID, _endpointID, _groupID, _statusEntry];
     return descriptionString;
 }
 
@@ -11058,8 +11049,6 @@ NS_ASSUME_NONNULL_BEGIN
         _binding = [MTRJointFabricDatastoreClusterDatastoreBindingTargetStruct new];
 
         _statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
-
-        _fabricIndex = @(0);
     }
     return self;
 }
@@ -11073,14 +11062,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.listID = self.listID;
     other.binding = self.binding;
     other.statusEntry = self.statusEntry;
-    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; endpointID:%@; listID:%@; binding:%@; statusEntry:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _nodeID, _endpointID, _listID, _binding, _statusEntry, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; endpointID:%@; listID:%@; binding:%@; statusEntry:%@; >", NSStringFromClass([self class]), _nodeID, _endpointID, _listID, _binding, _statusEntry];
     return descriptionString;
 }
 
@@ -11167,8 +11155,6 @@ NS_ASSUME_NONNULL_BEGIN
         _aclEntry = [MTRJointFabricDatastoreClusterDatastoreAccessControlEntryStruct new];
 
         _statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
-
-        _fabricIndex = @(0);
     }
     return self;
 }
@@ -11181,14 +11167,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.listID = self.listID;
     other.aclEntry = self.aclEntry;
     other.statusEntry = self.statusEntry;
-    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; listID:%@; aclEntry:%@; statusEntry:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _nodeID, _listID, _aclEntry, _statusEntry, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; listID:%@; aclEntry:%@; statusEntry:%@; >", NSStringFromClass([self class]), _nodeID, _listID, _aclEntry, _statusEntry];
     return descriptionString;
 }
 
@@ -11206,8 +11191,6 @@ NS_ASSUME_NONNULL_BEGIN
         _vendorID = @(0);
 
         _icac = [NSData data];
-
-        _fabricIndex = @(0);
     }
     return self;
 }
@@ -11220,14 +11203,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.friendlyName = self.friendlyName;
     other.vendorID = self.vendorID;
     other.icac = self.icac;
-    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; friendlyName:%@; vendorID:%@; icac:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _nodeID, _friendlyName, _vendorID, [_icac base64EncodedStringWithOptions:0], _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; friendlyName:%@; vendorID:%@; icac:%@; >", NSStringFromClass([self class]), _nodeID, _friendlyName, _vendorID, [_icac base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -11249,8 +11231,6 @@ NS_ASSUME_NONNULL_BEGIN
         _groupCATVersion = nil;
 
         _groupPermission = @(0);
-
-        _fabricIndex = @(0);
     }
     return self;
 }
@@ -11265,14 +11245,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.groupCAT = self.groupCAT;
     other.groupCATVersion = self.groupCATVersion;
     other.groupPermission = self.groupPermission;
-    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; friendlyName:%@; groupKeySetID:%@; groupCAT:%@; groupCATVersion:%@; groupPermission:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _friendlyName, _groupKeySetID, _groupCAT, _groupCATVersion, _groupPermission, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; friendlyName:%@; groupKeySetID:%@; groupCAT:%@; groupCATVersion:%@; groupPermission:%@; >", NSStringFromClass([self class]), _groupID, _friendlyName, _groupKeySetID, _groupCAT, _groupCATVersion, _groupPermission];
     return descriptionString;
 }
 
@@ -11324,42 +11303,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; groupKeySecurityPolicy:%@; epochKey0:%@; epochStartTime0:%@; epochKey1:%@; epochStartTime1:%@; epochKey2:%@; epochStartTime2:%@; groupKeyMulticastPolicy:%@; >", NSStringFromClass([self class]), _groupKeySetID, _groupKeySecurityPolicy, [_epochKey0 base64EncodedStringWithOptions:0], _epochStartTime0, [_epochKey1 base64EncodedStringWithOptions:0], _epochStartTime1, [_epochKey2 base64EncodedStringWithOptions:0], _epochStartTime2, _groupKeyMulticastPolicy];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRJointFabricDatastoreClusterDatastoreStatusStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _state = @(0);
-
-        _updateTimestamp = @(0);
-
-        _failureCode = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRJointFabricDatastoreClusterDatastoreStatusStruct alloc] init];
-
-    other.state = self.state;
-    other.updateTimestamp = self.updateTimestamp;
-    other.failureCode = self.failureCode;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: state:%@; updateTimestamp:%@; failureCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _state, _updateTimestamp, _failureCode, _fabricIndex];
     return descriptionString;
 }
 

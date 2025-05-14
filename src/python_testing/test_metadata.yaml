@@ -121,12 +121,6 @@ not_automated:
     - name: TC_AVSUMTestBase.py
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
-
-    - name: TC_DefaultWarnings.py
-      reason:
-          Fails after hard-coded values removed from defaults (seems to fail
-          because fixed label is empty). See
-          https://github.com/project-chip/connectedhomeip/issues/38857
     - name: TC_LTIME_3_1.py
       reason:
           Flaky/failing (maybe after removing defaults)
