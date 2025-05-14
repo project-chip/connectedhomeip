@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Copyright (c) 2018 Google LLC
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,17 +16,8 @@
  */
 
 /**
- * This file declares an implementation of Inet::UDPEndPoint using Network Framework.
+ *    @file
+ *      This file declares an implementation of System::Layer using select().
  */
 
-#pragma once
-
-#include <platform/Darwin/inet/UDPEndPointImplNetworkFramework.h>
-
-namespace chip {
-namespace Inet {
-
-using UDPEndPointImpl = UDPEndPointImplNetworkFramework;
-
-} // namespace Inet
-} // namespace chip
+#include <platform/Darwin/system/SystemLayerImplDispatch.h>

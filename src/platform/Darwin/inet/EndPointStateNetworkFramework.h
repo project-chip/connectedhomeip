@@ -1,8 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Copyright (c) 2018 Google LLC
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
+ *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,17 +17,27 @@
  */
 
 /**
- * This file declares an implementation of Inet::UDPEndPoint using Network Framework.
+ *  Shared state for Network Framework implementations of TCPEndPoint and UDPEndPoint.
  */
 
 #pragma once
 
-#include <platform/Darwin/inet/UDPEndPointImplNetworkFramework.h>
+#include <inet/EndPointBasis.h>
+
+#include <inet/IPAddress.h>
+
+#include <Network/Network.h>
 
 namespace chip {
 namespace Inet {
 
-using UDPEndPointImpl = UDPEndPointImplNetworkFramework;
+class DLL_EXPORT EndPointStateNetworkFramework
+{
+protected:
+    EndPointStateNetworkFramework() {}
+
+    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
+};
 
 } // namespace Inet
 } // namespace chip
