@@ -67,10 +67,12 @@ class TC_CLDIM_3_2(MatterBaseTest):
             TestStep("4c", "Verify Target attribute is updated"),
             TestStep("4d", "Wait for PIXIT.CLDIM.LatchingDuration seconds"),
             TestStep(5, "Verify CurrentState attribute is updated"),
-            TestStep("6a", "Send SetTarget command with Latch=False"),
-            TestStep("6b", "Verify Target attribute is updated"),
-            TestStep("6c", "Wait for PIXIT.CLDIM.LatchingDuration seconds"),
-            TestStep("6d", "Verify CurrentState attribute is updated"),
+            TestStep("6a", "Send Step command while device is latched"),
+            TestStep("6b", "Send SetTarget command while device is latched"),
+            TestStep("7a", "Send SetTarget command with Latch=False"),
+            TestStep("7b", "Verify Target attribute is updated"),
+            TestStep("7c", "Wait for PIXIT.CLDIM.LatchingDuration seconds"),
+            TestStep("7d", "Verify CurrentState attribute is updated"),
         ]
         return steps
 
@@ -203,8 +205,31 @@ class TC_CLDIM_3_2(MatterBaseTest):
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 5.")
 
-        # STEP 6a: Send SetTarget command with Latch=False
+        # STEP 6a: Send Step command while device is latched
         self.step("6a")
+        if is_positioning_supported:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.Step(
+                        direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, numberOfSteps=1),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
+
+        # STEP 6b: Send SetTarget command while device is latched
+        self.step("6b")
+        if is_positioning_supported:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
+
+        # STEP 7a: Send SetTarget command with Latch=False
+        self.step("7a")
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
@@ -213,8 +238,8 @@ class TC_CLDIM_3_2(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 6b: Verify Target attribute is updated
-        self.step("6b")
+        # STEP 7b: Verify Target attribute is updated
+        self.step("7b")
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
@@ -229,12 +254,12 @@ class TC_CLDIM_3_2(MatterBaseTest):
         else:
             logging.info("Target attribute is not supported. Skipping step 6b.")
 
-        # STEP 6c: Wait for PIXIT.CLDIM.LatchingDuration seconds
-        self.step("6c")
+        # STEP 7c: Wait for PIXIT.CLDIM.LatchingDuration seconds
+        self.step("7c")
         time.sleep(latching_duration)
 
-        # STEP 6d: Verify CurrentState attribute is updated
-        self.step("6d")
+        # STEP 7d: Verify CurrentState attribute is updated
+        self.step("7d")
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
