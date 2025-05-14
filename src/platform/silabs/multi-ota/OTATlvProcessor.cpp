@@ -20,6 +20,8 @@
 #include <lib/support/BufferReader.h>
 #include <lib/support/TypeTraits.h>
 
+#include <headers/ProvisionManager.h>
+#include <headers/ProvisionStorage.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
@@ -27,6 +29,7 @@
 #endif
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace chip {
 
