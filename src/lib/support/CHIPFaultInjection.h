@@ -45,38 +45,54 @@ namespace FaultInjection {
  * @details
  * Each point in the code at which a fault can be injected
  * is identified by a member of this enum.
+ *
+ * @note IMPORTANT: This enum must be kept in sync with the CHIPFaultId enum in
+ * src/controller/python/chip/fault_injection/__init__.py
+ * If you change values here, update them there as well.
  */
 typedef enum
 {
-    kFault_AllocExchangeContext, /**< Fail the allocation of an ExchangeContext */
-    kFault_DropIncomingUDPMsg,   /**< Drop an incoming UDP message without any processing */
-    kFault_DropOutgoingUDPMsg,   /**< Drop an outgoing UDP message at the chip Message layer */
-    kFault_AllocBinding,         /**< Fail the allocation of a Binding */
-    kFault_SendAlarm,            /**< Fail to send an alarm message */
-    kFault_HandleAlarm,          /**< Fail to handle an alarm message */
-    kFault_FuzzExchangeHeaderTx, /**< Fuzz a chip Exchange Header after it has been encoded into the packet buffer;
-                                      when the fault is enabled, it expects an integer argument, which is an index into
-                                      a table of modifications that can be applied to the header. @see FuzzExchangeHeader */
-    kFault_RMPDoubleTx,          /**< Force RMP to transmit the outgoing message twice */
-    kFault_RMPSendError,         /**< Fail a transmission in RMP as if the max number of retransmission has been exceeded */
-    kFault_BDXBadBlockCounter,   /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
-    kFault_BDXAllocTransfer,     /**< Fail the allocation of a BDXTransfer object */
-    kFault_SecMgrBusy,           /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
-    kFault_IMInvoke_SeparateResponses, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond
-                                        with 2 InvokeResponseMessages */
-    kFault_IMInvoke_SeparateResponsesInvertResponseOrder, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid
-                                        commands and respond with 2 InvokeResponseMessages where the response order is inverted
-                                        compared to the request order */
-    kFault_IMInvoke_SkipSecondResponse, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond
-                                        with 1 InvokeResponseMessage, dropping the response to the second request */
-    kFault_ModifyWebRTCAnswerSessionId, /**< Change the session ID in the outgoing WebRTC Answer command */
-    kFault_ModifyWebRTCOfferSessionId,  /**< Change the session ID in the outgoing WebRTC Offer command */
-#if CONFIG_NETWORK_LAYER_BLE
-    kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
-#endif
-    kFault_CASEServerBusy, /**< Respond to CASE_Sigma1 with a BUSY status */
-    kFault_NumItems,
+    kFault_AllocExchangeContext = 0, /**< Fail the allocation of an ExchangeContext */
+    kFault_DropIncomingUDPMsg   = 1, /**< Drop an incoming UDP message without any processing */
+    kFault_DropOutgoingUDPMsg   = 2, /**< Drop an outgoing UDP message at the chip Message layer */
+    kFault_AllocBinding         = 3, /**< Fail the allocation of a Binding */
+    kFault_SendAlarm            = 4, /**< Fail to send an alarm message */
+    kFault_HandleAlarm          = 5, /**< Fail to handle an alarm message */
+    kFault_FuzzExchangeHeaderTx = 6, /**< Fuzz a chip Exchange Header after it has been encoded into the packet buffer;
+                                       when the fault is enabled, it expects an integer argument, which is an index into
+                                       a table of modifications that can be applied to the header. @see FuzzExchangeHeader */
+    kFault_RMPDoubleTx        = 7,   /**< Force RMP to transmit the outgoing message twice */
+    kFault_RMPSendError       = 8,   /**< Fail a transmission in RMP as if the max number of retransmission has been exceeded */
+    kFault_BDXBadBlockCounter = 9,   /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
+    kFault_BDXAllocTransfer   = 10,  /**< Fail the allocation of a BDXTransfer object */
+    kFault_SecMgrBusy         = 11,  /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
+    kFault_IMInvoke_SeparateResponses = 12, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and
+                                         respond with 2 InvokeResponseMessages */
+    kFault_IMInvoke_SeparateResponsesInvertResponseOrder = 13, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid
+                                         commands and respond with 2 InvokeResponseMessages where the response order is inverted
+                                         compared to the request order */
+    kFault_IMInvoke_SkipSecondResponse = 14, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and
+                                         respond with 1 InvokeResponseMessage, dropping the response to the second request */
+    kFault_ModifyWebRTCAnswerSessionId         = 15, /**< Change the session ID in the outgoing WebRTC Answer command */
+    kFault_ModifyWebRTCOfferSessionId          = 16, /**< Change the session ID in the outgoing WebRTC Offer command */
+    kFault_CASEServerBusy                      = 17, /**< Respond to CASE_Sigma1 with a BUSY status */
+    kFault_CASESkipInitiatorResumeMIC          = 18, /**< Send CASE_Sigma1 with resumptionID but no initiatorResumeMIC  */
+    kFault_CASESkipResumptionID                = 19, /**< Send CASE_Sigma1 with initiatorResumeMIC but no resumptionID  */
+    kFault_CASECorruptInitiatorResumeMIC       = 20, /**< Send CASE_Sigma1 with an invalid initiatorResumeMIC  */
+    kFault_CASECorruptDestinationID            = 21, /**< Send CASE_Sigma1 with an invalid DestinationID */
+    kFault_CASECorruptTBEData3Encrypted        = 22, /**< Send CASE_Sigma3 with improperly generated TBEData3Encrypted */
+    kFault_CASECorruptSigma3NOC                = 23, /**< Send CASE_Sigma3 with invalid initiatorNOC   */
+    kFault_CASECorruptSigma3ICAC               = 24, /**< Send CASE_Sigma3 with invalid initiatorICAC   */
+    kFault_CASECorruptSigma3Signature          = 25, /**< Send CASE_Sigma3 with invalid Signature */
+    kFault_CASECorruptSigma3InitiatorEphPubKey = 26, /**< Send CASE_Sigma3 with invalid InitiatorEphPubKey */
+    kFault_CASECorruptSigma3ResponderEphPubKey = 27, /**< Send CASE_Sigma3 with invalid ResponderEphPubKey */
+    /** Please add new Fault IDs here  **/
+    kFault_NumItems
+
 } Id;
+
+extern const char * const sFaultNames[];
+extern const size_t kNumChipFaultsFromEnum;
 
 static_assert(kFault_IMInvoke_SeparateResponses == 12, "Test plan specification and automation code relies on this value being 12");
 static_assert(kFault_IMInvoke_SeparateResponsesInvertResponseOrder == 13,
@@ -88,6 +104,8 @@ static_assert(kFault_ModifyWebRTCAnswerSessionId == 15,
 static_assert(kFault_ModifyWebRTCOfferSessionId == 16, "Test plan specification and automation code relies on this value being 16");
 
 DLL_EXPORT nl::FaultInjection::Manager & GetManager();
+
+DLL_EXPORT uint32_t GetFaultCounter(uint32_t faultID);
 
 /**
  * The number of ways in which chip Fault Injection fuzzers can
