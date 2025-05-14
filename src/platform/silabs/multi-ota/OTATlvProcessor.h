@@ -131,7 +131,7 @@ public:
     void SetLength(uint32_t length) { mLength = length; }
     void SetWasSelected(bool selected) { mWasSelected = selected; }
     bool WasSelected() { return mWasSelected; }
-    static bool IsValidTag(uint32_t tag);
+    bool IsValidTag(OTAProcessorTag tag);
 
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     CHIP_ERROR vOtaProcessInternalEncryption(MutableByteSpan & block);
@@ -166,6 +166,7 @@ protected:
     void ClearInternal();
 
     bool IsError(CHIP_ERROR & status);
+    virtual uint32_t GetAccumulatorSize() const { return sizeof(Descriptor); }
 
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     /*ota decryption*/
