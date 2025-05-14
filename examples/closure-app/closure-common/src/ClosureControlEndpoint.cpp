@@ -73,7 +73,8 @@ DataModel::Nullable<ElapsedS> ClosureControlDelegate::GetRemainingTime()
     if (GetCountDownTime().IsNull())
         return DataModel::NullNullable;
 
-    return DataModel::MakeNullable((GetCountDownTime().Value() - static_cast<ElapsedS>(GetMovingTime() + GetWaitingTime() + GetCalibratingTime())));
+    return DataModel::MakeNullable(
+        (GetCountDownTime().Value() - static_cast<ElapsedS>(GetMovingTime() + GetWaitingTime() + GetCalibratingTime())));
 }
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data)
