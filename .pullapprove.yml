@@ -41,25 +41,26 @@ overrides:
   #       status: failure
   #       explanation: "An issue is required for all PRs"
 
-  - if: "len(groups.approved.include('shared-reviewers-*')) >= 2"
-    description: >
-      [Required
-      Reviewers](https://github.com/project-chip/connectedhomeip/blob/master/CONTRIBUTING.md#review-requirements)
-      This is the main group of required reviews for general pull
-      requests.
-    status: success
-    explanation: "PR has got required reviews."
-    labels:
-      approved: "review - approved"
-      pending: "review - pending"
-      rejected: "review - changed requested"
-
   ############################################################
   #  Fast tracking
   ############################################################
   - if: "'fast track' in labels"
     status: success
     explanation: "PR has been fast tracked, bypassing reviews"
+
+  ############################################################
+  #  Sufficient review requirement met.
+  ############################################################
+  - if: "len(groups.approved.include('shared-reviewers-*')) >= 2"
+    status: success
+    explanation: "PR has got required reviews."
+
+  ############################################################
+  #  Pullapprove failed.
+  ############################################################
+  - if: 1
+    status: failure
+    explanation: "PR does not meet any pullapprove requirements."
 
 ############################################################
 #  Notifications
