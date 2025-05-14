@@ -257,6 +257,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductAppearance
+namespace DeviceLocation {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type;
+    using DecodableType    = chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceLocation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DeviceLocation
 namespace ConfigurationVersion {
 struct TypeInfo
 {
@@ -325,6 +337,7 @@ struct TypeInfo
         Attributes::Reachable::TypeInfo::DecodableType reachable = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
         Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
+        Attributes::DeviceLocation::TypeInfo::DecodableType deviceLocation;
         Attributes::ConfigurationVersion::TypeInfo::DecodableType configurationVersion = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
