@@ -42,15 +42,15 @@ from chip.testing.matter_testing import AttributeValue, ClusterAttributeChangeAc
 from mobly import asserts
 
 
-class TC_CLDIM_6_1(MatterBaseTest):
+class TC_CLDIM_5_1(MatterBaseTest):
     async def read_cldim_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureDimension
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    def desc_TC_CLDIM_6_1(self) -> str:
-        return "[TC-CLDIM-6.1] Subscription Report Verification with DUT as Server"
+    def desc_TC_CLDIM_5_1(self) -> str:
+        return "[TC-CLDIM-5.1] Subscription Report Verification with DUT as Server"
 
-    def steps_TC_CLDIM_6_1(self) -> list[TestStep]:
+    def steps_TC_CLDIM_5_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
@@ -73,14 +73,14 @@ class TC_CLDIM_6_1(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_CLDIM_6_1(self) -> list[str]:
+    def pics_TC_CLDIM_5_1(self) -> list[str]:
         pics = [
             "CLDIM.S",
         ]
         return pics
 
     @async_test_body
-    async def test_TC_CLDIM_6_1(self):
+    async def test_TC_CLDIM_5_1(self):
         endpoint = self.get_endpoint(default=1)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
@@ -128,7 +128,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 3b: Read CurrentState attribute and save as ExpectedState
         self.step("3b")
         expected_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-    
+
         # STEP 3c: If ExpectedState.Position != MinPosition, send SetTarget command with Position=MinPosition
         self.step("3c")
         if expected_state.position != min_position:
@@ -139,14 +139,15 @@ class TC_CLDIM_6_1(MatterBaseTest):
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-        else:   
+        else:
             logging.info("ExpectedState.Position is already at MinPosition. Skipping step.")
-        
+
         # STEP 3d: If ExpectedState.Position != MinPosition, wait for CurrentState.Position to be updated to MinPosition
         self.step("3d")
         if expected_state.position != min_position:
             expected_state.position = min_position
-            expected_final_value = [AttributeValue(endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
+            expected_final_value = [AttributeValue(
+                endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
             sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
         else:
             logging.info("ExpectedState.Position is already at MinPosition. Skipping step.")
@@ -161,14 +162,15 @@ class TC_CLDIM_6_1(MatterBaseTest):
                 endpoint=endpoint
             )
         except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         # STEP 3f: Wait for CurrentState.Position to be updated to MaxPosition
         self.step("3f")
         expected_state.position = max_position
-        expected_final_value = [AttributeValue(endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
+        expected_final_value = [AttributeValue(
+            endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
         sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
-        
+
         # STEP 4a: If Latching feature is not supported, skip steps 4b to 4g
         self.step("4a")
         if not is_latching_supported:
@@ -207,7 +209,8 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 4e: Wait for CurrentState.Latch to be updated to True
         self.step("4e")
         expected_state.latch = True
-        expected_final_value = [AttributeValue(endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
+        expected_final_value = [AttributeValue(
+            endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
         sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
 
         # STEP 4f: Send SetTarget command with Latch=False
@@ -225,7 +228,8 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 4g: Wait for CurrentState.Latch to be updated to False
         self.step("4g")
         expected_state.latch = False
-        expected_final_value = [AttributeValue(endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
+        expected_final_value = [AttributeValue(
+            endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
         sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
 
 
