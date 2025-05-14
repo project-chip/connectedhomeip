@@ -7453,7 +7453,7 @@ provisional cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum ContainerFormatEnum : enum8 {
-    kCMAF = 0;
+    kCMAF = 0 [spec_name = "CMAF"];
   }
 
   enum IngestMethodsEnum : enum8 {
@@ -7465,10 +7465,9 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidStream = 3;
     kInvalidURL = 4;
     kInvalidZone = 5;
-    kUnsupportedContainerFormat = 6;
-    kUnsupportedIngestMethod = 7;
-    kInvalidTriggerType = 8;
-    kInvalidTransportStatus = 9;
+    kInvalidCombination = 6;
+    kInvalidTriggerType = 7;
+    kInvalidTransportStatus = 8;
   }
 
   shared enum StreamUsageEnum : enum8 {
@@ -7500,14 +7499,6 @@ provisional cluster PushAvStreamTransport = 1365 {
     kMetadata = 0x2;
   }
 
-  bitmap SupportedContainerFormatsBitmap : bitmap8 {
-    kCMAF = 0x1;
-  }
-
-  bitmap SupportedIngestMethodsBitmap : bitmap8 {
-    kCMAFIngest = 0x1;
-  }
-
   struct TransportMotionTriggerTimeControlStruct {
     int16u initialDuration = 0;
     int16u augmentationDuration = 1;
@@ -7516,8 +7507,8 @@ provisional cluster PushAvStreamTransport = 1365 {
   }
 
   struct TransportZoneOptionsStruct {
-    nullable int16u zone = 1;
-    optional int8u sensitivity = 2;
+    nullable int16u zone = 0;
+    optional int8u sensitivity = 1;
   }
 
   struct TransportTriggerOptionsStruct {
@@ -7532,6 +7523,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     int16u chunkDuration = 0;
     optional octet_string<16> CENCKey = 1;
     optional boolean metadataEnabled = 2;
+    optional octet_string<16> CENCKeyID = 3;
   }
 
   struct ContainerOptionsStruct {
@@ -7547,15 +7539,19 @@ provisional cluster PushAvStreamTransport = 1365 {
     long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
-    ContainerFormatEnum containerFormat = 7;
-    ContainerOptionsStruct containerOptions = 8;
-    optional epoch_s expiryTime = 9;
+    ContainerOptionsStruct containerOptions = 7;
+    optional epoch_s expiryTime = 8;
   }
 
   struct TransportConfigurationStruct {
     int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
     optional TransportOptionsStruct transportOptions = 2;
+  }
+
+  struct SupportedFormatStruct {
+    ContainerFormatEnum containerFormat = 0;
+    IngestMethodsEnum ingestMethod = 1;
   }
 
   info event PushTransportBegin = 0 {
@@ -7570,12 +7566,10 @@ provisional cluster PushAvStreamTransport = 1365 {
     optional TriggerActivationReasonEnum activationReason = 2;
   }
 
-  readonly attribute SupportedContainerFormatsBitmap supportedContainerFormats = 0;
-  readonly attribute SupportedIngestMethodsBitmap supportedIngestMethods = 1;
-  readonly attribute TransportConfigurationStruct currentConnections[] = 2;
+  readonly attribute SupportedFormatStruct supportedFormats[] = 0;
+  readonly attribute TransportConfigurationStruct currentConnections[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -7635,7 +7629,7 @@ provisional cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum ContainerFormatEnum : enum8 {
-    kCMAF = 0;
+    kCMAF = 0 [spec_name = "CMAF"];
   }
 
   enum IngestMethodsEnum : enum8 {
@@ -7647,10 +7641,9 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidStream = 3;
     kInvalidURL = 4;
     kInvalidZone = 5;
-    kUnsupportedContainerFormat = 6;
-    kUnsupportedIngestMethod = 7;
-    kInvalidTriggerType = 8;
-    kInvalidTransportStatus = 9;
+    kInvalidCombination = 6;
+    kInvalidTriggerType = 7;
+    kInvalidTransportStatus = 8;
   }
 
   shared enum StreamUsageEnum : enum8 {
@@ -7682,14 +7675,6 @@ provisional cluster PushAvStreamTransport = 1365 {
     kMetadata = 0x2;
   }
 
-  bitmap SupportedContainerFormatsBitmap : bitmap8 {
-    kCMAF = 0x1;
-  }
-
-  bitmap SupportedIngestMethodsBitmap : bitmap8 {
-    kCMAFIngest = 0x1;
-  }
-
   struct TransportMotionTriggerTimeControlStruct {
     int16u initialDuration = 0;
     int16u augmentationDuration = 1;
@@ -7698,8 +7683,8 @@ provisional cluster PushAvStreamTransport = 1365 {
   }
 
   struct TransportZoneOptionsStruct {
-    nullable int16u zone = 1;
-    optional int8u sensitivity = 2;
+    nullable int16u zone = 0;
+    optional int8u sensitivity = 1;
   }
 
   struct TransportTriggerOptionsStruct {
@@ -7714,6 +7699,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     int16u chunkDuration = 0;
     optional octet_string<16> CENCKey = 1;
     optional boolean metadataEnabled = 2;
+    optional octet_string<16> CENCKeyID = 3;
   }
 
   struct ContainerOptionsStruct {
@@ -7729,15 +7715,19 @@ provisional cluster PushAvStreamTransport = 1365 {
     long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
-    ContainerFormatEnum containerFormat = 7;
-    ContainerOptionsStruct containerOptions = 8;
-    optional epoch_s expiryTime = 9;
+    ContainerOptionsStruct containerOptions = 7;
+    optional epoch_s expiryTime = 8;
   }
 
   struct TransportConfigurationStruct {
     int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
     optional TransportOptionsStruct transportOptions = 2;
+  }
+
+  struct SupportedFormatStruct {
+    ContainerFormatEnum containerFormat = 0;
+    IngestMethodsEnum ingestMethod = 1;
   }
 
   info event PushTransportBegin = 0 {
@@ -7752,12 +7742,10 @@ provisional cluster PushAvStreamTransport = 1365 {
     optional TriggerActivationReasonEnum activationReason = 2;
   }
 
-  readonly attribute SupportedContainerFormatsBitmap supportedContainerFormats = 0;
-  readonly attribute SupportedIngestMethodsBitmap supportedIngestMethods = 1;
-  readonly attribute TransportConfigurationStruct currentConnections[] = 2;
+  readonly attribute SupportedFormatStruct supportedFormats[] = 0;
+  readonly attribute TransportConfigurationStruct currentConnections[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -10183,8 +10171,7 @@ endpoint 1 {
   }
 
   server cluster PushAvStreamTransport {
-    ram      attribute supportedContainerFormats;
-    ram      attribute supportedIngestMethods;
+    callback attribute supportedFormats;
     callback attribute currentConnections;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

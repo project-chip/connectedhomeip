@@ -38,10 +38,9 @@ std::unique_ptr<PushAvStreamTransportManager> sPushAvStramTransportInstance;
 std::unique_ptr<PushAvStreamTransportServer> sPushAvStramTransportClusterServerInstance;
 
 Protocols::InteractionModel::Status
-PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
-                                                    TransportConfigurationStruct & outTransporConfiguration)
+PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID)
 {
-    PushAvStream stream{ outTransporConfiguration.connectionID, outTransporConfiguration, PushAvStreamTransportStatusEnum::kIdle };
+    PushAvStream stream{ connectionID, transportOptions, TransportStatusEnum::kInactive, PushAvStreamTransportStatusEnum::kIdle };
 
     /*Store the allocated stream persistently*/
     pushavStreams.push_back(stream);
@@ -58,14 +57,13 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
 }
 
 Protocols::InteractionModel::Status
-PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID,
-                                                  const TransportOptionsDecodeableStruct & transportOptions)
+PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, const TransportOptionsStruct & transportOptions)
 {
     for (PushAvStream & stream : pushavStreams)
     {
         if (stream.id == connectionID)
         {
-            ChipLogError(Zcl, "Modified Push AV Stream with ID: %d", connectionID);
+            ChipLogProgress(Zcl, "Modified Push AV Stream with ID: %d", connectionID);
             return Status::Success;
         }
     }
@@ -82,8 +80,8 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
         {
             if (stream.id == connectionID)
             {
-                stream.transportConfig.transportStatus = transportStatus;
-                ChipLogError(Zcl, "Set Transport Status for Push AV Stream with ID: %d", connectionID);
+                stream.transportStatus = transportStatus;
+                ChipLogProgress(Zcl, "Set Transport Status for Push AV Stream with ID: %d", connectionID);
             }
         }
     }
@@ -99,27 +97,8 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     {
         if (stream.id == connectionID)
         {
-            stream.status = PushAvStreamTransportStatusEnum::kBusy;
-            ChipLogError(Zcl, "Transport triggered for Push AV Stream with ID: %d", connectionID);
-        }
-    }
-    return Status::Success;
-}
-
-Protocols::InteractionModel::Status
-PushAvStreamTransportManager::FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID)
-{
-    configList.clear();
-    for (PushAvStream & stream : pushavStreams)
-    {
-        if (connectionID.Value().IsNull())
-        {
-            configList.push_back(stream.transportConfig);
-        }
-        else if (connectionID.Value().Value() == stream.id)
-        {
-            ChipLogError(Zcl, "Transport Found for Push AV Stream with ID: %d", connectionID.Value().Value());
-            configList.push_back(stream.transportConfig);
+            stream.connectionStatus = PushAvStreamTransportStatusEnum::kBusy;
+            ChipLogProgress(Zcl, "Transport triggered for Push AV Stream with ID: %d", connectionID);
         }
     }
     return Status::Success;
@@ -130,7 +109,13 @@ CHIP_ERROR PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum 
                                                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
     // TODO: Validates the requested stream usage against the camera's resource management.
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    // Returning CHIP_NO_ERROR to pass through checks in the Server Implementation.
+    return CHIP_NO_ERROR;
+}
+
+bool PushAvStreamTransportManager::validateUrl(std::string url)
+{
+    return true;
 }
 
 CHIP_ERROR
@@ -139,7 +124,8 @@ PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
     // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    // Returning CHIP_NO_ERROR to pass through checks in the Server Implementation.
+    return CHIP_NO_ERROR;
 }
 
 PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportStatus(const uint16_t connectionID)
@@ -148,7 +134,7 @@ PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportStatus
     {
         if (stream.id == connectionID)
         {
-            return stream.status;
+            return stream.connectionStatus;
         }
     }
     return PushAvStreamTransportStatusEnum::kUnknown;
@@ -161,12 +147,12 @@ void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
 
 void PushAvStreamTransportManager::Init()
 {
-    ChipLogError(Zcl, "Push AV Stream Transport Initialized");
+    ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
 }
 CHIP_ERROR
 PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStructWithFabricIndex> & currentConnections)
 {
-    ChipLogError(Zcl, "Push AV Current Connections loaded");
+    ChipLogProgress(Zcl, "Push AV Current Connections loaded");
 
     return CHIP_NO_ERROR;
 }
@@ -174,7 +160,7 @@ PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfig
 CHIP_ERROR
 PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
 {
-    ChipLogError(Zcl, "Persistent attributes loaded");
+    ChipLogProgress(Zcl, "Persistent attributes loaded");
 
     return CHIP_NO_ERROR;
 }
@@ -190,7 +176,15 @@ void emberAfPushAvStreamTransportClusterInitCallback(EndpointId endpoint)
     sPushAvStramTransportInstance = std::make_unique<PushAvStreamTransportManager>();
     sPushAvStramTransportInstance->Init();
 
+    BitFlags<Feature> features;
+
     sPushAvStramTransportClusterServerInstance =
-        std::make_unique<PushAvStreamTransportServer>(*sPushAvStramTransportInstance.get(), endpoint);
+        std::make_unique<PushAvStreamTransportServer>(*sPushAvStramTransportInstance.get(), endpoint, features);
     sPushAvStramTransportClusterServerInstance->Init();
+}
+
+void emberAfPushAvStreamTransportClusterShutdownCallback(EndpointId endpoint)
+{
+    sPushAvStramTransportClusterServerInstance = nullptr;
+    sPushAvStramTransportInstance              = nullptr;
 }

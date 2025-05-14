@@ -28,7 +28,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#define MAX_PUSH_TRANSPORT_CONNECTION_ID 65535
+static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 
 using namespace chip;
 using namespace chip::app;
@@ -44,9 +44,11 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
-PushAvStreamTransportServer::PushAvStreamTransportServer(PushAvStreamTransportDelegate & aDelegate, EndpointId aEndpointId) :
+PushAvStreamTransportServer::PushAvStreamTransportServer(PushAvStreamTransportDelegate & aDelegate, EndpointId aEndpointId,
+                                                         const BitFlags<Feature> aFeatures) :
     AttributeAccessInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id),
-    CommandHandlerInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id), mDelegate(aDelegate)
+    CommandHandlerInterface(MakeOptional(aEndpointId), PushAvStreamTransport::Id), mDelegate(aDelegate), mFeatures(aFeatures),
+    mSupportedFormats{ SupportedFormatStruct{ ContainerFormatEnum::kCmaf, IngestMethodsEnum::kCMAFIngest } }
 {}
 
 PushAvStreamTransportServer::~PushAvStreamTransportServer()
@@ -67,6 +69,21 @@ void PushAvStreamTransportServer::Shutdown()
 { // Unregister command handler and attribute access interfaces
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+}
+
+bool PushAvStreamTransportServer::HasFeature(Feature feature) const
+{
+    return mFeatures.Has(feature);
+}
+
+CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    for (const auto & supportsFormat : mSupportedFormats)
+    {
+        ReturnErrorOnFailure(encoder.Encode(supportsFormat));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder)
@@ -128,13 +145,23 @@ void PushAvStreamTransportServer::RemoveStreamTransportConnection(const uint16_t
 CHIP_ERROR PushAvStreamTransportServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == PushAvStreamTransport::Id);
-    ChipLogError(Zcl, "Push AV Stream Transport[ep=%d]: Reading", AttributeAccessInterface::GetEndpointId().Value());
+    ChipLogProgress(Zcl, "Push AV Stream Transport[ep=%d]: Reading", AttributeAccessInterface::GetEndpointId().Value());
 
-    if (aPath.mClusterId == PushAvStreamTransport::Id && aPath.mAttributeId == Attributes::CurrentConnections::Id)
+    switch (aPath.mAttributeId)
     {
+    case FeatureMap::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFeatures));
+        break;
 
+    case SupportedFormats::Id:
+        ReturnErrorOnFailure(aEncoder.EncodeList(
+            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeSupportedFormats(encoder); }));
+        break;
+
+    case CurrentConnections::Id:
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeCurrentConnections(encoder); }));
+        break;
     }
 
     return CHIP_NO_ERROR;
@@ -232,24 +259,19 @@ PushAvStreamTransportServer::FindStreamTransportConnection(const uint16_t connec
 
 uint16_t PushAvStreamTransportServer::GenerateConnectionID()
 {
-    static uint16_t lastAssignedConnectionID = 0;
-    do
+    static uint16_t lastID = 0;
+
+    for (uint16_t i = 0; i < kMaxConnectionId; ++i)
     {
-        uint16_t nextConnectionID;
-        if (lastAssignedConnectionID == MAX_PUSH_TRANSPORT_CONNECTION_ID)
+        uint16_t candidateID = static_cast<uint16_t>((lastID + i + 1) % kMaxConnectionId); // Wrap from 0 to 65534
+        if (FindStreamTransportConnection(candidateID) == nullptr)
         {
-            nextConnectionID = 0;
+            lastID = candidateID;
+            return candidateID;
         }
-        else
-        {
-            nextConnectionID = static_cast<uint16_t>(lastAssignedConnectionID + 1);
-        }
-        lastAssignedConnectionID = nextConnectionID;
-        if (FindStreamTransportConnection(nextConnectionID) == nullptr)
-        {
-            return nextConnectionID;
-        }
-    } while (true);
+    }
+
+    return kMaxConnectionId; // All 0 to 65534 IDs are in use
 }
 
 void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & ctx,
@@ -258,37 +280,37 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(transportOptions.endpointID, TlsCertificateManagement::Id,
-                                                       MATTER_DM_TLS_CERTIFICATE_MANAGEMENT_CLUSTER_CLIENT_ENDPOINT_COUNT);
+    // Todo: TLSEndpointID Validation
 
-    if (ep == kEmberInvalidEndpointIndex)
+    bool isFormatSupported                  = false;
+    IngestMethodsEnum ingestMethod          = commandData.transportOptions.ingestMethod;
+    ContainerOptionsStruct containerOptions = commandData.transportOptions.containerOptions;
+
+    for (auto & supportsFormat : mSupportedFormats)
     {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTLSEndpoint);
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Valid TLSEndpointId not found");
+        if ((supportsFormat.ingestMethod == ingestMethod) && (supportsFormat.containerFormat == containerOptions.containerType))
+        {
+            isFormatSupported = true;
+        }
+    }
+
+    if (isFormatSupported == false)
+    {
+        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidCombination);
+        ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Format Combination");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
     }
 
-    // Todo: Match Fabric index of TLSEndpointID
+    bool isValidUrl = mDelegate.validateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
 
-    if (transportOptions.ingestMethod == IngestMethodsEnum::kUnknownEnumValue)
+    if (isValidUrl == false)
     {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kUnsupportedIngestMethod);
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Ingest method not supported");
+        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidURL);
+        ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Url");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
     }
-
-    if (transportOptions.containerFormat == ContainerFormatEnum::kUnknownEnumValue)
-    {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kUnsupportedContainerFormat);
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Container format not supported");
-        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
-        return;
-    }
-
-    // Todo: Check combination of Ingest method, Container format in Supported Formats
-    //  https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11504
 
     if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
     {
@@ -322,20 +344,25 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 
     uint16_t connectionID = GenerateConnectionID();
 
+    if (connectionID == kMaxConnectionId)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport: Max Connections Exhausted");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+        return;
+    }
+
     TransportConfigurationStruct outTransportConfiguration;
     outTransportConfiguration.connectionID    = connectionID;
     outTransportConfiguration.transportStatus = TransportStatusEnum::kInactive;
 
-    /**
-     * delegate should set the TransportOptions fields to the new values.
-     * Persistently store the resulting TransportConfigurationStruct and map it to the ConnectionID
-     */
-    Status status = mDelegate.AllocatePushTransport(transportOptions, outTransportConfiguration);
+    TransportOptionsStorage transportOptionArgs(transportOptions);
+    Status status = mDelegate.AllocatePushTransport(transportOptionArgs, connectionID);
 
     if (status == Status::Success)
     {
         // add connection to CurrentConnections
         FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+        outTransportConfiguration.transportOptions.SetValue(transportOptionArgs);
         TransportConfigurationStructWithFabricIndex transportConfiguration({ outTransportConfiguration, peerFabricIndex });
         UpsertStreamTransportConnection(transportConfiguration);
         response.transportConfiguration = outTransportConfiguration;
@@ -408,29 +435,30 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
         return;
     }
 
+    TransportOptionsStruct transportOptionArgs;
+    transportOptionArgs.streamUsage                = transportOptions.streamUsage;
+    transportOptionArgs.videoStreamID              = transportOptions.videoStreamID;
+    transportOptionArgs.audioStreamID              = transportOptions.audioStreamID;
+    transportOptionArgs.endpointID                 = transportOptions.endpointID;
+    transportOptionArgs.url                        = transportOptions.url;
+    transportOptionArgs.triggerOptions.triggerType = transportOptions.triggerOptions.triggerType;
+    // Todo: copy motion zones
+    transportOptionArgs.triggerOptions.motionSensitivity = transportOptions.triggerOptions.motionSensitivity;
+    transportOptionArgs.triggerOptions.motionTimeControl = transportOptions.triggerOptions.motionTimeControl;
+    transportOptionArgs.triggerOptions.maxPreRollLen     = transportOptions.triggerOptions.maxPreRollLen;
+    transportOptionArgs.ingestMethod                     = transportOptions.ingestMethod;
+    transportOptionArgs.containerOptions                 = transportOptions.containerOptions;
+    transportOptionArgs.expiryTime                       = transportOptions.expiryTime;
+
     // Call the delegate
-    status = mDelegate.ModifyPushTransport(connectionID, transportOptions);
+    status = mDelegate.ModifyPushTransport(connectionID, transportOptionArgs);
 
     if (status == Status::Success)
     {
         if (transportConfiguration->transportConfiguration.transportOptions.HasValue())
         {
-            TransportOptionsStruct transportOptionToModify =
-                transportConfiguration->transportConfiguration.transportOptions.Value();
-            transportOptionToModify.streamUsage                = transportOptions.streamUsage;
-            transportOptionToModify.videoStreamID              = transportOptions.videoStreamID;
-            transportOptionToModify.audioStreamID              = transportOptions.audioStreamID;
-            transportOptionToModify.endpointID                 = transportOptions.endpointID;
-            transportOptionToModify.url                        = transportOptions.url;
-            transportOptionToModify.triggerOptions.triggerType = transportOptions.triggerOptions.triggerType;
-            // Todo: copy motion zones
-            transportOptionToModify.triggerOptions.motionSensitivity = transportOptions.triggerOptions.motionSensitivity;
-            transportOptionToModify.triggerOptions.motionTimeControl = transportOptions.triggerOptions.motionTimeControl;
-            transportOptionToModify.triggerOptions.maxPreRollLen     = transportOptions.triggerOptions.maxPreRollLen;
-            transportOptionToModify.ingestMethod                     = transportOptions.ingestMethod;
-            transportOptionToModify.containerFormat                  = transportOptions.containerFormat;
-            transportOptionToModify.containerOptions                 = transportOptions.containerOptions;
-            transportOptionToModify.expiryTime                       = transportOptions.expiryTime;
+            transportConfiguration->transportConfiguration.transportOptions =
+                static_cast<Optional<Structs::TransportOptionsStruct::Type>>(transportOptionArgs);
         }
     }
 
@@ -548,16 +576,23 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
 void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
                                                       const Commands::FindTransport::DecodableType & commandData)
 {
-    Status status = Status::Success;
     Commands::FindTransportResponse::Type response;
 
     Optional<DataModel::Nullable<uint16_t>> connectionID = commandData.connectionID;
 
-    static std::vector<TransportConfigurationStruct> transportConfigurations{};
+    size_t count      = 0;
+    size_t bufferSize = mCurrentConnections.size();
+
+    Platform::ScopedMemoryBuffer<TransportConfigurationStruct> transportConfigurations;
+    if (!transportConfigurations.Calloc(bufferSize))
+    {
+        ChipLogError(Zcl, "Memory allocation failed for forecast buffer");
+        return;
+    }
 
     DataModel::List<const TransportConfigurationStruct> outTransportConfigurations;
 
-    if (connectionID.Value().IsNull())
+    if ((connectionID.HasValue() == false) || connectionID.Value().IsNull())
     {
         if (mCurrentConnections.size() == 0)
         {
@@ -570,7 +605,7 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
         {
             if (connection.fabricIndex == ctx.mCommandHandler.GetAccessingFabricIndex())
             {
-                transportConfigurations.push_back(connection.transportConfiguration);
+                transportConfigurations[count++] = connection.transportConfiguration;
             }
         }
     }
@@ -590,24 +625,13 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
             return;
         }
-        transportConfigurations.push_back(transportConfiguration->transportConfiguration);
+        transportConfigurations[count++] = transportConfiguration->transportConfiguration;
     }
 
-    outTransportConfigurations =
-        DataModel::List<const TransportConfigurationStruct>(transportConfigurations.data(), transportConfigurations.size());
+    response.transportConfigurations = DataModel::List<const TransportConfigurationStruct>(
+        Span<TransportConfigurationStruct>(transportConfigurations.Get(), count));
 
-    // Call the delegate
-    status = mDelegate.FindTransport(connectionID);
-    if (status == Status::Success)
-    {
-        response.transportConfigurations = outTransportConfigurations;
-
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    }
-    else
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-    }
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 } // namespace PushAvStreamTransport

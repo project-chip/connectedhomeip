@@ -30,8 +30,9 @@ namespace PushAvStreamTransport {
 struct PushAvStream
 {
     uint16_t id;
-    TransportConfigurationStruct transportConfig;
-    PushAvStreamTransportStatusEnum status;
+    TransportOptionsStruct transportOptions;
+    TransportStatusEnum transportStatus;
+    PushAvStreamTransportStatusEnum connectionStatus;
 };
 
 /**
@@ -40,18 +41,19 @@ struct PushAvStream
 class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 {
 public:
-    Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
-                                                              TransportConfigurationStruct & outTransporConfiguration);
+    Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
+                                                              const uint16_t connectionID);
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID);
     Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                            const TransportOptionsDecodeableStruct & transportOptions);
+                                                            const TransportOptionsStruct & transportOptions);
     Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
                                                            TransportStatusEnum transportStatus);
 
     Protocols::InteractionModel::Status
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
                              const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl);
-    Protocols::InteractionModel::Status FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID);
+
+    bool validateUrl(std::string url);
 
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
@@ -70,7 +72,6 @@ public:
 
 private:
     std::vector<PushAvStream> pushavStreams;
-    std::vector<TransportConfigurationStruct> configList;
 };
 
 } // namespace PushAvStreamTransport

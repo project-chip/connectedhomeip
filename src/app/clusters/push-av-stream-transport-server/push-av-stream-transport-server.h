@@ -29,6 +29,9 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
+static constexpr size_t kMaxUrlLength = 2000u;
+
+using SupportedFormatStruct                   = Structs::SupportedFormatStruct::Type;
 using CMAFContainerOptionsStruct              = Structs::CMAFContainerOptionsStruct::Type;
 using ContainerOptionsStruct                  = Structs::ContainerOptionsStruct::Type;
 using TransportZoneOptionsStruct              = Structs::TransportZoneOptionsStruct::Type;
@@ -36,8 +39,6 @@ using TransportTriggerOptionsStruct           = Structs::TransportTriggerOptions
 using TransportMotionTriggerTimeControlStruct = Structs::TransportMotionTriggerTimeControlStruct::Type;
 using TransportOptionsStruct                  = Structs::TransportOptionsStruct::Type;
 using TransportConfigurationStruct            = Structs::TransportConfigurationStruct::Type;
-
-using TransportOptionsDecodeableStruct = Structs::TransportOptionsStruct::DecodableType;
 
 struct TransportConfigurationStructWithFabricIndex
 {
@@ -50,6 +51,90 @@ enum class PushAvStreamTransportStatusEnum : uint8_t
     kBusy    = 0x00,
     kIdle    = 0x01,
     kUnknown = 0x02
+};
+
+struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
+{
+    TransportTriggerOptionsStorage() {};
+
+    TransportTriggerOptionsStorage(Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions)
+    {
+        triggerType = triggerOptions.triggerType;
+        // motionZones = triggerOptions.motionZones; //Todo: Create Storage for motion zones
+        motionSensitivity = triggerOptions.motionSensitivity;
+        motionTimeControl = triggerOptions.motionTimeControl;
+        maxPreRollLen     = triggerOptions.maxPreRollLen;
+    }
+};
+
+struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
+{
+    CMAFContainerOptionsStorage() {};
+
+    CMAFContainerOptionsStorage(Optional<Structs::CMAFContainerOptionsStruct::Type> CMAFContainerOptions)
+    {
+        if (CMAFContainerOptions.HasValue() == true)
+        {
+            chunkDuration = CMAFContainerOptions.Value().chunkDuration;
+
+            MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
+            CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKey.Value(), CENCKeyBuffer);
+            CENCKey.SetValue(CENCKeyBuffer);
+
+            metadataEnabled = CMAFContainerOptions.Value().metadataEnabled;
+
+            MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
+            CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKeyID.Value(), CENCKeyIDBuffer);
+            CENCKeyID.SetValue(CENCKeyIDBuffer);
+        }
+    }
+
+private:
+    uint8_t mCENCKeyBuffer[16];
+    uint8_t mCENCKeyIDBuffer[16];
+};
+
+struct ContainerOptionsStorage : public ContainerOptionsStruct
+{
+    ContainerOptionsStorage() {};
+
+    ContainerOptionsStorage(Structs::ContainerOptionsStruct::DecodableType containerOptions)
+    {
+        containerType = containerOptions.containerType;
+
+        CMAFContainerOptionsStorage cmafContainerStorage(containerOptions.CMAFContainerOptions);
+        CMAFContainerOptions.SetValue(cmafContainerStorage);
+    }
+};
+
+struct TransportOptionsStorage : public TransportOptionsStruct
+{
+    TransportOptionsStorage() {};
+
+    TransportOptionsStorage(Structs::TransportOptionsStruct::DecodableType transportOptions)
+    {
+        streamUsage   = transportOptions.streamUsage;
+        videoStreamID = transportOptions.videoStreamID;
+        audioStreamID = transportOptions.audioStreamID;
+        endpointID    = transportOptions.endpointID;
+
+        MutableCharSpan urlBuffer(mUrlBuffer);
+        CopyCharSpanToMutableCharSpan(transportOptions.url, urlBuffer);
+        url = urlBuffer;
+
+        TransportTriggerOptionsStorage triggerOptionsStorage(transportOptions.triggerOptions);
+        triggerOptions = triggerOptionsStorage;
+
+        ingestMethod = transportOptions.ingestMethod;
+
+        ContainerOptionsStorage containerOptionsStorage(transportOptions.containerOptions);
+        containerOptions = containerOptionsStorage;
+
+        expiryTime = transportOptions.expiryTime;
+    }
+
+private:
+    char mUrlBuffer[kMaxUrlLength];
 };
 
 /** @brief
@@ -68,14 +153,14 @@ public:
      *
      *   @param transportOptions[in]        represent the configuration options of the transport to be allocated
      *
-     *   @param outTransporConfiguration[out]        represent the configuration of the transport to be allocated
+     *   @param connectionID[in]            Indicates the connectionID to allocate.
      *
-     *   @return Success if the allocation is successful and a PushTransportConnectionID was
-     *   produced; otherwise, the command SHALL be rejected with an appropriate
-     *   error.
+     *   @return Success if the allocation is successful and a PushTransportConnectionID was produced; otherwise, the command SHALL
+     * be rejected with an appropriate error. The delegate is expected the process the transport options, allocate the transport and
+     * map it to the connectionID. On Success TransportConfigurationStruct is sent as response by the server.
      */
-    virtual Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsDecodeableStruct & transportOptions,
-                                                                      TransportConfigurationStruct & outTransporConfiguration) = 0;
+    virtual Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
+                                                                      const uint16_t connectionID) = 0;
     /**
      *   @brief Handle Command Delegate for Stream transport deallocation for the
      *   provided connectionID.
@@ -98,7 +183,7 @@ public:
      * appropriate error.
      */
     virtual Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                                    const TransportOptionsDecodeableStruct & transportOptions) = 0;
+                                                                    const TransportOptionsStruct & transportOptions) = 0;
 
     /**
      *   @brief Handle Command Delegate for Stream transport modification.
@@ -129,14 +214,12 @@ appropriate
                              const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) = 0;
 
     /**
-     *   @brief Handle Command Delegate to get the Stream Options Configuration for the specified push transport.
+     * @brief Validates the url
+     * @param[in] url The url to validate
      *
-     *   @param connectionID  [in]     Indicates the allocated connectionID to get the Stream Options Configuration of.
-     *   @return Success if the transport is already allocated; otherwise, the command SHALL be rejected with an appropriate
-     *   error.
-     *
+     * @return boolean value true if the url is valid else false.
      */
-    virtual Protocols::InteractionModel::Status FindTransport(const Optional<DataModel::Nullable<uint16_t>> & connectionID) = 0;
+    virtual bool validateUrl(std::string url) = 0;
 
     /**
      * @brief Validates the bandwidth requirement against the camera's resource management
@@ -174,6 +257,13 @@ appropriate
                                            const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
 
+    /**
+     * @brief Gets the status of the transport
+     *
+     * @param[in] connectionID Indicates the connectionID of the stream transport to check status
+     *
+     * @return busy if transport is active else idle
+     */
     virtual PushAvStreamTransportStatusEnum GetTransportStatus(const uint16_t connectionID) = 0;
 
     /**
@@ -183,11 +273,16 @@ appropriate
     virtual void OnAttributeChanged(AttributeId attributeId) = 0;
 
     /**
+     *  @brief
      *  Delegate functions to load the allocated transport connections.
      *  The delegate application is responsible for creating and persisting these connections ( based on the Allocation commands ).
      *  These Load APIs would be used to load the pre-allocated transport connections context information into the cluster server
-     * list, at initialization. Once loaded, the cluster server would be serving Reads on these attributes. The list is updatable
-     * via the Add/Remove functions for the respective transport connections.
+     *  list, at initialization. Once loaded, the cluster server would be serving Reads on these attributes. The list is updatable
+     *  via the Add/Remove functions for the respective transport connections.
+     *
+     * @note
+     * The callee is responsible for allocating the buffer that holds the currentConnections.
+     * The buffer is allocated internally by the function and returned to the caller via an output parameter.
      */
     virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStructWithFabricIndex> & currentConnections) = 0;
 
@@ -204,11 +299,12 @@ public:
     /**
      * Creates a Push AV Stream Transport server instance. The Init() function needs to be called for this instance to be registered
      * and called by the interaction model at the appropriate times.
-     * @param aDelegate A reference to the delegate to be used by this server.
+     * @param aDelegate    A reference to the delegate to be used by this server.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aFeatures   The bitflags value that identifies which features are supported by this instance.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    PushAvStreamTransportServer(PushAvStreamTransportDelegate & delegate, EndpointId endpointId);
+    PushAvStreamTransportServer(PushAvStreamTransportDelegate & delegate, EndpointId endpointId, const BitFlags<Feature> aFeatures);
 
     ~PushAvStreamTransportServer() override;
 
@@ -230,8 +326,6 @@ public:
     bool HasFeature(Feature feature) const;
 
     // Attribute Getters
-    BitMask<SupportedContainerFormatsBitmap> GetSupportedContainerFormats() const { return mSupportedContainerFormats; }
-    BitMask<SupportedIngestMethodsBitmap> GetSupportedIngestMethods() const { return mSupportedIngestMethods; }
 
 private:
     enum class UpsertResultEnum : uint8_t
@@ -242,11 +336,10 @@ private:
 
     PushAvStreamTransportDelegate & mDelegate;
 
+    const BitFlags<Feature> mFeatures;
+
     // Attributes
-    // Todo: Add SupportedFormats attribute form https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11504
-    BitMask<SupportedContainerFormatsBitmap> mSupportedContainerFormats;
-    BitMask<SupportedIngestMethodsBitmap> mSupportedIngestMethods;
-    // lists
+    std::vector<SupportedFormatStruct> mSupportedFormats;
     /*Moved from TransportConfigurationStruct to TransportConfigurationStructWithFabricIndex
      * to perform fabric index checks
      */
@@ -265,6 +358,7 @@ private:
 
     // Helpers to read list items via delegate APIs
     CHIP_ERROR ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     // Helper functions
     uint16_t GenerateConnectionID();
