@@ -8,6 +8,15 @@ github_api_version: "shadow-cat-preview"
 ############################################################
 
 overrides:
+
+  - if: "'len(statuses.failed) > 0'"
+    status: failure
+    explanation: "CI fails."
+
+  - if: "'len(statuses.pending) > 0'"
+    status: pending
+    explanation: "CI is pending."
+
   - if: "'hotfix' in labels"
     status: success
     explanation: "Hotfix label added, bypassing reviews"
