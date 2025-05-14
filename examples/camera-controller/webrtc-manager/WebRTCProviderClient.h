@@ -67,7 +67,7 @@ public:
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR
-    SolicitOffer(chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
+    SolicitOffer(StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
                  chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
                  chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
@@ -88,9 +88,8 @@ public:
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR
-    ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp,
-                 chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+    ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp, StreamUsageEnum streamUsage,
+                 chip::EndpointId originatingEndpointId, chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
                  chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
     /**
@@ -119,8 +118,7 @@ public:
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID, chip::app::DataModel::List<const ICECandidateStruct> ICECandidates);
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, chip::app::DataModel::List<const ICECandidateStruct> ICECandidates);
 
     /**
      * @brief Notify WebRTCProviderClient that the Offer command has been received.
@@ -224,8 +222,7 @@ private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
-    chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum mCurrentStreamUsage =
-        chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum::kUnknownEnumValue;
+    StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;

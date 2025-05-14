@@ -48,7 +48,7 @@ CHIP_ERROR ProvideOfferCommand::RunCommand()
     }
 
     // Convert the stream usage into its enum type:
-    auto streamUsage = static_cast<app::Clusters::WebRTCTransportProvider::StreamUsageEnum>(mStreamUsage);
+    auto streamUsage = static_cast<StreamUsageEnum>(mStreamUsage);
 
     return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage);
 }
@@ -58,7 +58,7 @@ CHIP_ERROR SolicitOfferCommand::RunCommand()
     ChipLogProgress(Camera, "Run SolicitOfferCommand");
 
     // Convert the stream usage into its enum type:
-    auto streamUsage = static_cast<app::Clusters::WebRTCTransportProvider::StreamUsageEnum>(mStreamUsage);
+    auto streamUsage = static_cast<StreamUsageEnum>(mStreamUsage);
 
     return WebRTCManager::Instance().SolicitOffer(streamUsage);
 }

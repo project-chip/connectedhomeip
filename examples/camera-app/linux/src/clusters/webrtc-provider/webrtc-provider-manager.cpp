@@ -72,7 +72,7 @@ void WebRTCProviderManager::Init()
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        std::string candidateStr        = std::string(candidate);
+        auto candidateStr               = std::string(candidate);
         ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidateStr.c_str()) };
         mLocalCandidates.push_back(iceCandidate);
         ChipLogProgress(Camera, "Local Candidate:");
@@ -567,8 +567,7 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    DataModel::List<const ICECandidateStruct> iceCandidateList =
-        DataModel::List<const ICECandidateStruct>(mLocalCandidates.data(), mLocalCandidates.size());
+    auto iceCandidateList = DataModel::List<const ICECandidateStruct>(mLocalCandidates.data(), mLocalCandidates.size());
 
     command.webRTCSessionID = mCurrentSessionId;
     command.ICECandidates   = iceCandidateList;

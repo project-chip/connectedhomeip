@@ -177,7 +177,7 @@ bool WebRTCTransportRequestorServer::IsPeerNodeSessionValid(uint16_t sessionId, 
     FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
     // Check if the session ID is in the existing sessions list
-    WebRTCSessionTypeStruct * existingSession = FindSession(sessionId);
+    WebRTCSessionStruct * existingSession = FindSession(sessionId);
 
     if (!existingSession)
     {
@@ -235,7 +235,7 @@ void WebRTCTransportRequestorServer::HandleOffer(HandlerContext & ctx, const Com
         args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
     }
 
-    WebRTCSessionTypeStruct outSession;
+    WebRTCSessionStruct outSession;
     // Delegate processing: handle the SDP offer, gather ICE candidates, SDP answer, etc.
     Protocols::InteractionModel::ClusterStatusCode delegateStatus =
         Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleOffer(sessionId, args));
@@ -273,13 +273,13 @@ void WebRTCTransportRequestorServer::HandleICECandidates(HandlerContext & ctx, c
     // Extract command fields from the request
     uint16_t sessionId = req.webRTCSessionID;
 
-    std::vector<std::string> candidates;
+    std::vector<ICECandidateStruct> candidates;
     auto iter = req.ICECandidates.begin();
     while (iter.Next())
     {
-        // Get current candidate CharSpan and convert to std::string.
-        const CharSpan & candidateSpan = iter.GetValue();
-        candidates.emplace_back(candidateSpan.data(), candidateSpan.size());
+        // Get current candidate.
+        const ICECandidateStruct & candidate = iter.GetValue();
+        candidates.push_back(candidate);
     }
 
     // Check the validity of the list.
@@ -335,12 +335,12 @@ void WebRTCTransportRequestorServer::HandleEnd(HandlerContext & ctx, const Comma
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath,
                                   Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleEnd(sessionId, reason)));
 
-    // Store the WebRTCSessionTypeStruct in the CurrentSessions
+    // Store the WebRTCSessionStruct in the CurrentSessions
     RemoveSession(sessionId);
 }
 
 // Helper functions
-WebRTCSessionTypeStruct * WebRTCTransportRequestorServer::FindSession(uint16_t sessionId)
+WebRTCSessionStruct * WebRTCTransportRequestorServer::FindSession(uint16_t sessionId)
 {
     for (auto & session : mCurrentSessions)
     {
@@ -353,8 +353,7 @@ WebRTCSessionTypeStruct * WebRTCTransportRequestorServer::FindSession(uint16_t s
     return nullptr;
 }
 
-WebRTCTransportRequestorServer::UpsertResultEnum
-WebRTCTransportRequestorServer::UpsertSession(const WebRTCSessionTypeStruct & session)
+WebRTCTransportRequestorServer::UpsertResultEnum WebRTCTransportRequestorServer::UpsertSession(const WebRTCSessionStruct & session)
 {
     // Search for a session in the current sessions
     UpsertResultEnum result;
@@ -383,7 +382,7 @@ void WebRTCTransportRequestorServer::RemoveSession(uint16_t sessionId)
     size_t originalSize = mCurrentSessions.size();
     // Remove the session if sessionId is matching
     mCurrentSessions.erase(std::remove_if(mCurrentSessions.begin(), mCurrentSessions.end(),
-                                          [sessionId](const WebRTCSessionTypeStruct & s) { return s.id == sessionId; }),
+                                          [sessionId](const WebRTCSessionStruct & s) { return s.id == sessionId; }),
                            mCurrentSessions.end());
 
     // Check whether session was removed
