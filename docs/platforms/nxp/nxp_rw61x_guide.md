@@ -56,7 +56,9 @@ For Matter over Wi-Fi with OpenThread Border Router :
     antenna)
 
 For Matter over Ethernet configuration :
--   For [`NXP FRDM-RW612`] board: nothing to do (embedded PCB ethernet connector)
+
+-   For [`NXP FRDM-RW612`] board: nothing to do (embedded PCB ethernet
+    connector)
 -   [`NXP RD-RW612-BGA`] board is not supported, recommandation: use frdm board
 
 <a name="building"></a>
@@ -98,10 +100,10 @@ to check all the supported configurations.
 > section.
 
 Ethernet cmake build commande example:
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ west build -d build_matter -b frdmrw612 examples/thermostat/nxp -DCONF_FILE_NAME=prj_eth.conf
 ```
-
 
 ### GN Build System
 
