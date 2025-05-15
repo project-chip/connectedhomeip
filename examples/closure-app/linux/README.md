@@ -83,7 +83,7 @@ for Raspberry Pi Desktop 20.10 (aarch64)**
             as described in
             [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
-    -   Run Linux Air Quality Example App
+    -   Run Linux Closure Example App
 
               $ cd ~/connectedhomeip/examples/closure-app/linux
               $ sudo out/debug/closure-app --ble-controller [bluetooth controller number]
