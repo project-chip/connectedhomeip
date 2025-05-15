@@ -20,11 +20,11 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/clusters/actions-server/actions-server.h>
 #include <app/util/attribute-storage.h>
+#include <bridged-actions-stub.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include <vector>
 
 #include "Device.h"
 #include "main.h"
@@ -108,8 +108,6 @@ CHIP_ERROR ActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, Attribute
     return aEncoder.Encode(ClusterRevision);
 }
 
-ActionsAttrAccess gAttrAccess;
-
 CHIP_ERROR ActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Actions::Id);
@@ -129,9 +127,29 @@ CHIP_ERROR ActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attr
     }
     return CHIP_NO_ERROR;
 }
+
+ActionsAttrAccess gAttrAccess;
+
+std::unique_ptr<Actions::ActionsDelegateImpl> sActionsDelegateImpl;
+std::unique_ptr<Actions::ActionsServer> sActionsServer;
+
 } // anonymous namespace
 
 void emberAfActionsClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrReturn(endpoint == 1,
+                   ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
+    VerifyOrReturn(emberAfContainsServer(endpoint, chip::app::Clusters::Actions::Id) == true,
+                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
+
+    VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
+
+    sActionsDelegateImpl = std::make_unique<chip::app::Clusters::Actions::ActionsDelegateImpl>();
+    sActionsServer       = std::make_unique<chip::app::Clusters::Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
+
+    sActionsServer->Init();
+
+    // TODO: this OVERRIDES the attribute access that `ActionsServer` adds with hardcoded values.
+    //       this is likely not sane.
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
