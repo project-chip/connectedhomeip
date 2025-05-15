@@ -300,7 +300,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
     ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
 
-    bool nocAddedDuringFailsafe = event->FailSafeTimerExpired.addNocCommandHasBeenInvoked;
+    bool nocAddedDuringFailsafe          = event->FailSafeTimerExpired.addNocCommandHasBeenInvoked;
     bool nocAddedOrUpdatedDuringFailsafe = nocAddedDuringFailsafe || event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked;
 
     FabricIndex fabricIndex = event->FailSafeTimerExpired.fabricIndex;
