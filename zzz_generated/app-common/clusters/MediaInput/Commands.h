@@ -79,6 +79,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SelectInput::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t index = static_cast<uint8_t>(0);
 
@@ -94,8 +95,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SelectInput::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t index = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SelectInput
@@ -110,6 +113,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ShowInputStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -123,6 +127,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ShowInputStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -138,6 +143,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::HideInputStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -151,6 +157,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::HideInputStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -168,6 +175,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RenameInput::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t index = static_cast<uint8_t>(0);
     chip::CharSpan name;
@@ -184,9 +192,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RenameInput::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t index = static_cast<uint8_t>(0);
     chip::CharSpan name;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RenameInput

@@ -28,11 +28,28 @@ namespace TlsCertificateManagement {
 namespace Structs {
 
 namespace TLSCertStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kCaid), caid);
     encoder.Encode(to_underlying(Fields::kCertificate), certificate);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -54,8 +71,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificate);
         }
-        else
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
+            err = DataModel::Decode(reader, fabricIndex);
         }
 
         ReturnErrorOnFailure(err);
@@ -65,12 +83,29 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TLSCertStruct
 
 namespace TLSClientCertificateDetailStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
     encoder.Encode(to_underlying(Fields::kClientCertificate), clientCertificate);
     encoder.Encode(to_underlying(Fields::kIntermediateCertificates), intermediateCertificates);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -96,8 +131,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, intermediateCertificates);
         }
-        else
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
+            err = DataModel::Decode(reader, fabricIndex);
         }
 
         ReturnErrorOnFailure(err);

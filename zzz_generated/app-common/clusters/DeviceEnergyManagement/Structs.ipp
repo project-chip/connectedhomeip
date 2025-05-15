@@ -64,9 +64,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, currency);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -111,9 +108,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, maxDuration);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -147,9 +141,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kCause))
         {
             err = DataModel::Decode(reader, cause);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -265,9 +256,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, maxDurationAdjustment);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -337,9 +325,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, forecastUpdateReason);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -389,9 +374,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, loadControl);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -430,9 +412,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kDuration))
         {
             err = DataModel::Decode(reader, duration);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

@@ -115,6 +115,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdatePIN::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::CharSpan> oldPIN;
     chip::CharSpan newPIN;
@@ -131,9 +132,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UpdatePIN::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::CharSpan> oldPIN;
     chip::CharSpan newPIN;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdatePIN
@@ -148,6 +151,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetPIN::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -161,6 +165,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ResetPIN::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -177,6 +182,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetPINResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan PINCode;
 
@@ -192,8 +198,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ResetPINResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan PINCode;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ResetPINResponse
@@ -208,6 +216,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Enable::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -221,6 +230,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Enable::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -236,6 +246,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Disable::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -249,6 +260,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Disable::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -266,6 +278,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddBonusTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::CharSpan> PINCode;
     Optional<uint32_t> bonusTime;
@@ -282,9 +295,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddBonusTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::CharSpan> PINCode;
     Optional<uint32_t> bonusTime;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddBonusTime
@@ -300,6 +315,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetScreenDailyTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t screenTime = static_cast<uint32_t>(0);
 
@@ -315,8 +331,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetScreenDailyTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t screenTime = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetScreenDailyTime
@@ -331,6 +349,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::BlockUnratedContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -344,6 +363,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::BlockUnratedContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -359,6 +379,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UnblockUnratedContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -372,6 +393,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UnblockUnratedContent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -388,6 +410,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetOnDemandRatingThreshold::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan rating;
 
@@ -403,8 +426,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetOnDemandRatingThreshold::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan rating;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetOnDemandRatingThreshold
@@ -420,6 +445,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetScheduledContentRatingThreshold::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan rating;
 
@@ -435,8 +461,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetScheduledContentRatingThreshold::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan rating;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetScheduledContentRatingThreshold

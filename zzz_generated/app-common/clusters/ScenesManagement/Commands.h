@@ -138,6 +138,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID   = static_cast<chip::GroupId>(0);
     uint8_t sceneID         = static_cast<uint8_t>(0);
@@ -157,13 +158,15 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID   = static_cast<chip::GroupId>(0);
     uint8_t sceneID         = static_cast<uint8_t>(0);
     uint32_t transitionTime = static_cast<uint32_t>(0);
     chip::CharSpan sceneName;
     DataModel::DecodableList<Structs::ExtensionFieldSetStruct::DecodableType> extensionFieldSetStructs;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace AddScene
 namespace AddSceneResponse {
@@ -180,6 +183,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddSceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
@@ -197,10 +201,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddSceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddSceneResponse
@@ -217,6 +223,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ViewScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
@@ -233,10 +240,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ViewScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ViewScene
 namespace ViewSceneResponse {
@@ -256,6 +265,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ViewSceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
@@ -276,6 +286,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ViewSceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
@@ -283,6 +294,7 @@ public:
     Optional<uint32_t> transitionTime;
     Optional<chip::CharSpan> sceneName;
     Optional<DataModel::DecodableList<Structs::ExtensionFieldSetStruct::DecodableType>> extensionFieldSetStructs;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ViewSceneResponse
@@ -299,6 +311,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
@@ -315,10 +328,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace RemoveScene
 namespace RemoveSceneResponse {
@@ -335,6 +350,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveSceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
@@ -352,10 +368,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveSceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveSceneResponse
@@ -371,6 +389,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveAllScenes::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
@@ -386,9 +405,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveAllScenes::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace RemoveAllScenes
 namespace RemoveAllScenesResponse {
@@ -404,6 +425,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveAllScenesResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
@@ -420,9 +442,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveAllScenesResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveAllScenesResponse
@@ -439,6 +463,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StoreScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
@@ -455,10 +480,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StoreScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace StoreScene
 namespace StoreSceneResponse {
@@ -475,6 +502,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StoreSceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
@@ -492,10 +520,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StoreSceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StoreSceneResponse
@@ -513,6 +543,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RecallScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
@@ -530,11 +561,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RecallScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
     Optional<DataModel::Nullable<uint32_t>> transitionTime;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace RecallScene
 namespace GetSceneMembership {
@@ -549,6 +582,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetSceneMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
@@ -564,9 +598,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetSceneMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace GetSceneMembership
 namespace GetSceneMembershipResponse {
@@ -584,6 +620,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetSceneMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status = static_cast<uint8_t>(0);
     DataModel::Nullable<uint8_t> capacity;
@@ -602,11 +639,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetSceneMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status = static_cast<uint8_t>(0);
     DataModel::Nullable<uint8_t> capacity;
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     Optional<DataModel::DecodableList<uint8_t>> sceneList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetSceneMembershipResponse
@@ -626,6 +665,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::BitMask<CopyModeBitmap> mode = static_cast<chip::BitMask<CopyModeBitmap>>(0);
     chip::GroupId groupIdentifierFrom  = static_cast<chip::GroupId>(0);
@@ -645,13 +685,15 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::BitMask<CopyModeBitmap> mode = static_cast<chip::BitMask<CopyModeBitmap>>(0);
     chip::GroupId groupIdentifierFrom  = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierFrom        = static_cast<uint8_t>(0);
     chip::GroupId groupIdentifierTo    = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierTo          = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace CopyScene
 namespace CopySceneResponse {
@@ -668,6 +710,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CopySceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status                    = static_cast<uint8_t>(0);
     chip::GroupId groupIdentifierFrom = static_cast<chip::GroupId>(0);
@@ -685,10 +728,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CopySceneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status                    = static_cast<uint8_t>(0);
     chip::GroupId groupIdentifierFrom = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierFrom       = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CopySceneResponse

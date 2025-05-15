@@ -51566,10 +51566,12 @@ class TlsCertificateManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="caid", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="certificate", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             caid: 'uint' = 0
             certificate: 'typing.Optional[bytes]' = None
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class TLSClientCertificateDetailStruct(ClusterObject):
@@ -51580,11 +51582,13 @@ class TlsCertificateManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="clientCertificate", Tag=1, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="intermediateCertificates", Tag=2, Type=typing.Optional[typing.List[bytes]]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             ccdid: 'uint' = 0
             clientCertificate: 'typing.Optional[bytes]' = None
             intermediateCertificates: 'typing.Optional[typing.List[bytes]]' = None
+            fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
