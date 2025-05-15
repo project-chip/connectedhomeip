@@ -311,7 +311,8 @@ class TC_FAN_3_5(MatterBaseTest):
         #   - Save the resulting attribute report values from each subscription as a baseline
         #     for future comparisons.
         # self.step(self.current_step_index + 1)
-        percent_setting_values, fan_mode_values, speed_setting_values = self.verify_expected_reports_and_progression(step, percent_setting_init)
+        percent_setting_values, fan_mode_values, speed_setting_values = self.verify_expected_reports_and_progression(
+            step, percent_setting_init)
         self.save_baseline_values(step, percent_setting_values, fan_mode_values, speed_setting_values)
 
     def verify_attribute_progression(self, step: Clusters.FanControl.Commands.Step, expected_attribute: Clusters.FanControl.Attributes, values: list) -> None:
@@ -408,7 +409,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 speed_setting_expected, speed_setting_values_produced,
                 f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_expected}, missing: {missing_speed_setting}."
             )
-            
+
         return percent_setting_values_produced, fan_mode_values_produced, speed_setting_values_produced
 
     def save_baseline_values(self, step: Clusters.FanControl.Commands.Step, percent_setting_values_produced: list, fan_mode_values_produced: list, speed_setting_values_produced: list) -> None:
