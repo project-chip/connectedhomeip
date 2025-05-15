@@ -244,49 +244,24 @@ groups:
   #  touches a region not covered by any custom review paths, 
   #  base condition is required.
   ############################################################
-  shared-reviewers-scripts-build:
-    type: optional
-    conditions:
-      - files.include('*')
-    reviewers:
-      users:
-        - andy31415
-    reviews:
-      request: 0 # Do not auto-add
-  shared-reviewers-integrations-docker:
-    type: optional
-    conditions:
-      - files.include('*')
-    reviewers:
-      users:
-        - andy31415
-    reviews:
-      request: 0 # Do not auto-add
-
-  ############################################################
-  #  Review requirements for PRs touching examples/chef*
-  #  One Googler requirement is sufficient.
-  ############################################################
-  chef-required-reviewers:
-    type: required
-    conditions:
-      - "'examples/chef/*' in files"
-    requirements:
-      - len(groups.approved.include('shared-reviewers-google')) >= 1 or len(groups.approved.include('shared-reviewers-*')) >= 2  
-    reviews:
-      required: 0
 
   ############################################################
   #  Review requirements for PRs touching scripts/build*.
   #  One shared-reviewers-scripts-build review is sufficient.
   ############################################################
-  scripts-build-required-reviewers:
+  shared-reviewers-scripts-build:
     type: required
     conditions:
-      - "'scripts/build/*' in files"
+      - files.include('scripts/build/*')
+    reviewers:
+      users:
+        - andy31415
     requirements:
-      - len(groups.approved.include('shared-reviewers-scripts-build')) >= 1 or len(groups.approved.include('shared-reviewers-*')) >= 2
+      - "len(groups.approved.include('shared-reviewers-scripts-build')) >= 1 or \
+        len(groups.approved.include('shared-reviewers-*')) >= 2"
     reviews:
+      # 1 review request will be sent at a time
+      request: 1
       required: 0
 
   ############################################################
@@ -294,12 +269,32 @@ groups:
   #  One shared-reviewers-integrations-docker review is
   #  sufficient.
   ############################################################
-  integrations-docker-required-reviewers:
+  shared-reviewers-integrations-docker:
     type: required
     conditions:
-      - "'integrations/docker/*' in files"
+      - files.include('integrations/docker/*')
+    reviewers:
+      users:
+        - andy31415
     requirements:
-      - len(groups.approved.include('shared-reviewers-integrations-docker')) >= 1 or len(groups.approved.include('shared-reviewers-*')) >= 2
+      - "len(groups.approved.include('shared-reviewers-integrations-docker')) >= 1 or \
+        len(groups.approved.include('shared-reviewers-*')) >= 2"
+    reviews:
+      # 1 review request will be sent at a time
+      request: 1
+      required: 0
+
+  ############################################################
+  #  Review requirements for PRs touching examples/chef*
+  #  One Googler requirement is sufficient.
+  ############################################################
+  shared-reviewers-chef:
+    type: required
+    conditions:
+      - files.include('examples/chef/*')
+    requirements:
+      - "len(groups.approved.include('shared-reviewers-google')) >= 1 or \
+        len(groups.approved.include('shared-reviewers-*')) >= 2"
     reviews:
       required: 0
 
@@ -307,14 +302,34 @@ groups:
   #  Review requirements for PRs touching integrations/cloudbuild*
   #  One Google review is sufficient.
   ############################################################
-  integrations-cloudbuild-required-reviewers:
+  shared-reviewers-integrations-cloudbuild:
     type: required
     conditions:
-      - "'integrations/cloudbuild/*' in files"
+      - files.include('integrations/cloudbuild/*')
     requirements:
-      - len(groups.approved.include('shared-reviewers-google')) >= 1 or len(groups.approved.include('shared-reviewers-*')) >= 2
+      - "len(groups.approved.include('shared-reviewers-google')) >= 1 or \
+        len(groups.approved.include('shared-reviewers-*')) >= 2"
     reviews:
       required: 0
+
+  ############################################################
+  #  Review requirements for PRs touching src/darwin
+  #  One Apple review is required.
+  ############################################################
+  shared-reviewers-src-darwin:
+    type: required
+    conditions:
+      - files.include('src/darwin/*')
+    reviewers:
+      users:
+        - bzbarsky
+    reviews:
+      request: 1
+      required: 1
+    labels:
+      approved: "[Darwin] review - approved"
+      pending: "[Darwin] review - pending"
+      rejected: "[Darwin] review - changed requested"
 
   ############################################################
   #  Base Required Reviewers
@@ -333,6 +348,7 @@ groups:
               .exclude('scripts/build/*')\
               .exclude('integrations/docker/*')\
               .exclude('integrations/cloudbuild/*')\
+              .exclude('src/darwin/*')\
             ) >= 1"
     requirements:
       - len(groups.approved.include('shared-reviewers-*')) >= 2
