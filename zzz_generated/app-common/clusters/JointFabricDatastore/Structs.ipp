@@ -59,9 +59,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, failureCode);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -101,9 +98,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -142,9 +136,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kCommissioningStatusEntry))
         {
             err = DataModel::Decode(reader, commissioningStatusEntry);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -190,9 +181,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -237,9 +225,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -283,9 +268,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kCluster))
         {
             err = DataModel::Decode(reader, cluster);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -336,9 +318,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -377,9 +356,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kDeviceType))
         {
             err = DataModel::Decode(reader, deviceType);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -425,9 +401,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, targets);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -472,9 +445,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusEntry);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -518,9 +488,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kIcac))
         {
             err = DataModel::Decode(reader, icac);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -575,9 +542,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kGroupPermission))
         {
             err = DataModel::Decode(reader, groupPermission);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -647,9 +611,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kGroupKeyMulticastPolicy))
         {
             err = DataModel::Decode(reader, groupKeyMulticastPolicy);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

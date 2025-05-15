@@ -54,9 +54,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, productIdentifierValue);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }

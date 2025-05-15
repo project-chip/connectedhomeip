@@ -18729,21 +18729,26 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
 public static class TlsCertificateManagementClusterTLSCertStruct {
   public Integer caid;
   public Optional<byte[]> certificate;
+  public Integer fabricIndex;
   private static final long CAID_ID = 0L;
   private static final long CERTIFICATE_ID = 1L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public TlsCertificateManagementClusterTLSCertStruct(
     Integer caid,
-    Optional<byte[]> certificate
+    Optional<byte[]> certificate,
+    Integer fabricIndex
   ) {
     this.caid = caid;
     this.certificate = certificate;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CAID_ID, new UIntType(caid)));
     values.add(new StructElement(CERTIFICATE_ID, certificate.<BaseTLVType>map((nonOptionalcertificate) -> new ByteArrayType(nonOptionalcertificate)).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -18754,6 +18759,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
     }
     Integer caid = null;
     Optional<byte[]> certificate = Optional.empty();
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CAID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -18765,11 +18771,17 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           certificate = Optional.of(castingValue.value(byte[].class));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new TlsCertificateManagementClusterTLSCertStruct(
       caid,
-      certificate
+      certificate,
+      fabricIndex
     );
   }
 
@@ -18783,6 +18795,9 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
     output.append("\tcertificate: ");
     output.append(certificate.isPresent() ? Arrays.toString(certificate.get()) : "");
     output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
@@ -18791,18 +18806,22 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
   public Integer ccdid;
   public Optional<byte[]> clientCertificate;
   public Optional<ArrayList<byte[]>> intermediateCertificates;
+  public Integer fabricIndex;
   private static final long CCDID_ID = 0L;
   private static final long CLIENT_CERTIFICATE_ID = 1L;
   private static final long INTERMEDIATE_CERTIFICATES_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     Integer ccdid,
     Optional<byte[]> clientCertificate,
-    Optional<ArrayList<byte[]>> intermediateCertificates
+    Optional<ArrayList<byte[]>> intermediateCertificates,
+    Integer fabricIndex
   ) {
     this.ccdid = ccdid;
     this.clientCertificate = clientCertificate;
     this.intermediateCertificates = intermediateCertificates;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -18810,6 +18829,7 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
     values.add(new StructElement(CCDID_ID, new UIntType(ccdid)));
     values.add(new StructElement(CLIENT_CERTIFICATE_ID, clientCertificate.<BaseTLVType>map((nonOptionalclientCertificate) -> new ByteArrayType(nonOptionalclientCertificate)).orElse(new EmptyType())));
     values.add(new StructElement(INTERMEDIATE_CERTIFICATES_ID, intermediateCertificates.<BaseTLVType>map((nonOptionalintermediateCertificates) -> ArrayType.generateArrayType(nonOptionalintermediateCertificates, (elementnonOptionalintermediateCertificates) -> new ByteArrayType(elementnonOptionalintermediateCertificates))).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -18821,6 +18841,7 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
     Integer ccdid = null;
     Optional<byte[]> clientCertificate = Optional.empty();
     Optional<ArrayList<byte[]>> intermediateCertificates = Optional.empty();
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CCDID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -18837,12 +18858,18 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
           ArrayType castingValue = element.value(ArrayType.class);
           intermediateCertificates = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class)));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
       ccdid,
       clientCertificate,
-      intermediateCertificates
+      intermediateCertificates,
+      fabricIndex
     );
   }
 
@@ -18858,6 +18885,9 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
     output.append("\n");
     output.append("\tintermediateCertificates: ");
     output.append(intermediateCertificates);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
