@@ -182,7 +182,7 @@ void PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         mVideoStream->codecpar->width     = 320;
         mVideoStream->codecpar->height    = 240;
 
-        mVideoStream->avg_frame_rate = (AVRational) { 15, 1 };
+        mVideoStream->avg_frame_rate = (AVRational){ 15, 1 };
     }
     else if (type == AVMEDIA_TYPE_AUDIO)
     {
@@ -194,7 +194,7 @@ void PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         // audio_enc_ctx->channels        = 2;
         audio_enc_ctx->bit_rate   = 20000;
         audio_enc_ctx->sample_fmt = audio_codec->sample_fmts[0];
-        audio_enc_ctx->time_base  = (AVRational) { 1, 48000 };
+        audio_enc_ctx->time_base  = (AVRational){ 1, 48000 };
         avcodec_open2(audio_enc_ctx, audio_codec, nullptr);
         avcodec_parameters_from_context(mAudioStream->codecpar, audio_enc_ctx);
         if (mFmtCtx->oformat->flags & AVFMT_GLOBALHEADER)
@@ -263,12 +263,12 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
         {
             AVInputFormat * ifmt = av_find_input_format("h264");
             int ret              = avformat_open_input(&mInFmtCtx, "", ifmt, nullptr);
-            if(ret != 0)
+            if (ret != 0)
             {
                 ChipLogError(Camera, "Failed to open input stream for video");
                 return ret;
             }
-            ret                  = avformat_find_stream_info(mInFmtCtx, nullptr);
+            ret = avformat_find_stream_info(mInFmtCtx, nullptr);
         }
         SetupOutput(mOutputPrefix, mInitSegName, mMediaSegName, useVideo);
         if (!mFmtCtx)
@@ -277,8 +277,8 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
     }
 
     AVStream * out_stream = useVideo ? mVideoStream : mAudioStream;
-    AVRational inputTb    = (AVRational) { 1, 1000000 };
-    AVRational outputTb   = useVideo ? (AVRational) { 1, 90000 } : (AVRational) { 1, 48000 };
+    AVRational inputTb    = (AVRational){ 1, 1000000 };
+    AVRational outputTb   = useVideo ? (AVRational){ 1, 90000 } : (AVRational){ 1, 48000 };
     int64_t currentPts    = AV_NOPTS_VALUE;
 
     if (pkt->pts != AV_NOPTS_VALUE)
