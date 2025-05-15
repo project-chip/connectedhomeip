@@ -243,14 +243,28 @@ class TC_FAN_3_5(MatterBaseTest):
         sd_enum = cluster.Enums.StepDirectionEnum
         percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
 
-        # Initialize and verify attributes
+        # *** NEXT STEP ***
+        # Initialize the PercentSetting attribute and verify the expected
+        # attribute changes in acordance with the Step command parameters
+        # self.step(self.current_step_index + 1)
         percent_setting_init = await self.initialize_and_verify_attribtutes(step)
 
-        # Reset subscriptions
+        # *** NEXT STEP ***
+        # Reset the subscriptions to clear any previous attribute reports
+        # self.step(self.current_step_index + 1)
         for sub in self.subscriptions:
             sub.reset()
 
-        # Send the Step command iteratively until the expected PercentSetting value is reached
+        # *** NEXT STEP ***
+        # TH sends Step commands iteratively
+        #  - During the loop:
+        #    - Calculate the PercentSetting range per Step and store for future use.
+        #      This only needs to be done once.
+        #    - Verify the expected PercentSetting attribute report value is reached.
+        #    - If the expected PercentSetting attribute report value is reached, send
+        #      an additional Step command to veiryf that the PercentSetting attribute
+        #      report value stays at the expected value, otherwise, the test is failed.
+        # self.step(self.current_step_index + 1)
         min_percent_setting = 0 if step.lowestOff else self.percent_setting_per_step
         percent_setting_expected = 100 if step.direction == sd_enum.kIncrease else min_percent_setting
         for i in range(100):
@@ -270,8 +284,6 @@ class TC_FAN_3_5(MatterBaseTest):
                     if i == 0:
                         self.percent_setting_per_step = percent_setting_init - percent_setting
 
-            # If the expected PercentSetting value is reached, send an additional Step
-            # command to veiryf the PercentSetting value stays at the expected value
             if percent_setting == percent_setting_expected:
                 await self.send_step_command(step)
                 percent_setting = await self.read_setting(attr.PercentSetting)
@@ -286,13 +298,23 @@ class TC_FAN_3_5(MatterBaseTest):
                         f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({percent_setting})."
                     )
 
-        # Veirfy attribute progression (each successive value is greater or less than the last)
-        self.verify_attribute_progression(step)
+        # *** NEXT STEP ***
+        #  Read the resulting attribute reports from each subscription after the Step commands
+        #   - Verify that the attribute report values from each subscription are in the
+        #     expected order in acordance with the Step command direction parameter.
+        #   - If the number of PercentSetting reports is greater than the number of FanMode reports:
+        #     -- Verify that all the expected FanMode values are present in the reports
+        #        in acordance with the FanModeSequence attribute value.
+        #   - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports:
+        #     -- Verify that all the expected SpeedSetting values are present in the reports
+        #        in acordance with the SpeedMax attribute value.
+        #   - Save the resulting attribute report values from each subscription as a baseline
+        #     for future comparisons.
+        # self.step(self.current_step_index + 1)
+        percent_setting_values, fan_mode_values, speed_setting_values = self.verify_expected_reports_and_progression(step, percent_setting_init)
+        self.save_baseline_values(step, percent_setting_values, fan_mode_values, speed_setting_values)
 
-        # Veirfy all expected reports after the Step commands are present
-        self.verify_expected_reports(step, percent_setting_init)
-
-    def verify_attribute_progression(self, step: Clusters.FanControl.Commands.Step) -> None:
+    def verify_attribute_progression(self, step: Clusters.FanControl.Commands.Step, expected_attribute: Clusters.FanControl.Attributes, values: list) -> None:
         """Verifies that the resulting attribute report values progress in the expected order.
 
         Args:
@@ -309,12 +331,11 @@ class TC_FAN_3_5(MatterBaseTest):
         comp_str = "greater" if step.direction == sd_enum.kIncrease else "less"
         shared_str = f"not all attribute values progressed in {order_str} order (current value {comp_str} than previous value)."
 
-        for sub in self.subscriptions:
-            values = [q.value for q in sub.attribute_queue.queue]
-            correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
-            asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
+        # Verify that the resulting attribute report values from each subscription are in expected order
+        correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
+        asserts.assert_true(correct_progression, f"[FC] {expected_attribute.__name__}: {shared_str}")
 
-    def verify_expected_reports(self, step: Clusters.FanControl.Commands.Step, percent_setting_init: int) -> None:
+    def verify_expected_reports_and_progression(self, step: Clusters.FanControl.Commands.Step, percent_setting_init: int) -> None:
         """Verify all expected FanMode and SpeedSetting reports are acounted for after a Step command.
 
         Args:
@@ -328,24 +349,28 @@ class TC_FAN_3_5(MatterBaseTest):
         fan_mode_report_qty = 0
         speed_setting_report_qty = 0
         cluster = Clusters.FanControl
+        attr = cluster.Attributes
         sd_enum = cluster.Enums.StepDirectionEnum
         fm_enum = cluster.Enums.FanModeEnum
 
         # - Count the number of each of the subscription attribute reports
         # - Get the values of the PercentSetting, FanMode, and SpeedSetting attributes
         for sub in self.subscriptions:
-            if sub._expected_attribute == Clusters.FanControl.Attributes.PercentSetting:
+            if sub._expected_attribute == attr.PercentSetting:
                 percent_setting_report_qty = len(sub.attribute_queue.queue)
                 percent_setting_values_produced = [q.value for q in sub.attribute_queue.queue]
+                self.verify_attribute_progression(step, attr.PercentSetting, percent_setting_values_produced)
                 sub.log_queue()
-            if sub._expected_attribute == Clusters.FanControl.Attributes.FanMode:
+            if sub._expected_attribute == attr.FanMode:
                 fan_mode_report_qty = len(sub.attribute_queue.queue)
                 fan_mode_values_produced = [q.value for q in sub.attribute_queue.queue]
+                self.verify_attribute_progression(step, attr.FanMode, fan_mode_values_produced)
                 sub.log_queue()
-            if sub._expected_attribute == Clusters.FanControl.Attributes.SpeedSetting:
+            if sub._expected_attribute == attr.SpeedSetting:
                 speed_setting_report_qty = len(sub.attribute_queue.queue)
-                sub.log_queue()
                 speed_setting_values_produced = [q.value for q in sub.attribute_queue.queue]
+                self.verify_attribute_progression(step, attr.SpeedSetting, speed_setting_values_produced)
+                sub.log_queue()
 
         # Get the expected FanMode and SpeedSetting values to verify all are present
         increase_step = step.direction == sd_enum.kIncrease
@@ -383,13 +408,24 @@ class TC_FAN_3_5(MatterBaseTest):
                 speed_setting_expected, speed_setting_values_produced,
                 f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_expected}, missing: {missing_speed_setting}."
             )
+            
+        return percent_setting_values_produced, fan_mode_values_produced, speed_setting_values_produced
 
-        # - Saving baseline attribute values both in ascending and descending order
-        #   as per the Step command direction to later verify that they're the same
-        #   when the Step command is executed in the opposite direction.
-        # - We remove the last element of each list as it represents the initialization
-        #   value of the sequence from the opposite direction, which is not considered
-        #   in the reports.
+    def save_baseline_values(self, step: Clusters.FanControl.Commands.Step, percent_setting_values_produced: list, fan_mode_values_produced: list, speed_setting_values_produced: list) -> None:
+        """This method saves the baseline PercentSetting, FanMode, and SpeedSetting values 
+        in both ascending and descending orders based on the Step command direction for
+        future verification.
+        The last element of each list is removed as it represents the initialization 
+        value from the opposite direction, which is not considered in the reports.
+
+        Args:
+            step (Clusters.FanControl.Commands.Step): Step command parameters, including direction and lowestOff flag.
+            percent_setting_values_produced (list): List of PercentSetting values produced during the Step command.
+            fan_mode_values_produced (list): List of FanMode values produced during the Step command.
+            speed_setting_values_produced (list): List of SpeedSetting values produced during the Step command.
+        """
+        sd_enum = Clusters.FanControl.Enums.StepDirectionEnum
+
         if step.direction == sd_enum.kDecrease and step.lowestOff:
             self.baseline_percent_setting_desc = percent_setting_values_produced[:-1]
             self.baseline_fan_mode_desc = fan_mode_values_produced[:-1]
@@ -493,7 +529,8 @@ class TC_FAN_3_5(MatterBaseTest):
         self.step("1")
 
         # *** STEP 2 ***
-        # If the DUT has the OnOff cluster, turn it on
+        # TH checks the DUT for the prescence of the OnOff cluster
+        # - If the cluster is present, set it to On
         # self.step("2")
         has_on_off_cluster = await self.cluster_guard(endpoint=self.endpoint, cluster=Clusters.OnOff, skip_step=False)
         if has_on_off_cluster:
@@ -518,16 +555,17 @@ class TC_FAN_3_5(MatterBaseTest):
 
         # *** STEP 5 ***
         # TH reads from the DUT the FanModeSequence attribute
-        # to determine the supported FanMode values
         #  - Store result for future reference
         # self.step("5")
         await self.get_fan_modes(remove_auto=True)
 
         # *** STEP 6 ***
-        # Subscribe to the PercentSetting, FanMode, and SpeedSetting attributes individually
+        # TH subscribes to the PercentSetting, FanMode, and SpeedSetting attributes individually
         # self.step("6")
         await self.subscribe_to_attributes()
 
+        # TH sends Step commands with the following parameters:
+        # Direction: Decrease, Wrap: False, lowestOff: True
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True))
 
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False))
