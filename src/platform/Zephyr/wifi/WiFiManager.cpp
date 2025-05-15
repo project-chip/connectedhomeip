@@ -296,11 +296,11 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
 
     if (status.state >= WIFI_STATE_ASSOCIATED)
     {
-        info.mSecurityType   = MapToMatterSecurityType(status.security);
-        info.mWiFiVersion    = MapToMatterWiFiVersionCode(status.link_mode);
-        info.mRssi           = static_cast<int8_t>(status.rssi);
-        info.mChannel        = static_cast<uint16_t>(status.channel);
-        info.mSsidLen        = status.ssid_len;
+        info.mSecurityType = MapToMatterSecurityType(status.security);
+        info.mWiFiVersion  = MapToMatterWiFiVersionCode(status.link_mode);
+        info.mRssi         = static_cast<int8_t>(status.rssi);
+        info.mChannel      = static_cast<uint16_t>(status.channel);
+        info.mSsidLen      = status.ssid_len;
 #ifdef CONFIG_WIFI_NXP
         info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_tx_rate);
 #else
