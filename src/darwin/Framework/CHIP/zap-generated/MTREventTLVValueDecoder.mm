@@ -2705,6 +2705,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+                if (cppValue.energyImported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyImported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
+                }
             } else {
                 memberValue = nil;
             }
@@ -2734,6 +2744,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                     memberValue.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported.Value().endSystime.Value()];
                 } else {
                     memberValue.endSystime = nil;
+                }
+                if (cppValue.energyExported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyExported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
                 }
             } else {
                 memberValue = nil;
@@ -2777,6 +2797,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+                if (cppValue.energyImported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyImported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
+                }
             } else {
                 memberValue = nil;
             }
@@ -2806,6 +2836,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                     memberValue.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported.Value().endSystime.Value()];
                 } else {
                     memberValue.endSystime = nil;
+                }
+                if (cppValue.energyExported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyExported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
                 }
             } else {
                 memberValue = nil;
