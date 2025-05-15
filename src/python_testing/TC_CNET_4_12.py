@@ -195,6 +195,10 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_true(num_networks > 0, "Error: No networks found")
 
         self.step(3)
+        # TODO: This test currently uses a single endpoint for both threads.
+        # Issue #<issue_number> created to track follow-ups on problems with secondary networks,
+        # since secondary network support is not implemented yet.
+
         # Find network index
         userth_netidx = None
         for idx, network in enumerate(networks):
