@@ -122,9 +122,7 @@ public:
 namespace AllocatePushTransportResponse {
 enum class Fields : uint8_t
 {
-    kConnectionID     = 0,
-    kTransportOptions = 1,
-    kTransportStatus  = 2,
+    kTransportConfiguration = 0,
 };
 
 struct Type
@@ -134,9 +132,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AllocatePushTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID = static_cast<uint16_t>(0);
-    Structs::TransportOptionsStruct::Type transportOptions;
-    TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
+    Structs::TransportConfigurationStruct::Type transportConfiguration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -151,9 +147,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AllocatePushTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID = static_cast<uint16_t>(0);
-    Structs::TransportOptionsStruct::DecodableType transportOptions;
-    TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
+    Structs::TransportConfigurationStruct::DecodableType transportConfiguration;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AllocatePushTransportResponse
@@ -238,7 +232,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetTransportStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID               = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> connectionID;
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -254,7 +248,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetTransportStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID               = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> connectionID;
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -332,7 +326,7 @@ public:
 namespace FindTransportResponse {
 enum class Fields : uint8_t
 {
-    kStreamConfigurations = 0,
+    kTransportConfigurations = 0,
 };
 
 struct Type
@@ -342,7 +336,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    DataModel::List<const Structs::TransportConfigurationStruct::Type> streamConfigurations;
+    DataModel::List<const Structs::TransportConfigurationStruct::Type> transportConfigurations;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -357,7 +351,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    DataModel::DecodableList<Structs::TransportConfigurationStruct::DecodableType> streamConfigurations;
+    DataModel::DecodableList<Structs::TransportConfigurationStruct::DecodableType> transportConfigurations;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace FindTransportResponse

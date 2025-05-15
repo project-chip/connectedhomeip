@@ -133,11 +133,11 @@ void NetworkStreamSource::ListenForStreamOnSocket()
                 {
                     if (mStreamType == StreamType::kVideo)
                     {
-                        mMediaController->DistributeVideo(buffer, bytesReceived, mStreamId);
+                        mMediaController->DistributeVideo(buffer, static_cast<size_t>(bytesReceived), mStreamId);
                     }
                     else if (mStreamType == StreamType::kAudio)
                     {
-                        mMediaController->DistributeAudio(buffer, bytesReceived, mStreamId);
+                        mMediaController->DistributeAudio(buffer, static_cast<size_t>(bytesReceived), mStreamId);
                     }
                 }
                 else if (bytesReceived == -1)

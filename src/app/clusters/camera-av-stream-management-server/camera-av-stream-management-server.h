@@ -303,7 +303,7 @@ public:
      * @param aMaxConcurrentEncoders            The maximum number of video encoders supported by camera.
      * @param aMaxEncodedPixelRate              The maximum data rate (encoded pixels/sec) supported by camera.
      * @param aVideoSensorParams                The set of video sensor parameters for the camera.
-     * @param aNightVisionCapable               Indicates whether the camera supports night vision.
+     * @param aNightVisionUsesInfrared          Indicates whether nightvision mode does or does not use infrared
      * @param aMinViewPort                      Indicates minimum resolution (width/height) in pixels allowed for camera viewport.
      * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
      *                                          encoders.
@@ -318,18 +318,21 @@ public:
      * @param aSnapshotCapabilities             Indicates the set of supported snapshot capabilities by the device, e.g., the image
      *                                          codec, the resolution and the maximum frame rate.
      * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume
+     * @param aSupportedStreamUsages            Indicates the possible stream types available
+     * @param aRankedStreamPriorities           Indicates the priority ranking of the available streams
      * for the transmission of its media streams.
      *
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                              const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders,
                              uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
-                             bool aNightVisionCapable, const VideoResolutionStruct & aMinViewPort,
+                             bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
                              const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
                              const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
-                             const std::vector<StreamUsageEnum> & aSupportedStreamUsages);
+                             const std::vector<StreamUsageEnum> & aSupportedStreamUsages,
+                             const std::vector<StreamUsageEnum> & aRankedStreamPriorities);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -358,6 +361,8 @@ public:
     CHIP_ERROR SetSoftLivestreamPrivacyModeEnabled(bool aSoftLivestreamPrivacyModeEnabled);
 
     CHIP_ERROR SetHardPrivacyModeOn(bool aHardPrivacyModeOn);
+
+    CHIP_ERROR SetNightVisionUsesInfrared(bool aNightVisionUsesInfrared);
 
     CHIP_ERROR SetNightVision(TriStateAutoEnum aNightVision);
 
@@ -404,7 +409,7 @@ public:
 
     const VideoSensorParamsStruct & GetVideoSensorParams() const { return mVideoSensorParams; }
 
-    bool GetNightVisionCapable() const { return mNightVisionCapable; }
+    bool GetNightVisionUsesInfrared() const { return mNightVisionUsesInfrared; }
 
     const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
 
@@ -511,7 +516,7 @@ private:
     const uint8_t mMaxConcurrentEncoders;
     const uint32_t mMaxEncodedPixelRate;
     const VideoSensorParamsStruct mVideoSensorParams;
-    const bool mNightVisionCapable;
+    const bool mNightVisionUsesInfrared;
     const VideoResolutionStruct mMinViewPort;
     const std::vector<RateDistortionTradeOffStruct> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;

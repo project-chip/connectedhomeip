@@ -90,7 +90,7 @@ The concept for OTA is the next one:
 -   during commissioning, each device is assigned a node id by the chip-tool
     (can be specified manually by the user). Using the node id of the device and
     of the reference application, chip-tool triggers the OTA transfer by
-    invoking the `announce-ota-provider` command - basically, the OTA Requestor
+    invoking the `announce-otaprovider` command - basically, the OTA Requestor
     is informed of the node id of the OTA Provider Application.
 
 _Computer #1_ can be any system running an Ubuntu distribution. We recommand
@@ -142,7 +142,7 @@ user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-th
 Start the OTA process:
 
 ```
-user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
 ```
 
 ### Known issues

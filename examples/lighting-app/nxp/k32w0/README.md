@@ -622,7 +622,7 @@ The concept for OTA is the next one:
 -   during commissioning, each device is assigned a node id by the chip-tool
     (can be specified manually by the user). Using the node id of the device and
     of the lighting application, chip-tool triggers the OTA transfer by invoking
-    the _announce-ota-provider_ command - basically, the OTA Requestor is
+    the _announce-otaprovider_ command - basically, the OTA Requestor is
     informed of the node id of the OTA Provider Application.
 
 _Computer #1_ can be any system running an Ubuntu distribution. We recommand

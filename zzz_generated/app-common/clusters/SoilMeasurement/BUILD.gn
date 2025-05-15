@@ -1,0 +1,92 @@
+# DO NOT EDIT MANUALLY - Generated file
+#
+# Cluster generated code for constants and metadata based on src/controller/data_model/controller-clusters.matter
+import("//build_overrides/chip.gni")
+
+source_set("ids") {
+  sources = [
+    "AttributeIds.h",
+    "ClusterId.h",
+    "CommandIds.h",
+    "EventIds.h",
+    "Ids.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app/common:global-ids",
+    "${chip_root}/src/lib/core:types",
+  ]
+}
+
+source_set("enums") {
+  sources = [
+    "Enums.h",
+    "EnumsCheck.h",
+  ]
+  public_deps = [
+    "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
+  ]
+}
+
+source_set("headers") {
+  sources = [
+    "Attributes.h",
+    "Commands.h",
+    "Events.h",
+    "Structs.h",
+  ]
+  public_deps = [
+    ":enums",
+    ":ids",
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app/common:global-ids",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:headers",
+  ]
+
+
+  public_configs = [ "${chip_root}/src/app/common:includes" ]
+
+  # Headers is a workaround for build size optmizations: what we would want is
+  # ":elements" to contain both headers and cpp files. However compiler seems
+  # to be able to optimize shared code if we place all structs in one huge
+  # CPP file, so "cluster-objects" contains that CPP file.
+  visibility = [
+    ":elements",
+    "${chip_root}/zzz_generated/app-common/clusters:all-headers",
+  ]
+}
+
+source_set("elements") {
+  public_deps = [
+    ":headers",
+    ":ids",
+
+    # NOTE: awkward dependency because cluster-objects contains ALL the cluster
+    #       .cpp files as one compile unit to optimize for flash size during
+    #       compilation.
+    # Dependency tree is as:
+    #      - <CLUSTER>:headers (mostly private as a target) contains *.h
+    #      - src/app/common:cluster-objects contains "*.ipp" for attrs/commands/events/structs
+    #      - <CLUSTER>:elements makes the headers available and depends on the cluster-objects impl.
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/common:global-ids",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:elements",
+  ]
+}
+
+source_set("metadata") {
+  sources = [ "Metadata.h" ]
+  public_deps = [
+    ":ids",
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
+}
+
+source_set("SoilMeasurement") {
+  public_deps = [
+    ":ids",
+    ":metadata",
+    ":enums",
+    ":elements",
+  ]
+}

@@ -99,7 +99,7 @@ public:
     static StorageKeyName FabricNOC(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/n", fabric); }
     static StorageKeyName FabricICAC(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/i", fabric); }
     static StorageKeyName FabricRCAC(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/r", fabric); }
-    static StorageKeyName FabricVVSC(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/vvvc", fabric); }
+    static StorageKeyName FabricVVSC(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/vvsc", fabric); }
     static StorageKeyName FabricVidVerificationStatement(FabricIndex fabric)
     {
         return StorageKeyName::Formatted("f/%x/vvs", fabric);
