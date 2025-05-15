@@ -45,8 +45,9 @@ public:
         currentIterating++;
         return true;
     }
-    void Release() override { /* nothing to do, we don't hold the ownership of the vector, and users is not expected to hold the
-                                 ownership in OnFinished for scan. */
+    void Release() override
+    { /* nothing to do, we don't hold the ownership of the vector, and users is not expected to hold the
+         ownership in OnFinished for scan. */
     }
 
 private:
