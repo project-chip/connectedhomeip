@@ -51,11 +51,11 @@ void NxpEthDriver::print_ip_addresses(struct netif *netif)
 void NxpEthDriver::eth_netif_ext_status_callback(struct netif *netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t *args)
 {
     if (((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) || (LWIP_NSC_IPV6_SET & reason) || (LWIP_NSC_IPV4_ADDRESS_CHANGED & reason) || (LWIP_NSC_IPV4_ADDRESS_CHANGED & reason))  && args)
-    {    
+    {
         ChipDeviceEvent event;
         print_ip_addresses(netif);
         event.Type                          = DeviceEventType::kPlatformNxpIpChangeEvent;
-        
+
         CHIP_ERROR err                      = PlatformMgr().PostEvent(&event);
         if (err != CHIP_NO_ERROR)
         {
