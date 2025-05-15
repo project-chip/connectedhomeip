@@ -15,6 +15,14 @@ def main(clang: bool):
     compiler_subdir = "clang" if clang else "gcc"
     build_dir = os.path.join(repo_dir, "build", compiler_subdir)
 
+    # Update the package list
+    subprocess.check_call(['sudo', 'apt', 'update', '-y'])
+
+    print("Install cmake.")
+
+    # Install CMake
+    subprocess.check_call(['sudo', 'apt', 'install', 'cmake', '-y'])
+
     # Generate build files in ./build
     cmake_cmd = [
         "cmake",
