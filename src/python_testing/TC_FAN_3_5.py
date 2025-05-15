@@ -40,11 +40,8 @@ from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_infrastructure.chip.testing.matter_testing import (
-    ClusterAttributeChangeAccumulator,
-    MatterBaseTest, TestStep, async_test_body,
-    default_matter_test_main
-)
+from matter_testing_infrastructure.chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
+                                                                       async_test_body, default_matter_test_main)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -250,14 +247,16 @@ class TC_FAN_3_5(MatterBaseTest):
         percent_setting_init = await self.initialize_and_verify_attribtutes(step)
 
         # Reset subscriptions
-        for sub in self.subscriptions: sub.reset()
+        for sub in self.subscriptions:
+            sub.reset()
 
         # Send the Step command iteratively until the expected PercentSetting value is reached
         min_percent_setting = 0 if step.lowestOff else self.percent_setting_per_step
         percent_setting_expected = 100 if step.direction == sd_enum.kIncrease else min_percent_setting
         for i in range(100):
             await self.send_step_command(step)
-            percent_setting = percent_setting_sub.get_last_attribute_report_value(self.endpoint, attr.PercentSetting, self.timeout_sec)
+            percent_setting = percent_setting_sub.get_last_attribute_report_value(
+                self.endpoint, attr.PercentSetting, self.timeout_sec)
             logging.info(f"[FC] PercentSetting attribute report value: {percent_setting}")
 
             # Calculate the PercentSetting range per Step
@@ -415,7 +414,8 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.initialize_and_verify_attribtutes(step)
 
         # Reset subscriptions
-        for sub in self.subscriptions: sub.reset()
+        for sub in self.subscriptions:
+            sub.reset()
 
         logging.info(f"[FC]")
         if step.direction == sd_enum.kDecrease and step.lowestOff:
@@ -565,6 +565,7 @@ class TC_FAN_3_5(MatterBaseTest):
             self.baseline_speed_setting_desc, list(reversed(self.baseline_speed_setting_asc)),
             f"[FC] SpeedSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_speed_setting_desc}, Ascending: {self.baseline_speed_setting_asc}."
         )
+
 
 if __name__ == "__main__":
     default_matter_test_main()
