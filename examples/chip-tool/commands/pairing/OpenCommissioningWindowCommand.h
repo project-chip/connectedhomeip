@@ -40,6 +40,7 @@ public:
                     &mIteration, "Number of PBKDF iterations to use to derive the verifier.  Ignored if 'option' is 0.");
         AddArgument("discriminator", 0, 4095, &mDiscriminator, "Discriminator to use for advertising.  Ignored if 'option' is 0.");
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout, "Time, in seconds, before this command is considered to have timed out.");
+        AddArgument("joint-fabric", 0, 1, &mJointFabric, "Open Joint Fabric Commissioning Window.");
     }
 
     /////////// CHIPCommand Interface /////////
@@ -56,6 +57,7 @@ private:
     uint16_t mDiscriminator;
 
     chip::Optional<uint16_t> mTimeout;
+    chip::Optional<bool> mJointFabric;
 
     chip::Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> mWindowOpener;
 

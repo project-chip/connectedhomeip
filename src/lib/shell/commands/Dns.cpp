@@ -217,6 +217,9 @@ bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
     case 'I':
         filterType = Dnssd::DiscoveryFilterType::kCompressedFabricId;
         break;
+    case 'J':
+        filterType = Dnssd::DiscoveryFilterType::kJointFabricMode;
+        break;
     default:
         return false;
     }

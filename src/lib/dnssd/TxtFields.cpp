@@ -161,6 +161,11 @@ uint8_t GetCommissioningMode(const ByteSpan & value)
     return MakeU8FromAsciiDecimal(value);
 }
 
+uint8_t GetJointFabricMode(const ByteSpan & value)
+{
+    return MakeU8FromAsciiDecimal(value);
+}
+
 uint32_t GetDeviceType(const ByteSpan & value)
 {
     return MakeU32FromAsciiDecimal(value);
@@ -260,6 +265,9 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionN
         break;
     case TxtFieldKey::kCommissionerPasscode:
         nodeData.supportsCommissionerGeneratedPasscode = Internal::GetCommissionerPasscode(val);
+        break;
+    case TxtFieldKey::kJointFabricMode:
+        nodeData.jointFabricMode = Internal::GetJointFabricMode(val);
         break;
     default:
         FillNodeDataFromTxt(key, val, static_cast<CommonResolutionData &>(nodeData));
