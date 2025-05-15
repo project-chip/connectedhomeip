@@ -38,7 +38,10 @@ executable("chip-bridge-app") {
 
   cflags = [ "-Wconversion" ]
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/bridge-app/bridge-common/include",
+  ]
 
   output_dir = root_out_dir
 }
