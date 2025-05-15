@@ -128,7 +128,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
-        DeviceLayer::SystemLayer().ScheduleLambda([this] { ReportEthernetName(); });
     }
     else
     {
