@@ -746,7 +746,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
         with test_step(23, description="Invoke SetVIDVerificationStatement with different VVSC and VIDVerificationStatement present and setting VID back to 0xFFF2 under TH2's fabric, inside fail-safe. Verify VIDVerificationStatement, VVSC and VID values match values set."):
             new_vvsc = b"\xcc" * 400
-            new_VIDVerificationStatement = b"\x01" +  (b"\x02" * (VID_VERIFICATION_STATEMENT_SIZE_BYTES_V1 - 1))
+            new_VIDVerificationStatement = b"\x01" + (b"\x02" * (VID_VERIFICATION_STATEMENT_SIZE_BYTES_V1 - 1))
             new_vendorID = 0xFFF2
 
             attrib_listener.reset()
@@ -807,7 +807,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
         with test_step(26, description="Invoke SetVIDVerificationStatement with VVSC and VIDVerificationStatement present and setting VID to 0xFFF4 under TH2's fabric, inside fail-safe. Verify VIDVerificationStatement, VVSC and VID values match values set."):
             vvsc = b"\xcd" * 400
-            VIDVerificationStatement = b"\x01" +  (b"\x03" * (VID_VERIFICATION_STATEMENT_SIZE_BYTES_V1 - 1))
+            VIDVerificationStatement = b"\x01" + (b"\x03" * (VID_VERIFICATION_STATEMENT_SIZE_BYTES_V1 - 1))
             vendorID = 0xFFF4
 
             attrib_listener.reset()
@@ -836,7 +836,8 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
                 # Expiring the failsafe timer in an attempt to clean up.
                 await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=new_th2_nodeId, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=27))
-                asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk, "Expected success of CommissioningComplete")
+                asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                                     "Expected success of CommissioningComplete")
 
             th2_dut_node_id = new_th2_nodeId
 
