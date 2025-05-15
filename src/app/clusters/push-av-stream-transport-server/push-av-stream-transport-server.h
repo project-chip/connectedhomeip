@@ -40,12 +40,6 @@ using TransportMotionTriggerTimeControlStruct = Structs::TransportMotionTriggerT
 using TransportOptionsStruct                  = Structs::TransportOptionsStruct::Type;
 using TransportConfigurationStruct            = Structs::TransportConfigurationStruct::Type;
 
-struct TransportConfigurationStructWithFabricIndex
-{
-    TransportConfigurationStruct transportConfiguration;
-    chip::FabricIndex fabricIndex;
-};
-
 enum class PushAvStreamTransportStatusEnum : uint8_t
 {
     kBusy    = 0x00,
@@ -102,9 +96,12 @@ struct ContainerOptionsStorage : public ContainerOptionsStruct
     {
         containerType = containerOptions.containerType;
 
-        CMAFContainerOptionsStorage cmafContainerStorage(containerOptions.CMAFContainerOptions);
-        CMAFContainerOptions.SetValue(cmafContainerStorage);
+        mCMAFContainerStorage = CMAFContainerOptionsStorage(containerOptions.CMAFContainerOptions);
+        CMAFContainerOptions.SetValue(mCMAFContainerStorage);
     }
+
+private:
+    CMAFContainerOptionsStorage mCMAFContainerStorage;
 };
 
 struct TransportOptionsStorage : public TransportOptionsStruct
@@ -119,22 +116,49 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         endpointID    = transportOptions.endpointID;
 
         MutableCharSpan urlBuffer(mUrlBuffer);
-        CopyCharSpanToMutableCharSpan(transportOptions.url, urlBuffer);
+        CopyCharSpanToMutableCharSpanWithTruncation(transportOptions.url, urlBuffer);
         url = urlBuffer;
 
-        TransportTriggerOptionsStorage triggerOptionsStorage(transportOptions.triggerOptions);
-        triggerOptions = triggerOptionsStorage;
+        mTriggerOptionsStorage = TransportTriggerOptionsStorage(transportOptions.triggerOptions);
+        triggerOptions         = mTriggerOptionsStorage;
 
         ingestMethod = transportOptions.ingestMethod;
 
-        ContainerOptionsStorage containerOptionsStorage(transportOptions.containerOptions);
-        containerOptions = containerOptionsStorage;
+        mContainerOptionsStorage = ContainerOptionsStorage(transportOptions.containerOptions);
+        containerOptions         = mContainerOptionsStorage;
 
         expiryTime = transportOptions.expiryTime;
     }
 
 private:
     char mUrlBuffer[kMaxUrlLength];
+    TransportTriggerOptionsStorage mTriggerOptionsStorage;
+    ContainerOptionsStorage mContainerOptionsStorage;
+};
+
+struct TransportConfigurationStorage : public TransportConfigurationStruct
+{
+    TransportConfigurationStorage() {}
+
+    TransportConfigurationStorage(const uint16_t aConnectionID, std::shared_ptr<TransportOptionsStorage> aTransportOptionsPtr)
+    {
+        connectionID    = aConnectionID;
+        transportStatus = TransportStatusEnum::kInactive;
+        /*Store the pointer to keep buffer alive*/
+        mTransportOptionsPtr = aTransportOptionsPtr;
+        /*Convert Storage type to base type*/
+        transportOptions.SetValue(*aTransportOptionsPtr);
+    }
+    std::shared_ptr<TransportOptionsStorage> GetTransportOptionsPtr() const { return mTransportOptionsPtr; }
+
+private:
+    std::shared_ptr<TransportOptionsStorage> mTransportOptionsPtr;
+};
+
+struct TransportConfigurationStorageWithFabricIndex
+{
+    TransportConfigurationStorage transportConfiguration;
+    chip::FabricIndex fabricIndex;
 };
 
 /** @brief
@@ -284,7 +308,7 @@ appropriate
      * The callee is responsible for allocating the buffer that holds the currentConnections.
      * The buffer is allocated internally by the function and returned to the caller via an output parameter.
      */
-    virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStructWithFabricIndex> & currentConnections) = 0;
+    virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorageWithFabricIndex> & currentConnections) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
@@ -343,7 +367,7 @@ private:
     /*Moved from TransportConfigurationStruct to TransportConfigurationStructWithFabricIndex
      * to perform fabric index checks
      */
-    std::vector<TransportConfigurationStructWithFabricIndex> mCurrentConnections;
+    std::vector<TransportConfigurationStorageWithFabricIndex> mCurrentConnections;
 
     /**
      * IM-level implementation of read
@@ -362,9 +386,9 @@ private:
 
     // Helper functions
     uint16_t GenerateConnectionID();
-    TransportConfigurationStructWithFabricIndex * FindStreamTransportConnection(const uint16_t connectionID);
+    TransportConfigurationStorageWithFabricIndex * FindStreamTransportConnection(const uint16_t connectionID);
     // Add/Remove Management functions for transport
-    UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStructWithFabricIndex & transportConfiguration);
+    UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStorageWithFabricIndex & transportConfiguration);
 
     void RemoveStreamTransportConnection(const uint16_t connectionID);
 

@@ -97,7 +97,7 @@ CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeCurrentConnections(const At
 }
 
 PushAvStreamTransportServer::UpsertResultEnum PushAvStreamTransportServer::UpsertStreamTransportConnection(
-    const TransportConfigurationStructWithFabricIndex & transportConfiguration)
+    const TransportConfigurationStorageWithFabricIndex & transportConfiguration)
 {
     UpsertResultEnum result;
     auto it = std::find_if(mCurrentConnections.begin(), mCurrentConnections.end(),
@@ -128,7 +128,7 @@ void PushAvStreamTransportServer::RemoveStreamTransportConnection(const uint16_t
 
     // Erase-Remove idiom
     mCurrentConnections.erase(std::remove_if(mCurrentConnections.begin(), mCurrentConnections.end(),
-                                             [transportConnectionId](const TransportConfigurationStructWithFabricIndex & s) {
+                                             [transportConnectionId](const TransportConfigurationStorageWithFabricIndex & s) {
                                                  return s.transportConfiguration.connectionID == transportConnectionId;
                                              }),
                               mCurrentConnections.end());
@@ -246,7 +246,7 @@ void PushAvStreamTransportServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-TransportConfigurationStructWithFabricIndex *
+TransportConfigurationStorageWithFabricIndex *
 PushAvStreamTransportServer::FindStreamTransportConnection(const uint16_t connectionID)
 {
     for (auto & transportConnection : mCurrentConnections)
@@ -351,19 +351,19 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         return;
     }
 
-    TransportConfigurationStruct outTransportConfiguration;
-    outTransportConfiguration.connectionID    = connectionID;
-    outTransportConfiguration.transportStatus = TransportStatusEnum::kInactive;
+    std::shared_ptr<TransportOptionsStorage> transportOptionsPtr = std::make_shared<TransportOptionsStorage>(transportOptions);
 
-    TransportOptionsStorage transportOptionArgs(transportOptions);
-    Status status = mDelegate.AllocatePushTransport(transportOptionArgs, connectionID);
+    TransportConfigurationStorage outTransportConfiguration(connectionID, transportOptionsPtr);
+
+    Status status = mDelegate.AllocatePushTransport(*transportOptionsPtr, connectionID);
 
     if (status == Status::Success)
     {
         // add connection to CurrentConnections
         FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
-        outTransportConfiguration.transportOptions.SetValue(transportOptionArgs);
-        TransportConfigurationStructWithFabricIndex transportConfiguration({ outTransportConfiguration, peerFabricIndex });
+
+        TransportConfigurationStorageWithFabricIndex transportConfiguration({ outTransportConfiguration, peerFabricIndex });
+
         UpsertStreamTransportConnection(transportConfiguration);
         response.transportConfiguration = outTransportConfiguration;
 
@@ -378,9 +378,9 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 void PushAvStreamTransportServer::HandleDeallocatePushTransport(
     HandlerContext & ctx, const Commands::DeallocatePushTransport::DecodableType & commandData)
 {
-    Status status                                                        = Status::Success;
-    uint16_t connectionID                                                = commandData.connectionID;
-    TransportConfigurationStructWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID);
+    Status status                                                         = Status::Success;
+    uint16_t connectionID                                                 = commandData.connectionID;
+    TransportConfigurationStorageWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID);
     if (transportConfiguration == nullptr)
     {
         ChipLogError(Zcl, "HandleDeallocatePushTransport: ConnectionID Not Found.");
@@ -412,7 +412,7 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
     uint16_t connectionID   = commandData.connectionID;
     auto & transportOptions = commandData.transportOptions;
 
-    TransportConfigurationStructWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID);
+    TransportConfigurationStorageWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID);
 
     if (transportConfiguration == nullptr)
     {
@@ -486,7 +486,7 @@ void PushAvStreamTransportServer::HandleSetTransportStatus(HandlerContext & ctx,
     }
     else
     {
-        TransportConfigurationStructWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID.Value());
+        TransportConfigurationStorageWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID.Value());
         if (transportConfiguration == nullptr)
         {
             ChipLogError(Zcl, "HandleSetTransportStatus: ConnectionID Not Found.");
@@ -516,7 +516,7 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
     auto & activationReason = commandData.activationReason;
     auto & timeControl      = commandData.timeControl;
 
-    TransportConfigurationStructWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID);
+    TransportConfigurationStorageWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID);
 
     if (transportConfiguration == nullptr)
     {
@@ -590,8 +590,6 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
         return;
     }
 
-    DataModel::List<const TransportConfigurationStruct> outTransportConfigurations;
-
     if ((connectionID.HasValue() == false) || connectionID.Value().IsNull())
     {
         if (mCurrentConnections.size() == 0)
@@ -611,7 +609,7 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
     }
     else
     {
-        TransportConfigurationStructWithFabricIndex * transportConfiguration =
+        TransportConfigurationStorageWithFabricIndex * transportConfiguration =
             FindStreamTransportConnection(connectionID.Value().Value());
         if (transportConfiguration == nullptr)
         {

@@ -62,7 +62,7 @@ public:
     PushAvStreamTransportStatusEnum GetTransportStatus(const uint16_t connectionID);
 
     void OnAttributeChanged(AttributeId attributeId);
-    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStructWithFabricIndex> & currentConnections);
+    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorageWithFabricIndex> & currentConnections);
     CHIP_ERROR PersistentAttributesLoadedCallback();
 
     void Init();

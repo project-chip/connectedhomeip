@@ -150,7 +150,7 @@ void PushAvStreamTransportManager::Init()
     ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
 }
 CHIP_ERROR
-PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStructWithFabricIndex> & currentConnections)
+PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStorageWithFabricIndex> & currentConnections)
 {
     ChipLogProgress(Zcl, "Push AV Current Connections loaded");
 
