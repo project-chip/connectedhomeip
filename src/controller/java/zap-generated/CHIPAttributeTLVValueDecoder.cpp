@@ -48009,13 +48009,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_groupPermissionClassName.c_str(), newElement_0_groupPermissionCtorSignature.c_str(),
                     jninewElement_0_groupPermission, newElement_0_groupPermission);
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
-                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
                     jclass datastoreGroupInformationEntryStructStructClass_1;
@@ -48034,7 +48027,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, datastoreGroupInformationEntryStructStructClass_1, "<init>",
                         "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Integer;)V",
+                        "Integer;)V",
                         &datastoreGroupInformationEntryStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || datastoreGroupInformationEntryStructStructCtor_1 == nullptr)
                     {
@@ -48044,10 +48037,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(
-                        datastoreGroupInformationEntryStructStructClass_1, datastoreGroupInformationEntryStructStructCtor_1,
-                        newElement_0_groupID, newElement_0_friendlyName, newElement_0_groupKeySetID, newElement_0_groupCAT,
-                        newElement_0_groupCATVersion, newElement_0_groupPermission, newElement_0_fabricIndex);
+                    newElement_0 = env->NewObject(datastoreGroupInformationEntryStructStructClass_1,
+                                                  datastoreGroupInformationEntryStructStructCtor_1, newElement_0_groupID,
+                                                  newElement_0_friendlyName, newElement_0_groupKeySetID, newElement_0_groupCAT,
+                                                  newElement_0_groupCATVersion, newElement_0_groupPermission);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -48135,13 +48128,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_commissioningStatusEntry_state, newElement_0_commissioningStatusEntry_updateTimestamp,
                         newElement_0_commissioningStatusEntry_failureCode);
                 }
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
-                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
                     jclass datastoreNodeInformationEntryStructStructClass_1;
@@ -48159,7 +48145,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, datastoreNodeInformationEntryStructStructClass_1, "<init>",
                         "(Ljava/lang/Long;Ljava/lang/String;Lchip/devicecontroller/"
-                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;Ljava/lang/Integer;)V",
+                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;)V",
                         &datastoreNodeInformationEntryStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || datastoreNodeInformationEntryStructStructCtor_1 == nullptr)
                     {
@@ -48169,10 +48155,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 =
-                        env->NewObject(datastoreNodeInformationEntryStructStructClass_1,
-                                       datastoreNodeInformationEntryStructStructCtor_1, newElement_0_nodeID,
-                                       newElement_0_friendlyName, newElement_0_commissioningStatusEntry, newElement_0_fabricIndex);
+                    newElement_0 = env->NewObject(datastoreNodeInformationEntryStructStructClass_1,
+                                                  datastoreNodeInformationEntryStructStructCtor_1, newElement_0_nodeID,
+                                                  newElement_0_friendlyName, newElement_0_commissioningStatusEntry);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -48216,13 +48201,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 env->SetByteArrayRegion(newElement_0_icacByteArray, 0, static_cast<jsize>(entry_0.icac.size()),
                                         reinterpret_cast<const jbyte *>(entry_0.icac.data()));
                 newElement_0_icac = newElement_0_icacByteArray;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
-                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
                     jclass datastoreAdministratorInformationEntryStructStructClass_1;
@@ -48241,7 +48219,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID datastoreAdministratorInformationEntryStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, datastoreAdministratorInformationEntryStructStructClass_1, "<init>",
-                        "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;[BLjava/lang/Integer;)V",
+                        "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;[B)V",
                         &datastoreAdministratorInformationEntryStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || datastoreAdministratorInformationEntryStructStructCtor_1 == nullptr)
                     {
@@ -48254,8 +48232,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 = env->NewObject(datastoreAdministratorInformationEntryStructStructClass_1,
                                                   datastoreAdministratorInformationEntryStructStructCtor_1, newElement_0_nodeID,
-                                                  newElement_0_friendlyName, newElement_0_vendorID, newElement_0_icac,
-                                                  newElement_0_fabricIndex);
+                                                  newElement_0_friendlyName, newElement_0_vendorID, newElement_0_icac);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -48290,38 +48267,31 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_failureCodeClassName.c_str(),
                                                                        value_failureCodeCtorSignature.c_str(), jnivalue_failureCode,
                                                                        value_failureCode);
-            jobject value_fabricIndex;
-            std::string value_fabricIndexClassName     = "java/lang/Integer";
-            std::string value_fabricIndexCtorSignature = "(I)V";
-            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
-                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
-                                                                       value_fabricIndex);
 
             {
-                jclass datastoreStatusStructStructClass_0;
+                jclass datastoreStatusEntryStructStructClass_0;
                 err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                    env, "chip/devicecontroller/ChipStructs$JointFabricDatastoreClusterDatastoreStatusStruct",
-                    datastoreStatusStructStructClass_0);
+                    env, "chip/devicecontroller/ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct",
+                    datastoreStatusEntryStructStructClass_0);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$JointFabricDatastoreClusterDatastoreStatusStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct");
                     return nullptr;
                 }
 
-                jmethodID datastoreStatusStructStructCtor_0;
-                err = chip::JniReferences::GetInstance().FindMethod(
-                    env, datastoreStatusStructStructClass_0, "<init>",
-                    "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                    &datastoreStatusStructStructCtor_0);
-                if (err != CHIP_NO_ERROR || datastoreStatusStructStructCtor_0 == nullptr)
+                jmethodID datastoreStatusEntryStructStructCtor_0;
+                err = chip::JniReferences::GetInstance().FindMethod(env, datastoreStatusEntryStructStructClass_0, "<init>",
+                                                                    "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;)V",
+                                                                    &datastoreStatusEntryStructStructCtor_0);
+                if (err != CHIP_NO_ERROR || datastoreStatusEntryStructStructCtor_0 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$JointFabricDatastoreClusterDatastoreStatusStruct constructor");
+                    ChipLogError(Zcl,
+                                 "Could not find ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct constructor");
                     return nullptr;
                 }
 
-                value = env->NewObject(datastoreStatusStructStructClass_0, datastoreStatusStructStructCtor_0, value_state,
-                                       value_updateTimestamp, value_failureCode, value_fabricIndex);
+                value = env->NewObject(datastoreStatusEntryStructStructClass_0, datastoreStatusEntryStructStructCtor_0, value_state,
+                                       value_updateTimestamp, value_failureCode);
             }
             return value;
         }
@@ -48414,13 +48384,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                        newElement_0_statusEntry_state, newElement_0_statusEntry_updateTimestamp,
                                        newElement_0_statusEntry_failureCode);
                 }
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
-                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
                     jclass datastoreEndpointGroupIDEntryStructStructClass_1;
@@ -48438,7 +48401,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, datastoreEndpointGroupIDEntryStructStructClass_1, "<init>",
                         "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Lchip/devicecontroller/"
-                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;Ljava/lang/Integer;)V",
+                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;)V",
                         &datastoreEndpointGroupIDEntryStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || datastoreEndpointGroupIDEntryStructStructCtor_1 == nullptr)
                     {
@@ -48450,8 +48413,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 = env->NewObject(datastoreEndpointGroupIDEntryStructStructClass_1,
                                                   datastoreEndpointGroupIDEntryStructStructCtor_1, newElement_0_nodeID,
-                                                  newElement_0_endpointID, newElement_0_groupID, newElement_0_statusEntry,
-                                                  newElement_0_fabricIndex);
+                                                  newElement_0_endpointID, newElement_0_groupID, newElement_0_statusEntry);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -48649,13 +48611,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                        newElement_0_statusEntry_state, newElement_0_statusEntry_updateTimestamp,
                                        newElement_0_statusEntry_failureCode);
                 }
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
-                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
                     jclass datastoreEndpointBindingEntryStructStructClass_1;
@@ -48674,7 +48629,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         env, datastoreEndpointBindingEntryStructStructClass_1, "<init>",
                         "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Lchip/devicecontroller/"
                         "ChipStructs$JointFabricDatastoreClusterDatastoreBindingTargetStruct;Lchip/devicecontroller/"
-                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;Ljava/lang/Integer;)V",
+                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;)V",
                         &datastoreEndpointBindingEntryStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || datastoreEndpointBindingEntryStructStructCtor_1 == nullptr)
                     {
@@ -48687,7 +48642,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0 = env->NewObject(datastoreEndpointBindingEntryStructStructClass_1,
                                                   datastoreEndpointBindingEntryStructStructCtor_1, newElement_0_nodeID,
                                                   newElement_0_endpointID, newElement_0_listID, newElement_0_binding,
-                                                  newElement_0_statusEntry, newElement_0_fabricIndex);
+                                                  newElement_0_statusEntry);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -48775,41 +48730,36 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                        newElement_0_statusEntry_state, newElement_0_statusEntry_updateTimestamp,
                                        newElement_0_statusEntry_failureCode);
                 }
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
-                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
-                    jclass datastoreNodeKeySetEntryStructClass_1;
+                    jclass datastoreNodeKeySetEntryStructStructClass_1;
                     err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                        env, "chip/devicecontroller/ChipStructs$JointFabricDatastoreClusterDatastoreNodeKeySetEntry",
-                        datastoreNodeKeySetEntryStructClass_1);
+                        env, "chip/devicecontroller/ChipStructs$JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct",
+                        datastoreNodeKeySetEntryStructStructClass_1);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$JointFabricDatastoreClusterDatastoreNodeKeySetEntry");
-                        return nullptr;
-                    }
-
-                    jmethodID datastoreNodeKeySetEntryStructCtor_1;
-                    err = chip::JniReferences::GetInstance().FindMethod(
-                        env, datastoreNodeKeySetEntryStructClass_1, "<init>",
-                        "(Ljava/lang/Long;Ljava/lang/Integer;Lchip/devicecontroller/"
-                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;Ljava/lang/Integer;)V",
-                        &datastoreNodeKeySetEntryStructCtor_1);
-                    if (err != CHIP_NO_ERROR || datastoreNodeKeySetEntryStructCtor_1 == nullptr)
-                    {
                         ChipLogError(Zcl,
-                                     "Could not find ChipStructs$JointFabricDatastoreClusterDatastoreNodeKeySetEntry constructor");
+                                     "Could not find class ChipStructs$JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct");
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(datastoreNodeKeySetEntryStructClass_1, datastoreNodeKeySetEntryStructCtor_1,
-                                                  newElement_0_nodeID, newElement_0_groupKeySetID, newElement_0_statusEntry,
-                                                  newElement_0_fabricIndex);
+                    jmethodID datastoreNodeKeySetEntryStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, datastoreNodeKeySetEntryStructStructClass_1, "<init>",
+                        "(Ljava/lang/Long;Ljava/lang/Integer;Lchip/devicecontroller/"
+                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;)V",
+                        &datastoreNodeKeySetEntryStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || datastoreNodeKeySetEntryStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "Could not find ChipStructs$JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_0 =
+                        env->NewObject(datastoreNodeKeySetEntryStructStructClass_1, datastoreNodeKeySetEntryStructStructCtor_1,
+                                       newElement_0_nodeID, newElement_0_groupKeySetID, newElement_0_statusEntry);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -49057,13 +49007,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                        newElement_0_statusEntry_state, newElement_0_statusEntry_updateTimestamp,
                                        newElement_0_statusEntry_failureCode);
                 }
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
-                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
                     jclass datastoreACLEntryStructStructClass_1;
@@ -49081,7 +49024,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         env, datastoreACLEntryStructStructClass_1, "<init>",
                         "(Ljava/lang/Long;Ljava/lang/Integer;Lchip/devicecontroller/"
                         "ChipStructs$JointFabricDatastoreClusterDatastoreAccessControlEntryStruct;Lchip/devicecontroller/"
-                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;Ljava/lang/Integer;)V",
+                        "ChipStructs$JointFabricDatastoreClusterDatastoreStatusEntryStruct;)V",
                         &datastoreACLEntryStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || datastoreACLEntryStructStructCtor_1 == nullptr)
                     {
@@ -49090,9 +49033,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(datastoreACLEntryStructStructClass_1, datastoreACLEntryStructStructCtor_1,
-                                                  newElement_0_nodeID, newElement_0_listID, newElement_0_ACLEntry,
-                                                  newElement_0_statusEntry, newElement_0_fabricIndex);
+                    newElement_0 =
+                        env->NewObject(datastoreACLEntryStructStructClass_1, datastoreACLEntryStructStructCtor_1,
+                                       newElement_0_nodeID, newElement_0_listID, newElement_0_ACLEntry, newElement_0_statusEntry);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

@@ -46,23 +46,24 @@ from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 cluster = Clusters.ElectricalGridConditions
 
 
-class EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
+class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
     """Implementation of test case TC_EGC_2_3."""
 
-    def desc_EGC_2_3(self) -> str:
+    def desc_TC_EGC_2_3(self) -> str:
         """Returns a description of this test"""
         return "[TC-EGC-2.3] Forecast feature functionality with DUT as Server"
 
-    def pics_EGC_2_3(self) -> list[str]:
+    def pics_TC_EGC_2_3(self) -> list[str]:
         """This function returns a list of PICS for this test case that must be True for the test to be run"""
         return [
             "EGC.S",
             "EGC.F00"
         ]
 
-    def steps_EGC_2_3(self) -> list[TestStep]:
+    def steps_TC_EGC_2_3(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EGC.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EGC.TESTEVENTTRIGGER for Forecast Conditions Update Test Event",
@@ -73,7 +74,7 @@ class EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         return steps
 
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
-    async def test_EGC_2_3(self):
+    async def test_TC_EGC_2_3(self):
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes
 
