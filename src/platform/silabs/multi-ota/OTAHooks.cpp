@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <include/platform/CHIPDeviceLayer.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>

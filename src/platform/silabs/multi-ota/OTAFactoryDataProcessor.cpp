@@ -17,7 +17,6 @@
  */
 
 #include <lib/core/TLV.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTAFactoryDataProcessor.h>
 
 namespace chip {
@@ -30,7 +29,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.GetData(), mAccumulator.GetThreshold());
     OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
 #endif
     error = DecodeTlv();
