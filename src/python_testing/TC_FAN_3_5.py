@@ -417,19 +417,18 @@ class TC_FAN_3_5(MatterBaseTest):
         for sub in self.subscriptions:
             sub.reset()
 
-        logging.info(f"[FC]")
         if step.direction == sd_enum.kDecrease and step.lowestOff:
-            logging.info(f"[FC] step.direction == sd_enum.kDecrease and step.lowestOff")
+            logging.info("[FC] step.direction == sd_enum.kDecrease and step.lowestOff")
             await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
             await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
         elif step.direction == sd_enum.kDecrease and not step.lowestOff:
-            logging.info(f"[FC] step.direction == sd_enum.kDecrease and not step.lowestOff")
+            logging.info("[FC] step.direction == sd_enum.kDecrease and not step.lowestOff")
             await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
         elif step.direction == sd_enum.kIncrease and step.lowestOff:
-            logging.info(f"[FC] step.direction == sd_enum.kIncrease and step.lowestOff")
+            logging.info("[FC] step.direction == sd_enum.kIncrease and step.lowestOff")
             await self.wrap_veirfy(step, percent_setting_expected=0)
         elif step.direction == sd_enum.kIncrease and not step.lowestOff:
-            logging.info(f"[FC] step.direction == sd_enum.kIncrease and not step.lowestOff")
+            logging.info("[FC] step.direction == sd_enum.kIncrease and not step.lowestOff")
             await self.wrap_veirfy(step, percent_setting_expected=self.percent_setting_per_step)
 
     async def wrap_veirfy(
