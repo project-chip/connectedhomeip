@@ -60,7 +60,11 @@ MTR_DIRECT_MEMBERS
 
     /**
      * _lock always protects access to all our mutable ivars (the ones that are
-     * modified after init).
+     * modified after init), except when we are on the Matter queue.  The
+     * interaction with the Matter queue is handled by ensuring that mutation of
+     * members can only happen on the matter queue (when we are associated with
+     * a controller) or not on the matter queue (when we are not associated with
+     * a controller).  And controller association changes happen under the lock.
      */
     os_unfair_lock _lock;
 }
@@ -139,7 +143,6 @@ MTR_DIRECT_MEMBERS
 
     NSSet * grants = [_accessGrants copy];
     [deviceController asyncDispatchToMatterQueue:^{
-        std::lock_guard lock(self->_lock);
         self->_matterAccessGrants = grants;
     }
                                     errorHandler:nil];
@@ -351,8 +354,6 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 {
     assertChipStackLockedByCurrentThread();
 
-    std::lock_guard lock(_lock);
-
     static_assert(FIXED_ENDPOINT_COUNT == 0, "Indexing will be off");
 
     // We can't use emberAfEndpointCount here, because that returns just the
@@ -391,20 +392,9 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 {
     assertChipStackLockedByCurrentThread();
 
-    // emberAfClearDynamicEndpoint has to happen outside our lock, because it
-    // will try to walk our clusters as part of its dirty-marking and access
-    // checks and whatnot.
-    std::optional<uint16_t> endpointIndex;
-    {
-        std::lock_guard lock(_lock);
-        endpointIndex = _endpointIndex;
+    if (_endpointIndex.has_value()) {
+        emberAfClearDynamicEndpoint(_endpointIndex.value());
     }
-
-    if (endpointIndex.has_value()) {
-        emberAfClearDynamicEndpoint(endpointIndex.value());
-    }
-
-    std::lock_guard lock(_lock);
 
     _endpointIndex.reset();
 
@@ -443,8 +433,6 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 - (NSArray<MTRAccessGrant *> *)matterAccessGrantsForCluster:(NSNumber *)clusterID
 {
     assertChipStackLockedByCurrentThread();
-
-    std::lock_guard lock(_lock);
 
     NSMutableArray<MTRAccessGrant *> * grants = [[_matterAccessGrants allObjects] mutableCopy];
     for (MTRServerCluster * cluster in _serverClusters) {
