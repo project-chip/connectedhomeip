@@ -290,6 +290,7 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
 
+        # TODO: Consider replacing the sleep (connect_max_time + fudge_factor) with a DNS-SD advertisement check as a follow-up improvement.
         # Wait for the device to establish connection with the new Thread network
         # Includes a fudge factor for SRP record propagation.
         await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
