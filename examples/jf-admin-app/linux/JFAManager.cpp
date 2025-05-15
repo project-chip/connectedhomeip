@@ -18,6 +18,7 @@
 
 #include "JFAManager.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -61,11 +62,13 @@ void JFAManager::HandleCommissioningCompleteEvent()
         FabricIndex fabricIndex = fb.GetFabricIndex();
         CATValues cats;
 
-        if ((jfFabricIndex == kUndefinedFabricId) && mServer->GetFabricTable().FetchCATs(fabricIndex, cats) == CHIP_NO_ERROR)
+        if ((jfFabricIndex == kUndefinedFabricIndex) && mServer->GetFabricTable().FetchCATs(fabricIndex, cats) == CHIP_NO_ERROR)
         {
-            /* When JFA is commissioned, it has to be issued with Anchor CAT and Administrator CAT */
+            /* When JFA is commissioned, it has to be issued a NOC with Anchor CAT and Administrator CAT */
             if (cats.ContainsIdentifier(kAdminCATIdentifier) && cats.ContainsIdentifier(kAnchorCATIdentifier))
             {
+                (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(1, fabricIndex);
+
                 jfFabricIndex = fabricIndex;
             }
         }

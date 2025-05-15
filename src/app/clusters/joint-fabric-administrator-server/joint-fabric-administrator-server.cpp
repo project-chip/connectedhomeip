@@ -94,7 +94,7 @@ CHIP_ERROR JointFabricAdministratorAttrAccess::Read(const ConcreteReadAttributeP
 // TODO
 CHIP_ERROR JointFabricAdministratorAttrAccess::ReadAdministratorFabricIndex(AttributeValueEncoder & aEncoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 
 void MatterJointFabricAdministratorPluginServerInitCallback()
