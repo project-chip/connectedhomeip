@@ -35,15 +35,16 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import math
 import operator
-from typing import Any
+from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_infrastructure.chip.testing.matter_testing import (ClusterAttributeChangeAccumulator,
-                                                                       MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+from matter_testing_infrastructure.chip.testing.matter_testing import (
+    ClusterAttributeChangeAccumulator,
+    MatterBaseTest, TestStep, async_test_body,
+    default_matter_test_main
+)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,7 @@ logger = logging.getLogger(__name__)
 
 class TC_FAN_3_5(MatterBaseTest):
     def desc_TC_FAN_3_5(self) -> str:
+        """Returns the test description for TC-FAN-3.5."""
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
 
     # def steps_TC_FAN_3_5(self):
@@ -63,14 +65,13 @@ class TC_FAN_3_5(MatterBaseTest):
     #             ]
 
     async def read_setting(self, attribute: Any) -> Any:
-        """
-        Asynchronously reads a specified attribute from the FanControl cluster at a given endpoint.
+        """Read a specified attribute from the FanControl cluster.
 
         Args:
-            attribute (Any): The attribute to be read.
+            attribute (Any): Attribute to read.
 
         Returns:
-            Any: The value of the specified attribute if the read operation is successful.
+            Any: Value of the specified attribute.
 
         Raises:
             AssertionError: If the read operation fails.
@@ -78,26 +79,29 @@ class TC_FAN_3_5(MatterBaseTest):
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    async def write_setting(self, attribute, value) -> None:
-        """
-        Writes a specified value to a given attribute on the device under test (DUT).
-        It verifies that the write operation is successful by asserting the status of the response.
+    async def write_setting(self, attribute: Callable[[Any], Any], value: Any) -> None:
+        """Write a value to an attribute on the DUT and verify the write is successful.
 
         Args:
-            attribute (Callable): The attribute to be written, represented as a callable that takes the value.
-            value (Any): The value to write to the specified attribute.
-
-        Returns:
-            None
+            attribute (Callable[[Any], Any]): Callable representing the attribute to write.
+            value (Any): Value to write to the attribute.
 
         Raises:
-            AssertionError: If the write operation fails or the response status is not successful.
+            AssertionError: If the write operation fails.
         """
         logger.info(f"[FC] Writing to the {attribute.__name__} attribute, value: {value}")
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
-        asserts.assert_equal(result[0].Status, Status.Success, f"[FC] {attribute.__name__} attribute write faield.")
+        asserts.assert_equal(result[0].Status, Status.Success, f"[FC] {attribute.__name__} attribute write failed.")
 
     async def send_step_command(self, step: Clusters.Objects.FanControl.Commands.Step) -> None:
+        """Sends a Step command to the DUT.
+
+        Args:
+            step (Clusters.Objects.FanControl.Commands.Step): Step command to send.
+
+        Raises:
+            AssertionError: If an unexpected error occurs during command execution.
+        """
         try:
             logger.info(
                 f"[FC] Sending Step command - direction: {step.direction.name}, wrap: {step.wrap}, lowestOff: {step.lowestOff}")
@@ -107,15 +111,23 @@ class TC_FAN_3_5(MatterBaseTest):
             pass
 
     async def send_on_off_command(self, cmd: Clusters.ClusterObjects.ClusterCommand) -> None:
+        """Send an On/Off command to the DUT.
+
+        Args:
+            cmd (Clusters.ClusterObjects.ClusterCommand): On/Off command to send.
+
+        Raises:
+            AssertionError: If an unexpected error occurs during command execution.
+        """
         try:
-            logger.info(
-                f"[FC] Sending OnOff command: {cmd}")
+            logger.info(f"[FC] Sending OnOff command: {cmd}")
             await self.send_single_cmd(cmd, endpoint=self.endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
             pass
 
     async def subscribe_to_attributes(self) -> None:
+        """Subscribe to PercentSetting, SpeedSetting, and FanMode attributes on the DUT."""
         cluster = Clusters.FanControl
         attr = cluster.Attributes
 
@@ -128,7 +140,12 @@ class TC_FAN_3_5(MatterBaseTest):
         for sub in self.subscriptions:
             await sub.start(self.default_controller, self.dut_node_id, self.endpoint)
 
-    async def get_fan_modes(self, remove_auto: bool = False):
+    async def get_fan_modes(self, remove_auto: bool = False) -> None:
+        """Determine and store supported FanMode values from FanModeSequence attribute.
+
+        Args:
+            remove_auto (bool): If True, exclude the 'Auto' FanMode from the result.
+        """
         # Read FanModeSequence attribute value
         fan_mode_sequence_attr = Clusters.FanControl.Attributes.FanModeSequence
         fm_enum = Clusters.FanControl.Enums.FanModeEnum
@@ -155,7 +172,15 @@ class TC_FAN_3_5(MatterBaseTest):
 
         self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
-    async def initialize_and_verify_attribtutes(self, step: Clusters.FanControl.Commands.Step) -> None:
+    async def initialize_and_verify_attribtutes(self, step: Clusters.FanControl.Commands.Step) -> int:
+        """Initialize PercentSetting and verify the expected corresponding attribute values.
+
+        Args:
+            step (Clusters.FanControl.Commands.Step): Step command parameters.
+
+        Returns:
+            int: The initialized PercentSetting value.
+        """
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         sd_enum = cluster.Enums.StepDirectionEnum
@@ -185,26 +210,38 @@ class TC_FAN_3_5(MatterBaseTest):
                 speed_setting_expected = self.speed_max if percent_setting_init == percent_setting_max else 0
                 await self.verify_expected_attribute_value(attr.FanMode, fan_mode_expected)
                 await self.verify_expected_attribute_value(attr.SpeedSetting, speed_setting_expected)
-        
+
         return percent_setting_init
 
-    async def verify_expected_attribute_value(self, attribute, expected_value) -> None:
-        """
-        Reads and verifies a given attribute report value against an expected value.
+    async def verify_expected_attribute_value(self, attribute: Callable, expected_value: Any) -> None:
+        """Verify that a given attribute has the expected value.
 
         Args:
-            attribute: The attribute to be verified.
-            expected_value: The expected value of the attribute.
+            attribute (Callable): The attribute to verify.
+            expected_value (Any): The expected value.
 
         Raises:
-            AssertionError: If the current attribute value does not match the expected value.
+            AssertionError: If the attribute value does not match the expected value.
         """
         # Reads and verifies a given attribute report value against an expected value.
         value_current = await self.read_setting(attribute)
-        asserts.assert_equal(value_current, expected_value,
-                                 f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({expected_value})")
+        asserts.assert_equal(
+            value_current, expected_value,
+            f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({expected_value})"
+        )
 
-    async def lowest_off_test(self, step: Clusters.FanControl.Commands.Step):
+    async def lowest_off_test(self, step: Clusters.FanControl.Commands.Step) -> None:
+        """Tests the `lowestOff` flag for the given Step command.
+
+        Args:
+            step (Clusters.FanControl.Commands.Step): Step command parameters.
+
+        Returns:
+            None
+
+        Raises:
+            AssertionError: If expected conditions are not met during test steps.
+        """
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         sd_enum = cluster.Enums.StepDirectionEnum
@@ -240,20 +277,32 @@ class TC_FAN_3_5(MatterBaseTest):
             if percent_setting == percent_setting_expected:
                 await self.send_step_command(step)
                 percent_setting = await self.read_setting(attr.PercentSetting)
-                asserts.assert_equal(percent_setting, percent_setting_expected,
-                                    f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})")
+                asserts.assert_equal(
+                    percent_setting, percent_setting_expected,
+                    f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})"
+                )
                 break
             else:
                 if i == 100:
-                    asserts.fail(f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({percent_setting}).")
+                    asserts.fail(
+                        f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({percent_setting})."
+                    )
 
         # Veirfy attribute progression (each successive value is greater or less than the last)
         self.verify_attribute_progression(step)
 
         # Veirfy all expected reports after the Step commands are present
-        return self.verify_expected_reports(step, percent_setting_init)
+        self.verify_expected_reports(step, percent_setting_init)
 
     def verify_attribute_progression(self, step: Clusters.FanControl.Commands.Step) -> None:
+        """Verifies that the resulting attribute report values progress in the expected order.
+
+        Args:
+            step (Clusters.FanControl.Commands.Step): Step command parameters.
+
+        Raises:
+            AssertionError: If attribute values do not progress correctly.
+        """
         sd_enum = Clusters.FanControl.Enums.StepDirectionEnum
         order_str = "ascending" if step.direction == sd_enum.kIncrease else "descending"
 
@@ -267,7 +316,16 @@ class TC_FAN_3_5(MatterBaseTest):
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
             asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
 
-    def verify_expected_reports(self, step: Clusters.FanControl.Commands.Step, percent_setting_init) -> tuple:
+    def verify_expected_reports(self, step: Clusters.FanControl.Commands.Step, percent_setting_init: int) -> None:
+        """Verify all expected FanMode and SpeedSetting reports are acounted for after a Step command.
+
+        Args:
+            step (Clusters.FanControl.Commands.Step): Step command parameters.
+            percent_setting_init (int): Initial PercentSetting value.
+
+        Raises:
+            AssertionError: If expected reports are missing.
+        """
         percent_setting_report_qty = 0
         fan_mode_report_qty = 0
         speed_setting_report_qty = 0
@@ -275,8 +333,8 @@ class TC_FAN_3_5(MatterBaseTest):
         sd_enum = cluster.Enums.StepDirectionEnum
         fm_enum = cluster.Enums.FanModeEnum
 
-        # - Count the number of each of the subscription reports
-        # - Get the values of the FanMode and SpeedSetting attributes
+        # - Count the number of each of the subscription attribute reports
+        # - Get the values of the PercentSetting, FanMode, and SpeedSetting attributes
         for sub in self.subscriptions:
             if sub._expected_attribute == Clusters.FanControl.Attributes.PercentSetting:
                 percent_setting_report_qty = len(sub.attribute_queue.queue)
@@ -314,15 +372,19 @@ class TC_FAN_3_5(MatterBaseTest):
         # - Verify that all the expected FanMode values are present in the reports
         if percent_setting_report_qty > fan_mode_report_qty:
             missing_fan_modes = [mode for mode in fan_modes_expected if mode not in fan_mode_values_produced]
-            asserts.assert_equal(fan_modes_expected, fan_mode_values_produced,
-                                 f"[FC] Some of the expected FanMode values are not present in the reports. Expected: {fan_modes_expected}, missing: {missing_fan_modes}.")
+            asserts.assert_equal(
+                fan_modes_expected, fan_mode_values_produced,
+                f"[FC] Some of the expected FanMode values are not present in the reports. Expected: {fan_modes_expected}, missing: {missing_fan_modes}."
+            )
 
         # If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports,
         # - Verify that all the expected SpeedSetting values are present in the reports
         if percent_setting_report_qty >= speed_setting_report_qty:
             missing_speed_setting = [speed for speed in speed_setting_expected if speed not in speed_setting_values_produced]
-            asserts.assert_equal(speed_setting_expected, speed_setting_values_produced,
-                                 f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_expected}, missing: {missing_speed_setting}.")
+            asserts.assert_equal(
+                speed_setting_expected, speed_setting_values_produced,
+                f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_expected}, missing: {missing_speed_setting}."
+            )
 
         # - Saving baseline attribute values both in ascending and descending order
         #   as per the Step command direction to later verify that they're the same
@@ -340,7 +402,12 @@ class TC_FAN_3_5(MatterBaseTest):
             self.baseline_fan_mode_asc = fan_mode_values_produced[:-1]
             self.baseline_speed_setting_asc = speed_setting_values_produced[:-1]
 
-    async def wrap_test(self, step: Clusters.FanControl.Commands.Step):
+    async def wrap_test(self, step: Clusters.FanControl.Commands.Step) -> None:
+        """Tests the `wrap` flag for the given Step command.
+
+        Args:
+            step (Clusters.FanControl.Commands.Step): Step command parameters.
+        """
         cluster = Clusters.FanControl
         fm_enum = cluster.Enums.FanModeEnum
         sd_enum = cluster.Enums.StepDirectionEnum
@@ -366,31 +433,60 @@ class TC_FAN_3_5(MatterBaseTest):
             logging.info(f"[FC] step.direction == sd_enum.kIncrease and not step.lowestOff")
             await self.wrap_veirfy(step, percent_setting_expected=self.percent_setting_per_step)
 
-    async def wrap_veirfy(self, step: Clusters.FanControl.Commands.Step, percent_setting_expected, fan_mode_expected = None, speed_setting_expected = None) -> None:
+    async def wrap_veirfy(
+        self,
+        step: Clusters.FanControl.Commands.Step,
+        percent_setting_expected: int,
+        fan_mode_expected: Optional[Any] = None,
+        speed_setting_expected: Optional[int] = None
+    ) -> None:
+        """Sends a Step command and verifies the resulting attribute values match expectations.
+
+        Args:
+            step (Clusters.FanControl.Commands.Step): Step command parameters.
+            percent_setting_expected (int): Expected PercentSetting after wrap.
+            fan_mode_expected (Optional[Any]): Expected FanMode (if any).
+            speed_setting_expected (Optional[int]): Expected SpeedSetting (if any).
+
+        Raises:
+            AssertionError: If any attribute value does not match its expected value.
+        """
         cluster = Clusters.FanControl
         attr = cluster.Attributes
 
         await self.send_step_command(step)
 
         percent_setting = await self.read_setting(attr.PercentSetting)
-        asserts.assert_equal(percent_setting, percent_setting_expected,
-                                f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected}).")
+        asserts.assert_equal(
+            percent_setting, percent_setting_expected,
+            f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})."
+        )
 
         if fan_mode_expected is not None:
             fan_mode = await self.read_setting(attr.FanMode)
-            asserts.assert_equal(fan_mode, fan_mode_expected,
-                                    f"[FC] FanMode attribute value ({fan_mode}) is not equal to the expected value ({fan_mode_expected}).")
+            asserts.assert_equal(
+                fan_mode, fan_mode_expected,
+                f"[FC] FanMode attribute value ({fan_mode}) is not equal to the expected value ({fan_mode_expected})."
+            )
 
         if speed_setting_expected is not None:
             speed_setting = await self.read_setting(attr.SpeedSetting)
-            asserts.assert_equal(speed_setting, speed_setting_expected,
-                                    f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({speed_setting_expected}).")        
+            asserts.assert_equal(
+                speed_setting, speed_setting_expected,
+                f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({speed_setting_expected})."
+            )
 
     def pics_TC_FAN_3_5(self) -> list[str]:
+        """Return a list of picture references for the test case."""
         return ["FAN.S"]
 
     @async_test_body
-    async def test_TC_FAN_3_5(self):
+    async def test_TC_FAN_3_5(self) -> None:
+        """Run the full test sequence for TC-FAN-3.5.
+
+        Raises:
+            AssertionError: If test invariants do not hold.
+        """
         # Setup
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
@@ -398,7 +494,7 @@ class TC_FAN_3_5(MatterBaseTest):
         cmd = cluster.Commands
         sd_enum = cluster.Enums.StepDirectionEnum
         self.timeout_sec: float = 0.5
-        self.percent_setting_per_step = None
+        self.percent_setting_per_step: Optional[int] = None
 
         # *** STEP 1 ***
         # Commissioning already done
@@ -464,12 +560,18 @@ class TC_FAN_3_5(MatterBaseTest):
         logging.info(f"[FC] self.baseline_fan_mode_asc: {self.baseline_fan_mode_asc}")
         logging.info(f"[FC] self.baseline_speed_setting_asc: {self.baseline_speed_setting_asc}")
 
-        asserts.assert_equal(self.baseline_percent_setting_desc, list(reversed(self.baseline_percent_setting_asc)),
-                             f"[FC] PercentSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_percent_setting_desc}, Ascending: {self.baseline_percent_setting_asc}.")
-        asserts.assert_equal(self.baseline_fan_mode_desc, list(reversed(self.baseline_fan_mode_asc)),
-                             f"[FC] FanMode attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_fan_mode_desc}, Ascending: {self.baseline_fan_mode_asc}.")
-        asserts.assert_equal(self.baseline_speed_setting_desc, list(reversed(self.baseline_speed_setting_asc)),
-                             f"[FC] SpeedSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_speed_setting_desc}, Ascending: {self.baseline_speed_setting_asc}.")
+        asserts.assert_equal(
+            self.baseline_percent_setting_desc, list(reversed(self.baseline_percent_setting_asc)),
+            f"[FC] PercentSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_percent_setting_desc}, Ascending: {self.baseline_percent_setting_asc}."
+        )
+        asserts.assert_equal(
+            self.baseline_fan_mode_desc, list(reversed(self.baseline_fan_mode_asc)),
+            f"[FC] FanMode attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_fan_mode_desc}, Ascending: {self.baseline_fan_mode_asc}."
+        )
+        asserts.assert_equal(
+            self.baseline_speed_setting_desc, list(reversed(self.baseline_speed_setting_asc)),
+            f"[FC] SpeedSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_speed_setting_desc}, Ascending: {self.baseline_speed_setting_asc}."
+        )
 
 if __name__ == "__main__":
     default_matter_test_main()
