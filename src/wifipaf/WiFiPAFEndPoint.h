@@ -117,6 +117,7 @@ private:
     enum class TimerStateFlag : uint8_t
     {
         kConnectTimerRunning     = 0x01, // PAFTP connect completion timer running.
+        kWaitResTimerRunning     = 0x02, // Wait for resource to be available
         kAckReceivedTimerRunning = 0x04, // Ack received timer running due to unacked sent fragment.
         kSendAckTimerRunning     = 0x08, // Send ack timer running; indicates pending ack to send.
     };
@@ -132,6 +133,7 @@ private:
 
     WiFiPAFTP mPafTP;
     WiFiPafRole mRole;
+    uint8_t mResWaitCount = 0;
 
     BitFlags<ConnectionStateFlag> mConnStateFlags;
     BitFlags<TimerStateFlag> mTimerStateFlags;
@@ -168,14 +170,17 @@ private:
     CHIP_ERROR StartAckReceivedTimer();   // Start ack-received timer if it's not already running.
     CHIP_ERROR RestartAckReceivedTimer(); // Restart ack-received timer.
     CHIP_ERROR StartSendAckTimer();       // Start send-ack timer if it's not already running.
+    CHIP_ERROR StartWaitResTimer();       // Start wait-res timer if it's not already running.
     void StopConnectTimer();              // Stop connect timer.
     void StopAckReceivedTimer();          // Stop ack-received timer.
     void StopSendAckTimer();              // Stop send-ack timer.
+    void StopWaitResTimer();              // Stop wait-res timer
 
     // Timer expired callbacks:
     static void HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState);
     static void HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState);
     static void HandleSendAckTimeout(chip::System::Layer * systemLayer, void * appState);
+    static void HandleWaitResTimeout(chip::System::Layer * systemLayer, void * appState);
 
     // Close functions:
     void DoCloseCallback(uint8_t state, uint8_t flags, CHIP_ERROR err);

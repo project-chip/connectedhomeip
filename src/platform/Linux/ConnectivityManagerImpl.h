@@ -266,6 +266,8 @@ private:
     uint16_t mApFreq;
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
+    bool _WiFiPAFResourceAvailable() { return mPafChnlAvailable; };
+    bool mPafChnlAvailable = true;
 #endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
