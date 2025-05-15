@@ -152,6 +152,18 @@ class AVSUMTestBase:
         pan = tilt = None
         await self.send_mptz_set_position_command(endpoint, pan, tilt, zoom, expected_status)
 
+    async def send_null_mptz_set_position_command(self, endpoint, expected_status: Status = Status.Success):
+        pan = tilt = zoom = None
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSetPosition(
+                pan=pan, tilt=tilt, zoom=zoom),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
     async def send_mptz_set_position_command(self, endpoint, pan, tilt, zoom, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSetPosition(
