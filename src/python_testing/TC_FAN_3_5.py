@@ -52,7 +52,6 @@ logger = logging.getLogger(__name__)
 
 class TC_FAN_3_5(MatterBaseTest):
     def desc_TC_FAN_3_5(self) -> str:
-        """Returns the test description for TC-FAN-3.5."""
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
 
     # def steps_TC_FAN_3_5(self):
@@ -477,16 +476,10 @@ class TC_FAN_3_5(MatterBaseTest):
             )
 
     def pics_TC_FAN_3_5(self) -> list[str]:
-        """Return a list of picture references for the test case."""
         return ["FAN.S"]
 
     @async_test_body
     async def test_TC_FAN_3_5(self) -> None:
-        """Run the full test sequence for TC-FAN-3.5.
-
-        Raises:
-            AssertionError: If test invariants do not hold.
-        """
         # Setup
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
