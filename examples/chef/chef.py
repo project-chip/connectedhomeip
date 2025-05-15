@@ -382,6 +382,10 @@ def main() -> int:
                       help=("For use with --build_all. Build labels to include. "
                             "Accepts a regex pattern. Mutually exclusive with --build_exclude."),
                       dest="build_include")
+    parser.add_option("", "--build_bundle",
+                      help=(
+                          "Build platform bundle after build successed when building single device."),
+                      action="store_true", dest="build_bundle")
     parser.add_option("-k", "--keep_going",
                       help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
@@ -935,6 +939,13 @@ def main() -> int:
     #
     # Compilation DB TODO
     #
+
+    #
+    # Build bundle
+    #
+
+    if options.build_bundle:
+        bundle(options.build_target, options.sample_device_type_name)
 
     #
     # Flash

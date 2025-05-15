@@ -39,6 +39,7 @@ struct AppEvent
         kAppEventButtonType_None = 0,
         kAppEventButtonType_Clicked,
         kAppEventButtonType_LongClicked,
+        kAppEventButtonType_DoubleClicked,
     };
 
     enum AppEventType Type;

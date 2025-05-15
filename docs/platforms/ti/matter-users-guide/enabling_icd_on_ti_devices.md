@@ -35,6 +35,13 @@ chip_persist_subscriptions = true
 Subscription timeout resumption allows devices to attempt re-establishing
 subscriptions that may have expired. This feature is disabled out of box.
 
+To enable Dynamic SIT/LIT Support (DSLS), set the following parameter to true
+(LIT must be enabled first):
+
+```
+chip_enable_icd_dsls = true
+```
+
 In addition, various ICD parameters such as idle/active mode duration, active
 mode threshold, and polling intervals can be configured in
 `src/platform/cc13xx_26xx/cc13x4_26x4/CHIPPlatformConfig.h`
@@ -60,6 +67,8 @@ To enable LIT ICD behavior, set the FeatureMap to 0x0007 to enable Check-In
 Protocol Support, User Active Mode Trigger Support, and Long Idle Time Support.
 In addition, enable the UserActiveModeTriggerHint,
 UserActiveModeTriggerInstruction, and MaximumCheckInBackOff attributes.
+
+To enable DSLS support, change the FeatureMap to 0x000F.
 
 After making the desired changes in the zap file, generate the .matter file by
 running the following commands:
