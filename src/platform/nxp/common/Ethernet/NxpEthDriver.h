@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "lwip/netifapi.h"
 #include "ethernetif.h"
+#include "lwip/netifapi.h"
 
 #include <platform/NetworkCommissioning.h>
 
@@ -57,7 +57,7 @@ public:
         NxpEthDriver * mDriver;
     };
 
-    netif * GetEthInetIf(){ return &netif_app; };
+    netif * GetEthInetIf() { return &netif_app; };
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new EthernetNetworkIterator(this); };
@@ -73,9 +73,11 @@ public:
         static NxpEthDriver instance;
         return instance;
     }
+
 private:
-    static void print_ip_addresses(struct netif *netif);
-    static void eth_netif_ext_status_callback(struct netif *netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t *args);
+    static void print_ip_addresses(struct netif * netif);
+    static void eth_netif_ext_status_callback(struct netif * netif, netif_nsc_reason_t reason,
+                                              const netif_ext_callback_args_t * args);
     phy_handle_t phyHandle;
     struct netif netif_app;
 };

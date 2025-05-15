@@ -20,7 +20,6 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -175,7 +174,6 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #endif
 }
 
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
 void ConnectivityManagerImpl::UpdateInternetConnectivityState()
 {
@@ -197,7 +195,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #if CONFIG_CHIP_ETHERNET
-    // Get the LwIP netif for the Ethernet station interface.
+        // Get the LwIP netif for the Ethernet station interface.
         struct netif * netif = DeviceLayer::NetworkCommissioning::NxpEthDriver::Instance().GetEthInetIf();
 #endif
 

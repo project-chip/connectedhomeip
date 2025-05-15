@@ -32,14 +32,14 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-void NxpEthDriver::print_ip_addresses(struct netif *netif)
+void NxpEthDriver::print_ip_addresses(struct netif * netif)
 {
 #if INET_CONFIG_ENABLE_IPV4
     ChipLogProgress(DeviceLayer, "IPv4 Address: %s\n", ipaddr_ntoa(&(netif->ip_addr)));
 #endif
     for (int i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++)
     {
-        const char *str_ip = "-";
+        const char * str_ip = "-";
         if (ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
         {
             str_ip = ip6addr_ntoa(netif_ip6_addr(netif, i));
@@ -48,15 +48,18 @@ void NxpEthDriver::print_ip_addresses(struct netif *netif)
     }
 }
 
-void NxpEthDriver::eth_netif_ext_status_callback(struct netif *netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t *args)
+void NxpEthDriver::eth_netif_ext_status_callback(struct netif * netif, netif_nsc_reason_t reason,
+                                                 const netif_ext_callback_args_t * args)
 {
-    if (((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) || (LWIP_NSC_IPV6_SET & reason) || (LWIP_NSC_IPV4_ADDRESS_CHANGED & reason) || (LWIP_NSC_IPV4_ADDRESS_CHANGED & reason))  && args)
+    if (((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) || (LWIP_NSC_IPV6_SET & reason) || (LWIP_NSC_IPV4_ADDRESS_CHANGED & reason) ||
+         (LWIP_NSC_IPV4_ADDRESS_CHANGED & reason)) &&
+        args)
     {
         ChipDeviceEvent event;
         print_ip_addresses(netif);
-        event.Type                          = DeviceEventType::kPlatformNxpIpChangeEvent;
+        event.Type = DeviceEventType::kPlatformNxpIpChangeEvent;
 
-        CHIP_ERROR err                      = PlatformMgr().PostEvent(&event);
+        CHIP_ERROR err = PlatformMgr().PostEvent(&event);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
@@ -67,15 +70,16 @@ void NxpEthDriver::eth_netif_ext_status_callback(struct netif *netif, netif_nsc_
 CHIP_ERROR NxpEthDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     err_t err;
-    ethernetif_config_t enet_config = {.phyHandle   = &phyHandle,
-                                       .phyAddr     = EXAMPLE_PHY_ADDRESS,
-                                       .phyOps      = EXAMPLE_PHY_OPS,
-                                       .phyResource = EXAMPLE_PHY_RESOURCE,
-                                       .srcClockHz  = EXAMPLE_CLOCK_FREQ,
+    ethernetif_config_t enet_config = {
+        .phyHandle   = &phyHandle,
+        .phyAddr     = EXAMPLE_PHY_ADDRESS,
+        .phyOps      = EXAMPLE_PHY_OPS,
+        .phyResource = EXAMPLE_PHY_RESOURCE,
+        .srcClockHz  = EXAMPLE_CLOCK_FREQ,
     };
 
     /* Set MAC address. */
-    (void)SILICONID_ConvertToMacAddr(&enet_config.macAddress);
+    (void) SILICONID_ConvertToMacAddr(&enet_config.macAddress);
 
 #if LWIP_IPV4
     err = netifapi_netif_add(&netif_app, NULL, NULL, NULL, &enet_config, EXAMPLE_NETIF_INIT_FN, tcpip_input);
@@ -101,8 +105,9 @@ CHIP_ERROR NxpEthDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
 
     if (err != ERR_OK)
     {
-        ChipLogProgress(DeviceLayer,
-                        "Ethernet interface initialization failed. Make sure there is internet conectivity on the board and reset!");
+        ChipLogProgress(
+            DeviceLayer,
+            "Ethernet interface initialization failed. Make sure there is internet conectivity on the board and reset!");
         chipDie();
     }
     ChipLogProgress(DeviceLayer, "Ethernet interface initialization done");

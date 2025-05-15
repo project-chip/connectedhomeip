@@ -47,8 +47,8 @@ extern "C" {
 }
 #endif
 #if CONFIG_CHIP_ETHERNET
-#include "fsl_silicon_id.h"
 #include "fsl_enet.h"
+#include "fsl_silicon_id.h"
 #endif
 
 namespace chip {

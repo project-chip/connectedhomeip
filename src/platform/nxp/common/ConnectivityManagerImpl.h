@@ -133,7 +133,7 @@ private:
     // ===== Private members reserved for use by this class only.
     bool mBorderRouterInit = false;
 
-#if CONFIG_CHIP_ETHERNET  && !CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CONFIG_CHIP_ETHERNET && !CHIP_DEVICE_CONFIG_ENABLE_WPA
     enum class ConnectivityFlags : uint16_t{
         kHaveIPv4InternetConnectivity = 0x0001,
         kHaveIPv6InternetConnectivity = 0x0002,
