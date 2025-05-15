@@ -601,22 +601,16 @@ class TC_FAN_3_5(MatterBaseTest):
         # self.step("6")
         await self.subscribe_to_attributes()
 
-        # TH sends Step commands with the following parameters:
-        # Direction: Decrease, Wrap: False, lowestOff: True
+        # LowestOff tests
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True))
-
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False))
-
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True))
-
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False))
 
+        # Wrap tests
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True))
-
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False))
-
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True))
-
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False))
 
         # *** STEP ???? ***
