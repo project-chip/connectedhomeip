@@ -107,13 +107,32 @@ protected:
 };
 
 // Encodes an attribute of List Data Type into a TLV Reader object for testing WriteClient::PutPreencodedAttribute
+// Warning: This method only encodes uint8_t or 1-octet ByteSpans
 template <class T>
 void TestWriteChunking::EncodeAttributeListIntoTLV(const DataModel::List<T> & aListAttribute,
                                                    TLV::ScopedBufferTLVReader & outEncodedListTlvReader)
 {
+    static_assert(std::is_same<T, chip::ByteSpan>::value || std::is_same<T, uint8_t>::value,
+                  "This method only encodes uint8_t or 1-octet ByteSpans");
+
+    size_t estimatedSize = 0;
+    for (size_t i = 0; i < aListAttribute.size(); i++)
+    {
+        if constexpr (std::is_same<T, uint8_t>::value)
+        {
+            // Control Octet (1) + size of uint8_t
+            estimatedSize += 1 + sizeof(uint8_t);
+        }
+        else if constexpr (std::is_same<T, chip::ByteSpan>::value)
+        {
+            // Control Octet (1) + Length Octet (1) + size of a single ByteSpan
+            estimatedSize += 2 + aListAttribute[i].size();
+        }
+    }
+
     // Encode AttributeData into a TLV Array
     chip::Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
-    buffer.Alloc(aListAttribute.size() * 2 + 2);
+    buffer.Alloc(TLV::EstimateStructOverhead(estimatedSize));
 
     TLV::TLVWriter writer;
     writer.Init(buffer.Get(), buffer.AllocatedSize());
@@ -1104,7 +1123,9 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
         .expectedStatus = { true },
     });
-    ChipLogProgress(Zcl, "Test 1bis: we should receive transaction notifications with EncodingMethod PrencodedAttribute");
+    ChipLogProgress(Zcl,
+                    "Test 1a (Encoding using Preencoded TLV): we should receive transaction notifications with EncodingMethod "
+                    "PrencodedAttribute");
     RunTest(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
@@ -1119,7 +1140,8 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus          = { false },
     });
 
-    ChipLogProgress(Zcl, "Test 2bis: we should receive transaction notifications for incomplete list operations");
+    ChipLogProgress(
+        Zcl, "Test 2a (Encoding using Preencoded TLV): we should receive transaction notifications for incomplete list operations");
     RunTest(
         Instructions{
             .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
@@ -1135,7 +1157,9 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true, true },
     });
 
-    ChipLogProgress(Zcl, "Test 3bis: we should receive transaction notifications for every list in the transaction");
+    ChipLogProgress(
+        Zcl,
+        "Test 3a (Encoding using Preencoded TLV): we should receive transaction notifications for every list in the transaction");
     RunTest(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
@@ -1159,7 +1183,8 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true, false },
     });
 
-    ChipLogProgress(Zcl, "Test 4bis: we should receive transaction notifications with the status of each list");
+    ChipLogProgress(
+        Zcl, "Test 4a (Encoding using Preencoded TLV): we should receive transaction notifications with the status of each list");
     RunTest(
         Instructions{
             .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
@@ -1186,10 +1211,10 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 5bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-        "null value before non null values");
+    ChipLogProgress(Zcl,
+                    "Test 5a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
+                    "if it is handled correctly for "
+                    "null value before non null values");
     RunTest(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
@@ -1209,10 +1234,10 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 6bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-        "null value after non null values");
+    ChipLogProgress(Zcl,
+                    "Test 6a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
+                    "if it is handled correctly for "
+                    "null value after non null values");
     RunTest(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
@@ -1233,10 +1258,10 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 7bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-        "null value between non null values");
+    ChipLogProgress(Zcl,
+                    "Test 7a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
+                    "if it is handled correctly for "
+                    "null value between non null values");
     RunTest(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
@@ -1254,7 +1279,7 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(Zcl, "Test 8bis: transactional list callbacks will be called for nullable lists");
+    ChipLogProgress(Zcl, "Test 8a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists");
     RunTest(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
@@ -1272,10 +1297,10 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { false },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 9bis: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
-        "during processing the requests");
+    ChipLogProgress(Zcl,
+                    "Test 9a (Encoding using Preencoded TLV): for nullable lists, we should receive notifications for unsuccessful "
+                    "writes when non-fatal occurred "
+                    "during processing the requests");
     RunTest(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
@@ -1432,7 +1457,7 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(Zcl, "Test 1bis: we should receive transaction notifications");
+    ChipLogProgress(Zcl, "Test 1a (Encoding using Preencoded TLV): we should receive transaction notifications");
     RunTest_NonEmptyReplaceAll(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
@@ -1447,7 +1472,8 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus          = { false },
     });
 
-    ChipLogProgress(Zcl, "Test 2bis: we should receive transaction notifications for incomplete list operations");
+    ChipLogProgress(
+        Zcl, "Test 2a (Encoding using Preencoded TLV): we should receive transaction notifications for incomplete list operations");
     RunTest_NonEmptyReplaceAll(
         Instructions{
             .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
@@ -1463,7 +1489,9 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true, true },
     });
 
-    ChipLogProgress(Zcl, "Test 3bis: we should receive transaction notifications for every list in the transaction");
+    ChipLogProgress(
+        Zcl,
+        "Test 3a (Encoding using Preencoded TLV): we should receive transaction notifications for every list in the transaction");
     RunTest_NonEmptyReplaceAll(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
@@ -1487,7 +1515,8 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true, false },
     });
 
-    ChipLogProgress(Zcl, "Test 4bis: we should receive transaction notifications with the status of each list");
+    ChipLogProgress(
+        Zcl, "Test 4a (Encoding using Preencoded TLV): we should receive transaction notifications with the status of each list");
     RunTest_NonEmptyReplaceAll(
         Instructions{
             .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
@@ -1514,10 +1543,10 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 5bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-        "null value before non null values");
+    ChipLogProgress(Zcl,
+                    "Test 5a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
+                    "if it is handled correctly for "
+                    "null value before non null values");
     RunTest_NonEmptyReplaceAll(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
@@ -1537,10 +1566,10 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 6bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-        "null value after non null values");
+    ChipLogProgress(Zcl,
+                    "Test 6a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
+                    "if it is handled correctly for "
+                    "null value after non null values");
     RunTest_NonEmptyReplaceAll(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
@@ -1561,10 +1590,10 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 7bis: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-        "null value between non null values");
+    ChipLogProgress(Zcl,
+                    "Test 7a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
+                    "if it is handled correctly for "
+                    "null value between non null values");
     RunTest_NonEmptyReplaceAll(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
@@ -1582,7 +1611,7 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(Zcl, "Test 8bis: transactional list callbacks will be called for nullable lists");
+    ChipLogProgress(Zcl, "Test 8a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists");
     RunTest_NonEmptyReplaceAll(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
@@ -1600,10 +1629,10 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .expectedStatus = { false },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 9bis: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
-        "during processing the requests");
+    ChipLogProgress(Zcl,
+                    "Test 9a (Encoding using Preencoded TLV): for nullable lists, we should receive notifications for unsuccessful "
+                    "writes when non-fatal occurred "
+                    "during processing the requests");
     RunTest_NonEmptyReplaceAll(
         Instructions{
             .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },

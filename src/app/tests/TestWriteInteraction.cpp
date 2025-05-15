@@ -267,9 +267,9 @@ void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, Encodi
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
         reader.Next();
-        EXPECT_EQ(aWriteClient.PutPreencodedAttribute(chip::app::ConcreteDataAttributePath(attributePathParams.mEndpointId,
-                                                                                           attributePathParams.mClusterId,
-                                                                                           attributePathParams.mAttributeId),
+        EXPECT_EQ(aWriteClient.PutPreencodedAttribute(ConcreteDataAttributePath(attributePathParams.mEndpointId,
+                                                                                attributePathParams.mClusterId,
+                                                                                attributePathParams.mAttributeId),
                                                       reader),
                   CHIP_NO_ERROR);
     }
