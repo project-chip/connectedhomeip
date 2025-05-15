@@ -2806,7 +2806,6 @@
           "define": "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "GetActiveDatasetRequest",
