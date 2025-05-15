@@ -16,13 +16,10 @@ def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None):
     repo_dir = os.path.join(script_dir, "..", "repo")
     build_dir = os.path.join(repo_dir, output_dir)
 
-    # Update the package list
-    subprocess.check_call(['sudo', 'apt', 'update', '-y'])
-
     print("Install cmake.")
 
     # Install CMake
-    subprocess.check_call(['sudo', 'apt', 'install', 'cmake', '-y'])
+    subprocess.check_call(['pip', 'install', 'cmake'])
 
     # Generate build files in ./build
     cmake_cmd = [
@@ -34,6 +31,7 @@ def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None):
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_CXX_FLAGS=-Wno-shadow",
         "-DBUILD_SHARED_LIBS=OFF",
+        "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
     ]
 
     if clang:
