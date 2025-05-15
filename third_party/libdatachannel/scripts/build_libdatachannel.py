@@ -16,6 +16,14 @@ def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None):
     repo_dir = os.path.join(script_dir, "..", "repo")
     build_dir = os.path.join(repo_dir, output_dir)
 
+    # Update the package list
+    subprocess.check_call(['sudo', 'apt', 'update', '-y'])
+
+    print("Install cmake.")
+
+    # Install CMake
+    subprocess.check_call(['sudo', 'apt', 'install', 'cmake', '-y'])
+
     # Generate build files in ./build
     cmake_cmd = [
         "cmake",
