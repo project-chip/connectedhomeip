@@ -36,9 +36,9 @@ constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
 constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
 
 // Closure Endpoints
-ClosureControlEndpoint ep1(1);
-ClosureDimensionEndpoint ep2(2);
-ClosureDimensionEndpoint ep3(3);
+ClosureControlEndpoint ep1(kClosureEndpoint);
+ClosureDimensionEndpoint ep2(kClosurePanel1Endpoint);
+ClosureDimensionEndpoint ep3(kClosurePanel2Endpoint);
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
