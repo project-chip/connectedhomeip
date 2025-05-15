@@ -94,8 +94,8 @@ enum Id
     kFault_NumItems                                    // marker value
 };
 
-extern const char * const sFaultNames[];
-extern const size_t kNumChipFaultsFromEnum;
+// Exporting kNumChipFaultsFromEnum for usage in Python bindings
+const size_t kNumChipFaultsFromEnum = kFault_NumItems;
 
 static_assert(kFault_IMInvoke_SeparateResponses == 12, "Test plan specification and automation code relies on this value being 12");
 static_assert(kFault_IMInvoke_SeparateResponsesInvertResponseOrder == 13,

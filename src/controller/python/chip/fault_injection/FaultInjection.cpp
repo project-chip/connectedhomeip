@@ -18,8 +18,6 @@
 
 #include <lib/support/CHIPFaultInjection.h>
 
-// #if CHIP_WITH_NLFAULTINJECTION
-
 extern "C" int32_t pychip_faultinjection_fail_at_fault(uint32_t faultID, uint32_t numCallsToSkip, uint32_t numCallsToFail,
                                                        bool takeMutex)
 {
@@ -39,14 +37,7 @@ extern "C" void pychip_faultinjection_reset_fault_counters(void)
     return chip::FaultInjection::GetManager().ResetFaultCounters();
 }
 
-extern "C" const char * const * pychip_faultinjection_get_fault_names()
-{
-    return chip::FaultInjection::sFaultNames;
-}
-
 extern "C" int pychip_faultinjection_get_num_faults()
 {
     return chip::FaultInjection::kNumChipFaultsFromEnum;
 }
-
-// #endif // CHIP_WITH_NLFAULTINJECTION
