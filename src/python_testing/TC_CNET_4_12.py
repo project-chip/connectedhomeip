@@ -170,6 +170,17 @@ class TC_CNET_4_12(MatterBaseTest):
                     f'NetworkID_THREAD_1ST_OPERATIONALDATASET = {thread_network_id_bytes_th1}, '
                     f'NetworkID_THREAD_2ND_OPERATIONALDATASET = {thread_network_id_bytes_th2}')
 
+        # Read the ConnectMaxTimeSeconds attribute after attempting to connect
+        connect_max_time_seconds = await self.read_single_attribute_check_success(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds
+        )
+        logger.info(f'Precondition: ConnectMaxTimeSeconds value: {connect_max_time_seconds}')
+
+        # Fudge factor to ensure the Thread networks are fully initialized before switching.
+        fudge_factor_seconds = 60
+        logger.info(f'Precondition: fudge_factors_seconds value: {fudge_factor_seconds}')
+
         # Steps
         self.step(1)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=self.failsafe_expiration_seconds, breadcrumb=1)
@@ -280,15 +291,9 @@ class TC_CNET_4_12(MatterBaseTest):
                              "Failure status returned from ConnectNetwork")
 
         # Wait for the device to establish connection with the new Thread network
-        await asyncio.sleep(60)
-        logger.info("sleep completed")
-
-        # Read the ConnectMaxTimeSeconds attribute after attempting to connect
-        connect_max_time_seconds = await self.read_single_attribute_check_success(
-            cluster=Clusters.NetworkCommissioning,
-            attribute=Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds
-        )
-        logger.info(f'Step #7: ConnectMaxTimeSeconds value: {connect_max_time_seconds}')
+        # Includes a fudge factor for SRP record propagation.
+        await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
+        logger.info("Step #7: Sleep completed for Thread network connection and SRP record propagation")
 
         self.step(8)
         # Verify that the TH successfully connects to the DUT
@@ -414,7 +419,9 @@ class TC_CNET_4_12(MatterBaseTest):
                              "Failure status returned from ConnectNetwork")
 
         # Wait for the device to establish connection with the new Thread network
-        await asyncio.sleep(60)
+        # Includes a fudge factor for SRP record propagation.
+        await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
+        logger.info("Step #16: Sleep completed for Thread network connection and SRP record propagation")
 
         self.step(17)
         # THREAD_2 - successfully connects to the DUT from previous step
@@ -436,7 +443,11 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_equal(breadcrumb_info, 3,
                              "The Breadcrumb attribute is not 3")
 
-        await asyncio.sleep(60)
+        # Wait for the device to establish connection with the new Thread network
+        # Includes a fudge factor for SRP record propagation.
+        await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
+        logger.info("Step #18: Sleep completed for Thread network connection and SRP record propagation")
+
         self.step(19)
         cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
         resp = await self.send_single_cmd(
