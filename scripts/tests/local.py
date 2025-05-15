@@ -253,6 +253,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             binary="chip-terms-and-conditions-app",
         )
     )
+    targets.append(
+        ApplicationTarget(
+            key="CAMERA_APP",
+            target=f"{target_prefix}-camera-{suffix}",
+            binary="chip-camera-app",
+        )
+    )
 
     return targets
 
@@ -1065,6 +1072,20 @@ def casting_test(test, log_directory, tv_app, tv_casting_app, runner):
         script += f" --log-directory '{log_directory}'"
 
     cmd = ";".join(["set -e", "source scripts/activate.sh", script])
+    subprocess.run(["bash", "-c", cmd], check=True)
+
+
+@cli.command()
+def prereq():
+    """
+    Install/force some prerequisites inside the build environment.
+
+    Work in progress, however generally we have:
+      - libdatachannel requires cmake 3.5
+    """
+
+    # Camera app needs cmake 3.5 and 4.0 removed compatibility. Force cmake 3.*
+    cmd = ";".join(["set -e", "source scripts/activate.sh", "pip install 'cmake>=3,<4'"])
     subprocess.run(["bash", "-c", cmd], check=True)
 
 

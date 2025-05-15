@@ -201,10 +201,10 @@ class MatterIdlTransformer(Transformer):
             raise Exception("Unexpected size for data type")
 
     @v_args(inline=True)
-    def constant_entry(self, api_maturity, id, number):
+    def constant_entry(self, api_maturity, id, number, spec_name):
         if api_maturity is None:
             api_maturity = ApiMaturity.STABLE
-        return ConstantEntry(name=id, code=number, api_maturity=api_maturity)
+        return ConstantEntry(name=id, code=number, api_maturity=api_maturity, specification_name=spec_name)
 
     @v_args(inline=True)
     def enum(self, shared, id, type, *entries):
