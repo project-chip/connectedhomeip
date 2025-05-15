@@ -59,7 +59,8 @@ For Matter over Ethernet configuration :
 
 -   For [`NXP FRDM-RW612`] board: nothing to do (embedded PCB ethernet
     connector)
--   [`NXP RD-RW612-BGA`] board is not supported, recommendation: use `frdm` board
+-   [`NXP RD-RW612-BGA`] board is not supported, recommendation: use `frdm`
+    board
 
 <a name="building"></a>
 
