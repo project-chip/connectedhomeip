@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)s] %(message)s")
 
 
-TIMEOUT = 2*60
+TIMEOUT = 900
 
 
 async def connect_wifi_linux(ssid, password):
@@ -201,7 +201,7 @@ class TC_CNET_4_11(MatterBaseTest):
     # Overrides default_timeout: Test includes several long waits, adjust timeout to accommodate.
     @property
     def default_timeout(self) -> int:
-        return 2*60
+        return TIMEOUT
 
     def steps_TC_CNET_4_11(self):
         return [
@@ -518,15 +518,12 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(17)
 
         logger.info(f" --- Step 17: Attempting to connect to: {wifi_2nd_ap_ssid}")
-        await asyncio.wait_for(
-            change_networks(
-                object=self,
-                cluster=cnet,
-                ssid=wifi_2nd_ap_ssid.encode(),
-                password=wifi_2nd_ap_credentials.encode(),
-                breadcrumb=3
-            ),
-            timeout=TIMEOUT
+        await change_networks(
+            object=self,
+            cluster=cnet,
+            ssid=wifi_2nd_ap_ssid.encode(),
+            password=wifi_2nd_ap_credentials.encode(),
+            breadcrumb=3
         )
 
         # TODO: same as step 8, remove from here and from spec
