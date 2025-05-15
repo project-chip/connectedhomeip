@@ -66,11 +66,11 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
 4. Run the Python CHIP Controller REPL with Bluetooth LE adapter defined from a
    command line:
 
-    For example, add `--ble-adapter=2` to use the virtual interface `hci2`
+    For example, add `--ble-controller=2` to use the virtual interface `hci2`
     listed above.
 
     ```
-    chip-repl --ble-adapter=2
+    chip-repl --ble-controller=2
     ```
 
 <hr>

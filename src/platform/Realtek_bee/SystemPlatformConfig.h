@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the CHIP System
- *          Layer on Qorvo QPG platforms.
+ *          Layer on Realtek Bee platforms.
  *
  */
 

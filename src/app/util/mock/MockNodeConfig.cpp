@@ -186,10 +186,14 @@ const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attribu
 MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters,
                                        std::initializer_list<EmberAfDeviceType> aDeviceTypes,
                                        std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags,
-                                       app::EndpointComposition aComposition) :
+                                       app::EndpointComposition aComposition, CharSpan aEndpointUniqueId) :
     id(aId),
     composition(aComposition), clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
+
 {
+
+    memcpy(endpointUniqueIdBuffer, aEndpointUniqueId.data(), aEndpointUniqueId.size());
+    endpointUniqueIdSize = static_cast<uint8_t>(aEndpointUniqueId.size());
     VerifyOrDie(aClusters.size() < UINT8_MAX);
 
     // Note: We're copying all the EmberAfClusters because they need to be contiguous in memory
@@ -207,6 +211,9 @@ MockEndpointConfig::MockEndpointConfig(const MockEndpointConfig & other) :
 {
     // fix self-referencing pointers
     mEmberEndpoint.cluster = mEmberClusters.data();
+
+    memcpy(endpointUniqueIdBuffer, other.endpointUniqueIdBuffer, other.endpointUniqueIdSize);
+    endpointUniqueIdSize = other.endpointUniqueIdSize;
 }
 
 const MockClusterConfig * MockEndpointConfig::clusterById(ClusterId clusterId, ptrdiff_t * outIndex) const

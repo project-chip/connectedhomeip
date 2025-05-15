@@ -40,7 +40,6 @@ import java.util.Date;
 public class MediaPlaybackSubscribeToCurrentStateExampleFragment extends Fragment {
   private static final String TAG =
       MediaPlaybackSubscribeToCurrentStateExampleFragment.class.getSimpleName();
-  private static final int DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW = 1;
 
   private final CastingPlayer selectedCastingPlayer;
   private final boolean useCommissionerGeneratedPasscode;
@@ -77,19 +76,7 @@ public class MediaPlaybackSubscribeToCurrentStateExampleFragment extends Fragmen
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    Endpoint endpoint;
-    if (useCommissionerGeneratedPasscode) {
-      // For the example Commissioner-Generated passcode commissioning flow, run demo interactions
-      // with the Endpoint with ID DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW = 1. For this flow, we
-      // commissioned with the Target Content Application with Vendor ID 1111. Since this target
-      // content application does not report its Endpoint's Vendor IDs, we find the desired endpoint
-      // based on the Endpoint ID. See connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-      endpoint =
-          EndpointSelectorExample.selectEndpointById(
-              selectedCastingPlayer, DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW);
-    } else {
-      endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
-    }
+    Endpoint endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
     if (endpoint == null) {
       Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
       return inflater.inflate(

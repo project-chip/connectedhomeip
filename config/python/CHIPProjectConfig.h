@@ -55,8 +55,6 @@
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 
-#define CHIP_CONFIG_ENABLE_UPDATE 1
-
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
 
 /* TODO: Ideally, these #defines should be enabled by default for Linux

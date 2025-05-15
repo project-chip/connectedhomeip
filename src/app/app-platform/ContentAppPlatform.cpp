@@ -324,13 +324,13 @@ ContentApp * ContentAppPlatform::LoadContentAppInternal(const CatalogVendorApp &
 
 ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint16_t productId)
 {
-    ChipLogProgress(DeviceLayer, "GetLoadContentAppByVendorId() - vendorId %d, productId %d", vendorId, productId);
+    ChipLogProgress(DeviceLayer, "LoadContentAppByVendorId() - vendorId %d, productId %d", vendorId, productId);
 
     CatalogVendorApp vendorApp;
     CHIP_ERROR err = mContentAppFactory->LookupCatalogVendorApp(vendorId, productId, &vendorApp);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetLoadContentAppByVendorId() - failed to find an app for vendorId %d, productId %d", vendorId,
+        ChipLogError(DeviceLayer, "LoadContentAppByVendorId() - failed to find an app for vendorId %d, productId %d", vendorId,
                      productId);
         return nullptr;
     }
@@ -514,7 +514,7 @@ bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t product
     ContentApp * app = LoadContentAppByClient(info.vendorId, info.productId);
     if (app == nullptr)
     {
-        ChipLogProgress(DeviceLayer, "no app found for vendor id=%d \r\n", info.vendorId);
+        ChipLogProgress(DeviceLayer, "no content app found for vendor id=%d \r\n", info.vendorId);
         return false;
     }
 
@@ -531,6 +531,8 @@ bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t product
         // if no match, then check allowed vendor list
         for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
         {
+            ChipLogProgress(DeviceLayer, "HasTargetContentApp() allowedVendor id: %d, Client vendor id: %d", allowedVendor,
+                            vendorId);
             if (allowedVendor == vendorId)
             {
                 allow = true;
@@ -539,10 +541,10 @@ bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t product
         }
         if (!allow)
         {
-            ChipLogProgress(
-                DeviceLayer,
-                "no permission given by ApplicationBasic cluster on app with vendor id=%d to client with vendor id=%d\r\n",
-                info.vendorId, vendorId);
+            ChipLogProgress(DeviceLayer,
+                            "no permission given by ApplicationBasic cluster on Content App with vendor id=%d to Client "
+                            "(Commissionee) with vendor id=%d\r\n",
+                            info.vendorId, vendorId);
             return false;
         }
     }

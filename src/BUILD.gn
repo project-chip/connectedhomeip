@@ -51,6 +51,7 @@ if (chip_build_tests) {
     deps = []
     tests = [
       "${chip_root}/src/access/tests",
+      "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -71,6 +72,7 @@ if (chip_build_tests) {
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
+      "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations

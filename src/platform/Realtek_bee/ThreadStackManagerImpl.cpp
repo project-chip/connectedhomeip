@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the ThreadStackManager object for the
- *          Qorvo QPG platform using the Qorvo QPG library and the OpenThread
+ *          Realtek Bee platform using the Realtek Bee library and the OpenThread
  *          stack.
  *
  */
@@ -26,16 +26,15 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
-// #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
-#include <platform/OpenThread/OpenThreadUtils.h>
-#include <platform/ThreadStackManager.h>
-
+#include "os_task.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-
+#include <mem_config.h>
 #include <openthread/heap.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
 #include <platforms/openthread-system.h>
 
 extern void otSysInit(int argc, char * argv[]);
@@ -56,6 +55,8 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    mThreadTask = NULL;
+
     ChipLogProgress(DeviceLayer, "ThreadStackManagerImpl::InitThreadStack");
     // Initialize the OpenThread platform layer
     otSysInit(0, NULL);
@@ -64,14 +65,113 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit");
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    //  err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
-    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit");
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit");
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
 exit:
     return err;
 }
+
+#if USE_FREERTOS_NATIVE_API
+void ThreadStackManagerImpl::SignalThreadActivityPending()
+{
+    if (mThreadTask != NULL)
+    {
+        xTaskNotifyGive(mThreadTask);
+    }
+}
+
+BaseType_t ThreadStackManagerImpl::SignalThreadActivityPendingFromISR()
+{
+    BaseType_t yieldRequired = pdFALSE;
+
+    if (mThreadTask != NULL)
+    {
+        vTaskNotifyGiveFromISR(mThreadTask, &yieldRequired);
+    }
+
+    return yieldRequired;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
+{
+    if (mThreadTask != NULL)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    xTaskCreate(ThreadTaskMain, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME,
+                CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t), this, CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY,
+                &mThreadTask);
+
+    if (mThreadTask == NULL)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::ExecuteThreadTask(void)
+{
+#if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
+    os_alloc_secure_ctx(1024);
+#endif
+
+    while (true)
+    {
+        LockThreadStack();
+        ProcessThreadActivity();
+        UnlockThreadStack();
+
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    }
+}
+
+#else // USE_FREERTOS_NATIVE_API
+
+void ThreadStackManagerImpl::SignalThreadActivityPending()
+{
+    if (mThreadTask != NULL)
+    {
+        os_task_notify_give(mThreadTask);
+    }
+}
+
+void ThreadStackManagerImpl::SignalThreadActivityPendingFromISR()
+{
+    if (mThreadTask != NULL)
+    {
+        os_task_notify_give(mThreadTask);
+    }
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
+{
+    if (os_task_create(&mThreadTask, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME, ThreadTaskMain, this,
+                       CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE, CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY))
+    {
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NO_MEMORY;
+}
+
+void ThreadStackManagerImpl::ExecuteThreadTask(void)
+{
+#if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
+    os_alloc_secure_ctx(1024);
+#endif
+    uint32_t notify;
+    while (true)
+    {
+        LockThreadStack();
+        ProcessThreadActivity();
+        UnlockThreadStack();
+
+        os_task_notify_take(1, 0xffffffff, &notify);
+    }
+}
+#endif // USE_FREERTOS_NATIVE_API
 
 void ThreadStackManagerImpl::GetExtAddress(otExtAddress & aExtAddr)
 {
@@ -88,12 +188,15 @@ bool ThreadStackManagerImpl::IsInitialized()
     return sInstance.mThreadStackLock != NULL;
 }
 
+void ThreadStackManagerImpl::ThreadTaskMain(void * arg)
+{
+    reinterpret_cast<ThreadStackManagerImpl *>(arg)->ExecuteThreadTask();
+}
+
 } // namespace DeviceLayer
 } // namespace chip
 
 using namespace ::chip::DeviceLayer;
-
-#if 1
 
 /**
  * Glue function called directly by the OpenThread stack when tasklet processing work
@@ -110,17 +213,14 @@ extern "C" void otTaskletsSignalPending(otInstance * p_instance)
  */
 extern "C" void otSysEventSignalPending(void)
 {
+#if USE_FREERTOS_NATIVE_API
     BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
     portYIELD_FROM_ISR(yieldRequired);
-}
+#else
+    ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
 #endif
-
-/*
-extern "C" otInstance * otrGetInstance()
-{
-    return ThreadStackMgrImpl().OTInstance();
 }
-*/
+
 extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 {
     return CHIPPlatformMemoryCalloc(aNum, aSize);

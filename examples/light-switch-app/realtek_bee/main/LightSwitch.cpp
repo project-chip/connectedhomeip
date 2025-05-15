@@ -35,12 +35,29 @@ void LightSwitch::Init()
 
 void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t action)
 {
-    BindingTable & bindingTable        = BindingTable::GetInstance();
+    BindingTable & bindingTable = BindingTable::GetInstance();
+    if (!bindingTable.Size())
+    {
+        ChipLogError(DeviceLayer, "bindingTable empty");
+        return;
+    }
+
     BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
     if (data)
     {
         data->EndpointId = endpointId;
         data->ClusterId  = Clusters::OnOff::Id;
+        data->IsGroup    = false;
+
+        for (auto & entry : bindingTable)
+        {
+            if (endpointId == entry.local && MATTER_MULTICAST_BINDING == entry.type)
+            {
+                data->IsGroup = true;
+                break;
+            }
+        }
+
         switch (action)
         {
         case Action::Toggle:
@@ -56,7 +73,6 @@ void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t acti
             Platform::Delete(data);
             return;
         }
-        data->IsGroup = BindingHandler::GetInstance().IsGroupBound();
         DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     }
 }

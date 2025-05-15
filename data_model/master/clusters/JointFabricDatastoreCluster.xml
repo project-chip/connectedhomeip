@@ -83,13 +83,16 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="DatastoreACLEntryStruct">
-      <field id="0" name="ListID" type="uint16">
+      <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="ACLEntry" type="AccessControlEntryStruct">
+      <field id="1" name="ListID" type="uint16">
         <mandatoryConform/>
       </field>
-      <field id="2" name="StatusEntry" type="DatastoreStatusEntryStruct">
+      <field id="2" name="ACLEntry" type="AccessControlEntryStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
@@ -115,23 +118,29 @@ Davis, CA 95616, USA
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="DatastoreBindingEntryStruct">
-      <field id="0" name="ListID" type="uint16">
+    <struct name="DatastoreEndpointBindingEntryStruct">
+      <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Binding" type="TargetStruct">
+      <field id="1" name="EndpointID" type="endpoint-no">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ListID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Binding" type="TargetStruct">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="2" name="StatusEntry" type="DatastoreStatusEntryStruct">
+      <field id="4" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
     <struct name="DatastoreEndpointEntryStruct">
-      <field id="0" name="EndpointID" type="endpoint-id">
+      <field id="0" name="EndpointID" type="endpoint-no">
         <mandatoryConform/>
       </field>
       <field id="1" name="NodeID" type="node-id">
@@ -146,21 +155,19 @@ Davis, CA 95616, USA
       <field id="3" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
-      <field id="4" name="GroupIDList" type="list">
-        <entry type="DatastoreGroupIDEntryStruct"/>
-        <mandatoryConform/>
-      </field>
-      <field id="5" name="BindingList" type="list">
-        <entry type="DatastoreBindingEntryStruct"/>
-        <mandatoryConform/>
-      </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="DatastoreGroupIDEntryStruct">
-      <field id="0" name="GroupID" type="group-id">
+    <struct name="DatastoreEndpointGroupIDEntryStruct">
+      <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="StatusEntry" type="DatastoreStatusEntryStruct">
+      <field id="1" name="EndpointID" type="endpoint-no">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
@@ -220,25 +227,16 @@ Davis, CA 95616, USA
       <field id="3" name="CommissioningStatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
-      <field id="4" name="NodeKeySetList" type="list">
-        <entry type="DatastoreNodeKeyEntryStruct"/>
-        <mandatoryConform/>
-      </field>
-      <field id="5" name="ACLList" type="list">
-        <entry type="DatastoreACLEntryStruct"/>
-        <mandatoryConform/>
-      </field>
-      <field id="6" name="EndpointList" type="list">
-        <entry type="DatastoreEndpointEntryStruct"/>
-        <mandatoryConform/>
-      </field>
       <access fabricScoped="true"/>
     </struct>
     <struct name="DatastoreNodeKeyEntryStruct">
-      <field id="0" name="GroupKeySetID" type="uint16">
+      <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="StatusEntry" type="DatastoreStatusEntryStruct">
+      <field id="1" name="GroupKeySetID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
@@ -297,6 +295,31 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0008" name="StatusEntry" type="DatastoreStatusEntryStruct">
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0009" name="EndpointGroupIDList" type="list">
+      <entry type="DatastoreEndpointGroupIDEntryStruct"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000A" name="EndpointBindingList" type="list">
+      <entry type="DatastoreEndpointBindingEntryStruct"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000B" name="NodeKeySetList" type="list">
+      <entry type="DatastoreNodeKeyEntryStruct"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000C" name="NodeACLList" type="list">
+      <entry type="DatastoreACLEntryStruct"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000D" name="NodeEndpointList" type="list">
+      <entry type="DatastoreEndpointEntryStruct"/>
       <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
@@ -499,7 +522,7 @@ Davis, CA 95616, USA
     <command id="0x0D" name="UpdateEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="EndpointID" type="endpoint-id">
+      <field id="0" name="EndpointID" type="endpoint-no">
         <mandatoryConform/>
       </field>
       <field id="1" name="NodeID" type="node-id">
@@ -518,7 +541,7 @@ Davis, CA 95616, USA
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="EndpointID" type="endpoint-id">
+      <field id="1" name="EndpointID" type="endpoint-no">
         <mandatoryConform/>
       </field>
       <field id="2" name="GroupID" type="group-id">
@@ -531,7 +554,7 @@ Davis, CA 95616, USA
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="EndpointID" type="endpoint-id">
+      <field id="1" name="EndpointID" type="endpoint-no">
         <mandatoryConform/>
       </field>
       <field id="2" name="GroupID" type="group-id">
@@ -544,7 +567,7 @@ Davis, CA 95616, USA
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="EndpointID" type="endpoint-id">
+      <field id="1" name="EndpointID" type="endpoint-no">
         <mandatoryConform/>
       </field>
       <field id="2" name="Binding" type="TargetStruct">
@@ -557,7 +580,7 @@ Davis, CA 95616, USA
       <field id="0" name="ListID" type="uint16">
         <mandatoryConform/>
       </field>
-      <field id="1" name="EndpointID" type="endpoint-id">
+      <field id="1" name="EndpointID" type="endpoint-no">
         <mandatoryConform/>
       </field>
       <field id="2" name="NodeID" type="node-id">

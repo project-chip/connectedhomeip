@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include "media-controller.h"
 #include <atomic>
 #include <cstdint>
-#include <media-controller.h>
 #include <thread>
 
 enum class StreamType

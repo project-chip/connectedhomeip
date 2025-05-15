@@ -15,8 +15,13 @@
 import dataclasses
 import enum
 import logging
+import sys
 from typing import Callable, Dict, List, Optional, Protocol, TypeVar
 
+import click
+import coloredlogs
+
+from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.matter_idl_types import ApiMaturity, Attribute, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
 
 
@@ -335,3 +340,50 @@ def is_backwards_compatible(original: Idl, updated: Idl):
     """
     checker = CompatibilityChecker(original, updated)
     return checker.check() == Compatibility.COMPATIBLE
+
+
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARN,
+    'fatal': logging.FATAL,
+}
+
+
+@click.command()
+@click.option(
+    '--log-level',
+    default='INFO',
+    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    help='Determines the verbosity of script output')
+@click.argument(
+    'old_idl',
+    type=click.Path(exists=True))
+@click.argument(
+    'new_idl',
+    type=click.Path(exists=True))
+def main(log_level, old_idl, new_idl):
+    """
+    Parses MATTER IDL files (.matter) and validates that <new_idl> is backwards compatible
+    when compared to <old_idl>.
+
+    Generally additions are safe, but not deletes or id changes. Actual set of rules
+    defined in `backwards_compatibility` module.
+    """
+    coloredlogs.install(
+        level=__LOG_LEVELS__[log_level],
+        fmt='%(asctime)s %(levelname)-7s %(message)s',
+    )
+
+    logging.info("Parsing OLD idl from %s" % old_idl)
+    old_tree = CreateParser().parse(open(old_idl, "rt").read())
+
+    logging.info("Parsing NEW idl from %s" % new_idl)
+    new_tree = CreateParser().parse(open(new_idl, "rt").read())
+
+    if not is_backwards_compatible(original=old_tree, updated=new_tree):
+        sys.exit(1)
+
+    sys.exit(0)

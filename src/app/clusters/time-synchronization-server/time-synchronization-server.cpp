@@ -462,7 +462,7 @@ void TimeSynchronizationServer::Init()
 
     // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
     // want time sync even if we can't register the deletgate here.
-    CHIP_ERROR err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    CHIP_ERROR err = Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync");
@@ -473,6 +473,7 @@ void TimeSynchronizationServer::Init()
 void TimeSynchronizationServer::Shutdown()
 {
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
 }
 
 void TimeSynchronizationServer::OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event)

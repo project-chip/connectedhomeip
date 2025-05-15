@@ -115,7 +115,7 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
     {
         if (searchOverAll || payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kBLE))
         {
-            if (CHIP_NO_ERROR == (err = StartDiscoverOverBle(payload)))
+            if (CHIP_NO_ERROR == (err = StartDiscoveryOverBLE(payload)))
             {
                 isRunning = true;
             }
@@ -124,7 +124,7 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
 
         if (searchOverAll || payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kSoftAP))
         {
-            if (CHIP_NO_ERROR == (err = StartDiscoverOverSoftAP(payload)))
+            if (CHIP_NO_ERROR == (err = StartDiscoveryOverSoftAP(payload)))
             {
                 isRunning = true;
             }
@@ -133,7 +133,7 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
         if (searchOverAll || payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kWiFiPAF))
         {
             ChipLogProgress(Controller, "WiFi-PAF: has RendezvousInformationFlag::kWiFiPAF");
-            if (CHIP_NO_ERROR == (err = StartDiscoverOverWiFiPAF(payload)))
+            if (CHIP_NO_ERROR == (err = StartDiscoveryOverWiFiPAF(payload)))
             {
                 isRunning = true;
             }
@@ -143,7 +143,7 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
 
     // We always want to search on network because any node that has already been commissioned will use on-network regardless of the
     // QR code flag.
-    if (CHIP_NO_ERROR == (err = StartDiscoverOverIP(payload)))
+    if (CHIP_NO_ERROR == (err = StartDiscoveryOverDNSSD(payload)))
     {
         isRunning = true;
     }
@@ -152,7 +152,7 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
     return isRunning ? CHIP_NO_ERROR : CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR SetUpCodePairer::StartDiscoverOverBle(SetupPayload & payload)
+CHIP_ERROR SetUpCodePairer::StartDiscoveryOverBLE(SetupPayload & payload)
 {
 #if CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -177,7 +177,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverBle(SetupPayload & payload)
 #endif // CONFIG_NETWORK_LAYER_BLE
 }
 
-CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
+CHIP_ERROR SetUpCodePairer::StopDiscoveryOverBLE()
 {
     // Make sure to not call CancelBleIncompleteConnection unless we are in fact
     // waiting on BLE discovery.  It will cancel connections that are in fact
@@ -201,7 +201,7 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
 #endif // CONFIG_NETWORK_LAYER_BLE
 }
 
-CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
+CHIP_ERROR SetUpCodePairer::StartDiscoveryOverDNSSD(SetupPayload & payload)
 {
     ChipLogProgress(Controller, "Starting commissioning discovery over DNS-SD");
 
@@ -229,7 +229,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
     return err;
 }
 
-CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
+CHIP_ERROR SetUpCodePairer::StopDiscoveryOverDNSSD()
 {
     ChipLogDetail(Controller, "Stopping commissioning discovery over DNS-SD");
 
@@ -242,23 +242,22 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetUpCodePairer::StartDiscoverOverSoftAP(SetupPayload & payload)
+CHIP_ERROR SetUpCodePairer::StartDiscoveryOverSoftAP(SetupPayload & payload)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
+CHIP_ERROR SetUpCodePairer::StopDiscoveryOverSoftAP()
 {
     mWaitingForDiscovery[kSoftAPTransport] = false;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
+CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF(SetupPayload & payload)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     ChipLogProgress(Controller, "Starting commissioning discovery over WiFiPAF");
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mWaitingForDiscovery[kWiFiPAFTransport] = true;
 
     const SetupDiscriminator connDiscriminator(payload.discriminator);
     VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
@@ -269,6 +268,8 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
                                             .discriminator = discriminator };
     ReturnErrorOnFailure(
         DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+
+    mWaitingForDiscovery[kWiFiPAFTransport] = true;
     CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
                                                                      OnWiFiPAFSubscribeError);
     if (err != CHIP_NO_ERROR)
@@ -282,7 +283,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
 #endif // CONFIG_NETWORK_LAYER_BLE
 }
 
-CHIP_ERROR SetUpCodePairer::StopConnectOverWiFiPAF()
+CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
 {
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -488,7 +489,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
     {
         // If the discovery type does not want the PASE auto retry mechanism, we will just store
         // a single IP. So the discovery process is stopped as it won't be of any help anymore.
-        StopConnectOverIP();
+        StopDiscoveryOverDNSSD();
         mDiscoveredParameters.emplace_back(resolutionData, 0);
     }
     else
@@ -547,18 +548,23 @@ bool SetUpCodePairer::DiscoveryInProgress() const
     return false;
 }
 
-void SetUpCodePairer::ResetDiscoveryState()
+void SetUpCodePairer::StopAllDiscoveryAttempts()
 {
-    StopConnectOverBle();
-    StopConnectOverIP();
-    StopConnectOverSoftAP();
-    StopConnectOverWiFiPAF();
+    LogErrorOnFailure(StopDiscoveryOverBLE());
+    LogErrorOnFailure(StopDiscoveryOverDNSSD());
+    LogErrorOnFailure(StopDiscoveryOverSoftAP());
+    LogErrorOnFailure(StopDiscoveryOverWiFiPAF());
 
     // Just in case any of those failed to reset the waiting state properly.
     for (auto & waiting : mWaitingForDiscovery)
     {
         waiting = false;
     }
+}
+
+void SetUpCodePairer::ResetDiscoveryState()
+{
+    StopAllDiscoveryAttempts();
 
     mDiscoveredParameters.clear();
     mCurrentPASEParameters.ClearValue();
@@ -690,9 +696,7 @@ void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, v
 {
     ChipLogError(Controller, "Discovery timed out");
     auto * pairer = static_cast<SetUpCodePairer *>(context);
-    LogErrorOnFailure(pairer->StopConnectOverBle());
-    LogErrorOnFailure(pairer->StopConnectOverIP());
-    LogErrorOnFailure(pairer->StopConnectOverSoftAP());
+    pairer->StopAllDiscoveryAttempts();
     if (!pairer->mWaitingForPASE && pairer->mDiscoveredParameters.empty())
     {
         // We're not waiting on any more PASE attempts, and we're not going to

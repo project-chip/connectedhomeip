@@ -23,9 +23,7 @@ pyobjc-framework-corebluetooth; sys_platform == 'darwin'
 # built venv
 #
 # TODO: this should change in the Future
-diskcache
-lark
-websockets
+-r ../tests/requirements.txt
 
 # mobly tests
 portpicker

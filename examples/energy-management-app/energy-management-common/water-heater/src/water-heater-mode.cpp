@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <EnergyManagementAppCommonMain.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <water-heater-mode.h>
 
@@ -100,8 +101,27 @@ void WaterHeaterMode::Shutdown()
 
 void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
 {
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
     VerifyOrDie(gWaterHeaterModeDelegate == nullptr && gWaterHeaterModeInstance == nullptr);
     gWaterHeaterModeDelegate = new WaterHeaterMode::ExampleWaterHeaterModeDelegate;
     gWaterHeaterModeInstance = new ModeBase::Instance(gWaterHeaterModeDelegate, endpointId, WaterHeaterMode::Id, 0);
     gWaterHeaterModeInstance->Init();
+}
+
+void emberAfWaterHeaterModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
+    if (gWaterHeaterModeInstance)
+    {
+        gWaterHeaterModeInstance->Shutdown();
+    }
+    WaterHeaterMode::Shutdown();
 }

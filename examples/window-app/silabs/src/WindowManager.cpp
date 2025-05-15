@@ -171,7 +171,9 @@ void WindowManager::DispatchEventAttributeChange(chip::EndpointId endpoint, chip
     case Attributes::CurrentPositionLiftPercent100ths::Id:
     case Attributes::CurrentPositionTiltPercent100ths::Id:
         UpdateLED();
+#ifdef DISPLAY_ENABLED
         UpdateLCD();
+#endif // DISPLAY_ENABLED
         break;
     default:
         break;
@@ -554,7 +556,7 @@ void WindowManager::OnIconTimeout(WindowManager::Timer & timer)
 #ifdef DISPLAY_ENABLED
     sWindow.mIcon = LcdIcon::None;
     sWindow.UpdateLCD();
-#endif
+#endif // DISPLAY_ENABLED
 }
 
 CHIP_ERROR WindowManager::Init()
@@ -632,10 +634,15 @@ void WindowManager::UpdateLED()
     }
 }
 
+#ifdef DISPLAY_ENABLED
+void WindowManager::DrawUI(GLIB_Context_t * glibContext)
+{
+    sWindow.UpdateLCD();
+}
+
 void WindowManager::UpdateLCD()
 {
     // Update LCD
-#ifdef DISPLAY_ENABLED
     if (BaseApplication::GetProvisionStatus())
     {
         Cover & cover = GetCover();
@@ -654,8 +661,8 @@ void WindowManager::UpdateLCD()
             LcdPainter::Paint(AppTask::GetAppTask().GetLCD(), type, lift.Value(), tilt.Value(), mIcon);
         }
     }
-#endif // DISPLAY_ENABLED
 }
+#endif // DISPLAY_ENABLED
 
 // Silabs button callback from button event ISR
 void WindowManager::ButtonEventHandler(uint8_t button, uint8_t btnAction)
@@ -792,7 +799,7 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         window->mIcon = window->mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
         window->UpdateLCD();
         break;
-#endif
+#endif // DISPLAY_ENABLED
 
     default:
         break;

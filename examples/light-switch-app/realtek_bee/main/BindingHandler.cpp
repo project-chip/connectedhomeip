@@ -260,20 +260,6 @@ void BindingHandler::InitInternal(intptr_t arg)
     chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
 
-bool BindingHandler::IsGroupBound()
-{
-    BindingTable & bindingTable = BindingTable::GetInstance();
-
-    for (auto & entry : bindingTable)
-    {
-        if (MATTER_MULTICAST_BINDING == entry.type)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 #ifdef CONFIG_ENABLE_CHIP_SHELL
 
 /********************************************************

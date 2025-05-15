@@ -72,6 +72,7 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
 {{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
             default:
+                // Not a known {{asUpperCamelCase name preserveAcronyms=true}} attribute.
                 result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
                 break;
         }

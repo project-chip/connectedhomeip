@@ -41,6 +41,17 @@ static Identify * firstIdentify = nullptr;
 
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState);
 
+// The Q quality rules for the Identify cluster are:
+// 1. When it changes from 0 to any other value and vice versa, or
+// 2. When it is written by a client, or
+// 3. When the value (identifytime) is set by an Identify command.
+//
+// Changes to identifytime by either a write or a command will result
+// in the attribute being set and marked dirty. This covers rules 2 and 3.
+// Rule 1 is handled by not marking the regular countdown changes as dirty
+// in the onIdentifyClusterTick function and only marking the attribute dirty
+// when the identifytime is set to 0.
+
 static Identify * inst(EndpointId endpoint)
 {
     Identify * current = firstIdentify;
@@ -93,19 +104,28 @@ void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
 
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState)
 {
-    uint16_t identifyTime = 0;
-    Identify * identify   = reinterpret_cast<Identify *>(appState);
+    Identify * identify = reinterpret_cast<Identify *>(appState);
 
     if (nullptr != identify)
     {
         EndpointId endpoint = identify->mEndpoint;
 
+        uint16_t identifyTime = 0;
         if (Status::Success == Attributes::IdentifyTime::Get(endpoint, &identifyTime) && 0 != identifyTime)
         {
-            identifyTime = static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1);
+            auto markDirty = MarkAttributeDirty::kNo;
+            identifyTime   = static_cast<uint16_t>(identifyTime - 1);
+
+            // If the new identify time is 0, we need to mark the attribute dirty so that
+            // the attribute change is reported
+            if (identifyTime == 0)
+            {
+                markDirty = MarkAttributeDirty::kYes;
+            }
+
             // This tick writes the new attribute, which will trigger the Attribute
             // Changed callback.
-            (void) Attributes::IdentifyTime::Set(endpoint, identifyTime);
+            (void) Attributes::IdentifyTime::Set(endpoint, identifyTime, markDirty);
         }
     }
 }

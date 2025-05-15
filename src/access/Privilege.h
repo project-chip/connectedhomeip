@@ -26,6 +26,9 @@ namespace Access {
 // Using bitfield values so privilege set and auth mode can be stored together.
 // Privilege set can have more than one value expressed (e.g. View,
 // ProxyView, and Operate).
+// NOTE: Every time this enum class changes, we need to update the lambda
+// function "kPrivilegeMaskValidation" in <app/data-model-provider/MetadataTypes.h>.
+// In particular, we need to keep the array "privilegeValues[]" up to date ALWAYS.
 enum class Privilege : uint8_t
 {
     kView       = 1 << 0,

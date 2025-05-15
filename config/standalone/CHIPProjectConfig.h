@@ -24,13 +24,17 @@
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
 
+#ifndef CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
+#endif
 
 // Uncomment this for a large Tunnel MTU.
 // #define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
 // Enable support functions for parsing command-line arguments
+#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
+#endif
 
 //  Enable use of test setup parameters for testing purposes only.
 //
@@ -44,7 +48,9 @@
 // Enable reading DRBG seed data from /dev/(u)random.
 // This is needed for test applications and the CHIP device manager to function
 // properly when CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG is enabled.
+#ifndef CHIP_CONFIG_DEV_RANDOM_DRBG_SEED
 #define CHIP_CONFIG_DEV_RANDOM_DRBG_SEED 1
+#endif
 
 // For convenience, Chip Security Test Mode can be enabled and the
 // requirement for authentication in various protocols can be disabled.
@@ -56,9 +62,9 @@
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 
-#define CHIP_CONFIG_ENABLE_UPDATE 1
-
+#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
+#endif
 
 #ifndef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4
@@ -81,9 +87,13 @@
 // 65 requests (the TestReadHandler_MultipleSubscriptions will issue CHIP_IM_MAX_NUM_READ_HANDLER + 1 subscriptions to verify heap
 // allocation logic) in total and that is 130 ECs. Round this up to 150 ECs
 //
+#ifndef CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 #define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 150
+#endif
 
 // Safe to enable this flag since standalone is associated with host and not a device.
+#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
+#endif
 
 #endif /* CHIPPROJECTCONFIG_H */

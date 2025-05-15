@@ -272,8 +272,8 @@ std::vector<SupportedCluster> make_default_supported_clusters()
 ContentAppFactoryImpl::ContentAppFactoryImpl() :
     mContentApps{ new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", make_default_supported_clusters(),
                                      nullptr, nullptr),
-                  new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021",
-                                     make_default_supported_clusters(), nullptr, nullptr),
+                  new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "0", make_default_supported_clusters(),
+                                     nullptr, nullptr),
                   new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", make_default_supported_clusters(),
                                      nullptr, nullptr),
                   new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021",

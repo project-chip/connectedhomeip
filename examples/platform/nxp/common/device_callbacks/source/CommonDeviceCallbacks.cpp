@@ -133,6 +133,12 @@ void chip::NXP::App::CommonDeviceCallbacks::OnInternetConnectivityChange(const C
         ChipLogProgress(DeviceLayer, "IPv6 Server ready at: [%s]:%d", ip_addr, CHIP_PORT);
 
         chip::app::DnssdServer::Instance().StartServer();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+        // Start the TBRM cluster after we are connected to local network. At this point the Open Thread
+        // Border Router management is up and running and the Border Router Service Name is created.
+        GetAppTask().EnableTbrManagementCluster();
+#endif
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

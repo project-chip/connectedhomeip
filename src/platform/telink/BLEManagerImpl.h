@@ -108,6 +108,7 @@ private:
     PacketBufferHandle c3CharDataBufferHandle;
 #endif
     bool mBLERadioInitialized;
+    bool mReadyToAttachThread;
 
     void DriveBLEState(void);
     CHIP_ERROR PrepareAdvertisingRequest(void);

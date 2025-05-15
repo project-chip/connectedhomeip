@@ -88,7 +88,7 @@ Davis, CA 95616, USA
     <feature bit="5" code="RAD" name="Radar" summary="Supports sensing using radar waves (microwave)">
       <optionalConform choice="a" more="true" min="1"/>
     </feature>
-    <feature bit="6" code="RFS" name="RFSensing" summary="Supports sensing based on RF signal analysis">
+    <feature bit="6" code="RFS" name="RFSensing" summary="Supports sensing using analysis of radio signals, e.g.: RSSI, CSI and/or any other metric from the signal">
       <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="7" code="VIS" name="Vision" summary="Supports sensing based on analyzing images">
@@ -135,21 +135,17 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="HoldTimeMax" type="uint16">
         <mandatoryConform/>
-        <constraint>
-          <min>
-            <field name="HoldTimeMin"/>
-          </min>
-        </constraint>
-        <constraint>
-          <min value="10"/>
-        </constraint>
       </field>
       <field id="2" name="HoldTimeDefault" type="uint16">
         <mandatoryConform/>
         <constraint>
           <between>
-            <field name="HoldTimeMin"/>
-            <field name="HoldTimeMax"/>
+            <from>
+              <field name="HoldTimeMin"/>
+            </from>
+            <to>
+              <field name="HoldTimeMax"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -198,12 +194,16 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint>
         <between>
-          <attribute name="HoldTimeLimits">
-            <field name="HoldTimeMin"/>
-          </attribute>
-          <attribute name="HoldTimeLimits">
-            <field name="HoldTimeMax"/>
-          </attribute>
+          <from>
+            <attribute name="HoldTimeLimits">
+              <field name="HoldTimeMin"/>
+            </attribute>
+          </from>
+          <to>
+            <attribute name="HoldTimeLimits">
+              <field name="HoldTimeMax"/>
+            </attribute>
+          </to>
         </between>
       </constraint>
     </attribute>

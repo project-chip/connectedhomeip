@@ -18,18 +18,18 @@
 /**
  *    @file
  *          Provides an implementation of the ThreadStackManager object
- *          for Qorvo platforms and the OpenThread
+ *          for Realtek platforms and the OpenThread
  *          stack.
  */
 
 #pragma once
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
-// #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
-
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+
+#define USE_FREERTOS_NATIVE_API 0
 
 extern "C" void otSysEventSignalPending(void);
 
@@ -47,7 +47,7 @@ extern int GetEntropy(uint8_t * buf, size_t bufSize);
  * using the OpenThread stack.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
-                                     public Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>,
+                                     public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>,
                                      public Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>
 {
     // Allow the ThreadStackManager interface class to delegate method calls to
@@ -73,6 +73,17 @@ public:
     using ThreadStackManager::InitThreadStack;
     CHIP_ERROR InitThreadStack(otInstance * otInst);
     void GetExtAddress(otExtAddress & aExtAddr);
+    void SignalThreadActivityPending();
+
+#if USE_FREERTOS_NATIVE_API
+    BaseType_t SignalThreadActivityPendingFromISR();
+#else
+    void SignalThreadActivityPendingFromISR();
+#endif
+
+protected:
+    // ===== Methods that implement the ThreadStackManager abstract interface.
+    CHIP_ERROR _StartThreadTask();
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -84,14 +95,19 @@ private:
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
     friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
     friend int Internal::GetEntropy(uint8_t * buf, size_t bufSize);
-
     static ThreadStackManagerImpl sInstance;
-
     static bool IsInitialized();
 
     // ===== Private members for use by this class only.
 
     ThreadStackManagerImpl() = default;
+#if USE_FREERTOS_NATIVE_API
+    TaskHandle_t mThreadTask;
+#else
+    void * mThreadTask;
+#endif
+    void ExecuteThreadTask(void);
+    static void ThreadTaskMain(void * arg);
 };
 
 /**

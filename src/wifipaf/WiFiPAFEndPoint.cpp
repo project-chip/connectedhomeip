@@ -801,7 +801,7 @@ CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader & reader, ui
 {
     CHIP_ERROR err;
     BitFlags<WiFiPAFTP::HeaderFlags> rx_flags;
-    uint8_t SnOffset = 0;
+    size_t SnOffset = 0;
     SequenceNumber_t * pSn;
     err = reader.Read8(rx_flags.RawStorage()).StatusCode();
     if (rx_flags.Has(WiFiPAFTP::HeaderFlags::kHankshake))
@@ -833,7 +833,7 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t PktDirect, Encoding:
     uint8_t * pAct = nullptr;
     char AckBuff[4];
     uint8_t * pSn;
-    uint8_t SnOffset = 0;
+    size_t SnOffset = 0;
 
     err = reader.Read8(rx_flags.RawStorage()).StatusCode();
     SuccessOrExit(err);

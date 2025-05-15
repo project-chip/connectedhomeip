@@ -645,3 +645,29 @@ tests:
                 value: 0x0016
       response:
           error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 64: TH reads ConfigurationVersion from the DUT."
+      PICS: BRBINFO.S.A0018
+      command: "readAttribute"
+      attribute: "ConfigurationVersion"
+      response:
+          saveAs: ConfigurationVersionValue
+          constraints:
+              type: int32u
+              minValue: 1
+
+    - label: "Step 65: TH writes ConfigurationVersion as '0x1124' "
+      PICS: BRBINFO.S.A0018
+      command: "writeAttribute"
+      attribute: "ConfigurationVersion"
+      arguments:
+          value: 4388
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 66: TH reads ConfigurationVersion from the DUT."
+      PICS: BRBINFO.S.A0018
+      command: "readAttribute"
+      attribute: "ConfigurationVersion"
+      response:
+          value: ConfigurationVersionValue

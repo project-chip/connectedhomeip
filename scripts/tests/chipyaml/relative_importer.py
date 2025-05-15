@@ -29,16 +29,6 @@ except ModuleNotFoundError:
     sys.path.append(os.path.join(SCRIPT_PATH, 'tests'))
 
 try:
-    import matter.idl  # noqa: F401
-except ModuleNotFoundError:
-    sys.path.append(os.path.join(SCRIPT_PATH, 'py_matter_idl'))
-
-try:
-    import matter_yamltests  # noqa: F401
-except ModuleNotFoundError:
-    sys.path.append(os.path.join(SCRIPT_PATH, 'py_matter_yamltests'))
-
-try:
     import matter_chip_tool_adapter  # noqa: F401
 except ModuleNotFoundError:
     sys.path.append(os.path.join(EXAMPLES_PATH, 'chip-tool', 'py_matter_chip_tool_adapter'))

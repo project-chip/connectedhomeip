@@ -112,7 +112,8 @@ struct MockEndpointConfig
     MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {},
                        std::initializer_list<EmberAfDeviceType> aDeviceTypes                                    = {},
                        std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags = {},
-                       app::EndpointComposition composition = app::EndpointComposition::kFullFamily);
+                       app::EndpointComposition composition = app::EndpointComposition::kFullFamily,
+                       chip::CharSpan aEndpointUniqueID     = chip::CharSpan());
 
     // Endpoint-config is self-referential: mEmberEndpoint.clusters references  mEmberClusters.data()
     MockEndpointConfig(const MockEndpointConfig & other);
@@ -133,6 +134,8 @@ struct MockEndpointConfig
     const EndpointId id;
     const app::EndpointComposition composition;
     const std::vector<MockClusterConfig> clusters;
+    char endpointUniqueIdBuffer[app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+    uint8_t endpointUniqueIdSize;
 
 private:
     std::vector<EmberAfCluster> mEmberClusters;

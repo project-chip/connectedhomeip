@@ -75,7 +75,7 @@ namespace app {
 inline constexpr const uint32_t kEventManagementProfile = 0x1;
 inline constexpr const uint32_t kFabricIndexTag         = 0x1;
 inline constexpr size_t kMaxEventSizeReserve            = 512;
-constexpr uint16_t kRequiredEventField =
+inline constexpr uint16_t kRequiredEventField =
     (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
 /**
@@ -201,6 +201,13 @@ struct LogStorageResources
 class EventManagement : public DataModel::EventsGenerator
 {
 public:
+    /**
+     * Note: Even though this class is used as a singleton, the default constructor is public in
+     * order to preserve the ability to instantiate this class in test code. This is meant to be
+     * temporary until we find a better solution.
+     */
+    constexpr EventManagement() = default;
+
     /**
      * Initialize the EventManagement with an array of LogStorageResources and
      * an equal-length array of CircularEventBuffers that correspond to those
@@ -390,6 +397,8 @@ public:
                              EventNumber & generatedEventNumber) override;
 
 private:
+    static EventManagement sInstance;
+
     class InternalEventOptions : public EventOptions
     {
     public:
@@ -567,9 +576,9 @@ private:
     MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
-    Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
+    Timestamp mLastEventTimestamp{};  ///< The timestamp of the last event in this buffer
 
-    System::Clock::Milliseconds64 mMonotonicStartupTime;
+    System::Clock::Milliseconds64 mMonotonicStartupTime{};
 
     EventReporter * mpEventReporter = nullptr;
 };

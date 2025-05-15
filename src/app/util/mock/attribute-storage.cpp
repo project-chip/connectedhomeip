@@ -244,6 +244,20 @@ chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
     return config.endpoints[index].id;
 }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdSpan)
+{
+
+    // Retrieve the endpoint configuration from the mock node configuration
+    auto epConfig = GetMockNodeConfig().endpointById(endpoint);
+    VerifyOrReturnError(epConfig != nullptr, CHIP_ERROR_NOT_FOUND);
+
+    // Copy the unique ID into the provided span
+    CharSpan targetSpan(epConfig->endpointUniqueIdBuffer, epConfig->endpointUniqueIdSize);
+    return CopyCharSpanToMutableCharSpan(targetSpan, epUniqueIdSpan);
+}
+#endif
+
 namespace chip {
 namespace app {
 

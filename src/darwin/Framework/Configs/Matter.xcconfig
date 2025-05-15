@@ -1,0 +1,41 @@
+// Product settings
+DEFINES_MODULE = YES
+DYLIB_COMPATIBILITY_VERSION = 1
+DYLIB_CURRENT_VERSION = 1
+DYLIB_INSTALL_NAME_BASE = @rpath
+INFOPLIST_FILE = CHIP/Info.plist
+INSTALL_PATH = $(LOCAL_LIBRARY_DIR)/Frameworks
+MODULEMAP_FILE = CHIP/Matter.modulemap
+PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter
+PRODUCT_NAME = $(TARGET_NAME)
+SWIFT_INSTALL_OBJC_HEADER = NO
+
+// If TAPI needs to read project headers, CHIP SDK headers need to be generated during installhdrs
+INSTALLHDRS_SCRIPT_PHASE = $(TAPI_ENABLE_PROJECT_HEADERS)
+
+// Compiler settings
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) CHIP_HAVE_CONFIG_H CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1
+OTHER_CFLAGS = -fmacro-prefix-map=$(SRCROOT)/CHIP/=
+OTHER_CPLUSPLUSFLAGS = $(OTHER_CFLAGS) -fno-c++-static-destructors -DCHIP_CONFIG_GLOBALS_NO_DESTRUCT=1
+SYSTEM_HEADER_SEARCH_PATHS = $(TEMP_DIR)/out/gen/include $(CHIP_ROOT)/src/darwin/Framework/CHIP $(CHIP_ROOT)/src $(CHIP_ROOT)/src/include $(CHIP_ROOT)/zzz_generated $(CHIP_ROOT)/zzz_generated/app-common $(CHIP_ROOT)/third_party/nlassert/repo/include $(CHIP_ROOT)/third_party/nlio/repo/include
+
+// Linker settings
+OTHER_LDFLAGS = $(inherited) $(LDFLAGS_NO_INITS) // disallow static initializers (unless ASAN or TSAN are enabled)
+LDFLAGS_NO_INITS = $(LDFLAGS_NO_INITS__$(ENABLE_ADDRESS_SANITIZER:default=NO)_$(ENABLE_THREAD_SANITIZER:default=NO))
+LDFLAGS_NO_INITS__NO_NO = -Wl,-no_inits
+
+OTHER_LDFLAGS = $(inherited) $(LDFLAGS_UNEXPORTS) // hide mangled C++ symbols and ASAN symbols
+LDFLAGS_UNEXPORTS = -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*"
+
+LIBRARY_SEARCH_PATHS = $(TEMP_DIR)/out/lib // libCHIP.a is built via GN
+OTHER_LDFLAGS = $(inherited) -Wl,-hidden-lCHIP // don't export any symbols from libCHIP
+
+OTHER_LDFLAGS = $(inherited) $(LDFLAGS_COMMON_LIBRARIES) $(LDFLAGS_PLATFORM_LIBRARIES) // dependencies
+LDFLAGS_COMMON_LIBRARIES = -framework Foundation -framework Security -framework CoreData -framework CoreBluetooth -lnetwork
+LDFLAGS_PLATFORM_LIBRARIES[sdk=macosx*] = -framework IOKit -framework CoreWLAN -framework SystemConfiguration
+
+STRIP_STYLE = non-global
+VERSION_INFO_EXPORT_DECL = __attribute__((visibility("hidden")))
+
+// Include override file last, if it exists
+#include? "Matter.override.xcconfig"

@@ -29,6 +29,9 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 assert(chip_device_platform == "nxp")
 
 declare_args() {
+  # Enable secondary network interface
+  chip_enable_secondary_nwk_if = false
+
   # Enable OTA encryption
   chip_with_ota_encryption = false
 
@@ -53,7 +56,6 @@ config("nxp_platform_config") {
       "../../common/factory_data",
     ]
     defines += [ "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1" ]
-    defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rt1060/FactoryDataProviderImpl.h\"" ]
   }
 
   # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
@@ -83,17 +85,27 @@ static_library("nxp_platform") {
     "../../common/KeyValueStoreManagerImpl.cpp",
     "../../common/KeyValueStoreManagerImpl.h",
     "../../common/Logging.cpp",
-    "../../common/NXPConfig.cpp",
     "../../common/NXPConfig.h",
     "../../common/NetworkProvisioningServerImpl.h",
     "../../common/PlatformManagerImpl.h",
     "../../common/SoftwareUpdateManagerImpl.h",
-    "../../common/ram_storage.c",
-    "../../common/ram_storage.h",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
-  deps = [ "${chip_root}/src/app:app_config" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+  ]
+
+  if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {
+    sources += [
+      "../../common/NXPConfig.cpp",
+      "../../common/ram_storage.c",
+      "../../common/ram_storage.h",
+    ]
+  } else if (nxp_nvm_component == "nvs") {
+    sources += [ "../../common/NXPConfigNVS.cpp" ]
+  }
 
   if (chip_enable_ble) {
     sources += [
@@ -150,15 +162,12 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [
-      "${chip_root}/src/app:app_config",
-      "${chip_root}/src/app/common:ids",
-    ]
+    deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
-    if (!nxp_build_matter_standalone_lib) {
-      deps += [ "${chip_root}/third_party/openthread:openthread" ]
-      public_deps +=
-          [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+
+    if (nxp_enable_matter_cli) {
+      public_deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
     }
 
     # dep required to include 'lib/spinel/spinel.h' in PlatformManagerImpl.cpp
@@ -186,8 +195,8 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../../common/factory_data/FactoryDataProvider.cpp",
-      "../../common/factory_data/FactoryDataProvider.h",
+      "../../common/factory_data/legacy/FactoryDataProvider.cpp",
+      "../../common/factory_data/legacy/FactoryDataProvider.h",
       "FactoryDataProviderImpl.cpp",
       "FactoryDataProviderImpl.h",
     ]

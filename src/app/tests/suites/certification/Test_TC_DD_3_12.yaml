@@ -71,7 +71,7 @@ tests:
           Use a Commissionee with a QR code that has the Custom Flow field set to 1, supports BLE for its Discovery Capability,
           and ensures the Version bit string follows the current Matter specification. Pass the QR code into the DUT during the commissioning process.
 
-          ./chip-all-clusters-app --capabilities 2 --custom-flow 1 --ble-device 1
+          ./chip-all-clusters-app --capabilities 2 --custom-flow 1 --ble-controller 1
           On the TH (All-Clusters App), verify that the user has a QR code available to pass into the DUT
 
           [1657234110.765249][370717:370717] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]

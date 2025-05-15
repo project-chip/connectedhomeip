@@ -170,9 +170,7 @@ mcxw71_k32w1_executable("lock_app") {
   }
 
   if (nxp_use_factory_data) {
-    include_dirs +=
-        [ "${chip_root}/src/platform/nxp/common/factory_data/legacy" ]
-    deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
+    # Custom factory data files can be added here
   }
 
   if (nxp_enable_matter_cli) {
@@ -253,7 +251,7 @@ mcxw71_k32w1_executable("lock_app") {
   }
 
   deps += [
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]

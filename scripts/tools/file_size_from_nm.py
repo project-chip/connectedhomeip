@@ -136,7 +136,11 @@ def tree_display_name(name: str) -> list[str]:
     'emberAf' prefixes to make them common and uses 'vtable for' information
     """
 
-    name = cxxfilt.demangle(name)
+    try:
+        name = cxxfilt.demangle(name)
+    except cxxfilt.InvalidName:
+        # Allow display of the name as-is
+        pass
 
     if name.startswith("non-virtual thunk to "):
         name = name[21:]

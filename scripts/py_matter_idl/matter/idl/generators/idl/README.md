@@ -10,7 +10,7 @@ It is useful for tools that ingest non-idl data but convert into idl data (e.g.
 
 A no-op usage can be:
 
-```
+```shell
 ./scripts/codegen.py -g idl --output-dir out/idlgen examples/all-clusters-app/all-clusters-common/all-clusters-app.matter
 ```
 
@@ -25,8 +25,8 @@ generation works. Actual usage of this generator would be inside XML tools.
 A XML parser will use this code generator to output a human readable view of the
 parsed data:
 
-```
-./scripts/py_matter_idl/matter/idl/zapxml_parser.py \
+```shell
+matter-zapxml-parser \
     ./src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
-    ./src/app/zap-templates/zcl/data-model/chip/global-attributes.xm
+    ./src/app/zap-templates/zcl/data-model/chip/global-attributes.xml
 ```

@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/ota-provider/CodegenIntegration.h>
 #include <app/clusters/ota-provider/DefaultOTAProviderUserConsent.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
-#include <app/clusters/ota-provider/ota-provider.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
 #include <json/json.h>
@@ -29,6 +29,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <unistd.h>
 
 using chip::BitFlags;
@@ -47,6 +48,7 @@ constexpr uint16_t kOptionUpdateAction              = 'a';
 constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 constexpr uint16_t kOptionFilepath                  = 'f';
 constexpr uint16_t kOptionImageUri                  = 'i';
+constexpr uint16_t kOptionMaxBDXBlockSize           = 'm';
 constexpr uint16_t kOptionOtaImageList              = 'o';
 constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
 constexpr uint16_t kOptionQueryImageStatus          = 'q';
@@ -72,6 +74,7 @@ static bool gUserConsentNeeded                       = false;
 static uint32_t gIgnoreQueryImageCount               = 0;
 static uint32_t gIgnoreApplyUpdateCount              = 0;
 static uint32_t gPollInterval                        = 0;
+static std::optional<uint16_t> gMaxBDXBlockSize      = std::nullopt;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -245,6 +248,19 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionPollInterval:
         gPollInterval = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
+    case kOptionMaxBDXBlockSize: {
+        auto blockSize = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
+        if (blockSize == 0)
+        {
+            PrintArgError("%s: ERROR: Invalid maxBDXBlockSize parameter: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            gMaxBDXBlockSize = blockSize;
+        }
+        break;
+    }
 
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -268,6 +284,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "ignoreQueryImage", chip::ArgParser::kArgumentRequired, kOptionIgnoreQueryImage },
     { "ignoreApplyUpdate", chip::ArgParser::kArgumentRequired, kOptionIgnoreApplyUpdate },
     { "pollInterval", chip::ArgParser::kArgumentRequired, kOptionPollInterval },
+    { "maxBDXBlockSize", chip::ArgParser::kArgumentRequired, kOptionMaxBDXBlockSize },
     {},
 };
 
@@ -285,6 +302,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -i, --imageUri <uri>\n"
                              "        Value for the ImageURI field in the QueryImageResponse.\n"
                              "        If none is supplied, a valid URI is generated.\n"
+                             "  -m, --maxBDXBlockSize <size>\n"
+                             "        Value for the maximum BDX block size to use for the transfer.\n"
+                             "        If none is supplied, a default value will be used.\n"
                              "  -o, --otaImageList <file path>\n"
                              "        Path to a file containing a list of OTA images\n"
                              "  -p, --delayedApplyActionTimeSec <time in seconds>\n"
@@ -359,6 +379,11 @@ void ApplicationInit()
     if (gPollInterval != 0)
     {
         gOtaProvider.SetPollInterval(gPollInterval);
+    }
+
+    if (gMaxBDXBlockSize)
+    {
+        gOtaProvider.SetMaxBDXBlockSize(*gMaxBDXBlockSize);
     }
 
     ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");

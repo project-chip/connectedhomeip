@@ -69,6 +69,8 @@ typedef enum
                                         compared to the request order */
     kFault_IMInvoke_SkipSecondResponse, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond
                                         with 1 InvokeResponseMessage, dropping the response to the second request */
+    kFault_ModifyWebRTCAnswerSessionId, /**< Change the session ID in the outgoing WebRTC Answer command */
+    kFault_ModifyWebRTCOfferSessionId,  /**< Change the session ID in the outgoing WebRTC Offer command */
 #if CONFIG_NETWORK_LAYER_BLE
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif
@@ -81,6 +83,9 @@ static_assert(kFault_IMInvoke_SeparateResponsesInvertResponseOrder == 13,
               "Test plan specification and automation code relies on this value being 13");
 static_assert(kFault_IMInvoke_SkipSecondResponse == 14,
               "Test plan specification and automation code relies on this value being 14");
+static_assert(kFault_ModifyWebRTCAnswerSessionId == 15,
+              "Test plan specification and automation code relies on this value being 15");
+static_assert(kFault_ModifyWebRTCOfferSessionId == 16, "Test plan specification and automation code relies on this value being 16");
 
 DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 

@@ -117,7 +117,7 @@ string(APPEND CHIP_GN_ARGS "chip_use_transitional_commissionable_data_provider =
 string(APPEND CHIP_GN_ARGS "chip_logging = true\n")
 string(APPEND CHIP_GN_ARGS "chip_error_logging = true\n")
 string(APPEND CHIP_GN_ARGS "chip_progress_logging = true\n")
-string(APPEND CHIP_GN_ARGS "chip_detail_logging= false\n")
+string(APPEND CHIP_GN_ARGS "chip_detail_logging= true\n")
 
 # project config
 string(APPEND CHIP_GN_ARGS "chip_project_config_include_dirs = [\"${matter_example_path}/main/include\"]\n")

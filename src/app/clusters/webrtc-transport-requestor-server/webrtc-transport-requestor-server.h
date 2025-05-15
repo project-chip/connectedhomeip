@@ -49,7 +49,6 @@ public:
 
     struct OfferArgs
     {
-        uint16_t sessionId;
         std::string sdp;
         Optional<std::vector<ICEServerDecodableTypeStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
@@ -63,12 +62,10 @@ public:
      * @param[in] args
      *   Structure containing all input arguments for the command.
      *
-     * @param[out] outSession New session struct is created with the new session details received.
-     *
      * @return CHIP_ERROR
      *   - Returns error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleOffer(uint16_t sessionId, const OfferArgs & args, WebRTCSessionTypeStruct & outSession) = 0;
+    virtual CHIP_ERROR HandleOffer(uint16_t sessionId, const OfferArgs & args) = 0;
     /**
      * @brief
      *   Handles the Answer command received by the server.
@@ -159,6 +156,15 @@ public:
      */
     UpsertResultEnum UpsertSession(const WebRTCSessionTypeStruct & session); // Now public
 
+    /**
+     * @brief
+     *   Removes a session identified by its session ID from the internal list of current sessions.
+     *
+     * @param sessionId  The session ID of the session to remove.
+     *                   If the ID is not found, the call is a no‑op.
+     */
+    void RemoveSession(uint16_t sessionId);
+
 private:
     WebRTCTransportRequestorDelegate & mDelegate;
     std::vector<WebRTCSessionTypeStruct> mCurrentSessions;
@@ -172,7 +178,6 @@ private:
     // Helper functions
     WebRTCSessionTypeStruct * FindSession(uint16_t sessionId);
     uint16_t GenerateSessionId();
-    void RemoveSession(uint16_t sessionId);
     bool IsPeerNodeSessionValid(uint16_t sessionId, HandlerContext & ctx);
 
     // Command handlers

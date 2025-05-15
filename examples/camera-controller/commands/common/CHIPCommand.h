@@ -93,12 +93,16 @@ public:
         AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace-to", &mTraceTo, "Trace destinations, comma-separated (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")");
-        AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId);
+        AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId, "Bluetooth adapter index. 0 -> hci0, 1 -> hci1, etc.");
         AddArgument("storage-directory", &mStorageDirectory,
                     "Directory to place camera-controller's storage files in.  Defaults to $TMPDIR, with fallback to /tmp");
         AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
                     "The vendor id to use for camera-controller. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will "
                     "be used.");
+        AddArgument("start-websocket-server", 0, 1, &mStartWebSocketServer,
+                    "Start the built‑in WebSocket server that exposes the interactive‑command API. "
+                    "If not provided or 0 (\"false\"), the WebSocket server is disabled. "
+                    "If 1 (\"true\"), the WebSocket server is started and listens on the default port.");
     }
 
     /////////// Command Interface /////////
@@ -160,6 +164,7 @@ protected:
     PersistentStorage mCommissionerStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::Optional<char *> mLogFilePath;
+    chip::Optional<bool> mStartWebSocketServer;
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
     static chip::Crypto::RawKeySessionKeystore sSessionKeystore;

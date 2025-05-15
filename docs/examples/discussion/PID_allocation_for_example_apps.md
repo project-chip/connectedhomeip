@@ -19,22 +19,23 @@ same because they are all signed by the same PAI (vendor id `0xFFF1`).
 In order to allow some differentiation between the various example apps, each
 app is assigned a PID from the list below:
 
-| App                     | PID      |
-| ----------------------- | -------- |
-| All Clusters            | `0x8001` |
-| Bridge                  | `0x8002` |
-| Door Lock               | `0x8003` |
-| Light switch            | `0x8004` |
-| Lighting                | `0x8005` |
-| Lock                    | `0x8006` |
-| OTA provider            | `0x8007` |
-| OTA requestor           | `0x8008` |
-| Persistent Storage      | `0x8009` |
-| Pigweed                 | `0x800B` |
-| Pump                    | `0x800A` |
-| Pump Controller         | `0x8011` |
-| Shell                   | `0x8012` |
-| Temperature measurement | `0x800D` |
-| Thermostat              | `0x800E` |
-| TV                      | `0x800F` |
-| Window                  | `0x8010` |
+| App                            | PID      |
+| ------------------------------ | -------- |
+| All Clusters                   | `0x8001` |
+| Bridge                         | `0x8002` |
+| Door Lock                      | `0x8003` |
+| Light switch                   | `0x8004` |
+| Lighting                       | `0x8005` |
+| Lock                           | `0x8006` |
+| OTA provider                   | `0x8007` |
+| OTA requestor                  | `0x8008` |
+| Persistent Storage             | `0x8009` |
+| Pigweed                        | `0x800B` |
+| Pump                           | `0x800A` |
+| Pump Controller                | `0x8011` |
+| Shell                          | `0x8012` |
+| Temperature measurement        | `0x800D` |
+| Thermostat                     | `0x800E` |
+| TV                             | `0x800F` |
+| Window                         | `0x8010` |
+| Network Infrastructure Manager | `0x8013` |

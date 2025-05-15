@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Defines platform-specific event types and data for the chip
- *          Device Layer on Qorvo QPG platforms.
+ *          Device Layer on Realtek Bee platforms.
  */
 
 #pragma once

@@ -17,6 +17,7 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +26,7 @@ import matter.tlv.TlvWriter
 class PushAvStreamTransportClusterTransportConfigurationStruct(
   val connectionID: UInt,
   val transportStatus: UInt,
-  val transportOptions: PushAvStreamTransportClusterTransportOptionsStruct,
+  val transportOptions: Optional<PushAvStreamTransportClusterTransportOptionsStruct>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportConfigurationStruct {\n")
@@ -40,7 +41,10 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CONNECTION_ID), connectionID)
       put(ContextSpecificTag(TAG_TRANSPORT_STATUS), transportStatus)
-      transportOptions.toTlv(ContextSpecificTag(TAG_TRANSPORT_OPTIONS), this)
+      if (transportOptions.isPresent) {
+        val opttransportOptions = transportOptions.get()
+        opttransportOptions.toTlv(ContextSpecificTag(TAG_TRANSPORT_OPTIONS), this)
+      }
       endStructure()
     }
   }
@@ -58,10 +62,16 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
       val transportStatus = tlvReader.getUInt(ContextSpecificTag(TAG_TRANSPORT_STATUS))
       val transportOptions =
-        PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(
-          ContextSpecificTag(TAG_TRANSPORT_OPTIONS),
-          tlvReader,
-        )
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRANSPORT_OPTIONS))) {
+          Optional.of(
+            PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(
+              ContextSpecificTag(TAG_TRANSPORT_OPTIONS),
+              tlvReader,
+            )
+          )
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 

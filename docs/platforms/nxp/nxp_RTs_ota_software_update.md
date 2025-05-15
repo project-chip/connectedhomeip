@@ -4,9 +4,9 @@
 
 This document describes OTA feature on NXP devices:
 
--   RW61x
--   RT1060_EVK-C
--   RT1170_EVK-B
+-   [RW61x](./nxp_rw61x_guide.md)
+-   [RT1060_EVK-C](./nxp_rt1060_guide.md)
+-   [RT1170_EVK-B](./nxp_rt1170_guide.md)
 
 The OTA Requestor feature enables the device to be informed of, download and
 apply a software update from an OTA Provider.
@@ -60,7 +60,60 @@ using the `MCUBoot DIRECT-XIP` upgrade mode.
 
 ## OTA Software Update process for RTs example application
 
-### Flashing the bootloader
+> Important note : When building the NXP Matter examples with CMake build
+> system, the mcuboot binary, the signed application image, and the .ota file
+> are all automatically generated when OTA SU is enabled. The auto-generation is
+> handled in `third_party/nxp/nxp_matter_support/cmake/build_helpers.cmake`.
+> Therefore, you may skip the generation process described below.
+>
+> To build with OTA enabled, you can refer to the 'Building' section of the
+> platform [dedicated readme](./nxp_examples_freertos_platforms.md#building). By
+> default, the software version is 1. For building with software version 2 you
+> can use a `prj_<custom>.conf` which has `v2` suffix.
+
+### Generating and Flashing the bootloader
+
+#### Generating MCUBoot bootloader
+
+> Note : For applications generated with CMake, this section can be skipped.
+> Auto-generated MCUBoot binary can be found under the path
+> `<build_dir>/modules/chip/mcuboot/` with `.elf` and `.bin` formats.
+
+MCUBoot application can be built with NXP MCUX SDK installed, using instructions
+below.
+
+-   Locate the MCUX SDK directory :
+
+```
+user@ubuntu: cd ~/Desktop/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk
+```
+
+-   Export your ARM GCC toolchain :
+
+```
+user@ubuntu: export ARMGCC_DIR=  # with ARMGCC_DIR referencing the compiler path recommended by the SDK.
+```
+
+-   Build `mcuboot` example from the root directory of MCUX SDK using
+    `west build` command :
+
+```
+user@ubuntu: west build -d mcuboot_build -b <RT_board> examples/ota_examples/mcuboot_opensource
+```
+
+> Note : For RT1170 platform, `-Dcore_id=cm7` argument should be added to the
+> build command-line above.
+
+Replace `RT_board` with :
+
+-   For RW61x platform, either `rdrw612bga` or `frdmrw612` based on the board
+    you are targeting.
+-   For `RT1170-EVKB`, use `evkbmimxrt1170`.
+-   For `RT1060-EVKC`, use `evkcmimxrt1060`.
+
+MCUBoot binary can be found under `mcuboot_build` folder under the SDK root.
+
+#### Flashing MCUBoot bootloader
 
 In order for the device to perform the software update, the MCUBoot bootloader
 must be flashed first at the base of the flash. A step-by-step guide is given
@@ -115,34 +168,10 @@ For RT1170-EVK-B
 J-Link > erase 0x30000000, 0x34000000
 ```
 
--   MCUBoot application can be built with SDK installed, using instructions
-    below.
--   Retrieve the mcuboot directory located at
-    _'<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<a href="#1" id="1-ref">`RTboard`<sup>1</sup></a>/ota_examples/`mcuboot_opensource/armgcc`'_
-
-_<a id="1" href="#1-ref"><sup>1</sup></a> `rdrw612bga` or `frdmrw612` for RW61x,
-`evkcmimxrt1060` for RT1060-EVK-C, `evkbmimxrt1170` for RT1170-EVK-B_
-
-```
-user@ubuntu: cd ~/Desktop/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<RT_board>/ota_examples/mcuboot_opensource/armgcc
-```
-
--   Build the mcuboot application with running
-    <a href="#2" id="2-ref">`build_script`<sup>2</sup></a>
-
-```
-user@ubuntu: chmod +x <build_script>
-user@ubuntu: export ARMGCC_DIR=/opt/gcc-arm-none-eabi-10.3-2021.10   # with ARMGCC_DIR referencing the compiler path
-user@ubuntu: ./<build_script>
-```
-
-_<a id="2" href="#2ref"><sup>2</sup></a> `build_flash_release.sh` for RW61x,
-`build_flexspi_nor_release.sh` for RT1060 and RT1170_
-
 -   Program the generated binary to the target board.
 
 ```
-J-Link > loadbin <path_to_mcuboot>/mcuboot_opensource.elf
+J-Link > loadfile <path_to_mcuboot>/mcuboot_opensource.elf
 ```
 
 -   If it runs successfully, the following logs will be displayed on the
@@ -160,13 +189,21 @@ Unable to find bootable image
 
 Note : By default, mcuboot application considers the primary and secondary
 partitions to be the size of 4.4 MB. If the size is to be changed, the partition
-addresses should be modified in the `flash_partitioning.h` accordingly. For more
-information about the flash partitioning with mcuboot, please refer to the
-dedicated `readme.txt` located in
-
-> _<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<a href="#1" id="1ref">`RTboard`<sup>1</sup></a>/ota_examples/`mcuboot_opensource`/._
+addresses could be modified in the
+`third_party/nxp/nxp_matter_support/cmake/rt/<rt_platform>/bootloader.conf` for
+a CMake build where the mcuboot application is automatically generated.
+Otherwise, to generate it manually, the partition addresses should be modified
+in `flash_partitioning.h` accordingly. For more information about the flash
+partitioning with mcuboot, please refer to the dedicated `readme.txt` located in
+`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/examples/ota_examples/mcuboot_opensource`.
 
 ### Generating and flashing the signed application image
+
+#### Generating the signed application image
+
+> Note : For applications generated with CMake, this section can be skipped.
+> Auto-generated signed application image can be found under the path
+> `<build_dir>/app_SIGNED.bin`.
 
 After flashing the bootloader, the application can be programmed to the board.
 The image must have the following format :
@@ -178,17 +215,12 @@ The image must have the following format :
     signature, the upgrade type, the swap status...
 
 The all-clusters application can be generated using the instructions from the
-
-README.md<a href="#3" id="3-ref"><sup>3</sup></a>'Building' section. The
-application is automatically linked to be executed from the primary image
+[CHIP NXP Examples Guide 'Building'](./nxp_examples_freertos_platforms.md#building).
+The application is automatically linked to be executed from the primary image
 partition, taking into consideration the offset imposed by mcuboot.
 
-_<a id="3" href="#3-ref"><sup>3</sup></a>
-[RW61x README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rw61x/README.md#building),
-[RT1060 README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rt1060/README.md#building),
-[RT1170 README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rt1170/README.md#building)_
-
-The resulting executable file found in
+For an application generated with GN build system, the resulting executable file
+found in
 out/release/chip-<a href="#4" id="4-ref">`board`<sup>4</sup></a>-all-cluster-example
 needs to be converted into raw binary format as shown below.
 
@@ -201,15 +233,15 @@ arm-none-eabi-objcopy -R .flash_config -R .NVM -O binary chip-<"board">-all-clus
 
 To sign the image and wrap the raw binary of the application with the header and
 trailer, "`imgtool`" is provided in the SDK and can be found in
-"`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/middleware/mcuboot_opensource/scripts/`".
+"`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/scripts/`".
 
 The following commands can be run (make sure to replace the /path/to/file/binary
 with the adequate files):
 
 ```sh
-user@ubuntu: cd ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/middleware/mcuboot_opensource/scripts/
+user@ubuntu: cd ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/scripts/
 
-user@ubuntu: python3 imgtool.py sign --key ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<RT board>/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --pad --confirm --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example_SIGNED.bin
+user@ubuntu: python3 imgtool.py sign --key ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --pad --confirm --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example_SIGNED.bin
 ```
 
 Notes :
@@ -221,7 +253,7 @@ Notes :
     adjusted accordingly.
 -   In this example, the image is signed with the private key provided by the
     SDK as an example
-    (`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<RT_board>/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem`),
+    (`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem`),
     MCUBoot is built with its corresponding public key which would be used to
     verify the integrity of the image. It is possible to generate a new pair of
     keys using the following commands. This procedure should be done prior to
@@ -240,29 +272,31 @@ user@ubuntu: python3 imgtool.py getpub -k priv_key.pem
 ```
 
 -   The extracted public key can then be copied to the
-    `<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<RT_board>/ota_examples/mcuboot_opensource/keys/sign-rsa2048-pub.c`,
+    `<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-pub.c`,
     given as a value to the rsa_pub_key[] array.
 
 The resulting output is the signed binary of the application version "1.0".
+
+#### Flashing the signed application image
 
 JLink can be used to flash the application using the command :
 
 For RW61x
 
 ```
-J-Link > loadbin chip-rw61x-all-cluster-example_SIGNED.bin 0x8020000
+J-Link > loadbin <application>_SIGNED.bin 0x8020000
 ```
 
 For RT1060-EVK-C
 
 ```
-J-Link > loadbin chip-rt1060-all-cluster-example_SIGNED.bin 0x60040000
+J-Link > loadbin <application>_SIGNED.bin 0x60040000
 ```
 
 For RT1170-EVK-B
 
 ```
-J-Link > loadbin chip-rt1170-all-cluster-example_SIGNED.bin 0x30040000
+J-Link > loadbin <application>_SIGNED.bin 0x30040000
 ```
 
 The bootloader should then be able to jump directly to the start of the
@@ -270,23 +304,72 @@ application and run it.
 
 ### Generating the OTA Update Image
 
-To generate the OTA update image the same procedure can be followed from the
+> Note : For applications generated with CMake, this section can be skipped.
+> Auto-generated `.ota` file can be found under `<build_dir>/app.ota` .
+
+To generate the OTA update image, the same procedure can be followed from the
 [Generating and flashing the signed application image](#generating-and-flashing-the-signed-application-image)
 sub-section, replacing the "--version "1.0"" argument with "--version "2.0""
 (recent version of the update), without arguments "--pad" "--confirm" when
 running `imgtool` script during OTA Update Image generation.
 
 Note : When building the update image, the build arguments
-nxp_software_version=2 nxp_software_version_string=\"2.0\" can be added to the
-gn gen command in order to specify the upgraded version.
+`nxp_software_version=2` `nxp_software_version_string=\"2.0\"` can be added to
+the gn gen command in order to specify the upgraded version. For a CMake build,
+this can be done by adding to the command line the arguments
+`-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2`
+`-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING="2.0"`, or using `prj_*_v2.conf`
+configuration files.
+
+In order to have a correct OTA process, the OTA header version should be the
+same as the binary embedded software version.
 
 When the signed binary of the update is generated, the file should be converted
-into OTA format. To do so, the ota_image_tool is provided in the repo and can be
-used to convert a binary file into an .ota file.
+into OTA format. To do so, the `scripts/tools/nxp/ota/ota_image_tool.py` is
+provided in the repo and can be used to convert a binary file into an .ota file.
+This NXP script is a wrapper over the standard tool `src/app/ota_image_tool.py`,
+and can be used to generate an OTA image with the following format :
+
+```
+    | OTA image header | TLV1 | TLV2 | ... | TLVn |
+```
+
+where each TLV is in the form `|tag|length|value|`.
+
+Note that "standard" TLV format is used. Matter TLV format is only used for
+factory data TLV value.
+
+Please find more information about the script and supported arguments in the
+[OTA image tool guide](../../../scripts/tools/nxp/ota/README.md).
+
+Example of command to generate the `.ota` file :
 
 ```sh
-user@ubuntu:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 2 -vs "2.0" -da sha256 chip-<"rt_board">-all-cluster-example_SIGNED.bin chip-rw61x-all-cluster-example.ota
+user@ubuntu:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 2 -vs "2.0" -da sha256 --app-input-file chip-<"rt_board">-all-cluster-example_SIGNED.bin chip-rw61x-all-cluster-example.ota
 ```
+
+#### OTA with encryption
+
+A user can choose to enable the encryption of the OTA update image. This can be
+done by adding `--enc_enable` and `--input_ota_key <aes_128_key>` to the
+ota_image_tool script, by replacing `<aes_128_key>` with the encryption key.
+This will generate an encrypted `.ota` file.
+
+Note that the application must enable the encryption also to be able to
+successfully process the update image. This can be done by adding to the build :
+
+-   For a GN build, add to the `gn gen` args `chip_with_ota_encryption=true` and
+    `chip_with_ota_key=<aes_128_key>`.
+-   For a CMake build, add to the `west build` command line the following
+    Kconfig `-DCONFIG_CHIP_OTA_ENCRYPTION=y` and
+    `-DCONFIG_CHIP_OTA_ENCRYPTION_KEY=<aes_128_key>`.
+
+The `<aes_128_key>` value must match between the application build and the
+`.ota` generation.
+
+> Note : For applications generated with CMake, if the build configuration has
+> `CONFIG_CHIP_OTA_ENCRYPTION=y` Kconfig enabled, then the auto-generated `.ota`
+> file will be encrypted with the specified key.
 
 The generated OTA file can be used to perform the OTA Software Update. The
 instructions below describe the procedure step-by-step.
@@ -295,8 +378,8 @@ instructions below describe the procedure step-by-step.
 
 Setup example :
 
--   [Chip-tool](../../../examples/chip-tool/README.md) application running on
-    the RPi.
+-   [Chip-tool](../../development_controllers/chip-tool/chip_tool_guide.md)
+    application running on the RPi.
 -   OTA Provider application built on the same RPi (as explained below).
 -   RT board programmed with the example application (with the instructions
     above).
@@ -329,7 +412,7 @@ user@ubuntu:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-wifi 
 ```
 
 Once commissioned, the OTA process can be initiated with the
-"announce-ota-provider" command using chip-tool (the given numbers refer
+"announce-otaprovider" command using chip-tool (the given numbers refer
 respectively to [ProviderNodeId][vendorid] [AnnouncementReason][endpoint]
 [node-id][endpoint-id]) :
 

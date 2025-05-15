@@ -9,6 +9,4 @@
 click
 click-option-group
 
-# scripts/py_matter_idl/matter/idl
-jinja2
-lark
+-e ${PW_PROJECT_ROOT}/scripts/py_matter_idl

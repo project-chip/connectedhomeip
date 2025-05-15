@@ -29,10 +29,10 @@ except ImportError:
     sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.matter_idl_parser import CreateParser
 
-from matter.idl.generators import GeneratorStorage
 from matter.idl.generators.cpp.application import CppApplicationGenerator
 from matter.idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter.idl.generators.java import JavaClassGenerator, JavaJNIGenerator
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import Idl
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
@@ -76,6 +76,9 @@ class TestCaseStorage(GeneratorStorage):
 
         path = self.get_existing_data_path(relative_path)
         if path:
+            if REGENERATE_GOLDEN_IMAGES and not os.path.exists(path):
+                return ""
+
             with open(path, 'rt') as golden:
                 return golden.read()
 
@@ -87,7 +90,11 @@ class TestCaseStorage(GeneratorStorage):
         if REGENERATE_GOLDEN_IMAGES:
             print("RE-GENERATING %r" % relative_path)
             # Expect writing only on regeneration
-            with open(self.get_existing_data_path(relative_path), 'wt') as golden:
+            path = os.path.abspath(self.get_existing_data_path(relative_path))
+            dir_path = os.path.dirname(path)
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            with open(path, 'wt') as golden:
                 golden.write(content)
                 return
 
@@ -137,7 +144,7 @@ class GeneratorTest:
             with checker.subTest(idl=test.input_idl):
                 storage = TestCaseStorage(test, checker)
                 with open(os.path.join(TESTS_DIR, test.input_idl), 'rt') as stream:
-                    idl = CreateParser().parse(stream.read())
+                    idl = CreateParser().parse(stream.read(), file_name=test.input_idl)
 
                 generator = self._create_generator(storage, idl)
                 generator.render(dry_run=False)

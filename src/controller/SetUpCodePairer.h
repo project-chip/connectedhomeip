@@ -105,17 +105,21 @@ private:
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
     CHIP_ERROR Connect(SetupPayload & paload);
-    CHIP_ERROR StartDiscoverOverBle(SetupPayload & payload);
-    CHIP_ERROR StopConnectOverBle();
-    CHIP_ERROR StartDiscoverOverIP(SetupPayload & payload);
-    CHIP_ERROR StopConnectOverIP();
-    CHIP_ERROR StartDiscoverOverSoftAP(SetupPayload & payload);
-    CHIP_ERROR StopConnectOverSoftAP();
-    CHIP_ERROR StartDiscoverOverWiFiPAF(SetupPayload & payload);
-    CHIP_ERROR StopConnectOverWiFiPAF();
+    CHIP_ERROR StartDiscoveryOverBLE(SetupPayload & payload);
+    CHIP_ERROR StopDiscoveryOverBLE();
+    CHIP_ERROR StartDiscoveryOverDNSSD(SetupPayload & payload);
+    CHIP_ERROR StopDiscoveryOverDNSSD();
+    CHIP_ERROR StartDiscoveryOverSoftAP(SetupPayload & payload);
+    CHIP_ERROR StopDiscoveryOverSoftAP();
+    CHIP_ERROR StartDiscoveryOverWiFiPAF(SetupPayload & payload);
+    CHIP_ERROR StopDiscoveryOverWiFiPAF();
 
     // Returns whether we have kicked off a new connection attempt.
     bool ConnectToDiscoveredDevice();
+
+    // Stop attempts to discover more things to connect to, but keep trying to
+    // connect to the ones we have already discovered.
+    void StopAllDiscoveryAttempts();
 
     // Reset our mWaitingForDiscovery/mDiscoveredParameters state to indicate no
     // pending work.

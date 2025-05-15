@@ -67,6 +67,9 @@ public:
 
     void SetMaximallyLargeCertsUsed(bool areMaximallyLargeCertsUsed) { mUseMaximallySizedCerts = areMaximallyLargeCertsUsed; }
 
+    // When enabled, chains will be Root -> NOC, for the given fabric ID, and not include an ICAC.
+    void SetAlwaysOmitIcac(bool enabled) { mAlwaysOmitIcac = enabled; }
+
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
     void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }
@@ -84,7 +87,7 @@ public:
     [[deprecated("This class stores the encryption key in clear storage. Don't use it for production code.")]] CHIP_ERROR
     Initialize(PersistentStorageDelegate & storage);
 
-    void SetIssuerId(uint32_t id) { mIssuerId = id; }
+    void SetIssuerId(uint32_t id) { mRootIssuerId = id; }
 
     void SetCurrentEpoch(uint32_t epoch) { mNow = epoch; }
 
@@ -109,10 +112,10 @@ public:
                                                MutableByteSpan & noc);
 
 private:
-    Crypto::P256Keypair mIssuer;
+    Crypto::P256Keypair mRootIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
     bool mInitialized              = false;
-    uint32_t mIssuerId             = 1;
+    uint32_t mRootIssuerId         = 1;
     uint32_t mIntermediateIssuerId = 2;
     uint32_t mNow                  = 0;
 
@@ -122,6 +125,7 @@ private:
     NodeId mNextAvailableNodeId          = 1;
     PersistentStorageDelegate * mStorage = nullptr;
     bool mUseMaximallySizedCerts         = false;
+    bool mAlwaysOmitIcac                 = false;
 
     NodeId mNextRequestedNodeId = 1;
     FabricId mNextFabricId      = 1;

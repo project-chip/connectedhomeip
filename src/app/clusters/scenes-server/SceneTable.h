@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/scenes-server/ExtensionFieldSets.h>
+#include <app/storage/TableEntry.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/IntrusiveList.h>
@@ -28,14 +29,13 @@ namespace chip {
 namespace scenes {
 
 // Storage index for scenes in nvm
-typedef uint16_t SceneIndex;
+typedef app::Storage::Data::EntryIndex SceneIndex;
 
 typedef uint32_t TransitionTimeMs;
 typedef uint32_t SceneTransitionTime;
 
-inline constexpr GroupId kGlobalGroupSceneId     = 0x0000;
-inline constexpr SceneIndex kUndefinedSceneIndex = 0xffff;
-inline constexpr SceneId kUndefinedSceneId       = 0xff;
+inline constexpr GroupId kGlobalGroupSceneId = 0x0000;
+inline constexpr SceneId kUndefinedSceneId   = 0xff;
 
 static constexpr size_t kIteratorsMax            = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMaxLength      = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
@@ -222,30 +222,7 @@ public:
         }
     };
 
-    /// @brief Struct combining both ID and data of a table entry
-    struct SceneTableEntry
-    {
-        // ID
-        SceneStorageId mStorageId;
-
-        // DATA
-        SceneData mStorageData;
-
-        SceneTableEntry() = default;
-        SceneTableEntry(SceneStorageId id) : mStorageId(id) {}
-        SceneTableEntry(const SceneStorageId id, const SceneData data) : mStorageId(id), mStorageData(data) {}
-
-        bool operator==(const SceneTableEntry & other) const
-        {
-            return (mStorageId == other.mStorageId && mStorageData == other.mStorageData);
-        }
-
-        void operator=(const SceneTableEntry & other)
-        {
-            mStorageId   = other.mStorageId;
-            mStorageData = other.mStorageData;
-        }
-    };
+    using SceneTableEntry = app::Storage::Data::TableEntry<SceneStorageId, SceneData>;
 
     SceneTable(){};
 
@@ -294,11 +271,6 @@ public:
      */
     virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
     virtual CHIP_ERROR RemoveEndpoint()                       = 0;
-
-    // Iterators
-    using SceneEntryIterator = CommonIterator<SceneTableEntry>;
-
-    virtual SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) = 0;
 
     // Handlers
     virtual bool HandlerListEmpty() { return mHandlerList.Empty(); }

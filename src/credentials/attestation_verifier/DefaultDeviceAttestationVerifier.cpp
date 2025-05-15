@@ -29,6 +29,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Crypto;
 using chip::TestCerts::GetTestPaaRootStore;
@@ -386,13 +388,27 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
 
         paaDerBuffer = MutableByteSpan(paaCert.Get(), paaCertAllocatedLen);
         err          = mAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer);
-        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED,
-                     attestationError = AttestationVerificationResult::kPaaNotFound);
-
         if (err == CHIP_ERROR_NOT_IMPLEMENTED)
         {
-            VerifyOrExit(gTestAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
-                         attestationError = AttestationVerificationResult::kPaaNotFound);
+            err = gTestAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer);
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            attestationError = AttestationVerificationResult::kPaaNotFound;
+            // Log the unmatched AKID in the format the DCL uses: Uppercase hex, with bytes
+            // separated by ':'. That means three chars per byte (2 hex digits and ':') except for
+            // the last byte.  If we use a StringBuilder sized to 3 chars per byte, that won't allow
+            // us to write the last ':' (since it uses that char for the null terminator), but
+            // that's exactly what we want.
+            StringBuilder<Crypto::kAuthorityKeyIdentifierLength * 3> akidStringBuilder;
+            for (uint8_t byte : akid)
+            {
+                akidStringBuilder.AddFormat("%02X", byte).Add(":");
+            }
+            ChipLogError(NotSpecified, "Unable to find PAA, err: %" CHIP_ERROR_FORMAT ", AKID: %s", err.Format(),
+                         akidStringBuilder.c_str());
+            ExitNow();
         }
 
         VerifyOrExit(ExtractVIDPIDFromX509Cert(paaDerBuffer, paaVidPid) == CHIP_NO_ERROR,

@@ -250,7 +250,11 @@ list(
 )
 
 if (matter_dac_key_encryption)
-list(APPEND chip_main_flags -DCONFIG_DAC_KEY_ENC=1)
+list(
+  APPEND chip_main_flags 
+
+  -DCONFIG_DAC_KEY_ENC=1
+)
 endif (matter_dac_key_encryption)
 
 if (matter_enable_persistentstorage_audit)

@@ -32,6 +32,9 @@ class RealtekApp(Enum):
     LIGHT_SWITCH = auto()
     LOCK = auto()
     WINDOW = auto()
+    ALL_CLUSTERS = auto()
+    THERMOSTAT = auto()
+    OTA_REQUESTOR = auto()
 
     @property
     def ExampleName(self):
@@ -43,6 +46,12 @@ class RealtekApp(Enum):
             return 'lock-app'
         elif self == RealtekApp.WINDOW:
             return 'window-app'
+        elif self == RealtekApp.ALL_CLUSTERS:
+            return 'all-clusters-app'
+        elif self == RealtekApp.OTA_REQUESTOR:
+            return 'ota-requestor-app'
+        elif self == RealtekApp.THERMOSTAT:
+            return 'thermostat'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -55,6 +64,12 @@ class RealtekApp(Enum):
         elif self == RealtekApp.LOCK:
             return 'matter-cli-mtd'
         elif self == RealtekApp.WINDOW:
+            return 'matter-cli-mtd'
+        elif self == RealtekApp.ALL_CLUSTERS:
+            return 'matter-cli-ftd'
+        elif self == RealtekApp.OTA_REQUESTOR:
+            return 'matter-cli-ftd'
+        elif self == RealtekApp.THERMOSTAT:
             return 'matter-cli-mtd'
         else:
             raise Exception('Unknown app type: %r' % self)
@@ -69,6 +84,12 @@ class RealtekApp(Enum):
             return 'chip-rtl8777g-lock-app'
         elif self == RealtekApp.WINDOW:
             return 'chip-rtl8777g-window-app'
+        elif self == RealtekApp.ALL_CLUSTERS:
+            return 'chip-rtl8777g-all-clusters-app'
+        elif self == RealtekApp.OTA_REQUESTOR:
+            return 'chip-rtl8777g-ota-requestor-app'
+        elif self == RealtekApp.THERMOSTAT:
+            return 'chip-rtl8777g-thermostat-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
