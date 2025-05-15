@@ -49,7 +49,7 @@ enum class PushAvStreamTransportStatusEnum : uint8_t
 
 struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 {
-    TransportTriggerOptionsStorage() {};
+    TransportTriggerOptionsStorage(){};
 
     TransportTriggerOptionsStorage(Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions)
     {
@@ -63,7 +63,7 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 
 struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 {
-    CMAFContainerOptionsStorage() {};
+    CMAFContainerOptionsStorage(){};
 
     CMAFContainerOptionsStorage(Optional<Structs::CMAFContainerOptionsStruct::Type> CMAFContainerOptions)
     {
@@ -90,7 +90,7 @@ private:
 
 struct ContainerOptionsStorage : public ContainerOptionsStruct
 {
-    ContainerOptionsStorage() {};
+    ContainerOptionsStorage(){};
 
     ContainerOptionsStorage(Structs::ContainerOptionsStruct::DecodableType containerOptions)
     {
@@ -106,7 +106,7 @@ private:
 
 struct TransportOptionsStorage : public TransportOptionsStruct
 {
-    TransportOptionsStorage() {};
+    TransportOptionsStorage(){};
 
     TransportOptionsStorage(Structs::TransportOptionsStruct::DecodableType transportOptions)
     {
