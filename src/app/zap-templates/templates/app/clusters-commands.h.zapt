@@ -1,5 +1,5 @@
 {{> header}}
-// This file is generated from cluster-commands.h.zapt
+// This file is generated from clusters-commands.h.zapt
 
 #pragma once
 

@@ -1,5 +1,5 @@
 {{> header}}
-// This file is generated from shared-cluster-attributes.h.zapt
+// This file is generated from clusters-shared-attributes.h.zapt
 
 #pragma once
 

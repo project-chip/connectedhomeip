@@ -1,5 +1,5 @@
 {{> header}}
-// This file is generated from shared-cluster-structs.ipp.zapt
+// This file is generated from clusters-shared-structs.ipp.zapt
 
 #include <clusters/shared/Structs.h>
 

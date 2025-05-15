@@ -1,5 +1,5 @@
 {{> header}}
-// This file is generated from cluster-attributes.ipp.zapt
+// This file is generated from clusters-attributes.ipp.zapt
 
 #include <clusters/{{asUpperCamelCase name}}/Attributes.h>
 

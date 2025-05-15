@@ -1,5 +1,5 @@
 {{> header}}
-// This file is generated from cluster-events.h.zapt
+// This file is generated from clusters-events.h.zapt
 
 #pragma once
 
