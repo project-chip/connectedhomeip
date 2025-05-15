@@ -307,8 +307,8 @@ class HostApp(Enum):
             yield 'chip-camera-controller'
             yield 'chip-camera-controller.map'
         elif self == HostApp.CLOSURE:
-            yield 'chip-closure-app'
-            yield 'chip-closure-app.map'
+            yield 'closure-app'
+            yield 'closure-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 

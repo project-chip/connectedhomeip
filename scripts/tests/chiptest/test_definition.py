@@ -241,7 +241,7 @@ class ApplicationPaths:
             ),
             (self.rvc_app, "chip-rvc-app"),
             (self.network_manager_app, "matter-network-manager-app"),
-            (self.closure_app, "chip-closure-app"),
+            (self.closure_app, "closure-app"),
         ]
 
 
