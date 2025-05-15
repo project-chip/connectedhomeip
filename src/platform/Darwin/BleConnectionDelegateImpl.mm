@@ -149,7 +149,7 @@ namespace DeviceLayer {
             }
 
             [ble stop];
-            ble = [[BleConnection alloc] initWithRecoveryIdentifier:recoveryIdentifier];
+            ble = [[MTRBleConnection alloc] initWithRecoveryIdentifier:recoveryIdentifier];
             [ble setBleLayer:bleLayer];
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;

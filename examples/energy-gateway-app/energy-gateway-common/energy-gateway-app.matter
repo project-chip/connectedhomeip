@@ -809,7 +809,7 @@ cluster GeneralCommissioning = 48 {
   enum NetworkRecoveryReasonEnum : enum8 {
     kUnspecified = 0;
     kRoute = 1;
-    kICD = 2;
+    kICD = 2 [spec_name = "ICD"];
     kAuth = 3;
     kVisibility = 4;
   }
