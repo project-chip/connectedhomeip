@@ -24,8 +24,8 @@
 #include "DiagnosticDataProviderImplNxp.h"
 
 #ifdef CONFIG_WIFI_NXP
-#include <platform/Zephyr/wifi/WiFiManager.h>
 #include <platform/Zephyr/InetUtils.h>
+#include <platform/Zephyr/wifi/WiFiManager.h>
 #endif
 
 namespace chip {
