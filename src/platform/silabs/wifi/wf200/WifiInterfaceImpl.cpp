@@ -594,7 +594,7 @@ void WifiInterface::GotIPv4Address(uint32_t ip)
     ChipLogDetail(DeviceLayer, "DHCP IP=%ld.%ld.%ld.%ld", (ip & 0xFF), (ip >> 8 & 0xFF), (ip >> 16 & 0xFF), (ip >> 24 & 0xFF));
     sta_ip = ip;
 
-    WifiInterfaceImpl::GetInstance().NotifyIPv4Change(true);
+    NotifyIPv4Change(true);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
