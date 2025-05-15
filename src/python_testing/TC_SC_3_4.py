@@ -97,7 +97,7 @@ class TC_SC_3_4(MatterBaseTest):
         try:
             await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
             asserts.fail(
-                f"Unexpected success return from CASE Establishment after injecting fault, CASE Establishment should have failed")
+                "Unexpected success return from CASE Establishment after injecting fault, CASE Establishment should have failed")
         except ChipStackError as e:
             asserts.assert_equal(e.err,  expectedErrorCode,
                                  f"Expected to return {expectedErrorName}")
@@ -140,7 +140,7 @@ class TC_SC_3_4(MatterBaseTest):
             await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
         except ChipStackError as e:
             asserts.fail(
-                f"Unexpected CASE Establishment Failure. Having an invalid InitiatorResumeMIC should have resulted in CASE falling back to the standard CASE without resumption")
+                f"Unexpected CASE Establishment Failure, CASE Should have succeeded. Having an invalid InitiatorResumeMIC should have resulted in CASE falling back to the standard CASE without resumption. \nError = {e}")
         self.ensure_fault_injection_point_was_reached(faultID=CHIPFaultId.CASECorruptInitiatorResumeMIC)
 
         self.step(4)
