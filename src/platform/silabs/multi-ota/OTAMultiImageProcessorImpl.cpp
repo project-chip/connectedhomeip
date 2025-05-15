@@ -20,11 +20,7 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/support/BufferReader.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
-
-#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,6 +28,7 @@ extern "C" {
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_driver.h"
 #include "sl_si91x_hal_soc_soft_reset.h"
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #else // This is not needed for the 917 SoC; it is required for EFR host applications
 #include "btl_interface.h"
 #include "em_bus.h" // For CORE_CRITICAL_SECTION

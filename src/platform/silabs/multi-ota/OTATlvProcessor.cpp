@@ -19,12 +19,12 @@
 #include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/TypeTraits.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-#include <platform/silabs/SilabsConfig.h>
+// TODO: Add this dependency when integrating the multi-OTA encryption feature
+//  #include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif
 

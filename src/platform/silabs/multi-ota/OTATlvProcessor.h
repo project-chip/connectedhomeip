@@ -89,9 +89,10 @@ public:
 
     uint8_t * GetData() { return data(); }
 
+    inline uint32_t GetThreshold() const { return mThreshold; }
+
 protected:
     inline uint8_t * data() { return mBuffer.Get(); }
-    inline uint32_t GetThreshold() const { return mThreshold; }
 
     uint32_t mThreshold    = 0;
     uint32_t mBufferOffset = 0;
@@ -120,6 +121,7 @@ public:
         char versionString[kVersionStringSize] = { 0 };
         char buildDate[kBuildDateSize]         = { 0 };
     };
+
     virtual ~OTATlvProcessor() {}
 
     virtual CHIP_ERROR Init();

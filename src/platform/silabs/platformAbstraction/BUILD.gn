@@ -1,0 +1,23 @@
+import("//build_overrides/chip.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
+
+source_set("platform-abstraction") {
+  sources = [
+    "${chip_root}/src/platform/silabs/platformAbstraction/SilabsPlatform.h",
+    "${chip_root}/src/platform/silabs/platformAbstraction/SilabsPlatformBase.h",
+  ]
+  if (wifi_soc == true) {
+    sources += [
+      "${chip_root}/src/platform/silabs/platformAbstraction/WiseMcuSpam.cpp",
+    ]
+  } else {
+    sources +=
+        [ "${chip_root}/src/platform/silabs/platformAbstraction/GsdkSpam.cpp" ]
+  }
+
+  deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}

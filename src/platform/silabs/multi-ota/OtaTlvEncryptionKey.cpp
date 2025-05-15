@@ -1,6 +1,8 @@
 #include "OtaTlvEncryptionKey.h"
 #include <lib/support/CodeUtils.h>
-#include <platform/silabs/SilabsConfig.h>
+// TODO: Add this dependency when integrating the multi-OTA encryption feature
+// #include <platform/silabs/SilabsConfig.h>
+#include "SilabsConfig.h"
 #include <sl_psa_crypto.h>
 #include <stdio.h>
 #include <string.h>

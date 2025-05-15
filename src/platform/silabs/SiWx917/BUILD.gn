@@ -63,9 +63,6 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
     "${silabs_platform_dir}/SystemPlatformConfig.h",
-    "${silabs_platform_dir}/platformAbstraction/SilabsPlatform.h",
-    "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
-    "${silabs_platform_dir}/platformAbstraction/WiseMcuSpam.cpp",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../rs911x/BLEManagerImpl.cpp",
@@ -78,6 +75,7 @@ static_library("SiWx917") {
   public_deps = [
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/platform:platform_base",
+    "../platformAbstraction:platform-abstraction",
   ]
   deps = [
     "${chip_root}/src/app/common:ids",
@@ -86,17 +84,7 @@ static_library("SiWx917") {
   ]
 
   if (chip_enable_multi_ota_requestor) {
-    sources += [
-      "${silabs_platform_dir}/multi-ota/OTAFactoryDataProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/OTAFactoryDataProcessor.h",
-      "${silabs_platform_dir}/multi-ota/OTAHooks.cpp",
-      "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.cpp",
-      "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.h",
-      "${silabs_platform_dir}/multi-ota/OTATlvProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
-      "${silabs_platform_dir}/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h",
-    ]
+    public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota" ]
   } else if (chip_enable_ota_requestor) {
     sources += [
       "${silabs_platform_dir}/OTAImageProcessorImpl.h",
