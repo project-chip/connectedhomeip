@@ -44,6 +44,7 @@ config("config") {
     "include/media-controller",
     "include/network-stream-source",
     "include/transport",
+    "include/uploader",
     "${chip_root}/examples/camera-app/camera-common/include",
     "${chip_root}/examples/camera-app/camera-common/include/media-controller",
     "${chip_root}/examples/camera-app/camera-common/include/transport",
@@ -62,6 +63,7 @@ executable("chip-camera-app") {
   configs += [ ":config" ]
 
   configs += [ ":gstreamer" ]
+  libs = ["curl"]
 
   sources = [
     "${chip_root}/examples/camera-app/linux/include/media-controller/default-media-controller.h",
@@ -72,6 +74,7 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc-provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
     "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
+    "${chip_root}/examples/camera-app/linux/src/uploader/pushav-uploader.cpp",
     "${chip_root}/examples/camera-app/linux/src/webrtc-transport.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
