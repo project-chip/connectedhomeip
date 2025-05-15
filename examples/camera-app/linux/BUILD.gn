@@ -73,7 +73,7 @@ executable("chip-camera-app") {
   configs += [ ":gstreamer" ]
 
   configs += [ ":ffmpeg" ]
-  libs = ["curl"]
+  libs = [ "curl" ]
 
   sources = [
     "${chip_root}/examples/camera-app/linux/include/media-controller/default-media-controller.h",
@@ -81,7 +81,7 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avsettingsuserlevel-mgmt/camera-avsettingsuserlevel-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avstream-mgmt/camera-av-stream-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
-    "${chip_root}/examples/camera-app/linux/src/clusters/webrtc-provider/webrtc-provider-manager.cpp",
+    "${chip_root}/examples/camera-app/linux/src/clusters/webrtc_provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
     "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
     "${chip_root}/examples/camera-app/linux/src/pushav-clip-recorder.cpp",
