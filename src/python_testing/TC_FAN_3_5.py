@@ -436,6 +436,32 @@ class TC_FAN_3_5(MatterBaseTest):
             self.baseline_fan_mode_asc = fan_mode_values_produced[:-1]
             self.baseline_speed_setting_asc = speed_setting_values_produced[:-1]
 
+    def verify_baseline_values(self):
+        """
+        Verifies that the baseline values for PercentSetting, FanMode, and SpeedSetting 
+        attributes are consistent after performing Step command decrease/increase operations.
+
+        This method checks if the descending baseline values are the reverse of the 
+        ascending baseline values for each attribute. If the values do not match, 
+        an assertion error is raised with a detailed message indicating the mismatch.
+
+        Raises:
+            AssertionError: If the descending baseline values do not match the reversed 
+                            ascending baseline values for any of the attributes.
+        """
+        asserts.assert_equal(
+            self.baseline_percent_setting_desc, list(reversed(self.baseline_percent_setting_asc)),
+            f"[FC] PercentSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_percent_setting_desc}, Ascending: {self.baseline_percent_setting_asc}."
+        )
+        asserts.assert_equal(
+            self.baseline_fan_mode_desc, list(reversed(self.baseline_fan_mode_asc)),
+            f"[FC] FanMode attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_fan_mode_desc}, Ascending: {self.baseline_fan_mode_asc}."
+        )
+        asserts.assert_equal(
+            self.baseline_speed_setting_desc, list(reversed(self.baseline_speed_setting_asc)),
+            f"[FC] SpeedSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_speed_setting_desc}, Ascending: {self.baseline_speed_setting_asc}."
+        )
+
     async def wrap_test(self, step: Clusters.FanControl.Commands.Step) -> None:
         """Tests the `wrap` flag for the given Step command.
 
@@ -446,25 +472,35 @@ class TC_FAN_3_5(MatterBaseTest):
         fm_enum = cluster.Enums.FanModeEnum
         sd_enum = cluster.Enums.StepDirectionEnum
 
-        # Initialize and verify attributes
+        # *** NEXT STEP ***
+        # Initialize the PercentSetting attribute and verify the expected
+        # attribute changes in acordance with the Step command parameters
+        # self.step(self.current_step_index + 1)
         await self.initialize_and_verify_attribtutes(step)
 
-        # Reset subscriptions
+        # *** NEXT STEP ***
+        # Reset the subscriptions to clear any previous attribute reports
+        # self.step(self.current_step_index + 1)
         for sub in self.subscriptions:
             sub.reset()
 
+        # *** NEXT STEP ***
+        # TH sends a Step command with the reqested parameters
+        #  - Verify the expected attribute values are produced
+        # self.step(self.current_step_index + 1)
         if step.direction == sd_enum.kDecrease and step.lowestOff:
-            logging.info("[FC] step.direction == sd_enum.kDecrease and step.lowestOff")
+            # - Verify that the attribute values all go to Off values
             await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
+            # - Verify that the attribute values all go to High values
             await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
         elif step.direction == sd_enum.kDecrease and not step.lowestOff:
-            logging.info("[FC] step.direction == sd_enum.kDecrease and not step.lowestOff")
+            # - Verify that the attribute values all go to High values
             await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
         elif step.direction == sd_enum.kIncrease and step.lowestOff:
-            logging.info("[FC] step.direction == sd_enum.kIncrease and step.lowestOff")
+            # - Verify that the PercentSetting attribute value goes to 0
             await self.wrap_veirfy(step, percent_setting_expected=0)
         elif step.direction == sd_enum.kIncrease and not step.lowestOff:
-            logging.info("[FC] step.direction == sd_enum.kIncrease and not step.lowestOff")
+            # - Verify that the PercentSetting attribute value goes to the minimum Step value above 0
             await self.wrap_veirfy(step, percent_setting_expected=self.percent_setting_per_step)
 
     async def wrap_veirfy(
@@ -582,26 +618,12 @@ class TC_FAN_3_5(MatterBaseTest):
 
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False))
 
-        logging.info(f"[FC] self.baseline_percent_setting_desc: {self.baseline_percent_setting_desc}")
-        logging.info(f"[FC] self.baseline_fan_mode_desc: {self.baseline_fan_mode_desc}")
-        logging.info(f"[FC] self.baseline_speed_setting_desc: {self.baseline_speed_setting_desc}")
-
-        logging.info(f"[FC] self.baseline_percent_setting_asc: {self.baseline_percent_setting_asc}")
-        logging.info(f"[FC] self.baseline_fan_mode_asc: {self.baseline_fan_mode_asc}")
-        logging.info(f"[FC] self.baseline_speed_setting_asc: {self.baseline_speed_setting_asc}")
-
-        asserts.assert_equal(
-            self.baseline_percent_setting_desc, list(reversed(self.baseline_percent_setting_asc)),
-            f"[FC] PercentSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_percent_setting_desc}, Ascending: {self.baseline_percent_setting_asc}."
-        )
-        asserts.assert_equal(
-            self.baseline_fan_mode_desc, list(reversed(self.baseline_fan_mode_asc)),
-            f"[FC] FanMode attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_fan_mode_desc}, Ascending: {self.baseline_fan_mode_asc}."
-        )
-        asserts.assert_equal(
-            self.baseline_speed_setting_desc, list(reversed(self.baseline_speed_setting_asc)),
-            f"[FC] SpeedSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_speed_setting_desc}, Ascending: {self.baseline_speed_setting_asc}."
-        )
+        # *** STEP ???? ***
+        # Read both the descending and ascending baseline attribute report values
+        #  - Verify that the descending baseline values are the exact reverse of the
+        #    ascending baseline values for each of the attributes
+        # self.step("????")
+        self.verify_baseline_values()
 
 
 if __name__ == "__main__":
