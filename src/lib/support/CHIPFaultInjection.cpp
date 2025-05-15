@@ -32,35 +32,13 @@ static int32_t sFault_CHIPNotificationSize_Arguments[1];
 static int32_t sFault_FuzzExchangeHeader_Arguments[1];
 static class nl::FaultInjection::Manager sChipFaultInMgr;
 static const nl::FaultInjection::Name sManagerName = "chip";
-const nl::FaultInjection::Name sFaultNames[]       = {
-    "AllocExchangeContext",
-    "DropIncomingUDPMsg",
-    "DropOutgoingUDPMsg",
-    "AllocBinding",
-    "SendAlarm",
-    "HandleAlarm",
-    "FuzzExchangeHeaderTx",
-    "RMPDoubleTx",
-    "RMPSendError",
-    "BDXBadBlockCounter",
-    "BDXAllocTransfer",
-    "SecMgrBusy",
-    "IMInvoke_SeparateResponses",
-    "IMInvoke_SeparateResponsesInvertResponseOrder",
-    "IMInvoke_SkipSecondResponse",
-    "ModifyWebRTCAnswerSessionId",
-    "ModifyWebRTCOfferSessionId",
-    "CASEServerBusy",
-    "CASESkipInitiatorResumeMIC",
-    "CASESkipResumptionID",
-    "CASECorruptInitiatorResumeMIC",
-    "CASECorruptDestinationID",
-    "CASECorruptTBEData3Encrypted",
-    "CASECorruptSigma3NOC",
-    "CASECorruptSigma3ICAC",
-    "CASECorruptSigma3Signature",
-    "CASECorruptSigma3InitiatorEphPubKey",
-    "CASECorruptSigma3ResponderEphPubKey",
+
+/*
+ * Array of strings containing the names for each Fault as defined in .h
+ */
+const nl::FaultInjection::Name sFaultNames[kFault_NumItems] = {
+#define _CHIP_FAULT_NAMES_STRING(FAULT, ...) #FAULT,
+    CHIP_FAULTS_ENUMERATE(_CHIP_FAULT_NAMES_STRING) //
 };
 
 static_assert(kFault_NumItems == sizeof(sFaultNames) / sizeof(sFaultNames[0]),
