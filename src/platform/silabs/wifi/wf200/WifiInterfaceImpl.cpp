@@ -589,7 +589,7 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-void WifiInterfaceImpl::GotIPv4Address(uint32_t ip)
+void WifiInterface::GotIPv4Address(uint32_t ip)
 {
     ChipLogDetail(DeviceLayer, "DHCP IP=%ld.%ld.%ld.%ld", (ip & 0xFF), (ip >> 8 & 0xFF), (ip >> 16 & 0xFF), (ip >> 24 & 0xFF));
     sta_ip = ip;
@@ -956,6 +956,8 @@ void WifiInterfaceImpl::ProcessEvents(void * arg)
 
                 if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !WifiInterfaceImpl::GetInstance().HasNotifiedIPv4())
                 {
+                    WifiInterfaceImpl::GetInstance().NotifyIPv4Change(false);
+
                     WifiInterfaceImpl::GetInstance().GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     if (!hasNotifiedWifiConnectivity)
                     {
