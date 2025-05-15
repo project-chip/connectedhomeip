@@ -964,7 +964,7 @@ def _OnWriteDoneCallback(closure):
 
 def WriteAttributes(future: Future, eventLoop, device,
                     attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
-                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None, forceLegacyListEncoding: Optional[bool] = None) -> PyChipError:
+                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None, forceLegacyListEncoding: bool = False) -> PyChipError:
     handle = GetLibraryHandle()
 
     numberOfAttributes = len(attributes)
@@ -1002,7 +1002,7 @@ def WriteAttributes(future: Future, eventLoop, device,
                 0 if interactionTimeoutMs is None else interactionTimeoutMs),
             ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
             pyWriteAttributes, ctypes.c_size_t(numberOfAttributes),
-            ctypes.c_bool(False if forceLegacyListEncoding is None else forceLegacyListEncoding))
+            ctypes.c_bool(forceLegacyListEncoding))
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
