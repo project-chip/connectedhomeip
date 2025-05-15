@@ -128,10 +128,12 @@ void InitialisePeerConnection(void * Client)
 }
 
 // API to destroy WebRTC client
-void DestroyClient(void * Client) {
-    if (Client == nullptr) {
+void DestroyClient(void * Client)
+{
+    if (Client == nullptr)
+    {
         ChipLogError(NotSpecified, "Client is null");
-	return;
+        return;
     }
 
     WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
