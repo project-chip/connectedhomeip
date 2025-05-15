@@ -214,12 +214,9 @@ static_library("nxp_platform") {
     }
   }
 
-  if(chip_enable_ethernet){
-     include_dirs =
-        [ "../../common/Ethernet/" ]
-    sources += [
-      "../../common/Ethernet/NxpEthDriver.cpp",
-    ]
+  if (chip_enable_ethernet) {
+    include_dirs = [ "../../common/Ethernet/" ]
+    sources += [ "../../common/Ethernet/NxpEthDriver.cpp" ]
   }
 
   if (nxp_use_factory_data) {
