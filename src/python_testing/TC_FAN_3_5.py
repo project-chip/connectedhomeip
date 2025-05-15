@@ -51,14 +51,14 @@ class TC_FAN_3_5(MatterBaseTest):
     def desc_TC_FAN_3_5(self) -> str:
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
 
-    # def steps_TC_FAN_3_5(self):
-    #     return [TestStep("1", "[FC] Commissioning already done.", is_commissioning=True),
-    #             TestStep("2", "[FC] TH checks the DUT for support of the Step and MultiSpeed features.",
-    #                      "If the DUT does not support both features, the test is skipped."),
-    #             TestStep("3", "[FC] TH reads from the DUT the SpeedMax attribute.", "Store value for future reference."),
+    def steps_TC_FAN_3_5(self):
+        return [TestStep("1", "[FC] Commissioning already done.", is_commissioning=True),
+                # TestStep("2", "[FC] TH checks the DUT for support of the Step and MultiSpeed features.",
+                #          "If the DUT does not support both features, the test is skipped."),
+                # TestStep("3", "[FC] TH reads from the DUT the SpeedMax attribute.", "Store value for future reference."),
 
-    #             TestStep("4", "[FC] TH subscribes to the FanControl cluster.", "Enables the TH to recei
-    #             ]
+                # TestStep("4", "[FC] TH subscribes to the FanControl cluster.", "Enables the TH to recei
+                ]
 
     async def read_setting(self, attribute: Any) -> Any:
         """Read a specified attribute from the FanControl cluster.
@@ -491,7 +491,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
         # *** STEP 1 ***
         # Commissioning already done
-        # self.step("1")
+        self.step("1")
 
         # *** STEP 2 ***
         # If the DUT has the OnOff cluster, turn it on
