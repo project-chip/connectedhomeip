@@ -133,6 +133,7 @@ private:
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
     void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
+    void NewConnection(BleLayer * bleLayer, void * appState, uint64_t connRecoveryIdentifier) override{};
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
