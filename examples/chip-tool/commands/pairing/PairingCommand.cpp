@@ -36,6 +36,23 @@
 using namespace ::chip;
 using namespace ::chip::Controller;
 
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+static void StopSignalHandler(int signum)
+{
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
+        switch (role)
+        {
+        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
+            break;
+        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
+            break;
+        }
+    });
+}
+#endif
+
 CHIP_ERROR PairingCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
@@ -63,6 +80,11 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = static_cast<int>(SA_RESETHAND);
+#endif
     switch (mPairingMode)
     {
     case PairingMode::None:
@@ -72,6 +94,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
             mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+        sigaction(SIGINT, &sa, nullptr);
+        sigaction(SIGTERM, &sa, nullptr);
+#endif
 #endif
         err = PairWithCode(remoteId);
         break;
@@ -91,6 +117,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::WiFiPAF:
         chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
             mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+        sigaction(SIGINT, &sa, nullptr);
+        sigaction(SIGTERM, &sa, nullptr);
+#endif
         err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
         break;
 #endif
@@ -242,6 +272,7 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
     }
 
     ReturnErrorOnFailure(MaybeDisplayTermsAndConditions(commissioningParams));
+    CurrentCommissioner().RegisterPairingDelegate(this);
     return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, discoveryType);
 }
 
