@@ -50,7 +50,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_CLDIM_3_3(self) -> str:
-        return "[TC-CLDIM-3.3] {C_SET_TARGET} Command Field Sanity Check with DUT as Server"
+        return "[TC-CLDIM-3.3] SetTarget Command Field Sanity Check with DUT as Server"
 
     def steps_TC_CLDIM_3_3(self) -> list[TestStep]:
         steps = [

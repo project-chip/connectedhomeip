@@ -50,7 +50,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_CLDIM_3_1(self) -> str:
-        return "[TC-CLDIM-3.1] {C_SET_TARGET} Command Positioning Functionality with DUT as Server"
+        return "[TC-CLDIM-3.1] SetTarget Command Positioning Functionality with DUT as Server"
 
     def steps_TC_CLDIM_3_1(self) -> list[TestStep]:
         steps = [

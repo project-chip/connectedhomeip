@@ -50,7 +50,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_CLDIM_3_2(self) -> str:
-        return "[TC-CLDIM-3.2] {C_SET_TARGET} Command Latching Functionality with DUT as Server"
+        return "[TC-CLDIM-3.2] SetTarget Command Latching Functionality with DUT as Server"
 
     def steps_TC_CLDIM_3_2(self) -> list[TestStep]:
         steps = [
