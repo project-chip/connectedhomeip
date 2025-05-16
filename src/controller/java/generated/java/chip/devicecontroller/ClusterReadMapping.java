@@ -17755,17 +17755,17 @@ public class ClusterReadMapping {
           readCameraAvSettingsUserLevelManagementMPTZPresetsCommandParams
         );
         result.put("readMPTZPresetsAttribute", readCameraAvSettingsUserLevelManagementMPTZPresetsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvSettingsUserLevelManagementDPTZRelativeMoveAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementDPTZStreamsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvSettingsUserLevelManagementDPTZStreamsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster).readDPTZRelativeMoveAttribute(
-              (ChipClusters.CameraAvSettingsUserLevelManagementCluster.DPTZRelativeMoveAttributeCallback) callback
+            ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster).readDPTZStreamsAttribute(
+              (ChipClusters.CameraAvSettingsUserLevelManagementCluster.DPTZStreamsAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveAttributeCallback(),
-          readCameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams
+          () -> new ClusterInfoMapping.DelegatedCameraAvSettingsUserLevelManagementClusterDPTZStreamsAttributeCallback(),
+          readCameraAvSettingsUserLevelManagementDPTZStreamsCommandParams
         );
-        result.put("readDPTZRelativeMoveAttribute", readCameraAvSettingsUserLevelManagementDPTZRelativeMoveAttributeInteractionInfo);
+        result.put("readDPTZStreamsAttribute", readCameraAvSettingsUserLevelManagementDPTZStreamsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvSettingsUserLevelManagementZoomMaxCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvSettingsUserLevelManagementZoomMaxAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

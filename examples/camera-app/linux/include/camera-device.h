@@ -237,7 +237,7 @@ private:
     int16_t mTilt = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultTilt;
     uint8_t mZoom = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
-    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 320, 585, 2240, 1665 };
+    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 0, 0, 1920, 1080 };
     uint16_t mCurrentVideoFrameRate                                         = 0;
     bool mHDREnabled                                                        = false;
     bool mMicrophoneMuted                                                   = false;
