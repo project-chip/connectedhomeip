@@ -41,7 +41,7 @@ import inspect
 import logging
 import re
 import sys
-from binascii import unhexlify, hexlify
+from binascii import hexlify, unhexlify
 from typing import Optional
 
 import chip.clusters as Clusters
