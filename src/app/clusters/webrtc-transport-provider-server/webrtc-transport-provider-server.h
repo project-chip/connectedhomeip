@@ -160,7 +160,9 @@ public:
      *   (i.e., Trickle ICE).
      *
      * @param[in] sessionId  The current session ID.
-     * @param[in] candidates A list of ICE candidate strings.
+     * @param[in] candidates A list of ICE candidate structs.
+     * Note: The callee cannot reference the `candidates` vector after this call
+     * returns, and must copy the contents over for later use, if required.
      *
      * @return CHIP_ERROR
      *   - CHIP_NO_ERROR on success

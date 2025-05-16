@@ -85,7 +85,9 @@ public:
      *   Called when the server receives the ICECandidates command.
      *
      * @param[in] sessionId  Current session ID.
-     * @param[in] candidates List of ICE candidate strings.
+     * @param[in] candidates List of ICE candidate structs.
+     * Note: The callee cannot reference the `candidates` vector after this call
+     * returns, and must copy the contents over for later use, if required.
      *
      * @return CHIP_ERROR
      *   - Returns error if the session is invalid or the candidates cannot be processed
