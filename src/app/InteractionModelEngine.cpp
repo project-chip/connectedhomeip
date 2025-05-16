@@ -93,9 +93,9 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
                                                                aSubjectDescriptor);
     }
 
-    for (auto & cluster : aProvider->ServerClustersIgnoreError(aEventPath.mEndpointId))
+    for (auto & cluster : aProvider->ServerClustersIgnoreError(aEndpoint))
     {
-        if (MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEventPath.mEndpointId, cluster.clusterId),
+        if (MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, cluster.clusterId),
                                                             aEventPath, aSubjectDescriptor))
         {
             return true;
