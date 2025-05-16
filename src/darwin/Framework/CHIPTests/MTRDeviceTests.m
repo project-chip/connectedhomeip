@@ -2927,13 +2927,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             if (path.cluster.unsignedIntValue == MTRClusterIDTypeOnOffID && path.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOnOffAttributeOnTimeID) {
                 NSDictionary * dataValue = attributeResponseValue[MTRDataKey];
                 NSNumber * onTimeValue = dataValue[MTRValueKey];
-                if ([onTimeValue isEqual:@(testOnTimeValue + 4)]) {
-                    [onTimeWriteSuccess fulfill];
-                } else {
-                    // The first write we did might get reported, but none of
-                    // the other ones should be.
-                    XCTAssertEqualObjects(onTimeValue, @(testOnTimeValue + 1));
-                }
+                // All the writes should have been coalesced
+                XCTAssertEqualObjects(onTimeValue, @(testOnTimeValue + 4));
+                [onTimeWriteSuccess fulfill];
             }
         }
     };
@@ -2948,10 +2944,24 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                            timedWriteTimeout:nil];
     };
 
+    // Enqueue an item on the device work queue that will block it until we have finished queueing
+    // up our writes.  Otherwise we can have random failures due to multiple writes getting
+    // dispatched before we have actually queued them all up, if we lose the timeslice for a bit
+    // between the writeOnTimeValue calls.
+    XCTestExpectation * allWritesQueuedExpectation = [self expectationWithDescription:@"All writes queued expectation"];
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
+    [workItem setReadyHandler:^(id device, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        [self waitForExpectations:@[ allWritesQueuedExpectation ] timeout:kTimeoutInSeconds];
+        completion(MTRAsyncWorkComplete);
+    }];
+    [device.asyncWorkQueue enqueueWorkItem:workItem description:@"Blocking work item"];
+
     writeOnTimeValue(testOnTimeValue + 1);
     writeOnTimeValue(testOnTimeValue + 2);
     writeOnTimeValue(testOnTimeValue + 3);
     writeOnTimeValue(testOnTimeValue + 4);
+
+    [allWritesQueuedExpectation fulfill];
 
     [self waitForExpectations:@[ onTimeWriteSuccess ] timeout:10];
 }

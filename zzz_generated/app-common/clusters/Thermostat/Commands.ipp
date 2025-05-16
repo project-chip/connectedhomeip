@@ -28,6 +28,7 @@ namespace Clusters {
 namespace Thermostat {
 namespace Commands {
 namespace SetpointRaiseLower {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -54,15 +55,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, amount);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetpointRaiseLower.
 namespace GetWeeklyScheduleResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -98,9 +97,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kTransitions))
         {
             err = DataModel::Decode(reader, transitions);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -108,6 +104,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 } // namespace GetWeeklyScheduleResponse.
 namespace SetWeeklySchedule {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -144,15 +141,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transitions);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetWeeklySchedule.
 namespace GetWeeklySchedule {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -179,15 +174,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, modeToReturn);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetWeeklySchedule.
 namespace ClearWeeklySchedule {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -209,6 +202,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 } // namespace ClearWeeklySchedule.
 namespace SetActiveScheduleRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -230,15 +224,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, scheduleHandle);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetActiveScheduleRequest.
 namespace SetActivePresetRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -260,15 +252,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, presetHandle);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetActivePresetRequest.
 namespace AtomicResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -300,15 +290,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeout);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace AtomicResponse.
 namespace AtomicRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -339,9 +327,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kTimeout))
         {
             err = DataModel::Decode(reader, timeout);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
