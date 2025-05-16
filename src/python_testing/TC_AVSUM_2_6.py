@@ -106,7 +106,7 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
                     break
 
             asserts.assert_true(notFound, "Preset not removed despite invocation of MPTZRemovePreset")
-            self.skip_all_remaining_steps(6)
+            self.mark_all_remaining_steps_skipped(6)
             return
 
         self.step(6)
