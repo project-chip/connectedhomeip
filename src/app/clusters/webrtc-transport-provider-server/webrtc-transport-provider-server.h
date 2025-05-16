@@ -23,16 +23,16 @@
 #include <string>
 #include <vector>
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace WebRTCTransportProvider {
+
 using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
 using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
 using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WebRTCTransportProvider {
 
 /**
  * @brief

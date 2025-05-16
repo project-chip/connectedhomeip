@@ -24,6 +24,7 @@
 #include <webrtc-manager/WebRTCManager.h>
 
 using namespace ::chip;
+using StreamUsageEnum = chip::app::Clusters::Globals::StreamUsageEnum;
 
 namespace webrtc {
 

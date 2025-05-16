@@ -21,6 +21,7 @@
 
 using namespace ::chip;
 using namespace ::chip::app;
+using WebRTCSessionStruct = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
 
 namespace {
 
