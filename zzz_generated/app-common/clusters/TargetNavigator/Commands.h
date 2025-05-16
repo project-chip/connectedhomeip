@@ -70,6 +70,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::NavigateTarget::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t target = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> data;
@@ -86,9 +87,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTarget::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t target = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> data;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTarget
@@ -105,6 +108,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
@@ -121,9 +125,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTargetResponse

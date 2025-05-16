@@ -68,6 +68,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOTAProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId providerNodeID               = static_cast<chip::NodeId>(0);
     chip::VendorId vendorID                   = static_cast<chip::VendorId>(0);
@@ -87,12 +88,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOTAProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId providerNodeID               = static_cast<chip::NodeId>(0);
     chip::VendorId vendorID                   = static_cast<chip::VendorId>(0);
     AnnouncementReasonEnum announcementReason = static_cast<AnnouncementReasonEnum>(0);
     Optional<chip::ByteSpan> metadataForNode;
     chip::EndpointId endpoint = static_cast<chip::EndpointId>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AnnounceOTAProvider

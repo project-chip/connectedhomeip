@@ -194,6 +194,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::ByteSpan> PINCode;
 
@@ -209,8 +210,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::LockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::ByteSpan> PINCode;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LockDoor
@@ -226,6 +229,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UnlockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::ByteSpan> PINCode;
 
@@ -241,8 +245,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UnlockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::ByteSpan> PINCode;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnlockDoor
@@ -259,6 +265,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeout::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t timeout = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> PINCode;
@@ -275,9 +282,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeout::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t timeout = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> PINCode;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnlockWithTimeout
@@ -299,6 +308,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex                = static_cast<uint8_t>(0);
     uint16_t userIndex                  = static_cast<uint16_t>(0);
@@ -320,6 +330,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex                = static_cast<uint8_t>(0);
     uint16_t userIndex                  = static_cast<uint16_t>(0);
@@ -328,6 +339,7 @@ public:
     uint8_t startMinute                 = static_cast<uint8_t>(0);
     uint8_t endHour                     = static_cast<uint8_t>(0);
     uint8_t endMinute                   = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetWeekDaySchedule
@@ -344,6 +356,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -360,9 +373,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeekDaySchedule
@@ -385,6 +400,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -407,6 +423,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -416,6 +433,7 @@ public:
     Optional<uint8_t> startMinute;
     Optional<uint8_t> endHour;
     Optional<uint8_t> endMinute;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeekDayScheduleResponse
@@ -432,6 +450,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -448,9 +467,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ClearWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearWeekDaySchedule
@@ -469,6 +490,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex    = static_cast<uint8_t>(0);
     uint16_t userIndex      = static_cast<uint16_t>(0);
@@ -487,11 +509,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex    = static_cast<uint8_t>(0);
     uint16_t userIndex      = static_cast<uint16_t>(0);
     uint32_t localStartTime = static_cast<uint32_t>(0);
     uint32_t localEndTime   = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetYearDaySchedule
@@ -508,6 +532,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -524,9 +549,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetYearDaySchedule
@@ -546,6 +573,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -565,12 +593,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
     DlStatus status      = static_cast<DlStatus>(0);
     Optional<uint32_t> localStartTime;
     Optional<uint32_t> localEndTime;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetYearDayScheduleResponse
@@ -587,6 +617,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -603,9 +634,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ClearYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearYearDaySchedule
@@ -624,6 +657,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex            = static_cast<uint8_t>(0);
     uint32_t localStartTime         = static_cast<uint32_t>(0);
@@ -642,11 +676,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex            = static_cast<uint8_t>(0);
     uint32_t localStartTime         = static_cast<uint32_t>(0);
     uint32_t localEndTime           = static_cast<uint32_t>(0);
     OperatingModeEnum operatingMode = static_cast<OperatingModeEnum>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetHolidaySchedule
@@ -662,6 +698,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
 
@@ -677,8 +714,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetHolidaySchedule
@@ -698,6 +737,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
     DlStatus status      = static_cast<DlStatus>(0);
@@ -717,12 +757,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
     DlStatus status      = static_cast<DlStatus>(0);
     Optional<uint32_t> localStartTime;
     Optional<uint32_t> localEndTime;
     Optional<OperatingModeEnum> operatingMode;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetHolidayScheduleResponse
@@ -738,6 +780,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
 
@@ -753,8 +796,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ClearHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearHolidaySchedule
@@ -776,6 +821,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataOperationTypeEnum operationType = static_cast<DataOperationTypeEnum>(0);
     uint16_t userIndex                  = static_cast<uint16_t>(0);
@@ -797,6 +843,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataOperationTypeEnum operationType = static_cast<DataOperationTypeEnum>(0);
     uint16_t userIndex                  = static_cast<uint16_t>(0);
@@ -805,6 +852,7 @@ public:
     DataModel::Nullable<UserStatusEnum> userStatus;
     DataModel::Nullable<UserTypeEnum> userType;
     DataModel::Nullable<CredentialRuleEnum> credentialRule;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetUser
@@ -820,6 +868,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
 
@@ -835,8 +884,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetUser
@@ -861,6 +912,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetUserResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::CharSpan> userName;
@@ -885,6 +937,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetUserResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::CharSpan> userName;
@@ -896,6 +949,7 @@ public:
     DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextUserIndex;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetUserResponse
@@ -911,6 +965,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
 
@@ -926,8 +981,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ClearUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearUser
@@ -948,6 +1005,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataOperationTypeEnum operationType = static_cast<DataOperationTypeEnum>(0);
     Structs::CredentialStruct::Type credential;
@@ -968,6 +1026,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataOperationTypeEnum operationType = static_cast<DataOperationTypeEnum>(0);
     Structs::CredentialStruct::DecodableType credential;
@@ -975,6 +1034,7 @@ public:
     DataModel::Nullable<uint16_t> userIndex;
     DataModel::Nullable<UserStatusEnum> userStatus;
     DataModel::Nullable<UserTypeEnum> userType;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetCredential
@@ -992,6 +1052,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetCredentialResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DlStatus status = static_cast<DlStatus>(0);
     DataModel::Nullable<uint16_t> userIndex;
@@ -1009,10 +1070,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetCredentialResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DlStatus status = static_cast<DlStatus>(0);
     DataModel::Nullable<uint16_t> userIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetCredentialResponse
@@ -1028,6 +1091,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::CredentialStruct::Type credential;
 
@@ -1043,8 +1107,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::CredentialStruct::DecodableType credential;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetCredentialStatus
@@ -1065,6 +1131,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatusResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     bool credentialExists = static_cast<bool>(0);
     DataModel::Nullable<uint16_t> userIndex;
@@ -1085,6 +1152,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatusResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     bool credentialExists = static_cast<bool>(0);
     DataModel::Nullable<uint16_t> userIndex;
@@ -1092,6 +1160,7 @@ public:
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
     Optional<DataModel::Nullable<chip::ByteSpan>> credentialData;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetCredentialStatusResponse
@@ -1107,6 +1176,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<Structs::CredentialStruct::Type> credential;
 
@@ -1122,8 +1192,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ClearCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<Structs::CredentialStruct::DecodableType> credential;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearCredential
@@ -1139,6 +1211,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UnboltDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::ByteSpan> PINCode;
 
@@ -1154,8 +1227,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UnboltDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::ByteSpan> PINCode;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnboltDoor
@@ -1174,6 +1249,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetAliroReaderConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan signingKey;
     chip::ByteSpan verificationKey;
@@ -1192,11 +1268,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetAliroReaderConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan signingKey;
     chip::ByteSpan verificationKey;
     chip::ByteSpan groupIdentifier;
     Optional<chip::ByteSpan> groupResolvingKey;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetAliroReaderConfig
@@ -1211,6 +1289,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearAliroReaderConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -1224,6 +1303,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ClearAliroReaderConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
