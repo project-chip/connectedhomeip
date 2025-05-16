@@ -105,6 +105,7 @@ uint16_t getIndexLevelControl(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, LevelControl::Id, kLevelControlCount);
 }
+constexpr uint8_t kMinLevel  = 1;
 constexpr uint8_t kMaxLevel  = 254;
 constexpr uint8_t kNullLevel = 255;
 
@@ -165,7 +166,7 @@ void postMoveToLevel(EndpointId endpoint, uint8_t level)
     ChipLogDetail(DeviceLayer, "[chef-pump] Inside handleMoveToLevel. level = %d", level);
 
     bool pumpOn = false;
-    OnOff::Attributes::OnOff::Get(endpoint, onOff);
+    OnOff::Attributes::OnOff::Get(endpoint, pumpOn);
 
     if (!pumpOn)
     {
@@ -282,8 +283,8 @@ void init()
         epIndex = getIndexLevelControl(endpointId);
         if (epIndex < kLevelControlCount)
         {
-            VerifyOrDieWithMsg(LevelControl::Attributes::CurrentLevel::SetNull(endpointId) == Status::Success, DeviceLayer,
-                               "Failed to initialize Current Level to NULL for Endpoint: %d", endpointId);
+            VerifyOrDieWithMsg(LevelControl::Attributes::CurrentLevel::Set(endpointId, kMinLevel) == Status::Success, DeviceLayer,
+                               "Failed to initialize Current Level to 1 for Endpoint: %d", endpointId);
         }
 
         VerifyOrDieWithMsg(OnOff::Attributes::OnOff::Set(endpointId, false) == Status::Success, DeviceLayer,
