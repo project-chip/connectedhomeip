@@ -392,7 +392,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 th1_root_parser = MatterCertParser(root_certs[0])
                 th1_root_public_key = th1_root_parser.get_public_key_bytes()
             except (ValueError, IndexError, KeyError, TypeError) as e:
-                asserts.fail("Failed to parse root certificate for TH1's fabric")
+                asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
             logging.info("Parsed TH1's RCAC successfully.")
             logging.info(f"  -> Root public key bytes: {to_octet_string(th1_root_public_key)}")
 
@@ -423,7 +423,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 th2_rcac = MatterCertParser(rcacResp)
                 th2_root_public_key = th2_rcac.get_public_key_bytes()
             except (ValueError, IndexError, KeyError, TypeError) as e:
-                asserts.fail("Failed to parse root certificate for TH2's fabric")
+                asserts.fail(f"Failed to parse root certificate for TH2's fabric: {str(e)}")
             logging.info("Parsed TH2's RCAC successfully.")
             logging.info(f"  -> Root public key bytes: {to_octet_string(th2_root_public_key)}")
 
