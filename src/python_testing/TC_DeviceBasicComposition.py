@@ -185,7 +185,7 @@ from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
                                                cluster_id_type, command_id_type)
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
+                                         async_test_body, default_matter_test_main, UnknownProblemLocation)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
                                                     get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
@@ -675,10 +675,19 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 "At least one cluster has failed the range and support checks for its listed attributes, commands or features")
 
         # Wildcard reads of events: event list MUST NOT be empty since at least a boot event should be registered.
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
-                                                               events=[('*')],
-                                                               fabricFiltered=True,
-                                                               reportInterval=(100, 1000))
+        self.print_step(12, "Validate that event wildcard subscription works")
+        subscription = None
+        try:
+            subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
+                                                                events=[('*')],
+                                                                fabricFiltered=True,
+                                                                reportInterval=(100, 1000))
+        except Exception as e:
+            self.record_error(self.get_test_name(), problem=f"Failed to wildcard subscribe events(*): {e}", location=UnknownProblemLocation())
+
+        if subscription is None:
+            self.fail_current_test()
+            return
 
         if len(subscription.GetEvents()) == 0:
             self.fail_current_test('Wildcard event subscription returned no events')
