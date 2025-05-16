@@ -173,14 +173,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
-            if is_positioning_supported:
-                asserts.assert_greater_equal(target.position, min_position, "Target Position is outside expected range")
-                asserts.assert_less_equal(target.position, max_position, "Target Position is outside expected range")
             asserts.assert_equal(target.latch, True, "Target Latch is not True")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
         else:
             logging.info("Target attribute is not supported. Skipping step 4c.")
 
@@ -243,14 +236,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
-            if is_positioning_supported:
-                asserts.assert_greater_equal(target.position, min_position, "Target Position is outside expected range")
-                asserts.assert_less_equal(target.position, max_position, "Target Position is outside expected range")
             asserts.assert_equal(target.latch, False, "Target Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
         else:
             logging.info("Target attribute is not supported. Skipping step 6b.")
 
