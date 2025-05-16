@@ -111,6 +111,9 @@ private:
     Optional<ByteSpan> mOperationalDataset;
     uint64_t mBreadcrumb;
 
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mSsidBuffer;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mCredBuffer;
+    
     NetworkRecoverBehaviour mNetworkRecoverBehaviour = NetworkRecoverBehaviour::kDiscover;
     NetworkRecoverDelegate * mNetworkRecoverDelegate = nullptr;
     DeviceCommissioner * mCommissioner               = nullptr;

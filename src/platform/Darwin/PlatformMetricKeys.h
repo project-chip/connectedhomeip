@@ -51,6 +51,9 @@ constexpr Tracing::MetricKey kMetricBLEBadOpCode = "dwnpm_ble_bad_opcode";
 // Mismatched discriminator when connecting to a peripheral
 constexpr Tracing::MetricKey kMetricBLEMismatchedDiscriminator = "dwnpm_ble_mismatched_discriminator";
 
+// Mismatched recovery identifier when connecting to a peripheral
+constexpr Tracing::MetricKey kMetricBLEMismatchedRecoveryIdentifier = "dwnpm_ble_mismatched_recovery_identifier";
+
 // Attempt to connect to discovered peripheral
 constexpr Tracing::MetricKey kMetricBLEConnectPeripheral = "dwnpm_ble_connect_peripheral";
 

@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (assign, nonatomic) uint64_t nodeId;
 
-@property (strong, nonatomic) NSNumber * recoveryId;
+@property (assign, nonatomic) uint64_t recoveryId;
 
 @property (strong, nonatomic) NSString * produceName;
 

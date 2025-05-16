@@ -16,6 +16,7 @@
  */
 
 #import "MatterDevice.h"
+#import "DefaultsUtils.h"
 
 @implementation MatterDevice
 
@@ -23,9 +24,9 @@
 {
     self = [super init];
     if (self) {
-        // TODO: fetch recovery id from cluster
-        _recoveryId = [NSNumber numberWithLong:1234605616436508552];
         _nodeId = nodeId;
+        _recoveryId = MTRGetRecoveryIdentifier(nodeId);
+        _produceName = MTRGetDeviceName(nodeId);
     }
     return self;
 }

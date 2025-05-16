@@ -342,6 +342,31 @@ public:
             [delegate controller:controller didFindCommissionableDevice:result];
         });
     }
+    
+    void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const ChipBLENetworkRecoveryInfo & info) override
+    {
+        assertChipStackLockedByCurrentThread();
+
+        // Copy delegate and controller to the stack to avoid capturing `this` in the dispatch_async
+        id<MTRCommissionableBrowserDelegate> delegate = mDelegate;
+        MTRDeviceController * controller = mController;
+        VerifyOrReturn(delegate != nil && controller != nil);
+
+        auto result = [[MTRNetworkRecoverableBrowserResult alloc] init];
+        
+        NSData *recoveryIdentifierData = [NSData dataWithBytes:info.RecoveryIdentifier length:8];
+        uint64_t recoveryIdentifier = 0;
+        [recoveryIdentifierData getBytes:&recoveryIdentifier length:8];
+        
+        result.recoveryID = @(recoveryIdentifier);
+        result.recoveryReason = @(info.GetPrimaryReason());
+        result.params = chip::MakeOptional(chip::Controller::SetUpCodePairerParameters(connObj, false /* connected */));
+        result.peripheral = CBPeripheralFromBleConnObject(connObj); // avoid params holding a dangling pointer
+
+        dispatch_async(mDispatchQueue, ^{
+            [delegate controller:controller didFindNetworkRecoverableDevice:result];
+        });
+    }
 
     void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) override
     {

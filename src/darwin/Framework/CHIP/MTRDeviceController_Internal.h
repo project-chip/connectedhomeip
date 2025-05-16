@@ -147,5 +147,6 @@ static NSString * const kDeviceControllerErrorCSRValidation = @"Extracting publi
 static NSString * const kDeviceControllerErrorGetCommissionee = @"Failure obtaining device being commissioned";
 static NSString * const kDeviceControllerErrorGetAttestationChallenge = @"Failure getting attestation challenge";
 static NSString * const kDeviceControllerErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
+static NSString * const kDeviceControllerErrorRecoverDevice = @"Failure while recovering the device";
 
 NS_ASSUME_NONNULL_END
