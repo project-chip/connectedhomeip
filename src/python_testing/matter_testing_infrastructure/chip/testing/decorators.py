@@ -25,7 +25,7 @@ import asyncio
 import logging
 from enum import IntFlag
 from functools import partial
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Any, Callable, Type
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
@@ -41,7 +41,7 @@ EndpointCheckFunction = Callable[[
     Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
-def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: ClusterObjects.Cluster) -> bool:
+def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: Type[ClusterObjects.Cluster]) -> bool:
     """Check if a cluster exists on a specific endpoint.
 
     Args:
@@ -95,7 +95,8 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
         ValueError: If AttributeList value is not a list type
         KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+    # Cast result to Any to satisfy mypy about subsequent .Attributes access
+    cluster: Any = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
@@ -153,7 +154,8 @@ def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
         ValueError: If AcceptedCommandList value is not a list type
         KeyError: If command's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+    # Cast result to Any to satisfy mypy about subsequent .Attributes access
+    cluster: Any = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
@@ -202,10 +204,12 @@ def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
     if cluster not in wildcard.attributes[endpoint]:
         return False
 
-    if cluster.Attributes.FeatureMap not in wildcard.attributes[endpoint][cluster]:
+    # Access cluster.Attributes.FeatureMap with a type ignore
+    if cluster.Attributes.FeatureMap not in wildcard.attributes[endpoint][cluster]:  # type: ignore[attr-defined]
         return False
 
-    feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
+    # Access the feature map value
+    feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]  # type: ignore[attr-defined]
     if not isinstance(feature_map, int):
         raise ValueError(
             f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
