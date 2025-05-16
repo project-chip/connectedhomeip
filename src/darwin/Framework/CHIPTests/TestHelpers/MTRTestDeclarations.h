@@ -63,7 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 - (void)_deviceMayBeReachable;
 
-@property (nonatomic, readwrite, nullable) NSNumber * highestObservedEventNumber;
+@property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
