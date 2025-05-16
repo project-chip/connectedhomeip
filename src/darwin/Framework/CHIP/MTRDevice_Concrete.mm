@@ -346,6 +346,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Keep track of the last time we received subscription related communication from the device
 @property (nonatomic, nullable) NSDate * lastSubscriptionActiveTime;
 
+@property (nonatomic, readwrite) BOOL diagnosticLogTransferInProgress;
+
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -465,6 +467,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 //@synthesize lock = _lock;
 //@synthesize persistedClusterData = _persistedClusterData;
 @synthesize lastSubscriptionIPAddress = _lastSubscriptionIPAddress;
+@synthesize diagnosticLogTransferInProgress = _diagnosticLogTransferInProgress;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_Concrete *)controller
 {
@@ -3907,12 +3910,21 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     auto * baseDevice = [self newBaseDevice];
 
+    os_unfair_lock_lock(&self->_lock);
+    // per Matter spec, only one BDX transfer is allowed at a time.
+    self.diagnosticLogTransferInProgress = YES;
+    os_unfair_lock_unlock(&self->_lock);
+
     mtr_weakify(self);
+
     [baseDevice downloadLogOfType:type
                           timeout:timeout
                             queue:queue
                        completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
                            mtr_strongify(self);
+                           os_unfair_lock_lock(&self->_lock);
+                           self.diagnosticLogTransferInProgress = NO;
+                           os_unfair_lock_unlock(&self->_lock);
                            MTR_LOG("%@ downloadLogOfType %lu completed: %@", self, static_cast<unsigned long>(type), error);
                            completion(url, error);
                        }];

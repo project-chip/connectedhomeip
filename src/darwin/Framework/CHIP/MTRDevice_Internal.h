@@ -212,6 +212,7 @@ static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDe
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
 static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
 static NSString * const kMTRDeviceInternalPropertyDeviceCachePrimed = @"MTRDeviceInternalPropertyDeviceCachePrimed";
+static NSString * const kMTRDeviceInternalPropertyNumDiagLogTransfersInProgress = @"kMTRDeviceInternalPropertyNumDiagLogTransfersInProgress";
 static NSString * const kMTRDeviceInternalPropertyEstimatedStartTime = @"MTRDeviceInternalPropertyEstimatedStartTime";
 static NSString * const kMTRDeviceInternalPropertyEstimatedSubscriptionLatency = @"MTRDeviceInternalPropertyEstimatedSubscriptionLatency";
 
