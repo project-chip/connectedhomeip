@@ -44,8 +44,7 @@ void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDe
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
-    outStreamID                  = kInvalidStreamID;
-    bool unallocatedStreamExists = false;
+    outStreamID = kInvalidStreamID;
 
     for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
@@ -75,18 +74,9 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
 
             return Status::Success;
         }
-        if (!stream.isAllocated)
-        {
-            unallocatedStreamExists = true;
-        }
     }
 
-    if (!unallocatedStreamExists)
-    {
-        return Status::ResourceExhausted;
-    }
-
-    return Status::Failure;
+    return Status::DynamicConstraintError;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(const uint16_t streamID,
@@ -146,8 +136,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(const AudioStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
-    outStreamID                  = kInvalidStreamID;
-    bool unallocatedStreamExists = false;
+    outStreamID = kInvalidStreamID;
 
     for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
     {
@@ -169,18 +158,9 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
             }
             return Status::Success;
         }
-        if (!stream.isAllocated)
-        {
-            unallocatedStreamExists = true;
-        }
     }
 
-    if (!unallocatedStreamExists)
-    {
-        return Status::ResourceExhausted;
-    }
-
-    return Status::Failure;
+    return Status::DynamicConstraintError;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate(const uint16_t streamID)
@@ -211,8 +191,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
-    outStreamID                  = kInvalidStreamID;
-    bool unallocatedStreamExists = false;
+    outStreamID = kInvalidStreamID;
 
     for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
     {
@@ -234,18 +213,9 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
             }
             return Status::Success;
         }
-        if (!stream.isAllocated)
-        {
-            unallocatedStreamExists = true;
-        }
     }
 
-    if (!unallocatedStreamExists)
-    {
-        return Status::ResourceExhausted;
-    }
-
-    return Status::Failure;
+    return Status::DynamicConstraintError;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(const uint16_t streamID,
