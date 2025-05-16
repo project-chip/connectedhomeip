@@ -189,7 +189,7 @@ template("qpg_executable") {
     hexmerge_arguments = [
       "${out_dir}/${ihex_name}",
       "${out_dir}/${objcopy_image_name}",
-      "${out_dir}/bootloader_${qpg_target_ic}${qpg_flavour}.hex",
+      "${out_dir}/bootloader_${qpg_target_ic}.hex",
       "${out_dir}/${output_base_name}.factorydata.hex",
       "--ignore_start_execution_addr",
     ]
