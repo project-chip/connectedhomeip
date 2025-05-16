@@ -34,8 +34,8 @@
 class WebRTCProviderClient : public chip::app::CommandSender::Callback
 {
 public:
-    using ICECandidateStruct  = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-    using StreamUsageEnum     = chip::app::Clusters::Globals::StreamUsageEnum;
+    using ICECandidateStruct = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using StreamUsageEnum    = chip::app::Clusters::Globals::StreamUsageEnum;
 
     /**
      * @brief Construct a new WebRTCProviderClient object. Also initializes callbacks

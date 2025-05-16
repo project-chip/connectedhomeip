@@ -184,12 +184,8 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-<<<<<<< HEAD
-    DataModel::DecodableList<chip::CharSpan> ICECandidates;
-
-=======
     DataModel::DecodableList<Globals::Structs::ICECandidateStruct::DecodableType> ICECandidates;
->>>>>>> 33022a5847 (Codegen files for zap-regen)
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ICECandidates
@@ -225,14 +221,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-<<<<<<< HEAD
-    uint16_t webRTCSessionID   = static_cast<uint16_t>(0);
-    WebRTCEndReasonEnum reason = static_cast<WebRTCEndReasonEnum>(0);
-
-=======
     uint16_t webRTCSessionID            = static_cast<uint16_t>(0);
     Globals::WebRTCEndReasonEnum reason = static_cast<Globals::WebRTCEndReasonEnum>(0);
->>>>>>> 33022a5847 (Codegen files for zap-regen)
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace End

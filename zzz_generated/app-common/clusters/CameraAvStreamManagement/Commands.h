@@ -159,22 +159,13 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-<<<<<<< HEAD
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
-    AudioCodecEnum audioCodec   = static_cast<AudioCodecEnum>(0);
-    uint8_t channelCount        = static_cast<uint8_t>(0);
-    uint32_t sampleRate         = static_cast<uint32_t>(0);
-    uint32_t bitRate            = static_cast<uint32_t>(0);
-    uint8_t bitDepth            = static_cast<uint8_t>(0);
-
-=======
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     AudioCodecEnum audioCodec            = static_cast<AudioCodecEnum>(0);
     uint8_t channelCount                 = static_cast<uint8_t>(0);
     uint32_t sampleRate                  = static_cast<uint32_t>(0);
     uint32_t bitRate                     = static_cast<uint32_t>(0);
     uint8_t bitDepth                     = static_cast<uint8_t>(0);
->>>>>>> 33022a5847 (Codegen files for zap-regen)
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AudioStreamAllocate
@@ -621,12 +612,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-<<<<<<< HEAD
-    DataModel::DecodableList<StreamUsageEnum> streamPriorities;
-
-=======
     DataModel::DecodableList<Globals::StreamUsageEnum> streamPriorities;
->>>>>>> 33022a5847 (Codegen files for zap-regen)
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetStreamPriorities

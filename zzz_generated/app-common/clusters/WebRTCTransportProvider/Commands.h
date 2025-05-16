@@ -132,14 +132,9 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Globals::Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-<<<<<<< HEAD
-    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
+    Optional<bool> metadataEnabled;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
-=======
-    Optional<bool> metadataEnabled;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
->>>>>>> 33022a5847 (Codegen files for zap-regen)
 };
 }; // namespace SolicitOffer
 namespace SolicitOfferResponse {
@@ -240,14 +235,9 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Globals::Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-<<<<<<< HEAD
-    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
+    Optional<bool> metadataEnabled;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
-=======
-    Optional<bool> metadataEnabled;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
->>>>>>> 33022a5847 (Codegen files for zap-regen)
 };
 }; // namespace ProvideOffer
 namespace ProvideOfferResponse {
@@ -362,14 +352,9 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-<<<<<<< HEAD
-    DataModel::DecodableList<chip::CharSpan> ICECandidates;
+    DataModel::DecodableList<Globals::Structs::ICECandidateStruct::DecodableType> ICECandidates;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
-=======
-    DataModel::DecodableList<Globals::Structs::ICECandidateStruct::DecodableType> ICECandidates;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
->>>>>>> 33022a5847 (Codegen files for zap-regen)
 };
 }; // namespace ProvideICECandidates
 namespace EndSession {
@@ -404,16 +389,10 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-<<<<<<< HEAD
-    uint16_t webRTCSessionID   = static_cast<uint16_t>(0);
-    WebRTCEndReasonEnum reason = static_cast<WebRTCEndReasonEnum>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
-=======
     uint16_t webRTCSessionID            = static_cast<uint16_t>(0);
     Globals::WebRTCEndReasonEnum reason = static_cast<Globals::WebRTCEndReasonEnum>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
->>>>>>> 33022a5847 (Codegen files for zap-regen)
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace EndSession
 } // namespace Commands

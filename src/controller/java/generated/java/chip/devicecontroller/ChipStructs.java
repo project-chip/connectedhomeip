@@ -14859,7 +14859,6 @@ public static class CameraAvSettingsUserLevelManagementClusterViewportStruct {
     return output.toString();
   }
 }
-<<<<<<< HEAD
 public static class CameraAvSettingsUserLevelManagementClusterDPTZStruct {
   public Integer videoStreamID;
   public ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport;
@@ -14872,41 +14871,16 @@ public static class CameraAvSettingsUserLevelManagementClusterDPTZStruct {
   ) {
     this.videoStreamID = videoStreamID;
     this.viewport = viewport;
-=======
-public static class WebRTCTransportProviderClusterICECandidateStruct {
-  public String candidate;
-  public @Nullable String SDPMid;
-  public @Nullable Integer SDPMLineIndex;
-  private static final long CANDIDATE_ID = 0L;
-  private static final long SDP_MID_ID = 1L;
-  private static final long SDPM_LINE_INDEX_ID = 2L;
-
-  public WebRTCTransportProviderClusterICECandidateStruct(
-    String candidate,
-    @Nullable String SDPMid,
-    @Nullable Integer SDPMLineIndex
-  ) {
-    this.candidate = candidate;
-    this.SDPMid = SDPMid;
-    this.SDPMLineIndex = SDPMLineIndex;
->>>>>>> 33022a5847 (Codegen files for zap-regen)
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-<<<<<<< HEAD
     values.add(new StructElement(VIDEO_STREAM_ID_ID, new UIntType(videoStreamID)));
     values.add(new StructElement(VIEWPORT_ID, viewport.encodeTlv()));
-=======
-    values.add(new StructElement(CANDIDATE_ID, new StringType(candidate)));
-    values.add(new StructElement(SDP_MID_ID, SDPMid != null ? new StringType(SDPMid) : new NullType()));
-    values.add(new StructElement(SDPM_LINE_INDEX_ID, SDPMLineIndex != null ? new UIntType(SDPMLineIndex) : new NullType()));
->>>>>>> 33022a5847 (Codegen files for zap-regen)
 
     return new StructType(values);
   }
 
-<<<<<<< HEAD
   public static CameraAvSettingsUserLevelManagementClusterDPTZStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
@@ -14929,7 +14903,50 @@ public static class WebRTCTransportProviderClusterICECandidateStruct {
     return new CameraAvSettingsUserLevelManagementClusterDPTZStruct(
       videoStreamID,
       viewport
-=======
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvSettingsUserLevelManagementClusterDPTZStruct {\n");
+    output.append("\tvideoStreamID: ");
+    output.append(videoStreamID);
+    output.append("\n");
+    output.append("\tviewport: ");
+    output.append(viewport);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WebRTCTransportProviderClusterICECandidateStruct {
+  public String candidate;
+  public @Nullable String SDPMid;
+  public @Nullable Integer SDPMLineIndex;
+  private static final long CANDIDATE_ID = 0L;
+  private static final long SDP_MID_ID = 1L;
+  private static final long SDPM_LINE_INDEX_ID = 2L;
+
+  public WebRTCTransportProviderClusterICECandidateStruct(
+    String candidate,
+    @Nullable String SDPMid,
+    @Nullable Integer SDPMLineIndex
+  ) {
+    this.candidate = candidate;
+    this.SDPMid = SDPMid;
+    this.SDPMLineIndex = SDPMLineIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CANDIDATE_ID, new StringType(candidate)));
+    values.add(new StructElement(SDP_MID_ID, SDPMid != null ? new StringType(SDPMid) : new NullType()));
+    values.add(new StructElement(SDPM_LINE_INDEX_ID, SDPMLineIndex != null ? new UIntType(SDPMLineIndex) : new NullType()));
+
+    return new StructType(values);
+  }
+
   public static WebRTCTransportProviderClusterICECandidateStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
@@ -14959,21 +14976,12 @@ public static class WebRTCTransportProviderClusterICECandidateStruct {
       candidate,
       SDPMid,
       SDPMLineIndex
->>>>>>> 33022a5847 (Codegen files for zap-regen)
     );
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-<<<<<<< HEAD
-    output.append("CameraAvSettingsUserLevelManagementClusterDPTZStruct {\n");
-    output.append("\tvideoStreamID: ");
-    output.append(videoStreamID);
-    output.append("\n");
-    output.append("\tviewport: ");
-    output.append(viewport);
-=======
     output.append("WebRTCTransportProviderClusterICECandidateStruct {\n");
     output.append("\tcandidate: ");
     output.append(candidate);
@@ -14983,7 +14991,6 @@ public static class WebRTCTransportProviderClusterICECandidateStruct {
     output.append("\n");
     output.append("\tSDPMLineIndex: ");
     output.append(SDPMLineIndex);
->>>>>>> 33022a5847 (Codegen files for zap-regen)
     output.append("\n");
     output.append("}\n");
     return output.toString();

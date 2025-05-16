@@ -81,13 +81,6 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::OperationalStateStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-<<<<<<< HEAD
-                           const chip::app::Clusters::detail::Structs::WebRTCSessionStruct::DecodableType & value);
-=======
-                           const chip::app::Clusters::detail::Structs::ViewportStruct::DecodableType & value);
->>>>>>> 33022a5847 (Codegen files for zap-regen)
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
