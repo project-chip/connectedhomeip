@@ -190,7 +190,7 @@ public:
     WiFiPAF::WiFiPAFLayer * GetWiFiPAF();
     void WiFiPafSetApFreq(const uint16_t freq);
     CHIP_ERROR WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
-    bool WiFiPAFResourceAvailable(void);
+    bool WiFiPAFResourceAvailable();
 #endif
 
     // WiFi AP methods
