@@ -29,11 +29,11 @@ using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
 using chip::app::Clusters::CameraAvStreamManagement::RateDistortionTradeOffStruct;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;
-using chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum;
 using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
+using chip::app::Clusters::Globals::StreamUsageEnum;
 
 struct VideoStream
 {

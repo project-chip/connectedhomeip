@@ -37,6 +37,12 @@ using namespace chip;
 using namespace chip::app;
 using chip::Protocols::InteractionModel::Status;
 
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+
 namespace {
 
 static constexpr uint16_t kMaxSessionId = 65534;
@@ -275,7 +281,6 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     args.streamUsage           = req.streamUsage;
     args.videoStreamId         = req.videoStreamID;
     args.audioStreamId         = req.audioStreamID;
-    args.metadataOptions       = req.metadataOptions;
     args.peerNodeId            = GetNodeIdFromCtx(ctx.mCommandHandler);
     args.fabricIndex           = ctx.mCommandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
@@ -401,7 +406,6 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         args.streamUsage           = req.streamUsage;
         args.videoStreamId         = videoStreamID;
         args.audioStreamId         = audioStreamID;
-        args.metadataOptions       = req.metadataOptions;
         args.peerNodeId            = peerNodeId;
         args.fabricIndex           = peerFabricIndex;
         args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
@@ -507,13 +511,13 @@ void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & 
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
 
-    std::vector<std::string> candidates;
+    std::vector<ICECandidateStruct> candidates;
     auto iter = req.ICECandidates.begin();
     while (iter.Next())
     {
-        // Get current candidate CharSpan and convert to std::string.
-        const CharSpan & candidateSpan = iter.GetValue();
-        candidates.emplace_back(candidateSpan.data(), candidateSpan.size());
+        // Get current candidate.
+        const ICECandidateStruct & candidate = iter.GetValue();
+        candidates.push_back(candidate);
     }
 
     // Check the validity of the list.

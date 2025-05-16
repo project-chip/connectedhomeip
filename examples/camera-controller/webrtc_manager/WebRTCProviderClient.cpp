@@ -21,6 +21,7 @@
 
 using namespace ::chip;
 using namespace ::chip::app;
+using WebRTCSessionStruct = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
 
 namespace {
 
@@ -41,8 +42,7 @@ void WebRTCProviderClient::Init(const ScopedNodeId & peerId, EndpointId endpoint
                     ChipLogValueX64(peerId.GetNodeId()), static_cast<unsigned>(endpointId));
 }
 
-CHIP_ERROR WebRTCProviderClient::SolicitOffer(Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage,
-                                              EndpointId originatingEndpointId,
+CHIP_ERROR WebRTCProviderClient::SolicitOffer(StreamUsageEnum streamUsage, EndpointId originatingEndpointId,
                                               Optional<DataModel::Nullable<uint16_t>> videoStreamId,
                                               Optional<DataModel::Nullable<uint16_t>> audioStreamId)
 {
@@ -85,8 +85,7 @@ CHIP_ERROR WebRTCProviderClient::SolicitOffer(Clusters::WebRTCTransportProvider:
 }
 
 CHIP_ERROR WebRTCProviderClient::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp,
-                                              Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage,
-                                              EndpointId originatingEndpointId,
+                                              StreamUsageEnum streamUsage, EndpointId originatingEndpointId,
                                               Optional<DataModel::Nullable<uint16_t>> videoStreamId,
                                               Optional<DataModel::Nullable<uint16_t>> audioStreamId)
 {
@@ -163,7 +162,8 @@ CHIP_ERROR WebRTCProviderClient::ProvideAnswer(uint16_t webRTCSessionId, const s
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, DataModel::List<const chip::CharSpan> ICECandidates)
+CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId,
+                                                      DataModel::List<const ICECandidateStruct> ICECandidates)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -388,7 +388,7 @@ void WebRTCProviderClient::HandleSolicitOfferResponse(TLV::TLVReader & data)
                    ChipLogError(Camera, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format()));
 
     // Create a new session record and populate fields from the decoded command response and current secure session info
-    Clusters::WebRTCTransportProvider::Structs::WebRTCSessionStruct::Type session;
+    WebRTCSessionStruct session;
     session.id             = value.webRTCSessionID;
     session.peerNodeID     = mPeerId.GetNodeId();
     session.fabricIndex    = mPeerId.GetFabricIndex();
@@ -443,7 +443,7 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
                    ChipLogError(Camera, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format()));
 
     // Create a new session record and populate fields from the decoded command response and current secure session info
-    Clusters::WebRTCTransportProvider::Structs::WebRTCSessionStruct::Type session;
+    WebRTCSessionStruct session;
     session.id             = value.webRTCSessionID;
     session.peerNodeID     = mPeerId.GetNodeId();
     session.fabricIndex    = mPeerId.GetFabricIndex();

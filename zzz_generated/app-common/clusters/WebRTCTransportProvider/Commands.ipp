@@ -38,7 +38,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
     encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
-    encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
+    encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
     return encoder.Finalize();
 }
 
@@ -76,9 +76,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         {
             err = DataModel::Decode(reader, ICETransportPolicy);
         }
-        else if (__context_tag == to_underlying(Fields::kMetadataOptions))
+        else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {
-            err = DataModel::Decode(reader, metadataOptions);
+            err = DataModel::Decode(reader, metadataEnabled);
         }
 
         ReturnErrorOnFailure(err);
@@ -141,7 +141,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
     encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
-    encoder.Encode(to_underlying(Fields::kMetadataOptions), metadataOptions);
+    encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
     return encoder.Finalize();
 }
 
@@ -187,9 +187,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         {
             err = DataModel::Decode(reader, ICETransportPolicy);
         }
-        else if (__context_tag == to_underlying(Fields::kMetadataOptions))
+        else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {
-            err = DataModel::Decode(reader, metadataOptions);
+            err = DataModel::Decode(reader, metadataEnabled);
         }
 
         ReturnErrorOnFailure(err);
