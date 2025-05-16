@@ -71,8 +71,9 @@
 
 #define WIFIPAF_ACK_SEND_TIMEOUT_MS 2500
 #define WIFIPAF_WAIT_RES_TIMEOUT_MS 1000
-// If the network resources is unavailable for a long time, drop the connection
-#define WIFIPAF_MAX_RES_BLOCK_PERIOD 60
+// Drop the connection if network resources remain unavailable for the period.
+// Known condition: If the remote site is awaiting an ACK packet, the wait time must not exceed PAFTP_ACK_TIMEOUT_MS.
+#define WIFIPAF_MAX_RESOURCE_BLOCK_COUNT (PAFTP_ACK_TIMEOUT_MS / WIFIPAF_WAIT_RES_TIMEOUT_MS)
 
 /**
  *  @def WIFIPAF_WINDOW_NO_ACK_SEND_THRESHOLD
@@ -248,7 +249,7 @@ void WiFiPAFEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR 
             // Cancel send and receive-ack timers, if running.
             StopAckReceivedTimer();
             StopSendAckTimer();
-            StopWaitResTimer();
+            StopWaitResourceTimer();
             mConnStateFlags.Set(ConnectionStateFlag::kOperationInFlight);
         }
         else
@@ -279,7 +280,7 @@ void WiFiPAFEndPoint::Free()
     StopConnectTimer();
     StopAckReceivedTimer();
     StopSendAckTimer();
-    StopWaitResTimer();
+    StopWaitResourceTimer();
 
     // Clear callbacks.
     mOnPafSubscribeComplete = nullptr;
@@ -602,14 +603,13 @@ CHIP_ERROR WiFiPAFEndPoint::DriveSending()
         return CHIP_NO_ERROR;
     }
 
-    if (mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable() == false)
+    if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable())
     {
         // Resource is currently unavailable, send packets later
-        StartWaitResTimer();
+        StartWaitResourceTimer();
         return CHIP_NO_ERROR;
     }
-    // Reset the resource wait count
-    mResWaitCount = 0;
+    mResourceWaitCount = 0;
 
     // Otherwise, let's see what we can send.
     if ((!mAckToSend.IsNull()) && !mConnStateFlags.Has(ConnectionStateFlag::kStandAloneAckInFlight))
@@ -1189,13 +1189,13 @@ CHIP_ERROR WiFiPAFEndPoint::StartSendAckTimer()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiPAFEndPoint::StartWaitResTimer()
+CHIP_ERROR WiFiPAFEndPoint::StartWaitResourceTimer()
 {
-    mResWaitCount++;
-    if (mResWaitCount >= WIFIPAF_MAX_RES_BLOCK_PERIOD)
+    mResourceWaitCount++;
+    if (mResourceWaitCount >= WIFIPAF_MAX_RESOURCE_BLOCK_COUNT)
     {
         ChipLogError(WiFiPAF, "Network resource has been unavailable for a long time");
-        mResWaitCount = 0;
+        mResourceWaitCount = 0;
         DoClose(kWiFiPAFCloseFlag_AbortTransmission, CHIP_ERROR_NOT_CONNECTED);
         return CHIP_NO_ERROR;
     }
@@ -1203,7 +1203,7 @@ CHIP_ERROR WiFiPAFEndPoint::StartWaitResTimer()
     {
         ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "starting new SendAckTimer");
         const CHIP_ERROR timerErr = mWiFiPafLayer->mSystemLayer->StartTimer(
-            System::Clock::Milliseconds32(WIFIPAF_WAIT_RES_TIMEOUT_MS), HandleWaitResTimeout, this);
+            System::Clock::Milliseconds32(WIFIPAF_WAIT_RES_TIMEOUT_MS), HandleWaitResourceTimeout, this);
         ReturnErrorOnFailure(timerErr);
         mTimerStateFlags.Set(TimerStateFlag::kWaitResTimerRunning);
     }
@@ -1231,10 +1231,10 @@ void WiFiPAFEndPoint::StopSendAckTimer()
     mTimerStateFlags.Clear(TimerStateFlag::kSendAckTimerRunning);
 }
 
-void WiFiPAFEndPoint::StopWaitResTimer()
+void WiFiPAFEndPoint::StopWaitResourceTimer()
 {
-    // Cancel any existing send-ack timer.
-    mWiFiPafLayer->mSystemLayer->CancelTimer(HandleWaitResTimeout, this);
+    // Cancel any existing wait-resource timer.
+    mWiFiPafLayer->mSystemLayer->CancelTimer(HandleWaitResourceTimeout, this);
     mTimerStateFlags.Clear(TimerStateFlag::kWaitResTimerRunning);
 }
 
@@ -1287,7 +1287,7 @@ void WiFiPAFEndPoint::HandleSendAckTimeout(chip::System::Layer * systemLayer, vo
     }
 }
 
-void WiFiPAFEndPoint::HandleWaitResTimeout(chip::System::Layer * systemLayer, void * appState)
+void WiFiPAFEndPoint::HandleWaitResourceTimeout(chip::System::Layer * systemLayer, void * appState)
 {
     WiFiPAFEndPoint * ep = static_cast<WiFiPAFEndPoint *>(appState);
 

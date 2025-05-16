@@ -266,8 +266,9 @@ private:
     uint16_t mApFreq;
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
-    bool _WiFiPAFResourceAvailable() { return mPafChnlAvailable; };
-    bool mPafChnlAvailable = true;
+    bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
+    // The resource checking is needed right before sending data packets that they are initialized and connected.
+    bool mPafChannelAvailable = true;
 #endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);

@@ -1130,7 +1130,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
         SuccessOrExit(ret);
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    mPafChnlAvailable = false;
+    mPafChannelAvailable = false;
 #endif
 
     result = wpa_supplicant_1_interface_call_add_network_sync(
@@ -1159,7 +1159,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
         ChipLogError(DeviceLayer, "wpa_supplicant: failed to add network: %s", err ? err->message : "unknown error");
         mWpaSupplicant.networkPath.reset();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        mPafChnlAvailable = true;
+        mPafChannelAvailable = true;
 #endif
         ret = CHIP_ERROR_INTERNAL;
     }
@@ -2393,7 +2393,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
 
     g_strfreev(oldBsss);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    mPafChnlAvailable = true;
+    mPafChannelAvailable = true;
 #endif
 }
 
