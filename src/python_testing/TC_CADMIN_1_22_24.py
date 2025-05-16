@@ -39,7 +39,7 @@ from time import sleep
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, run_with_error_check
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
@@ -98,17 +98,17 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                              "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
-        try:
-            await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=901, iteration=10000, discriminator=self.discriminator, option=1)
+        # Since we provided 901 seconds as the timeout duration,
+        # we should not be able to open comm window as duration is too long.
+        # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
 
-        except ChipStackError as e:
-            # Since we provided 901 seconds as the timeout duration,
-            # we should not be able to open comm window as duration is too long.
-            # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
-            _INVALID_COMMAND = 0x00000585
-            asserts.assert_equal(e.err,  _INVALID_COMMAND,
-                                 "Expected to error as we provided failure value for opening commissioning window")
+        await run_with_error_check(
+            self.th1.OpenCommissioningWindow,
+            nodeid=self.dut_node_id, timeout=901, iteration=10000, discriminator=self.discriminator, option=1,
+            exception_type=ChipStackError,
+            assert_func=lambda e: asserts.assert_equal(
+                e.err,  0x00000585, "Expected to error as we provided failure value for opening commissioning window")
+        )
 
         self.step(6)
         window_status2 = await self.support.get_window_status(th=self.th1)
@@ -157,17 +157,17 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                              "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
-        try:
-            await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=179, iteration=10000, discriminator=self.discriminator, option=1)
+        # Since we provided 179 seconds as the timeout duration,
+        # we should not be able to open comm window as duration is too long.
+        # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
 
-        except ChipStackError as e:
-            # Since we provided 179 seconds as the timeout duration,
-            # we should not be able to open comm window as duration is too long.
-            # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
-            _INVALID_COMMAND = 0x00000585
-            asserts.assert_equal(e.err, _INVALID_COMMAND,
-                                 "Expected to error as we provided failure value for opening commissioning window")
+        await run_with_error_check(
+            self.th1.OpenCommissioningWindow,
+            nodeid=self.dut_node_id, timeout=179, iteration=10000, discriminator=self.discriminator, option=1,
+            exception_type=ChipStackError,
+            assert_func=lambda e: asserts.assert_equal(
+                e.err, 0x00000585, "Expected to error as we provided failure value for opening commissioning window")
+        )
 
         self.step(6)
         window_status2 = await self.support.get_window_status(th=self.th1)
