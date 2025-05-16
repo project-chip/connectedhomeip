@@ -674,6 +674,16 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test(
                 "At least one cluster has failed the range and support checks for its listed attributes, commands or features")
 
+        # Wildcard reads of events: event list MUST NOT be empty since at least a boot event should be registered.
+        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
+                                                               events=[('*')],
+                                                               fabricFiltered=True,
+                                                               reportInterval=(100, 1000))
+
+        if len(subscription.GetEvents()) == 0:
+            self.fail_current_test('Wildcard event subscription returned no events')
+            success = False
+
     def test_TC_IDM_11_1(self):
         success = True
         for endpoint_id, endpoint in self.endpoints_tlv.items():
@@ -941,8 +951,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 logging.info(f'{start_tag}{line}')
             logging.info(f'{start_tag}END ====')
 
-        log_structured_data('==== json: ', json_str)
-        log_structured_data('==== txt: ', txt_str)
+        #log_structured_data('==== json: ', json_str)
+        #log_structured_data('==== txt: ', txt_str)
 
     @async_test_body
     async def test_TC_DESC_2_1(self):
