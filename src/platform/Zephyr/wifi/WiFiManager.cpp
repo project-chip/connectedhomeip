@@ -32,6 +32,7 @@
 #include <zephyr/net/net_event.h>
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/net_stats.h>
+#include <zephyr/version.h>
 
 extern "C" {
 #include <common/defs.h>
@@ -301,7 +302,7 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
         info.mRssi         = static_cast<int8_t>(status.rssi);
         info.mChannel      = static_cast<uint16_t>(status.channel);
         info.mSsidLen      = status.ssid_len;
-#ifdef CONFIG_WIFI_NXP
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
         info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_tx_rate);
 #else
         info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_rate);
