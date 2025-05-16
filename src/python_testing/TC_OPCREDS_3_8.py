@@ -738,7 +738,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             # fabricId is already 0x2222
             new_th2_nodeId = 0x22222222
             success = await CommissioningBuildingBlocks.UpdateNOC(
-                devCtrl=th2_dev_ctrl, existingNodeId=th1_dut_node_id + 1, newNodeId=new_th2_nodeId,
+                devCtrl=th2_dev_ctrl, existingNodeId=th2_dut_node_id, newNodeId=new_th2_nodeId,
                 omitCommissioningComplete=True, failSafeDurationSeconds=600
             )
 
