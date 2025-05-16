@@ -218,6 +218,8 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
 
 bool InteractiveCommand::ParseCommand(char * command, int * status)
 {
+    ChipLogProgress(NotSpecified, "ParseCommand: %s", command);
+
     if (strcmp(command, kInteractiveModeStopCommand) == 0)
     {
         // If scheduling the cleanup fails, there is not much we can do.
