@@ -24,6 +24,9 @@
 class WebRTCRequestorDelegate : public chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate
 {
 public:
+    using ICECandidateStruct  = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using WebRTCEndReasonEnum = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+
     WebRTCRequestorDelegate()  = default;
     ~WebRTCRequestorDelegate() = default;
 

@@ -27,6 +27,9 @@
 class WebRTCManager
 {
 public:
+    using ICECandidateStruct = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using StreamUsageEnum    = chip::app::Clusters::Globals::StreamUsageEnum;
+
     static WebRTCManager & Instance()
     {
         static WebRTCManager instance;
