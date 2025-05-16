@@ -1117,198 +1117,119 @@ TEST_F(TestWriteChunking, TestTransactionalList)
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
 
-    // Test 1: we should receive transaction notifications
-    ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
-    RunTest(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-        .expectedStatus = { true },
-    });
-    ChipLogProgress(Zcl,
-                    "Test 1a (Encoding using Preencoded TLV): we should receive transaction notifications with EncodingMethod "
-                    "PrencodedAttribute");
-    RunTest(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
+    for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
+    {
+        const char * encodingMethodName = (encodingMethod == EncodingMethod::Standard ? "StandardEncoding" : "PreencodedTLV");
 
-    ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
-    RunTest(Instructions{
-        .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-        .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
-        .expectedStatus          = { false },
-    });
-
-    ChipLogProgress(
-        Zcl, "Test 2a (Encoding using Preencoded TLV): we should receive transaction notifications for incomplete list operations");
-    RunTest(
-        Instructions{
-            .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-            .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
-            .expectedStatus          = { false },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
-    RunTest(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
-        .expectedStatus = { true, true },
-    });
-
-    ChipLogProgress(
-        Zcl,
-        "Test 3a (Encoding using Preencoded TLV): we should receive transaction notifications for every list in the transaction");
-    RunTest(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
-            .expectedStatus = { true, true },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
-    RunTest(Instructions{
-        .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                   ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
-        .onListWriteBeginActions =
-            [&](const app::ConcreteAttributePath & aPath) {
-                if (aPath.mAttributeId == kTestListAttribute2)
-                {
-                    return Operations::kShutdownWriteClient;
-                }
-                return Operations::kNoop;
+        // Test 1: we should receive transaction notifications
+        ChipLogProgress(Zcl, "Test 1 [%s]: we should receive transaction notifications", encodingMethodName);
+        RunTest(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                .expectedStatus = { true },
             },
-        .expectedStatus = { true, false },
-    });
+            encodingMethod);
 
-    ChipLogProgress(
-        Zcl, "Test 4a (Encoding using Preencoded TLV): we should receive transaction notifications with the status of each list");
-    RunTest(
-        Instructions{
-            .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                       ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
-            .onListWriteBeginActions =
-                [&](const app::ConcreteAttributePath & aPath) {
-                    if (aPath.mAttributeId == kTestListAttribute2)
-                    {
-                        return Operations::kShutdownWriteClient;
-                    }
-                    return Operations::kNoop;
-                },
-            .expectedStatus = { true, false },
-        },
-        EncodingMethod::PreencodedTLV);
+        ChipLogProgress(Zcl, "Test 2a [%s]: we should receive transaction notifications for incomplete list operations",
+                        encodingMethodName);
+        RunTest(
+            Instructions{
+                .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                .onListWriteBeginActions =
+                    [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
+                .expectedStatus = { false },
+            },
+            encodingMethod);
 
-    ChipLogProgress(Zcl,
-                    "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-                    "null value before non null values");
-    RunTest(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-        .data           = { ListData::kNull, ListData::kList },
-        .expectedStatus = { true },
-    });
+        ChipLogProgress(Zcl, "Test 3 [%s]: we should receive transaction notifications for every list in the transaction",
+                        encodingMethodName);
+        RunTest(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
+                .expectedStatus = { true, true },
+            },
+            encodingMethod);
 
-    ChipLogProgress(Zcl,
-                    "Test 5a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
-                    "if it is handled correctly for "
-                    "null value before non null values");
-    RunTest(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-            .data           = { ListData::kNull, ListData::kList },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
+        ChipLogProgress(Zcl, "Test 4 [%s]: we should receive transaction notifications with the status of each list",
+                        encodingMethodName);
+        RunTest(
+            Instructions{
+                .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
+                .onListWriteBeginActions =
+                    [&](const app::ConcreteAttributePath & aPath) {
+                        if (aPath.mAttributeId == kTestListAttribute2)
+                        {
+                            return Operations::kShutdownWriteClient;
+                        }
+                        return Operations::kNoop;
+                    },
+                .expectedStatus = { true, false },
+            },
+            encodingMethod);
 
-    ChipLogProgress(Zcl,
-                    "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-                    "null value after non null values");
-    RunTest(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-        .data           = { ListData::kList, ListData::kNull },
-        .expectedStatus = { true },
-    });
+        ChipLogProgress(Zcl,
+                        "Test 5 [%s]: transactional list callbacks will be called for nullable lists, test if it is handled "
+                        "correctly for null value before non null values",
+                        encodingMethodName);
+        RunTest(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                .data           = { ListData::kNull, ListData::kList },
+                .expectedStatus = { true },
+            },
+            encodingMethod);
 
-    ChipLogProgress(Zcl,
-                    "Test 6a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
-                    "if it is handled correctly for "
-                    "null value after non null values");
-    RunTest(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-            .data           = { ListData::kList, ListData::kNull },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
+        ChipLogProgress(Zcl,
+                        "Test 6 [%s]: transactional list callbacks will be called for nullable lists, test if it is handled "
+                        "correctly for null value after non null values",
+                        encodingMethodName);
+        RunTest(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                .data           = { ListData::kList, ListData::kNull },
+                .expectedStatus = { true },
+            },
+            encodingMethod);
 
-    ChipLogProgress(Zcl,
-                    "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-                    "null value between non null values");
-    RunTest(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-        .data           = { ListData::kList, ListData::kNull, ListData::kList },
-        .expectedStatus = { true },
-    });
+        ChipLogProgress(Zcl,
+                        "Test 7 [%s]: transactional list callbacks will be called for nullable lists, test if it is handled "
+                        "correctly for null value between non null values",
+                        encodingMethodName);
+        RunTest(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                .data           = { ListData::kList, ListData::kNull, ListData::kList },
+                .expectedStatus = { true },
+            },
+            encodingMethod);
 
-    ChipLogProgress(Zcl,
-                    "Test 7a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
-                    "if it is handled correctly for "
-                    "null value between non null values");
-    RunTest(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-            .data           = { ListData::kList, ListData::kNull, ListData::kList },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
+        ChipLogProgress(Zcl, "Test 8 [%s]: transactional list callbacks will be called for nullable lists", encodingMethodName);
+        RunTest(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                .data           = { ListData::kNull },
+                .expectedStatus = { true },
+            },
+            encodingMethod);
 
-    ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
-    RunTest(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-        .data           = { ListData::kNull },
-        .expectedStatus = { true },
-    });
-
-    ChipLogProgress(Zcl, "Test 8a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists");
-    RunTest(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-            .data           = { ListData::kNull },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl,
-                    "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
-                    "during processing the requests");
-    RunTest(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-        .data           = { ListData::kBadValue },
-        .expectedStatus = { false },
-    });
-
-    ChipLogProgress(Zcl,
-                    "Test 9a (Encoding using Preencoded TLV): for nullable lists, we should receive notifications for unsuccessful "
-                    "writes when non-fatal occurred "
-                    "during processing the requests");
-    RunTest(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-            .data           = { ListData::kBadValue },
-            .expectedStatus = { false },
-        },
-        EncodingMethod::PreencodedTLV);
-
+        ChipLogProgress(Zcl,
+                        "Test 9 [%s]: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal "
+                        "occurred during processing the requests",
+                        encodingMethodName);
+        RunTest(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                .data           = { ListData::kBadValue },
+                .expectedStatus = { false },
+            },
+            encodingMethod);
+    }
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
@@ -1450,210 +1371,126 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);
 
-    // Test 1: we should receive transaction notifications
-    ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
-    RunTest_NonEmptyReplaceAll(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-        .expectedStatus = { true },
-    });
-
-    ChipLogProgress(Zcl, "Test 1a (Encoding using Preencoded TLV): we should receive transaction notifications");
-    RunTest_NonEmptyReplaceAll(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
-    RunTest_NonEmptyReplaceAll(Instructions{
-        .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-        .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
-        .expectedStatus          = { false },
-    });
-
-    ChipLogProgress(
-        Zcl, "Test 2a (Encoding using Preencoded TLV): we should receive transaction notifications for incomplete list operations");
-    RunTest_NonEmptyReplaceAll(
-        Instructions{
-            .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-            .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
-            .expectedStatus          = { false },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
-    RunTest_NonEmptyReplaceAll(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                            ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id) },
-        .expectedStatus = { true, true },
-    });
-
-    ChipLogProgress(
-        Zcl,
-        "Test 3a (Encoding using Preencoded TLV): we should receive transaction notifications for every list in the transaction");
-    RunTest_NonEmptyReplaceAll(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id) },
-            .expectedStatus = { true, true },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
-    RunTest_NonEmptyReplaceAll(Instructions{
-        .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                   ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id) },
-        .onListWriteBeginActions =
-            [&](const app::ConcreteAttributePath & aPath) {
-                if (aPath.mAttributeId == AccessControl::Attributes::Extension::Id)
-                {
-                    return Operations::kShutdownWriteClient;
-                }
-                return Operations::kNoop;
-            },
-        .expectedStatus = { true, false },
-    });
-
-    ChipLogProgress(
-        Zcl, "Test 4a (Encoding using Preencoded TLV): we should receive transaction notifications with the status of each list");
-    RunTest_NonEmptyReplaceAll(
-        Instructions{
-            .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                       ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id) },
-            .onListWriteBeginActions =
-                [&](const app::ConcreteAttributePath & aPath) {
-                    if (aPath.mAttributeId == AccessControl::Attributes::Extension::Id)
-                    {
-                        return Operations::kShutdownWriteClient;
-                    }
-                    return Operations::kNoop;
-                },
-            .expectedStatus = { true, false },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl,
-                    "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-                    "null value before non null values");
-    RunTest_NonEmptyReplaceAll(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                            ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-        .data           = { ListData::kNull, ListData::kList },
-        .expectedStatus = { true },
-    });
-
-    ChipLogProgress(Zcl,
-                    "Test 5a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
-                    "if it is handled correctly for "
-                    "null value before non null values");
-    RunTest_NonEmptyReplaceAll(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-            .data           = { ListData::kNull, ListData::kList },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl,
-                    "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-                    "null value after non null values");
-    RunTest_NonEmptyReplaceAll(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                            ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-        .data           = { ListData::kList, ListData::kNull },
-        .expectedStatus = { true },
-    });
-
-    ChipLogProgress(Zcl,
-                    "Test 6a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
-                    "if it is handled correctly for "
-                    "null value after non null values");
-    RunTest_NonEmptyReplaceAll(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-            .data           = { ListData::kList, ListData::kNull },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl,
-                    "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-                    "null value between non null values");
-    RunTest_NonEmptyReplaceAll(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                            ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                            ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-        .data           = { ListData::kList, ListData::kNull, ListData::kList },
-        .expectedStatus = { true },
-    });
-
-    ChipLogProgress(Zcl,
-                    "Test 7a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists, test "
-                    "if it is handled correctly for "
-                    "null value between non null values");
-    RunTest_NonEmptyReplaceAll(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
-                                ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-            .data           = { ListData::kList, ListData::kNull, ListData::kList },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
-    RunTest_NonEmptyReplaceAll(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-        .data           = { ListData::kNull },
-        .expectedStatus = { true },
-    });
-
-    ChipLogProgress(Zcl, "Test 8a (Encoding using Preencoded TLV): transactional list callbacks will be called for nullable lists");
-    RunTest_NonEmptyReplaceAll(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-            .data           = { ListData::kNull },
-            .expectedStatus = { true },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    ChipLogProgress(Zcl,
-                    "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
-                    "during processing the requests");
-    RunTest_NonEmptyReplaceAll(Instructions{
-        .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-        .data           = { ListData::kBadValue },
-        .expectedStatus = { false },
-    });
-
-    ChipLogProgress(Zcl,
-                    "Test 9a (Encoding using Preencoded TLV): for nullable lists, we should receive notifications for unsuccessful "
-                    "writes when non-fatal occurred "
-                    "during processing the requests");
-    RunTest_NonEmptyReplaceAll(
-        Instructions{
-            .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
-            .data           = { ListData::kBadValue },
-            .expectedStatus = { false },
-        },
-        EncodingMethod::PreencodedTLV);
-
-    // This TestCase tests corner cases when we Encode many attributes into the same WriteRequest, up to 10 Attributes will be
-    // Encoded.
-
-    for (EncodingMethod encoding : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
+    for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
     {
+        const char * encodingMethodName = (encodingMethod == EncodingMethod::Standard ? "StandardEncoding" : "PreencodedTLV");
+
+        // Test 1: we should receive transaction notifications
+        ChipLogProgress(Zcl, "Test 1 [%s]: we should receive transaction notifications", encodingMethodName);
+        RunTest_NonEmptyReplaceAll(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+                .expectedStatus = { true },
+            },
+            encodingMethod);
+
+        ChipLogProgress(Zcl, "Test 2 [%s]: we should receive transaction notifications for incomplete list operations",
+                        encodingMethodName);
+        RunTest_NonEmptyReplaceAll(
+            Instructions{
+                .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+                .onListWriteBeginActions =
+                    [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
+                .expectedStatus = { false },
+            },
+            encodingMethod);
+
+        ChipLogProgress(Zcl, "Test 3 [%s]: we should receive transaction notifications for every list in the transaction",
+                        encodingMethodName);
+        RunTest_NonEmptyReplaceAll(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                    ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id) },
+                .expectedStatus = { true, true },
+            },
+            encodingMethod);
+
+        ChipLogProgress(Zcl, "Test 4 [%s]: we should receive transaction notifications with the status of each list",
+                        encodingMethodName);
+        RunTest_NonEmptyReplaceAll(
+            Instructions{
+                .paths = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                           ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id) },
+                .onListWriteBeginActions =
+                    [&](const app::ConcreteAttributePath & aPath) {
+                        if (aPath.mAttributeId == AccessControl::Attributes::Extension::Id)
+                        {
+                            return Operations::kShutdownWriteClient;
+                        }
+                        return Operations::kNoop;
+                    },
+                .expectedStatus = { true, false },
+            },
+            encodingMethod);
+
+        ChipLogProgress(Zcl,
+                        "Test 5 [%s]: transactional list callbacks will be called for nullable lists, test if it is handled "
+                        "correctly for null value before non null values",
+                        encodingMethodName);
+        RunTest_NonEmptyReplaceAll(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                    ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+                .data           = { ListData::kNull, ListData::kList },
+                .expectedStatus = { true },
+            },
+            encodingMethod);
+
+        ChipLogProgress(Zcl,
+                        "Test 6 [%s]: transactional list callbacks will be called for nullable lists, test if it is handled "
+                        "correctly for null value after non null values",
+                        encodingMethodName);
+        RunTest_NonEmptyReplaceAll(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                    ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+                .data           = { ListData::kList, ListData::kNull },
+                .expectedStatus = { true },
+            },
+            encodingMethod);
+
+        ChipLogProgress(Zcl,
+                        "Test 7 [%s]: transactional list callbacks will be called for nullable lists, test if it is handled "
+                        "correctly for null value between non null values",
+                        encodingMethodName);
+        RunTest_NonEmptyReplaceAll(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                    ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id),
+                                    ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+                .data           = { ListData::kList, ListData::kNull, ListData::kList },
+                .expectedStatus = { true },
+            },
+            encodingMethod);
+
+        ChipLogProgress(Zcl, "Test 8 [%s]: transactional list callbacks will be called for nullable lists", encodingMethodName);
+        RunTest_NonEmptyReplaceAll(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+                .data           = { ListData::kNull },
+                .expectedStatus = { true },
+            },
+            encodingMethod);
+
+        ChipLogProgress(Zcl,
+                        "Test 9 [%s]: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal "
+                        "occurred during processing the requests",
+                        encodingMethodName);
+        RunTest_NonEmptyReplaceAll(
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id) },
+                .data           = { ListData::kBadValue },
+                .expectedStatus = { false },
+            },
+            encodingMethod);
+
+        // This TestCase tests corner cases when we Encode many attributes into the same WriteRequest, up to 10 Attributes will be
+        // Encoded.
+
         for (int nullableListCount = 1; nullableListCount <= 10; nullableListCount++)
         {
-            ChipLogProgress(Zcl, "Test 10.%d: Encoding %d nullable lists following a single non-nullable list", nullableListCount,
-                            nullableListCount);
-
             ChipLogProgress(Zcl, "Test 10.%d [%s]: Encoding %d nullable list(s) following a single non-nullable list",
-                            nullableListCount, (encoding == EncodingMethod::Standard ? "StandardEncoding" : "PreencodedTLV"),
-                            nullableListCount);
+                            nullableListCount, encodingMethodName, nullableListCount);
 
             Instructions test;
 
@@ -1669,7 +1506,7 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
             }
 
             test.expectedStatus = { true };
-            RunTest_NonEmptyReplaceAll(test, encoding);
+            RunTest_NonEmptyReplaceAll(test, encodingMethod);
         }
     }
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
