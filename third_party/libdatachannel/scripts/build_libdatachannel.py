@@ -15,6 +15,11 @@ def main(clang: bool):
     compiler_subdir = "clang" if clang else "gcc"
     build_dir = os.path.join(repo_dir, "build", compiler_subdir)
 
+    print("Install cmake.")
+
+    # Install CMake
+    subprocess.check_call(['pip', 'install', 'cmake'])
+
     # Generate build files in ./build
     cmake_cmd = [
         "cmake",
@@ -23,7 +28,8 @@ def main(clang: bool):
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_CXX_FLAGS=-Wno-shadow",
-        "-DBUILD_SHARED_LIBS=OFF"
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
     ]
 
     if clang:
