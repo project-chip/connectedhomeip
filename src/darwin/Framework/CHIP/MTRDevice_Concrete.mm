@@ -627,6 +627,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceCachePrimed, @(_deviceCachePrimed), properties);
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedStartTime, _estimatedStartTime, properties);
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedSubscriptionLatency, _estimatedSubscriptionLatency, properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress, @(_diagnosticLogTransferInProgress), properties);
     }
 
     return properties;
