@@ -166,7 +166,7 @@ void postMoveToLevel(EndpointId endpoint, uint8_t level)
     ChipLogDetail(DeviceLayer, "[chef-pump] Inside handleMoveToLevel. level = %d", level);
 
     bool pumpOn = false;
-    OnOff::Attributes::OnOff::Get(endpoint, pumpOn);
+    OnOff::Attributes::OnOff::Get(endpoint, &pumpOn);
 
     if (!pumpOn)
     {
