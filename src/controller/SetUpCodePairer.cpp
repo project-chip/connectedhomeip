@@ -349,7 +349,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
             else
             {
                 ChipLogError(Controller,
-                             "SetUpCodePairer unable to handle discovered parameters with no discriminator, because it has %u "
+                             "SetUpCodePairer: Unable to handle discovered parameters with no discriminator, because it has %u "
                              "possible payloads",
                              static_cast<unsigned>(mSetupPayloads.size()));
                 continue;
