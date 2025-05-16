@@ -35,6 +35,17 @@
  */
 void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
+/** @brief Cluster Shutdown
+ *
+ * This function is called when a specific cluster is shutdown. It gives the
+ * application an opportunity to take care of cluster shutdown procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ * @param clusterId   Ver.: always
+ */
+void emberAfClusterShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
+
 /** @brief Attribute Read Access
  *
  * This function is called whenever the Application Framework needs to check

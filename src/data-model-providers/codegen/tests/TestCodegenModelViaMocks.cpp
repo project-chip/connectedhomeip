@@ -80,8 +80,9 @@ using namespace chip::app::Clusters::Globals::Attributes;
 
 using chip::Protocols::InteractionModel::Status;
 
-// Mock function for linking
+// Mock functions for linking
 void InitDataModelHandler() {}
+void ShutdownDataModelHandler() {}
 
 namespace {
 
