@@ -37,25 +37,61 @@ namespace ClosureDimension {
 using Protocols::InteractionModel::Status;
 
 /**
- * @class PrintOnlyDelegate
+ * @class ClosureDimensionDelegate
  * @brief A delegate class that handles Closure Dimension commands at the application level.
  *
  * This class is responsible for processing Closure Dimension commands such as Stop, MoveTo, and Calibrate
  * according to specific business logic. It is designed to be used as a delegate for the Closure Dimension cluster.
- *
- * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
  */
-class PrintOnlyDelegate : public DelegateBase
+class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    PrintOnlyDelegate() {}
+    ClosureDimensionDelegate() {}
+
+    virtual ~ClosureDimensionDelegate() = default;
 
     // Override for the DelegateBase Virtual functions
+
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
                            const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                       const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
-    bool IsManualLatchingNeeded() override { return false; }
+
+    bool IsManualLatchingNeeded() override;
+
+    /**
+     * @brief Initializes the ClosureDimensionDelegate instance.
+     *        Sets the Initial state of Closure.
+     *
+     * @return CHIP_ERROR indicating the result of the initialization.
+     */
+    CHIP_ERROR Init();
+
+    /**
+     * @brief Function to set the current state of the cluster.
+     */
+    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
+
+    /**
+     * @brief Function to get the current state of the cluster.
+     */
+    ClusterLogic * GetLogic() const { return mLogic; }
+
+    /**
+     * @brief Function to get the target direction of the cluster.
+     */
+    StepDirectionEnum GetTargetDirection() const { return mTargetDirection; }
+
+    /**
+     * @brief Function to set the target direction of the cluster.
+     */
+    void SetTargetDirection(StepDirectionEnum direction) { mTargetDirection = direction; }
+
+private:
+    bool isMoving                      = false;
+    bool isManualLatch                 = false;
+    StepDirectionEnum mTargetDirection = StepDirectionEnum::kUnknownEnumValue;
+    ClusterLogic * mLogic;
 };
 
 /**
@@ -76,7 +112,11 @@ class ClosureDimensionEndpoint
 public:
     ClosureDimensionEndpoint(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
-    {}
+    {
+        mDelegate.SetLogic(&mLogic);
+    }
+
+    virtual ~ClosureDimensionEndpoint() = default;
 
     /**
      * @brief Initializes the ClosureDimensionEndpoint instance.
@@ -88,14 +128,22 @@ public:
     /**
      * @brief Retrieves the delegate associated with this Closure Dimension endpoint.
      *
-     * @return Reference to the PrintOnlyDelegate instance.
+     * @return Reference to the ClosureDimensionDelegate instance.
      */
-    PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+    ClosureDimensionDelegate & GetDelegate() { return mDelegate; }
+
+    /**
+     * @brief Retrieves the Cluster logic object associated with this Closure Dimension endpoint.
+     *
+     * @return Reference to the ClosureDimensionDelegate instance.
+     */
+
+    ClusterLogic & GetLogic() { return mLogic; }
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
-    PrintOnlyDelegate mDelegate;
+    ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
 };

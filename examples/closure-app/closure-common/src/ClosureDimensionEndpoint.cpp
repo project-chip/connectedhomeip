@@ -19,27 +19,130 @@
 #include <ClosureDimensionEndpoint.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-server.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+namespace {
+constexpr chip::Percent100ths kLimitRangeMin = 0;
+constexpr chip::Percent100ths kLimitRangeMax = 10000;
+constexpr chip::Percent100ths kStep          = 1000;
+constexpr uint32_t kExampleMotionCountDown   = 5;
+constexpr uint32_t kExampleStepCountDown     = 3000;
+} // namespace
 
 using namespace chip;
 using namespace chip::app::Clusters::ClosureDimension;
-
 using Protocols::InteractionModel::Status;
 
-Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
-                                          const Optional<Globals::ThreeLevelAutoEnum> & speed)
+CHIP_ERROR ClosureDimensionDelegate::Init()
 {
-    ChipLogProgress(AppServer, "HandleSetTarget");
-    // Add the SetTarget handling logic here
+    GenericCurrentStateStruct currentState{ Optional<Percent100ths>(0), Optional<bool>(false),
+                                            Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+    ReturnErrorOnFailure(mLogic->SetCurrentState(chip::app::DataModel::MakeNullable(currentState)));
+
+    GenericTargetStruct targetState{ Optional<Percent100ths>(0), Optional<bool>(false),
+                                     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+    ReturnErrorOnFailure(mLogic->SetTarget(chip::app::DataModel::MakeNullable(targetState)));
+
+    Structs::RangePercent100thsStruct::Type limitRange;
+    limitRange.min = kLimitRangeMin;
+    limitRange.max = kLimitRangeMax;
+    ReturnErrorOnFailure(mLogic->SetLimitRange(limitRange));
+
+    ReturnErrorOnFailure(mLogic->SetStepValue(kStep));
+
+    return CHIP_NO_ERROR;
+}
+
+static void MotionTimerEventHandler(System::Layer * systemLayer, void * data)
+{
+    ClosureDimensionDelegate * delegate = reinterpret_cast<ClosureDimensionDelegate *>(data);
+    chip::app::DataModel::Nullable<GenericTargetStruct> target;
+    chip::app::DataModel::Nullable<GenericCurrentStateStruct> current;
+
+    delegate->GetLogic()->GetTarget(target);
+    delegate->GetLogic()->GetCurrentState(current);
+    if (target.Value().position.HasValue())
+    {
+        current.Value().position.SetValue(target.Value().position.Value());
+    }
+
+    if (target.Value().latch.HasValue())
+    {
+        current.Value().latch.SetValue(target.Value().latch.Value());
+    }
+
+    if (target.Value().speed.HasValue())
+    {
+        current.Value().speed.SetValue(target.Value().speed.Value());
+    }
+    delegate->GetLogic()->SetCurrentState(current);
+}
+
+Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
+                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed)
+{
+    (void) DeviceLayer::SystemLayer().CancelTimer(MotionTimerEventHandler, this);
+
+    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kExampleMotionCountDown), MotionTimerEventHandler, this);
+
+    // Trigger Motion Action
+
     return Status::Success;
 }
 
-Status PrintOnlyDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-                                     const Optional<Globals::ThreeLevelAutoEnum> & speed)
+static void HandleStepMotion(System::Layer * systemLayer, void * data)
 {
-    ChipLogProgress(AppServer, "HandleStep");
-    // Add the Step handling logic here
+    ClosureDimensionDelegate * delegate = reinterpret_cast<ClosureDimensionDelegate *>(data);
+    VerifyOrReturn(delegate != nullptr, void());
+
+    ClusterState state = delegate->GetLogic()->GetState();
+
+    StepDirectionEnum direction = delegate->GetTargetDirection();
+
+    uint32_t newPos;
+    if (direction == StepDirectionEnum::kDecrease)
+    {
+        newPos =
+            std::max((state.target.Value().position.Value() + 0), (state.currentState.Value().position.Value() - state.stepValue));
+    }
+    else
+    {
+        newPos =
+            std::min((state.target.Value().position.Value() + 0), (state.currentState.Value().position.Value() + state.stepValue));
+    }
+    state.currentState.Value().position.SetValue(newPos);
+    delegate->GetLogic()->SetCurrentState(state.currentState);
+    if (state.target.Value().position.Value() == state.currentState.Value().position.Value())
+    {
+        (void) DeviceLayer::SystemLayer().CancelTimer(HandleStepMotion, delegate);
+    }
+    else
+    {
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown), HandleStepMotion,
+                                                     delegate);
+        // Trigger Step Action
+    }
+}
+
+Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+                                            const Optional<Globals::ThreeLevelAutoEnum> & speed)
+{
+    mTargetDirection = direction;
+    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(kExampleStepCountDown), HandleStepMotion, this);
+
+    // Trigger Step Action
     return Status::Success;
+}
+
+bool ClosureDimensionDelegate::IsManualLatchingNeeded()
+{
+    // Check if closure needs manual latching.(manufacture specific)
+    return false;
 }
 
 CHIP_ERROR ClosureDimensionEndpoint::Init()
@@ -57,5 +160,7 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 
     ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());
+    ReturnErrorOnFailure(mDelegate.Init());
+
     return CHIP_NO_ERROR;
 }
