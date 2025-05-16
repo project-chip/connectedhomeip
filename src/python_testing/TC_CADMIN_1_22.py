@@ -74,6 +74,10 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                      "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
             TestStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
                      "DUT_CE windows status shows the window is closed"),
+            TestStep(7, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
+                     "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
+            TestStep(8, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
+                     "DUT_CE windows status shows the window is closed"),
         ]
 
     @async_test_body
@@ -115,48 +119,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         asserts.assert_equal(window_status2, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 
-    def pics_TC_CADMIN_1_24(self) -> list[str]:
-        return ["CADMIN.S"]
-
-    def steps_TC_CADMIN_1_24(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 180 seconds",
-                     "DUT_CE opens its Commissioning window to allow a second commissioning"),
-            TestStep(3, "Wait for the commissioning window in step 2 to timeout"),
-            TestStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
-                     "DUT_CE windows status shows the window is closed"),
-            TestStep(5, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
-                     "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
-            TestStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
-                     "DUT_CE windows status shows the window is closed"),
-        ]
-
-    @async_test_body
-    async def test_TC_CADMIN_1_24(self):
-        self.step(1)
-        self.th1 = self.default_controller
-        self.discriminator = random.randint(0, 4095)
-
-        self.step(2)
-        await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=180, iteration=10000, discriminator=self.discriminator, option=1)
-
-        self.step(3)
-        sleep(180)
-
-        self.step(4)
-        # TODO: Issue noticed when initially attempting to check window status after waiting for timeout to occur, issue is detailed here: https://github.com/project-chip/connectedhomeip/issues/35983
-        # Workaround in place below until above issue resolved
-        try:
-            window_status = await self.support.get_window_status(th=self.th1)
-        except asyncio.CancelledError:
-            window_status = await self.support.get_window_status(th=self.th1)
-
-        asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
-                             "Commissioning window is expected to be closed, but was found to be open")
-
-        self.step(5)
+        self.step(7)
         try:
             await self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=179, iteration=10000, discriminator=self.discriminator, option=1)
@@ -169,9 +132,9 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
             asserts.assert_equal(e.err, _INVALID_COMMAND,
                                  "Expected to error as we provided failure value for opening commissioning window")
 
-        self.step(6)
-        window_status2 = await self.support.get_window_status(th=self.th1)
-        asserts.assert_equal(window_status2, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
+        self.step(8)
+        window_status3 = await self.support.get_window_status(th=self.th1)
+        asserts.assert_equal(window_status3, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 
 
