@@ -831,7 +831,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_equal(th2_fabrics_entry.vendorID, vendorID,
                                  "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
 
-        with test_step(27, description="Invoke CommissioningComplete on the pending fabric under TH2 root. Verify VIDVerificationStatement, VVSC and VID values match values are still set as inside fail-safe."):
+        with test_step(27, description="Invoke CommissioningComplete on the pending fabric under TH2 root. Verify VIDVerificationStatement, VVSC and VID values match the values that were set inside the fail-safe period."):
             resp = await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=new_th2_nodeId, cmd=Clusters.GeneralCommissioning.Commands.CommissioningComplete())
             if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
                 # Expiring the failsafe timer in an attempt to clean up.
