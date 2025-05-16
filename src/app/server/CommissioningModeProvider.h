@@ -31,6 +31,7 @@ class DLL_EXPORT CommissioningModeProvider
 {
 public:
     virtual Dnssd::CommissioningMode GetCommissioningMode() const = 0;
+    virtual bool IsJointFabricEnabled()                           = 0;
 
     virtual ~CommissioningModeProvider() {}
 };

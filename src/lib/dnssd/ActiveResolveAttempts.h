@@ -172,6 +172,8 @@ public:
             case chip::Dnssd::DiscoveryFilterType::kInstanceName:
                 return strncmp(browse.filter.instanceName, nodeData.instanceName,
                                chip::Dnssd::Commission::kInstanceNameMaxLength + 1) == 0;
+            case chip::Dnssd::DiscoveryFilterType::kJointFabricMode:
+                return browse.filter.code == nodeData.jointFabricMode;
             case chip::Dnssd::DiscoveryFilterType::kCommissioner:
             case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
             default:

@@ -88,6 +88,10 @@ public:
                                                Crypto::Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
                                                FabricIndex fabricIndex, VendorId vendorId);
 
+    CHIP_ERROR OpenJointCommissioningWindow(System::Clock::Seconds32 commissioningTimeout, uint16_t discriminator,
+                                            Crypto::Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
+                                            FabricIndex fabricIndex, VendorId vendorId);
+
     void CloseCommissioningWindow();
 
     app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum CommissioningWindowStatusForCluster() const;
@@ -102,6 +106,7 @@ public:
 
     // CommissioningModeProvider implementation.
     Dnssd::CommissioningMode GetCommissioningMode() const override;
+    bool IsJointFabricEnabled() override { return mJCM; }
 
     //// UnsolicitedMessageHandler Implementation ////
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
@@ -126,6 +131,8 @@ private:
     void OnSessionReleased() override;
 
     void SetBLE(bool ble) { mIsBLE = ble; }
+
+    void SetJCM(bool jcm) { mJCM = jcm; }
 
     CHIP_ERROR SetTemporaryDiscriminator(uint16_t discriminator);
 
@@ -190,6 +197,7 @@ private:
         app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
 
     bool mIsBLE = true;
+    bool mJCM   = false;
 
     PASESession mPairingSession;
 

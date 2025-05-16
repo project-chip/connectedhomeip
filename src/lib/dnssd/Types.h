@@ -44,6 +44,7 @@ enum class DiscoveryFilterType : uint8_t
     kInstanceName,
     kCommissioner,
     kCompressedFabricId,
+    kJointFabricMode,
 };
 
 struct DiscoveryFilter
@@ -234,6 +235,7 @@ struct CommissionNodeData : public CommonResolutionData
     char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
     char deviceName[kMaxDeviceNameLen + 1]                    = {};
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+    uint8_t jointFabricMode                                   = 0;
 
     CommissionNodeData() {}
 
@@ -292,6 +294,7 @@ struct CommissionNodeData : public CommonResolutionData
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
         ChipLogDetail(Discovery, "\tSupports Commissioner Generated Passcode: %s",
                       supportsCommissionerGeneratedPasscode ? "true" : "false");
+        ChipLogDetail(Discovery, "\tJoint Fabric Mode: %u", jointFabricMode);
     }
 };
 
