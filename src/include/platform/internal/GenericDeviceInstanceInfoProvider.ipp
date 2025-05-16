@@ -182,6 +182,12 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetHardwareVersionStr
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSoftwareVersionString(MutableCharSpan & softwareVersionString)
+{
+    return mGenericConfigManager.GetSoftwareVersionString(softwareVersionString.data(), softwareVersionString.size());
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;

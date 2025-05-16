@@ -104,6 +104,11 @@ struct LinuxDeviceOptions
     chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
     chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
 #endif
+    chip::Optional<std::string> vendorName;
+    chip::Optional<std::string> productName;
+    chip::Optional<std::string> hardwareVersionString;
+    chip::Optional<std::string> softwareVersionString;
+    chip::Optional<std::string> serialNumber;
     static LinuxDeviceOptions & GetInstance();
 };
 

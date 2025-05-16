@@ -194,6 +194,60 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    /**
+     * @brief Obtain a Software Version String from the device's factory data.
+     *
+     * The SoftwareVersionString can be used to provide a more user-friendly value than that
+     * represented by the SoftwareVersion attribute.
+     *
+     * @param[in, out] softwareVersionString Buffer to copy string.
+     *                     On CHIP_NO_ERROR return from this function this buffer will be null-terminated.
+     *                     On error CHIP_ERROR_BUFFER_TOO_SMALL there is no guarantee that buffer will be null-terminated.
+     * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if the buffer was too small to fit string and null
+     * terminating. or another CHIP_ERROR from the underlying implementation if access fails.
+     */
+    virtual CHIP_ERROR GetSoftwareVersionString(MutableCharSpan & softwareVersionString) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Set a Vendor Name that will be returned by GetVendorName.
+     *
+     * @param[in] buf Buffer containing the string.
+     * @returns CHIP_NO_ERROR on success.
+     */
+    virtual CHIP_ERROR SetVendorName(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Set a Product Name that will be returned by GetProductName.
+     *
+     * @param[in] buf Buffer containing the string.
+     * @returns CHIP_NO_ERROR on success.
+     */
+    virtual CHIP_ERROR SetProductName(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Set a Serial Number that will be returned by GetSerialNumber.
+     *
+     * @param[in] buf Buffer containing the string.
+     * @returns CHIP_NO_ERROR on success.
+     */
+    virtual CHIP_ERROR SetSerialNumber(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Set a Hardware Version String that will be returned by GetHardwareVersionString.
+     *
+     * @param[in] buf Buffer containing the string.
+     * @returns CHIP_NO_ERROR on success.
+     */
+    virtual CHIP_ERROR SetHardwareVersionString(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Set a Software Version String that will be returned by GetSoftwareVersionString.
+     *
+     * @param[in] buf Buffer containing the string.
+     * @returns CHIP_NO_ERROR on success.
+     */
+    virtual CHIP_ERROR SetSoftwareVersionString(const char * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 /**
