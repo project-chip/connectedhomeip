@@ -502,6 +502,47 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::detail::Structs::ViewportStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("X1", indent + 1, value.x1);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X1'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Y1", indent + 1, value.y1);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y1'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("X2", indent + 1, value.x2);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X2'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Y2", indent + 1, value.y2);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y2'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -642,47 +683,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OperationalStateLabel'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::detail::Structs::ViewportStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("X1", indent + 1, value.x1);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X1'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Y1", indent + 1, value.y1);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y1'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("X2", indent + 1, value.x2);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X2'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Y2", indent + 1, value.y2);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y2'");
             return err;
         }
     }
@@ -6121,6 +6121,32 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Settings'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("VideoStreamID", indent + 1, value.videoStreamID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VideoStreamID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Viewport", indent + 1, value.viewport);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Viewport'");
             return err;
         }
     }
@@ -20800,10 +20826,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MPTZPresets", 1, value);
         }
-        case CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::Id: {
-            chip::app::DataModel::DecodableList<uint16_t> value;
+        case CameraAvSettingsUserLevelManagement::Attributes::DPTZStreams::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DPTZRelativeMove", 1, value);
+            return DataModelLogger::LogValue("DPTZStreams", 1, value);
         }
         case CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::Id: {
             uint8_t value;
