@@ -28,7 +28,6 @@ set(PRIV_INCLUDE_DIRS_LIST  "${ALL_CLUSTERS_COMMON_DIR}/include"
                             "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/include"
                             "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/include"
                             "${CMAKE_CURRENT_LIST_DIR}/include"
-                            "${CHIP_ROOT}/examples/common"
                             "${CHIP_ROOT}/examples/providers"
                             "${CHIP_ROOT}/examples/platform/esp32"
 )
