@@ -322,7 +322,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow());
+        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(initParams.discoveryTimeout));
 #endif
     }
 
