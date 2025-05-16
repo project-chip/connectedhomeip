@@ -59,8 +59,8 @@ nest_asyncio.apply()
 
 
 def to_octet_string(input: bytes) -> str:
-  """Takes `input` bytes and convert to a colon-separated hex octet string representation."""
-  return ":".join(["%02x" % b for b in input])
+    """Takes `input` bytes and convert to a colon-separated hex octet string representation."""
+    return ":".join(["%02x" % b for b in input])
 
 
 class MatterCertParser:
