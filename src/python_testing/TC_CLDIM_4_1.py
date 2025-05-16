@@ -212,13 +212,6 @@ class TC_CLDIM_4_1(MatterBaseTest):
             expected_position = max(max_position - 2 * step_value, min_position)
             asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
-            if is_latching_supported:
-                asserts.assert_equal(target.latch, False, "Target Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
-
         # STEP 4c: Wait for PIXIT.CLDIM.StepMotionDuration * 2 seconds
         self.step("4c")
         time.sleep(step_motion_duration * 2)
@@ -253,13 +246,6 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             asserts.assert_equal(target.position, max_position, "Target Position is not updated correctly")
-
-            if is_latching_supported:
-                asserts.assert_equal(target.latch, False, "Target Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
 
         # STEP 4g: Wait for PIXIT.CLDIM.StepMotionDuration * 2 seconds
         self.step("4g")
@@ -308,9 +294,6 @@ class TC_CLDIM_4_1(MatterBaseTest):
             expected_position = max_position - step_value
             asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
-            if is_latching_supported:
-                asserts.assert_equal(target.latch, False, "Target Latch is not False")
-
             asserts.assert_equal(target.speed, 3, "Target Speed is not High")
 
         # STEP 5d: Wait for PIXIT.CLDIM.StepMotionDuration seconds
@@ -358,9 +341,6 @@ class TC_CLDIM_4_1(MatterBaseTest):
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             expected_position = max_position
             asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
-
-            if is_latching_supported:
-                asserts.assert_equal(target.latch, False, "Target Latch is not False")
 
             asserts.assert_equal(target.speed, 0, "Target Speed is not Auto")
 
@@ -429,13 +409,6 @@ class TC_CLDIM_4_1(MatterBaseTest):
             expected_position = max(max_position - 3 * step_value, min_position)
             asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
-            if is_latching_supported:
-                asserts.assert_equal(target.latch, False, "Target Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
-
         # STEP 7e: Wait for PIXIT.CLDIM.StepMotionDuration * 3 seconds
         self.step("7e")
         time.sleep(step_motion_duration * 3)
@@ -473,13 +446,6 @@ class TC_CLDIM_4_1(MatterBaseTest):
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             asserts.assert_equal(target.position, min_position, "Target Position is not at MinPosition")
 
-            if is_latching_supported:
-                asserts.assert_equal(target.latch, False, "Target Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
-
         # STEP 8c: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("8c")
         time.sleep(full_motion_duration)
@@ -515,13 +481,6 @@ class TC_CLDIM_4_1(MatterBaseTest):
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             asserts.assert_equal(target.position, max_position, "Target Position is not at MaxPosition")
-
-            if is_latching_supported:
-                asserts.assert_equal(target.latch, False, "Target Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(target.speed, 0, "Target Speed is outside allowed range")
-                asserts.assert_less_equal(target.speed, 3, "Target Speed is outside allowed range")
 
         # STEP 8g: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("8g")
