@@ -71,7 +71,7 @@ public:
     CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
     CHIP_ERROR WiFiPAFMessageSend(WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
     CHIP_ERROR WiFiPAFCloseSession(WiFiPAFSession & SessionInfo) override { return CHIP_NO_ERROR; }
-    bool WiFiPAFResourceAvailable(void) override { return true; }
+    bool WiFiPAFResourceAvailable() override { return true; }
     static constexpr size_t kTestPacketLength     = 100;
     static constexpr size_t kTestPacketLengthLong = 500;
 
