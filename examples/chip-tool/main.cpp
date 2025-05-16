@@ -33,11 +33,42 @@
 
 #include <zap-generated/cluster/Commands.h>
 
+#include "platform/PlatformManager.h"
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+using namespace chip::WiFiPAF;
+#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+static void StopSignalHandler(int signum)
+{
+    WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPafRole role) {
+        switch (role)
+        {
+        case WiFiPafRole::kWiFiPafRole_Publisher:
+            chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
+            break;
+        case WiFiPafRole::kWiFiPafRole_Subscriber:
+            chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
+            break;
+        }
+    });
+}
+#endif
+
 // ================================================================================
 // Main Code
 // ================================================================================
 int main(int argc, char * argv[])
 {
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = static_cast<int>(SA_RESETHAND);
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
+#endif
+
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
     registerCommandsDCL(commands);
