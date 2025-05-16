@@ -97,7 +97,7 @@ private:
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
-    dispatch_queue_t mWorkQueue;
+    dispatch_queue_t mWorkQueue = nullptr;
 
     enum class WorkQueueState
     {
@@ -109,7 +109,7 @@ private:
     std::atomic<WorkQueueState> mWorkQueueState = WorkQueueState::kSuspended;
 
     // Semaphore used to implement blocking behavior in _RunEventLoop.
-    dispatch_semaphore_t mRunLoopSem;
+    dispatch_semaphore_t mRunLoopSem = nullptr;
 };
 
 /**
