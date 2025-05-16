@@ -41,7 +41,7 @@ import inspect
 import logging
 import re
 import sys
-from binascii import unhexlify
+from binascii import hexlify, unhexlify
 from typing import Optional
 
 import chip.clusters as Clusters
@@ -58,18 +58,36 @@ from mobly import asserts
 nest_asyncio.apply()
 
 
+def to_octet_string(input: bytes) -> str:
+    """Takes `input` bytes and convert to a colon-separated hex octet string representation."""
+    return ":".join(["%02x" % b for b in input])
+
+
 class MatterCertParser:
     SUBJECT_TAG = 6
     SUBJECT_PUBLIC_KEY_TAG = 9
     SUBJECT_FABRIC_ID_TAG = 21
 
     def __init__(self, matter_cert_bytes: bytes):
-        self.parsed_tlv = TLVReader(matter_cert_bytes).get()["Any"]
+        try:
+            full_parsed_tlv = TLVReader(matter_cert_bytes).get()
+        except (ValueError, TypeError, KeyError, IndexError) as e:
+            raise ValueError(f"Failed to parse Matter TLV cert: {str(e)}. TLV cert bytes: {hexlify(matter_cert_bytes)}")
+
+        if (not isinstance(full_parsed_tlv, dict)) or ("Any" not in full_parsed_tlv) or (not isinstance(full_parsed_tlv['Any'], dict)):
+            raise ValueError(f"Failed to find top-level anonymous struct in Matter TLV cert: (TLV: {full_parsed_tlv}).")
+
+        self.parsed_tlv = full_parsed_tlv["Any"]
 
     def get_subject_names(self) -> dict[int, object]:
+        if self.SUBJECT_TAG not in self.parsed_tlv:
+            raise ValueError(f"Did not find Subject tag in Matter TLV certificate: {self.parsed_tlv}")
         return {tag: value for tag, value in self.parsed_tlv[self.SUBJECT_TAG]}
 
     def get_public_key_bytes(self) -> bytes:
+        if self.SUBJECT_PUBLIC_KEY_TAG not in self.parsed_tlv:
+            raise ValueError(f"Did not find Subject Public Key tag in Matter TLV certificate: {self.parsed_tlv}")
+
         public_key_bytes = self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
         return public_key_bytes
 
@@ -368,8 +386,15 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             )
             asserts.assert_true(len(root_certs) == 1,
                                 f"Expecting exactly one root from TrustedRootCertificates (TH1's), got {len(root_certs)}")
-            th1_root_parser = MatterCertParser(root_certs[0])
-            th1_root_public_key = th1_root_parser.get_public_key_bytes()
+
+            logging.info("Parsing root certificate for TH1's fabric")
+            try:
+                th1_root_parser = MatterCertParser(root_certs[0])
+                th1_root_public_key = th1_root_parser.get_public_key_bytes()
+            except (ValueError, IndexError, KeyError, TypeError) as e:
+                asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
+            logging.info("Parsed TH1's RCAC successfully.")
+            logging.info(f"  -> Root public key bytes: {to_octet_string(th1_root_public_key)}")
 
         with test_step(1, description="Commission DUT in TH2's fabric. Cert chain must NOT include ICAC"):
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -392,8 +417,15 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             rcacResp = chain.rcacBytes
 
             th2_fabric_index = nocResp.fabricIndex
-            th2_rcac = MatterCertParser(rcacResp)
-            th2_root_public_key = th2_rcac.get_public_key_bytes()
+
+            logging.info("Parsing root certificate for TH2's fabric")
+            try:
+                th2_rcac = MatterCertParser(rcacResp)
+                th2_root_public_key = th2_rcac.get_public_key_bytes()
+            except (ValueError, IndexError, KeyError, TypeError) as e:
+                asserts.fail(f"Failed to parse root certificate for TH2's fabric: {str(e)}")
+            logging.info("Parsed TH2's RCAC successfully.")
+            logging.info(f"  -> Root public key bytes: {to_octet_string(th2_root_public_key)}")
 
         # Read NOCs and validate that both the entry for TH1 and TH2 are readable
         # and have the right expected fabricId
@@ -424,11 +456,18 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                     if noc_struct.fabricIndex != fabric_index:
                         continue
 
-                    noc_cert = MatterCertParser(noc_struct.noc)
-                    for tag, value in noc_cert.get_subject_names().items():
-                        if tag == noc_cert.SUBJECT_FABRIC_ID_TAG:
-                            fabric_ids_from_certs[controller_name] = value
-                    noc_public_keys_from_certs[controller_name] = noc_cert.get_public_key_bytes()
+                    try:
+                        logging.info(f"Trying to parse NOC for fabric index {fabric_index}")
+                        noc_cert = MatterCertParser(noc_struct.noc)
+                        for tag, value in noc_cert.get_subject_names().items():
+                            if tag == noc_cert.SUBJECT_FABRIC_ID_TAG:
+                                fabric_ids_from_certs[controller_name] = value
+                        noc_public_keys_from_certs[controller_name] = noc_cert.get_public_key_bytes()
+                    except (ValueError, IndexError, KeyError, TypeError) as e:
+                        asserts.fail(f"Failed to parse NOC for fabric index {fabric_index}: {str(e)}")
+
+                    logging.info(f"Succeeded in parsing NOC for fabric index {fabric_index}.")
+                    logging.info(f"  -> NOC public key bytes: {to_octet_string(noc_public_keys_from_certs[controller_name])}")
 
             logging.info(f"Fabric IDs found: {fabric_ids_from_certs}")
 
