@@ -19,6 +19,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/SafePointerCast.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DeviceControlServer.h>
@@ -101,6 +102,19 @@ static void StopSignalHandler(int signum)
     });
 }
 #endif
+
+void ConnectivityManagerImpl::ReportEthernetName()
+{
+    if (mpStatusChangeCallback != nullptr)
+    {
+        uint8_t interfaceName[kMaxNetworkIDLen];
+        uint8_t interfaceNameLen =
+            static_cast<uint8_t>(strnlen(SafePointerCast<char *>(mEthIfName), Inet::InterfaceId::kMaxIfNameLength));
+        memcpy(interfaceName, mEthIfName, interfaceNameLen);
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(interfaceName, interfaceNameLen)),
+                                                         NullOptional);
+    }
+}
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {

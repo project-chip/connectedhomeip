@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/ConnectivityUtils.h>
@@ -30,12 +31,23 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
+CHIP_ERROR LinuxEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
+{
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
+    return CHIP_NO_ERROR;
+}
+
 NetworkIterator * LinuxEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
     ConnectivityUtils::GetEthInterfaceName(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName));
     ret->interfaceNameLen = static_cast<uint8_t>(strnlen(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName)));
     return ret;
+}
+
+void LinuxEthernetDriver::Shutdown()
+{
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
 }
 
 } // namespace NetworkCommissioning

@@ -276,6 +276,7 @@ void InitNetworkCommissioning()
     {
 #if CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
         sEthernetNetworkCommissioningInstance.Init();
+        DeviceLayer::ConnectivityMgrImpl().ReportEthernetName();
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
     }
 }
