@@ -125,7 +125,7 @@ void TestWriteChunking::EncodeAttributeListIntoTLV(const DataModel::List<T> & aL
         }
         else if constexpr (std::is_same<T, chip::ByteSpan>::value)
         {
-            ASSERT_LE(aListAttribute[i].size(), UINT8_MAX);
+            ASSERT_LE(aListAttribute[i].size(), static_cast<size_t>(UINT8_MAX));
 
             // Control Octet (1) + Length Octet (1) + size of a single ByteSpan
             estimatedSize += 2 + aListAttribute[i].size();
