@@ -40,7 +40,9 @@ using namespace Camera;
 // Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
 // Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
 
+#ifdef AV_STREAM_GST_USE_TEST_SRC
 const int kBallAnimationPattern = 18;
+#endif
 
 CameraDevice::CameraDevice()
 {
@@ -508,7 +510,7 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
     }
 
     int channels   = it->audioStreamParams.channelCount;
-    int sampleRate = it->audioStreamParams.sampleRate;
+    int sampleRate = static_cast<int>(it->audioStreamParams.sampleRate);
 
     // Create Gstreamer video pipeline
     CameraError error          = CameraError::SUCCESS;

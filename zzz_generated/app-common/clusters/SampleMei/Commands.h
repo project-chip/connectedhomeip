@@ -73,6 +73,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Ping::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -86,6 +87,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Ping::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -102,6 +104,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddArgumentsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t returnValue = static_cast<uint8_t>(0);
 
@@ -117,8 +120,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddArgumentsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t returnValue = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddArgumentsResponse
@@ -135,6 +140,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddArguments::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t arg1 = static_cast<uint8_t>(0);
     uint8_t arg2 = static_cast<uint8_t>(0);
@@ -151,9 +157,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddArguments::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t arg1 = static_cast<uint8_t>(0);
     uint8_t arg2 = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddArguments

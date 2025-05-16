@@ -78,6 +78,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::OpenCommissioningWindow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
     chip::ByteSpan PAKEPasscodeVerifier;
@@ -97,12 +98,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::OpenCommissioningWindow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
     chip::ByteSpan PAKEPasscodeVerifier;
     uint16_t discriminator = static_cast<uint16_t>(0);
     uint32_t iterations    = static_cast<uint32_t>(0);
     chip::ByteSpan salt;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OpenCommissioningWindow
@@ -118,6 +121,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::OpenBasicCommissioningWindow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
 
@@ -133,8 +137,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::OpenBasicCommissioningWindow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OpenBasicCommissioningWindow
@@ -149,6 +155,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RevokeCommissioning::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -162,6 +169,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RevokeCommissioning::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
