@@ -1,5 +1,5 @@
 {{> header}}
-// This file is generated from clusters-commands.ipp.zapt
+// This file is generated from clusters-Commands.ipp.zapt
 
 #include <clusters/{{asUpperCamelCase name}}/Commands.h>
 

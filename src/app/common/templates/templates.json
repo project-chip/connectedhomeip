@@ -100,86 +100,86 @@
             "output": "cluster-enums-check.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-shared-enums.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-shared-Enums.h.zapt",
             "name": "Shared enumerations header",
             "output": "../../clusters/shared/Enums.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-shared-enums-check.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-shared-Enums-Check.h.zapt",
             "name": "Shared enumeration check header",
             "output": "../../clusters/shared/EnumsCheck.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-shared-structs.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-shared-Structs.h.zapt",
             "name": "Shared/global structures",
             "output": "../../clusters/shared/Structs.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-shared-structs.ipp.zapt",
+            "path": "../../zap-templates/templates/app/clusters-shared-Structs.ipp.zapt",
             "name": "Shared/global structures",
             "output": "../../clusters/shared/Structs.ipp"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-shared-attributes.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-shared-Attributes.h.zapt",
             "name": "Shared/global structures",
             "output": "../../clusters/shared/Attributes.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-attributes.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Attributes.h.zapt",
             "name": "Cluster-specific attribute declarations",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Attributes.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-events.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Events.h.zapt",
             "name": "Cluster-specific event declarations",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Events.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-events.ipp.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Events.ipp.zapt",
             "name": "Cluster-specific event implementations",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Events.ipp"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-structs.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Structs.h.zapt",
             "name": "Cluster-specific structure declarations",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Structs.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-structs.ipp.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Structs.ipp.zapt",
             "name": "Cluster-specific structure implementations",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Structs.ipp"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-attributes.ipp.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Attributes.ipp.zapt",
             "name": "Cluster-specific attributes implementations",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Attributes.ipp"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-commands.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Commands.h.zapt",
             "name": "Cluster-specific command declarations",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Commands.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-commands.ipp.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Commands.ipp.zapt",
             "name": "Cluster-specific command implementations",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Commands.ipp"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-enums.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Enums.h.zapt",
             "name": "Cluster-specific enumerations header",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/Enums.h"
         },
         {
-            "path": "../../zap-templates/templates/app/clusters-enums-check.h.zapt",
+            "path": "../../zap-templates/templates/app/clusters-Enums-Check.h.zapt",
             "name": "Cluster-specific enumerations header",
             "iterator": "availableCluster",
             "output": "../../clusters/{name:touppercamelcase}/EnumsCheck.h"

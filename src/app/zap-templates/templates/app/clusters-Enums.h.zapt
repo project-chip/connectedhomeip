@@ -1,5 +1,5 @@
 {{> header}}
-// This file is generated from clusters-enums.h.zapt
+// This file is generated from clusters-Enums.h.zapt
 
 #pragma once
 

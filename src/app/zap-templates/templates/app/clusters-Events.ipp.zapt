@@ -1,5 +1,5 @@
 {{> header}}
-// This file is generated from clusters-events.ipp.zapt
+// This file is generated from clusters-Events.ipp.zapt
 
 #include <clusters/{{asUpperCamelCase name}}/Events.h>
 

@@ -1,5 +1,5 @@
 {{> header}}
-// This file is generated from clusters-shared-enums.h.zapt
+// This file is generated from clusters-shared-Enums.h.zapt
 
 #pragma once
 
@@ -70,5 +70,3 @@ k{{asUpperCamelCase label}} = {{asHex mask}},
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-
