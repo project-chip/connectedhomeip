@@ -51,22 +51,22 @@ provided to the tool using these arguments:
 -   --pics-template is the absolute path to the folder containing the PICS
     templates
 -   --pics-output is the absolute path to the output folder to be used
--   --dm-xml is the absolute path to the spec scrape to use, located in the
-    data_model folder in the root of the connectedhomeip repo. An example path
-    is "connectedhomeip/data_model/master".
+-   --dm-xml (Optional) is the absolute path to the spec scrape to use, located
+    in the data_model folder in the root of the connectedhomeip repo. An example
+    path is "connectedhomeip/data_model/master".
 
 If the device has not been commissioned this can be done by passing in the
 commissioning information:
 
 ```
-python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --dm-xml <pathToDmScrapeFolder> --commissioning-method ble-thread --discriminator <DESCRIMINATOR> --passcode <PASSCODE> --thread-dataset-hex <DATASET_AS_HEX>
+python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --commissioning-method ble-thread --discriminator <DESCRIMINATOR> --passcode <PASSCODE> --thread-dataset-hex <DATASET_AS_HEX>
 ```
 
 or in case the device is e.g. an example running on a Linux/macOS system, use
 the on-network commissioning:
 
 ```
-python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --dm-xml <pathToDmScrapeFolder> --commissioning-method on-network --discriminator <DESCRIMINATOR> --passcode <PASSCODE>
+python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --commissioning-method on-network --discriminator <DESCRIMINATOR> --passcode <PASSCODE>
 ```
 
 In case the device uses a development PAA, the following parameter should be
@@ -86,8 +86,20 @@ added.
 If a device has already been commissioned, the tool can be executed like this:
 
 ```
-python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --dm-xml <pathToDmScrapeFolder>
+python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath>
 ```
+
+The tool can be used to generate PICS for a specific spec versions, this can be
+done by providing the following tag in the command, if no path is provided the
+tool will request the specification version from the device in the
+BasicInformation cluster and use that to select DM scrape to use for the PICS
+generation.
+
+```
+python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder> --dm-xml <pathToDmScrapeFolder>
+```
+
+If the tag is not provided
 
 # Updates for future releases
 
@@ -105,3 +117,6 @@ To run the XMLPICSValidator, the following command can be used:
 ```
 python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder> --dm-xml <pathToDmScrapeFolder>
 ```
+
+NOTE: The --dm-xml is required for this script, since it does not run agains a
+specific device.
