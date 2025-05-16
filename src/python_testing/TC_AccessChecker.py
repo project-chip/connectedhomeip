@@ -55,6 +55,7 @@ from enum import Enum, auto
 from typing import Optional
 
 import chip.clusters as Clusters
+from chip.clusters.Attribute import ValueDecodeFailure
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
@@ -281,6 +282,11 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             # Because we read everything with admin, we should have this in the wildcard read
             # This will only not work if we end up with write-only attributes. We do not currently have any of these.
             val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
+            if isinstance(val, ValueDecodeFailure):
+                self.record_error(test_name=test_name, location=location,
+                                  problem=f"Attribute {attribute} returned a read error {val} - unable to write current value")
+                self.success = False
+                continue
             if isinstance(val, list):
                 # Use an empty list for writes in case the list is large and does not fit
                 val = []
