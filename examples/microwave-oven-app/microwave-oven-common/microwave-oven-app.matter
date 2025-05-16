@@ -1512,9 +1512,7 @@ endpoint 0 {
 
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
-    emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
@@ -1548,7 +1546,6 @@ endpoint 0 {
     persist  attribute localConfigDisabled default = 0;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    callback attribute productAppearance;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
     callback attribute configurationVersion default = 1;
@@ -1714,7 +1711,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_microwave_oven = 121, version 1;
+  device type ma_microwave_oven = 121, version 2;
 
 
   server cluster Identify {
@@ -1749,7 +1746,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster MicrowaveOvenControl {
