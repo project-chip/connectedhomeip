@@ -18,6 +18,7 @@
 #pragma once
 
 #include "PresetStructWithOwnedMembers.h"
+#include "ScheduleStructWithOwnedMembers.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -133,6 +134,30 @@ public:
      *
      */
     virtual void ClearPendingPresetList() = 0;
+
+    virtual CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & ScheduleType) = 0;
+
+    virtual uint8_t GetNumberOfSchedules() = 0;
+
+    virtual uint8_t GetNumberOfScheduleTransitions() = 0;
+
+    virtual DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionPerDay() = 0;
+
+    virtual CHIP_ERROR GetScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) = 0;
+
+    virtual CHIP_ERROR GetActiveScheduleHandle(DataModel::Nullable<MutableByteSpan> & activeScheduleHandle) = 0;
+
+    virtual CHIP_ERROR SetActiveScheduleHandle(const DataModel::Nullable<ByteSpan> & newActiveScheduleHandle) = 0;
+
+    virtual void InitializePendingSchedules() = 0;
+
+    virtual CHIP_ERROR AppendToPendingScheduleList(const ScheduleStructWithOwnedMembers & schedule) = 0;
+
+    virtual CHIP_ERROR GetPendingScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) = 0;
+
+    virtual CHIP_ERROR CommitPendingSchedules() = 0;
+
+    virtual void ClearPendingScheduleList() = 0;
 };
 
 } // namespace Thermostat
