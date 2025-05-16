@@ -1,4 +1,6 @@
 {{> header}}
+// This file is generated from clusters-shared-Attributes.h.zapt
+
 #pragma once
 
 #include <app/common/GlobalIds.h>

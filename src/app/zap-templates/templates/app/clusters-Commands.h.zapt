@@ -1,4 +1,6 @@
 {{> header}}
+// This file is generated from clusters-Commands.h.zapt
+
 #pragma once
 
 #include <app/data-model/DecodableList.h>

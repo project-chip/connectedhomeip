@@ -1,4 +1,5 @@
 {{> header}}
+// This file is generated from cluster-objects.h.zapt
 
 #pragma once
 

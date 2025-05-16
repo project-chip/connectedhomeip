@@ -1,4 +1,6 @@
 {{> header}}
+// This file is generated from clusters-Commands.ipp.zapt
+
 #include <clusters/{{asUpperCamelCase name}}/Commands.h>
 
 #include <app/data-model/StructDecodeIterator.h>

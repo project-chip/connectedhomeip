@@ -1,4 +1,6 @@
 {{> header}}
+// This file is generated from clusters-shared-Enums-Check.h.zapt
+
 #pragma once
 
 #include <clusters/shared/Enums.h>
