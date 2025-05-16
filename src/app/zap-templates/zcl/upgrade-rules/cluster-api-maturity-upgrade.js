@@ -3,7 +3,7 @@
  * and it is no longer provisional.
  * @param {*} api
  * @param {*} context
- * @returns A string mentioning the API changes made to .zap file
+ * @returns A string mentioning the cluster API maturity changes made to a .zap file
  */
 async function postLoad(api, context)
 {
@@ -19,17 +19,15 @@ async function postLoad(api, context)
       - THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER
       - THREAD_NETWORK_DIRECTORY_CLUSTER
       */
-      if (parseInt(clusters[j].code) == 0x0451 || parseInt(clusters[j].code) == 0x0452 || parseInt(clusters[j].code) == 0x0453) {
+      if ((parseInt(clusters[j].code) == 0x0451 || parseInt(clusters[j].code) == 0x0452 || parseInt(clusters[j].code) == 0x0453)
+          && clusters[j].apiMaturity == 'provisional') {
         resMsg += `${clusters[j].name} cluster on endpoint ${epts[i].endpointIdentifier} is no longer provisional.\n`
       }
     }
   }
   // Status can be 'nothing', 'automatic', 'user_verification', 'impossible'.
   if (resMsg) {
-    return
-    {
-      message: resMsg, status: 'automatic'
-    }
+    return { message : resMsg, status : 'automatic' };
   }
 }
 
