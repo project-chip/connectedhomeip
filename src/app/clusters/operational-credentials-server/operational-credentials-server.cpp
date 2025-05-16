@@ -301,7 +301,8 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
 
     bool nocAddedDuringFailsafe          = event->FailSafeTimerExpired.addNocCommandHasBeenInvoked;
-    bool nocAddedOrUpdatedDuringFailsafe = nocAddedDuringFailsafe || event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked;
+    bool nocUpdatedDuringFailsafe        = event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked;
+    bool nocAddedOrUpdatedDuringFailsafe = nocAddedDuringFailsafe || nocUpdatedDuringFailsafe;
 
     FabricIndex fabricIndex = event->FailSafeTimerExpired.fabricIndex;
 
@@ -347,9 +348,10 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
         }
     }
 
-    if (nocAddedOrUpdatedDuringFailsafe)
+    if (nocUpdatedDuringFailsafe)
     {
-        // Operational identities/records available may have changed. Need to refresh all records.
+        // Operational identities/records available may have changed due to NodeID update. Need to refresh all records.
+        // The fabric removal reverted case is handled by the `DeleteFabricFromTable` flow above.
         app::DnssdServer::Instance().StartServer();
     }
 }
