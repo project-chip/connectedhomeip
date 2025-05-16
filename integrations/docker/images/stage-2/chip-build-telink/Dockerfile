@@ -18,7 +18,7 @@ RUN set -x \
     && : # last line
 
 # Setup Zephyr version: 3.7.0; branch: develop
-ARG ZEPHYR_REVISION=6f10af9b4e7d453bc33089ccc74b62008822c47c
+ARG ZEPHYR_REVISION=b702c1597bd56f67d58167ef97342b234a9530f2
 ARG N22_BIN_REVISION=05f9bcecde9df997a7d735ea119bb9a8212b8a8f
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
