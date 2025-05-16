@@ -17,7 +17,7 @@ RUN set -x \
     && zephyr-sdk-0.17.0/setup.sh -t riscv64-zephyr-elf \
     && : # last line
 
-# Setup Zephyr version: 3.7.0; branch: develop
+# Setup Zephyr version: 4.1.0; branch: develop
 ARG ZEPHYR_REVISION=ed037d7de7c23eb14c908453d2d481cdf782796a
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
