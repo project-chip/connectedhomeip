@@ -242,7 +242,6 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
     }
 
     ReturnErrorOnFailure(MaybeDisplayTermsAndConditions(commissioningParams));
-    CurrentCommissioner().RegisterPairingDelegate(this);
     return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, discoveryType);
 }
 

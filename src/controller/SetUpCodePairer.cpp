@@ -270,10 +270,6 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF(SetupPayload & payload)
         DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
 
     mWaitingForDiscovery[kWiFiPAFTransport] = true;
-    auto * delegate                         = mCommissioner->GetPairingDelegate();
-    VerifyOrDie(delegate != this);
-    mPairingDelegate = delegate;
-
     CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
                                                                      OnWiFiPAFSubscribeError);
     if (err != CHIP_NO_ERROR)
@@ -404,10 +400,6 @@ void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 {
     ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnPairingComplete(err);
-    }
 }
 
 void SetUpCodePairer::OnWiFiPAFSubscribeComplete(void * appState)
