@@ -22,9 +22,8 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
+#include <clusters/ColorControl/AttributeIds.h>
+#include <clusters/LevelControl/AttributeIds.h>
 #include <lib/support/TypeTraits.h>
 
 using namespace chip;
@@ -262,7 +261,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("Auto Turn Off has been triggered!");
 
-    light->InitiateAction(actor, OFF_ACTION, nullptr);
+    light->InitiateAction(actor, OFF_ACTION, nullptr); // nullptr: no additional data needed for OFF_ACTION
 }
 
 void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
@@ -280,7 +279,7 @@ void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("OffEffect completed");
 
-    light->InitiateAction(actor, OFF_ACTION, nullptr);
+    light->InitiateAction(actor, OFF_ACTION, nullptr); // nullptr: no additional data needed for OFF_ACTION
 }
 
 void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)

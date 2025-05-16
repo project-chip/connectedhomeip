@@ -1,23 +1,21 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
 
 #include "RGBLEDWidget.h"
+#include <algorithm>
 #include <math.h>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -82,9 +80,6 @@ void RGBLEDWidget::SetColorFromCT(uint16_t ctMireds)
     SetColor(rgb.r, rgb.g, rgb.b);
 }
 
-// define a clamp macro to substitute the std::clamp macro which is available from C++17 onwards
-#define clamp(a, min, max) ((a) < (min) ? (min) : ((a) > (max) ? (max) : (a)))
-
 // Constant values
 constexpr float kMaxChromaticity    = 65535.0f;
 constexpr float kMaxBrightnessLevel = 254.0f;
@@ -99,9 +94,9 @@ constexpr uint8_t kMaxColorValue    = 255;
 // to the specified range given as min and max
 RgbColor_t RGBLEDWidget::RgbClamp(RgbColor_t rgb, uint8_t min, uint8_t max)
 {
-    rgb.r = static_cast<uint8_t>(clamp(rgb.r, min, max));
-    rgb.g = static_cast<uint8_t>(clamp(rgb.g, min, max));
-    rgb.b = static_cast<uint8_t>(clamp(rgb.b, min, max));
+    rgb.r = static_cast<uint8_t>(std::clamp(rgb.r, min, max));
+    rgb.g = static_cast<uint8_t>(std::clamp(rgb.g, min, max));
+    rgb.b = static_cast<uint8_t>(std::clamp(rgb.b, min, max));
     return rgb;
 }
 
