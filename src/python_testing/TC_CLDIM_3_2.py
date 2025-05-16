@@ -59,6 +59,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             TestStep("2b", "If MotionLatching feature is not supported, skip remaining steps"),
             TestStep("2c", "Read AttributeList attribute"),
             TestStep("2d", "Read LimitRange attribute"),
+            TestStep("2e", "Read LatchControlModes attribute"),
             TestStep("3a", "If manual latching is required, skip steps 3b and 3c"),
             TestStep("3b", "Send SetTarget command with Latch=True"),
             TestStep("3c", "Manually latch the device"),
@@ -69,10 +70,12 @@ class TC_CLDIM_3_2(MatterBaseTest):
             TestStep(5, "Verify CurrentState attribute is updated"),
             TestStep("6a", "Send Step command while device is latched"),
             TestStep("6b", "Send SetTarget command while device is latched"),
-            TestStep("7a", "Send SetTarget command with Latch=False"),
-            TestStep("7b", "Verify Target attribute is updated"),
-            TestStep("7c", "Wait for PIXIT.CLDIM.LatchingDuration seconds"),
-            TestStep("7d", "Verify CurrentState attribute is updated"),
+            TestStep("7a", "If manual latching is required, unlatch device manually"),
+            TestStep("7b", "If manual latching is required, skip steps 7c to 7e"),
+            TestStep("7c", "Send SetTarget command with Latch=False"),
+            TestStep("7d", "Verify Target attribute is updated"),
+            TestStep("7e", "Wait for PIXIT.CLDIM.LatchingDuration seconds"),
+            TestStep("7f", "Verify CurrentState attribute is updated"),
         ]
         return steps
 
@@ -129,9 +132,15 @@ class TC_CLDIM_3_2(MatterBaseTest):
             min_position = limit_range.min
             max_position = limit_range.max
 
+        # STEP 2e: Read LatchControlModes attribute
+        self.step("2e")
+        latch_control_modes = 0b0  # Default value as a bitmap
+        if attributes.LatchControlModes.attribute_id in attribute_list:
+            latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+
         # STEP 3a: If manual latching is required, skip steps 3b and 3c
         self.step("3a")
-        if self.check_pics("CLDIM.S.M.ManualLatching"):
+        if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
             logging.info("Manual latching is required. Skipping steps 3b and 3c.")
             self.skip_step("3b")
             self.skip_step("3c")
@@ -153,7 +162,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 4a: If manual latching is not required, skip steps 4b to 4d
         self.step("4a")
-        if not self.check_pics("CLDIM.S.M.ManualLatching"):
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
             self.skip("4b")
             self.skip("4c")
             self.skip("4d")
@@ -221,31 +230,48 @@ class TC_CLDIM_3_2(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
 
-        # STEP 7a: Send SetTarget command with Latch=False
+        # STEP 7a: If manual latching is required, unlatch device manually
         self.step("7a")
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
+            test_step = "Manual unlatch the device"
+            self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
+        else:
+            logging.info("Manual latching is not required. Skipping step.")
+
+        # STEP 7b: If manual latching is not required, skip steps 7c to 7e
+        self.step("7b")
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
+            logging.info("Manual latching is not required. Skipping steps 7c to 7e.")
+            self.skip_step("7c")
+            self.skip_step("7d")
+            self.skip_step("7e")
+            return
+
+        # STEP 7c: Send SetTarget command with Latch=False
+        self.step("7c")
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
                 endpoint=endpoint
             )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            asserts.assert_equal(e.status, Status.Success, "Unexpected status returned")
 
-        # STEP 7b: Verify Target attribute is updated
-        self.step("7b")
+        # STEP 7d: Verify Target attribute is updated
+        self.step("7d")
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
 
             asserts.assert_equal(target.latch, False, "Target Latch is not False")
         else:
-            logging.info("Target attribute is not supported. Skipping step 6b.")
+            logging.info("Target attribute is not supported. Skipping step 7d.")
 
-        # STEP 7c: Wait for PIXIT.CLDIM.LatchingDuration seconds
-        self.step("7c")
+        # STEP 7e: Wait for PIXIT.CLDIM.LatchingDuration seconds
+        self.step("7e")
         time.sleep(latching_duration)
 
-        # STEP 7d: Verify CurrentState attribute is updated
-        self.step("7d")
+        # STEP 7f: Verify CurrentState attribute is updated
+        self.step("7f")
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
