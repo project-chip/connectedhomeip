@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 NXP
+ *    Copyright (c) 2024-2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@
 
 #if CONFIG_CHIP_CRYPTO_PSA
 #define MBEDTLS_PSA_CRYPTO_DRIVERS
-#define MBEDTLS_PSA_KEY_SLOT_COUNT 64
 #endif /* CONFIG_CHIP_CRYPTO_PSA */
 
 #if CONFIG_MCUX_ELS_PKC
