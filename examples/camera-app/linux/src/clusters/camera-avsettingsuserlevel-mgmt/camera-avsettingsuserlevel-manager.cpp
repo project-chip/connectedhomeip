@@ -28,9 +28,9 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using chip::Protocols::InteractionModel::Status;
 
-void CameraAVSettingsUserLevelManager::SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDeviceHAL)
+void CameraAVSettingsUserLevelManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
 {
-    mCameraDeviceHAL = aCameraDeviceHAL;
+    mCameraDevice = aCameraDevice;
 }
 
 bool CameraAVSettingsUserLevelManager::CanChangeMPTZ()
@@ -45,7 +45,7 @@ bool CameraAVSettingsUserLevelManager::IsValidVideoStreamID(uint16_t aVideoStrea
     // The server needs to verify that the provided Video Stream ID is valid and known and subject to digital modification
     // The camera app needs to also have an instance of AV Stream Management, querying that to determine validity of the provided
     // id.
-    for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
+    for (VideoStream & stream : mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == aVideoStreamID && stream.isAllocated)
         {
@@ -64,17 +64,17 @@ Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan,
     //
     if (aPan.HasValue())
     {
-        mCameraDeviceHAL->SetPan(aPan.Value());
+        mCameraDevice->GetCameraHALInterface().SetPan(aPan.Value());
     }
 
     if (aTilt.HasValue())
     {
-        mCameraDeviceHAL->SetTilt(aTilt.Value());
+        mCameraDevice->GetCameraHALInterface().SetTilt(aTilt.Value());
     }
 
     if (aZoom.HasValue())
     {
-        mCameraDeviceHAL->SetZoom(aZoom.Value());
+        mCameraDevice->GetCameraHALInterface().SetZoom(aZoom.Value());
     }
 
     return Status::Success;
@@ -88,17 +88,17 @@ Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan
     //
     if (aPan.HasValue())
     {
-        mCameraDeviceHAL->SetPan(aPan.Value());
+        mCameraDevice->GetCameraHALInterface().SetPan(aPan.Value());
     }
 
     if (aTilt.HasValue())
     {
-        mCameraDeviceHAL->SetTilt(aTilt.Value());
+        mCameraDevice->GetCameraHALInterface().SetTilt(aTilt.Value());
     }
 
     if (aZoom.HasValue())
     {
-        mCameraDeviceHAL->SetZoom(aZoom.Value());
+        mCameraDevice->GetCameraHALInterface().SetZoom(aZoom.Value());
     }
 
     return Status::Success;
@@ -112,17 +112,17 @@ Status CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optio
     //
     if (aPan.HasValue())
     {
-        mCameraDeviceHAL->SetPan(aPan.Value());
+        mCameraDevice->GetCameraHALInterface().SetPan(aPan.Value());
     }
 
     if (aTilt.HasValue())
     {
-        mCameraDeviceHAL->SetTilt(aTilt.Value());
+        mCameraDevice->GetCameraHALInterface().SetTilt(aTilt.Value());
     }
 
     if (aZoom.HasValue())
     {
-        mCameraDeviceHAL->SetZoom(aZoom.Value());
+        mCameraDevice->GetCameraHALInterface().SetZoom(aZoom.Value());
     }
 
     return Status::Success;
@@ -150,7 +150,7 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
     // The application needs to interact with iHAL to access the stream, validate the viewport
     // and set the new viewport value.
     //
-    for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
+    for (VideoStream & stream : mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == aVideoStreamID && stream.isAllocated)
         {
@@ -162,8 +162,8 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
             //
             uint16_t requestedWidth             = aViewport.x2 - aViewport.x1;
             uint16_t requestedHeight            = aViewport.y2 - aViewport.y1;
-            VideoResolutionStruct minResolution = mCameraDeviceHAL->GetMinViewport();
-            VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetVideoSensorParams();
+            VideoResolutionStruct minResolution = mCameraDevice->GetCameraHALInterface().GetMinViewport();
+            VideoSensorParamsStruct sensorParms = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
             if ((requestedWidth < minResolution.width) || (requestedHeight < minResolution.height) ||
                 (requestedWidth > sensorParms.sensorWidth) || (requestedHeight > sensorParms.sensorHeight))
             {
@@ -186,7 +186,7 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
                 ChipLogError(Camera, "CameraApp: DPTZSetViewport with mismatching aspect ratio.");
                 return Status::ConstraintError;
             }
-            mCameraDeviceHAL->SetViewport(stream, aViewport);
+            mCameraDevice->GetCameraHALInterface().SetViewport(stream, aViewport);
             return Status::Success;
         }
     }
@@ -202,13 +202,13 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
     // and set the new values for the viewpoort based on the pixel movement requested
     //
-    for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
+    for (VideoStream & stream : mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == aVideoStreamID && stream.isAllocated)
         {
             ViewportStruct viewport             = stream.viewport;
-            VideoResolutionStruct minResolution = mCameraDeviceHAL->GetMinViewport();
-            VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetVideoSensorParams();
+            VideoResolutionStruct minResolution = mCameraDevice->GetCameraHALInterface().GetMinViewport();
+            VideoSensorParamsStruct sensorParms = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
 
             if (aDeltaX.HasValue())
             {
@@ -294,7 +294,7 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 viewport.x2 = sensorParms.sensorWidth - 1;
                 viewport.y2 = sensorParms.sensorHeight - 1;
             }
-            mCameraDeviceHAL->SetViewport(stream, viewport);
+            mCameraDevice->GetCameraHALInterface().SetViewport(stream, viewport);
             return Status::Success;
         }
     }

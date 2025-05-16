@@ -61,12 +61,10 @@ CameraDevice::CameraDevice()
 
     // Set the CameraHALInterface in CameraAVStreamManager and CameraAVsettingsUserLevelManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
-    mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
+    mCameraAVSettingsUserLevelManager.SetCameraDevice(this);
 
     // Provider manager uses the Media controller to register WebRTC Transport with media controller for AV source data
     mWebRTCProviderManager.SetMediaController(&mMediaController);
-
-    mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
 }
 
 CameraDevice::~CameraDevice()

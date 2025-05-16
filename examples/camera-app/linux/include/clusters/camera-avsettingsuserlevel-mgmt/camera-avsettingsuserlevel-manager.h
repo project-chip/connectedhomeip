@@ -58,10 +58,10 @@ public:
     Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                          Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta) override;
 
-    void SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDevice);
+    void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
 
 private:
-    CameraDeviceInterface::CameraHALInterface * mCameraDeviceHAL = nullptr;
+    CameraDeviceInterface * mCameraDevice = nullptr;
 };
 
 } // namespace CameraAvSettingsUserLevelManagement
