@@ -138,9 +138,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, viewport);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
