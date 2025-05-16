@@ -481,7 +481,7 @@ inline CHIP_ERROR ConnectivityManager::WiFiPAFShutdown(uint32_t id, WiFiPAF::WiF
     return static_cast<ImplClass *>(this)->_WiFiPAFShutdown(id, role);
 }
 
-inline bool ConnectivityManager::WiFiPAFResourceAvailable(void)
+inline bool ConnectivityManager::WiFiPAFResourceAvailable()
 {
     return static_cast<ImplClass *>(this)->_WiFiPAFResourceAvailable();
 }
