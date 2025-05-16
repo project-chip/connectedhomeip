@@ -63,6 +63,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             TestStep(11, "Read RotationAxis attribute, if supported"),
             TestStep(12, "Read Overflow attribute, if supported"),
             TestStep(13, "Read ModulationType attribute, if supported"),
+            TestStep(14, "Read LatchControlModes attribute, if supported"),
         ]
         return steps
 
@@ -211,6 +212,14 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if attributes.ModulationType.attribute_id in attribute_list:
             modulation_type = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.ModulationType)
             asserts.assert_true(0 <= modulation_type <= 4, "ModulationType is not in the expected range")
+        else:
+            logging.info("Test step skipped")
+
+        # STEP 14: Read LatchControlModes attribute
+        self.step(14)
+        if attributes.LatchControlModes.attribute_id in attribute_list:
+            latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+            asserts.assert_true(0 <= latch_control_modes <= 3, "LatchControlModes is not in the expected range")
         else:
             logging.info("Test step skipped")
 

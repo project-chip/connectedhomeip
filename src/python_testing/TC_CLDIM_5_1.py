@@ -57,7 +57,8 @@ class TC_CLDIM_5_1(MatterBaseTest):
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Read AttributeList attribute"),
             TestStep("2c", "Read LimitRange attribute"),
-            TestStep("2d", "Setup subscription to CurrentState attribute"),
+            TestStep("2d", "Read LacthControlModes attribute"),
+            TestStep("2e", "Setup subscription to CurrentState attribute"),
             TestStep("3a", "If Positioning feature is not supported, skip steps 3b to 3f"),
             TestStep("3b", "Read CurrentState attribute and save as ExpectedState"),
             TestStep("3c", "If ExpectedState.Position != MinPosition, send SetTarget command with Position=MinPosition"),
@@ -69,8 +70,9 @@ class TC_CLDIM_5_1(MatterBaseTest):
             TestStep("4c", "If manual latching is required, manually latch the device"),
             TestStep("4d", "If manual latching is not required, send SetTarget command with Latch=True"),
             TestStep("4e", "Wait for CurrentState.Latch to be updated to True"),
-            TestStep("4f", "Send SetTarget command with Latch=False"),
-            TestStep("4g", "Wait for CurrentState.Latch to be updated to False"),
+            TestStep("4f", "If manual unlatching is required, manually unlatch the device"),
+            TestStep("4g", "If manual unlatching is not required, send SetTarget command with Latch=False"),
+            TestStep("4h", "Wait for CurrentState.Latch to be updated to False"),
         ]
         return steps
 
@@ -111,8 +113,14 @@ class TC_CLDIM_5_1(MatterBaseTest):
             min_position = limit_range.min
             max_position = limit_range.max
 
-        # STEP 2d: Setup subscription to CurrentState attribute
+        # STEP 2d: Read LatchControlModes attribute
         self.step("2d")
+        latch_control_modes = 0b0  # Default value as a bitmap
+        if attributes.LatchControlModes.attribute_id in attribute_list:
+            latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+
+        # STEP 2d: Setup subscription to CurrentState attribute
+        self.step("2e")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
         await sub_handler.start(self.default_controller, self.dut.node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
@@ -190,7 +198,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
 
         # STEP 4c: If manual latching is required, manually latch the device
         self.step("4c")
-        if self.check_pics("CLDIM.S.M.ManualLatching"):
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
             test_step = "Manually latch the device"
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
         else:
@@ -198,7 +206,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
 
         # STEP 4d: If manual latching is not required, send SetTarget command with Latch=True
         self.step("4d")
-        if not self.check_pics("CLDIM.S.M.ManualLatching"):
+        if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
@@ -214,20 +222,30 @@ class TC_CLDIM_5_1(MatterBaseTest):
             endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
         sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
 
-        # STEP 4f: Send SetTarget command with Latch=False
+        # STEP 4f: If manual unlatching is required, manually unlatch the device
         self.step("4f")
         sub_handler.reset()
 
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
-                endpoint=endpoint
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteUnlatching:
+            test_step = "Manually unlatch the device"
+            self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
+        else:
+            logging.info("Manual unlatching is not required. Skipping step.")
 
-        # STEP 4g: Wait for CurrentState.Latch to be updated to False
+        # STEP 4g: If manual unlatching is not required, send SetTarget command with Latch=False
         self.step("4g")
+
+        if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteUnlatching:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
+        # STEP 4h: Wait for CurrentState.Latch to be updated to False
+        self.step("4h")
         expected_state.latch = False
         expected_final_value = [AttributeValue(
             endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
