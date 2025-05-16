@@ -1888,6 +1888,7 @@ endpoint 1 {
 
   server cluster LevelControl {
     ram      attribute currentLevel;
+    ram      attribute minLevel default = 0x01;
     ram      attribute options default = 0x00;
     ram      attribute onLevel;
     callback attribute generatedCommandList;
