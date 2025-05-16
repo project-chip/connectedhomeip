@@ -3926,6 +3926,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         // we should use a counter internally.
         std::lock_guard lock(self->_lock);
         self.diagnosticLogTransferInProgress = YES;
+        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     }
 
     mtr_weakify(self);
@@ -3938,6 +3939,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                            {
                                std::lock_guard lock(self->_lock);
                                self.diagnosticLogTransferInProgress = NO;
+                               [self _notifyDelegateOfPrivateInternalPropertiesChanges];
                            }
                            MTR_LOG("%@ downloadLogOfType %lu completed: %@", self, static_cast<unsigned long>(type), error);
                            completion(url, error);
