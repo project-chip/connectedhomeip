@@ -120,7 +120,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-#if defined(CONFIG_NET_L2_OPENTHREAD)
+#if defined(CONFIG_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {

@@ -70,7 +70,7 @@ config HEAP_MEM_POOL_IGNORE_MIN
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
     default 10240 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
-    default 8192 if NET_L2_OPENTHREAD
+    default 8192 if OPENTHREAD
 
 config MPSL_WORK_STACK_SIZE
     default 2048 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
@@ -88,6 +88,8 @@ config ZMS_LOOKUP_CACHE_SIZE
 # ==============================================================================
 # Zephyr networking configuration
 # ==============================================================================
+
+if NETWORKING
 
 config NET_IPV6_MLD
     default y
@@ -119,6 +121,8 @@ config NET_BUF_TX_COUNT
 
 config NET_SOCKETS_POLL_MAX
     default 6 if CHIP_WIFI
+
+endif # NETWORKING
 
 # ==============================================================================
 # Bluetooth Low Energy configuration
@@ -245,7 +249,7 @@ config NRF_WIFI_FW_PATCH_DFU
     default y if NRF_WIFI_PATCHES_EXT_FLASH_STORE
 
 # ==============================================================================
-# OpenThread configuration
+# OpenThread L2 configuration
 # ==============================================================================
 
 config NET_L2_OPENTHREAD
@@ -257,6 +261,17 @@ if NET_L2_OPENTHREAD
 config IEEE802154_NRF5_RX_STACK_SIZE
     default 1024
 
+endif # NET_L2_OPENTHREAD
+
+# ==============================================================================
+# OpenThread configuration
+# ==============================================================================
+
+config OPENTHREAD
+    default y if !WIFI_NRF70
+
+if OPENTHREAD
+
 config OPENTHREAD_THREAD_STACK_SIZE
     default 6144 if (PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON) || PSA_CRYPTO_DRIVER_CRACEN
     default 4096
@@ -266,7 +281,7 @@ config OPENTHREAD_DEFAULT_TX_POWER
     default 3 if SOC_SERIES_NRF53X
     default 8 if SOC_SERIES_NRF52X || SOC_SERIES_NRF54LX
 
-endif # NET_L2_OPENTHREAD
+endif # OPENTHREAD
 
 # ==============================================================================
 # ICD configuration

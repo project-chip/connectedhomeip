@@ -152,7 +152,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-#if defined(CONFIG_NET_L2_OPENTHREAD)
+#if defined(CONFIG_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -176,7 +176,7 @@ CHIP_ERROR AppTask::Init()
     TEMPORARY_RETURN_IGNORED sWiFiCommissioningInstance.Init();
 #else
     return CHIP_ERROR_INTERNAL;
-#endif // CONFIG_NET_L2_OPENTHREAD
+#endif // CONFIG_OPENTHREAD
 
     // Initialize LEDs
     LEDWidget::InitGpio();
@@ -585,7 +585,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
         break;
-#if defined(CONFIG_NET_L2_OPENTHREAD)
+#if defined(CONFIG_OPENTHREAD)
     case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
         InitBasicOTARequestor();
