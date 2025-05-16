@@ -1121,7 +1121,9 @@ TEST_F(TestWriteChunking, TestTransactionalList)
 
     for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
     {
-        const char * encodingMethodName = (encodingMethod == EncodingMethod::Standard ? "StandardEncoding" : "PreencodedTLV");
+        // For builds without ChipLogProgress, encodingMethodName will be ununsed and trigger build failures
+        [[maybe_unused]] const char * encodingMethodName =
+            (encodingMethod == EncodingMethod::Standard ? "StandardEncoding" : "PreencodedTLV");
 
         // Test 1: we should receive transaction notifications
         ChipLogProgress(Zcl, "Test 1 [%s]: we should receive transaction notifications", encodingMethodName);
@@ -1375,7 +1377,9 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
 
     for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
     {
-        const char * encodingMethodName = (encodingMethod == EncodingMethod::Standard ? "StandardEncoding" : "PreencodedTLV");
+        // For builds without ChipLogProgress, encodingMethodName will be ununsed and trigger build failures
+        [[maybe_unused]] const char * encodingMethodName =
+            (encodingMethod == EncodingMethod::Standard ? "StandardEncoding" : "PreencodedTLV");
 
         // Test 1: we should receive transaction notifications
         ChipLogProgress(Zcl, "Test 1 [%s]: we should receive transaction notifications", encodingMethodName);
