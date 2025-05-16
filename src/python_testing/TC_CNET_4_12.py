@@ -34,9 +34,11 @@ class TC_CNET_4_12(MatterBaseTest):
     This test verifies the DUT connectivity to the Thread network using the ConnectNetwork Command, 
     including validation for two Thread operational datasets.
 
+    Requires the following arguments:
+    - --endpoint: Required endpoint for the Thread network.
+    - --thread-dataset-hex: First operational dataset for the Thread network.
+
     Requires the following PIXITs:
-    - PIXIT.CNET.ENDPOINT_THREAD: Required endpoint for the Thread network.
-    - PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET: First operational dataset for the Thread network.
     - PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET: Second operational dataset for the Thread network.
 
     If any of the above PIXITs are missing, the test will raise an error.
@@ -166,7 +168,7 @@ class TC_CNET_4_12(MatterBaseTest):
 
         thread_network_id_bytes_th1 = await self.validate_thread_dataset(thread_dataset_1_bytes, "THREAD_1ST_OPERATIONALDATASET")
         thread_network_id_bytes_th2 = await self.validate_thread_dataset(thread_dataset_2_bytes, "THREAD_2ND_OPERATIONALDATASET")
-        logger.info('Precondition 2: NetworkID : '
+        logger.info('Precondition: NetworkID : '
                     f'NetworkID_THREAD_1ST_OPERATIONALDATASET = {thread_network_id_bytes_th1}, '
                     f'NetworkID_THREAD_2ND_OPERATIONALDATASET = {thread_network_id_bytes_th2}')
 
