@@ -46,6 +46,7 @@ cluster_to_pics_dict = {
     "Thermostat": "Thermostat Cluster",
     "Boolean State": "Boolean State Cluster",
     "AccessControl": "Access Control Cluster",
+    "Energy EVSE": "Energy EVSE Cluster",
 }
 
 
