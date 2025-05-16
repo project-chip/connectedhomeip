@@ -338,7 +338,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
 
     for (const auto & candidate : candidates)
     {
-        // ChipLogProgress(Camera, "Applying candidate: %s", candidate.candidate);
+        ChipLogProgress(Camera, "Applying candidate: %s", std::string(candidate.candidate.begin(), candidate.candidate.end()).c_str());
         if (candidate.SDPMid.IsNull())
         {
             mPeerConnection->addRemoteCandidate(
