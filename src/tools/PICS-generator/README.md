@@ -118,5 +118,5 @@ To run the XMLPICSValidator, the following command can be used:
 python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder> --dm-xml <pathToDmScrapeFolder>
 ```
 
-NOTE: The --dm-xml is required for this script, since it does not run agains a
+NOTE: The --dm-xml is required for this script, since it does not run against a
 specific device.
