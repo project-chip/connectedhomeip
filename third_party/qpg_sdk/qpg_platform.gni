@@ -18,7 +18,6 @@ import("${chip_root}/src/crypto/crypto.gni")
 declare_args() {
   # QPG chip
   qpg_target_ic = "unset"
-  qpg_flavour = ""
   mbedtls_alt_enabled = true
 }
 
