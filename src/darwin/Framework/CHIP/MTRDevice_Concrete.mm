@@ -627,6 +627,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceCachePrimed, @(_deviceCachePrimed), properties);
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedStartTime, _estimatedStartTime, properties);
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedSubscriptionLatency, _estimatedSubscriptionLatency, properties);
+        MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress, @(_diagnosticLogTransferInProgress), properties);
     }
 
     return properties;
@@ -3920,10 +3921,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     auto * baseDevice = [self newBaseDevice];
 
-    os_unfair_lock_lock(&self->_lock);
-    // per Matter spec, only one BDX transfer is allowed at a time.
-    self.diagnosticLogTransferInProgress = YES;
-    os_unfair_lock_unlock(&self->_lock);
+    {
+        // assumption:  only one BDX transfer will be in progress at a time,
+        // so we can use just a BOOL for this status.  if more than one is possible,
+        // we should use a counter internally.
+        std::lock_guard lock(self->_lock);
+        self.diagnosticLogTransferInProgress = YES;
+        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+    }
 
     mtr_weakify(self);
 
@@ -3932,9 +3937,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             queue:queue
                        completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
                            mtr_strongify(self);
-                           os_unfair_lock_lock(&self->_lock);
-                           self.diagnosticLogTransferInProgress = NO;
-                           os_unfair_lock_unlock(&self->_lock);
+                           {
+                               std::lock_guard lock(self->_lock);
+                               self.diagnosticLogTransferInProgress = NO;
+                               [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+                           }
                            MTR_LOG("%@ downloadLogOfType %lu completed: %@", self, static_cast<unsigned long>(type), error);
                            completion(url, error);
                        }];
