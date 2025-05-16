@@ -592,15 +592,47 @@ class TC_TSTAT_2_2(MatterBaseTest):
         # Test Harness Reads MinSetpointDeadBand attribute from Server DUT and verifies that the value is within range
         if self.pics_guard(hasAutoModeFeature):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
-            asserts.assert_less_equal(val, 25)
+            asserts.assert_less_equal(val, 127)
+            asserts.assert_greater_equal(val, 0)
 
             if self.pics_guard(self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
-                # Test Harness Writes a value back that is different but valid for MinSetpointDeadBand attribute
-                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(5), endpoint_id=endpoint)
+                def get_valid_min_setpoint_deadband_value(orgval):
+                    # prepare latest value for comparison
+                    TempOccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedCoolingSetpoint)
+                    TempOccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint)
+                    TempUnoccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedCoolingSetpoint)
+                    TempUnoccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedHeatingSetpoint)
 
-                # Test Harness Reads it back again to confirm the successful write of MinSetpointDeadBand attribute
-                val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
-                asserts.assert_equal(val, 5)
+                    # modify original value
+                    if orgval <= 5:
+                        newval = 100
+                    else:
+                        newval = orgval - 5
+                    newval *= 10    # convert to 0.01C
+
+                    # check if newval is valid
+                    # note 1, values already restored to default
+                    newval = min(newval, (AbsMinCoolSetpointLimitValue - AbsMinHeatSetpointLimitValue))
+                    # note 2, values already restored to default
+                    newval = min(newval, (AbsMaxCoolSetpointLimitValue - AbsMaxHeatSetpointLimitValue))
+                    # note 3, values already restored to default
+                    newval = min(newval, (MinCoolSetpointLimitValue - MinHeatSetpointLimitValue))
+                    # note 4, values already restored to default
+                    newval = min(newval, (MaxCoolSetpointLimitValue - MaxHeatSetpointLimitValue))
+                    newval = min(newval, (TempOccupiedCoolingSetpointValue - TempOccupiedHeatingSetpointValue))  # note 5
+                    newval = min(newval, (TempUnoccupiedCoolingSetpointValue - TempUnoccupiedHeatingSetpointValue))  # note 6
+                    newval = max(0, newval)  # cannot be negative
+                    asserts.assert_not_equal(newval, orgval)    # valid value different from original value cannot be found
+
+                    return (newval / 10)    # convert to 0.1C
+
+                validval = get_valid_min_setpoint_deadband_value(val)
+                # Test Harness Writes a value back that is different but valid for MinSetpointDeadBand attribute
+                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(validval), endpoint_id=endpoint)
+
+                # Test Harness Reads it back again to confirm the write of MinSetpointDeadBand attribute is discarded
+                newval = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+                asserts.assert_equal(val, newval)
 
         self.step("11b")
 
@@ -610,17 +642,27 @@ class TC_TSTAT_2_2(MatterBaseTest):
             asserts.assert_equal(status, Status.ConstraintError)
 
             # Test Harness Writes the value above MinSetpointDeadBand
-            status = await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(30), endpoint_id=endpoint, expect_success=False)
+            status = await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(128), endpoint_id=endpoint, expect_success=False)
             asserts.assert_equal(status, Status.ConstraintError)
 
         self.step("11c")
 
         if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
+            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+
             # Test Harness Writes the min limit of MinSetpointDeadBand
             await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(0), endpoint_id=endpoint)
 
+            # Test Harness Reads it back again to confirm the write of MinSetpointDeadBand attribute is discarded
+            newval = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+            asserts.assert_equal(val, newval)
+
             # Test Harness Writes the max limit of MinSetpointDeadBand
-            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(25), endpoint_id=endpoint)
+            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(127), endpoint_id=endpoint)
+
+            # Test Harness Reads it back again to confirm the write of MinSetpointDeadBand attribute is discarded
+            newval = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+            asserts.assert_equal(val, newval)
 
         self.step("12")
 
