@@ -44,7 +44,7 @@ from mobly import asserts
 
 class TC_CLDIM_4_2(MatterBaseTest):
     def desc_TC_CLDIM_4_2(self) -> str:
-        return "[TC-CLDIM-4.2] {C_STEP} Command Input Sanity Check with DUT as Server"
+        return "[TC-CLDIM-4.2] Step Command Input Sanity Check with DUT as Server"
 
     def steps_TC_CLDIM_4_2(self) -> list[TestStep]:
         steps = [

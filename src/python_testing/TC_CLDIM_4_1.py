@@ -51,7 +51,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_CLDIM_4_1(self) -> str:
-        return "[TC-CLDIM-4.1] {C_STEP} Command Primary Functionality with DUT as Server"
+        return "[TC-CLDIM-4.1] Step Command Primary Functionality with DUT as Server"
 
     def steps_TC_CLDIM_4_1(self) -> list[TestStep]:
         steps = [
