@@ -950,8 +950,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 logging.info(f'{start_tag}{line}')
             logging.info(f'{start_tag}END ====')
 
-        #log_structured_data('==== json: ', json_str)
-        #log_structured_data('==== txt: ', txt_str)
+        log_structured_data('==== json: ', json_str)
+        log_structured_data('==== txt: ', txt_str)
 
     @async_test_body
     async def test_TC_DESC_2_1(self):
