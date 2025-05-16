@@ -41,36 +41,29 @@ namespace Clusters {
 namespace PushAvStreamTransport {
 namespace Attributes {
 
-namespace SupportedContainerFormats {
+namespace SupportedFormats {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedContainerFormatsBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedContainerFormatsBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedContainerFormatsBitmap>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::PushAvStreamTransport::Structs::SupportedFormatStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::PushAvStreamTransport::Structs::SupportedFormatStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::PushAvStreamTransport::Structs::SupportedFormatStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedContainerFormats::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedFormats::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SupportedContainerFormats
-namespace SupportedIngestMethods {
-struct TypeInfo
-{
-    using Type             = chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap>;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedIngestMethods::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace SupportedIngestMethods
+} // namespace SupportedFormats
 namespace CurrentConnections {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const uint16_t>;
-    using DecodableType    = chip::app::DataModel::DecodableList<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<uint16_t> &;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::PushAvStreamTransport::Structs::TransportConfigurationStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentConnections::Id; }
@@ -116,10 +109,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::SupportedContainerFormats::TypeInfo::DecodableType supportedContainerFormats =
-            static_cast<chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedContainerFormatsBitmap>>(0);
-        Attributes::SupportedIngestMethods::TypeInfo::DecodableType supportedIngestMethods =
-            static_cast<chip::BitMask<chip::app::Clusters::PushAvStreamTransport::SupportedIngestMethodsBitmap>>(0);
+        Attributes::SupportedFormats::TypeInfo::DecodableType supportedFormats;
         Attributes::CurrentConnections::TypeInfo::DecodableType currentConnections;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;

@@ -92,7 +92,7 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following command:
 
 ```
-sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+sudo apt-get install git gcc g++ pkg-config cmake libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
      python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
      default-jre
@@ -131,7 +131,7 @@ Complete the following steps:
 1. Install some Raspberry Pi specific dependencies:
 
     ```
-    sudo apt-get install pi-bluetooth avahi-utils
+    sudo apt-get install bluez pi-bluetooth avahi-utils
     ```
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
@@ -161,7 +161,7 @@ during the Matter commissioning process.
     ```ini
     [Service]
     ExecStart=
-    ExecStart=/usr/lib/bluetooth/bluetoothd -E -P battery
+    ExecStart=/usr/libexec/bluetooth/bluetoothd -E -P battery
     ```
 
 1. Restart the Bluetooth service by running the following command:

@@ -93,4 +93,4 @@ fi
 
 paths=$(git diff --ignore-submodules --name-only --merge-base "$ref")
 
-echo "$paths" | xargs -n "$MAX_ARGS" bash -c 'restyle-paths "$@"'
+echo "$paths" | xargs -n "$MAX_ARGS" "$BASH" -c 'restyle-paths "$@"' -

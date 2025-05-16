@@ -54,9 +54,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, relativePositionTag);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -90,9 +87,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kLandmarkInfo))
         {
             err = DataModel::Decode(reader, landmarkInfo);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -133,9 +127,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, areaInfo);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -169,9 +160,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kName))
         {
             err = DataModel::Decode(reader, name);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -216,9 +204,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEstimatedTime))
         {
             err = DataModel::Decode(reader, estimatedTime);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

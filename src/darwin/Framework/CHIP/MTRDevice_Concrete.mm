@@ -57,6 +57,7 @@
 #import <platform/PlatformManager.h>
 
 static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
+static NSString * const sHighestObservedEventNumberKey = @"highestObservedEventNumber";
 
 static NSString * const sDeviceMayBeReachableReason = @"SPI client indicated the device may now be reachable";
 
@@ -288,6 +289,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // The highest event number we have observed, if there was one at all.
 @property (nonatomic, readwrite, nullable) NSNumber * highestObservedEventNumber;
 
+// Whether the highestObservedEventNumber value needs persisting to storage.
+@property (nonatomic, readwrite, assign) BOOL highestObservedEventNumberNeedsPersisting;
+
 // receivingReport is true if we are receving a subscription report.  In
 // particular, this will be false if we're just getting an attribute value from
 // a read-through.
@@ -342,6 +346,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Keep track of the last time we received subscription related communication from the device
 @property (nonatomic, nullable) NSDate * lastSubscriptionActiveTime;
 
+@property (nonatomic, readwrite) BOOL diagnosticLogTransferInProgress;
+
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -373,6 +379,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @implementation MTRDevice_Concrete {
 #ifdef DEBUG
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
+    NSUInteger _unitTestEventsReportedSinceLastCheck;
 #endif
 
     // _deviceCachePrimed is true if we have the data that comes from an initial
@@ -460,6 +467,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 //@synthesize lock = _lock;
 //@synthesize persistedClusterData = _persistedClusterData;
 @synthesize lastSubscriptionIPAddress = _lastSubscriptionIPAddress;
+@synthesize diagnosticLogTransferInProgress = _diagnosticLogTransferInProgress;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_Concrete *)controller
 {
@@ -483,6 +491,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _clusterDataToPersist = nil;
         _persistedClusters = [NSMutableSet set];
         _highestObservedEventNumber = nil;
+        _highestObservedEventNumberNeedsPersisting = NO;
         _matterCPPObjectsHolder = [[MTRDeviceMatterCPPObjectsHolder alloc] init];
         _throttlingDeviceBecameActiveCallbacks = NO;
 
@@ -512,9 +521,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
 
+    __block id testDelegate = nil;
 #ifdef DEBUG
     // Save the first delegate for testing
-    __block id testDelegate = nil;
     for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
         testDelegate = delegateInfo.delegate;
         break;
@@ -536,7 +545,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Clear this device from subscription pool and persist cached data to storage as needed.
     std::lock_guard lock(_lock);
-    [self _clearSubscriptionPoolWork];
+    [self _clearSubscriptionPoolWorkWithProvidedDelegate:testDelegate];
     [self _doPersistClusterData];
 }
 
@@ -1062,6 +1071,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
     os_unfair_lock_unlock(&self->_lock);
 
+    BOOL resubscribeScheduled = NO;
+
     if (readClientToResubscribe) {
         if (nodeLikelyReachable) {
             // If we have reason to suspect the node is now reachable, reset the
@@ -1070,7 +1081,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             // here (e.g. still booting up), but should try again reasonably quickly.
             subscriptionCallback->ResetResubscriptionBackoff();
         }
-        readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
+        resubscribeScheduled = readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
     } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing && !self.doingCASEAttemptForDeviceMayBeReachable) || shouldReattemptSubscription) && nodeLikelyReachable) {
         // If we have reason to suspect that the node is now reachable and we haven't established a
         // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
@@ -1095,7 +1106,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // and should be called after the above ReleaseSession call, to avoid churn.
     if (shouldReattemptSubscription) {
         std::lock_guard lock(_lock);
-        [self _reattemptSubscriptionNowIfNeededWithReason:reason];
+        resubscribeScheduled = [self _reattemptSubscriptionNowIfNeededWithReason:reason];
+    }
+
+    // In the case no resubscribe was actually scheduled, remove this device from the subscription pool
+    if (!resubscribeScheduled) {
+        std::lock_guard lock(_lock);
+        [self _clearSubscriptionPoolWork];
     }
 }
 
@@ -1376,15 +1393,28 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_clearSubscriptionPoolWork
 {
+    [self _clearSubscriptionPoolWorkWithProvidedDelegate:nil];
+}
+
+// We provide a delegate to notify if we are doing
+// _clearSubscriptionPoolWorkWithProvidedDelegate after clearing our delegates
+// in dealloc.
+- (void)_clearSubscriptionPoolWorkWithProvidedDelegate:(nullable id)providedDelegate
+{
     os_unfair_lock_assert_owner(&self->_lock);
     MTRAsyncWorkCompletionBlock completion = self->_subscriptionPoolWorkCompletionBlock;
     if (completion) {
 #ifdef DEBUG
-        [self _callDelegatesWithBlock:^(id testDelegate) {
+        auto notificationBlock = ^(id testDelegate) {
             if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionPoolWorkComplete:)]) {
                 [testDelegate unitTestSubscriptionPoolWorkComplete:self];
             }
-        }];
+        };
+        if (providedDelegate != nil) {
+            notificationBlock(providedDelegate);
+        } else {
+            [self _callDelegatesWithBlock:notificationBlock];
+        }
 #endif
         self->_subscriptionPoolWorkCompletionBlock = nil;
         completion(MTRAsyncWorkComplete);
@@ -1412,7 +1442,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
             mtr_strongify(self);
-            VerifyOrReturn(self, MTR_LOG_DEBUG("_scheduleSubscriptionPoolWork readyHandler called with nil MTRDevice"));
+            if (self == nil) {
+                MTR_LOG_DEBUG("_scheduleSubscriptionPoolWork readyHandler called with nil MTRDevice, nothing to do");
+                completion(MTRAsyncWorkComplete);
+                return;
+            }
 
             MTR_LOG("%@ - work item is ready to attempt pooled subscription", self);
             os_unfair_lock_lock(&self->_lock);
@@ -1659,18 +1693,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
-- (void)_reattemptSubscriptionNowIfNeededWithReason:(NSString *)reason
+- (BOOL)_reattemptSubscriptionNowIfNeededWithReason:(NSString *)reason
 {
     assertChipStackLockedByCurrentThread();
 
     os_unfair_lock_assert_owner(&self->_lock);
     if (!self.reattemptingSubscription) {
         [self _clearSubscriptionPoolWork];
-        return;
+        return NO;
     }
 
     MTR_LOG("%@ reattempting subscription with reason %@", self, reason);
     [self _setupSubscriptionWithReason:reason];
+
+    return YES;
 }
 
 - (void)_handleUnsolicitedMessageFromPublisher
@@ -1784,6 +1820,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return _persistedClusterData != nil;
 }
 
+- (BOOL)_haveClusterDataToPersist
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    return _clusterDataToPersist.count > 0 || self.highestObservedEventNumberNeedsPersisting;
+}
+
 // Need an inner method for dealloc to call, so unit test callbacks don't re-capture self.
 //
 // Returns whether persistence actually happened.
@@ -1795,6 +1838,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (![self _dataStoreExists]) {
         MTR_LOG_ERROR("%@ storage behavior: no data store in _persistClusterData!", self);
         return NO;
+    }
+
+    if (self.highestObservedEventNumberNeedsPersisting) {
+        [self _storePersistedDeviceData];
     }
 
     // Nothing to persist
@@ -1864,12 +1911,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     std::lock_guard lock(_lock);
 
     // Nothing to persist
-    if (!_clusterDataToPersist.count) {
+    if (![self _haveClusterDataToPersist]) {
         return;
     }
 
     // This is run with a dispatch_after, and need to check again if this device is reporting excessively
     if ([self _deviceIsReportingExcessively]) {
+        return;
+    }
+
+    // Do not persist partial data in the middle of receiving a report. _handleReportEnd will schedule next persistence
+    if (_receivingReport) {
         return;
     }
 
@@ -1923,7 +1975,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     // Nothing to persist
-    if (!_clusterDataToPersist.count) {
+    if (![self _haveClusterDataToPersist]) {
         MTR_LOG_DEBUG("%@ storage behavior: nothing to persist", self);
         return;
     }
@@ -2072,6 +2124,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _receivingPrimingReport = NO;
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
 
+    [self _commitPendingDataVersions];
     [self _scheduleClusterDataPersistence];
 
     // After the handling of the report, if we detected a device configuration change, notify the delegate
@@ -2420,6 +2473,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             [self.highestObservedEventNumber compare:eventNumber] == NSOrderedAscending) {
             // This is an event we have not seen before.
             self.highestObservedEventNumber = eventNumber;
+            self.highestObservedEventNumberNeedsPersisting = YES;
         } else {
             // We have seen this event already; just filter it out.  But also, we must be getting
             // some sort of priming report if we are getting events we have seen before.
@@ -2562,6 +2616,30 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTR_LOG_DEBUG("%@ _getCachedDataVersions dataVersions count: %lu", self, static_cast<unsigned long>(dataVersions.count));
 
     return dataVersions;
+}
+
+- (void)_commitPendingDataVersionsForClusterPath:(MTRClusterPath *)path
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    MTRDeviceClusterData * clusterData = _clusterDataToPersist[path];
+    if (clusterData.pendingDataVersion) {
+        clusterData.dataVersion = clusterData.pendingDataVersion;
+        clusterData.pendingDataVersion = nil;
+    }
+}
+
+- (void)_commitPendingDataVersions
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (!_clusterDataToPersist) {
+        // nothing to do
+        return;
+    }
+
+    for (MTRClusterPath * path in _clusterDataToPersist) {
+        [self _commitPendingDataVersionsForClusterPath:path];
+    }
 }
 
 - (MTRDeviceDataValueDictionary _Nullable)_cachedAttributeValueForPath:(MTRAttributePath *)path
@@ -2869,6 +2947,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                        // OnAttributeData
                                        [self _handleAttributeReport:value fromSubscription:YES];
 #ifdef DEBUG
+                                       std::lock_guard lock(self->_lock);
                                        self->_unitTestAttributesReportedSinceLastCheck += value.count;
 #endif
                                    });
@@ -2888,6 +2967,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
                                        // OnEventReport
                                        [self _handleEventReport:value];
+#ifdef DEBUG
+                                       std::lock_guard lock(self->_lock);
+                                       self->_unitTestEventsReportedSinceLastCheck += value.count;
+#endif
                                    });
                                },
                                ^(NSError * error) {
@@ -3081,9 +3164,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck
 {
+    std::lock_guard lock(_lock);
+
     NSUInteger attributesReportedSinceLastCheck = _unitTestAttributesReportedSinceLastCheck;
     _unitTestAttributesReportedSinceLastCheck = 0;
     return attributesReportedSinceLastCheck;
+}
+
+- (NSUInteger)unitTestEventsReportedSinceLastCheck
+{
+    std::lock_guard lock(_lock);
+
+    NSUInteger eventsReportedSinceLastCheck = _unitTestEventsReportedSinceLastCheck;
+    _unitTestEventsReportedSinceLastCheck = 0;
+    return eventsReportedSinceLastCheck;
 }
 #endif
 
@@ -3826,12 +3920,21 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     auto * baseDevice = [self newBaseDevice];
 
+    os_unfair_lock_lock(&self->_lock);
+    // per Matter spec, only one BDX transfer is allowed at a time.
+    self.diagnosticLogTransferInProgress = YES;
+    os_unfair_lock_unlock(&self->_lock);
+
     mtr_weakify(self);
+
     [baseDevice downloadLogOfType:type
                           timeout:timeout
                             queue:queue
                        completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
                            mtr_strongify(self);
+                           os_unfair_lock_lock(&self->_lock);
+                           self.diagnosticLogTransferInProgress = NO;
+                           os_unfair_lock_unlock(&self->_lock);
                            MTR_LOG("%@ downloadLogOfType %lu completed: %@", self, static_cast<unsigned long>(type), error);
                            completion(url, error);
                        }];
@@ -3969,14 +4072,20 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    if (dataVersion == nil || clusterPath == nil) {
+        MTR_LOG_ERROR("%@ Attempted to update data version with a nil value. clusterPath: %@, dataVersion: %@", self, clusterPath, dataVersion);
+        return;
+    }
+
     BOOL dataVersionChanged = NO;
     // Update data version used for subscription filtering
     MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
     if (!clusterData) {
-        clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:nil];
+        clusterData = [[MTRDeviceClusterData alloc] init];
+        clusterData.pendingDataVersion = dataVersion;
         dataVersionChanged = YES;
     } else if (![clusterData.dataVersion isEqualToNumber:dataVersion]) {
-        clusterData.dataVersion = dataVersion;
+        clusterData.pendingDataVersion = dataVersion;
         dataVersionChanged = YES;
     }
 
@@ -4412,10 +4521,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     std::lock_guard lock(_lock);
 
-    // For now the only data we care about is our initial subscribe latency.
     id initialSubscribeLatency = data[sLastInitialSubscribeLatencyKey];
     if (initialSubscribeLatency != nil) {
         [self _setLastInitialSubscribeLatency:initialSubscribeLatency];
+    }
+
+    id highestObservedEventNumber = data[sHighestObservedEventNumberKey];
+    if (highestObservedEventNumber != nil && [highestObservedEventNumber isKindOfClass:NSNumber.class]) {
+        self.highestObservedEventNumber = highestObservedEventNumber;
     }
 }
 
@@ -4429,11 +4542,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return;
     }
 
-    // For now the only data we have is our initial subscribe latency.
     NSMutableDictionary<NSString *, id> * data = [NSMutableDictionary dictionary];
     if (_estimatedSubscriptionLatency != nil) {
         data[sLastInitialSubscribeLatencyKey] = _estimatedSubscriptionLatency;
     }
+    if (self.highestObservedEventNumber != nil) {
+        data[sHighestObservedEventNumberKey] = self.highestObservedEventNumber;
+        self.highestObservedEventNumberNeedsPersisting = NO;
+    }
+
+    MTR_LOG_DEBUG("%@ _storePersistedDeviceData: %@", self, data);
 
     [datastore storeDeviceData:[data copy] forNodeID:self.nodeID];
 }

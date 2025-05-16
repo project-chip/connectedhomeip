@@ -27,6 +27,14 @@ config("config") {
     "-Wno-shadow",
   ]
 
+  if (is_clang) {
+    # libdatachannel has a lot of these like:
+    #   ...... libdatachannel/repo/include/rtc/h265nalunit.hpp:40:60: error: implicit conversion loses integer precision: 'int'
+    #   to 'uint8_t' (aka 'unsigned char') [-Werror,-Wimplicit-int-conversion]
+    #   40 |         uint8_t nuhLayerId() const { return ((_first & 0x1) << 5) | ((_second & 0b1111'1000) >> 3); }
+    cflags += [ "-Wno-implicit-int-conversion" ]
+  }
+
   include_dirs = [
     "include",
     "include/clusters/chime",
@@ -64,6 +72,7 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc_provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
     "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
+    "${chip_root}/examples/camera-app/linux/src/webrtc-transport.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

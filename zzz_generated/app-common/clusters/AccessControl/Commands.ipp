@@ -28,6 +28,7 @@ namespace Clusters {
 namespace AccessControl {
 namespace Commands {
 namespace ReviewFabricRestrictions {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -35,7 +36,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -49,15 +50,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arl);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace ReviewFabricRestrictions.
 namespace ReviewFabricRestrictionsResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -78,9 +77,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kToken))
         {
             err = DataModel::Decode(reader, token);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

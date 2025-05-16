@@ -146,10 +146,6 @@
 #include <clusters/ContentLauncher/Commands.ipp>
 #include <clusters/ContentLauncher/Events.ipp>
 #include <clusters/ContentLauncher/Structs.ipp>
-#include <clusters/DemandResponseLoadControl/Attributes.ipp>
-#include <clusters/DemandResponseLoadControl/Commands.ipp>
-#include <clusters/DemandResponseLoadControl/Events.ipp>
-#include <clusters/DemandResponseLoadControl/Structs.ipp>
 #include <clusters/Descriptor/Attributes.ipp>
 #include <clusters/Descriptor/Commands.ipp>
 #include <clusters/Descriptor/Events.ipp>
@@ -262,6 +258,14 @@
 #include <clusters/IlluminanceMeasurement/Commands.ipp>
 #include <clusters/IlluminanceMeasurement/Events.ipp>
 #include <clusters/IlluminanceMeasurement/Structs.ipp>
+#include <clusters/JointFabricAdministrator/Attributes.ipp>
+#include <clusters/JointFabricAdministrator/Commands.ipp>
+#include <clusters/JointFabricAdministrator/Events.ipp>
+#include <clusters/JointFabricAdministrator/Structs.ipp>
+#include <clusters/JointFabricDatastore/Attributes.ipp>
+#include <clusters/JointFabricDatastore/Commands.ipp>
+#include <clusters/JointFabricDatastore/Events.ipp>
+#include <clusters/JointFabricDatastore/Structs.ipp>
 #include <clusters/KeypadInput/Attributes.ipp>
 #include <clusters/KeypadInput/Commands.ipp>
 #include <clusters/KeypadInput/Events.ipp>
@@ -462,6 +466,10 @@
 #include <clusters/SoftwareDiagnostics/Commands.ipp>
 #include <clusters/SoftwareDiagnostics/Events.ipp>
 #include <clusters/SoftwareDiagnostics/Structs.ipp>
+#include <clusters/SoilMeasurement/Attributes.ipp>
+#include <clusters/SoilMeasurement/Commands.ipp>
+#include <clusters/SoilMeasurement/Events.ipp>
+#include <clusters/SoilMeasurement/Structs.ipp>
 #include <clusters/Switch/Attributes.ipp>
 #include <clusters/Switch/Commands.ipp>
 #include <clusters/Switch/Events.ipp>
@@ -1039,13 +1047,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::DemandResponseLoadControl::Id: {
-        switch (aCommand)
-        {
-        default:
-            return false;
-        }
-    }
     case Clusters::Messages::Id: {
         switch (aCommand)
         {
@@ -1309,6 +1310,18 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::PushAvStreamTransport::Id: {
         switch (aCommand)
         {
+        case Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
+            return true;
         default:
             return false;
         }
@@ -1334,6 +1347,20 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::JointFabricDatastore::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::JointFabricAdministrator::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::TlsCertificateManagement::Id: {
         switch (aCommand)
         {
@@ -1341,13 +1368,19 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
             return true;
+        case Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id:
+            return true;
         case Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
             return true;
+        case Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
+            return true;
         case Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
             return true;

@@ -103,7 +103,6 @@ void MatterAlarmsPluginServerInitCallback() {}
 void MatterTimePluginServerInitCallback() {}
 void MatterAclPluginServerInitCallback() {}
 void MatterPollControlPluginServerInitCallback() {}
-void MatterUnitLocalizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}

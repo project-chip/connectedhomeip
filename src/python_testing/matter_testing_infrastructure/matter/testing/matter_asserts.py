@@ -356,3 +356,15 @@ def assert_valid_enum(value: Any, description: str, enum_type: type) -> None:
     """
     asserts.assert_true(isinstance(value, enum_type),
                         f"{description} must be of type {enum_type.__name__}")
+
+# map8 bitmap
+
+
+def assert_valid_map8(value: Any, description: str = "Value") -> None:
+    """
+    Asserts that 'value' is a valid 8-bit bitmap (map8).
+    """
+    asserts.assert_true(isinstance(value, int),
+                        f"{description} must be an integer")
+    asserts.assert_true(0 <= value <= 0xFF,
+                        f"{description} must be between 0 and 255 (inclusive)")

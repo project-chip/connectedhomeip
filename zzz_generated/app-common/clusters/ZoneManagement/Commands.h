@@ -89,6 +89,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::TwoDCartesianZoneStruct::Type zone;
 
@@ -104,8 +105,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::TwoDCartesianZoneStruct::DecodableType zone;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CreateTwoDCartesianZone
@@ -121,6 +124,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
 
@@ -136,8 +140,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CreateTwoDCartesianZoneResponse
@@ -154,6 +160,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
     Structs::TwoDCartesianZoneStruct::Type zone;
@@ -170,9 +177,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UpdateTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
     Structs::TwoDCartesianZoneStruct::DecodableType zone;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateTwoDCartesianZone
@@ -188,6 +197,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<DataModel::Nullable<uint16_t>> zoneID;
 
@@ -203,8 +213,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<DataModel::Nullable<uint16_t>> zoneID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetTwoDCartesianZone
@@ -220,6 +232,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::TwoDCartesianZoneStruct::Type> zones;
 
@@ -235,8 +248,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<Structs::TwoDCartesianZoneStruct::DecodableType> zones;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetTwoDCartesianZoneResponse
@@ -252,6 +267,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
 
@@ -267,8 +283,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveZone
