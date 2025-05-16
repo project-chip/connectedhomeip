@@ -332,7 +332,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
             }
             if (!found)
             {
-                ChipLogError(Controller, "SetUpCodePairer discovered discriminator %u does not match any of our setup payloads",
+                ChipLogError(Controller, "SetUpCodePairer: Discovered discriminator %u does not match any of our setup payloads",
                              longDiscriminator);
                 // Move on to the the next discovered params; nothing we can do here.
                 continue;
