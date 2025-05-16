@@ -80,4 +80,9 @@
     NSLog(@"Node %@ has received network credentials", nodeID);
 }
 
+- (void)controller:(MTRDeviceController *)controller networkRecoverComplete:(NSError *)error nodeID:(NSNumber *)nodeID
+{
+    NSLog(@"Network recover complete, node:%@", nodeID);
+}
+
 @end

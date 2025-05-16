@@ -16,12 +16,20 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "DefaultsUtils.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RootViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface RootViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, MTRCommissionableBrowserDelegate>
 @property (strong, nonatomic) UITableView * tableView;
+@property (nonatomic, strong) UIAlertController *loadingAlert;
 @property (strong, nonatomic) NSArray * options;
+@property (strong, nonatomic) NSMutableArray *deviceList;
+@property (nonatomic) dispatch_queue_t matterQueue;
+@property (readwrite) MTRDeviceController * chipController;
+@property (strong, nonatomic) NSTimer *updateTimer;
+@property (strong, nonatomic) NSTimer *discoverTimer;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -1777,6 +1777,18 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000000B: {
+                "attributeName": "RecoveryIdentifier",
+                "attributeId": 0x0000000B,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x0000000C: {
+                "attributeName": "NetworkRecoveryReason",
+                "attributeId": 0x0000000C,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

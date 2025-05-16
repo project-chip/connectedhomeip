@@ -42,6 +42,9 @@ public:
     // Called when a scan result is available.
     virtual void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBLEDeviceIdentificationInfo & info) {}
 
+    // Called when a scan result for network recovery is available.
+    virtual void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBLENetworkRecoveryInfo & info) {}
+    
     // Called when a scan result is not available anymore.
     virtual void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) {}
 

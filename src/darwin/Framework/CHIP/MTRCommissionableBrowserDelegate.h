@@ -20,6 +20,7 @@
 #import <Matter/MTRDefines.h>
 
 @class MTRCommissionableBrowserResult;
+@class MTRNetworkRecoverableBrowserResult;
 @class MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -30,6 +31,11 @@ MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
  * Tells the delegate the commissionable manager discovered a device while scanning for devices.
  */
 - (void)controller:(MTRDeviceController *)controller didFindCommissionableDevice:(MTRCommissionableBrowserResult *)device;
+
+/**
+ * Tells the delegate the commissionable manager discovered a device while scanning for devices.
+ */
+- (void)controller:(MTRDeviceController *)controller didFindNetworkRecoverableDevice:(MTRNetworkRecoverableBrowserResult *)device;
 
 /**
  * Tells the delegate a previously discovered device is is no longer available.

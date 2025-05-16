@@ -218,6 +218,10 @@ public:
     void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
                  TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                 Transport::PeerAddress & addr,
+                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
+
     /*
      * This function can be called to establish a secure session with the device.
      *

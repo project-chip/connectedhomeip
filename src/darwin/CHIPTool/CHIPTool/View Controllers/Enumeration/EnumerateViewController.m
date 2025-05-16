@@ -88,7 +88,7 @@
 {
     NSLog(@"UpdatingUIResult: %@", result);
     _resultLabel.hidden = NO;
-    _resultLabel.text = result;
+    _resultLabel.text = [NSString stringWithFormat:@"%@\n\n%@",result,_resultLabel.text];
 }
 
 // MARK: UIButton actions

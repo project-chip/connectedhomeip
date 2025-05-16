@@ -34,6 +34,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/server/Dnssd.h>
+#include <controller/AutoNetworkRecover.h>
 #include <controller/CurrentFabricRemover.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/WriteInteraction.h>
@@ -473,7 +474,7 @@ DeviceCommissioner::DeviceCommissioner() :
     mOnDeviceConnectionRetryCallback(OnDeviceConnectionRetryFn, this),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
-    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
+    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this), mNetworkRecover(this)
 {}
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
@@ -533,8 +534,10 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     mSetUpCodePairer.SetSystemLayer(mSystemState->SystemLayer());
+    mNetworkRecover.SetSystemLayer(mSystemState->SystemLayer());
 #if CONFIG_NETWORK_LAYER_BLE
     mSetUpCodePairer.SetBleLayer(mSystemState->BleLayer());
+    mNetworkRecover.SetBleLayer(mSystemState->BleLayer());
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     return CHIP_NO_ERROR;
@@ -3786,6 +3789,21 @@ CHIP_ERROR DeviceController::GetRootPublicKey(Crypto::P256PublicKey & outRootPub
     const auto * fabricTable = GetFabricTable();
     VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return fabricTable->FetchRootPubkey(mFabricIndex, outRootPublicKey);
+}
+
+CHIP_ERROR DeviceCommissioner::DiscoverRecoverableNodes(uint16_t timeout)
+{
+    return mNetworkRecover.Discover(timeout);
+}
+
+CHIP_ERROR DeviceCommissioner::RecoverNode(NodeId remoteId, uint64_t recoveryId, WiFiCredentials wiFiCreds, uint64_t breadcrumb)
+{
+    return mNetworkRecover.Recover(remoteId, recoveryId, wiFiCreds, breadcrumb);
+}
+
+CHIP_ERROR DeviceCommissioner::RecoverNode(NodeId remoteId, uint64_t recoveryId, ByteSpan operationalDataset, uint64_t breadcrumb)
+{
+    return mNetworkRecover.Recover(remoteId, recoveryId, operationalDataset, breadcrumb);
 }
 
 } // namespace Controller

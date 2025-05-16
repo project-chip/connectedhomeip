@@ -43,6 +43,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
+- (void)controller:(MTRDeviceController *)controller didFindNetworkRecoverableDevice:(MTRNetworkRecoverableBrowserResult *)device
+{
+    // TODO:
+}
+
 - (void)controller:(nonnull MTRDeviceController *)controller didRemoveCommissionableDevice:(MTRCommissionableBrowserResult *)device
 {
     __auto_type block = self.onDidRemoveCommissionableDevice;

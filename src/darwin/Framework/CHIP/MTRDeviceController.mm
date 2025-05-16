@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 #import <Matter/MTRCommissionableBrowserResult.h>
+#import <Matter/MTRNetworkRecoverableBrowserResult.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerParameters.h>
 
@@ -731,6 +732,15 @@ using namespace chip::Tracing::DarwinFramework;
     } logString:__PRETTY_FUNCTION__];
 }
 
+- (void)controller:(MTRDeviceController *)controller networkRecoverComplete:(NSError *)error nodeID:(NSNumber *)nodeID
+{
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:networkRecoverComplete:nodeID:)]) {
+            [delegate controller:controller networkRecoverComplete:error nodeID:nodeID];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
 @end
 
 // TODO: This should not be in the superclass: either move to
@@ -892,6 +902,19 @@ using namespace chip::Tracing::DarwinFramework;
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
+{
+    MTR_ABSTRACT_METHOD();
+    if (error) {
+        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+    }
+    return NO;
+}
+- (BOOL)discoverRecoverableNodes:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue timeout:(uint16_t)second
+{
+    MTR_ABSTRACT_METHOD();
+    return NO;
+}
+- (BOOL)recoverDevice:(uint64_t)deviceID recoveryIdentifier:(uint64_t)recoveryIdentifier wifiSSID:(NSString*)ssid wifiCredentials:(NSString*)credentials error:(NSError * __autoreleasing *)error
 {
     MTR_ABSTRACT_METHOD();
     if (error) {

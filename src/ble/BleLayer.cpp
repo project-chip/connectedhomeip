@@ -367,6 +367,24 @@ CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
     return err;
 }
 
+CHIP_ERROR BleLayer::NewBleConnectionByRecoveryIdentifier(uint64_t connRecoveryIdentifier, void * appState,
+                                                          BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
+                                                          BleConnectionDelegate::OnConnectionErrorFunct onError,
+                                                          BleConnectionDelegate::OnDiscoverCompleteFunct onDiscover)
+{
+    VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mConnectionDelegate->OnConnectionComplete = onSuccess;
+    mConnectionDelegate->OnConnectionError    = onError;
+    mConnectionDelegate->OnDiscoverComplete   = onDiscover;
+
+    mConnectionDelegate->NewConnection(this, appState == nullptr ? this : appState, connRecoveryIdentifier);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState,
                                                      BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
                                                      BleConnectionDelegate::OnConnectionErrorFunct onError)

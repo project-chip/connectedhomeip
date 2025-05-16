@@ -61,6 +61,14 @@ namespace TCUpdateDeadline {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TCUpdateDeadline::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kAdminister, std::nullopt);
 } // namespace TCUpdateDeadline
+namespace RecoveryIdentifier {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(RecoveryIdentifier::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kManage, std::nullopt);
+} // namespace RecoveryIdentifier
+namespace NetworkRecoveryReason {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(NetworkRecoveryReason::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kManage, std::nullopt);
+} // namespace NetworkRecoveryReason
 
 } // namespace Attributes
 
