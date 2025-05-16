@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@
 
 extern ex_sss_boot_ctx_t gex_sss_chip_ctx;
 
-/* SE predefined keyid values */
+/* SE predefined keyid values. Let kKeyId_node_op_keyid_start be the last entry */
 enum keyid_values
 {
     kKeyId_NotInitialized           = 0,
@@ -71,8 +71,15 @@ extern int spake_objects_created;
 extern "C" {
 #endif
 
+
 /* Open session to se05x */
 CHIP_ERROR se05x_sessionOpen(void);
+
+/* Close session to se05x */
+CHIP_ERROR se05x_close_session(void);
+
+/* Check if key exists in se05x */
+CHIP_ERROR Se05xCheckObjectExists(uint32_t keyid);
 
 /* Delete key in se05x */
 void se05x_delete_key(uint32_t keyid);
@@ -80,6 +87,16 @@ void se05x_delete_key(uint32_t keyid);
 /* Set key in se05x */
 CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart,
                                    sss_cipher_type_t cipherType);
+
+/* Set certificate in se05x */
+CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t buflen);
+
+/* Set Binary data in se05x */
+CHIP_ERROR se05xSetBinaryData(uint32_t keyId, const uint8_t * buf, size_t buflen);
+
+/* Perform internal sign in se05x (only on SE051H) */
+CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t * sigBuf, size_t * sigBufLen);
+
 
 #if ENABLE_REENTRANCY
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -57,6 +57,10 @@ namespace Crypto {
         0xA1, 0x44, 0x03, 0x42, 0x00,                                                                                              \
     }
 
+
+#define SE05X_MAX_NODE_OP_KEYS 5
+
+
 extern CHIP_ERROR Initialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256KeypairContext * mKeypair);
 extern CHIP_ERROR ECDSA_sign_msg_H(P256KeypairContext * mKeypair, const uint8_t * msg, const size_t msg_length,
                                    P256ECDSASignature & out_signature);
@@ -90,6 +94,7 @@ static CHIP_ERROR parse_se05x_keyid_from_keypair(const P256KeypairContext mKeypa
 
 P256Keypair::~P256Keypair()
 {
+#if (ENABLE_SE05X_GENERATE_EC_KEY || ENABLE_SE05X_ECDSA_VERIFY)
     uint32_t keyid = 0;
     if (CHIP_NO_ERROR != parse_se05x_keyid_from_keypair(mKeypair, &keyid))
     {
@@ -99,12 +104,14 @@ P256Keypair::~P256Keypair()
     {
         // Delete the key in SE
     }
+#endif
 }
 
 CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 {
 #if !ENABLE_SE05X_GENERATE_EC_KEY
-    if (CHIP_NO_ERROR == Initialize_H(this, &mPublicKey, &mKeypair))
+    CHIP_ERROR error = Initialize_H(this, &mPublicKey, &mKeypair);
+    if (CHIP_NO_ERROR == error)
     {
         mInitialized = true;
     }
@@ -120,20 +127,40 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     uint32_t keyid     = 0;
     uint32_t options   = kKeyObject_Mode_Transient;
 
-    ChipLogDetail(Crypto, "se05x::Generate nist256 key using se05x");
-
     if (key_target == ECPKeyTarget::ECDH)
     {
         keyid = kKeyId_case_ephemeral_keyid;
     }
     else
     {
-        // Add the logic to use different keyid
-        keyid   = kKeyId_node_op_keyid_start;
-        options = kKeyObject_Mode_Persistent;
+        size_t i = 0;
+        while(i < SE05X_MAX_NODE_OP_KEYS)
+        {
+            if (Se05xCheckObjectExists(kKeyId_node_op_keyid_start + i) != CHIP_NO_ERROR)
+            {
+                // slot is free to be used
+                keyid   = kKeyId_node_op_keyid_start + i;
+                options = kKeyObject_Mode_Persistent;
+                break;
+            }
+            i++;
+        }
+    }
+
+    if (keyid == 0)
+    {
+        ChipLogDetail(Crypto, "se05x::Generating nist256 key on host (no node operational key id slot found)");
+        CHIP_ERROR error = Initialize_H(this, &mPublicKey, &mKeypair);
+        if (CHIP_NO_ERROR == error)
+        {
+            mInitialized = true;
+        }
+        return error;
     }
 
     VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+    ChipLogDetail(Crypto, "se05x::Generate nist256 key using se05x (at id = %x)", keyid);
 
     status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
@@ -287,7 +314,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     }
     else
     {
-#if !ENABLE_SE05X_KEY_IMPORT
+#if 1 //!ENABLE_SE05X_KEY_IMPORT
         if (CHIP_NO_ERROR == (error = Deserialize_H(this, &mPublicKey, &mKeypair, input)))
         {
             mInitialized = true;
@@ -487,7 +514,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, si
     MutableByteSpan out_der_sig_span(signature_se05x, signature_se05x_len);
 
     VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(hash_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(hash_length == 32, CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogDetail(Crypto, "ECDSA_validate_msg_signature: Using se05x for ECDSA verify (hash) !");
 

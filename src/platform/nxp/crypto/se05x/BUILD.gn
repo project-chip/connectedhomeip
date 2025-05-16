@@ -23,12 +23,8 @@ if (chip_crypto == "platform") {
 }
 
 source_set("public_headers") {
-  sources = [
-    "CHIPCryptoPAL.h",
-    "OperationalKeystore.h",
-  ]
-
   public_deps = [
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -46,6 +42,7 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_rng.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
+    #"${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_spake2p.cpp"
   ]
 
   public_deps = [ ":public_headers" ]

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2022, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
  *      mbedTLS based implementation of CHIP crypto primitives
  */
 
-#include "CHIPCryptoPAL.h"
+#include <crypto/CHIPCryptoPAL.h>
 
 #include <type_traits>
 
@@ -43,6 +43,7 @@
 #include <mbedtls/oid.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
+#include <mbedtls/version.h>
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
@@ -912,7 +913,7 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
         {
             int isCA                 = 0;
             int pathLen              = -1;
-            unsigned char * seqStart = p;
+            unsigned char * seqStart;
 
             VerifyOrExit(extCritical, error = CHIP_ERROR_INTERNAL);
             extBasicPresent = true;
@@ -921,6 +922,7 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
             VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
             if (len > 0)
             {
+                seqStart = p;
                 result = mbedtls_asn1_get_bool(&p, end, &isCA);
                 VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
 
