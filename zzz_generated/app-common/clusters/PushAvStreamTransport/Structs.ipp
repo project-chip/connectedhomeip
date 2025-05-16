@@ -64,9 +64,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, blindDuration);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -100,9 +97,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kSensitivity))
         {
             err = DataModel::Decode(reader, sensitivity);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -153,9 +147,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, maxPreRollLen);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -200,9 +191,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, CENCKeyID);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -236,9 +224,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kCMAFContainerOptions))
         {
             err = DataModel::Decode(reader, CMAFContainerOptions);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -309,9 +294,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, expiryTime);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -351,9 +333,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transportOptions);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -387,9 +366,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kIngestMethod))
         {
             err = DataModel::Decode(reader, ingestMethod);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

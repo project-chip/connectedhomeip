@@ -100,6 +100,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
     chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
@@ -121,6 +122,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
     chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
@@ -129,7 +131,8 @@ public:
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
     Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace SolicitOffer
 namespace SolicitOfferResponse {
@@ -147,6 +150,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SolicitOfferResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     bool deferredOffer       = static_cast<bool>(0);
@@ -165,11 +169,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOfferResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     bool deferredOffer       = static_cast<bool>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SolicitOfferResponse
@@ -193,6 +199,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvideOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
@@ -216,6 +223,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProvideOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
@@ -226,7 +234,8 @@ public:
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
     Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ProvideOffer
 namespace ProvideOfferResponse {
@@ -243,6 +252,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvideOfferResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
@@ -260,10 +270,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProvideOfferResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvideOfferResponse
@@ -280,6 +292,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvideAnswer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     chip::CharSpan sdp;
@@ -296,10 +309,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProvideAnswer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     chip::CharSpan sdp;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ProvideAnswer
 namespace ProvideICECandidates {
@@ -315,6 +330,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     DataModel::List<const chip::CharSpan> ICECandidates;
@@ -331,10 +347,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     DataModel::DecodableList<chip::CharSpan> ICECandidates;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ProvideICECandidates
 namespace EndSession {
@@ -350,6 +368,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EndSession::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID   = static_cast<uint16_t>(0);
     WebRTCEndReasonEnum reason = static_cast<WebRTCEndReasonEnum>(0);
@@ -366,10 +385,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::EndSession::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID   = static_cast<uint16_t>(0);
     WebRTCEndReasonEnum reason = static_cast<WebRTCEndReasonEnum>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace EndSession
 } // namespace Commands

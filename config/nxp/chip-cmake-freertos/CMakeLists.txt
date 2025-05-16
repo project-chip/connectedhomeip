@@ -99,6 +99,10 @@ endif()
 # Enable map file generation by default
 matter_add_gn_arg_bool("chip_generate_link_map_file" true)
 
+matter_add_gn_arg_string("nxp_ar" ${CMAKE_AR})
+matter_add_gn_arg_string("nxp_cc" ${CMAKE_C_COMPILER})
+matter_add_gn_arg_string("nxp_cxx" ${CMAKE_CXX_COMPILER})
+
 matter_common_gn_args(
     DEBUG CONFIG_DEBUG
     LIB_SHELL CONFIG_CHIP_LIB_SHELL

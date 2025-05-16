@@ -617,51 +617,9 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for the units in which values are conveyed in communication to a
-      user. As such, Nodes that visually or audibly convey measurable values to the user need a
-      mechanism by which they can be configured to use a user’s preferred unit. */
-cluster UnitLocalization = 45 {
-  revision 2;
-
-  enum TempUnitEnum : enum8 {
-    kFahrenheit = 0;
-    kCelsius = 1;
-    kKelvin = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kTemperatureUnit = 0x1;
-  }
-
-  attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
-  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CommissioningErrorEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -1884,24 +1842,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 5;
   }
 
-  server cluster LocalizationConfiguration {
-    ram      attribute activeLocale;
-    callback attribute supportedLocales;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster UnitLocalization {
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
@@ -1909,7 +1849,7 @@ endpoint 0 {
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision default = 2;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2136,7 +2076,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;

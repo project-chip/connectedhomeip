@@ -28,6 +28,7 @@ namespace Clusters {
 namespace OperationalCredentials {
 namespace Commands {
 namespace AttestationRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -49,15 +50,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, attestationNonce);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace AttestationRequest.
 namespace AttestationResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -84,15 +83,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, attestationSignature);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace AttestationResponse.
 namespace CertificateChainRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -114,15 +111,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificateType);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace CertificateChainRequest.
 namespace CertificateChainResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -144,15 +139,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificate);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace CertificateChainResponse.
 namespace CSRRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -179,15 +172,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, isForUpdateNOC);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace CSRRequest.
 namespace CSRResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -214,15 +205,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, attestationSignature);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace CSRResponse.
 namespace AddNOC {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -264,15 +253,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, adminVendorId);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddNOC.
 namespace UpdateNOC {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -281,7 +268,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -299,15 +286,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ICACValue);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace UpdateNOC.
 namespace NOCResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -339,15 +324,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, debugText);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace NOCResponse.
 namespace UpdateFabricLabel {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -355,7 +338,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -369,15 +352,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, label);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace UpdateFabricLabel.
 namespace RemoveFabric {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -399,15 +380,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fabricIndex);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveFabric.
 namespace AddTrustedRootCertificate {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -429,15 +408,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, rootCACertificate);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddTrustedRootCertificate.
 namespace SetVIDVerificationStatement {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -447,7 +424,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -469,15 +446,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, vvsc);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetVIDVerificationStatement.
 namespace SignVIDVerificationRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -504,15 +479,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, clientChallenge);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SignVIDVerificationRequest.
 namespace SignVIDVerificationResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -543,9 +516,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kSignature))
         {
             err = DataModel::Decode(reader, signature);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
