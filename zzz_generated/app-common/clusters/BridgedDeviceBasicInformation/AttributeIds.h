@@ -4,8 +4,8 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
+#include <app/common/GlobalIds.h>
 
 namespace chip {
 namespace app {
@@ -80,6 +80,10 @@ namespace ProductAppearance {
 inline constexpr AttributeId Id = 0x00000014;
 } // namespace ProductAppearance
 
+namespace DeviceLocation {
+inline constexpr AttributeId Id = 0x00000017;
+} // namespace DeviceLocation
+
 namespace ConfigurationVersion {
 inline constexpr AttributeId Id = 0x00000018;
 } // namespace ConfigurationVersion
@@ -103,6 +107,7 @@ inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 namespace ClusterRevision {
 inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
+
 
 } // namespace Attributes
 } // namespace BridgedDeviceBasicInformation

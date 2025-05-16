@@ -1208,6 +1208,15 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
 } // namespace UniqueID
 
+namespace DeviceLocation {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type * value); // LocationDescriptorStruct
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type value, MarkAttributeDirty markDirty);
+} // namespace DeviceLocation
+
 namespace ConfigurationVersion {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // int32u
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
