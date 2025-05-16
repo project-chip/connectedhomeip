@@ -115,11 +115,14 @@ class TC_CLDIM_2_1(MatterBaseTest):
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             if target is not NullValue:
                 if is_positioning_supported:
-                    asserts.assert_true(0 <= target.position <= 10000, "Position is not in the expected range")
+                    asserts.assert_true(target.position is NullValue or (0 <= target.position <= 10000),
+                                        "Position is not NullValue or not in the expected range")
                 if is_latching_supported:
-                    asserts.assert_is_instance(target.latch, bool, "Latch is not a boolean")
+                    asserts.assert_true(isinstance(target.latch, bool) or target.latch is NullValue,
+                                        "Latch is not a boolean or NullValue")
                 if is_speed_supported:
-                    asserts.assert_true(0 <= target.speed <= 3, "Speed is not in the expected range")
+                    asserts.assert_true(target.speed is NullValue or (0 <= target.speed <= 3),
+                                        "Speed is not NullValue or in the expected range")
         else:
             logging.info("Test step skipped")
 
