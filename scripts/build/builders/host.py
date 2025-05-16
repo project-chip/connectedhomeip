@@ -91,6 +91,7 @@ class HostApp(Enum):
     TERMS_AND_CONDITIONS = auto()
     CAMERA = auto()
     CAMERA_CONTROLLER = auto()
+    CLOSURE = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -173,6 +174,8 @@ class HostApp(Enum):
             return 'camera-app/linux'
         elif self == HostApp.CAMERA_CONTROLLER:
             return 'camera-controller'
+        elif self == HostApp.CLOSURE:
+            return 'closure-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -303,6 +306,9 @@ class HostApp(Enum):
         elif self == HostApp.CAMERA_CONTROLLER:
             yield 'chip-camera-controller'
             yield 'chip-camera-controller.map'
+        elif self == HostApp.CLOSURE:
+            yield 'closure-app'
+            yield 'closure-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
