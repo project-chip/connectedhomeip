@@ -28,6 +28,7 @@ namespace Clusters {
 namespace Chime {
 namespace Commands {
 namespace PlayChimeSound {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };

@@ -64,9 +64,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, exportedResetSystime);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -115,9 +112,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEndSystime))
         {
             err = DataModel::Decode(reader, endSystime);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

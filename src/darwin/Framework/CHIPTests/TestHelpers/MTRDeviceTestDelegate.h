@@ -24,6 +24,7 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
 @property (nonatomic, nullable) dispatch_block_t onReachable;
 @property (nonatomic, nullable) dispatch_block_t onNotReachable;
+@property (nonatomic, nullable) dispatch_block_t onInternalStateChanged;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
 @property (nonatomic, nullable) dispatch_block_t onReportBegin;
