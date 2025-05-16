@@ -266,9 +266,8 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF(SetupPayload & payload)
     WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
                                             .nodeId        = mRemoteId,
                                             .discriminator = discriminator };
-    ReturnErrorOnFailure(
-        DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
-
+    WiFiPAF::WiFiPAFLayer & pafLayer    = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    ReturnErrorOnFailure(pafLayer.AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
     mWaitingForDiscovery[kWiFiPAFTransport] = true;
     CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
                                                                      OnWiFiPAFSubscribeError);
@@ -276,7 +275,11 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF(SetupPayload & payload)
     {
         ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
         mWaitingForDiscovery[kWiFiPAFTransport] = false;
+        pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo);
+        return err;
     }
+    WiFiPAF::WiFiPAFSession * pSession = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
+    mPAFSessionId                      = pSession->id;
     return err;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -286,8 +289,21 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF(SetupPayload & payload)
 CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
 {
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+    if (mPAFSessionId != WiFiPAF::kUndefinedWiFiPafSessionId)
+    {
+        WiFiPAF::WiFiPAFSession sessionInfo = { .role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber, .id = mPAFSessionId };
+        WiFiPAF::WiFiPAFLayer & pafLayer    = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+        WiFiPAF::WiFiPAFSession * pSession  = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
+        if ((pSession != nullptr) && (pSession->peer_id == WiFiPAF::kUndefinedWiFiPafSessionId))
+        {
+            // Canceling the subscription to discover the commissionee only if commissionee has not be discovered successfully.
+            // publish_id and subscribe_id are required in the follow-up packets
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(mPAFSessionId);
+            mPAFSessionId = WiFiPAF::kUndefinedWiFiPafSessionId;
+        }
+    }
 #endif
     return CHIP_NO_ERROR;
 }
@@ -387,6 +403,11 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
 {
+    if (mWaitingForDiscovery[kWiFiPAFTransport] == false)
+    {
+        // Discovery has stopped or device has been discovered
+        return;
+    }
     ChipLogProgress(Controller, "Discovered device to be commissioned over WiFiPAF, RemoteId: %lu", mRemoteId);
 
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
@@ -398,6 +419,11 @@ void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
 
 void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 {
+    if (mWaitingForDiscovery[kWiFiPAFTransport] == false)
+    {
+        // Discovery has stopped or device has been discovered
+        return;
+    }
     ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 }

@@ -211,21 +211,8 @@ CHIP_ERROR WiFiPAFTP::EncodeStandAloneAck(const PacketBufferHandle & data)
     return CHIP_NO_ERROR;
 }
 
-// Calling convention:
-//   WiFiPAFTP does not retain ownership of reassembled messages, layer above needs to free when done.
-//
-//   WiFiPAFTP does not reset itself on error. Upper layer should free outbound message and inbound reassembly buffers
-//   if there is a problem.
-
-// HandleCharacteristicReceived():
-//
-//   Non-NULL characteristic data arg is always either designated as or appended to the message reassembly buffer,
-//   or freed if it holds a stand-alone ack. In all cases, caller must clear its reference to data arg when this
-//   function returns.
-//
-//   Upper layer must immediately clean up and reinitialize protocol engine if returned err != CHIP_NO_ERROR.
-CHIP_ERROR WiFiPAFTP::HandleCharacteristicReceived(System::PacketBufferHandle && data, SequenceNumber_t & receivedAck,
-                                                   bool & didReceiveAck)
+CHIP_ERROR WiFiPAFTP::HandleFollowUpMsgReceived(System::PacketBufferHandle && data, SequenceNumber_t & receivedAck,
+                                                bool & didReceiveAck)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     BitFlags<HeaderFlags> rx_flags;
@@ -380,7 +367,7 @@ exit:
     {
         mRxState = kState_Error;
         // Dump protocol engine state, plus header flags and received data length.
-        ChipLogError(WiFiPAF, "HandleCharacteristicReceived failed, err = %" CHIP_ERROR_FORMAT ", rx_flags = %u", err.Format(),
+        ChipLogError(WiFiPAF, "HandleFollowUpMsgReceived failed, err = %" CHIP_ERROR_FORMAT ", rx_flags = %u", err.Format(),
                      rx_flags.Raw());
         if (didReceiveAck)
         {
@@ -421,14 +408,14 @@ PacketBufferHandle WiFiPAFTP::TakeRxPacket()
 // Calling convention:
 //   May only be called if data arg is committed for immediate, synchronous subsequent transmission.
 //   Returns false on error. Caller must free data arg on error.
-bool WiFiPAFTP::HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack)
+bool WiFiPAFTP::HandleFollowUpMsgSend(System::PacketBufferHandle data, bool send_ack)
 {
-    uint8_t * characteristic;
+    uint8_t * pPayload;
     mTxCharCount++;
 
     if (send_ack && !HasUnackedData())
     {
-        ChipLogError(Inet, "HandleCharacteristicSend: send_ack true, but nothing to acknowledge.");
+        ChipLogError(WiFiPAF, "HandleFollowUpMsgSend: send_ack true, but nothing to acknowledge.");
         return false;
     }
 
@@ -455,7 +442,7 @@ bool WiFiPAFTP::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         if (!mTxBuf->EnsureReservedSize(header_size))
         {
             // handle error
-            ChipLogError(Inet, "HandleCharacteristicSend: not enough headroom");
+            ChipLogError(WiFiPAF, "HandleFollowUpMsgSend: not enough headroom");
             mTxState = kState_Error;
             mTxBuf   = nullptr; // Avoid double-free after assignment above, as caller frees data on error.
 
@@ -463,22 +450,22 @@ bool WiFiPAFTP::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         }
 
         // prepend header.
-        characteristic = mTxBuf->Start();
-        characteristic -= header_size;
-        mTxBuf->SetStart(characteristic);
+        pPayload = mTxBuf->Start();
+        pPayload -= header_size;
+        mTxBuf->SetStart(pPayload);
         uint8_t cursor = 1; // first position past header flags byte
         BitFlags<HeaderFlags> headerFlags(HeaderFlags::kStartMessage);
 
         if (send_ack)
         {
             headerFlags.Set(HeaderFlags::kFragmentAck);
-            characteristic[cursor++] = GetAndRecordRxAckSeqNum();
-            ChipLogDebugWiFiPAFTP(WiFiPAF, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
+            pPayload[cursor++] = GetAndRecordRxAckSeqNum();
+            ChipLogDebugWiFiPAFTP(WiFiPAF, "===> encoded piggybacked ack, ack_num = %u", pPayload[cursor - 1]);
         }
 
-        characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
-        characteristic[cursor++] = static_cast<uint8_t>(mTxLength & 0xff);
-        characteristic[cursor++] = static_cast<uint8_t>(mTxLength >> 8);
+        pPayload[cursor++] = GetAndIncrementNextTxSeqNum();
+        pPayload[cursor++] = static_cast<uint8_t>(mTxLength & 0xff);
+        pPayload[cursor++] = static_cast<uint8_t>(mTxLength >> 8);
 
         if ((mTxLength + cursor) <= mTxFragmentSize)
         {
@@ -494,7 +481,7 @@ bool WiFiPAFTP::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
             mTxLength = static_cast<uint16_t>((mTxLength + cursor) - mTxFragmentSize);
         }
 
-        characteristic[0] = headerFlags.Raw();
+        pPayload[0] = headerFlags.Raw();
         ChipLogDebugWiFiPAFTP(WiFiPAF, ">>> CHIPoWiFiPAF preparing to send first fragment:");
         ChipLogDebugBufferWiFiPAFTP(WiFiPAF, mTxBuf);
     }
@@ -506,13 +493,13 @@ bool WiFiPAFTP::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         }
 
         // advance past the previous fragment
-        characteristic = mTxBuf->Start();
-        characteristic += mTxFragmentSize;
+        pPayload = mTxBuf->Start();
+        pPayload += mTxFragmentSize;
 
         // prepend header
-        characteristic -= send_ack ? kTransferProtocolMidFragmentMaxHeaderSize
-                                   : (kTransferProtocolMidFragmentMaxHeaderSize - kTransferProtocolAckSize);
-        mTxBuf->SetStart(characteristic);
+        pPayload -= send_ack ? kTransferProtocolMidFragmentMaxHeaderSize
+                             : (kTransferProtocolMidFragmentMaxHeaderSize - kTransferProtocolAckSize);
+        mTxBuf->SetStart(pPayload);
         uint8_t cursor = 1; // first position past header flags byte
 
         BitFlags<HeaderFlags> headerFlags(HeaderFlags::kContinueMessage);
@@ -520,11 +507,11 @@ bool WiFiPAFTP::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         if (send_ack)
         {
             headerFlags.Set(HeaderFlags::kFragmentAck);
-            characteristic[cursor++] = GetAndRecordRxAckSeqNum();
-            ChipLogDebugWiFiPAFTP(WiFiPAF, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
+            pPayload[cursor++] = GetAndRecordRxAckSeqNum();
+            ChipLogDebugWiFiPAFTP(WiFiPAF, "===> encoded piggybacked ack, ack_num = %u", pPayload[cursor - 1]);
         }
 
-        characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
+        pPayload[cursor++] = GetAndIncrementNextTxSeqNum();
 
         if ((mTxLength + cursor) <= mTxFragmentSize)
         {
@@ -540,7 +527,7 @@ bool WiFiPAFTP::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
             mTxLength = static_cast<uint16_t>((mTxLength + cursor) - mTxFragmentSize);
         }
 
-        characteristic[0] = headerFlags.Raw();
+        pPayload[0] = headerFlags.Raw();
         ChipLogDebugWiFiPAFTP(WiFiPAF, ">>> CHIPoWiFiPAF preparing to send additional fragment:");
         ChipLogDebugBufferWiFiPAFTP(WiFiPAF, mTxBuf);
     }

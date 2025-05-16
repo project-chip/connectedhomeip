@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,8 +54,8 @@ public:
      */
     CHIP_ERROR Init(const WiFiPAFListenParameters & param);
     bool CanSendToPeer(const Transport::PeerAddress & address) override;
-    void SetWiFiPAFLayerTransportToSelf() { mWiFiPAFLayer->mWiFiPAFTransport = this; }
-    bool IsWiFiPAFLayerTransportSetToSelf() { return mWiFiPAFLayer->mWiFiPAFTransport == this; }
+    void SetWiFiPAFLayerTransportToSelf() { mWiFiPAFLayer.mWiFiPAFTransport = this; }
+    bool IsWiFiPAFLayerTransportSetToSelf() { return mWiFiPAFLayer.mWiFiPAFTransport == this; }
     /**
      * Interface of Base
      */
@@ -74,7 +74,7 @@ private:
      */
     CHIP_ERROR SendAfterConnect(System::PacketBufferHandle && msg);
 
-    WiFiPAF::WiFiPAFLayer * mWiFiPAFLayer = nullptr; ///< Associated wifipaf layer
+    WiFiPAF::WiFiPAFLayer & mWiFiPAFLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer(); ///< Associated wifipaf layer
 
     System::PacketBufferHandle * mPendingPackets;
     size_t mPendingPacketsSize;
