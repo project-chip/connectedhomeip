@@ -682,7 +682,6 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         if len(subscription.GetEvents()) == 0:
             self.fail_current_test('Wildcard event subscription returned no events')
-            success = False
 
     def test_TC_IDM_11_1(self):
         success = True
