@@ -43,6 +43,7 @@ limitations under the License.
     <name>General Commissioning</name>
     <code>0x0030</code>
     <define>GENERAL_COMMISSIONING_CLUSTER</define>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
     <description>This cluster is used to manage global aspects of the Commissioning flow.</description>
     <features>
       <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms and Conditions acknowledgement" apiMaturity="provisional">

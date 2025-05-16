@@ -71,6 +71,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     IntentEnum intent                      = static_cast<IntentEnum>(0);
     TransferProtocolEnum requestedProtocol = static_cast<TransferProtocolEnum>(0);
@@ -88,10 +89,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     IntentEnum intent                      = static_cast<IntentEnum>(0);
     TransferProtocolEnum requestedProtocol = static_cast<TransferProtocolEnum>(0);
     Optional<chip::CharSpan> transferFileDesignator;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RetrieveLogsRequest
@@ -110,6 +113,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     chip::ByteSpan logContent;
@@ -128,11 +132,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     chip::ByteSpan logContent;
     Optional<uint64_t> UTCTimeStamp;
     Optional<uint64_t> timeSinceBoot;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RetrieveLogsResponse

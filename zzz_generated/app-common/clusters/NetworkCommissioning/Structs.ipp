@@ -64,9 +64,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, clientIdentifier);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -131,9 +128,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, lqi);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -187,9 +181,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kRssi))
         {
             err = DataModel::Decode(reader, rssi);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

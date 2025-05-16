@@ -89,6 +89,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     Structs::GroupKeySetStruct::Type groupKeySet;
 
@@ -104,9 +105,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     Structs::GroupKeySetStruct::DecodableType groupKeySet;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace KeySetWrite
 namespace KeySetRead {
@@ -121,6 +124,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetRead::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
 
@@ -136,9 +140,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetRead::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace KeySetRead
 namespace KeySetReadResponse {
@@ -153,6 +159,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::GroupKeySetStruct::Type groupKeySet;
 
@@ -168,8 +175,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::GroupKeySetStruct::DecodableType groupKeySet;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetReadResponse
@@ -185,6 +194,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetRemove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
 
@@ -200,9 +210,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetRemove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace KeySetRemove
 namespace KeySetReadAllIndices {
@@ -216,6 +228,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -229,8 +242,9 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace KeySetReadAllIndices
 namespace KeySetReadAllIndicesResponse {
@@ -245,6 +259,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const uint16_t> groupKeySetIDs;
 
@@ -260,8 +275,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<uint16_t> groupKeySetIDs;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetReadAllIndicesResponse

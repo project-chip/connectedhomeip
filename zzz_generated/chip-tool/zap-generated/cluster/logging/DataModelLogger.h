@@ -560,7 +560,7 @@ LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntry::DecodableType & value);
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::DecodableType & value);
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
@@ -605,9 +605,6 @@ LogValue(const char * label, size_t indent,
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::DecodableType & value);

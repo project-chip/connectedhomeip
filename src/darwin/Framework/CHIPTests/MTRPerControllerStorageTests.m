@@ -2890,38 +2890,40 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         };
     }
 
-    // We have one fake device, which we use an invalid node ID for, that we use
-    // to test what happens if a device is deallocated while its subscription
-    // work item is queued.
-    //
-    // Schedule a job in the controller's pool that will not complete until the
-    // fake device is deallocated.
-    __auto_type * fakeDeviceDeletedExpectation = [self expectationWithDescription:@"Fake device deleted"];
-    MTRAsyncWorkItem * blockingWorkItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
-    [blockingWorkItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
-        [self waitForExpectations:@[ fakeDeviceDeletedExpectation ] timeout:kTimeoutInSeconds];
-        completion(MTRAsyncWorkComplete);
-    }];
-    [controller.concurrentSubscriptionPool enqueueWorkItem:blockingWorkItem description:@"Waiting for fake device deletion"];
+    if (subscriptionPoolSize == 1) {
+        // We have one fake device, which we use an invalid node ID for, that we use
+        // to test what happens if a device is deallocated while its subscription
+        // work item is queued.  It should not block other things from running.
+        //
+        // Schedule a job in the controller's pool that will not complete until the
+        // fake device is deallocated.
+        __auto_type * fakeDeviceDeletedExpectation = [self expectationWithDescription:@"Fake device deleted"];
+        MTRAsyncWorkItem * blockingWorkItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
+        [blockingWorkItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
+            [self waitForExpectations:@[ fakeDeviceDeletedExpectation ] timeout:kTimeoutInSeconds];
+            completion(MTRAsyncWorkComplete);
+        }];
+        [controller.concurrentSubscriptionPool enqueueWorkItem:blockingWorkItem description:@"Waiting for fake device deletion"];
 
-    // Make sure the delegate for the fake device does not go away before the
-    // fake device does, so keep it out of the @autoreleasepool block.
-    MTRDeviceTestDelegate * fakeDeviceDelegate = [[MTRDeviceTestDelegate alloc] init];
-    fakeDeviceDelegate.pretendThreadEnabled = YES;
+        // Make sure the delegate for the fake device does not go away before the
+        // fake device does, so keep it out of the @autoreleasepool block.
+        MTRDeviceTestDelegate * fakeDeviceDelegate = [[MTRDeviceTestDelegate alloc] init];
+        fakeDeviceDelegate.pretendThreadEnabled = YES;
 
-    @autoreleasepool {
-        // Create our fake device and have it dealloc before the blocking WorkItem
-        // completes and hence before its subscription work item gets a chance
-        // to run (in the width-1 case).
+        @autoreleasepool {
+            // Create our fake device and have it dealloc before the blocking WorkItem
+            // completes and hence before its subscription work item gets a chance
+            // to run (in the width-1 case).
 
-        // onSubscriptionCallbackDelete is called from dealloc
-        fakeDeviceDelegate.onSubscriptionCallbackDelete = ^{
-            [fakeDeviceDeletedExpectation fulfill];
-        };
+            // onSubscriptionCallbackDelete is called from dealloc
+            fakeDeviceDelegate.onSubscriptionCallbackDelete = ^{
+                [fakeDeviceDeletedExpectation fulfill];
+            };
 
-        NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
-        __auto_type * device = [MTRDevice deviceWithNodeID:fakeDeviceID controller:controller];
-        [device setDelegate:fakeDeviceDelegate queue:queue];
+            NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
+            __auto_type * device = [MTRDevice deviceWithNodeID:fakeDeviceID controller:controller];
+            [device setDelegate:fakeDeviceDelegate queue:queue];
+        }
     }
 
     for (NSNumber * deviceID in orderedDeviceIDs) {
