@@ -20,20 +20,19 @@
 #include <lib/support/BufferReader.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <headers/ProvisionManager.h>
+#include <headers/ProvisionStorage.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-#include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace chip {
 
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
-#endif
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 {
     CHIP_ERROR status     = CHIP_NO_ERROR;
@@ -109,11 +108,10 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
     uint32_t keyId;
-    SilabsConfig::ReadConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, keyId);
+    Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKey(keyId);
     chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key(keyId);
     key.Decrypt(block, mIVOffset);
-
     return CHIP_NO_ERROR;
 }
-#endif
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 } // namespace chip
