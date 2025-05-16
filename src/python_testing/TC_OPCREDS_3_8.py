@@ -44,16 +44,17 @@ import sys
 from binascii import unhexlify
 from typing import Optional
 
-import chip.clusters as Clusters
 import nest_asyncio
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
-                                         TestStep, async_test_body, default_matter_test_main)
-from chip.tlv import TLVReader
-from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
 from ecdsa.keys import BadSignatureError
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
+                                           TestStep, async_test_body, default_matter_test_main)
+from matter.tlv import TLVReader
+from matter.utils import CommissioningBuildingBlocks
 
 nest_asyncio.apply()
 
