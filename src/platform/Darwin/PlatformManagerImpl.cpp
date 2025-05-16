@@ -147,7 +147,7 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 bool PlatformManagerImpl::_IsChipStackLockedByCurrentThread() const
 {
     // Assume our caller knows what they are doing in terms of concurrency if the work queue is suspended.
-    return IsWorkQueueCurrentQueue() || mWorkQueueState.load() == WorkQueueState::kSuspended;
+    return IsWorkQueueCurrentQueue() || mWorkQueueState.load() == WorkQueueState::kSuspended || (mChipStackIsLocked && (pthread_equal(pthread_self(), mChipStackLockOwnerThread)));
 };
 #endif
 
