@@ -1433,16 +1433,18 @@ CHIP_ERROR ReadClient::GetMinEventNumber(const ReadPrepareParams & aReadPrepareP
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::TriggerResubscribeIfScheduled(const char * reason)
+bool ReadClient::TriggerResubscribeIfScheduled(const char * reason)
 {
     if (!mIsResubscriptionScheduled)
     {
-        return;
+        return false;
     }
 
     ChipLogDetail(DataManagement, "ReadClient[%p] triggering resubscribe, reason: %s", this, reason);
     CancelResubscribeTimer();
     OnResubscribeTimerCallback(nullptr, this);
+
+    return true;
 }
 
 Optional<System::Clock::Timeout> ReadClient::GetSubscriptionTimeout()

@@ -70,6 +70,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ContentAppMessage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::CharSpan> data;
     chip::CharSpan encodingHint;
@@ -86,9 +87,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ContentAppMessage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::CharSpan> data;
     chip::CharSpan encodingHint;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ContentAppMessage
@@ -106,6 +109,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ContentAppMessageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
@@ -123,10 +127,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ContentAppMessageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
     Optional<chip::CharSpan> encodingHint;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ContentAppMessageResponse

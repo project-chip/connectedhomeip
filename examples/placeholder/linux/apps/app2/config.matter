@@ -1548,7 +1548,7 @@ cluster PowerSource = 47 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CommissioningErrorEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -1639,7 +1639,7 @@ cluster GeneralCommissioning = 48 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CommissioningErrorEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -6503,7 +6503,7 @@ cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -8394,7 +8394,7 @@ cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
   device type ma_powersource = 17, version 1;
 
   binding cluster GeneralCommissioning;
@@ -8534,7 +8534,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -8732,7 +8732,7 @@ endpoint 0 {
     ram      attribute uniqueID;
     callback attribute productAppearance;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0005;
   }
 
   server cluster Switch {
@@ -9203,7 +9203,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;

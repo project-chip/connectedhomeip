@@ -28,6 +28,7 @@ namespace Clusters {
 namespace MicrowaveOvenControl {
 namespace Commands {
 namespace SetCookingParameters {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -69,15 +70,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, startAfterSetting);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetCookingParameters.
 namespace AddMoreTime {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -98,9 +97,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kTimeToAdd))
         {
             err = DataModel::Decode(reader, timeToAdd);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

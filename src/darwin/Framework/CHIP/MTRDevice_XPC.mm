@@ -341,6 +341,7 @@
         kMTRDeviceInternalPropertyNetworkFeatures : NSNumber.class,
         kMTRDeviceInternalPropertyMostRecentReportTime : NSDate.class,
         kMTRDeviceInternalPropertyLastSubscriptionFailureTime : NSDate.class,
+        kMTRDeviceInternalPropertyNumDiagLogTransfersInProgress : NSNumber.class
     };
 
     VerifyOrReturn([self _ensureValidValuesForKeys:requiredInternalStateKeys inInternalState:newState valueRequired:YES]);

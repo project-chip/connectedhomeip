@@ -466,7 +466,7 @@ namespace DeviceLayer {
     MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
 
     if (error != nil) {
-        ChipLogError(Ble, "Failed to discover characterstics: %@", error);
+        ChipLogError(Ble, "Failed to discover characteristics: %@", error);
     }
 
     // XXX error ?

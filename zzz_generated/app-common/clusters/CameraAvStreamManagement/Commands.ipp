@@ -28,6 +28,7 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 namespace Commands {
 namespace AudioStreamAllocate {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -74,15 +75,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, bitDepth);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace AudioStreamAllocate.
 namespace AudioStreamAllocateResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -103,9 +102,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kAudioStreamID))
         {
             err = DataModel::Decode(reader, audioStreamID);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -113,6 +109,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 } // namespace AudioStreamAllocateResponse.
 namespace AudioStreamDeallocate {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -134,15 +131,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace AudioStreamDeallocate.
 namespace VideoStreamAllocate {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -219,15 +214,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, OSDEnabled);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace VideoStreamAllocate.
 namespace VideoStreamAllocateResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -249,15 +242,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, videoStreamID);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace VideoStreamAllocateResponse.
 namespace VideoStreamModify {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -289,15 +280,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, OSDEnabled);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace VideoStreamModify.
 namespace VideoStreamDeallocate {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -319,15 +308,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, videoStreamID);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace VideoStreamDeallocate.
 namespace SnapshotStreamAllocate {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -379,15 +366,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, OSDEnabled);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SnapshotStreamAllocate.
 namespace SnapshotStreamAllocateResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -409,15 +394,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, snapshotStreamID);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SnapshotStreamAllocateResponse.
 namespace SnapshotStreamModify {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -449,15 +432,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, OSDEnabled);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SnapshotStreamModify.
 namespace SnapshotStreamDeallocate {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -479,15 +460,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, snapshotStreamID);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SnapshotStreamDeallocate.
 namespace SetStreamPriorities {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -509,15 +488,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, streamPriorities);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetStreamPriorities.
 namespace CaptureSnapshot {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -544,15 +521,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, requestedResolution);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace CaptureSnapshot.
 namespace CaptureSnapshotResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -583,9 +558,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kResolution))
         {
             err = DataModel::Decode(reader, resolution);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

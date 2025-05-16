@@ -1022,7 +1022,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CommissioningErrorEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -2288,7 +2288,7 @@ cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2365,7 +2365,7 @@ endpoint 0 {
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2575,7 +2575,7 @@ endpoint 1 {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Identify;
     handle command TriggerEffect;
