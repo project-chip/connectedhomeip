@@ -107,13 +107,13 @@ protected:
 };
 
 // Encodes an attribute of List Data Type into a TLV Reader object for testing WriteClient::PutPreencodedAttribute
-// Warning: This method only encodes uint8_t or 1-octet ByteSpans
+// Warning: This method only encodes uint8_t or ByteSpans whose length fits in one octet
 template <class T>
 void TestWriteChunking::EncodeAttributeListIntoTLV(const DataModel::List<T> & aListAttribute,
                                                    TLV::ScopedBufferTLVReader & outEncodedListTlvReader)
 {
     static_assert(std::is_same<T, chip::ByteSpan>::value || std::is_same<T, uint8_t>::value,
-                  "This method only encodes uint8_t or 1-octet ByteSpans");
+                  "This method only encodes uint8_t or ByteSpans whose length fits in one octet");
 
     size_t estimatedSize = 0;
     for (size_t i = 0; i < aListAttribute.size(); i++)
@@ -125,6 +125,8 @@ void TestWriteChunking::EncodeAttributeListIntoTLV(const DataModel::List<T> & aL
         }
         else if constexpr (std::is_same<T, chip::ByteSpan>::value)
         {
+            ASSERT_LE(aListAttribute[i].size(), UINT8_MAX);
+
             // Control Octet (1) + Length Octet (1) + size of a single ByteSpan
             estimatedSize += 2 + aListAttribute[i].size();
         }
@@ -139,9 +141,9 @@ void TestWriteChunking::EncodeAttributeListIntoTLV(const DataModel::List<T> & aL
     TLV::TLVType outerContainer;
 
     EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerContainer));
-    for (uint8_t j = 0; j < aListAttribute.size(); j++)
+    for (auto & item : aListAttribute)
     {
-        EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), aListAttribute[j]));
+        EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), item));
     }
     EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(outerContainer));
 

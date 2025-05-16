@@ -38,7 +38,7 @@ chip_test_suite("tests") {
     ]
 
     # At some instances, this Test end ups allocating more than 32 Timers, and since the fake platform doesn`t use the heap, the maximum number of allowed timers is 32.
-    # So we get failures because we can't allocate anymore timers, in the log it looks like:
+    # So we get failures because we can't allocate any more timers, in the log it looks like:
     # SendMessage() to UDP:[::1]:5541 failed: b
     # deactivating since the Fake platform is mostly done to test Platform APIs
     if (chip_device_platform != "fake") {
