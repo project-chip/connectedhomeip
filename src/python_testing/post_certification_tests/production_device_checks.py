@@ -149,12 +149,17 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.vid_pid_str = f'{self.vid_str} pid = 0x{self.pid:04X}'
         self.vid_pid_sv_str = f'{self.vid_pid_str} software version = {self.software_version}'
 
+    def get_DSL_data(self, url_path: str, force: bool = False):
+        """Retrieves DSL data and caches it. Returns JSON."""
+        full_url = f"{self.url.rstrip('/')}/{url_path.lstrip('/')}"
+        return requests.get(full_url).json()
+
     def steps_Vendor(self):
         return [TestStep(1, "Check if device VID is listed in the DCL vendor schema", "Listing found")]
 
     def test_Vendor(self):
         self.step(1)
-        entry = requests.get(f"{self.url}/dcl/vendorinfo/vendors/{self.vid}").json()
+        entry = self.get_DSL_data(f"/dcl/vendorinfo/vendors/{self.vid}")
         key = 'vendorInfo'
         asserts.assert_true(key in entry.keys(), f"Unable to find vendor entry for {self.vid_str}")
         logging.info(f'Found vendor key for {self.vid_str} in the DCL:')
@@ -166,7 +171,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     def test_Model(self):
         self.step(1)
         key = 'model'
-        entry = requests.get(f"{self.url}/dcl/model/models/{self.vid}/{self.pid}").json()
+        entry = self.get_DSL_data(f"/dcl/model/models/{self.vid}/{self.pid}")
         asserts.assert_true(key in entry.keys(), f"Unable to find model entry for {self.vid_pid_str}")
         logging.info(f'Found model entry for {self.vid_pid_str} in the DCL:')
         logging.info(f'{entry[key]}')
@@ -177,8 +182,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     def test_Compliance(self):
         self.step(1)
         key = 'complianceInfo'
-        entry = requests.get(
-            f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{self.software_version}/matter").json()
+        entry = self.get_DSL_data(f"/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{self.software_version}/matter")
         asserts.assert_true(key in entry.keys(),
                             f"Unable to find compliance entry for {self.vid_pid_sv_str}")
         logging.info(
@@ -191,8 +195,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     def test_CertifiedModel(self):
         self.step(1)
         key = 'certifiedModel'
-        entry = requests.get(
-            f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{self.software_version}/matter").json()
+        entry = self.get_DSL_data(f"/dcl/compliance/certified-models/{self.vid}/{self.pid}/{self.software_version}/matter")
         asserts.assert_true(key in entry.keys(),
                             f"Unable to find certified model entry for {self.vid_pid_sv_str}")
         logging.info(
@@ -205,7 +208,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
 
     def test_AllSoftwareVersions(self):
         self.step(1)
-        versions_entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
+        versions_entry = self.get_DSL_data(f"/dcl/model/versions/{self.vid}/{self.pid}")
         key_model_versions = 'modelVersions'
         asserts.assert_true(key_model_versions in versions_entry.keys(),
                             f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
@@ -218,7 +221,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         problems = []
         self.step(2)
         for software_version in versions_entry[key_model_versions][key_software_versions]:
-            entry_wrapper = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}/{software_version}").json()
+            entry_wrapper = self.get_DSL_data(f"/dcl/model/versions/{self.vid}/{self.pid}/{software_version}")
             key_model_version = 'modelVersion'
             if key_model_version not in entry_wrapper:
                 problems.append(
