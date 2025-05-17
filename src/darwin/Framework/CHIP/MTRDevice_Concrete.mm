@@ -661,6 +661,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }];
 }
 
+#ifdef DEBUG
+- (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block
+{
+    dispatch_sync(self.queue, block);
+}
+#endif
+
 #pragma mark - Time Synchronization
 
 - (void)_setTimeOnDevice
@@ -1072,8 +1079,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
     os_unfair_lock_unlock(&self->_lock);
 
-    BOOL resubscribeScheduled = NO;
-
     if (readClientToResubscribe) {
         if (nodeLikelyReachable) {
             // If we have reason to suspect the node is now reachable, reset the
@@ -1082,7 +1087,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             // here (e.g. still booting up), but should try again reasonably quickly.
             subscriptionCallback->ResetResubscriptionBackoff();
         }
-        resubscribeScheduled = readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
+
+        BOOL resubscribeScheduled = readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
+
+        // In the case no resubscribe was actually scheduled, remove this device from the subscription pool
+        if (!resubscribeScheduled) {
+            std::lock_guard lock(_lock);
+            [self _clearSubscriptionPoolWork];
+        }
     } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing && !self.doingCASEAttemptForDeviceMayBeReachable) || shouldReattemptSubscription) && nodeLikelyReachable) {
         // If we have reason to suspect that the node is now reachable and we haven't established a
         // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
@@ -1107,13 +1119,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // and should be called after the above ReleaseSession call, to avoid churn.
     if (shouldReattemptSubscription) {
         std::lock_guard lock(_lock);
-        resubscribeScheduled = [self _reattemptSubscriptionNowIfNeededWithReason:reason];
-    }
-
-    // In the case no resubscribe was actually scheduled, remove this device from the subscription pool
-    if (!resubscribeScheduled) {
-        std::lock_guard lock(_lock);
-        [self _clearSubscriptionPoolWork];
+        [self _reattemptSubscriptionNowIfNeededWithReason:reason];
     }
 }
 
