@@ -6183,7 +6183,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 - (void)test048_MTRDeviceResubscribeOnSubscriptionPool
 {
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
-    //    dispatch_queue_t queue = dispatch_get_main_queue();
     dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
 
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
