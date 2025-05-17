@@ -6180,6 +6180,47 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     delegate.onReachable = nil;
 }
 
+- (void)test048_MTRDeviceResubscribeOnSubscriptionPool
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    //    dispatch_queue_t queue = dispatch_get_main_queue();
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    delegate.subscriptionMaxIntervalOverride = @(20); // larger than kTimeoutInSeconds so empty reports do not clear subscription pool sooner
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription work completed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // Wait for subscription report stuff to clear and _handleSubscriptionEstablished asynced to device queue
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    // Wait for _handleSubscriptionEstablished to finish removing subscription work from pool
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+
+    // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test
+    XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"_triggerResubscribeWithReason work completed"];
+    delegate.onSubscriptionPoolWorkComplete = ^{
+        [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
+    };
+
+    // Now that subscription is established and live, ReadClient->mIsResubscriptionScheduled should be false, and _handleResubscriptionNeededWithDelayOnDeviceQueue can simulate the code path that leads to ReadClient->TriggerResubscribeIfScheduled() returning false, and exercise the edge case
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+
+    [self waitForExpectations:@[ subscriptionPoolWorkCompleteForTriggerTestExpectation ] timeout:kTimeoutInSeconds];
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
