@@ -34,7 +34,7 @@ RUN set -x \
    && apt-get update \
    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
    libdbus-glib-1-dev \
-   libgirepository1.0-dev \
+   libgirepository-2.0-dev \
    psmisc \
    python3-pip \
    python3-venv \

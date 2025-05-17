@@ -27,7 +27,7 @@ RUN apt-get update \
   libcairo2-dev \
   libdbus-1-dev \
   libgif-dev \
-  libgirepository1.0-dev \
+  libgirepository-2.0-dev \
   libglib2.0-dev \
   libjpeg-dev \
   openssh-server \
@@ -40,14 +40,14 @@ RUN apt-get update \
   wpasupplicant \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
   && (mkdir ot-br-posix \
-      && cd ot-br-posix \
-      && git init \
-      && git remote add origin https://github.com/openthread/ot-br-posix \
-      && git fetch origin $OT_BR_POSIX_CHECKOUT --depth=1 \
-      && git reset --hard FETCH_HEAD \
-      && git submodule update --init --depth=1 \
-      && ./script/bootstrap \
-      && ./script/setup)\
+  && cd ot-br-posix \
+  && git init \
+  && git remote add origin https://github.com/openthread/ot-br-posix \
+  && git fetch origin $OT_BR_POSIX_CHECKOUT --depth=1 \
+  && git reset --hard FETCH_HEAD \
+  && git submodule update --init --depth=1 \
+  && ./script/bootstrap \
+  && ./script/setup)\
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   git psmisc ninja-build cmake wget libreadline-dev libncurses-dev libcpputest-dev \
   libavahi-common-dev libavahi-client-dev libboost-dev libboost-filesystem-dev \
