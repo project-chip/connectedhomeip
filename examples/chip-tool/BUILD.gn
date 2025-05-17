@@ -117,7 +117,7 @@ static_library("chip-tool-utils") {
     sources += [ "commands/common/DeviceScanner.cpp" ]
   }
 
-  if (chip_device_platform == "darwin" || chip_crypto == "boringssl") {
+  if (chip_crypto == "boringssl") {
     deps += [ "${boringssl_root}:boringssl_with_ssl_sources" ]
   }
 
