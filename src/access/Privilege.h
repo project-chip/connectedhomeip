@@ -46,8 +46,8 @@ constexpr auto kPrivilegeMaskValidation(uint8_t mask)
     // Array of all current values defined inside the enum class "Privilege".
     // For this validation to work, this array ALWAYS must match the listed contents
     // of our enum class "Privilege".
-    Privilege privilegeValues[] = { Access::Privilege::kView, Access::Privilege::kProxyView, Access::Privilege::kOperate,
-                                    Access::Privilege::kManage, Access::Privilege::kAdminister };
+    constexpr Privilege privilegeValues[] = { Privilege::kView, Privilege::kProxyView, Privilege::kOperate,
+                                              Privilege::kManage, Privilege::kAdminister };
 
     for (const auto & value : privilegeValues)
     {
