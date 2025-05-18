@@ -33,26 +33,12 @@ public:
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetSoftwareVersionString(MutableCharSpan & softwareVersionString) override;
-
-    CHIP_ERROR SetVendorName(const char * buf) override;
-    CHIP_ERROR SetProductName(const char * buf) override;
-    CHIP_ERROR SetSerialNumber(const char * buf) override;
-    CHIP_ERROR SetHardwareVersionString(const char * buf) override;
-    CHIP_ERROR SetSoftwareVersionString(const char * buf) override;
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
 
     DeviceInstanceInfoProviderImpl() : DeviceInstanceInfoProviderImpl(ConfigurationManagerImpl::GetDefaultInstance()) {}
     DeviceInstanceInfoProviderImpl(ConfigurationManagerImpl & configManager) :
         Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>(configManager)
     {}
-
-private:
-    // Values of basic information cluster attributes that may be set from the command-line.
-    const char * mpVendorName            = nullptr;
-    const char * mpProductName           = nullptr;
-    const char * mpSerialNumber          = nullptr;
-    const char * mpHardwareVersionString = nullptr;
-    const char * mpSoftwareVersionString = nullptr;
 };
 
 DeviceInstanceInfoProviderImpl & DeviceInstanceInfoProviderMgrImpl();

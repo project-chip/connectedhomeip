@@ -425,11 +425,156 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 }
 #endif
 
+class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
+{
+public:
+    void Init(DeviceInstanceInfoProvider * defaultProvider) { mDefaultProvider = defaultProvider; }
+
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override
+    {
+        // Check if it was set from the command line or fall back to default provider.
+        if (mpVendorName)
+        {
+            VerifyOrReturnError(bufSize > strlen(mpVendorName), CHIP_ERROR_BUFFER_TOO_SMALL);
+            strcpy(buf, mpVendorName);
+            return CHIP_NO_ERROR;
+        }
+
+        return mDefaultProvider->GetVendorName(buf, bufSize);
+    }
+
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return mDefaultProvider->GetVendorId(vendorId); }
+
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override
+    {
+        // Check if it was set from the command line or fall back to default provider.
+        if (mpProductName)
+        {
+            VerifyOrReturnError(bufSize > strlen(mpProductName), CHIP_ERROR_BUFFER_TOO_SMALL);
+            strcpy(buf, mpProductName);
+            return CHIP_NO_ERROR;
+        }
+
+        return mDefaultProvider->GetProductName(buf, bufSize);
+    }
+
+    CHIP_ERROR GetProductId(uint16_t & productId) override { return mDefaultProvider->GetProductId(productId); }
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductLabel(buf, bufSize); }
+
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override
+    {
+        // Check if it was set from the command line or fall back to default provider.
+        if (mpSerialNumber)
+        {
+            VerifyOrReturnError(bufSize > strlen(mpSerialNumber), CHIP_ERROR_BUFFER_TOO_SMALL);
+            strcpy(buf, mpSerialNumber);
+            return CHIP_NO_ERROR;
+        }
+
+        return mDefaultProvider->GetSerialNumber(buf, bufSize);
+    }
+
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override
+    {
+        return mDefaultProvider->GetManufacturingDate(year, month, day);
+    }
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override
+    {
+        return mDefaultProvider->GetHardwareVersion(hardwareVersion);
+    }
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override
+    {
+        // Check if it was set from the command line or fall back to default provider.
+        if (mpHardwareVersionString)
+        {
+            VerifyOrReturnError(bufSize > strlen(mpHardwareVersionString), CHIP_ERROR_BUFFER_TOO_SMALL);
+            strcpy(buf, mpHardwareVersionString);
+            return CHIP_NO_ERROR;
+        }
+
+        return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
+    }
+
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override
+    {
+        // Check if it was set from the command line or fall back to default provider.
+        if (mpSoftwareVersionString)
+        {
+            VerifyOrReturnError(bufSize > strlen(mpSoftwareVersionString), CHIP_ERROR_BUFFER_TOO_SMALL);
+            strcpy(buf, mpSoftwareVersionString);
+            return CHIP_NO_ERROR;
+        }
+
+        return mDefaultProvider->GetSoftwareVersionString(buf, bufSize);
+    }
+
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
+    {
+        return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
+    }
+    CHIP_ERROR GetProductFinish(chip::app::Clusters::BasicInformation::ProductFinishEnum * finish) override;
+    CHIP_ERROR GetProductPrimaryColor(chip::app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
+
+    // Once one of these Set methods is called, the corresponding Get method will return the stored value instead of getting the value from the default provider.
+    void SetVendorName(const char * buf)
+    {
+        mpVendorName = buf;
+    }
+    void SetProductName(const char * buf)
+    {
+        mpProductName = buf;
+    }
+    void SetSerialNumber(const char * buf)
+    {
+        mpSerialNumber = buf;
+    }
+    void SetHardwareVersionString(const char * buf)
+    {
+        mpHardwareVersionString = buf;
+    }
+    void SetSoftwareVersionString(const char * buf)
+    {
+        mpSoftwareVersionString = buf;
+    }
+
+private:
+    DeviceInstanceInfoProvider * mDefaultProvider;
+
+    // Values of basic information cluster attributes that may be set from the command-line.
+    // Whenever GetX is called, if this value is non-null it will be returned instead of getting the value from the default provider.
+    const char * mpVendorName            = nullptr;
+    const char * mpProductName           = nullptr;
+    const char * mpSerialNumber          = nullptr;
+    const char * mpHardwareVersionString = nullptr;
+    const char * mpSoftwareVersionString = nullptr;
+};
+
+CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductFinish(chip::app::Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    // Our example device claims to have a Satin finish for now.  We can make
+    // this configurable as needed.
+    *finish = chip::app::Clusters::BasicInformation::ProductFinishEnum::kSatin;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(chip::app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    // Our example device claims to have a nice purple color for now.  We can
+    // make this configurable as needed.
+    *primaryColor = chip::app::Clusters::BasicInformation::ColorEnum::kPurple;
+    return CHIP_NO_ERROR;
+}
+
+ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
+
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     bool isAllClustersVariant = (std::string(argv[0]).find("all-clusters") != std::string::npos);
+    DeviceInstanceInfoProvider * defaultDeviceInstanceInfoProvider = nullptr;
 
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
@@ -602,22 +747,30 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+    // Initialize device instance info provider.
+    defaultDeviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
+    if (defaultDeviceInstanceInfoProvider != &gExampleDeviceInstanceInfoProvider)
+    {
+        gExampleDeviceInstanceInfoProvider.Init(defaultDeviceInstanceInfoProvider);
+        SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
+    }
+
     // Command line arguments to set attributes of the basic information cluster.
     if (LinuxDeviceOptions::GetInstance().vendorName.HasValue())
-        GetDeviceInstanceInfoProvider()->SetVendorName(LinuxDeviceOptions::GetInstance().vendorName.Value().c_str());
+        gExampleDeviceInstanceInfoProvider.SetVendorName(LinuxDeviceOptions::GetInstance().vendorName.Value().c_str());
 
     if (LinuxDeviceOptions::GetInstance().productName.HasValue())
-        GetDeviceInstanceInfoProvider()->SetProductName(LinuxDeviceOptions::GetInstance().productName.Value().c_str());
+        gExampleDeviceInstanceInfoProvider.SetProductName(LinuxDeviceOptions::GetInstance().productName.Value().c_str());
 
     if (LinuxDeviceOptions::GetInstance().serialNumber.HasValue())
-        GetDeviceInstanceInfoProvider()->SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value().c_str());
+        gExampleDeviceInstanceInfoProvider.SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value().c_str());
 
     if (LinuxDeviceOptions::GetInstance().softwareVersionString.HasValue())
-        GetDeviceInstanceInfoProvider()->SetSoftwareVersionString(
+        gExampleDeviceInstanceInfoProvider.SetSoftwareVersionString(
             LinuxDeviceOptions::GetInstance().softwareVersionString.Value().c_str());
 
     if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
-        GetDeviceInstanceInfoProvider()->SetHardwareVersionString(
+        gExampleDeviceInstanceInfoProvider.SetHardwareVersionString(
             LinuxDeviceOptions::GetInstance().hardwareVersionString.Value().c_str());
 
 exit:

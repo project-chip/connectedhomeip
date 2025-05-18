@@ -182,9 +182,9 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetHardwareVersionStr
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSoftwareVersionString(MutableCharSpan & softwareVersionString)
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
-    return mGenericConfigManager.GetSoftwareVersionString(softwareVersionString.data(), softwareVersionString.size());
+    return mGenericConfigManager.GetSoftwareVersionString(buf, bufSize);
 }
 
 template <class ConfigClass>
