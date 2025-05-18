@@ -45,6 +45,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     BitFlags<CameraAvStreamManagement::Feature> features;
     features.Set(CameraAvStreamManagement::Feature::kSnapshot);
     features.Set(CameraAvStreamManagement::Feature::kVideo);
+    features.Set(CameraAvStreamManagement::Feature::kPrivacy);
 
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
