@@ -17,13 +17,15 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#ifdef MATTER_DM_PLUGIN_SWITCH_SERVER
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <platform/PlatformManager.h>
 
 #include "SwitchEventHandler.h"
 
+#include <app/util/config.h>
+
+#ifdef MATTER_DM_PLUGIN_SWITCH_SERVER
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
