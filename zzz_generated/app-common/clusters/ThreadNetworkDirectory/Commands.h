@@ -79,6 +79,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan operationalDataset;
 
@@ -94,8 +95,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan operationalDataset;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddNetwork
@@ -111,6 +114,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan extendedPanID;
 
@@ -126,8 +130,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan extendedPanID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveNetwork
@@ -143,6 +149,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetOperationalDataset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan extendedPanID;
 
@@ -158,8 +165,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetOperationalDataset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan extendedPanID;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetOperationalDataset
@@ -175,6 +184,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::OperationalDatasetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan operationalDataset;
 
@@ -190,8 +200,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::OperationalDatasetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan operationalDataset;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OperationalDatasetResponse

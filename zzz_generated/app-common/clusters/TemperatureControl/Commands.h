@@ -65,6 +65,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<int16_t> targetTemperature;
     Optional<uint8_t> targetTemperatureLevel;
@@ -81,9 +82,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<int16_t> targetTemperature;
     Optional<uint8_t> targetTemperatureLevel;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetTemperature
