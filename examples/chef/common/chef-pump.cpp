@@ -181,8 +181,8 @@ void postMoveToLevel(EndpointId endpoint, uint8_t level)
 }
 
 /**
- * @brief Post onOff change handler. Updates setpoints if LevelControl is disabled for endpoint. If LevelControl is
- * enabled, only level is updated, handleMoveToLevel should be called to update setponts.
+ * @brief Post onOff change handler. Matches setpoints to currentLevel when going from
+ * off to on. Sets setpoints to NULL when going from On to Off.
  */
 void postOnOff(EndpointId endpoint, bool value)
 {
