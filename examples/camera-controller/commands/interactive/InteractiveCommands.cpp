@@ -20,6 +20,7 @@
 
 #include <platform/logging/LogV.h>
 #include <system/SystemClock.h>
+#include <webrtc_manager/WebRTCManager.h>
 
 #include <editline.h>
 
@@ -56,8 +57,10 @@ void ReadCommandThread()
         command = readline(kInteractiveModePrompt);
         if (command != nullptr && *command)
         {
-            std::unique_lock<std::mutex> lock(sQueueMutex);
-            sCommandQueue.push(command);
+            {
+                std::unique_lock<std::mutex> lock(sQueueMutex);
+                sCommandQueue.push(command);
+            }
             free(command);
             sQueueCondition.notify_one();
         }
@@ -118,6 +121,7 @@ char * InteractiveStartCommand::GetCommand(char * command)
 
     std::string cmd = sCommandQueue.front();
     sCommandQueue.pop();
+    lock.unlock();
 
     if (command != nullptr)
     {
@@ -210,6 +214,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         command = nullptr;
     }
 
+    WebRTCManager::Instance().Shutdown();
     SetCommandExitStatus(CHIP_NO_ERROR);
     CloseLogFile();
 
