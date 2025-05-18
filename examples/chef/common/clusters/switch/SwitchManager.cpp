@@ -42,11 +42,11 @@ class SwitchActionsDelegate : public chip::app::ActionsDelegate
 {
 public:
     SwitchActionsDelegate(ClusterId clusterId, SwitchEventHandler * eventHandler) :
-        ActionsDelegate(clusterId), mEventHandler(eventHandler) {};
-    ~SwitchActionsDelegate() override {};
+        ActionsDelegate(clusterId), mEventHandler(eventHandler){};
+    ~SwitchActionsDelegate() override{};
 
     void AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args) override;
-    void CommandHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args) override {};
+    void CommandHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args) override{};
     void EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t> args) override;
 
 private:
