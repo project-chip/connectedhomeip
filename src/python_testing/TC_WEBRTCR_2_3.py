@@ -37,7 +37,6 @@ import asyncio
 import logging
 import os
 import tempfile
-import time
 
 import websockets
 from chip.testing.apps import AppServerSubprocess
