@@ -45,6 +45,7 @@ from mobly import asserts
 
 SERVER_URI = "ws://localhost:9002"
 
+
 class TC_WebRTCRequestor_2_4(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
