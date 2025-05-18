@@ -1768,8 +1768,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         if self.runner_hook:
             self.runner_hook.show_image_prompt(
-              msg=prompt_msg,
-              img_hex_str=image_stream
+                msg=prompt_msg,
+                img_hex_str=image_stream
             )
 
         logging.info("========= USER PROMPT for Image Verification =========")
