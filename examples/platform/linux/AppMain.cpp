@@ -514,58 +514,43 @@ public:
     {
         return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
     }
-    CHIP_ERROR GetProductFinish(chip::app::Clusters::BasicInformation::ProductFinishEnum * finish) override;
-    CHIP_ERROR GetProductPrimaryColor(chip::app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
 
-    // Once one of these Set methods is called, the corresponding Get method will return the stored value instead of getting the value from the default provider.
-    void SetVendorName(const char * buf)
+    CHIP_ERROR GetProductFinish(chip::app::Clusters::BasicInformation::ProductFinishEnum * finish) override
     {
-        mpVendorName = buf;
+        // Our example device claims to have a Satin finish for now.  We can make
+        // this configurable as needed.
+        *finish = chip::app::Clusters::BasicInformation::ProductFinishEnum::kSatin;
+        return CHIP_NO_ERROR;
     }
-    void SetProductName(const char * buf)
+
+    CHIP_ERROR GetProductPrimaryColor(chip::app::Clusters::BasicInformation::ColorEnum * primaryColor) override
     {
-        mpProductName = buf;
+        // Our example device claims to have a nice purple color for now.  We can
+        // make this configurable as needed.
+        *primaryColor = chip::app::Clusters::BasicInformation::ColorEnum::kPurple;
+        return CHIP_NO_ERROR;
     }
-    void SetSerialNumber(const char * buf)
-    {
-        mpSerialNumber = buf;
-    }
-    void SetHardwareVersionString(const char * buf)
-    {
-        mpHardwareVersionString = buf;
-    }
-    void SetSoftwareVersionString(const char * buf)
-    {
-        mpSoftwareVersionString = buf;
-    }
+
+    // Once one of these Set methods is called, the corresponding Get method will return the stored value instead of getting the
+    // value from the default provider.
+    void SetVendorName(const char * buf) { mpVendorName = buf; }
+    void SetProductName(const char * buf) { mpProductName = buf; }
+    void SetSerialNumber(const char * buf) { mpSerialNumber = buf; }
+    void SetHardwareVersionString(const char * buf) { mpHardwareVersionString = buf; }
+    void SetSoftwareVersionString(const char * buf) { mpSoftwareVersionString = buf; }
 
 private:
     DeviceInstanceInfoProvider * mDefaultProvider;
 
     // Values of basic information cluster attributes that may be set from the command-line.
-    // Whenever GetX is called, if this value is non-null it will be returned instead of getting the value from the default provider.
+    // Whenever GetX is called, if this value is non-null it will be returned instead of getting the value from the default
+    // provider.
     const char * mpVendorName            = nullptr;
     const char * mpProductName           = nullptr;
     const char * mpSerialNumber          = nullptr;
     const char * mpHardwareVersionString = nullptr;
     const char * mpSoftwareVersionString = nullptr;
 };
-
-CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductFinish(chip::app::Clusters::BasicInformation::ProductFinishEnum * finish)
-{
-    // Our example device claims to have a Satin finish for now.  We can make
-    // this configurable as needed.
-    *finish = chip::app::Clusters::BasicInformation::ProductFinishEnum::kSatin;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(chip::app::Clusters::BasicInformation::ColorEnum * primaryColor)
-{
-    // Our example device claims to have a nice purple color for now.  We can
-    // make this configurable as needed.
-    *primaryColor = chip::app::Clusters::BasicInformation::ColorEnum::kPurple;
-    return CHIP_NO_ERROR;
-}
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
@@ -986,9 +971,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     signal(SIGTERM, StopSignalHandler);
     // NOLINTEND(bugprone-signal-handler)
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif
