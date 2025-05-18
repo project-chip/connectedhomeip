@@ -33,6 +33,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import os
 import tempfile
@@ -153,7 +154,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         )
 
         self.step(2)
-        time.sleep(1)
+        await asyncio.sleep(1)
         # Prompt user with instructions
         prompt_msg = (
             "\nPlease connect the server app from DUT:\n"
@@ -166,7 +167,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
             self.wait_for_user_input(prompt_msg)
 
         self.step(3)
-        time.sleep(1)
+        await asyncio.sleep(1)
         # Prompt user with instructions
         prompt_msg = (
             "\nSend 'SolicitOffer' command to the server app from DUT:\n"
