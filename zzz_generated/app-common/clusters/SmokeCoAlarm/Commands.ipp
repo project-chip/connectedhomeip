@@ -28,6 +28,7 @@ namespace Clusters {
 namespace SmokeCoAlarm {
 namespace Commands {
 namespace SelfTestRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };

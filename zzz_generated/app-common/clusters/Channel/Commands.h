@@ -99,6 +99,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan match;
 
@@ -114,8 +115,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan match;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannel
@@ -132,6 +135,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
@@ -148,9 +152,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannelResponse
@@ -167,6 +173,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumber::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t majorNumber = static_cast<uint16_t>(0);
     uint16_t minorNumber = static_cast<uint16_t>(0);
@@ -183,9 +190,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumber::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t majorNumber = static_cast<uint16_t>(0);
     uint16_t minorNumber = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannelByNumber
@@ -201,6 +210,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     int16_t count = static_cast<int16_t>(0);
 
@@ -216,8 +226,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     int16_t count = static_cast<int16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SkipChannel
@@ -239,6 +251,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetProgramGuide::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<uint32_t> startTime;
     Optional<uint32_t> endTime;
@@ -260,6 +273,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetProgramGuide::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<uint32_t> startTime;
     Optional<uint32_t> endTime;
@@ -268,6 +282,7 @@ public:
     Optional<chip::BitMask<RecordingFlagBitmap>> recordingFlag;
     Optional<DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType>> externalIDList;
     Optional<chip::ByteSpan> data;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetProgramGuide
@@ -284,6 +299,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProgramGuideResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::ChannelPagingStruct::Type paging;
     DataModel::List<const Structs::ProgramStruct::Type> programList;
@@ -300,9 +316,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProgramGuideResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::ChannelPagingStruct::DecodableType paging;
     DataModel::DecodableList<Structs::ProgramStruct::DecodableType> programList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProgramGuideResponse
@@ -321,6 +339,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RecordProgram::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);
@@ -339,11 +358,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RecordProgram::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);
     DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType> externalIDList;
     chip::ByteSpan data;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RecordProgram
@@ -362,6 +383,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CancelRecordProgram::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);
@@ -380,11 +402,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CancelRecordProgram::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);
     DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType> externalIDList;
     chip::ByteSpan data;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CancelRecordProgram

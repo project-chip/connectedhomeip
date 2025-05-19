@@ -59015,7 +59015,7 @@ public class ChipClusters {
     private static final long MPTZ_POSITION_ATTRIBUTE_ID = 0L;
     private static final long MAX_PRESETS_ATTRIBUTE_ID = 1L;
     private static final long MPTZ_PRESETS_ATTRIBUTE_ID = 2L;
-    private static final long DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID = 3L;
+    private static final long DPTZ_STREAMS_ATTRIBUTE_ID = 3L;
     private static final long ZOOM_MAX_ATTRIBUTE_ID = 4L;
     private static final long TILT_MIN_ATTRIBUTE_ID = 5L;
     private static final long TILT_MAX_ATTRIBUTE_ID = 6L;
@@ -59221,8 +59221,8 @@ public class ChipClusters {
       void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> value);
     }
 
-    public interface DPTZRelativeMoveAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Integer> value);
+    public interface DPTZStreamsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -59315,30 +59315,30 @@ public class ChipClusters {
         }, MPTZ_PRESETS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readDPTZRelativeMoveAttribute(
-        DPTZRelativeMoveAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
+    public void readDPTZStreamsAttribute(
+        DPTZStreamsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_STREAMS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID, true);
+        }, DPTZ_STREAMS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeDPTZRelativeMoveAttribute(
-        DPTZRelativeMoveAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
+    public void subscribeDPTZStreamsAttribute(
+        DPTZStreamsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_STREAMS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, DPTZ_STREAMS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readZoomMaxAttribute(
@@ -64168,6 +64168,11 @@ public class ChipClusters {
 
     public void readProvisionedRootCertificatesAttribute(
         ProvisionedRootCertificatesAttributeCallback callback) {
+      readProvisionedRootCertificatesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readProvisionedRootCertificatesAttributeWithFabricFilter(
+        ProvisionedRootCertificatesAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -64176,7 +64181,7 @@ public class ChipClusters {
             List<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID, true);
+        }, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeProvisionedRootCertificatesAttribute(
@@ -64220,6 +64225,11 @@ public class ChipClusters {
 
     public void readProvisionedClientCertificatesAttribute(
         ProvisionedClientCertificatesAttributeCallback callback) {
+      readProvisionedClientCertificatesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readProvisionedClientCertificatesAttributeWithFabricFilter(
+        ProvisionedClientCertificatesAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -64228,7 +64238,7 @@ public class ChipClusters {
             List<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID, true);
+        }, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeProvisionedClientCertificatesAttribute(
