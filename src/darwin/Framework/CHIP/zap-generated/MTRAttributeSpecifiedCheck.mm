@@ -6009,7 +6009,7 @@ static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(Att
     case Attributes::MPTZPresets::Id: {
         return YES;
     }
-    case Attributes::DPTZRelativeMove::Id: {
+    case Attributes::DPTZStreams::Id: {
         return YES;
     }
     case Attributes::ZoomMax::Id: {

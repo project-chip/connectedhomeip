@@ -13116,9 +13116,9 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "DPTZRelativeMove",
+                "attributeName": "DPTZStreams",
                 "attributeId": 0x00000003,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x00000004: {
