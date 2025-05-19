@@ -456,7 +456,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 speed_setting_expected, speed_setting_values_produced,
                 f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_expected}, missing: {missing_speed_setting}."
             )
-            
+
         asserts.assert_equal(self.speed_current_values_produced, speed_setting_values_produced,
                              f"[FC] SpeedCurrent attribute values do not match SpeedSetting values. Expected: {speed_setting_values_produced}, produced: {self.speed_current_values_produced}.")
 
@@ -523,7 +523,7 @@ class TC_FAN_3_5(MatterBaseTest):
         asserts.assert_equal(
             self.baseline_speed_current_desc, list(reversed(self.baseline_speed_current_asc)),
             f"[FC] SpeedCurrent attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_speed_current_desc}, Ascending: {self.baseline_speed_current_asc}."
-            )
+        )
 
     async def wrap_test(self, step: Clusters.FanControl.Commands.Step) -> None:
         """Tests the `wrap` flag for the given Step command.
