@@ -26,10 +26,9 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
-# from chip.testing.matter_testing import MatterStackState, MatterTestConfig
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(level=logging.INFO)
 
 
 TIMEOUT = 900
@@ -40,32 +39,28 @@ async def connect_wifi_linux(ssid, password):
         ssid = ssid.decode()
     if type(password) == bytes:
         password = password.decode()
-    logger.debug(f" --- connect_wifi_linux: type(ssid): {type(ssid)}, type(password): {type(password)}")
 
     if not shutil.which("nmcli"):
         logger.error("'nmcli' is not installed. Install with: sudo apt install network-manager")
-        return
+        return None
 
     try:
         # Activates Wi-Fi in case it is deactivated
         subprocess.run(["nmcli", "radio", "wifi", "on"], check=False)
 
-        # Erase old profiles with same SSID
-        # subprocess.run(["nmcli", "connection", "delete", ssid], check=False)
-
         # Detects the active Wi-Fi interface
-        get_iface = subprocess.run(
+        interface_result = subprocess.run(
             ["nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device"],
             capture_output=True, text=True
         )
-        iface = None
-        for line in get_iface.stdout.strip().splitlines():
+        interface = None
+        for line in interface_result.stdout.strip().splitlines():
             parts = line.split(":")
             if len(parts) >= 3 and parts[1] == "wifi":
-                iface = parts[0]
+                interface = parts[0]
                 if parts[2] == "connected":
-                    logger.debug(f" --- Disconnecting interface {iface}")
-                    subprocess.run(["nmcli", "device", "disconnect", iface], check=False)
+                    # Disconnecting interface
+                    subprocess.run(["nmcli", "device", "disconnect", interface], check=False)
                 break
 
         # Let's try to connect
@@ -74,10 +69,6 @@ async def connect_wifi_linux(ssid, password):
             ["nmcli", "d", "wifi", "connect", ssid, "password", password],
             capture_output=True, text=True
         )
-
-        logger.debug(f"stdout: {result.stdout.strip()}")
-        logger.debug(f"stderr: {result.stderr.strip()}")
-
         await asyncio.sleep(10)  # wait the connection to be ready
 
         # Let's verify it is connected
@@ -85,26 +76,22 @@ async def connect_wifi_linux(ssid, password):
             ["nmcli", "-t", "-f", "ACTIVE,SSID", "dev", "wifi"],
             capture_output=True, text=True
         )
-        logger.debug(" --- Active networks after connection:")
-        logger.debug(check.stdout.strip())
-
         if any(line.startswith("yes:" + ssid) for line in check.stdout.splitlines()):
-            logger.info(f" --- Successfully connected to '{ssid}'")
+            logger.info(f" --- connect_wifi_linux: Successfully connected to '{ssid}'")
         else:
-            logger.warning(f" --- Could not confirm connection to '{ssid}'")
+            logger.info(f" --- connect_wifi_linux: Could not confirm WiFi connection to '{ssid}'")
 
     except Exception as e:
         logger.error(f" --- connect_wifi_linux: Exception when trying to connect to '{ssid}': {e}")
-
     finally:
         return result
 
 
 async def connect_wifi_mac(ssid, password):
-    logger.debug(f" --- connect_wifi_mac: type(ssid): {type(ssid)}, type(password): {type(password)}")
     if not shutil.which("networksetup"):
         logger.error(" --- connect_wifi_mac: 'networksetup' is not present. Please install 'networksetup'.")
-        return
+        return None
+
     try:
         # Get the Wi-Fi interface
         interface_result = subprocess.run(
@@ -118,12 +105,14 @@ async def connect_wifi_mac(ssid, password):
                     if "Device" in line:
                         interface = line.split(":")[1].strip()
                         break
-        logger.debug(f" --- connect_wifi_mac: Using interface: {interface}")
+
+        logger.info(f" --- connect_wifi_mac: Using interface: {interface}")
         result = subprocess.run([
             "networksetup",
             "-setairportnetwork", interface, ssid, password
         ], check=True, capture_output=True, text=True)
         await asyncio.sleep(10)
+
     except subprocess.CalledProcessError as e:
         logger.error(f" --- connect_wifi_mac: Error connecting with networksetup: {e.stderr.strip()}")
     except Exception as e:
@@ -133,13 +122,13 @@ async def connect_wifi_mac(ssid, password):
 
 
 async def connect_host_wifi(ssid, password, max_retries):
-    logger.debug(f" --- connect_host_wifi: type(ssid): {type(ssid)}, type(password): {type(password)}")
     os_name = platform.system()
     logger.info(f" --- connect_host_wifi: OS detected: {os_name}")
-    # We try to connect the TH to the second network a few times, to avoid network unstability
+
+    # We try to connect the TH to the second network a few times, to avoid network instability
     retry = 1
     while retry <= max_retries:
-        logger.debug(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{max_retries}")
+        logger.info(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{max_retries}")
         try:
             if os_name == "Linux":
                 conn = await connect_wifi_linux(ssid, password)
@@ -147,10 +136,13 @@ async def connect_host_wifi(ssid, password, max_retries):
                 conn = await connect_wifi_mac(ssid, password)
             else:
                 logger.error(" --- connect_host_wifi: OS not supported.")
-            logger.debug(f" --- connect_host_wifi: Connection return code: {conn.returncode}")
-            if conn.returncode == 0:
-                logger.debug(f" --- connect_host_wifi: Connected to {ssid}")
-                break
+            if conn != None:
+                if conn.returncode == 0:
+                    logger.info(f" --- connect_host_wifi: Connected to {ssid}")
+                    break
+            else:
+                asserts.fail(f" --- connect_host_wifi: Not able to connect to {ssid}")
+
         except subprocess.CalledProcessError as e:
             logger.error(f" --- connect_host_wifi: Exception when trying to connect to {ssid} stderr: {conn.stderr.decode()}")
         finally:
@@ -160,7 +152,6 @@ async def connect_host_wifi(ssid, password, max_retries):
 async def change_networks(object, cluster, ssid, password, breadcrumb):
     # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
     # so they loose connection between each other. Thus, ConnectNetwork throws an exception
-    logger.debug(f" --- change_networks: type(ssid): {type(ssid)}, type(password): {type(password)}")
     try:
         Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.value = 60
         await object.send_single_cmd(
@@ -169,16 +160,18 @@ async def change_networks(object, cluster, ssid, password, breadcrumb):
                 breadcrumb=breadcrumb
             )
         )
+
     except Exception as e:
-        logger.error(f" --- change_networks: Exception in ConnectNetwork: {e}")
+        logger.error(f" --- change_networks: Lost connection with the DUT.")
+
     # After telling the DUT to change networks, we must change TH to the second network, so it can find the DUT
     # But first wait a couple of seconds so the DUT finishes changing networks
-    logger.debug(" --- change_networks: Waiting 10 seconds for DUT to switch networks")
     await asyncio.sleep(10)
     await asyncio.wait_for(
         connect_host_wifi(ssid=ssid, password=password, max_retries=4),
         timeout=TIMEOUT
     )
+
     try:
         # Let's wait a couple seconds to finish changing networks
         await asyncio.sleep(10)
@@ -191,9 +184,9 @@ async def change_networks(object, cluster, ssid, password, breadcrumb):
             ),
             timeout=TIMEOUT
         )
-        logger.debug(f" --- change_networks: 2nd Exception when calling ConnectNetwork - Returned: {err}")
+
     except Exception as e:
-        logger.error(f" --- change_networks: 2nd Exception when calling ConnectNetwork: {e}")
+        logger.error(f" --- change_networks: Exception on 2nd call to ConnectNetwork: {e}")
 
 
 class TC_CNET_4_11(MatterBaseTest):
@@ -248,9 +241,6 @@ class TC_CNET_4_11(MatterBaseTest):
         wifi_2nd_ap_ssid = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"]
         wifi_2nd_ap_credentials = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"]
 
-        # controller = self.default_controller
-        # node_id = self.matter_test_config.controller_node_id
-
         cgen = Clusters.GeneralCommissioning
         cnet = Clusters.NetworkCommissioning
         attr = cnet.Attributes
@@ -284,8 +274,6 @@ class TC_CNET_4_11(MatterBaseTest):
             attribute=cnet.Attributes.Networks
         )
         num_networks = len(networks)
-        logger.debug(f" --- Step 2: networks: {networks}")
-        logger.debug(f" --- Step 2: Got NumNetworks: {num_networks}")
 
         # TH finds the index of the Networks list entry with NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as 'userwifi_netidx'
         self.step(3)
@@ -298,7 +286,7 @@ class TC_CNET_4_11(MatterBaseTest):
         for idx, network in enumerate(networks):
             if network.networkID == wifi_1st_ap_ssid.encode():
                 userwifi_netidx = idx
-                logger.debug(f" --- Step 3: NetworkID 1st SSID: {network.networkID.decode()}")
+                logger.info(f" --- Step 3: NetworkID of 1st SSID: {network.networkID.decode()}")
                 asserts.assert_true(network.connected, f"Wifi network {wifi_1st_ap_ssid} is not connected.")
                 break
         asserts.assert_true(userwifi_netidx is not None, f"Wifi network not found for 1st SSID: {wifi_1st_ap_ssid}")
@@ -332,6 +320,7 @@ class TC_CNET_4_11(MatterBaseTest):
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
         response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=5000)
+
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
                             "Unexpected value returned from AddOrUpdateWiFiNetwork")
@@ -351,13 +340,13 @@ class TC_CNET_4_11(MatterBaseTest):
             cluster=cnet,
             attribute=cnet.Attributes.Networks
         )
-        logger.debug(f" --- Step 6: networks: {networks}")
+
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is FALSE
         userwifi_2nd_netidx = None
         for idx, network in enumerate(networks):
             if network.networkID == wifi_2nd_ap_ssid.encode():
-                logger.debug(f" --- Step 6: NetworkID 2nd SSID: {network.networkID.decode()}")
+                logger.info(f" --- Step 6: NetworkID of 2nd SSID: {network.networkID.decode()}")
                 userwifi_2nd_netidx = idx
                 asserts.assert_false(network.connected, f"Wifi network {wifi_2nd_ap_ssid} should not be connected.")
                 break
@@ -389,7 +378,7 @@ class TC_CNET_4_11(MatterBaseTest):
             ),
             timeout=TIMEOUT
         )
-        logger.debug(f" --- Step 9: networks: {networks}")
+
         for idx, network in enumerate(networks):
             if network.networkID == wifi_2nd_ap_ssid.encode():
                 asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid} is not connected.")
@@ -404,7 +393,7 @@ class TC_CNET_4_11(MatterBaseTest):
             cluster=cgen,
             attribute=cgen.Attributes.Breadcrumb
         )
-        logger.debug(f" --- Step 10: Breadcrumb is: {breadcrumb}")
+        logger.info(f" --- Step 10: Breadcrumb is: {breadcrumb}")
         asserts.assert_equal(breadcrumb, 2, f"Expected breadcrumb to be 2, but got: {breadcrumb}")
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0.
@@ -447,7 +436,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 ),
                 timeout=TIMEOUT
             )
-        # except chip.exceptions.ChipStackError as e:
+
         except Exception as e:
             logger.error(f" --- Step 13: Exception reading networks: {e}")
             # Let's wait a couple of seconds to change networks
@@ -460,7 +449,6 @@ class TC_CNET_4_11(MatterBaseTest):
                 timeout=TIMEOUT
             )
 
-        logger.debug(f" --- Step 13: networks: {networks}")
         # Verify that the TH successfully connects to the DUT
         for idx, network in enumerate(networks):
             if network.networkID == wifi_1st_ap_ssid.encode():
@@ -487,6 +475,7 @@ class TC_CNET_4_11(MatterBaseTest):
             ),
             timedRequestTimeoutMs=5000
         )
+
         # Verify that DUT sends NetworkConfigResponse to command with the following response fields:
         # 1. NetworkingStatus is success
         asserts.assert_equal(response.networkingStatus,
@@ -503,6 +492,7 @@ class TC_CNET_4_11(MatterBaseTest):
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
         response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=5000)
+
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         # 1. NetworkingStatus is success which is "0"
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
@@ -542,6 +532,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 ),
                 timeout=TIMEOUT
             )
+
         except Exception as e:
             logger.error(f" --- Step 19: Exception reading networks: {e}")
             # Let's wait a couple of seconds to change networks
@@ -554,7 +545,6 @@ class TC_CNET_4_11(MatterBaseTest):
                 timeout=TIMEOUT
             )
 
-        logger.debug(f" --- Step 19: networks: {networks}")
         for idx, network in enumerate(networks):
             if network.networkID == wifi_2nd_ap_ssid.encode():
                 asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid} is not connected.")
@@ -581,6 +571,7 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info(" --- Step 21: Disarming the failsafe")
         cmd = cgen.Commands.CommissioningComplete()
         response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=5000)
+
         # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
         asserts.assert_true(isinstance(response, cgen.Commands.CommissioningCompleteResponse), "Got wrong response type")
         asserts.assert_equal(response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
@@ -597,7 +588,7 @@ class TC_CNET_4_11(MatterBaseTest):
             ),
             timeout=TIMEOUT
         )
-        logger.debug(f" --- Step 22: networks: {networks}")
+
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is TRUE
         for idx, network in enumerate(networks):
