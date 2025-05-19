@@ -19,6 +19,7 @@
 #pragma once
 
 #include <cstdint>
+#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace Access {
@@ -27,7 +28,7 @@ namespace Access {
 // Privilege set can have more than one value expressed (e.g. View,
 // ProxyView, and Operate).
 // NOTE: Every time this enum class changes, we need to update the function
-// "kPrivilegeMaskValidation" below.
+// "IsValidAllPrivilegesMask" below.
 // In particular, we need to keep the array "privilegeValues[]" up to date ALWAYS.
 enum class Privilege : uint8_t
 {
@@ -40,18 +41,18 @@ enum class Privilege : uint8_t
 
 // Function used to validate that the parameter 'mask' contains all the values
 // defined inside the enum class "Privilege", and only those values.
-constexpr auto kPrivilegeMaskValidation(uint8_t mask)
+constexpr auto IsValidAllPrivilegesMask(uint8_t mask)
 {
 
     // Array of all current values defined inside the enum class "Privilege".
-    // For this validation to work, this array ALWAYS must match the listed contents
+    // For this validation to work, this array must ALWAYS match the listed contents
     // of our enum class "Privilege".
     constexpr Privilege privilegeValues[] = { Privilege::kView, Privilege::kProxyView, Privilege::kOperate, Privilege::kManage,
                                               Privilege::kAdminister };
 
     for (const auto & value : privilegeValues)
     {
-        mask ^= static_cast<uint8_t>(value);
+        mask ^= to_underlying(value);
     }
 
     return (mask == 0);

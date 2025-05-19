@@ -95,7 +95,7 @@ constexpr uint8_t kPrivilegeBits = 5;
 constexpr uint8_t kPrivilegeMask = ((1 << kPrivilegeBits) - 1);
 
 // Validating contents of 'kPrivilegeMask'.
-static_assert(Access::kPrivilegeMaskValidation(kPrivilegeMask) == true,
+static_assert(Access::IsValidAllPrivilegesMask(kPrivilegeMask) == true,
               "\"kPrivilegeMask\" does not match all the values defined "
               "inside the enum class Access::Privilege.");
 
