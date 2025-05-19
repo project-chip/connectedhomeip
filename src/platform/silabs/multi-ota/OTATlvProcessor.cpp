@@ -118,10 +118,24 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    uint8_t keyBuffer[kOTAEncryptionKeyLength] = { 0 };
+    // Read the key from the provisioning storage
+    MutableByteSpan keySpan = MutableByteSpan(keyBuffer);
+    chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKey(keySpan);
+
+    VerifyOrReturnError(keySpan.size() == kOTAEncryptionKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Decrypt the block
+    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key;
+    key.Import(keyBuffer, keySpan.size());
+    key.Decrypt(block, mIVOffset);
+#else  // MBEDTLS_USE_PSA_CRYPTO
     uint32_t keyId;
     Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKey(keyId);
     chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key(keyId);
     key.Decrypt(block, mIVOffset);
+#endif // SL_MBEDTLS_USE_TINYCRYPT
     return CHIP_NO_ERROR;
 }
 

@@ -355,7 +355,17 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
     }
 
-    cflags += [ "-Wno-shadow" ]
+    if (chip_enable_multi_ota_requestor) {
+      if (chip_enable_multi_ota_encryption) {
+        defines += [ "SL_MATTER_ENABLE_OTA_ENCRYPTION=1" ]
+      }
+    }
+
+    cflags += [
+      "-Wno-shadow",
+      "-Wno-unknown-warning-option",
+      "-Wno-unused-variable",
+    ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
