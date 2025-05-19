@@ -272,45 +272,45 @@ class TC_CLDIM_4_1(MatterBaseTest):
             self.skip_step("5c")
             self.skip_step("5d")
             self.skip_step("5e")
+        else:
+            # STEP 5b: Send Step command to decrease position by 1 step with Speed=High
+            self.step("5b")
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.Step(
+                        direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
+                        numberOfSteps=1,
+                        speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh
+                    ),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 5b: Send Step command to decrease position by 1 step with Speed=High
-        self.step("5b")
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    numberOfSteps=1,
-                    speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh
-                ),
-                endpoint=endpoint
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            # STEP 5c: Verify Target attribute is updated
+            self.step("5c")
+            if attributes.Target.attribute_id in attribute_list:
+                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+                expected_position = max_position - step_value
+                asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
-        # STEP 5c: Verify Target attribute is updated
-        self.step("5c")
-        if attributes.Target.attribute_id in attribute_list:
-            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            expected_position = max_position - step_value
-            asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
+                asserts.assert_equal(target.speed, 3, "Target Speed is not High")
 
-            asserts.assert_equal(target.speed, 3, "Target Speed is not High")
+            # STEP 5d: Wait for PIXIT.CLDIM.StepMotionDuration seconds
+            self.step("5d")
+            time.sleep(step_motion_duration)
 
-        # STEP 5d: Wait for PIXIT.CLDIM.StepMotionDuration seconds
-        self.step("5d")
-        time.sleep(step_motion_duration)
+            # STEP 5e: Verify CurrentState attribute is updated
+            self.step("5e")
+            if attributes.CurrentState.attribute_id in attribute_list:
+                current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+                expected_position = max_position - step_value
+                asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
 
-        # STEP 5e: Verify CurrentState attribute is updated
-        self.step("5e")
-        if attributes.CurrentState.attribute_id in attribute_list:
-            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            expected_position = max_position - step_value
-            asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
+                if is_latching_supported:
+                    asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
-            if is_latching_supported:
-                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-            asserts.assert_equal(current_state.speed, 3, "CurrentState Speed is not High")
+                asserts.assert_equal(current_state.speed, 3, "CurrentState Speed is not High")
 
         # STEP 6a: If Speed Feature is not supported, skip step 6b to 6e
         self.step("6a")
@@ -320,45 +320,45 @@ class TC_CLDIM_4_1(MatterBaseTest):
             self.skip_step("6c")
             self.skip_step("6d")
             self.skip_step("6e")
+        else:
+            # STEP 6b: Send Step command to increase position by 1 step with Speed=Auto
+            self.step("6b")
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.Step(
+                        direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
+                        numberOfSteps=1,
+                        speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto
+                    ),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 6b: Send Step command to increase position by 1 step with Speed=Auto
-        self.step("6b")
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
-                    numberOfSteps=1,
-                    speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto
-                ),
-                endpoint=endpoint
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            # STEP 6c: Verify Target attribute is updated
+            self.step("6c")
+            if attributes.Target.attribute_id in attribute_list:
+                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+                expected_position = max_position
+                asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
-        # STEP 6c: Verify Target attribute is updated
-        self.step("6c")
-        if attributes.Target.attribute_id in attribute_list:
-            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            expected_position = max_position
-            asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
+                asserts.assert_equal(target.speed, 0, "Target Speed is not Auto")
 
-            asserts.assert_equal(target.speed, 0, "Target Speed is not Auto")
+            # STEP 6d: Wait for PIXIT.CLDIM.StepMotionDuration seconds
+            self.step("6d")
+            time.sleep(step_motion_duration)
 
-        # STEP 6d: Wait for PIXIT.CLDIM.StepMotionDuration seconds
-        self.step("6d")
-        time.sleep(step_motion_duration)
+            # STEP 6e: Verify CurrentState attribute is updated
+            self.step("6e")
+            if attributes.CurrentState.attribute_id in attribute_list:
+                current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+                expected_position = max_position
+                asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
 
-        # STEP 6e: Verify CurrentState attribute is updated
-        self.step("6e")
-        if attributes.CurrentState.attribute_id in attribute_list:
-            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            expected_position = max_position
-            asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
+                if is_latching_supported:
+                    asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
 
-            if is_latching_supported:
-                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-            asserts.assert_equal(current_state.speed, 0, "CurrentState Speed is not Auto")
+                asserts.assert_equal(current_state.speed, 0, "CurrentState Speed is not Auto")
 
         # STEP 7a: Send Step command to decrease position by 1 step
         self.step("7a")
