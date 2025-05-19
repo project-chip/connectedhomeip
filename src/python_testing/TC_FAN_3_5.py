@@ -288,7 +288,7 @@ class TC_FAN_3_5(MatterBaseTest):
             percent_setting = percent_setting_sub.get_last_attribute_report_value(
                 self.endpoint, attr.PercentSetting, self.timeout_sec)
             logging.info(f"[FC] PercentSetting attribute report value: {percent_setting}")
-            
+
             self.percent_current_values_produced.append(await self.read_setting(attr.PercentCurrent))
             self.speed_current_values_produced.append(await self.read_setting(attr.SpeedCurrent))
 
@@ -335,7 +335,7 @@ class TC_FAN_3_5(MatterBaseTest):
         """
 
         percent_setting_init = await self.get_initial_reports_and_values(step)
-        
+
         logging.info(f"[FC] precent_current_values: {self.precent_current_values}")
         logging.info(f"[FC] speed_current_values: {self.speed_current_values}")
 
@@ -444,7 +444,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 fan_modes_expected, fan_mode_values_produced,
                 f"[FC] Some of the expected FanMode values are not present in the reports. Expected: {fan_modes_expected}, missing: {missing_fan_modes}."
             )
-            
+
         asserts.assert_equal(self.percent_current_values_produced, percent_setting_values_produced,
                              f"[FC] PercentCurrent attribute values do not match PercentSetting values. Expected: {percent_setting_values_produced}, produced: {self.percent_current_values_produced}.")
 
@@ -490,7 +490,6 @@ class TC_FAN_3_5(MatterBaseTest):
             self.baseline_speed_setting_asc = speed_setting_values_produced[:-1]
             self.baseline_percent_current_asc = self.percent_current_values_produced[:-1]
             self.baseline_speed_current_asc = self.speed_current_values_produced[:-1]
-            
 
     def verify_baseline_values(self):
         """
@@ -690,7 +689,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # self.step(self.current_step_index + 1)
         self.step(35)
         self.verify_baseline_values()
-        
 
         # # *** STEP 36 ***
         # # TH subscribes to the PercentCurrent and SpeedCurrent attributes individually
