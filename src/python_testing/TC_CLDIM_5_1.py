@@ -133,54 +133,54 @@ class TC_CLDIM_5_1(MatterBaseTest):
             self.skip_step("3d")
             self.skip_step("3e")
             self.skip_step("3f")
+        else:
+            # STEP 3b: Read CurrentState attribute and save as ExpectedState
+            self.step("3b")
+            expected_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-        # STEP 3b: Read CurrentState attribute and save as ExpectedState
-        self.step("3b")
-        expected_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+            # STEP 3c: If ExpectedState.Position != MinPosition, send SetTarget command with Position=MinPosition
+            self.step("3c")
+            if expected_state.position != min_position:
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position),
+                        endpoint=endpoint
+                    )
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            else:
+                logging.info("ExpectedState.Position is already at MinPosition. Skipping step.")
+                self.mark_current_step_skipped()
 
-        # STEP 3c: If ExpectedState.Position != MinPosition, send SetTarget command with Position=MinPosition
-        self.step("3c")
-        if expected_state.position != min_position:
+            # STEP 3d: If ExpectedState.Position != MinPosition, wait for CurrentState.Position to be updated to MinPosition
+            self.step("3d")
+            if expected_state.position != min_position:
+                expected_state.position = min_position
+                expected_final_value = [AttributeValue(
+                    endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
+                sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
+            else:
+                logging.info("ExpectedState.Position is already at MinPosition. Skipping step.")
+                self.mark_current_step_skipped()
+
+            # STEP 3e: Send SetTarget command with Position=MaxPosition
+            self.step("3e")
+            sub_handler.reset()
+
             try:
                 await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position),
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-        else:
-            logging.info("ExpectedState.Position is already at MinPosition. Skipping step.")
-            self.mark_current_step_skipped()
 
-        # STEP 3d: If ExpectedState.Position != MinPosition, wait for CurrentState.Position to be updated to MinPosition
-        self.step("3d")
-        if expected_state.position != min_position:
-            expected_state.position = min_position
+            # STEP 3f: Wait for CurrentState.Position to be updated to MaxPosition
+            self.step("3f")
+            expected_state.position = max_position
             expected_final_value = [AttributeValue(
                 endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
             sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
-        else:
-            logging.info("ExpectedState.Position is already at MinPosition. Skipping step.")
-            self.mark_current_step_skipped()
-
-        # STEP 3e: Send SetTarget command with Position=MaxPosition
-        self.step("3e")
-        sub_handler.reset()
-
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
-                endpoint=endpoint
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-
-        # STEP 3f: Wait for CurrentState.Position to be updated to MaxPosition
-        self.step("3f")
-        expected_state.position = max_position
-        expected_final_value = [AttributeValue(
-            endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
-        sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
 
         # STEP 4a: If Latching feature is not supported, skip steps 4b to 4g
         self.step("4a")
@@ -192,67 +192,67 @@ class TC_CLDIM_5_1(MatterBaseTest):
             self.skip_step("4e")
             self.skip_step("4f")
             self.skip_step("4g")
-
-        # STEP 4b: Read CurrentState attribute and save as ExpectedState
-        self.step("4b")
-        expected_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-        sub_handler.reset()
-
-        # STEP 4c: If manual latching is required, manually latch the device
-        self.step("4c")
-        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
-            test_step = "Manually latch the device"
-            self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
         else:
-            logging.info("Manual latching is not required. Skipping step.")
-            self.mark_current_step_skipped()
+            # STEP 4b: Read CurrentState attribute and save as ExpectedState
+            self.step("4b")
+            expected_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+            sub_handler.reset()
 
-        # STEP 4d: If manual latching is not required, send SetTarget command with Latch=True
-        self.step("4d")
-        if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-        else:
-            logging.info("Manual latching is required. Skipping step.")
-            self.mark_current_step_skipped()
+            # STEP 4c: If manual latching is required, manually latch the device
+            self.step("4c")
+            if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
+                test_step = "Manually latch the device"
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
+            else:
+                logging.info("Manual latching is not required. Skipping step.")
+                self.mark_current_step_skipped()
 
-        # STEP 4e: Wait for CurrentState.Latch to be updated to True
-        self.step("4e")
-        expected_state.latch = True
-        expected_final_value = [AttributeValue(
-            endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
-        sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
+            # STEP 4d: If manual latching is not required, send SetTarget command with Latch=True
+            self.step("4d")
+            if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
+                        endpoint=endpoint
+                    )
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            else:
+                logging.info("Manual latching is required. Skipping step.")
+                self.mark_current_step_skipped()
 
-        # STEP 4f: If manual unlatching is required, manually unlatch the device
-        self.step("4f")
-        sub_handler.reset()
+            # STEP 4e: Wait for CurrentState.Latch to be updated to True
+            self.step("4e")
+            expected_state.latch = True
+            expected_final_value = [AttributeValue(
+                endpoint, attribute=Clusters.ClosureDimension.Attributes.CurrentState, value=expected_state)]
+            sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
 
-        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteUnlatching:
-            test_step = "Manually unlatch the device"
-            self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
-        else:
-            logging.info("Manual unlatching is not required. Skipping step.")
-            self.mark_current_step_skipped()
+            # STEP 4f: If manual unlatching is required, manually unlatch the device
+            self.step("4f")
+            sub_handler.reset()
 
-        # STEP 4g: If manual unlatching is not required, send SetTarget command with Latch=False
-        self.step("4g")
+            if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteUnlatching:
+                test_step = "Manually unlatch the device"
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
+            else:
+                logging.info("Manual unlatching is not required. Skipping step.")
+                self.mark_current_step_skipped()
 
-        if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteUnlatching:
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-        else:
-            logging.info("Manual unlatching is required. Skipping step.")
-            self.mark_current_step_skipped()
+            # STEP 4g: If manual unlatching is not required, send SetTarget command with Latch=False
+            self.step("4g")
+
+            if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteUnlatching:
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
+                        endpoint=endpoint
+                    )
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            else:
+                logging.info("Manual unlatching is required. Skipping step.")
+                self.mark_current_step_skipped()
 
         # STEP 4h: Wait for CurrentState.Latch to be updated to False
         self.step("4h")
