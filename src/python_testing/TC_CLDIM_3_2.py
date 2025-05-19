@@ -185,6 +185,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             asserts.assert_equal(target.latch, True, "Target Latch is not True")
         else:
             logging.info("Target attribute is not supported. Skipping step 4c.")
+            self.mark_current_step_skipped()
 
         # STEP 4d: Wait for PIXIT.CLDIM.LatchingDuration seconds
         self.step("4d")
@@ -206,6 +207,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
                 asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 5.")
+            self.mark_current_step_skipped()
 
         # STEP 6a: Send Step command while device is latched
         self.step("6a")
@@ -237,6 +239,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
         else:
             logging.info("Manual latching is not required. Skipping step.")
+            self.mark_current_step_skipped()
 
         # STEP 7b: If manual latching is not required, skip steps 7c to 7e
         self.step("7b")
@@ -265,6 +268,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             asserts.assert_equal(target.latch, False, "Target Latch is not False")
         else:
             logging.info("Target attribute is not supported. Skipping step 7d.")
+            self.mark_current_step_skipped()
 
         # STEP 7e: Wait for PIXIT.CLDIM.LatchingDuration seconds
         self.step("7e")
@@ -286,6 +290,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
                 asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 6d.")
+            self.mark_current_step_skipped()
 
 
 if __name__ == "__main__":

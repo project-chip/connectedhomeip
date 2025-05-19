@@ -188,6 +188,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
         else:
             logging.info("MinPosition not > 0. Skipping step 4c.")
+            self.mark_current_step_skipped()
 
         # STEP 4d: Send SetTarget command with Position above MaxPosition
         self.step("4d")
@@ -201,6 +202,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
         else:
             logging.info("MaxPosition not < 10000. Skipping step 4d.")
+            self.mark_current_step_skipped()
 
         # STEP 4e: Send SetTarget command with Position exceeding 100%
         self.step("4e")
@@ -240,6 +242,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
         else:
             logging.info("MinPosition not > 0. Skipping step 5b.")
+            self.mark_current_step_skipped()
 
         # STEP 5c: Verify Target attribute is updated
         self.step("5c")
@@ -249,6 +252,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(target.position, min_position, "Target Position does not match MinPosition")
         else:
             logging.info("MinPosition not > 0. Skipping step 5c.")
+            self.mark_current_step_skipped()
 
         # STEP 5d: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("5d")
@@ -256,6 +260,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             time.sleep(full_motion_duration)
         else:
             logging.info("MinPosition not > 0. Skipping step 5d.")
+            self.mark_current_step_skipped()
 
         # STEP 5e: Verify CurrentState attribute is updated
         self.step("5e")
@@ -265,6 +270,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(current_state.position, min_position, "CurrentState Position does not match MinPosition")
         else:
             logging.info("MinPosition not > 0. Skipping step 5e.")
+            self.mark_current_step_skipped()
 
         # STEP 5f: Send SetTarget command with Position at MaxPosition
         self.step("5f")
@@ -278,6 +284,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
         else:
             logging.info("MaxPosition not < 10000. Skipping step 5f.")
+            self.mark_current_step_skipped()
 
         # STEP 5g: Verify Target attribute is updated
         self.step("5g")
@@ -287,6 +294,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(target.position, max_position, "Target Position does not match MaxPosition")
         else:
             logging.info("MaxPosition not < 10000. Skipping step 5g.")
+            self.mark_current_step_skipped()
 
         # STEP 5h: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("5h")
@@ -294,6 +302,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             time.sleep(full_motion_duration)
         else:
             logging.info("MaxPosition not < 10000. Skipping step 5h.")
+            self.mark_current_step_skipped()
 
         # STEP 5i: Verify CurrentState attribute is updated
         self.step("5i")
@@ -303,6 +312,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(current_state.position, max_position, "CurrentState Position does not match MaxPosition")
         else:
             logging.info("MaxPosition not < 10000. Skipping step 5i.")
+            self.mark_current_step_skipped()
 
         # STEP 6: Send SetTarget command with invalid Position
         self.step(6)
@@ -319,6 +329,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else:
             logging.info("Positioning feature is not supported. Skipping step 6.")
+            self.mark_current_step_skipped()
 
         # STEP 7a: If Resolution is unsupported, skip step 7b to 7i
         self.step("7a")
@@ -354,6 +365,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(target.position, min_position + resolution, "Target Position does not match expected value")
         else:
             logging.info("Target attribute not supported. Skipping step 7c.")
+            self.mark_current_step_skipped()
 
         # STEP 7d: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("7d")
@@ -371,6 +383,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                                      "CurrentState Position does not match expected value")
         else:
             logging.info("CurrentState attribute not supported. Skipping step 7e.")
+            self.mark_current_step_skipped()
 
         # STEP 7f: Send SetTarget command with Position not a multiple of Resolution
         self.step("7f")
@@ -393,6 +406,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(target.position, max_position - resolution, "Target Position does not match expected value")
         else:
             logging.info("Target attribute not supported. Skipping step 7g.")
+            self.mark_current_step_skipped()
 
         # STEP 7h: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("7h")
@@ -410,6 +424,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                                      "CurrentState Position does not match expected value")
         else:
             logging.info("CurrentState attribute not supported. Skipping step 7i.")
+            self.mark_current_step_skipped()
 
         # STEP 8: Send SetTarget command with Latch field when MotionLatching is unsupported
         self.step(8)
@@ -435,6 +450,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
         else:
             logging.info("Speed feature is supported. Skipping step 9.")
+            self.mark_current_step_skipped()
 
         # STEP 10: Send SetTarget command with invalid Speed when Speed is unsupported
         self.step(10)
@@ -451,6 +467,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else:
             logging.info("Speed feature is supported. Skipping step 10.")
+            self.mark_current_step_skipped()
 
         # STEP 11: Send SetTarget command with invalid Speed
         self.step(11)
@@ -467,6 +484,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else:
             logging.info("Speed feature is not supported. Skipping step 11.")
+            self.mark_current_step_skipped()
 
 
 if __name__ == "__main__":

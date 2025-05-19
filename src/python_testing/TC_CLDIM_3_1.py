@@ -171,6 +171,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
                 asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 3d.")
+            self.mark_current_step_skipped()
 
         # STEP 4a: If Speed feature is not supported, skip step 4b to 4e
         self.step("4a")
@@ -202,6 +203,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
                                  "Target Speed does not match Medium")
         else:
             logging.info("Target attribute is not supported. Skipping step 4c.")
+            self.mark_current_step_skipped()
 
         # STEP 4d: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("4d")
@@ -221,6 +223,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
                                  "CurrentState Speed does not match Medium")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 4e.")
+            self.mark_current_step_skipped()
 
         # STEP 5a: Set Position to min_position
         self.step("5a")
@@ -240,6 +243,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             asserts.assert_equal(target.position, min_position, "Target Position does not match MinPosition")
         else:
             logging.info("Target attribute is not supported. Skipping step 5b.")
+            self.mark_current_step_skipped()
 
         # STEP 5c: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("5c")
@@ -260,6 +264,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
                                      "CurrentState Speed does not match Medium")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 5d.")
+            self.mark_current_step_skipped()
 
         # STEP 6a: If Speed feature is not supported, skip step 6b to 6e
         self.step("6a")
@@ -292,6 +297,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
                                  "Target Speed does not match High")
         else:
             logging.info("Target attribute is not supported. Skipping step 6c.")
+            self.mark_current_step_skipped()
 
         # STEP 6d: Wait for PIXIT.CLDIM.FullMotionDuration seconds
         self.step("6d")
@@ -311,6 +317,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
                                  "CurrentState Speed does not match High")
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 6e.")
+            self.mark_current_step_skipped()
 
 
 if __name__ == "__main__":
