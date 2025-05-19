@@ -351,7 +351,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     if (nocUpdatedDuringFailsafe)
     {
         // Operational identities/records available may have changed due to NodeID update. Need to refresh all records.
-        // The fabric removal reverted case is handled by the `DeleteFabricFromTable` flow above.
+        // The case of fabric removal that reverts AddNOC is handled by the `DeleteFabricFromTable` flow above.
         app::DnssdServer::Instance().StartServer();
     }
 }
