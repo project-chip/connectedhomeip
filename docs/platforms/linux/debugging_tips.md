@@ -8,7 +8,7 @@ notably these include:
 ## The HCI Interface
 
 The interface between the Bluetooth Host and the Bluetooth Controller is based
-on a standardised serial protocol. The information exchanged via this protocol
+on a standardized serial protocol. The information exchanged via this protocol
 can be captured into a file by the `hcidump` command. The data can be recorded
 by running the command with the `--save-dump` commandline switch:
 
@@ -47,7 +47,7 @@ editor where the `--debug` switch can be added:
 systemctl edit bluetooth.service
 ```
 
-In the editor window the folowing lines need to be typed:
+In the editor window the following lines need to be typed:
 
 ```ini
 [Service]
