@@ -24,6 +24,7 @@ extern NSString * const MTRToolDefaultsDomain;
 extern NSString * const kNetworkSSIDDefaultsKey;
 extern NSString * const kNetworkPasswordDefaultsKey;
 extern NSString * const kFabricIdKey;
+extern NSString * const kRecoveryIdentifierKey;
 
 MTRDeviceController * _Nullable InitializeMTR(void);
 MTRDeviceController * _Nullable MTRRestartController(MTRDeviceController * controller);
@@ -39,6 +40,9 @@ BOOL MTRIsDevicePaired(uint64_t id);
 BOOL MTRGetConnectedDevice(MTRDeviceConnectionCallback completionHandler);
 BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback completionHandler);
 void MTRUnpairDeviceWithID(uint64_t deviceId);
+uint64_t MTRGetRecoveryIdentifier(uint64_t deviceId);
+void MTRSetRecoveryIdentifier(uint64_t deviceId, uint64_t recoveryIdentifier);
+NSString * KeyForRecoveryIdentifier(uint64_t deviceId);
 MTRBaseDevice * _Nullable MTRGetDeviceBeingCommissioned(void);
 
 @interface CHIPToolPersistentStorageDelegate : NSObject <MTRPersistentStorageDelegate>

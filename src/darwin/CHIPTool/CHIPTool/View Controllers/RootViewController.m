@@ -25,6 +25,7 @@
 #import "TemperatureSensorViewController.h"
 #import "UnpairDevicesViewController.h"
 #import "WiFiViewController.h"
+#import "NetworkRecoveryViewController.h"
 
 @implementation RootViewController
 
@@ -43,7 +44,7 @@
     [self.view addSubview:self.tableView];
     self.options = @[
         @"QRCode scanner", @"Enumeration", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"WiFi Configuration",
-        @"Enable Pairing", @"Unpair Devices", @"Fabric Management"
+        @"Enable Pairing", @"Unpair Devices", @"Fabric Management", @"Network Recovery"
     ];
 }
 
@@ -96,9 +97,17 @@
     case 8:
         [self pushFabric];
         break;
+    case 9:
+        [self pushNetworkRecovery];
     default:
         break;
     }
+}
+
+- (void)pushNetworkRecovery
+{
+    NetworkRecoveryViewController * controller = [NetworkRecoveryViewController new];
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)pushFabric

@@ -684,6 +684,15 @@
     // track this device
     MTRSetDevicePaired([nodeID unsignedLongLongValue], YES);
     [self setVendorIDOnAccessory];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:@"Commissioning completed!" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okBtn = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            [self.navigationController popViewControllerAnimated:YES];
+        }];
+        [alert addAction:okBtn];
+        [self presentViewController:alert animated:YES completion:nil];
+    });
 }
 
 // MARK: MTRDeviceControllerDelegate

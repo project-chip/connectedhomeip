@@ -54,6 +54,8 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
     kScanning,
     kScanningWithTimeout,
     kConnecting,
+    kScanForNetworkRecoveryDiscover,
+    kScanForNetworkRecoveryRecover,
 };
 
 @interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
@@ -66,20 +68,24 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 @property (strong, nonatomic) NSMutableDictionary<CBPeripheral *, NSDictionary *> * cachedPeripherals;
 @property (assign, nonatomic) bool found;
 @property (assign, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
+@property (assign, nonatomic) uint64_t recoveryIdentifier;
 @property (assign, nonatomic) void * appState;
 @property (assign, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
 @property (assign, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
+@property (assign, nonatomic) BleConnectionDelegate::OnDiscoverCompleteFunct onDiscoverComplete;
 @property (assign, nonatomic) chip::DeviceLayer::BleScannerDelegate * scannerDelegate;
 @property (assign, nonatomic) chip::Ble::BleLayer * mBleLayer;
 
 - (instancetype)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
 - (instancetype)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
+- (instancetype)initWithRecoveryIdentifier:(uint64_t)recoveryIdentifier;
 
 - (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer;
 - (void)start;
 - (void)stop;
 - (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
 - (void)updateWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
+- (void)updateWithRecoveryIdentifier:(uint64_t)recoveryIdentifier;
 - (void)updateWithPeripheral:(CBPeripheral *)peripheral;
 - (BOOL)isConnecting;
 - (void)addPeripheralToCache:(CBPeripheral *)peripheral data:(NSData *)data;
@@ -113,6 +119,7 @@ namespace DeviceLayer {
                 ble.appState = appState;
                 ble.onConnectionComplete = OnConnectionComplete;
                 ble.onConnectionError = OnConnectionError;
+                ble.onDiscoverComplete = OnDiscoverComplete;
                 [ble updateWithDiscriminator:deviceDiscriminator];
                 return;
             }
@@ -123,6 +130,35 @@ namespace DeviceLayer {
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
+            ble.onDiscoverComplete = OnDiscoverComplete;
+            ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
+        }
+
+        void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, uint64_t recoveryIdentifier)
+        {
+            assertChipStackLockedByCurrentThread();
+
+            ChipLogProgress(Ble, "ConnectionDelegate NewConnection with recoveryIdentifier: %lld", (int64_t)recoveryIdentifier);
+
+            // If the previous connection delegate was not a try to connect to something, just reuse it instead of
+            // creating a brand new connection but update the discriminator and the ble layer members.
+            if (ble and ![ble isConnecting]) {
+                [ble setBleLayer:bleLayer];
+                ble.appState = appState;
+                ble.onConnectionComplete = OnConnectionComplete;
+                ble.onConnectionError = OnConnectionError;
+                ble.onDiscoverComplete = OnDiscoverComplete;
+                [ble updateWithRecoveryIdentifier:recoveryIdentifier];
+                return;
+            }
+
+            [ble stop];
+            ble = [[BleConnection alloc] initWithRecoveryIdentifier:recoveryIdentifier];
+            [ble setBleLayer:bleLayer];
+            ble.appState = appState;
+            ble.onConnectionComplete = OnConnectionComplete;
+            ble.onConnectionError = OnConnectionError;
+            ble.onDiscoverComplete = OnDiscoverComplete;
             ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
@@ -149,6 +185,7 @@ namespace DeviceLayer {
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
+            ble.onDiscoverComplete = OnDiscoverComplete;
             [ble updateWithPeripheral:peripheral];
         }
 
@@ -264,6 +301,18 @@ namespace DeviceLayer {
     return self;
 }
 
+- (id)initWithRecoveryIdentifier:(uint64_t)recoveryIdentifier
+{
+    self = [self init];
+    if (self) {
+        _recoveryIdentifier = recoveryIdentifier;
+        _currentMode = recoveryIdentifier == 0 ? kScanForNetworkRecoveryDiscover : kScanForNetworkRecoveryRecover;
+        [self setupTimer:kScanningWithDiscriminatorTimeoutInSeconds];
+    }
+
+    return self;
+}
+
 - (BOOL)isConnecting
 {
     return _currentMode == kConnecting;
@@ -305,6 +354,13 @@ namespace DeviceLayer {
 {
     if (self.onConnectionComplete != nil) {
         self.onConnectionComplete(self.appState, BleConnObjectFromCBPeripheral(peripheral));
+    }
+}
+
+- (void)dispatchDiscoverComplete:(uint64_t)recoverIdentifier
+{
+    if (self.onDiscoverComplete != nil) {
+        self.onDiscoverComplete(self.appState, recoverIdentifier);
     }
 }
 
@@ -361,7 +417,7 @@ namespace DeviceLayer {
     }
 
     const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
-    if ([serviceData length] != sizeof(ChipBLEDeviceIdentificationInfo)) {
+    if ([serviceData length] != sizeof(ChipBLEDeviceIdentificationInfo) && [serviceData length] != sizeof(ChipBLENetworkRecoveryInfo)) {
         NSMutableString * hexString = [NSMutableString stringWithCapacity:([serviceData length] * 2)];
         for (NSUInteger i = 0; i < [serviceData length]; i++) {
             [hexString appendString:[NSString stringWithFormat:@"%02lx", (unsigned long) bytes[i]]];
@@ -384,25 +440,62 @@ namespace DeviceLayer {
         return;
     }
 
-    uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
+    if (opCode == 0) {
+        uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
 
-    if ([self isConnecting]) {
-        if (![self checkDiscriminator:discriminator]) {
-            ChipLogError(Ble,
-                "A device (%p) with a matching Matter UUID has been discovered but the service data discriminator not match our "
-                "expectation (discriminator = %u).",
-                peripheral, discriminator);
-            MATTER_LOG_METRIC(kMetricBLEMismatchedDiscriminator);
-            return;
+        if ([self isConnecting]) {
+            if (![self checkDiscriminator:discriminator]) {
+                ChipLogError(Ble,
+                    "A device (%p) with a matching Matter UUID has been discovered but the service data discriminator not match our "
+                    "expectation (discriminator = %u).",
+                    peripheral, discriminator);
+                MATTER_LOG_METRIC(kMetricBLEMismatchedDiscriminator);
+                return;
+            }
+    
+            MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
+            ChipLogProgress(Ble, "Connecting to device %p with discriminator: %d", peripheral, discriminator);
+            [self connect:peripheral];
+            [self stopScanning];
+        } else {
+            [self addPeripheralToCache:peripheral data:serviceData];
         }
-
-        MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
-        ChipLogProgress(Ble, "Connecting to device %p with discriminator: %d", peripheral, discriminator);
-        [self connect:peripheral];
-        [self stopScanning];
     } else {
-        [self addPeripheralToCache:peripheral data:serviceData];
+        ChipBLENetworkRecoveryInfo info;
+        memcpy(&info, [serviceData bytes], sizeof(info));
+        
+        NSData *recoveryIdentifierData = [NSData dataWithBytes:info.RecoveryIdentifier length:8];
+        uint64_t recoveryIdentifier = 0;
+        [recoveryIdentifierData getBytes:&recoveryIdentifier length:8];
+
+        if (_currentMode != kScanForNetworkRecoveryRecover) {
+            [self dispatchDiscoverComplete: recoveryIdentifier];
+
+            auto delegate = _scannerDelegate;
+            if (delegate) {
+                delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(peripheral), info);
+            }
+        } else {
+            if (![self checkRecoveryIdentifier: recoveryIdentifier]) {
+                ChipLogError(Ble,
+                    "A device (%p) with a matching Matter UUID has been discovered but the service data recovery identifier not match our "
+                    "expectation (recovery identifier = %lld).",
+                    peripheral, (int64_t)recoveryIdentifier);
+                MATTER_LOG_METRIC(kMetricBLEMismatchedRecoveryIdentifier);
+                return;
+            }
+            
+            MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
+            ChipLogProgress(Ble, "Connecting to device %p with recovery identifier: %lld", peripheral, (int64_t)recoveryIdentifier);
+            [self connect:peripheral];
+            [self stopScanning];
+        }
     }
+}
+
+- (BOOL)checkRecoveryIdentifier:(uint64_t)recoveryIdentifier
+{
+    return recoveryIdentifier == _recoveryIdentifier;
 }
 
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
@@ -675,6 +768,36 @@ namespace DeviceLayer {
         memcpy(&info, [serviceData bytes], sizeof(info));
 
         if ([self checkDiscriminator:info.GetDeviceDiscriminator()]) {
+            peripheral = cachedPeripheral;
+            break;
+        }
+    }
+
+    [self removePeripheralsFromCache];
+
+    if (peripheral) {
+        MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
+        ChipLogProgress(Ble, "Connecting to cached device: %p", peripheral);
+        [self connect:peripheral];
+        // The cached peripheral might be obsolete, so continue scanning until didConnectPeripheral is triggered.
+    } else {
+        [self setupTimer:kScanningWithDiscriminatorTimeoutInSeconds];
+    }
+}
+
+- (void)updateWithRecoveryIdentifier:(uint64_t)recoveryIdentifier
+{
+//    [self detachScannerDelegate];
+    _recoveryIdentifier = recoveryIdentifier;
+    _currentMode = recoveryIdentifier == 0 ? kScanForNetworkRecoveryDiscover : kScanForNetworkRecoveryRecover;
+
+    CBPeripheral * peripheral = nil;
+    for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
+        NSData * serviceData = _cachedPeripherals[cachedPeripheral][@"data"];
+        ChipBLENetworkRecoveryInfo info;
+        memcpy(&info, [serviceData bytes], sizeof(info));
+
+        if (recoveryIdentifier == info.GetRecoveryIdentifier()) {
             peripheral = cachedPeripheral;
             break;
         }

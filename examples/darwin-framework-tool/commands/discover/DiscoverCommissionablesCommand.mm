@@ -37,6 +37,14 @@ auto gDispatchQueue = dispatch_queue_create("com.chip.discover", DISPATCH_QUEUE_
     NSLog(@"Found Device (%@) with discriminator: %@ (vendor: %@, product: %@)", instanceName, discriminator, vendorId, productId);
 }
 
+-(void)controller:(MTRDeviceController *)controller didFindNetworkRecoverableDevice:(MTRNetworkRecoverableBrowserResult *)device
+{
+    auto recoveryID = device.recoveryID;
+    auto recoveryReason = device.recoveryReason;
+    
+    NSLog(@"Found recoverable device with recoveryID: %@, recoveryReason: %@)", recoveryID, recoveryReason);
+}
+
 - (void)controller:(MTRDeviceController *)controller didRemoveCommissionableDevice:(MTRCommissionableBrowserResult *)device
 {
     auto instanceName = device.instanceName;

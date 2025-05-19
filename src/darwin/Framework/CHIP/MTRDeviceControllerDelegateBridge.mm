@@ -210,6 +210,40 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId
     }
 }
 
+void MTRDeviceControllerDelegateBridge::OnNetworkRecoverDiscover(std::list<uint64_t> recoveryIds)
+{
+    MTRDeviceController * strongController = mController;
+
+    if (!recoveryIds.empty()) {
+        uint64_t firstId = recoveryIds.front();
+        MTR_LOG("%@ DeviceControllerDelegate Network recover discover. recoveryId: 0x%016llx", strongController, firstId);
+    } else {
+        MTR_LOG("%@ DeviceControllerDelegate Network recover discover. No recoveryId found.", strongController);
+    }
+}
+
+void MTRDeviceControllerDelegateBridge::OnNetworkRecoverComplete(chip::NodeId deviceId, CHIP_ERROR error)
+{
+    MTRDeviceController * strongController = mController;
+
+    MTR_LOG("%@ DeviceControllerDelegate Network recover complete. NodeId 0x%016llx Status %s", strongController, deviceId, chip::ErrorStr(error));
+    MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, error);
+
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+    if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:networkRecoverComplete:nodeID:)]) {
+            dispatch_async(mQueue, ^{
+                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
+                NSNumber * nodeID = nil;
+                if (error == CHIP_NO_ERROR) {
+                    nodeID = @(deviceId);
+                }
+                [strongDelegate controller:strongController networkRecoverComplete:nsError nodeID:nodeID];
+            });
+        }
+    }
+}
+
 void MTRDeviceControllerDelegateBridge::SetDeviceNodeID(chip::NodeId deviceNodeId)
 {
     mDeviceNodeId = deviceNodeId;

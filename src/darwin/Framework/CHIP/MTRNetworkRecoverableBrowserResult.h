@@ -19,28 +19,21 @@
 
 #import <Matter/MTRDefines.h>
 
-@class MTRCommissionableBrowserResult;
-@class MTRNetworkRecoverableBrowserResult;
-@class MTRDeviceController;
-
 NS_ASSUME_NONNULL_BEGIN
 
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-@protocol MTRCommissionableBrowserDelegate <NSObject>
-/**
- * Tells the delegate the commissionable manager discovered a device while scanning for devices.
- */
-- (void)controller:(MTRDeviceController *)controller didFindCommissionableDevice:(MTRCommissionableBrowserResult *)device;
+@interface MTRNetworkRecoverableBrowserResult : NSObject
 
 /**
- * Tells the delegate the commissionable manager discovered a device while scanning for devices.
+ * A 64-bit value unsigned value identifying the device recovery identifier.
  */
-- (void)controller:(MTRDeviceController *)controller didFindNetworkRecoverableDevice:(MTRNetworkRecoverableBrowserResult *)device;
+@property (readonly, nonatomic) NSNumber * recoveryID;
 
 /**
- * Tells the delegate a previously discovered device is is no longer available.
+ * A 4-bit value unsigned value identifying the recovery reason.
  */
-- (void)controller:(MTRDeviceController *)controller didRemoveCommissionableDevice:(MTRCommissionableBrowserResult *)device;
+@property (readonly, nonatomic) NSNumber * recoveryReason;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
 
-class MTRDeviceControllerDelegateBridge : public chip::Controller::DevicePairingDelegate {
+class MTRDeviceControllerDelegateBridge : public chip::Controller::DevicePairingDelegate, public chip::Controller::NetworkRecoverDelegate {
 public:
     MTRDeviceControllerDelegateBridge();
     ~MTRDeviceControllerDelegateBridge();
@@ -44,6 +44,9 @@ public:
     void OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR error) override;
 
     void SetDeviceNodeID(chip::NodeId deviceNodeId);
+
+    void OnNetworkRecoverDiscover(std::list<uint64_t> recoveryIds) override;
+    void OnNetworkRecoverComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
 private:
     MTRDeviceController * __weak mController;

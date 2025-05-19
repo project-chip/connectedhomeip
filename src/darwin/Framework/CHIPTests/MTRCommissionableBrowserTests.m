@@ -141,6 +141,11 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
     }
 }
 
+- (void)controller:(MTRDeviceController *)controller didFindNetworkRecoverableDevice:(MTRNetworkRecoverableBrowserResult *)device
+{
+    // TODO
+}
+
 - (void)controller:(MTRDeviceController *)controller didRemoveCommissionableDevice:(MTRCommissionableBrowserResult *)device
 {
     __auto_type * snapshot = ResultSnapshot(device);

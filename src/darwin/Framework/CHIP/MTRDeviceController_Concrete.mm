@@ -23,6 +23,7 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
+#import "MTRNetworkRecoverableBrowserResult_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRConversion.h"
 #import "MTRDeviceControllerDelegateBridge.h"
@@ -594,6 +595,8 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
+        
+        _cppCommissioner->RegisterNetworkRecoverDelegate(_deviceControllerDelegateBridge);
 
         // nocBuffer might not be used, but if it is it needs to live
         // long enough (until after we are done using
@@ -1936,6 +1939,58 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
     if (!success) {
         MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, errorCode);
+    }
+    return success;
+}
+- (BOOL)discoverRecoverableNodes:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue timeout:(uint16_t)second
+{
+    auto block = ^BOOL {
+        VerifyOrReturnValueWithMetric(kMetricStartBrowseForCommissionables, self->_commissionableBrowser == nil, NO);
+
+        auto commissionableBrowser = [[MTRCommissionableBrowser alloc] initWithDelegate:delegate controller:self queue:queue];
+        VerifyOrReturnValueWithMetric(kMetricStartBrowseForCommissionables, [commissionableBrowser start], NO);
+
+        self->_commissionableBrowser = commissionableBrowser;
+        
+        self->_cppCommissioner->DiscoverRecoverableNodes(second);
+
+        return YES;
+    };
+
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:nil];
+}
+
+- (BOOL)recoverDevice:(uint64_t)deviceID recoveryIdentifier:(uint64_t)recoveryIdentifier wifiSSID:(NSString*)ssid wifiCredentials:(NSString*)credentials error:(NSError * __autoreleasing *)error
+{
+    [[MTRMetricsCollector sharedInstance] resetMetrics];
+
+    // Track overall commissioning
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceRecovering);
+
+    // Capture in a block variable to avoid losing granularity for metrics,
+    // when translating CHIP_ERROR to NSError
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+
+    auto block = ^BOOL {
+
+        chip::ByteSpan wifiSSID = AsByteSpan([ssid dataUsingEncoding:NSUTF8StringEncoding]);
+        chip::ByteSpan wifiCredentials;
+        if (credentials != nil) {
+            wifiCredentials = AsByteSpan([credentials dataUsingEncoding:NSUTF8StringEncoding]);
+        }
+        chip::Controller::WiFiCredentials wifiCreds(wifiSSID, wifiCredentials);
+
+        errorCode = self->_cppCommissioner->RecoverNode(deviceID, recoveryIdentifier, wifiCreds);
+        if (CHIP_NO_ERROR == errorCode) {
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
+        }
+
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorRecoverDevice error:error];
+    };
+
+    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    if (!success) {
+        MATTER_LOG_METRIC_END(kMetricDeviceRecovering, errorCode);
     }
     return success;
 }

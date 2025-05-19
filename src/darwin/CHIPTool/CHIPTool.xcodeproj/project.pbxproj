@@ -13,6 +13,7 @@
 		2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */; };
 		51C8E3FB28261DCF00D47D00 /* FabricKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C8E3FA28261DCF00D47D00 /* FabricKeys.m */; };
 		991DC091247747F500C13860 /* EnumerateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EnumerateViewController.m */; };
+		9E8AFAF72DD71D4E00228B43 /* NetworkRecoveryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E8AFAF62DD71D4E00228B43 /* NetworkRecoveryViewController.m */; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
 		B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */; };
@@ -67,6 +68,8 @@
 		51C8E3FA28261DCF00D47D00 /* FabricKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FabricKeys.m; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EnumerateViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnumerateViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EnumerateViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnumerateViewController.m; sourceTree = "<group>"; };
+		9E8AFAF52DD71D4E00228B43 /* NetworkRecoveryViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkRecoveryViewController.h; sourceTree = "<group>"; };
+		9E8AFAF62DD71D4E00228B43 /* NetworkRecoveryViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkRecoveryViewController.m; sourceTree = "<group>"; };
 		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -162,6 +165,15 @@
 			path = UnpairDevices;
 			sourceTree = "<group>";
 		};
+		9E8AFAF42DD71D0600228B43 /* Network Recovery */ = {
+			isa = PBXGroup;
+			children = (
+				9E8AFAF52DD71D4E00228B43 /* NetworkRecoveryViewController.h */,
+				9E8AFAF62DD71D4E00228B43 /* NetworkRecoveryViewController.m */,
+			);
+			path = "Network Recovery";
+			sourceTree = "<group>";
+		};
 		B20252DE2459EC7600F97062 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -224,6 +236,7 @@
 		B232D8BF251A0EC500792CB4 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				9E8AFAF42DD71D0600228B43 /* Network Recovery */,
 				2C460C2F25D97CB3000512D6 /* UnpairDevices */,
 				2C460C2225D7594B000512D6 /* DeviceSelector.h */,
 				2C460C2325D7594B000512D6 /* DeviceSelector.m */,
@@ -400,6 +413,7 @@
 				B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */,
 				991DC091247747F500C13860 /* EnumerateViewController.m in Sources */,
 				B2C2267526289324009DAB8B /* FabricUIViewController.m in Sources */,
+				9E8AFAF72DD71D4E00228B43 /* NetworkRecoveryViewController.m in Sources */,
 				B2B0209225C9C1AC00A4C220 /* BindingsViewController.m in Sources */,
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
 				B2F51E99252DCDC000911FA5 /* TemperatureSensorViewController.m in Sources */,
