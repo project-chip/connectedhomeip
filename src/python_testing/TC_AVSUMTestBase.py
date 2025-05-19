@@ -174,6 +174,18 @@ class AVSUMTestBase:
     async def send_mptz_relative_move_zoom_command(self, endpoint, zoomDelta, expected_status: Status = Status.Success):
         panDelta = tiltDelta = None
         await self.send_mptz_relative_move_command(endpoint, panDelta, tiltDelta, zoomDelta, expected_status)
+    
+    async def send_null_mptz_relative_move_command(self, endpoint, expected_status: Status = Status.Success):
+        panDelta = tiltDelta = zoomDelta = None
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZRelativeMove(
+                panDelta=panDelta, tiltDelta=tiltDelta, zoomDelta=zoomDelta),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def send_mptz_relative_move_command(self, endpoint, panDelta, tiltDelta, zoomDelta, expected_status: Status = Status.Success):
         try:
