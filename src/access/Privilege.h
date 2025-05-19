@@ -19,7 +19,6 @@
 #pragma once
 
 #include <cstdint>
-#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace Access {
@@ -52,7 +51,7 @@ constexpr auto IsValidAllPrivilegesMask(uint8_t mask)
 
     for (const auto & value : privilegeValues)
     {
-        mask ^= to_underlying(value);
+        mask ^= static_cast<uint8_t>(value);
     }
 
     return (mask == 0);
