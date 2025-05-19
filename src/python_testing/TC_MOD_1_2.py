@@ -139,7 +139,7 @@ class MOD_1_2(MatterBaseTest):
 
         self.step(4)
         # DEPONOFF in the Mandatory/Optional Column
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.OnMode):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.OnMode):
             on_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.OnMode)
             # On mode can be Nullvalue
             self._log_attribute("OnMode", on_mode)
@@ -151,7 +151,7 @@ class MOD_1_2(MatterBaseTest):
 
         # Validate startup mode (attribute Startup is optional)
         self.step(5)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.StartUpMode):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.StartUpMode):
             startup_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.StartUpMode)
             self._log_attribute("StartupMode", startup_mode)
             asserts.assert_true(isinstance(startup_mode, int), "Startupmode is not int")

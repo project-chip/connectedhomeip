@@ -118,7 +118,7 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
             self.check_CommodityPriceStruct(cluster=cluster, struct=val)
 
         self.step("5")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.PriceForecast):
+        if self.attribute_guard(endpoint=endpoint, attribute=attributes.PriceForecast):
             val = await self.read_single_attribute_check_success(endpoint=endpoint,
                                                                  cluster=cluster,
                                                                  attribute=cluster.Attributes.PriceForecast)
