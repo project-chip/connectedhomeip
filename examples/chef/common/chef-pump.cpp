@@ -116,7 +116,7 @@ template <typename T>
 DataModel::Nullable<T> LevelToSetpoint(DataModel::Nullable<uint8_t> level, DataModel::Nullable<T> RangeMin,
                                        DataModel::Nullable<T> RangeMax)
 {
-    if (level.IsNull() || !level.Value() || RangeMin.IsNull() || RangeMax.IsNull())
+    if (level.IsNull() || !level.Value() || level.Value() == kNullLevel || RangeMin.IsNull() || RangeMax.IsNull())
         return DataModel::NullNullable;
 
     return RangeMin.Value() + (RangeMax.Value() - RangeMin.Value()) * std::min(level.ValueOr(0), (uint8_t) 200) / 200;
