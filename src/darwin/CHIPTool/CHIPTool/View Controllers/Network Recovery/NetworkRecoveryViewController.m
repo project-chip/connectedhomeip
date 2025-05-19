@@ -169,40 +169,40 @@
         uint64_t recoveryID = MTRGetRecoveryIdentifier(deviceId);
         if (recoveryID != 0) {
             self->_recoveryIDTextField.text = [NSString stringWithFormat:@"%llu",recoveryID];
-        }
-        
-        [self updateResult:[NSString stringWithFormat:@"Fetching the network recovery identifier attribute"]];
-        
-        // Read recovery ID
-        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
-                if (chipDevice) {
-                    MTRBaseClusterGeneralCommissioning * commissioningCluster = [[MTRBaseClusterGeneralCommissioning alloc] initWithDevice:chipDevice endpointID:@0 queue:self->_matterQueue];
-                    [commissioningCluster readAttributeRecoveryIdentifierWithCompletion:^(NSData * _Nullable value, NSError * _Nullable error) {
-                        
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            NSString * resultString = nil;
-                            if (error == nil) {
-                                unsigned long long receivedLongLongValue = 0;
-                                [value getBytes:&receivedLongLongValue length:8];
-                                MTRSetRecoveryIdentifier(deviceId, receivedLongLongValue);
-                                self->_recoveryIDTextField.text = [NSString stringWithFormat:@"%llu",receivedLongLongValue];
-                                
-                                resultString = [NSString stringWithFormat:@"readAttributeRecoveryIdentifier command failed: %@.", error];
-                            } else {
-                                resultString = [NSString
-                                                stringWithFormat:@"Command readAttributeRecoveryIdentifier command succeeded."];
-                            }
-                            
-                            [self updateResult:resultString];
-                        });
-                    }];
-                } else {
-                    [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
-                }
-            })) {
-            [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"]];
         } else {
-            [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"]];
+            [self updateResult:[NSString stringWithFormat:@"Fetching the network recovery identifier attribute"]];
+            
+            // Read recovery ID
+            if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
+                    if (chipDevice) {
+                        MTRBaseClusterGeneralCommissioning * commissioningCluster = [[MTRBaseClusterGeneralCommissioning alloc] initWithDevice:chipDevice endpointID:@0 queue:self->_matterQueue];
+                        [commissioningCluster readAttributeRecoveryIdentifierWithCompletion:^(NSData * _Nullable value, NSError * _Nullable error) {
+                            
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                NSString * resultString = nil;
+                                if (error == nil) {
+                                    unsigned long long receivedLongLongValue = 0;
+                                    [value getBytes:&receivedLongLongValue length:8];
+                                    MTRSetRecoveryIdentifier(deviceId, receivedLongLongValue);
+                                    self->_recoveryIDTextField.text = [NSString stringWithFormat:@"%llu",receivedLongLongValue];
+
+                                    resultString = [NSString
+                                                    stringWithFormat:@"readAttributeRecoveryIdentifier command succeeded."];
+                                } else {
+                                    resultString = [NSString stringWithFormat:@"readAttributeRecoveryIdentifier command failed: %@.", error];
+                                }
+                                
+                                [self updateResult:resultString];
+                            });
+                        }];
+                    } else {
+                        [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
+                    }
+                })) {
+                [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"]];
+            } else {
+                [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"]];
+            }
         }
     }];
 }
@@ -210,14 +210,16 @@
 // MARK: MTRCommissionableBrowserDelegate
 - (void)controller:(MTRDeviceController *)controller didFindNetworkRecoverableDevice:(nonnull MTRNetworkRecoverableBrowserResult *)device
 {
-    [self updateResult:[NSString stringWithFormat:@"Found recoverable device with recoveryID: %@, recovery reason:%@", device.recoveryID, device.recoveryReason]];
-    
-    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if ([device.recoveryID longLongValue] == deviceId) {
-            self->_recoverButton.backgroundColor = UIColor.systemBlueColor;
-            self->_recoverButton.enabled = YES;
-        }
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateResult:[NSString stringWithFormat:@"Found recoverable device with recoveryID: %@, recovery reason:%@", device.recoveryID, device.recoveryReason]];
+        
+        [self->_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+            if ([device.recoveryID longLongValue] == MTRGetRecoveryIdentifier(deviceId)) {
+                self->_recoverButton.backgroundColor = UIColor.systemBlueColor;
+                self->_recoverButton.enabled = YES;
+            }
+        }];
+    });
 }
 
 - (void)controller:(nonnull MTRDeviceController *)controller didFindCommissionableDevice:(nonnull MTRCommissionableBrowserResult *)device { 
@@ -255,84 +257,87 @@ networkRecoverComplete:(nonnull NSError *)error nodeID:(nonnull NSNumber *)nodeI
 
 - (IBAction)onDiscoverBtnTapped:(id)sender {
     [self updateResult:[NSString stringWithFormat:@"Discover recoverable devices..."]];
-    //    [self.chipController discoverRecoverableNodes:self queue:_matterQueue timeout:3];
+    [self.chipController discoverRecoverableNodes:self queue:_matterQueue timeout:3];
 }
 
 - (IBAction)onRecoverBtnTapped:(id)sender {
-    UIAlertController * alertController =
-    [UIAlertController alertControllerWithTitle:@"Network Recovery"
-                                        message:@"Input the new network SSID and password"
-                                 preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
-        textField.placeholder = @"Network SSID";
-        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
-        textField.borderStyle = UITextBorderStyleRoundedRect;
-        
-        NSString * networkSSID = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey);
-        if ([networkSSID length] > 0) {
-            textField.text = networkSSID;
-        }
-    }];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
-        [textField setSecureTextEntry:YES];
-        textField.placeholder = @"Password";
-        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
-        textField.borderStyle = UITextBorderStyleRoundedRect;
-        textField.secureTextEntry = YES;
-        
-        NSString * networkPassword = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey);
-        if ([networkPassword length] > 0) {
-            textField.text = networkPassword;
-        }
-    }];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel"
-                                                        style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * action) {
-    }]];
     
-    __weak typeof(self) weakSelf = self;
-    [alertController
-     addAction:[UIAlertAction actionWithTitle:@"Send"
-                                        style:UIAlertActionStyleDefault
-                                      handler:^(UIAlertAction * action) {
-        typeof(self) strongSelf = weakSelf;
-        if (strongSelf) {
-            NSArray * textfields = alertController.textFields;
-            UITextField * networkSSID = textfields[0];
-            UITextField * networkPassword = textfields[1];
-            if ([networkSSID.text length] > 0) {
-                MTRSetDomainValueForKey(
-                                        MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
+    [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
+        UIAlertController * alertController =
+        [UIAlertController alertControllerWithTitle:@"Network Recovery"
+                                            message:@"Input the new network SSID and password"
+                                     preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
+            textField.placeholder = @"Network SSID";
+            textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+            textField.borderStyle = UITextBorderStyleRoundedRect;
+            
+            NSString * networkSSID = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+            if ([networkSSID length] > 0) {
+                textField.text = networkSSID;
             }
+        }];
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
+            [textField setSecureTextEntry:YES];
+            textField.placeholder = @"Password";
+            textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+            textField.borderStyle = UITextBorderStyleRoundedRect;
+            textField.secureTextEntry = YES;
             
-            if ([networkPassword.text length] > 0) {
-                MTRSetDomainValueForKey(
-                                        MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey, networkPassword.text);
+            NSString * networkPassword = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey);
+            if ([networkPassword length] > 0) {
+                textField.text = networkPassword;
             }
-            NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
-            
-            UIAlertController *loading = [UIAlertController alertControllerWithTitle:nil
-                                                                             message:@"Network recover in progress...\n\n"
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
-            UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
-            indicator.translatesAutoresizingMaskIntoConstraints = NO;
-            [loading.view addSubview:indicator];
-            [indicator.centerXAnchor constraintEqualToAnchor:loading.view.centerXAnchor].active = YES;
-            [indicator.bottomAnchor constraintEqualToAnchor:loading.view.bottomAnchor constant:-20].active = YES;
-            [indicator startAnimating];
-            
-            strongSelf.loadingAlert = loading;
-            [strongSelf presentViewController:loading animated:YES completion:nil];
-            
-            NSError * error;
-            
-            //                                                 if(![strongSelf.chipController recoverDevice:device.nodeId recoveryIdentifier:device.recoveryId wifiSSID:networkSSID.text wifiCredentials:networkPassword.text error:&error]){
-            //                                                     NSLog(@"Failed to recover device %llu, with error %@", device.nodeId, error);
-            //                                                 }
-            
-        }
-    }]];
-    [self presentViewController:alertController animated:YES completion:nil];
+        }];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+        }]];
+        
+        __weak typeof(self) weakSelf = self;
+        [alertController
+         addAction:[UIAlertAction actionWithTitle:@"Send"
+                                            style:UIAlertActionStyleDefault
+                                          handler:^(UIAlertAction * action) {
+            typeof(self) strongSelf = weakSelf;
+            if (strongSelf) {
+                NSArray * textfields = alertController.textFields;
+                UITextField * networkSSID = textfields[0];
+                UITextField * networkPassword = textfields[1];
+                if ([networkSSID.text length] > 0) {
+                    MTRSetDomainValueForKey(
+                                            MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
+                }
+                
+                if ([networkPassword.text length] > 0) {
+                    MTRSetDomainValueForKey(
+                                            MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey, networkPassword.text);
+                }
+                NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
+                
+                UIAlertController *loading = [UIAlertController alertControllerWithTitle:nil
+                                                                                 message:@"Network recover in progress...\n\n"
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+                UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+                indicator.translatesAutoresizingMaskIntoConstraints = NO;
+                [loading.view addSubview:indicator];
+                [indicator.centerXAnchor constraintEqualToAnchor:loading.view.centerXAnchor].active = YES;
+                [indicator.bottomAnchor constraintEqualToAnchor:loading.view.bottomAnchor constant:-20].active = YES;
+                [indicator startAnimating];
+                
+                strongSelf.loadingAlert = loading;
+                [strongSelf presentViewController:loading animated:YES completion:nil];
+                
+                NSError * error;
+                
+                if(![strongSelf.chipController recoverDevice:deviceId recoveryIdentifier:MTRGetRecoveryIdentifier(deviceId) wifiSSID:networkSSID.text wifiCredentials:networkPassword.text error:&error]){
+                    NSLog(@"Failed to recover device %llu, with error %@", deviceId, error);
+                }
+                
+            }
+        }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }];
 }
 
 @end
