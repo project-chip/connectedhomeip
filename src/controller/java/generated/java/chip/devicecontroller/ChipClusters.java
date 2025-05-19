@@ -59015,7 +59015,7 @@ public class ChipClusters {
     private static final long MPTZ_POSITION_ATTRIBUTE_ID = 0L;
     private static final long MAX_PRESETS_ATTRIBUTE_ID = 1L;
     private static final long MPTZ_PRESETS_ATTRIBUTE_ID = 2L;
-    private static final long DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID = 3L;
+    private static final long DPTZ_STREAMS_ATTRIBUTE_ID = 3L;
     private static final long ZOOM_MAX_ATTRIBUTE_ID = 4L;
     private static final long TILT_MIN_ATTRIBUTE_ID = 5L;
     private static final long TILT_MAX_ATTRIBUTE_ID = 6L;
@@ -59221,8 +59221,8 @@ public class ChipClusters {
       void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> value);
     }
 
-    public interface DPTZRelativeMoveAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Integer> value);
+    public interface DPTZStreamsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -59315,30 +59315,30 @@ public class ChipClusters {
         }, MPTZ_PRESETS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readDPTZRelativeMoveAttribute(
-        DPTZRelativeMoveAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
+    public void readDPTZStreamsAttribute(
+        DPTZStreamsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_STREAMS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID, true);
+        }, DPTZ_STREAMS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeDPTZRelativeMoveAttribute(
-        DPTZRelativeMoveAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID);
+    public void subscribeDPTZStreamsAttribute(
+        DPTZStreamsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DPTZ_STREAMS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, DPTZ_RELATIVE_MOVE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, DPTZ_STREAMS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readZoomMaxAttribute(
@@ -62922,7 +62922,7 @@ public class ChipClusters {
     }
 
     public interface StatusAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(ChipStructs.JointFabricDatastoreClusterDatastoreStatusStruct value);
+      void onSuccess(ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct value);
     }
 
     public interface EndpointGroupIDListAttributeCallback extends BaseAttributeCallback {
@@ -62934,7 +62934,7 @@ public class ChipClusters {
     }
 
     public interface NodeKeySetListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntry> value);
+      void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct> value);
     }
 
     public interface NodeACLListAttributeCallback extends BaseAttributeCallback {
@@ -63089,11 +63089,6 @@ public class ChipClusters {
 
     public void readGroupListAttribute(
         GroupListAttributeCallback callback) {
-      readGroupListAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readGroupListAttributeWithFabricFilter(
-        GroupListAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GROUP_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63102,7 +63097,7 @@ public class ChipClusters {
             List<ChipStructs.JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, GROUP_LIST_ATTRIBUTE_ID, isFabricFiltered);
+        }, GROUP_LIST_ATTRIBUTE_ID, true);
     }
 
     public void subscribeGroupListAttribute(
@@ -63120,11 +63115,6 @@ public class ChipClusters {
 
     public void readNodeListAttribute(
         NodeListAttributeCallback callback) {
-      readNodeListAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readNodeListAttributeWithFabricFilter(
-        NodeListAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NODE_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63133,7 +63123,7 @@ public class ChipClusters {
             List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NODE_LIST_ATTRIBUTE_ID, isFabricFiltered);
+        }, NODE_LIST_ATTRIBUTE_ID, true);
     }
 
     public void subscribeNodeListAttribute(
@@ -63151,11 +63141,6 @@ public class ChipClusters {
 
     public void readAdminListAttribute(
         AdminListAttributeCallback callback) {
-      readAdminListAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readAdminListAttributeWithFabricFilter(
-        AdminListAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ADMIN_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63164,7 +63149,7 @@ public class ChipClusters {
             List<ChipStructs.JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ADMIN_LIST_ATTRIBUTE_ID, isFabricFiltered);
+        }, ADMIN_LIST_ATTRIBUTE_ID, true);
     }
 
     public void subscribeAdminListAttribute(
@@ -63187,7 +63172,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            ChipStructs.JointFabricDatastoreClusterDatastoreStatusStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, STATUS_ATTRIBUTE_ID, true);
@@ -63200,7 +63185,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            ChipStructs.JointFabricDatastoreClusterDatastoreStatusStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, STATUS_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -63208,11 +63193,6 @@ public class ChipClusters {
 
     public void readEndpointGroupIDListAttribute(
         EndpointGroupIDListAttributeCallback callback) {
-      readEndpointGroupIDListAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readEndpointGroupIDListAttributeWithFabricFilter(
-        EndpointGroupIDListAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENDPOINT_GROUP_ID_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63221,7 +63201,7 @@ public class ChipClusters {
             List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ENDPOINT_GROUP_ID_LIST_ATTRIBUTE_ID, isFabricFiltered);
+        }, ENDPOINT_GROUP_ID_LIST_ATTRIBUTE_ID, true);
     }
 
     public void subscribeEndpointGroupIDListAttribute(
@@ -63239,11 +63219,6 @@ public class ChipClusters {
 
     public void readEndpointBindingListAttribute(
         EndpointBindingListAttributeCallback callback) {
-      readEndpointBindingListAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readEndpointBindingListAttributeWithFabricFilter(
-        EndpointBindingListAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENDPOINT_BINDING_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63252,7 +63227,7 @@ public class ChipClusters {
             List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, ENDPOINT_BINDING_LIST_ATTRIBUTE_ID, isFabricFiltered);
+        }, ENDPOINT_BINDING_LIST_ATTRIBUTE_ID, true);
     }
 
     public void subscribeEndpointBindingListAttribute(
@@ -63270,20 +63245,15 @@ public class ChipClusters {
 
     public void readNodeKeySetListAttribute(
         NodeKeySetListAttributeCallback callback) {
-      readNodeKeySetListAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readNodeKeySetListAttributeWithFabricFilter(
-        NodeKeySetListAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NODE_KEY_SET_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntry> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NODE_KEY_SET_LIST_ATTRIBUTE_ID, isFabricFiltered);
+        }, NODE_KEY_SET_LIST_ATTRIBUTE_ID, true);
     }
 
     public void subscribeNodeKeySetListAttribute(
@@ -63293,7 +63263,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntry> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, NODE_KEY_SET_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -63301,11 +63271,6 @@ public class ChipClusters {
 
     public void readNodeACLListAttribute(
         NodeACLListAttributeCallback callback) {
-      readNodeACLListAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readNodeACLListAttributeWithFabricFilter(
-        NodeACLListAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NODE_ACL_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63314,7 +63279,7 @@ public class ChipClusters {
             List<ChipStructs.JointFabricDatastoreClusterDatastoreACLEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NODE_ACL_LIST_ATTRIBUTE_ID, isFabricFiltered);
+        }, NODE_ACL_LIST_ATTRIBUTE_ID, true);
     }
 
     public void subscribeNodeACLListAttribute(
@@ -64203,6 +64168,11 @@ public class ChipClusters {
 
     public void readProvisionedRootCertificatesAttribute(
         ProvisionedRootCertificatesAttributeCallback callback) {
+      readProvisionedRootCertificatesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readProvisionedRootCertificatesAttributeWithFabricFilter(
+        ProvisionedRootCertificatesAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -64211,7 +64181,7 @@ public class ChipClusters {
             List<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID, true);
+        }, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeProvisionedRootCertificatesAttribute(
@@ -64255,6 +64225,11 @@ public class ChipClusters {
 
     public void readProvisionedClientCertificatesAttribute(
         ProvisionedClientCertificatesAttributeCallback callback) {
+      readProvisionedClientCertificatesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readProvisionedClientCertificatesAttributeWithFabricFilter(
+        ProvisionedClientCertificatesAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -64263,7 +64238,7 @@ public class ChipClusters {
             List<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID, true);
+        }, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeProvisionedClientCertificatesAttribute(

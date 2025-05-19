@@ -3050,6 +3050,7 @@
           "define": "JOINT_FABRIC_DATASTORE_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddKeySet",
@@ -3220,6 +3221,7 @@
           "define": "JOINT_FABRIC_ADMINISTRATOR_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "ICACCSRRequest",
@@ -3256,6 +3258,30 @@
             {
               "name": "OpenJointCommissioningWindow",
               "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "TransferAnchorRequest",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "TransferAnchorResponse",
+              "code": 6,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "TransferAnchorComplete",
+              "code": 7,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,

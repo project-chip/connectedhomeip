@@ -82,6 +82,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ViewportStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::detail::Structs::ViewportStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request,
                         Json::Value & value);
 
@@ -105,11 +110,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::OperationalStateStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ViewportStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::detail::Structs::ViewportStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::WebRTCSessionStruct::Type & request,
                         Json::Value & value);
@@ -778,6 +778,12 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type & request);
+
 static CHIP_ERROR
 Setup(const char * label,
       chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::Type & request,
@@ -907,10 +913,10 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntry::Type & request,
+                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntry::Type & request);
+static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeInformationEntryStruct::Type & request,
@@ -979,12 +985,6 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::Type & request,
                         Json::Value & value);

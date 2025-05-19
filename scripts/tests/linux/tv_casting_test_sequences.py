@@ -71,8 +71,6 @@ VENDOR_ID = 0xFFF1  # 0xFFF1 = 65521; Spec 7.20.2.1 MEI code: test vendor IDs ar
 PRODUCT_ID = 0x8001  # 0x8001 = 32769 = Test product id
 DEVICE_TYPE_CASTING_VIDEO_PLAYER = 0x23  # 0x23 = 35 = Device type library 10.3: Casting Video Player
 
-# 0x457 = 1111 = Target Content Application Vendor ID for the commissioner generated passcode flow
-COMMISSIONER_GENERATED_PASSCODE_VENDOR_ID = 0x457
 COMMISSIONER_GENERATED_PASSCODE = '0x00BC_614E'  # 0x00BC_614E = 12345678 = Default commissioner generated passcode
 
 # Value to verify the subscription state against in the Linux tv-casting-app output.
@@ -118,6 +116,12 @@ test_sequences = [
 
             # Send `controller ux ok\n` command to the tv-app subprocess.
             Step(app=App.TV_APP, input_cmd='controller ux ok\n'),
+
+            # Validate that we received the instructions on the tv-app output for sending the `controller ux ok [passcode]` command.
+            Step(app=App.TV_APP, output_msg=['Via Shell Enter: controller ux ok [passcode]']),
+
+            # Send `controller ux ok 20202021\n` command to the tv-app subprocess.
+            Step(app=App.TV_APP, input_cmd='controller ux ok 20202021\n'),
 
             # Validate that pairing succeeded between the tv-casting-app and the tv-app.
             Step(app=App.TV_APP, output_msg=['Secure Pairing Success']),
@@ -179,10 +183,10 @@ test_sequences = [
             # mCommissionerPasscode:      true                        -> This flag instructs the commissioner to use the commissioner-generated-passcode flow for commissioning.
             # mCommissionerPasscodeReady: false                       -> This flag indicates that the commissionee has not obtained the commissioner passcode from the user and
             #                                                            thus is not ready for commissioning.
-            # Vendor ID: {COMMISSIONER_GENERATED_PASSCODE_VENDOR_ID}  -> The initial VENDOR_ID of the casting player will be overridden to {COMMISSIONER_GENERATED_PASSCODE_VENDOR_ID}.
-            #                                                            Otherwise we will enter the commissionee-generated-passcode flow.
+            # Vendor ID: {VENDOR_ID}                                  -> The target VENDOR_ID of the casting player is the same for both commissionee-generated-passcode and
+            #                                                            commissioner-generated-passcode flows.
             Step(app=App.TV_CASTING_APP, output_msg=['IdentificationDeclarationOptions::LogDetail()', 'IdentificationDeclarationOptions::mCommissionerPasscode:      true',
-                 'IdentificationDeclarationOptions::mCommissionerPasscodeReady: false', 'IdentificationDeclarationOptions::TargetAppInfos list:', f'TargetAppInfo 1, Vendor ID: {COMMISSIONER_GENERATED_PASSCODE_VENDOR_ID}']),
+                 'IdentificationDeclarationOptions::mCommissionerPasscodeReady: false', 'IdentificationDeclarationOptions::TargetAppInfos list:', f'TargetAppInfo 1, Vendor ID: {VENDOR_ID}']),
 
             # Validate that we received the cast request from the tv-casting-app on the tv-app output.
             Step(app=App.TV_APP,
@@ -221,10 +225,10 @@ test_sequences = [
             # mCommissionerPasscode:      true                        -> This flag instructs the commissioner to use the commissioner-generated-passcode flow for commissioning.
             # mCommissionerPasscodeReady: true                        -> This flag indicates that the commissionee has obtained the commissioner passcode from the user and
             #                                                            thus is ready for commissioning.
-            # Vendor ID: {COMMISSIONER_GENERATED_PASSCODE_VENDOR_ID}  -> The initial VENDOR_ID of the casting player will be overridden to {COMMISSIONER_GENERATED_PASSCODE_VENDOR_ID}.
-            #                                                            Otherwise we will enter the commissionee-generated-passcode flow.
+            # Vendor ID: {VENDOR_ID}                                  -> The target VENDOR_ID of the casting player is the same for both commissionee-generated-passcode and
+            #                                                            commissioner-generated-passcode flows.
             Step(app=App.TV_CASTING_APP, output_msg=['IdentificationDeclarationOptions::LogDetail()', 'IdentificationDeclarationOptions::mCommissionerPasscode:      true',
-                                                     'IdentificationDeclarationOptions::mCommissionerPasscodeReady: true', 'IdentificationDeclarationOptions::TargetAppInfos list:', f'TargetAppInfo 1, Vendor ID: {COMMISSIONER_GENERATED_PASSCODE_VENDOR_ID}']),
+                                                     'IdentificationDeclarationOptions::mCommissionerPasscodeReady: true', 'IdentificationDeclarationOptions::TargetAppInfos list:', f'TargetAppInfo 1, Vendor ID: {VENDOR_ID}']),
 
             # Validate that pairing succeeded between the tv-casting-app and the tv-app.
             Step(app=App.TV_APP, output_msg=['Secure Pairing Success']),

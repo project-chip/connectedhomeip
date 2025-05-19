@@ -54,9 +54,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, role);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -91,9 +88,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, subCategory);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -127,9 +121,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEpisode))
         {
             err = DataModel::Decode(reader, episode);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -189,9 +180,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kType))
         {
             err = DataModel::Decode(reader, type);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -312,9 +300,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, externalIDList);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -354,9 +339,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, before);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -391,9 +373,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, nextToken);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -427,9 +406,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kValue))
         {
             err = DataModel::Decode(reader, value);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -474,9 +450,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kLineupInfoType))
         {
             err = DataModel::Decode(reader, lineupInfoType);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
