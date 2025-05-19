@@ -10,7 +10,7 @@ for details.
 
 Refer the below image to connect SE05x to i.MX 8M using I2C pins.
 
-![SE05x-i.MX8M-Mini](../../../../platform/nxp/se05x/linux/doc/images/imx8evk_se05x.jpg)
+![SE05x-i.MX8M-Mini](../../../platform/nxp/se05x/linux/doc/images/imx8evk_se05x.jpg)
 
 
 # SE05x Integration Configuration
