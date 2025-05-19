@@ -425,6 +425,9 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 }
 #endif
 
+// Wrapper for DeviceInstanceInfoProvider that allows the example app to set
+// attribute values from the command-line, provide hardcoded values, or fall
+// back to the default DeviceInstanceInfoProvider.
 class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
 {
 public:
@@ -732,7 +735,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    // Initialize device instance info provider.
+    // Initialize the ExampleDeviceInstanceInfoProvider.
     defaultDeviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
     if (defaultDeviceInstanceInfoProvider != &gExampleDeviceInstanceInfoProvider)
     {
