@@ -109,6 +109,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                     asserts.assert_true(0 <= current_state.speed <= 3, "Speed is not in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 4: Read Target attribute
         self.step(4)
@@ -126,6 +127,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                                         "Speed is not NullValue or in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 5: Read Resolution attribute
         self.step(5)
@@ -134,6 +136,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(1 <= resolution <= 10000, "Resolution is not in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 6: Read StepValue attribute
         self.step(6)
@@ -143,6 +146,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(step_value % resolution == 0, "StepValue is not a multiple of Resolution")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 7: Read Unit attribute
         self.step(7)
@@ -152,6 +156,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(0 <= unit <= 1, "Unit is not in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 8: Read UnitRange attribute
         self.step(8)
@@ -171,6 +176,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                                         "UnitRange.max - UnitRange.min is not in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 9: Read LimitRange attribute
         self.step(9)
@@ -182,6 +188,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(limit_range.max % resolution == 0, "LimitRange.max is not a multiple of Resolution")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 10: Read TranslationDirection attribute
         self.step(10)
@@ -190,6 +197,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(0 <= translation_direction <= 15, "TranslationDirection is not in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 11: Read RotationAxis attribute
         self.step(11)
@@ -198,6 +206,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(0 <= rotation_axis <= 10, "RotationAxis is not in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 12: Read Overflow attribute
         self.step(12)
@@ -206,6 +215,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(0 <= overflow <= 10, "Overflow is not in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 13: Read ModulationType attribute
         self.step(13)
@@ -214,6 +224,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(0 <= modulation_type <= 4, "ModulationType is not in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         # STEP 14: Read LatchControlModes attribute
         self.step(14)
@@ -222,6 +233,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(0 <= latch_control_modes <= 3, "LatchControlModes is not in the expected range")
         else:
             logging.info("Test step skipped")
+            self.mark_current_step_skipped()
 
 
 if __name__ == "__main__":

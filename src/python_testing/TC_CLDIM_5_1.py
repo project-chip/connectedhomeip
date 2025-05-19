@@ -150,6 +150,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
         else:
             logging.info("ExpectedState.Position is already at MinPosition. Skipping step.")
+            self.mark_current_step_skipped()
 
         # STEP 3d: If ExpectedState.Position != MinPosition, wait for CurrentState.Position to be updated to MinPosition
         self.step("3d")
@@ -160,6 +161,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
             sub_handler.await_all_final_values_reported(expected_final_value, timeout_sec=timeout)
         else:
             logging.info("ExpectedState.Position is already at MinPosition. Skipping step.")
+            self.mark_current_step_skipped()
 
         # STEP 3e: Send SetTarget command with Position=MaxPosition
         self.step("3e")
@@ -203,6 +205,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
         else:
             logging.info("Manual latching is not required. Skipping step.")
+            self.mark_current_step_skipped()
 
         # STEP 4d: If manual latching is not required, send SetTarget command with Latch=True
         self.step("4d")
@@ -214,6 +217,9 @@ class TC_CLDIM_5_1(MatterBaseTest):
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+        else:
+            logging.info("Manual latching is required. Skipping step.")
+            self.mark_current_step_skipped()
 
         # STEP 4e: Wait for CurrentState.Latch to be updated to True
         self.step("4e")
@@ -231,6 +237,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
         else:
             logging.info("Manual unlatching is not required. Skipping step.")
+            self.mark_current_step_skipped()
 
         # STEP 4g: If manual unlatching is not required, send SetTarget command with Latch=False
         self.step("4g")
@@ -243,6 +250,9 @@ class TC_CLDIM_5_1(MatterBaseTest):
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+        else:
+            logging.info("Manual unlatching is required. Skipping step.")
+            self.mark_current_step_skipped()
 
         # STEP 4h: Wait for CurrentState.Latch to be updated to False
         self.step("4h")
