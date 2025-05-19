@@ -673,7 +673,7 @@ private:
 
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
 
-    bool mIsPeerLITOperationMode = false;
+    bool mPeerIsOperatingAsLIT = false;
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
     // Reserved size for the uint8_t InteractionModelRevision flag, which takes up 1 byte for the control tag and 1 byte for the

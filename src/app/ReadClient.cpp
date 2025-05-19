@@ -519,16 +519,16 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
 
-    if (mReadPrepareParams.mIsPeerLIT)
+    if (mReadPrepareParams.mRegisteredCheckInToken)
     {
-        mIsPeerLITOperationMode = (aType == PeerType::kLITCheckIn);
+        mPeerIsOperatingAsLIT = (aType == PeerType::kLITICD);
     }
 
-    ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLITOperationMode ? "a" : "not a");
+    ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mPeerIsOperatingAsLIT ? "a" : "not a");
 
     // If the peer is no longer LIT and we were waiting for a check-in to try to resubscribe,
     // just try to resubscribe now, because a SIT is not going to send a check-in.
-    if (!mIsPeerLITOperationMode && IsInactiveICDSubscription())
+    if (!mPeerIsOperatingAsLIT && IsInactiveICDSubscription())
     {
         TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
     }
@@ -1057,7 +1057,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    if (_this->mIsPeerLITOperationMode)
+    if (_this->mPeerIsOperatingAsLIT)
     {
         subscriptionTerminationCause = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
     }
@@ -1187,9 +1187,13 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
         mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
     }
 
-    mReadPrepareParams.mIsPeerLIT = aReadPrepareParams.mIsPeerLIT;
-    mIsPeerLITOperationMode = aReadPrepareParams.mIsPeerLIT;
+    mPeerIsOperatingAsLIT                      = aReadPrepareParams.mIsPeerLIT;
+    mReadPrepareParams.mRegisteredCheckInToken = aReadPrepareParams.mRegisteredCheckInToken;
     if (aReadPrepareParams.mIsPeerLIT)
+    {
+        mReadPrepareParams.mRegisteredCheckInToken = true;
+    }
+    if (aReadPrepareParams.mRegisteredCheckInToken)
     {
         ChipLogProgress(DataManagement, "Peer device has been registered with ICD CheckIn token");
     }
