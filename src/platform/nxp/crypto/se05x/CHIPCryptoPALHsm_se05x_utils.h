@@ -75,9 +75,6 @@ extern "C" {
 /* Open session to se05x */
 CHIP_ERROR se05x_sessionOpen(void);
 
-/* Close session to se05x */
-CHIP_ERROR se05x_close_session(void);
-
 /* Check if key exists in se05x */
 CHIP_ERROR Se05xCheckObjectExists(uint32_t keyid);
 
