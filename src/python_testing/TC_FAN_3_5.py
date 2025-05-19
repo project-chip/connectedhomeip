@@ -52,12 +52,41 @@ class TC_FAN_3_5(MatterBaseTest):
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
 
     def steps_TC_FAN_3_5(self):
-        return [TestStep("1", "[FC] Commissioning already done.", is_commissioning=True),
-                # TestStep("2", "[FC] TH checks the DUT for support of the Step and MultiSpeed features.",
-                #          "If the DUT does not support both features, the test is skipped."),
-                # TestStep("3", "[FC] TH reads from the DUT the SpeedMax attribute.", "Store value for future reference."),
-
-                # TestStep("4", "[FC] TH subscribes to the FanControl cluster.", "Enables the TH to recei
+        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+                TestStep(2, "[FC] Action_2.", "Check."),
+                TestStep(3, "[FC] Action_3.", "Check."),
+                TestStep(4, "[FC] Action_4.", "Check."),
+                TestStep(5, "[FC] Action_5.", "Check."),
+                TestStep(6, "[FC] Action_6.", "Check."),
+                TestStep(7, "[FC] Action_7.", "Check."),
+                TestStep(8, "[FC] Action_8.", "Check."),
+                TestStep(9, "[FC] Action_9.", "Check."),
+                TestStep(10, "[FC] Action_10.", "Check."),
+                TestStep(11, "[FC] Action_11.", "Check."),
+                TestStep(12, "[FC] Action_12.", "Check."),
+                TestStep(13, "[FC] Action_13.", "Check."),
+                TestStep(14, "[FC] Action_14.", "Check."),
+                TestStep(15, "[FC] Action_15.", "Check."),
+                TestStep(16, "[FC] Action_16.", "Check."),
+                TestStep(17, "[FC] Action_17.", "Check."),
+                TestStep(18, "[FC] Action_18.", "Check."),
+                TestStep(19, "[FC] Action_19.", "Check."),
+                TestStep(20, "[FC] Action_20.", "Check."),
+                TestStep(21, "[FC] Action_21.", "Check."),
+                TestStep(22, "[FC] Action_22.", "Check."),
+                TestStep(23, "[FC] Action_23.", "Check."),
+                TestStep(24, "[FC] Action_24.", "Check."),
+                TestStep(25, "[FC] Action_25.", "Check."),
+                TestStep(26, "[FC] Action_26.", "Check."),
+                TestStep(27, "[FC] Action_27.", "Check."),
+                TestStep(28, "[FC] Action_28.", "Check."),
+                TestStep(29, "[FC] Action_29.", "Check."),
+                TestStep(30, "[FC] Action_30.", "Check."),
+                TestStep(31, "[FC] Action_31.", "Check."),
+                TestStep(32, "[FC] Action_32.", "Check."),
+                TestStep(33, "[FC] Action_33.", "Check."),
+                TestStep(34, "[FC] Action_34.", "Check."),
+                TestStep(35, "[FC] Action_35.", "Check."),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
@@ -122,16 +151,12 @@ class TC_FAN_3_5(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
             pass
 
-    async def subscribe_to_attributes(self) -> None:
+    async def subscribe_to_attributes(self, subscriptions: list) -> None:
         """Subscribe to PercentSetting, SpeedSetting, and FanMode attributes on the DUT."""
         cluster = Clusters.FanControl
         attr = cluster.Attributes
 
-        self.subscriptions = [
-            ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
-            ClusterAttributeChangeAccumulator(cluster, attr.SpeedSetting),
-            ClusterAttributeChangeAccumulator(cluster, attr.FanMode)
-        ]
+        self.subscriptions = subscriptions
 
         for sub in self.subscriptions:
             await sub.start(self.default_controller, self.dut_node_id, self.endpoint)
@@ -226,18 +251,7 @@ class TC_FAN_3_5(MatterBaseTest):
             f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({expected_value})"
         )
 
-    async def lowest_off_test(self, step: Clusters.FanControl.Commands.Step) -> None:
-        """Tests the `lowestOff` flag for the given Step command.
-
-        Args:
-            step (Clusters.FanControl.Commands.Step): Step command parameters.
-
-        Returns:
-            None
-
-        Raises:
-            AssertionError: If expected conditions are not met during test steps.
-        """
+    async def get_initial_reports_and_values(self, step: Clusters.FanControl.Commands.Step) -> None:
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         sd_enum = cluster.Enums.StepDirectionEnum
@@ -246,14 +260,16 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** NEXT STEP ***
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in acordance with the Step command parameters
-        # self.step(self.current_step_index + 1)
+        self.step(self.current_step_index + 1)
         percent_setting_init = await self.initialize_and_verify_attribtutes(step)
 
         # *** NEXT STEP ***
         # Reset the subscriptions to clear any previous attribute reports
-        # self.step(self.current_step_index + 1)
+        self.step(self.current_step_index + 1)
         for sub in self.subscriptions:
             sub.reset()
+        self.percent_current_values_produced = []
+        self.speed_current_values_produced = []
 
         # *** NEXT STEP ***
         # TH sends Step commands iteratively
@@ -264,7 +280,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #    - If the expected PercentSetting attribute report value is reached, send
         #      an additional Step command to veiryf that the PercentSetting attribute
         #      report value stays at the expected value, otherwise, the test is failed.
-        # self.step(self.current_step_index + 1)
+        self.step(self.current_step_index + 1)
         min_percent_setting = 0 if step.lowestOff else self.percent_setting_per_step
         percent_setting_expected = 100 if step.direction == sd_enum.kIncrease else min_percent_setting
         for i in range(100):
@@ -272,6 +288,9 @@ class TC_FAN_3_5(MatterBaseTest):
             percent_setting = percent_setting_sub.get_last_attribute_report_value(
                 self.endpoint, attr.PercentSetting, self.timeout_sec)
             logging.info(f"[FC] PercentSetting attribute report value: {percent_setting}")
+            
+            self.percent_current_values_produced.append(await self.read_setting(attr.PercentCurrent))
+            self.speed_current_values_produced.append(await self.read_setting(attr.SpeedCurrent))
 
             # Calculate the PercentSetting range per Step
             #  - The first run of this function sets PercentSetting to 100,
@@ -284,6 +303,8 @@ class TC_FAN_3_5(MatterBaseTest):
                     if i == 0:
                         self.percent_setting_per_step = percent_setting_init - percent_setting
 
+            # Send extra Step command to verify that the PercentSetting attribute
+            # report value stays at the expected value
             if percent_setting == percent_setting_expected:
                 await self.send_step_command(step)
                 percent_setting = await self.read_setting(attr.PercentSetting)
@@ -298,6 +319,26 @@ class TC_FAN_3_5(MatterBaseTest):
                         f"[FC] PercentSetting attribute value never reached ({percent_setting_expected}), last reported value is ({percent_setting})."
                     )
 
+        return percent_setting_init
+
+    async def lowest_off_test(self, step: Clusters.FanControl.Commands.Step) -> None:
+        """Tests the `lowestOff` flag for the given Step command.
+
+        Args:
+            step (Clusters.FanControl.Commands.Step): Step command parameters.
+
+        Returns:
+            None
+
+        Raises:
+            AssertionError: If expected conditions are not met during test steps.
+        """
+
+        percent_setting_init = await self.get_initial_reports_and_values(step)
+        
+        logging.info(f"[FC] precent_current_values: {self.precent_current_values}")
+        logging.info(f"[FC] speed_current_values: {self.speed_current_values}")
+
         # *** NEXT STEP ***
         #  Read the resulting attribute reports from each subscription after the Step commands
         #   - Verify that the attribute report values from each subscription are in the
@@ -310,7 +351,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #        in acordance with the SpeedMax attribute value.
         #   - Save the resulting attribute report values from each subscription as a baseline
         #     for future comparisons.
-        # self.step(self.current_step_index + 1)
+        self.step(self.current_step_index + 1)
         percent_setting_values, fan_mode_values, speed_setting_values = self.verify_expected_reports_and_progression(
             step, percent_setting_init)
         self.save_baseline_values(step, percent_setting_values, fan_mode_values, speed_setting_values)
@@ -373,6 +414,9 @@ class TC_FAN_3_5(MatterBaseTest):
                 self.verify_attribute_progression(step, attr.SpeedSetting, speed_setting_values_produced)
                 sub.log_queue()
 
+        self.verify_attribute_progression(step, attr.PercentCurrent, self.percent_current_values_produced)
+        self.verify_attribute_progression(step, attr.SpeedCurrent, self.speed_current_values_produced)
+
         # Get the expected FanMode and SpeedSetting values to verify all are present
         increase_step = step.direction == sd_enum.kIncrease
         speed_max_range = range(0, self.speed_max + 1)
@@ -400,6 +444,9 @@ class TC_FAN_3_5(MatterBaseTest):
                 fan_modes_expected, fan_mode_values_produced,
                 f"[FC] Some of the expected FanMode values are not present in the reports. Expected: {fan_modes_expected}, missing: {missing_fan_modes}."
             )
+            
+        asserts.assert_equal(self.percent_current_values_produced, percent_setting_values_produced,
+                             f"[FC] PercentCurrent attribute values do not match PercentSetting values. Expected: {percent_setting_values_produced}, produced: {self.percent_current_values_produced}.")
 
         # If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports,
         # - Verify that all the expected SpeedSetting values are present in the reports
@@ -409,6 +456,9 @@ class TC_FAN_3_5(MatterBaseTest):
                 speed_setting_expected, speed_setting_values_produced,
                 f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_expected}, missing: {missing_speed_setting}."
             )
+            
+        asserts.assert_equal(self.speed_current_values_produced, speed_setting_values_produced,
+                             f"[FC] SpeedCurrent attribute values do not match SpeedSetting values. Expected: {speed_setting_values_produced}, produced: {self.speed_current_values_produced}.")
 
         return percent_setting_values_produced, fan_mode_values_produced, speed_setting_values_produced
 
@@ -431,11 +481,16 @@ class TC_FAN_3_5(MatterBaseTest):
             self.baseline_percent_setting_desc = percent_setting_values_produced[:-1]
             self.baseline_fan_mode_desc = fan_mode_values_produced[:-1]
             self.baseline_speed_setting_desc = speed_setting_values_produced[:-1]
+            self.baseline_percent_current_desc = self.percent_current_values_produced[:-1]
+            self.baseline_speed_current_desc = self.speed_current_values_produced[:-1]
 
         if step.direction == sd_enum.kIncrease and step.lowestOff:
             self.baseline_percent_setting_asc = percent_setting_values_produced[:-1]
             self.baseline_fan_mode_asc = fan_mode_values_produced[:-1]
             self.baseline_speed_setting_asc = speed_setting_values_produced[:-1]
+            self.baseline_percent_current_asc = self.percent_current_values_produced[:-1]
+            self.baseline_speed_current_asc = self.speed_current_values_produced[:-1]
+            
 
     def verify_baseline_values(self):
         """
@@ -462,6 +517,14 @@ class TC_FAN_3_5(MatterBaseTest):
             self.baseline_speed_setting_desc, list(reversed(self.baseline_speed_setting_asc)),
             f"[FC] SpeedSetting attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_speed_setting_desc}, Ascending: {self.baseline_speed_setting_asc}."
         )
+        asserts.assert_equal(
+            self.baseline_percent_current_desc, list(reversed(self.baseline_percent_current_asc)),
+            f"[FC] PercentCurrent attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_percent_current_desc}, Ascending: {self.baseline_percent_current_asc}."
+        )
+        asserts.assert_equal(
+            self.baseline_speed_current_desc, list(reversed(self.baseline_speed_current_asc)),
+            f"[FC] SpeedCurrent attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_speed_current_desc}, Ascending: {self.baseline_speed_current_asc}."
+            )
 
     async def wrap_test(self, step: Clusters.FanControl.Commands.Step) -> None:
         """Tests the `wrap` flag for the given Step command.
@@ -476,19 +539,19 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** NEXT STEP ***
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in acordance with the Step command parameters
-        # self.step(self.current_step_index + 1)
+        self.step(self.current_step_index + 1)
         await self.initialize_and_verify_attribtutes(step)
 
         # *** NEXT STEP ***
         # Reset the subscriptions to clear any previous attribute reports
-        # self.step(self.current_step_index + 1)
+        self.step(self.current_step_index + 1)
         for sub in self.subscriptions:
             sub.reset()
 
         # *** NEXT STEP ***
         # TH sends a Step command with the reqested parameters
         #  - Verify the expected attribute values are produced
-        # self.step(self.current_step_index + 1)
+        self.step(self.current_step_index + 1)
         if step.direction == sd_enum.kDecrease and step.lowestOff:
             # - Verify that the attribute values all go to Off values
             await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
@@ -560,15 +623,17 @@ class TC_FAN_3_5(MatterBaseTest):
         sd_enum = cluster.Enums.StepDirectionEnum
         self.timeout_sec: float = 0.5
         self.percent_setting_per_step: Optional[int] = None
+        self.precent_current_values = []
+        self.speed_current_values = []
 
         # *** STEP 1 ***
         # Commissioning already done
-        self.step("1")
+        self.step(1)
 
         # *** STEP 2 ***
         # TH checks the DUT for the prescence of the OnOff cluster
         # - If the cluster is present, set it to On
-        # self.step("2")
+        self.step(2)
         has_on_off_cluster = await self.cluster_guard(endpoint=self.endpoint, cluster=Clusters.OnOff, skip_step=False)
         if has_on_off_cluster:
             await self.send_on_off_command(Clusters.OnOff.Commands.On())
@@ -576,7 +641,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** STEP 3 ***
         # TH checks the DUT for support of the Step and MultiSpeed features
         #  - If the DUT does not support both features, the test is skipped
-        # self.step("3")
+        self.step(3)
         feature_map = await self.read_setting(attr.FeatureMap)
         self.supports_step = bool(feature_map & cluster.Bitmaps.Feature.kStep)
         self.supports_multi_speed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
@@ -587,19 +652,24 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** STEP 4 ***
         # TH reads from the DUT the SpeedMax attribute
         #  - Store value for future reference
-        # self.step("4")
+        self.step(4)
         self.speed_max = await self.read_setting(attr.SpeedMax)
 
         # *** STEP 5 ***
         # TH reads from the DUT the FanModeSequence attribute
         #  - Store result for future reference
-        # self.step("5")
+        self.step(5)
         await self.get_fan_modes(remove_auto=True)
 
         # *** STEP 6 ***
         # TH subscribes to the PercentSetting, FanMode, and SpeedSetting attributes individually
-        # self.step("6")
-        await self.subscribe_to_attributes()
+        self.step(6)
+        subscriptions = [
+            ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
+            ClusterAttributeChangeAccumulator(cluster, attr.SpeedSetting),
+            ClusterAttributeChangeAccumulator(cluster, attr.FanMode)
+        ]
+        await self.subscribe_to_attributes(subscriptions)
 
         # LowestOff tests
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True))
@@ -613,12 +683,24 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True))
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False))
 
-        # *** STEP ???? ***
+        # *** STEP 35 ***
         # Read both the descending and ascending baseline attribute report values
         #  - Verify that the descending baseline values are the exact reverse of the
         #    ascending baseline values for each of the attributes
-        # self.step("????")
+        # self.step(self.current_step_index + 1)
+        self.step(35)
         self.verify_baseline_values()
+        
+
+        # # *** STEP 36 ***
+        # # TH subscribes to the PercentCurrent and SpeedCurrent attributes individually
+        # self.step(36)
+        # subscriptions = [
+        #     ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
+        #     ClusterAttributeChangeAccumulator(cluster, attr.PercentCurrent),
+        #     ClusterAttributeChangeAccumulator(cluster, attr.SpeedCurrent)
+        # ]
+        # await self.subscribe_to_attributes(subscriptions)
 
 
 if __name__ == "__main__":
