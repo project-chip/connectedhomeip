@@ -277,7 +277,7 @@ class TC_CNET_4_12(MatterBaseTest):
             network_ids,
             f"Expected networkID {thread_network_id_bytes_th2} not found in networks."
         )
-        # TODO: Update test plan to verify that the Networks attribute list has an entry NetworkID=th_xpan_2 insted of th_xpan_1
+        # TODO: PR #<PR_number> created PR test plan to verify that the Networks attribute list has an entry NetworkID=th_xpan_2 insted of th_xpan_1
 
         self.step(7)
         cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
