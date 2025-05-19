@@ -34,30 +34,5 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductId(uint16_t & productId)
     return Internal::PosixConfig::ReadConfigValue(Internal::PosixConfig::kConfigKey_ProductId, productId);
 }
 
-CHIP_ERROR DeviceInstanceInfoProviderImpl::GetVendorName(char * buf, size_t bufSize)
-{
-    return Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>::GetVendorName(buf, bufSize);
-}
-
-CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductName(char * buf, size_t bufSize)
-{
-    return Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>::GetProductName(buf, bufSize);
-}
-
-CHIP_ERROR DeviceInstanceInfoProviderImpl::GetSerialNumber(char * buf, size_t bufSize)
-{
-    return Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>::GetSerialNumber(buf, bufSize);
-}
-
-CHIP_ERROR DeviceInstanceInfoProviderImpl::GetHardwareVersionString(char * buf, size_t bufSize)
-{
-    return Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>::GetHardwareVersionString(buf, bufSize);
-}
-
-CHIP_ERROR DeviceInstanceInfoProviderImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
-{
-    return Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>::GetSoftwareVersionString(buf, bufSize);
-}
-
 } // namespace DeviceLayer
 } // namespace chip
