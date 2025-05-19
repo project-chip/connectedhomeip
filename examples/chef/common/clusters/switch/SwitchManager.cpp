@@ -27,7 +27,7 @@
 #include "chef-rpc-actions-worker.h"
 #include <app/util/config.h>
 
-#if MATTER_DM_SWITCH_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 using namespace chip;
 using namespace chip::app;
@@ -170,4 +170,4 @@ void emberAfSwitchClusterInitCallback(EndpointId endpointId)
     ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, gSwitchActionsDelegate);
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gLatchingSwitch));
 }
-#endif // MATTER_DM_SWITCH_SERVER_ENDPOINT_COUNT > 0
+#endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0

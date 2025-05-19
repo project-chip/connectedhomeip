@@ -25,7 +25,7 @@
 
 #include <app/util/config.h>
 
-#if MATTER_DM_SWITCH_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -80,4 +80,4 @@ void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t pre
 
     Clusters::SwitchServer::Instance().OnMultiPressComplete(endpointId, previousPosition, count);
 }
-#endif // MATTER_DM_SWITCH_SERVER_ENDPOINT_COUNT > 0
+#endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
