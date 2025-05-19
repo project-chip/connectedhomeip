@@ -28,11 +28,12 @@ namespace chip {
 namespace Inet {
     namespace Darwin {
 
-        typedef std::pair<uint32_t, in_addr> InetInterface;
-        typedef std::pair<uint32_t, in6_addr> Inet6Interface;
+        typedef std::pair<nw_interface_t, in_addr> InetInterface;
+        typedef std::pair<nw_interface_t, in6_addr> Inet6Interface;
         typedef std::vector<InetInterface> InetInterfacesVector;
-        typedef std::vector<std::pair<uint32_t, in6_addr>> Inet6InterfacesVector;
+        typedef std::vector<Inet6Interface> Inet6InterfacesVector;
         typedef void (^OnInterfaceChanges)(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces);
+        typedef void (^OnPathChange)(nw_path_t path);
 
         class InterfacesMonitor {
         public:
@@ -46,6 +47,9 @@ namespace Inet {
             void StopMonitorInterfaces();
 
         private:
+            nw_path_monitor_t CreatePathMonitor(nw_interface_type_t type, nw_path_monitor_update_handler_t handler, bool once);
+            void EnumeratePathInterfaces(nw_path_t path, InetInterfacesVector & out4, Inet6InterfacesVector & out6, bool searchLoopBackOnly);
+
             nw_path_monitor_t mInterfaceMonitor = nullptr;
 
             // Default to kDNSServiceInterfaceIndexLocalOnly so we don't mess around

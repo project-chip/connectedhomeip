@@ -73,6 +73,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FailAtFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     FaultType type          = static_cast<FaultType>(0);
     uint32_t id             = static_cast<uint32_t>(0);
@@ -92,12 +93,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::FailAtFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     FaultType type          = static_cast<FaultType>(0);
     uint32_t id             = static_cast<uint32_t>(0);
     uint32_t numCallsToSkip = static_cast<uint32_t>(0);
     uint32_t numCallsToFail = static_cast<uint32_t>(0);
     bool takeMutex          = static_cast<bool>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace FailAtFault
@@ -115,6 +118,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FailRandomlyAtFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     FaultType type     = static_cast<FaultType>(0);
     uint32_t id        = static_cast<uint32_t>(0);
@@ -132,10 +136,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::FailRandomlyAtFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     FaultType type     = static_cast<FaultType>(0);
     uint32_t id        = static_cast<uint32_t>(0);
     uint8_t percentage = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace FailRandomlyAtFault

@@ -140,6 +140,36 @@ functionality can still work fine.
 -   Quit the monitor by pressing `Ctrl+]`. Note: You can see a menu of various
     monitor commands by hitting Ctrl+t Ctrl+h while the monitor is running.
 
+### Troubleshooting Environment Setup Issues
+
+If you have already built an example and later change the ESP-IDF version, you
+may encounter environment setup issues. To resolve this, follow these steps:
+
+1. Clean the build artifacts:
+
+    ```
+    cd examples/<app-name>/esp32
+    rm -rf build sdkconfig managed_components dependencies.lock
+    ```
+
+2. Close the terminal, open a new one, and source the ESP-IDF and Matter
+   environments:
+
+    ```
+    cd path/to/esp-idf
+    source export.sh
+
+    cd path/to/connectedhomeip
+    source scripts/activate.sh
+    ```
+
+3. Rebuild the example application:
+
+    ```
+    cd examples/<app-name>/esp32
+    idf.py build
+    ```
+
 ## Commissioning
 
 Below apps can be used for commissioning the application running on ESP32:

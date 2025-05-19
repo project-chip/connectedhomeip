@@ -33,6 +33,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
+#include <app/server/JointFabricDatastore.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -133,6 +134,8 @@ struct ServerInitParams
 
     // Application delegate to handle some commissioning lifecycle events
     AppDelegate * appDelegate = nullptr;
+    // device discovery timeout
+    System::Clock::Seconds32 discoveryTimeout = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS);
     // Port to use for Matter commissioning/operational traffic
     uint16_t operationalServicePort = CHIP_PORT;
     // Port to use for UDC if supported
@@ -416,6 +419,8 @@ public:
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
+    app::JointFabricDatastore & GetJointFabricDatastore() { return mJointFabricDatastore; }
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
 
@@ -694,6 +699,8 @@ private:
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;
+
+    app::JointFabricDatastore mJointFabricDatastore;
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;

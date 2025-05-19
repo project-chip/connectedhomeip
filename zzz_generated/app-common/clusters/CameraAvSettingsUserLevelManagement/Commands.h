@@ -96,6 +96,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZSetPosition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<int16_t> pan;
     Optional<int16_t> tilt;
@@ -113,10 +114,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::MPTZSetPosition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<int16_t> pan;
     Optional<int16_t> tilt;
     Optional<uint8_t> zoom;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MPTZSetPosition
@@ -134,6 +137,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<int16_t> panDelta;
     Optional<int16_t> tiltDelta;
@@ -151,10 +155,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::MPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<int16_t> panDelta;
     Optional<int16_t> tiltDelta;
     Optional<int8_t> zoomDelta;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MPTZRelativeMove
@@ -170,6 +176,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZMoveToPreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t presetID = static_cast<uint8_t>(0);
 
@@ -185,8 +192,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::MPTZMoveToPreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t presetID = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MPTZMoveToPreset
@@ -203,6 +212,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZSavePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<uint8_t> presetID;
     chip::CharSpan name;
@@ -219,9 +229,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::MPTZSavePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<uint8_t> presetID;
     chip::CharSpan name;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MPTZSavePreset
@@ -237,6 +249,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZRemovePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t presetID = static_cast<uint8_t>(0);
 
@@ -252,8 +265,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::MPTZRemovePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t presetID = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MPTZRemovePreset
@@ -270,6 +285,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DPTZSetViewport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
     Structs::ViewportStruct::Type viewport;
@@ -286,9 +302,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::DPTZSetViewport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
     Structs::ViewportStruct::DecodableType viewport;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DPTZSetViewport
@@ -307,6 +325,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
     Optional<int16_t> deltaX;
@@ -325,11 +344,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::DPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
     Optional<int16_t> deltaX;
     Optional<int16_t> deltaY;
     Optional<int8_t> zoomDelta;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DPTZRelativeMove

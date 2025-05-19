@@ -28,6 +28,7 @@ namespace Clusters {
 namespace ThreadNetworkDirectory {
 namespace Commands {
 namespace AddNetwork {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -48,9 +49,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kOperationalDataset))
         {
             err = DataModel::Decode(reader, operationalDataset);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -58,6 +56,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 } // namespace AddNetwork.
 namespace RemoveNetwork {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -78,9 +77,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kExtendedPanID))
         {
             err = DataModel::Decode(reader, extendedPanID);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -88,6 +84,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 } // namespace RemoveNetwork.
 namespace GetOperationalDataset {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -109,15 +106,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, extendedPanID);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetOperationalDataset.
 namespace OperationalDatasetResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -138,9 +133,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kOperationalDataset))
         {
             err = DataModel::Decode(reader, operationalDataset);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

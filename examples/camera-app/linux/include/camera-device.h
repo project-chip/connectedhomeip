@@ -44,13 +44,13 @@ static constexpr uint32_t kMaxEncodedPixelRate       = 27648000; // 720p at 30fp
 static constexpr uint8_t kMicrophoneMinLevel         = 1;
 static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
 static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
-static constexpr uint16_t kMinResolutionWidth        = 256;  // Low SD resolution
-static constexpr uint16_t kMinResolutionHeight       = 144;  // Low SD resolution
+static constexpr uint16_t kMinResolutionWidth        = 640;  // Low SD resolution
+static constexpr uint16_t kMinResolutionHeight       = 360;  // Low SD resolution
 static constexpr uint16_t kMaxResolutionWidth        = 1920; // 1080p resolution
 static constexpr uint16_t kMaxResolutionHeight       = 1080; // 1080p resolution
 static constexpr uint16_t kSnapshotStreamFrameRate   = 30;
 static constexpr uint16_t kMaxVideoFrameRate         = 120;
-static constexpr uint16_t kMinVideoFrameRate         = 15;
+static constexpr uint16_t kMinVideoFrameRate         = 30;
 static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
 static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
 static constexpr uint32_t kMinFragLenMsec            = 1000;    // 1 sec
@@ -237,7 +237,7 @@ private:
     int16_t mTilt = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultTilt;
     uint8_t mZoom = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
-    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 320, 585, 2240, 1665 };
+    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 0, 0, 1920, 1080 };
     uint16_t mCurrentVideoFrameRate                                         = 0;
     bool mHDREnabled                                                        = false;
     bool mMicrophoneMuted                                                   = false;

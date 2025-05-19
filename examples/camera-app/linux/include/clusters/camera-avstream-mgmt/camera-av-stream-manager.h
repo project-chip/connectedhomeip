@@ -78,10 +78,10 @@ public:
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;
 
-    void SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDevice);
+    void SetCameraDeviceHAL(CameraDeviceInterface * aCameraDevice);
 
 private:
-    CameraDeviceInterface::CameraHALInterface * mCameraDeviceHAL = nullptr;
+    CameraDeviceInterface * mCameraDeviceHAL = nullptr;
 };
 
 } // namespace CameraAvStreamManagement

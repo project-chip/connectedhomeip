@@ -46,6 +46,7 @@ public:
     CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units);
     const DataModel::List<TempUnitEnum> & GetSupportedTemperatureUnits(void) { return mSupportedTemperatureUnits; }
     TempUnitEnum GetTemperatureUnit(void) { return mTemperatureUnit; }
+    CHIP_ERROR SetTemperatureUnit(TempUnitEnum unit);
 
 private:
     UnitLocalizationServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UnitLocalization::Id) {}

@@ -32,7 +32,25 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 {
     for (NSTask * task in tasks) {
         NSLog(@"Terminating task %@", task);
-        [task terminate];
+
+        [task terminate]; // Sends SIGTERM
+
+        // Wait up to 10 seconds for graceful shutdown
+        BOOL terminated = NO;
+        for (int i = 0; i < 100; i++) {
+            if (![task isRunning]) {
+                terminated = YES;
+                break;
+            }
+            [NSThread sleepForTimeInterval:0.1];
+        }
+
+        if (!terminated) {
+            NSLog(@"Force killing unresponsive task %@", task);
+            kill(task.processIdentifier, SIGKILL);
+        }
+
+        [task waitUntilExit];
     }
     tasks = nil;
 }

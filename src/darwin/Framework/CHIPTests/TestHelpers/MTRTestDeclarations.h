@@ -62,8 +62,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 - (void)_deviceMayBeReachable;
+- (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs;
 
-@property (nonatomic, readwrite, nullable) NSNumber * highestObservedEventNumber;
+@property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
@@ -100,6 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSUInteger)unitTestAttributeCount;
+- (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
 @end
 #endif
 

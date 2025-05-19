@@ -96,6 +96,8 @@ target_sources(app
 
 if (CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
     message(FATAL_ERROR "WiFi + Thread (Border Router) configuration is not supported in this application.")
+elseif(CONFIG_CHIP_ETHERNET)
+    message(FATAL_ERROR "Ethernet configuration is not supported in this application.")
 else()
     chip_configure_data_model(app
         INCLUDE_SERVER

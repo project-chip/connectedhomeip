@@ -193,7 +193,7 @@ class AVSUMTestBase:
                 videoCodec=0,
                 minFrameRate=30,
                 maxFrameRate=120,
-                minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=400, height=300),
+                minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=640, height=360),
                 maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080),  # 16/9
                 minBitRate=20000,
                 maxBitRate=150000,

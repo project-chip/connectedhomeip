@@ -394,6 +394,7 @@ class NxpBuilder(GnBuilder):
             "prj",
             f"thread_{thread_type}" if self.enable_thread else None,
             "wifi" if self.enable_wifi else None,
+            "eth" if self.enable_ethernet else None,
             "br" if self.enable_wifi and self.enable_thread else None,
             "ota" if self.enable_ota else None,
             "fdata" if self.enable_factory_data else None,

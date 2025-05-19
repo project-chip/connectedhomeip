@@ -134,6 +134,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AttestationRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan attestationNonce;
 
@@ -149,8 +150,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AttestationRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan attestationNonce;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AttestationRequest
@@ -167,6 +170,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AttestationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan attestationElements;
     chip::ByteSpan attestationSignature;
@@ -183,9 +187,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AttestationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan attestationElements;
     chip::ByteSpan attestationSignature;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AttestationResponse
@@ -201,6 +207,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CertificateChainRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CertificateChainTypeEnum certificateType = static_cast<CertificateChainTypeEnum>(0);
 
@@ -216,8 +223,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CertificateChainRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CertificateChainTypeEnum certificateType = static_cast<CertificateChainTypeEnum>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CertificateChainRequest
@@ -233,6 +242,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CertificateChainResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan certificate;
 
@@ -248,8 +258,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CertificateChainResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan certificate;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CertificateChainResponse
@@ -266,6 +278,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan CSRNonce;
     Optional<bool> isForUpdateNOC;
@@ -282,9 +295,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan CSRNonce;
     Optional<bool> isForUpdateNOC;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CSRRequest
@@ -301,6 +316,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
@@ -317,9 +333,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CSRResponse
@@ -339,6 +357,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddNOC::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
@@ -358,12 +377,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddNOC::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
     uint64_t caseAdminSubject    = static_cast<uint64_t>(0);
     chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddNOC
@@ -380,6 +401,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateNOC::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
@@ -396,10 +418,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UpdateNOC::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace UpdateNOC
 namespace NOCResponse {
@@ -416,6 +440,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     NodeOperationalCertStatusEnum statusCode = static_cast<NodeOperationalCertStatusEnum>(0);
     Optional<chip::FabricIndex> fabricIndex;
@@ -433,10 +458,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     NodeOperationalCertStatusEnum statusCode = static_cast<NodeOperationalCertStatusEnum>(0);
     Optional<chip::FabricIndex> fabricIndex;
     Optional<chip::CharSpan> debugText;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NOCResponse
@@ -452,6 +479,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateFabricLabel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::CharSpan label;
 
@@ -467,9 +495,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::UpdateFabricLabel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::CharSpan label;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace UpdateFabricLabel
 namespace RemoveFabric {
@@ -484,6 +514,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveFabric::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
@@ -499,8 +530,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveFabric::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveFabric
@@ -516,6 +549,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddTrustedRootCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan rootCACertificate;
 
@@ -531,8 +565,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddTrustedRootCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan rootCACertificate;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddTrustedRootCertificate
@@ -550,6 +586,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetVIDVerificationStatement::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     Optional<chip::VendorId> vendorID;
     Optional<chip::ByteSpan> VIDVerificationStatement;
@@ -567,11 +604,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetVIDVerificationStatement::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     Optional<chip::VendorId> vendorID;
     Optional<chip::ByteSpan> VIDVerificationStatement;
     Optional<chip::ByteSpan> vvsc;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace SetVIDVerificationStatement
 namespace SignVIDVerificationRequest {
@@ -587,6 +626,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan clientChallenge;
@@ -603,9 +643,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan clientChallenge;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SignVIDVerificationRequest
@@ -623,6 +665,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     uint8_t fabricBindingVersion  = static_cast<uint8_t>(0);
@@ -640,10 +683,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     uint8_t fabricBindingVersion  = static_cast<uint8_t>(0);
     chip::ByteSpan signature;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SignVIDVerificationResponse

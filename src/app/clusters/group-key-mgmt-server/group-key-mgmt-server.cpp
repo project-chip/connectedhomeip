@@ -678,6 +678,7 @@ struct KeySetReadAllIndicesResponse
 {
     static constexpr CommandId GetCommandId() { return GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id; }
     static constexpr ClusterId GetClusterId() { return GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     GroupDataProvider::KeySetIterator * mIterator = nullptr;
 

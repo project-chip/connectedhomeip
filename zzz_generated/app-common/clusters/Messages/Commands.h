@@ -75,6 +75,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan messageID;
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
@@ -96,6 +97,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan messageID;
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
@@ -104,7 +106,8 @@ public:
     DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::DecodableType>> responses;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace PresentMessagesRequest
 namespace CancelMessagesRequest {
@@ -119,6 +122,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CancelMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::List<const chip::ByteSpan> messageIDs;
 
@@ -134,9 +138,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CancelMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::DecodableList<chip::ByteSpan> messageIDs;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace CancelMessagesRequest
 } // namespace Commands

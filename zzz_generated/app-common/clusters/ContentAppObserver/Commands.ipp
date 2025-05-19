@@ -28,6 +28,7 @@ namespace Clusters {
 namespace ContentAppObserver {
 namespace Commands {
 namespace ContentAppMessage {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -54,15 +55,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, encodingHint);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace ContentAppMessage.
 namespace ContentAppMessageResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -93,9 +92,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEncodingHint))
         {
             err = DataModel::Decode(reader, encodingHint);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

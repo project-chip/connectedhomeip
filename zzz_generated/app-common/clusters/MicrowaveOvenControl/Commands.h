@@ -73,6 +73,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetCookingParameters::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<uint8_t> cookMode;
     Optional<uint32_t> cookTime;
@@ -92,12 +93,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetCookingParameters::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<uint8_t> cookMode;
     Optional<uint32_t> cookTime;
     Optional<uint8_t> powerSetting;
     Optional<uint8_t> wattSettingIndex;
     Optional<bool> startAfterSetting;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetCookingParameters
@@ -113,6 +116,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddMoreTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t timeToAdd = static_cast<uint32_t>(0);
 
@@ -128,8 +132,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddMoreTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t timeToAdd = static_cast<uint32_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddMoreTime

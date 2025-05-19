@@ -17785,7 +17785,7 @@ public class ClusterIDMapping {
             MPTZPosition(0L),
             MaxPresets(1L),
             MPTZPresets(2L),
-            DPTZRelativeMove(3L),
+            DPTZStreams(3L),
             ZoomMax(4L),
             TiltMin(5L),
             TiltMax(6L),

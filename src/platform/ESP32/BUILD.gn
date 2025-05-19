@@ -32,7 +32,6 @@ declare_args() {
   chip_enable_ble_controller = false
   chip_use_secure_cert_dac_provider = false
   chip_use_esp32_ecdsa_peripheral = false
-  chip_enable_ethernet = false
   chip_enable_route_hook = false
   chip_memory_alloc_mode = "default"
 }

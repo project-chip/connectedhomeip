@@ -165,7 +165,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                 val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
 
             # The other aspects of this verification are handled by the helper
-            self.check_CommodityPriceStruct(cluster=cluster, struct=val.CurrentPrice,
+            self.check_CommodityPriceStruct(cluster=cluster, struct=val.currentPrice,
                                             details=details)
 
         self.step("5")
@@ -179,7 +179,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                 val.currentPrice, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
 
             # The other aspects of this verification are handled by the helper
-            self.check_CommodityPriceStruct(cluster=cluster, struct=val.CurrentPrice,
+            self.check_CommodityPriceStruct(cluster=cluster, struct=val.currentPrice,
                                             details=details)
 
         self.step("6")

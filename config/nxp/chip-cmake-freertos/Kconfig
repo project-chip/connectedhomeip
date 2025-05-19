@@ -162,6 +162,11 @@ config CHIP_WIFI
 	help
 		Enable Matter-over-Wi-Fi.
 
+config CHIP_ETHERNET
+	bool "Enable NXP ethernet support"
+	help
+		Enable Matter-over-ethernet.
+
 config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
 	int "Define the minimum connection recovery time interval in milliseconds"
 	depends on CHIP_WIFI

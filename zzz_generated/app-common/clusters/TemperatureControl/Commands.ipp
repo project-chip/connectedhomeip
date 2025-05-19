@@ -28,6 +28,7 @@ namespace Clusters {
 namespace TemperatureControl {
 namespace Commands {
 namespace SetTemperature {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -53,9 +54,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kTargetTemperatureLevel))
         {
             err = DataModel::Decode(reader, targetTemperatureLevel);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

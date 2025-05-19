@@ -198,4 +198,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
     # nrfconnect test runner
     'src/test_driver/nrfconnect/main/runner.cpp': {'vector'},
+
+    # Not intended for embedded clients
+    'src/app/server/JointFabricDatastore.cpp': {'vector'},
+    'src/app/server/JointFabricDatastore.h': {'vector'},
 }

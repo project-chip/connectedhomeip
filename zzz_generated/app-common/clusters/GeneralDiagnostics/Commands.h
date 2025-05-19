@@ -85,6 +85,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TestEventTrigger::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan enableKey;
     uint64_t eventTrigger = static_cast<uint64_t>(0);
@@ -101,9 +102,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::TestEventTrigger::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan enableKey;
     uint64_t eventTrigger = static_cast<uint64_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestEventTrigger
@@ -118,6 +121,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TimeSnapshot::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -131,6 +135,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::TimeSnapshot::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -148,6 +153,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint64_t systemTimeMs = static_cast<uint64_t>(0);
     DataModel::Nullable<uint64_t> posixTimeMs;
@@ -164,9 +170,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint64_t systemTimeMs = static_cast<uint64_t>(0);
     DataModel::Nullable<uint64_t> posixTimeMs;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TimeSnapshotResponse
@@ -184,6 +192,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PayloadTestRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan enableKey;
     uint8_t value  = static_cast<uint8_t>(0);
@@ -201,10 +210,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::PayloadTestRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan enableKey;
     uint8_t value  = static_cast<uint8_t>(0);
     uint16_t count = static_cast<uint16_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PayloadTestRequest
@@ -220,6 +231,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PayloadTestResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan payload;
 
@@ -235,8 +247,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::PayloadTestResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan payload;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PayloadTestResponse

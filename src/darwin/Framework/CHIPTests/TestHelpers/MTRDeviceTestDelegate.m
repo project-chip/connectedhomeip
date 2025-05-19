@@ -63,6 +63,10 @@
 
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
 {
+    if (self.subscriptionMaxIntervalOverride) {
+        return self.subscriptionMaxIntervalOverride;
+    }
+
     // Make sure our subscriptions time out in finite time.
     return @(2); // seconds
 }

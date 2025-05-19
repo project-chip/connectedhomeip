@@ -59,9 +59,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, metric);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -100,9 +97,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kAudioOutputIndex))
         {
             err = DataModel::Decode(reader, audioOutputIndex);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -143,9 +137,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioTracks);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -179,9 +170,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kValue))
         {
             err = DataModel::Decode(reader, value);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -222,9 +210,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, externalIDList);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -253,9 +238,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kParameterList))
         {
             err = DataModel::Decode(reader, parameterList);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -295,9 +277,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kSize))
         {
             err = DataModel::Decode(reader, size);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -352,9 +331,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kWaterMark))
         {
             err = DataModel::Decode(reader, waterMark);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
