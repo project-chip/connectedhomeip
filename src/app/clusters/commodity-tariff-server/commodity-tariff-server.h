@@ -124,31 +124,15 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
 class CommodityTariffPrimaryData {
-private:
+public:
+    CommodityTariffPrimaryData() = default;
+    virtual ~CommodityTariffPrimaryData() = default;
+
 // 1. First declare storage
 #define X(attrName, attrType) \
     attrType m##attrName;
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-public:
-/**
- * @def X(attrName, attrType)
- * @brief Macro generating attribute-specific data management objects
- */
-#define X(attrName, attrType) \
-    attrName##DataClass attrName{m##attrName};
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-    CommodityTariffPrimaryData() = default;
-    virtual ~CommodityTariffPrimaryData() = default;
-
-    //CHIP_ERROR LoadJson(const Json::Value& root);
-    bool IsValid() const { return __is_valid(); }
-
-protected:
-    virtual bool __is_valid() const { return true; };
+#undef X    
 };
 
 class CommodityTariffDataProvider
@@ -178,7 +162,7 @@ public:
         else
         {
     #define X(attrName, attrType) \
-            Set##attrName(newData.attrName.GetValue());
+            Set##attrName(newData.m##attrName);
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
     #undef X
             ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
@@ -216,6 +200,16 @@ COMMODITY_TARIFF_CURRENT_ATTRIBUTES
 private:
     /*  */
     CommodityTariffPrimaryData mTariffData;
+
+    /**
+     * @def X(attrName, attrType)
+     * @brief Macro generating attribute-specific data management objects
+     */
+#define X(attrName, attrType) \
+    attrName##DataClass attrName{m##attrName};
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
 
 #define X(attrName, attrType) \
     attrType m##attrName;

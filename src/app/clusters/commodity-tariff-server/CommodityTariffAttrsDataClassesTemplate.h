@@ -235,13 +235,18 @@ public:
      * - List types: compares sizes
      * - Others: always returns true (assume changed)
      */
-     bool HasChanged(const T& newValue) {
+     bool HasChanged() {
         if constexpr (IsValueNullable()) {
-            return NullableNotEqual(newValue, mValue);
+            return NullableNotEqual(mNewValue, mValue);
         }
         else if constexpr (IsValueList()) {
-            return ListsNotEqual(newValue, mValue);
+            return ListsNotEqual(mNewValue, mValue);
         }
+    }
+
+    bool IsValid()
+    {
+        return (mNewValue != nullptr);
     }
 
     /**
@@ -251,13 +256,33 @@ public:
      * 
      * Checks HasChanged() before applying the update
      */
-     bool Update(const T& aValue) {
-        if (!HasChanged(aValue)) {
-            return false;
-        }
-    
+     CHIP_ERROR UpdateBegin(const T & aValue) {
         CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
+        err = ValidateValue(aValue)
+
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        };
+
+        is_valid = true;
+
+        mNewValue = aValue;
+
+        return err;
+    };
+
+    void UpdateCommit()
+    {
+        if (!HasChanged(aValue))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        value_is_changed = true;
+
+
         if constexpr (IsValueNullable()) {
             //InspectTypes();
             // Handling for other Nullable types (Struct, numeric, enum)
@@ -265,7 +290,7 @@ public:
                 if constexpr (IsList<WrappedType>::value)
                 {
                     DataModel::List<PayloadType> newList;
-                    err = UpdateList(aValue.Value(), newList);
+                    err = UpdateList(mNewValue.Value());
                     if (err == CHIP_NO_ERROR)
                     {
                         CleanupValue();
@@ -294,8 +319,8 @@ public:
         else if constexpr (IsValueList()) {
             //InspectTypes();
             // Handling for plain List<Struct>
-            DataModel::List<PayloadType> newList;
-            err = UpdateList(aValue, newList);
+            //DataModel::List<PayloadType> newList;
+            err = UpdateList(aValue, mNewValue);
             if (err == CHIP_NO_ERROR)
             {
                 CleanupValue();
@@ -306,9 +331,13 @@ public:
             InspectTypes();
             static_assert(false, "Unexpected type");
         }
-    
-        return err == CHIP_NO_ERROR;
-    };
+    }
+
+    void UpdateAbort()
+    {
+        is_valid = false;
+        mNewValue = mValue;
+    }
 
     /**
      * @brief Update the stored value
@@ -346,7 +375,10 @@ public:
         }
     }
 protected:
-    T & mValue; ///< Reference to the managed value storage
+    T & mValue; // Reference to the applied value storage
+    WrappedType & mNewValue = unwrapValue(mValue);;  // Reference to a value for updating
+    bool is_valid = false;
+    bool value_is_changed = false;
 
     /**
      * @brief Validate a new value
@@ -355,8 +387,8 @@ protected:
      * 
      * @note Derived classes should override for custom validation
      */
-    virtual bool IsValid(const T& newValue) const {
-        return true;
+    virtual CHIP_ERROR ValidateValue(const WrappedType & newValue) const {
+        return CHIP_NO_ERROR;
     }
 
 
@@ -418,7 +450,6 @@ protected:
 
     virtual CHIP_ERROR UpdateStructValue(const PayloadType& source, PayloadType& destination)
     {
-        //mValue = aValue;
         memcpy(&destination, &source, sizeof(PayloadType));
         return CHIP_NO_ERROR;
     }
