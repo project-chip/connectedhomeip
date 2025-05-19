@@ -25,17 +25,36 @@
 #include <webrtc_manager/WebRTCManager.h>
 #include <zap-generated/cluster/Commands.h>
 
+#include <csignal>
 #include <iostream>
 #include <string>
+#include <unistd.h>
 #include <vector>
 
 using namespace chip;
+
+namespace {
+
+void StopSignalHandler(int signum)
+{
+    ChipLogProgress(NotSpecified, "SIGTERM received, exiting...");
+    _exit(0);
+}
+
+} // namespace
 
 // ================================================================================
 // Main Code
 // ================================================================================
 int main(int argc, char * argv[])
 {
+    // Set up signal handler for SIGTERM
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = 0;
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
+
     // Convert command line arguments to a vector of strings for easier manipulation
     std::vector<std::string> args(argv, argv + argc);
 
