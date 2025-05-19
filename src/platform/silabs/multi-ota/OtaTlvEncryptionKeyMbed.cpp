@@ -29,26 +29,18 @@ CHIP_ERROR OtaTlvEncryptionKey::Import(const uint8_t * key, size_t key_len)
 
 CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVOffset)
 {
-    constexpr uint8_t au8Iv[] = {
-        0x00, 0x00, 0x00, 0x10,
-        0x11, 0x12, 0x13, 0x14,
-        0x15, 0x16, 0x17, 0x18,
-        0x00, 0x00, 0x00, 0x00
-    };
+    constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
 
     uint8_t iv[16];
-    uint8_t stream_block[16] = {0};
-    size_t nc_off = 0;
-    uint32_t offset = 0;
-    size_t remaining = block.size();
+    uint8_t stream_block[16] = { 0 };
+    size_t nc_off            = 0;
+    uint32_t offset          = 0;
+    size_t remaining         = block.size();
 
     memcpy(iv, au8Iv, sizeof(au8Iv));
 
     // Set IV based on mIVOffset
-    uint32_t counter = ((uint32_t) iv[12] << 24) |
-                       ((uint32_t) iv[13] << 16) |
-                       ((uint32_t) iv[14] << 8) |
-                       (uint32_t) iv[15];
+    uint32_t counter = ((uint32_t) iv[12] << 24) | ((uint32_t) iv[13] << 16) | ((uint32_t) iv[14] << 8) | (uint32_t) iv[15];
 
     counter += (mIVOffset / 16);
     iv[12] = (counter >> 24) & 0xFF;
