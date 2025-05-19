@@ -16,7 +16,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Import(const uint8_t * key, size_t key_len)
 {
     if (key_len != 16) // Ensure the key length is 128 bits (16 bytes)
     {
-        ChipLogError(DeviceLayer, "Invalid key length: %zu", key_len);
+        ChipLogError(DeviceLayer, "Invalid key length: %lu", (unsigned long) key_len);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
