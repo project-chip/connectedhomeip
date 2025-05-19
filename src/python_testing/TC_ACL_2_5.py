@@ -387,7 +387,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         self.step(14)
         # Rerunning test with new list method
-        if force_legacy_encoding:
+        if not force_legacy_encoding:
             logging.info("Rerunning test with new list method now")
 
 
