@@ -19,6 +19,7 @@
 
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/TLV.h>
 
 namespace chip {
@@ -54,10 +55,13 @@ public:
 
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
     {
-        return DataModel::EncodeForRead(writer, tag, aAccessingFabricIndex, mValue);
+        return DataModel::Encode(writer, tag, aAccessingFabricIndex, mValue);
     }
 
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override { return DataModel::Encode(writer, tag, mValue); }
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+    {
+        return DataModel::Encode(writer, tag, kUndefinedFabricIndex, mValue);
+    }
 
 private:
     const T & mValue;

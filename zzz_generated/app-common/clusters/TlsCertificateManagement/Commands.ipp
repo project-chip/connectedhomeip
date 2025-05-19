@@ -118,17 +118,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace FindRootCertificate.
 namespace FindRootCertificateResponse {
 
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.EncodeForRead(to_underlying(Fields::kCertificateDetails), aAccessingFabricIndex, certificateDetails);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.EncodeForWrite(to_underlying(Fields::kCertificateDetails), certificateDetails);
     return encoder.Finalize();
 }
 
@@ -368,17 +361,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace FindClientCertificate.
 namespace FindClientCertificateResponse {
 
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.EncodeForRead(to_underlying(Fields::kCertificateDetails), aAccessingFabricIndex, certificateDetails);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.EncodeForWrite(to_underlying(Fields::kCertificateDetails), certificateDetails);
     return encoder.Finalize();
 }
 

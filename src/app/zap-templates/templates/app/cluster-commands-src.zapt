@@ -15,36 +15,22 @@ namespace {{asUpperCamelCase name}} {
 
 {{#if isFabricScoped~}}
 {{#if (isServer source)}}
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const {
+{{else}}
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
+{{/if}}
+{{else}}
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
+{{/if}}
     DataModel::WrappedStructEncoder encoder{aWriter, aTag};
     {{#zcl_command_arguments~}}
 
     {{~#if_is_fabric_scoped_struct type~}}
+    {{#if (isServer parent.source)}}
     encoder.EncodeForRead(to_underlying(Fields::k{{asUpperCamelCase label}}), aAccessingFabricIndex, {{asLowerCamelCase label}});
     {{else}}
-    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
-    {{/if_is_fabric_scoped_struct}}
-
-    {{~/zcl_command_arguments}}
-    return encoder.Finalize();
-}
-{{/if}}
-{{/if}}
-
-{{#if isFabricScoped~}}
-{{#if (isServer source)}}
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
-{{else}}
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
-{{/if}}
-{{else}}
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
-{{/if}}
-    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
-    {{#zcl_command_arguments~}}
-
-    {{~#if_is_fabric_scoped_struct type~}}
     encoder.EncodeForWrite(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    {{/if}}
     {{else}}
     encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
     {{/if_is_fabric_scoped_struct}}

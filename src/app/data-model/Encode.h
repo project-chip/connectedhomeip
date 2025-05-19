@@ -120,18 +120,44 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
 /*
  * @brief
  *
- * A way to encode fabric-scoped structs for a write that omits encoding the containing fabric index field.
+ * A way to encode fabric-scoped structs for a read that always encodes the containing fabric index field.
+ *
+ * An accessing fabric index must be passed in to permit including/omitting sensitive fields based on a match with the fabric index
+ * associated with the scoped struct.
  */
 template <typename X,
-          typename std::enable_if_t<std::is_class<X>::value &&
-                                        std::is_same<decltype(std::declval<X>().EncodeForWrite(std::declval<TLV::TLVWriter &>(),
-                                                                                               std::declval<TLV::Tag>())),
-                                                     CHIP_ERROR>::value &&
-                                        DataModel::IsFabricScoped<X>::value,
-                                    X> * = nullptr>
-CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Encode(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>(),
+                                                                 std::declval<FabricIndex>())),
+                               CHIP_ERROR>::value &&
+                  DataModel::IsFabricScoped<X>::value,
+              X> * = nullptr>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, const X & x)
 {
-    return x.EncodeForWrite(writer, tag);
+    return x.Encode(writer, tag, accessingFabricIndex);
+}
+
+/*
+ * @brief
+ *
+ * This specific variant that encodes cluster objects (like non fabric-scoped structs, commands, events) to TLV
+ * depends on the presence of an Encode method on the object. The signature of that method
+ * is as follows:
+ *
+ * CHIP_ERROR <Object>::Encode(TLVWriter &writer, TLV::Tag tag) const;
+ *
+ *
+ */
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Encode(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>())),
+                               CHIP_ERROR>::value,
+              X> * = nullptr>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, const X & x)
+{
+    return x.Encode(writer, tag);
 }
 
 /*
@@ -143,9 +169,10 @@ template <typename X,
           typename std::enable_if_t<std::is_class<X>::value &&
                                         std::is_same<decltype(std::declval<X>().EncodeForWrite(std::declval<TLV::TLVWriter &>(),
                                                                                                std::declval<TLV::Tag>())),
-                                                     CHIP_ERROR>::value,
+                                                     CHIP_ERROR>::value &&
+                                        DataModel::IsFabricScoped<X>::value,
                                     X> * = nullptr>
-CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
+CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
 {
     return x.EncodeForWrite(writer, tag);
 }
@@ -169,28 +196,6 @@ template <typename X,
 CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, const X & x)
 {
     return x.EncodeForRead(writer, tag, accessingFabricIndex);
-}
-
-/*
- * @brief
- *
- * This specific variant that encodes cluster objects (like non fabric-scoped structs, commands, events) to TLV
- * depends on the presence of an Encode method on the object. The signature of that method
- * is as follows:
- *
- * CHIP_ERROR <Object>::Encode(TLVWriter &writer, TLV::Tag tag) const;
- *
- *
- */
-template <typename X,
-          typename std::enable_if_t<
-              std::is_class<X>::value &&
-                  std::is_same<decltype(std::declval<X>().Encode(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>())),
-                               CHIP_ERROR>::value,
-              X> * = nullptr>
-CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, const X & x)
-{
-    return x.Encode(writer, tag);
 }
 
 /*
