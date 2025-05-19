@@ -64,6 +64,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
@@ -79,8 +80,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newMode = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeToMode

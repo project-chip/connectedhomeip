@@ -80,6 +80,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<Structs::ApplicationStruct::Type> application;
     Optional<chip::ByteSpan> data;
@@ -96,9 +97,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<Structs::ApplicationStruct::DecodableType> application;
     Optional<chip::ByteSpan> data;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchApp
@@ -114,6 +117,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<Structs::ApplicationStruct::Type> application;
 
@@ -129,8 +133,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<Structs::ApplicationStruct::DecodableType> application;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopApp
@@ -146,6 +152,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<Structs::ApplicationStruct::Type> application;
 
@@ -161,8 +168,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<Structs::ApplicationStruct::DecodableType> application;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideApp
@@ -179,6 +188,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::ByteSpan> data;
@@ -195,9 +205,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::ByteSpan> data;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse
