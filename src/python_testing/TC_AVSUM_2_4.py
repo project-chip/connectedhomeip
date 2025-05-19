@@ -68,15 +68,15 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             TestStep(7, "Loop over the supported presets, for each verify the PresetID and Name are in range"),
             TestStep(8, "For each found preset, invoke MoveToPreset with the PresetID. Verify that the MPTZPosition is that from the Preset"),
             TestStep(9, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
-            TestStep(10,"Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response. End the text case"),
-            TestStep(11,"Send a MPTZMovePreset command with a presetID of MaxPresets. Verify Not Found failure response."),
-            TestStep(12,"Create a new saved preset with PresetID of MaxPresets"),
-            TestStep(13,"Create a new MPTZPosition that is the mid-point of all support PTZ attributes"),
-            TestStep(14,"Move to a the MPTZPosition created in step 13."),
-            TestStep(15,"Move to the saved preset from step 12"),
-            TestStep(16,"Verify that the MPTZPosition is that of the preset"),
-            TestStep(17,"If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
-            TestStep(18,"Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response."),
+            TestStep(10, "Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response. End the text case"),
+            TestStep(11, "Send a MPTZMovePreset command with a presetID of MaxPresets. Verify Not Found failure response."),
+            TestStep(12, "Create a new saved preset with PresetID of MaxPresets"),
+            TestStep(13, "Create a new MPTZPosition that is the mid-point of all support PTZ attributes"),
+            TestStep(14, "Move to a the MPTZPosition created in step 13."),
+            TestStep(15, "Move to the saved preset from step 12"),
+            TestStep(16, "Verify that the MPTZPosition is that of the preset"),
+            TestStep(17, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
+            TestStep(18, "Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response."),
         ]
         return steps
 
@@ -207,6 +207,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
                     await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.Busy)
             else:
                 self.skip_step(18)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
