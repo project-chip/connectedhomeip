@@ -424,7 +424,7 @@ class TC_ACL_2_5(MatterBaseTest):
             TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list", "Result is SUCCESS"),
             TestStep(13, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
                      "Result is SUCCESS, value is list of AccessControlExtensionChanged containing at least 1 new element if new write list method is used LatestValue Field should be D_OK_EMPTY, else then the legacy list method is used value should be D_OK_SINGLE."),
-            TestStep(14, "Rerunning test with new list method", "Rerunning test with new list method"),
+            TestStep(14, "Rerunning test with legacy list method", "Rerunning test with legacy list method"),
             ]
         return steps
 
