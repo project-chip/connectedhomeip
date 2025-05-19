@@ -153,7 +153,6 @@ class TC_FAN_3_5(MatterBaseTest):
 
     async def subscribe_to_attributes(self, subscriptions: list) -> None:
         """Subscribe to PercentSetting, SpeedSetting, and FanMode attributes on the DUT."""
-        cluster = Clusters.FanControl
 
         self.subscriptions = subscriptions
 
