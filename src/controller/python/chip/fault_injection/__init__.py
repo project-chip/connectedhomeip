@@ -14,6 +14,7 @@ class FaultType(IntEnum):
 
 # IMPORTANT: CHIPFaultId enum must be kept in sync with the 'Id' enum in src/lib/support/CHIPFaultInjection.h
 # If you change values in the C/C++ header, update them here as well.
+# BEGIN-IF-CHANGE-ALSO-CHANGE(/src/lib/support/CHIPFaultInjection.h)
 class CHIPFaultId(IntEnum):
     """Fault IDs for CHIP fault injection, matching the `Id` enum in src/lib/support/CHIPFaultInjection.h"""
     AllocExchangeContext = 0
@@ -44,6 +45,10 @@ class CHIPFaultId(IntEnum):
     CASECorruptSigma3Signature = 25
     CASECorruptSigma3InitiatorEphPubKey = 26
     CASECorruptSigma3ResponderEphPubKey = 27
+
+# END-IF-CHANGE-ALSO-CHANGE(/src/lib/support/CHIPFaultInjection.h)
+# IMPORTANT: CHIPFaultId enum above must be kept in sync with the 'Id' enum in src/lib/support/CHIPFaultInjection.h
+# If you change values in the C/C++ header, update them here as well.
 
 
 def _GetNlFaultInjectionLibraryHandle() -> ctypes.CDLL:

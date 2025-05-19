@@ -891,18 +891,18 @@ CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSig
 
     if (input.sessionResumptionRequested)
     {
-        bool TestOnlySkipResumptionID       = false;
-        bool TestOnlySkipInitiatorResumeMIC = false;
-        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESkipResumptionID, TestOnlySkipResumptionID = true);
-        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESkipInitiatorResumeMIC, TestOnlySkipInitiatorResumeMIC = true);
+        bool testOnlySkipResumptionID       = false;
+        bool testOnlySkipInitiatorResumeMIC = false;
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESkipResumptionID, testOnlySkipResumptionID = true);
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESkipInitiatorResumeMIC, testOnlySkipInitiatorResumeMIC = true);
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptInitiatorResumeMIC, input.initiatorResume1MICBuffer[0] ^= 0xFF);
 
-        if (!TestOnlySkipResumptionID)
+        if (!testOnlySkipResumptionID)
         {
             ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma1Tags::kResumptionID), input.resumptionId));
         }
 
-        if (!TestOnlySkipInitiatorResumeMIC)
+        if (!testOnlySkipInitiatorResumeMIC)
         {
             ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma1Tags::kResume1MIC), input.initiatorResumeMIC));
         }
@@ -1750,9 +1750,14 @@ CHIP_ERROR CASESession::SendSigma3a()
 
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3NOC, *data.nocCert.data() ^= 0xFF);
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ICAC, *data.icaCert.data() ^= 0xFF);
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ResponderEphPubKey, *mRemotePubKey ^= 0xFF);
+
+        // Safe const_cast: Pubkey() returns a const reference to P256Keypair::mPublicKey, which is a non-const member variable.
+        // mEphemeralKey is allocated via a non-const call to Platform::New<Crypto::P256Keypair>(), meaning the object resides in
+        // writable heap memory and was not originally declared const. so casting away constness here does not result in undefined
+        // behavior.
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3InitiatorEphPubKey,
                           *(const_cast<P256PublicKey *>(&mEphemeralKey->Pubkey()))->Bytes() ^= 0xFF);
-        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ResponderEphPubKey, *mRemotePubKey ^= 0xFF);
 
         // Prepare Sigma3 TBS Data Blob
         size_t msgR3SignedLen = EstimateStructOverhead(data.nocCert.size(),    // initiatorNOC

@@ -44,6 +44,7 @@ namespace FaultInjection {
 // WARNING: When adding/modifying Faults to the below macro, make sure the changes are duplicated to the CHIPFaultId enum in the
 // Python Module src/controller/python/chip/fault_injection/__init__.py
 
+// BEGIN-IF-CHANGE-ALSO-CHANGE(src/controller/python/chip/fault_injection/__init__.py)
 #define CHIP_FAULTS_ENUMERATE(X)                                                                                                   \
     X(AllocExchangeContext, 0) /**< Fail the allocation of an ExchangeContext */                                                   \
     X(DropIncomingUDPMsg, 1)   /**< Drop an incoming UDP message without any processing */                                         \
@@ -74,6 +75,10 @@ namespace FaultInjection {
     X(CASECorruptSigma3Signature, 25)                    /**< Send Sigma3 with invalid signature */                                \
     X(CASECorruptSigma3InitiatorEphPubKey, 26)           /**< Send Sigma3 with invalid initiator ephemeral public key */           \
     X(CASECorruptSigma3ResponderEphPubKey, 27)           /**< Send Sigma3 with invalid responder ephemeral public key */
+
+// END-IF-CHANGE-ALSO-CHANGE(src/controller/python/chip/fault_injection/__init__.py)
+// WARNING: When adding/modifying Faults to the below macro, make sure the changes are duplicated to the CHIPFaultId enum in the
+// Python Module src/controller/python/chip/fault_injection/__init__.py
 
 /**
  * @brief   Fault injection points
