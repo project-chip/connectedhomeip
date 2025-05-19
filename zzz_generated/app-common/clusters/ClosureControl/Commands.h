@@ -73,6 +73,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -86,6 +87,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -104,6 +106,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveTo::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<TargetPositionEnum> position;
     Optional<bool> latch;
@@ -121,10 +124,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::MoveTo::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<TargetPositionEnum> position;
     Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveTo
@@ -139,6 +144,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Calibrate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -152,6 +158,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Calibrate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

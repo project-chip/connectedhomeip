@@ -36,8 +36,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, maxPresets);
     case Attributes::MPTZPresets::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, MPTZPresets);
-    case Attributes::DPTZRelativeMove::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, DPTZRelativeMove);
+    case Attributes::DPTZStreams::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, DPTZStreams);
     case Attributes::ZoomMax::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, zoomMax);
     case Attributes::TiltMin::TypeInfo::GetAttributeId():

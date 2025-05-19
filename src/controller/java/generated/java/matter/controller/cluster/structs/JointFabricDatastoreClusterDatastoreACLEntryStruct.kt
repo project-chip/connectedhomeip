@@ -27,7 +27,6 @@ class JointFabricDatastoreClusterDatastoreACLEntryStruct(
   val listID: UShort,
   val ACLEntry: JointFabricDatastoreClusterDatastoreAccessControlEntryStruct,
   val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
-  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreACLEntryStruct {\n")
@@ -35,7 +34,6 @@ class JointFabricDatastoreClusterDatastoreACLEntryStruct(
     append("\tlistID : $listID\n")
     append("\tACLEntry : $ACLEntry\n")
     append("\tstatusEntry : $statusEntry\n")
-    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -46,7 +44,6 @@ class JointFabricDatastoreClusterDatastoreACLEntryStruct(
       put(ContextSpecificTag(TAG_LIST_ID), listID)
       ACLEntry.toTlv(ContextSpecificTag(TAG_ACL_ENTRY), this)
       statusEntry.toTlv(ContextSpecificTag(TAG_STATUS_ENTRY), this)
-      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -56,7 +53,6 @@ class JointFabricDatastoreClusterDatastoreACLEntryStruct(
     private const val TAG_LIST_ID = 1
     private const val TAG_ACL_ENTRY = 2
     private const val TAG_STATUS_ENTRY = 3
-    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -75,7 +71,6 @@ class JointFabricDatastoreClusterDatastoreACLEntryStruct(
           ContextSpecificTag(TAG_STATUS_ENTRY),
           tlvReader,
         )
-      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -84,7 +79,6 @@ class JointFabricDatastoreClusterDatastoreACLEntryStruct(
         listID,
         ACLEntry,
         statusEntry,
-        fabricIndex,
       )
     }
   }
