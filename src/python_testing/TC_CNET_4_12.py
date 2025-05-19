@@ -329,7 +329,7 @@ class TC_CNET_4_12(MatterBaseTest):
                              "Failure status returned from arm failsafe")
 
         self.step(11)
-        # Step 11: When the failsafe is disarmed, the device should automatically return to Thread 1.
+        # Step 11: When the failsafe is disarmed, the device should automatically return to THREAD_1ST.
         # This means the THREAD_2ND network will be removed,
         # and the device will reconnect to Thread 1 without further intervention.
         logger.info(f'Step #11 - DUT automatically return to Thread 1')
@@ -483,45 +483,78 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         logger.info(f'Step #20: Networks attribute: {networks}')
 
-        # Back to original THREAD_1ST network
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0)
+        # Back to Thread 1
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
+            expiryLengthSeconds=self.failsafe_expiration_seconds
+        )
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        logger.info(f'Step #20 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        logger.info(f'Step #20 - Back THREAD_1ST: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
-        # Step 20: When the failsafe is disarmed, the device should automatically return to THREAD_1ST.
-        # This means the THREAD_2ND network will be removed, and the device will reconnect to THREAD_1ST.
-
-        # Session expired and re-establish the new session reading attribute (Breadcrum)
-        await asyncio.sleep(connect_max_time_seconds + 5)
-        breadcrumb_info = await self.read_single_attribute_check_success(
-            cluster=Clusters.GeneralCommissioning,
-            attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb
+        cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
+            operationalDataset=thread_dataset_1_bytes
         )
+        resp = await self.send_single_cmd(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            cmd=cmd
+        )
+        logger.info(f'Step #20 - Back THREAD_1ST: AddOrUpdateThreadNetwork response ({vars(resp)})')
+        logger.info(f'Step #20 - Back THREAD_1ST: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
+        # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
+        debug_text = resp.debugText
+        if resp.networkingStatus == Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
+            # If Successful, 'debugText' should be empty or not included.
+            asserts.assert_true(debug_text is None or debug_text == '',
+                                "debugText must be None or empty if status is success.")
+        else:
+            # If fails, 'debugText' must be a string with a maximum length of 512 characters.
+            asserts.assert_true(len(debug_text) <= 512,
+                                "debugText must be a string with a max length of 512 characters if not success.")
+
+        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
+            networkID=thread_network_id_bytes_th1
+        )
+
+        resp = await self.send_single_cmd(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            cmd=cmd
+        )
+        logger.info(f'Step #20 - Back THREAD_1ST: ConnectNetwork resp VARS ({vars(resp)})')
+        # Verify that the DUT responds with ConnectNetwork with NetworkingStatus as 'Success'(0)
+        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             "Failure status returned from ConnectNetwork")
+
+        # TODO: Consider replacing the sleep (connect_max_time + fudge_factor) with dns-sd adverts check as improvement.
+        # Wait for the device to establish connection with the new Thread network
+        # Includes a fudge factor for SRP record propagation.
+        await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
+        logger.info("Step #20 - Back THREAD_1ST: Sleep completed for Thread network connection and SRP record propagation")
 
         # THREAD_1ST Successfully connects to the DUT from previous step
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
-        logger.info(f'Step #20: Networks attribute: {networks}')
+        logger.info(f'Step #20 - Back THREAD_1ST: Networks attribute: {networks}')
 
         for n in networks:
             if n.networkID == thread_network_id_bytes_th1:
-                logger.info("Step #20: Found expected THREAD_1ST networkID")
+                logger.info("Step #20 - Back THREAD_1ST: Found expected THREAD_1ST networkID")
                 asserts.assert_true(n.connected,
                                     "THREAD_1ST network expected to be connected, but connection was not established.")
                 break
         else:
             asserts.fail("Thread network ID not found in Networks attribute.")
 
-        logger.info(f'Step #20: THREAD_1ST network is connected successfully')
+        logger.info(f'Step #20 - Back THREAD_1ST: THREAD_1ST network is connected successfully')
 
 
 if __name__ == "__main__":
