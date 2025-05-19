@@ -5,6 +5,14 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 [README document](../../../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md)
 for details.
 
+
+# Connecting SE05x to i.MX 8M
+
+Refer the below image to connect SE05x to i.MX 8M using I2C pins.
+
+![SE05x-i.MX8M-Mini](../../../../platform/nxp/se05x/linux/doc/images/imx8evk_se05x.jpg)
+
+
 # SE05x Integration Configuration
 
 By default the SE05x secure element is used for following cryptographic operations
