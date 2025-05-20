@@ -333,6 +333,7 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
 
     BitFlags<Feature> features;
     features.Set(Feature::kSnapshot);
+    features.Set(Feature::kNightVision);
 
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(OptionalAttribute::kNightVision);
@@ -340,7 +341,7 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     uint32_t maxConcurrentVideoEncoders  = 1;
     uint32_t maxEncodedPixelRate         = 10000;
     VideoSensorParamsStruct sensorParams = { 4608, 2592, 120, Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
-    bool nightVisionCapable              = false;
+    bool nightVisionUsesInfrared         = false;
     VideoResolutionStruct minViewport    = { 854, 480 }; // Assuming 480p resolution.
     std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};
     uint32_t maxContentBufferSize                                          = 1024;
@@ -350,11 +351,13 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
     uint32_t maxNetworkBandwidth                                 = 64;
     std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<StreamUsageEnum> rankedStreamPriorities          = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
     sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamMgmtServer>(
         *sCameraAVStreamMgrInstance.get(), endpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
-        sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
-        spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages);
+        sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
+        spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
+        rankedStreamPriorities);
     sCameraAVStreamMgmtClusterServerInstance->Init();
 }
 

@@ -28,6 +28,7 @@ namespace Clusters {
 namespace ActivatedCarbonFilterMonitoring {
 namespace Commands {
 namespace ResetCondition {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };

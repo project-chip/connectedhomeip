@@ -34,7 +34,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Dnssd.h>
-#include <assert.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -42,13 +41,10 @@
 #include <ota/OTAInitializer.h>
 #endif
 
-#include "matter_ble.h"
-
 static const char * TAG = "app-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
-using namespace ::chip::app::Clusters::DoorLock;
 using ::chip::app::DataModel::Nullable;
 
 using namespace ::chip::app;

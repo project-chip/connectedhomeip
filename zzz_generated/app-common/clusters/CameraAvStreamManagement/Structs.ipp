@@ -54,9 +54,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, height);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -151,9 +148,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, referenceCount);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -174,6 +168,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kReferenceCount), referenceCount);
     encoder.Encode(to_underlying(Fields::kEncodedPixels), encodedPixels);
     encoder.Encode(to_underlying(Fields::kHardwareEncoder), hardwareEncoder);
+    encoder.Encode(to_underlying(Fields::kWatermarkEnabled), watermarkEnabled);
+    encoder.Encode(to_underlying(Fields::kOSDEnabled), OSDEnabled);
     return encoder.Finalize();
 }
 
@@ -223,8 +219,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, hardwareEncoder);
         }
-        else
+        else if (__context_tag == to_underlying(Fields::kWatermarkEnabled))
         {
+            err = DataModel::Decode(reader, watermarkEnabled);
+        }
+        else if (__context_tag == to_underlying(Fields::kOSDEnabled))
+        {
+            err = DataModel::Decode(reader, OSDEnabled);
         }
 
         ReturnErrorOnFailure(err);
@@ -275,9 +276,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, requiresHardwareEncoder);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -316,9 +314,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMinBitRate))
         {
             err = DataModel::Decode(reader, minBitRate);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -363,9 +358,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kSupportedBitDepths))
         {
             err = DataModel::Decode(reader, supportedBitDepths);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -431,9 +423,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, referenceCount);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -477,9 +466,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMaxHDRFPS))
         {
             err = DataModel::Decode(reader, maxHDRFPS);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

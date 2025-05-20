@@ -69,6 +69,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SelectOutput::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t index = static_cast<uint8_t>(0);
 
@@ -84,8 +85,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SelectOutput::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t index = static_cast<uint8_t>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SelectOutput
@@ -102,6 +105,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RenameOutput::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t index = static_cast<uint8_t>(0);
     chip::CharSpan name;
@@ -118,9 +122,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RenameOutput::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t index = static_cast<uint8_t>(0);
     chip::CharSpan name;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RenameOutput

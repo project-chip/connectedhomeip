@@ -98,7 +98,7 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
  * @brief
  *
  * This specific variant that decodes cluster objects (like structs, commands, events) from TLV
- * depends on the presence of a Decode method on the object to present. The signature of that method
+ * depends on the presence of a Decode method on X. The signature of that method
  * is as follows:
  *
  * CHIP_ERROR <Object>::Decode(TLVReader &reader);
@@ -112,6 +112,46 @@ template <typename X,
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
     return x.Decode(reader);
+}
+
+/*
+ * @brief
+ *
+ * Overload for Decode(TLV::TLVReader & reader, X & x) matching structs which
+ * are fabric-scoped, to allow for consistent usage at call-site
+ *
+ * CHIP_ERROR <Object>::Decode(TLVReader &reader);
+ *
+ */
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>())), CHIP_ERROR>::value,
+              X> * = nullptr>
+CHIP_ERROR Decode(TLV::TLVReader & reader, X & x, FabricIndex aAccessingFabricIndex)
+{
+    return x.Decode(reader);
+}
+
+/*
+ * @brief
+ *
+ * This specific variant that decodes cluster objects which are fabric-scoped
+ * (like structs, commands, events) from TLV depends on the presence of a Decode
+ * method on X. The signature of that method is as follows:
+ *
+ * CHIP_ERROR <Object>::Decode(TLVReader &reader, FabricIndex aAccessingFabricIndex);
+ *
+ */
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>(), std::declval<FabricIndex>())),
+                               CHIP_ERROR>::value,
+              X> * = nullptr>
+CHIP_ERROR Decode(TLV::TLVReader & reader, X & x, FabricIndex aAccessingFabricIndex)
+{
+    return x.Decode(reader, aAccessingFabricIndex);
 }
 
 /*

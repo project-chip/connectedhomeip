@@ -85,6 +85,10 @@ TEST_F(TestFailSafeContext, TestFailSafeContext_NocCommandInvoked)
     EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex1);
 
+    EXPECT_FALSE(failSafeContext.AddNocCommandHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.NocCommandHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.UpdateNocCommandHasBeenInvoked());
+
     failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);
     EXPECT_TRUE(failSafeContext.NocCommandHasBeenInvoked());
     EXPECT_TRUE(failSafeContext.AddNocCommandHasBeenInvoked());
@@ -95,6 +99,35 @@ TEST_F(TestFailSafeContext, TestFailSafeContext_NocCommandInvoked)
     EXPECT_TRUE(failSafeContext.UpdateNocCommandHasBeenInvoked());
 
     failSafeContext.DisarmFailSafe();
+
+    EXPECT_FALSE(failSafeContext.AddNocCommandHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.NocCommandHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.UpdateNocCommandHasBeenInvoked());
+}
+
+TEST_F(TestFailSafeContext, TestFailSafeContext_MiscellaneousElementFlagsWork)
+{
+    chip::app::FailSafeContext failSafeContext;
+
+    EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+
+    failSafeContext.SetUpdateTermsAndConditionsHasBeenInvoked();
+
+    EXPECT_TRUE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+
+    failSafeContext.RecordSetVidVerificationStatementHasBeenInvoked();
+
+    EXPECT_TRUE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+    EXPECT_TRUE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+
+    failSafeContext.DisarmFailSafe();
+
+    EXPECT_FALSE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
 }
 
 } // namespace
