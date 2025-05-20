@@ -107,3 +107,10 @@ gn gen out
 ninja -C out se05x_dev_attest_key_prov
 ./out/se05x_dev_attest_key_prov
 ```
+
+# SCP03
+
+To enable SCP03 authentication with SE05x, build the example with option
+```
+gn gen out --args="chip_se05x_auth=\"scp03\""
+```

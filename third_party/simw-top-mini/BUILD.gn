@@ -48,7 +48,6 @@ config("se05x_config") {
   }
 
   include_dirs = [
-    "repo",
     "repo/sss/inc",
     "repo/sss/port/default",
     "repo/sss/ex/src",
@@ -62,6 +61,17 @@ config("se05x_config") {
     "repo/hostlib/hostLib/libCommon/smCom",
     "repo/hostlib/hostLib/libCommon/smCom/T1oI2C",
   ]
+
+  if(chip_se05x_auth == "scp03") {
+    include_dirs += [
+      "repo/scp03_ftr",
+    ]
+  }
+  else {
+    include_dirs += [
+      "repo",
+    ]
+  }
 
   if (chip_device_platform == "k32w0") {
     include_dirs += [
