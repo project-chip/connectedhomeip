@@ -71,6 +71,13 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
     if (ModeSelect::Attributes::SupportedModes::Id == aPath.mAttributeId)
     {
+
+        if (gSupportedModeManager == nullptr)
+        {
+            ChipLogError(Zcl, "ModeSelect: SupportedModesManager is NULL");
+            return aEncoder.EncodeEmptyList();
+        }
+
         const ModeSelect::SupportedModesManager::ModeOptionsProvider modeOptionsProvider =
             gSupportedModeManager->getModeOptionsProvider(aPath.mEndpointId);
         if (modeOptionsProvider.begin() == nullptr)
