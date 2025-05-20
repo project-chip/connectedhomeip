@@ -244,7 +244,7 @@ public:
     }
 
 private:
-    PeerAddress(Type type, uint16_t shortId) : mTransportType(type), mNFCShortId(shortId) {}
+    PeerAddress(uint16_t shortId) : mTransportType(Type::kNfc), mNFCShortId(shortId) {}
 
     static PeerAddress FromString(char * addrStr, uint16_t port, Type type)
     {
