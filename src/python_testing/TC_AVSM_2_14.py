@@ -177,7 +177,8 @@ class TC_AVSM_2_14(MatterBaseTest):
             asserts.assert_is_not_none(
                 audioStreamAllocateResponse.audioStreamID, "AudioStreamAllocateResponse does not contain StreamID"
             )
-            asserts.assert_equal(audioStreamAllocateResponse.audioStreamID, aAudioStreamID, "The previous audio stream is not reused")
+            asserts.assert_equal(audioStreamAllocateResponse.audioStreamID,
+                                 aAudioStreamID, "The previous audio stream is not reused")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
@@ -188,6 +189,7 @@ class TC_AVSM_2_14(MatterBaseTest):
         )
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1.")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
