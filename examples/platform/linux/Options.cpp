@@ -88,6 +88,7 @@ enum
     kDeviceOption_PICS,
     kDeviceOption_KVS,
     kDeviceOption_InterfaceId,
+    kDeviceOption_AppID,
     kDeviceOption_Spake2pVerifierBase64,
     kDeviceOption_Spake2pSaltBase64,
     kDeviceOption_Spake2pIterations,
@@ -180,6 +181,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
+    { "app-id", kArgumentRequired, kDeviceOption_AppID },
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
@@ -321,6 +323,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --interface-id <interface>\n"
     "       A interface id to advertise on.\n"
+    "\n"
+    "  --app-id <custom-id>\n"
+    "       Application custom id.\n"
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n"
     "  --trace_file <file>\n"
@@ -633,6 +638,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_KVS:
         LinuxDeviceOptions::GetInstance().KVS = aValue;
+        break;
+    
+    case kDeviceOption_AppID:
+        LinuxDeviceOptions::GetInstance().app_id = aValue;
         break;
 
     case kDeviceOption_InterfaceId:

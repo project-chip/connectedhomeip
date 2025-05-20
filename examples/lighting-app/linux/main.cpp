@@ -78,10 +78,10 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
 void ApplicationInit()
 {
-    const char * app_id = std::getenv("CHIP_LIGHTING_APP_ID");
+    const char * app_id = LinuxDeviceOptions::GetInstance().app_id;
     if (app_id == nullptr)
     {
-        app_id = "54321";
+        app_id = "";
     }
 
     std::string path = kChipEventFifoPathPrefix + std::string(app_id);
