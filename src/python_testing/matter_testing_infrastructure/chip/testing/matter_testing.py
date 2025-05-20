@@ -73,17 +73,7 @@ from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
-from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
-from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
-from mobly.test_runner import TestRunner
-
-try:
-    from matter.yamltests.hooks import TestRunnerHooks
-except ImportError:
-    class TestRunnerHooks:
-        pass
-
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
