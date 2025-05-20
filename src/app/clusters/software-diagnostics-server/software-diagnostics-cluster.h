@@ -27,6 +27,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <sys/types.h>
 
 namespace chip {
 namespace app {
@@ -84,27 +85,18 @@ public:
         {
         case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
             uint64_t value;
-            if (LOGIC::GetCurrentHeapFree(value) != CHIP_NO_ERROR)
-            {
-                value = 0;
-            }
-            return encoder.Encode(value);
+            CHIP_ERROR err = LOGIC::GetCurrentHeapFree(value);
+            return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
             uint64_t value;
-            if (LOGIC::GetCurrentHeapUsed(value) != CHIP_NO_ERROR)
-            {
-                value = 0;
-            }
-            return encoder.Encode(value);
+            CHIP_ERROR err = LOGIC::GetCurrentHeapUsed(value);
+            return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
             uint64_t value;
-            if (LOGIC::GetCurrentHighWatermark(value) != CHIP_NO_ERROR)
-            {
-                value = 0;
-            }
-            return encoder.Encode(value);
+            CHIP_ERROR err = LOGIC::GetCurrentHighWatermark(value);
+            return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
             return LOGIC::ReadThreadMetrics(encoder);
@@ -138,6 +130,25 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
     {
         return LOGIC::Attributes(builder);
+    }
+
+private:
+
+    // Encodes the `value` in `encoder`, while handling a potential `readError` that occured
+    // when the input `value` was read:
+    //   - CHIP_ERROR_NOT_IMPLEMENTED results in a 0 being encoded
+    //   - any other read error is just forwarded
+    CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
+    {
+        if (readError == CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            value = 0;
+        }
+        else if (readError != CHIP_NO_ERROR)
+        {
+            return readError;
+        }
+        return encoder.Encode(value);
     }
 };
 
