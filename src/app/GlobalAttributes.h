@@ -20,7 +20,7 @@
 #include <app/AppConfig.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/DataModelTypes.h>
