@@ -24,6 +24,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
+using chip::app::Clusters::SoftwareDiagnostics::StaticApplicationConfig::IsAttributeEnabledOnSomeEndpoint;
 
 // this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
 static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1,
@@ -33,7 +34,7 @@ static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[
 
 namespace {
 
-Global<RegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>>> gServer;
+Global<LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>>> gServer;
 
 } // namespace
 
@@ -41,9 +42,17 @@ void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
     // NOTE: we assume code-generation logic is always correct here (we assert at least kFixedClusterConfig settings)
     //       so no error checks are done.
+    const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
+        .enableThreadMetrics     = IsAttributeEnabledOnSomeEndpoint(Attributes::ThreadMetrics::Id),
+        .enableCurrentHeapFree   = IsAttributeEnabledOnSomeEndpoint(Attributes::CurrentHeapFree::Id),
+        .enableCurrentHeapUsed   = IsAttributeEnabledOnSomeEndpoint(Attributes::CurrentHeapUsed::Id),
+        .enableCurrentWatermarks = IsAttributeEnabledOnSomeEndpoint(Attributes::CurrentHeapHighWatermark::Id),
+    };
+    gServer->Create(enabledAttributes);
     (void) CodegenDataModelProvider::Instance().Registry().Register(gServer->Registration());
 }
 void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
 {
     (void) CodegenDataModelProvider::Instance().Registry().Unregister(&gServer->Cluster());
+    gServer->Destroy();
 }

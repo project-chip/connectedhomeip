@@ -81,7 +81,7 @@ CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & e
 
 CHIP_ERROR SoftwareDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (GetDiagnosticDataProvider().SupportsWatermarks())
+    if (mEnabledAttributes.enableCurrentWatermarks && GetDiagnosticDataProvider().SupportsWatermarks())
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetWatermarks::kMetadataEntry };
         return builder.ReferenceExisting(kAcceptedCommands);
@@ -97,28 +97,22 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
     // guarded by feature maps)
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(4 + DefaultServerCluster::GlobalAttributes().size()));
 
-    // NOTE:
-    //   - logic here is slow, however it is accurate.
-    //   - we COULD make the diagnostics provider give us a bitmap of support (maybe easiest however it changes API)
-    //     or cache this (would require a tiny amount of RAM).
-    AutoFreeThreadMetrics metrics(GetDiagnosticDataProvider());
-    if (metrics.ReadThreadMetrics() != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    if (mEnabledAttributes.enableThreadMetrics)
     {
         ReturnErrorOnFailure(builder.Append(Attributes::ThreadMetrics::kMetadataEntry));
     }
 
-    uint64_t unusedValue;
-    if (GetCurrentHeapFree(unusedValue) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    if (mEnabledAttributes.enableCurrentHeapFree)
     {
         ReturnErrorOnFailure(builder.Append(Attributes::CurrentHeapFree::kMetadataEntry));
     }
 
-    if (GetCurrentHeapUsed(unusedValue) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    if (mEnabledAttributes.enableCurrentHeapUsed)
     {
         ReturnErrorOnFailure(builder.Append(Attributes::CurrentHeapUsed::kMetadataEntry));
     }
 
-    if (GetDiagnosticDataProvider().SupportsWatermarks())
+    if (mEnabledAttributes.enableCurrentWatermarks)
     {
         ReturnErrorOnFailure(builder.Append(Attributes::CurrentHeapHighWatermark::kMetadataEntry));
     }

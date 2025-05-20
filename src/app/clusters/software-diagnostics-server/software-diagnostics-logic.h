@@ -27,11 +27,20 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+struct SoftwareDiagnosticsEnabledAttributes
+{
+    bool enableThreadMetrics : 1;
+    bool enableCurrentHeapFree : 1;
+    bool enableCurrentHeapUsed : 1;
+    bool enableCurrentWatermarks : 1;
+};
+
 /// Type-safe implementation for callbacks for the SoftwareDiagnostics server
 class SoftwareDiagnosticsLogic
 {
 public:
-    SoftwareDiagnosticsLogic()          = default;
+    SoftwareDiagnosticsLogic(const SoftwareDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes)
+    {}
     virtual ~SoftwareDiagnosticsLogic() = default;
 
     CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const { return GetDiagnosticDataProvider().GetCurrentHeapFree(out); }
@@ -48,7 +57,8 @@ public:
     BitFlags<SoftwareDiagnostics::Feature> GetFeatureMap() const
     {
         return BitFlags<SoftwareDiagnostics::Feature>().Set(SoftwareDiagnostics::Feature::kWatermarks,
-                                                            GetDiagnosticDataProvider().SupportsWatermarks());
+                                                            mEnabledAttributes.enableCurrentWatermarks &&
+                                                                GetDiagnosticDataProvider().SupportsWatermarks());
     }
 
     CHIP_ERROR ResetWatermarks() { return GetDiagnosticDataProvider().ResetWatermarks(); }
@@ -68,13 +78,18 @@ protected:
     /// use `DeviceLayer::GetDiagnosticDataProvider` and not incur RAM cost and also
     /// have a RAM-based implementation for unit testing.
     [[nodiscard]] virtual DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const = 0;
+
+private:
+    const SoftwareDiagnosticsEnabledAttributes mEnabledAttributes;
 };
 
 /// Minimal class that uses DeviceLayer (singleton) diagnostics provider
 class DeviceLayerSoftwareDiagnosticsLogic : public SoftwareDiagnosticsLogic
 {
 public:
-    DeviceLayerSoftwareDiagnosticsLogic() = default;
+    DeviceLayerSoftwareDiagnosticsLogic(const SoftwareDiagnosticsEnabledAttributes enabledAttributes) :
+        SoftwareDiagnosticsLogic(enabledAttributes)
+    {}
 
 protected:
     [[nodiscard]] DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const override
@@ -87,7 +102,10 @@ protected:
 class InjectedDiagnosticsSoftwareDiagnosticsLogic : public SoftwareDiagnosticsLogic
 {
 public:
-    InjectedDiagnosticsSoftwareDiagnosticsLogic(DeviceLayer::DiagnosticDataProvider & provider) : mProvider(provider) {}
+    InjectedDiagnosticsSoftwareDiagnosticsLogic(DeviceLayer::DiagnosticDataProvider & provider,
+                                                const SoftwareDiagnosticsEnabledAttributes enabledAttributes) :
+        SoftwareDiagnosticsLogic(enabledAttributes), mProvider(provider)
+    {}
 
 protected:
     [[nodiscard]] DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const override { return mProvider; }

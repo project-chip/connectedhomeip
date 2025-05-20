@@ -84,17 +84,26 @@ public:
         {
         case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
             uint64_t value;
-            ReturnErrorOnFailure(LOGIC::GetCurrentHeapFree(value));
+            if (LOGIC::GetCurrentHeapFree(value) != CHIP_NO_ERROR)
+            {
+                value = 0;
+            }
             return encoder.Encode(value);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
             uint64_t value;
-            ReturnErrorOnFailure(LOGIC::GetCurrentHeapUsed(value));
+            if (LOGIC::GetCurrentHeapUsed(value) != CHIP_NO_ERROR)
+            {
+                value = 0;
+            }
             return encoder.Encode(value);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
             uint64_t value;
-            ReturnErrorOnFailure(LOGIC::GetCurrentHighWatermark(value));
+            if (LOGIC::GetCurrentHighWatermark(value) != CHIP_NO_ERROR)
+            {
+                value = 0;
+            }
             return encoder.Encode(value);
         }
         case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
