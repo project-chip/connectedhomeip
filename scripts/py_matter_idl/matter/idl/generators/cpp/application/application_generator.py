@@ -182,12 +182,28 @@ class CppApplicationGenerator(CodeGenerator):
         )
 
         for name, config in cluster_instances(self.idl).items():
+            all_enabled_attributes = set()
+            all_enabled_commands = set()
+            for cfg in config.endpoint_configs:
+                for attr in cfg.instance.attributes:
+                    all_enabled_attributes.add(attr.name)
+                for cmd in cfg.instance.commands:
+                    all_enabled_commands.add(cmd.name)
+
+            all_enabled_attributes = list(all_enabled_attributes)
+            all_enabled_commands = list(all_enabled_commands)
+
+            all_enabled_attributes.sort()
+            all_enabled_commands.sort()
+
             self.internal_render_one_output(
                 template_path="ServerClusterConfig.jinja",
                 output_file_name=f"app/static-cluster-config/{name}.h",
                 vars={
                     "cluster_name": name,
                     "config": config,
-                    "input_name": self.idl.parse_file_name
+                    "input_name": self.idl.parse_file_name,
+                    "all_enabled_attributes": all_enabled_attributes,
+                    "all_enabled_commands": all_enabled_commands,
                 },
             )
