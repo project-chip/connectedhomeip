@@ -69,6 +69,7 @@ CHIP_ERROR UnitLocalizationServer::SetSupportedTemperatureUnits(DataModel::List<
         mUnitsBuffer[i++] = item;
     }
     mSupportedTemperatureUnits = DataModel::List<TempUnitEnum>(mUnitsBuffer, units.size());
+    MatterReportingAttributeChangeCallback(kRootEndpointId, UnitLocalization::Id, SupportedTemperatureUnits::Id);
     ChipLogProgress(Zcl, "Set number of supported temperature units to: %u",
                     static_cast<unsigned int>(mSupportedTemperatureUnits.size()));
     return CHIP_NO_ERROR;
