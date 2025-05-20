@@ -32,7 +32,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-/// Integration of Software diagnostics logic within the matter data model
+/// Integration of Software diagnostics logic within the Matter data model
 ///
 /// Translates between matter calls and Software Diagnostics logic
 ///
