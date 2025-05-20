@@ -41,7 +41,7 @@ public:
         return GetDiagnosticDataProvider().GetCurrentHeapHighWatermark(out);
     }
 
-    // Encodes the thread metrics LIST within an encoder.
+    // Encodes the thread metrics list, using the provided encoder.
     CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder) const;
 
     /// Determines the feature map based on the DiagnosticsProvider support.
