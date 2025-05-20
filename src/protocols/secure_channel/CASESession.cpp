@@ -1750,14 +1750,9 @@ CHIP_ERROR CASESession::SendSigma3a()
 
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3NOC, *data.nocCert.data() ^= 0xFF);
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ICAC, *data.icaCert.data() ^= 0xFF);
-        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ResponderEphPubKey, *mRemotePubKey ^= 0xFF);
-
-        // Safe const_cast: Pubkey() returns a const reference to P256Keypair::mPublicKey, which is a non-const member variable.
-        // mEphemeralKey is allocated via a non-const call to Platform::New<Crypto::P256Keypair>(), meaning the object resides in
-        // writable heap memory and was not originally declared const. so casting away constness here does not result in undefined
-        // behavior.
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3InitiatorEphPubKey,
-                          *(const_cast<P256PublicKey *>(&mEphemeralKey->Pubkey()))->Bytes() ^= 0xFF);
+                          TestOnlyInjectFaultIntoInitiatorEphemeralKey());
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ResponderEphPubKey, *mRemotePubKey ^= 0xFF);
 
         // Prepare Sigma3 TBS Data Blob
         size_t msgR3SignedLen = EstimateStructOverhead(data.nocCert.size(),    // initiatorNOC
@@ -2718,5 +2713,24 @@ SessionEstablishmentStage CASESession::MapCASEStateToSessionEstablishmentStage(S
         return SessionEstablishmentStage::kUnknown; // Default mapping
     }
 }
+
+#if CHIP_WITH_NLFAULTINJECTION
+
+// safely corrupt the ephemeral key by serializing it, modifying the serialized buffer, and deserializing into a new keypair.
+// This avoids using const_cast which could be unsafe and is guaranteed to work across all keystore implementations.
+void CASESession::TestOnlyInjectFaultIntoInitiatorEphemeralKey(void)
+{
+    Crypto::P256SerializedKeypair serializedKeypairToCorrupt;
+    mEphemeralKey->Serialize(serializedKeypairToCorrupt);
+
+    *serializedKeypairToCorrupt.Bytes() ^= 0xFF;
+    ChipLogProgress(SecureChannel, "Fault Injected into Sigma3 InitiatorEphPubKey");
+
+    Crypto::P256Keypair * corruptedKeyPair;
+    corruptedKeyPair = mFabricsTable->AllocateEphemeralKeypairForCASE();
+    corruptedKeyPair->Deserialize(serializedKeypairToCorrupt);
+    mEphemeralKey = corruptedKeyPair;
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 } // namespace chip
