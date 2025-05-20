@@ -79,7 +79,7 @@ class AVSUMTestBase:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
-    async def send_save_presets_command(self, endpoint, name: str, presetID: int = None, expected_status: Status = Status.Success):
+    async def send_save_preset_command(self, endpoint, name: str, presetID: int = None, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSavePreset(
                 name=name,
