@@ -432,10 +432,12 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
     }
 
     // Start the network stream source after the Gstreamer pipeline is setup
-    mNetworkVideoSource.Start(streamID);
+    // mNetworkVideoSource.Start(streamID);
 
     // Store in stream context
     it->videoContext = videoPipeline;
+
+    ChipLogProgress(Camera, "Video is PLAYING …");
 
     return CameraError::SUCCESS;
 }

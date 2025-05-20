@@ -21,6 +21,7 @@
 #include <commands/delay/Commands.h>
 #include <commands/interactive/Commands.h>
 #include <commands/interactive/InteractiveCommands.h>
+#include <commands/liveview/Commands.h>
 #include <commands/pairing/Commands.h>
 #include <commands/webrtc/Commands.h>
 #include <webrtc-manager/WebRTCManager.h>
@@ -75,6 +76,7 @@ int main(int argc, char * argv[])
     registerCommandsDelay(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
     registerCommandsWebRTC(commands, &credIssuerCommands);
+    registerCommandsLiveView(commands, &credIssuerCommands);
 
     WebRTCManager::Instance().Init();
 
