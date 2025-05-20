@@ -113,7 +113,7 @@ CHIP_ERROR PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum 
     return CHIP_NO_ERROR;
 }
 
-bool PushAvStreamTransportManager::validateUrl(std::string url)
+bool PushAvStreamTransportManager::ValidateUrl(std::string url)
 {
     return true;
 }

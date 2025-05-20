@@ -53,7 +53,7 @@ public:
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
                              const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl);
 
-    bool validateUrl(std::string url);
+    bool ValidateUrl(std::string url);
 
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);

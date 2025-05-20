@@ -296,17 +296,17 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 
     if (isFormatSupported == false)
     {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidCombination);
+        auto status = to_underlying(StatusCodeEnum::kInvalidCombination);
         ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Format Combination");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
     }
 
-    bool isValidUrl = mDelegate.validateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
+    bool isValidUrl = mDelegate.ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
 
     if (isValidUrl == false)
     {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidURL);
+        auto status = to_underlying(StatusCodeEnum::kInvalidURL);
         ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Url");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
@@ -314,7 +314,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 
     if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
     {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidTriggerType);
+        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
         ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Trigger type");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
@@ -336,7 +336,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         mDelegate.ValidateStreamUsage(transportOptions.streamUsage, transportOptions.videoStreamID, transportOptions.audioStreamID);
     if (err != CHIP_NO_ERROR)
     {
-        auto status = static_cast<uint8_t>(StatusCodeEnum::kInvalidStream);
+        auto status = to_underlying(StatusCodeEnum::kInvalidStream);
         ChipLogError(Zcl, "HandleAllocatePushTransport: Invalid Stream");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
@@ -351,7 +351,8 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         return;
     }
 
-    std::shared_ptr<TransportOptionsStorage> transportOptionsPtr = std::make_shared<TransportOptionsStorage>(transportOptions);
+    std::shared_ptr<TransportOptionsStorage> transportOptionsPtr =
+        std::make_shared<TransportOptionsStorage>(transportOptions, mFeatures);
 
     TransportConfigurationStorage outTransportConfiguration(connectionID, transportOptionsPtr);
 
@@ -541,7 +542,7 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
 
     if (transportConfiguration->transportConfiguration.transportStatus == TransportStatusEnum::kInactive)
     {
-        auto clusterStatus = static_cast<uint8_t>(StatusCodeEnum::kInvalidTransportStatus);
+        auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTransportStatus);
         ChipLogError(Zcl, "HandleManuallyTriggerTransport: Invalid Transport status");
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, clusterStatus);
         return;
@@ -552,7 +553,7 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
             TransportTriggerTypeEnum::kContinuous)
         {
 
-            auto clusterStatus = static_cast<uint8_t>(StatusCodeEnum::kInvalidTriggerType);
+            auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
             ChipLogError(Zcl, "HandleManuallyTriggerTransport: Invalid Trigger type");
             ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, clusterStatus);
             return;

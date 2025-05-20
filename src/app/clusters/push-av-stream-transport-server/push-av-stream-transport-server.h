@@ -49,37 +49,77 @@ enum class PushAvStreamTransportStatusEnum : uint8_t
 
 struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 {
-    TransportTriggerOptionsStorage(){};
+    TransportTriggerOptionsStorage() {};
 
-    TransportTriggerOptionsStorage(Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions)
+    TransportTriggerOptionsStorage(Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions,
+                                   const BitFlags<Feature> features)
     {
         triggerType = triggerOptions.triggerType;
-        // motionZones = triggerOptions.motionZones; //Todo: Create Storage for motion zones
+
+        if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion && triggerOptions.motionZones.HasValue())
+        {
+            if (triggerOptions.motionZones.Value().IsNull() == false)
+            {
+                auto & motionZonesList = triggerOptions.motionZones;
+                auto iter              = motionZonesList.Value().Value().begin();
+
+                while (iter.Next())
+                {
+                    auto & transportZoneOption = iter.GetValue();
+                    mTransportZoneOptions.push_back(transportZoneOption);
+                }
+
+                motionZones.SetValue(DataModel::Nullable<DataModel::List<const TransportZoneOptionsStruct>>(
+                    Span<TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
+            }
+        }
+        else
+        {
+            motionZones.Missing();
+        }
+
         motionSensitivity = triggerOptions.motionSensitivity;
         motionTimeControl = triggerOptions.motionTimeControl;
         maxPreRollLen     = triggerOptions.maxPreRollLen;
     }
+
+private:
+    std::vector<TransportZoneOptionsStruct> mTransportZoneOptions;
 };
 
 struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 {
-    CMAFContainerOptionsStorage(){};
+    CMAFContainerOptionsStorage() {};
 
-    CMAFContainerOptionsStorage(Optional<Structs::CMAFContainerOptionsStruct::Type> CMAFContainerOptions)
+    CMAFContainerOptionsStorage(Optional<Structs::CMAFContainerOptionsStruct::Type> CMAFContainerOptions,
+                                const BitFlags<Feature> features)
     {
         if (CMAFContainerOptions.HasValue() == true)
         {
             chunkDuration = CMAFContainerOptions.Value().chunkDuration;
 
-            MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
-            CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKey.Value(), CENCKeyBuffer);
-            CENCKey.SetValue(CENCKeyBuffer);
+            if (CMAFContainerOptions.Value().CENCKey.HasValue())
+            {
+                MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
+                CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKey.Value(), CENCKeyBuffer);
+                CENCKey.SetValue(CENCKeyBuffer);
+            }
 
-            metadataEnabled = CMAFContainerOptions.Value().metadataEnabled;
+            if (features.Has(Feature::kMetadata) && CMAFContainerOptions.HasValue())
+            {
+                metadataEnabled = CMAFContainerOptions.Value().metadataEnabled;
+            }
+            else
+            {
+                metadataEnabled.Missing();
+            }
 
-            MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
-            CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKeyID.Value(), CENCKeyIDBuffer);
-            CENCKeyID.SetValue(CENCKeyIDBuffer);
+            if (CMAFContainerOptions.Value().CENCKey.HasValue())
+            {
+                MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
+                CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKeyID.Value(), CENCKeyIDBuffer);
+                CENCKeyID.SetValue(CENCKeyIDBuffer);
+            }
         }
     }
 
@@ -90,14 +130,21 @@ private:
 
 struct ContainerOptionsStorage : public ContainerOptionsStruct
 {
-    ContainerOptionsStorage(){};
+    ContainerOptionsStorage() {};
 
-    ContainerOptionsStorage(Structs::ContainerOptionsStruct::DecodableType containerOptions)
+    ContainerOptionsStorage(Structs::ContainerOptionsStruct::DecodableType containerOptions, const BitFlags<Feature> features)
     {
         containerType = containerOptions.containerType;
 
-        mCMAFContainerStorage = CMAFContainerOptionsStorage(containerOptions.CMAFContainerOptions);
-        CMAFContainerOptions.SetValue(mCMAFContainerStorage);
+        if (containerType == ContainerFormatEnum::kCmaf)
+        {
+            mCMAFContainerStorage = CMAFContainerOptionsStorage(containerOptions.CMAFContainerOptions, features);
+            CMAFContainerOptions.SetValue(mCMAFContainerStorage);
+        }
+        else
+        {
+            CMAFContainerOptions.Missing();
+        }
     }
 
 private:
@@ -106,9 +153,9 @@ private:
 
 struct TransportOptionsStorage : public TransportOptionsStruct
 {
-    TransportOptionsStorage(){};
+    TransportOptionsStorage() {};
 
-    TransportOptionsStorage(Structs::TransportOptionsStruct::DecodableType transportOptions)
+    TransportOptionsStorage(Structs::TransportOptionsStruct::DecodableType transportOptions, const BitFlags<Feature> features)
     {
         streamUsage   = transportOptions.streamUsage;
         videoStreamID = transportOptions.videoStreamID;
@@ -119,12 +166,12 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         CopyCharSpanToMutableCharSpanWithTruncation(transportOptions.url, urlBuffer);
         url = urlBuffer;
 
-        mTriggerOptionsStorage = TransportTriggerOptionsStorage(transportOptions.triggerOptions);
+        mTriggerOptionsStorage = TransportTriggerOptionsStorage(transportOptions.triggerOptions, features);
         triggerOptions         = mTriggerOptionsStorage;
 
         ingestMethod = transportOptions.ingestMethod;
 
-        mContainerOptionsStorage = ContainerOptionsStorage(transportOptions.containerOptions);
+        mContainerOptionsStorage = ContainerOptionsStorage(transportOptions.containerOptions, features);
         containerOptions         = mContainerOptionsStorage;
 
         expiryTime = transportOptions.expiryTime;
@@ -158,7 +205,7 @@ private:
 struct TransportConfigurationStorageWithFabricIndex
 {
     TransportConfigurationStorage transportConfiguration;
-    chip::FabricIndex fabricIndex;
+    FabricIndex fabricIndex;
 };
 
 /** @brief
@@ -180,8 +227,8 @@ public:
      *   @param connectionID[in]            Indicates the connectionID to allocate.
      *
      *   @return Success if the allocation is successful and a PushTransportConnectionID was produced; otherwise, the command SHALL
-     * be rejected with an appropriate error. The delegate is expected the process the transport options, allocate the transport and
-     * map it to the connectionID. On Success TransportConfigurationStruct is sent as response by the server.
+     *   be rejected with an appropriate error. The delegate is expected to process the transport options, allocate the transport
+     * and map it to the connectionID. On Success TransportConfigurationStruct is sent as response by the server.
      */
     virtual Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
                                                                       const uint16_t connectionID) = 0;
@@ -235,7 +282,7 @@ appropriate
      */
     virtual Protocols::InteractionModel::Status
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) = 0;
+                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::Type> & timeControl) = 0;
 
     /**
      * @brief Validates the url
@@ -243,7 +290,7 @@ appropriate
      *
      * @return boolean value true if the url is valid else false.
      */
-    virtual bool validateUrl(std::string url) = 0;
+    virtual bool ValidateUrl(std::string url) = 0;
 
     /**
      * @brief Validates the bandwidth requirement against the camera's resource management
@@ -305,8 +352,9 @@ appropriate
      *  via the Add/Remove functions for the respective transport connections.
      *
      * @note
-     * The callee is responsible for allocating the buffer that holds the currentConnections.
-     * The buffer is allocated internally by the function and returned to the caller via an output parameter.
+     *
+     * The required buffers are managed by TransportConfigurationStorage, the delegate function is expected to populate the vector
+     * correctly.
      */
     virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorageWithFabricIndex> & currentConnections) = 0;
 
