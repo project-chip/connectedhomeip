@@ -539,9 +539,7 @@ jobs:
               run: |
                   echo -n "" >/tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
-                  echo "ALL_CLUSTERS_APP_ID: \"123452\"" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: out/linux-x64-bridge-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-bridge-app" >> /tmp/test_env.yaml
-                  echo "BRIDGE_APP_ID: \"123453\"" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: out/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
                   echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
@@ -550,7 +548,6 @@ jobs:
                   echo "AIR_PURIFIER_APP: out/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test/chip-air-purifier-app" >> /tmp/test_env.yaml
                   echo "CHIP_MICROWAVE_OVEN_APP: out/linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test/chip-microwave-oven-app" >> /tmp/test_env.yaml
                   echo "CHIP_RVC_APP: out/linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test/chip-rvc-app" >> /tmp/test_env.yaml
-                  echo "CHIP_RVC_APP_ID: \"123451\"" >> /tmp/test_env.yaml
                   echo "NETWORK_MANAGEMENT_APP: out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
                   echo "FABRIC_ADMIN_APP: out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
