@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <rtc/rtc.hpp>
-#include <webrtc_manager/WebRTCProviderClient.h>
-#include <webrtc_manager/WebRTCRequestorDelegate.h>
+#include <webrtc-manager/WebRTCProviderClient.h>
+#include <webrtc-manager/WebRTCRequestorDelegate.h>
 
 class WebRTCManager
 {
