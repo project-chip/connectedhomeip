@@ -92,7 +92,7 @@ class XmlAttribute:
 class XmlCommand:
     id: int
     name: str
-    conformance: Callable[[uint], ConformanceDecision]
+    conformance: ConformanceCallable
     privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
     def __str__(self):
