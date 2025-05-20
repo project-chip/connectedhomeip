@@ -27,9 +27,6 @@
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/entropy.h>
 
-namespace chip {
-namespace Crypto {
-
 
 #if !ENABLE_SE05X_RND_GEN
 
@@ -86,6 +83,12 @@ void free_entropy_context_h()
     }
 }
 
+#endif //#if !ENABLE_SE05X_RND_GEN
+
+namespace chip {
+namespace Crypto {
+
+#if !ENABLE_SE05X_RND_GEN
 CHIP_ERROR DRBG_get_bytes_h(uint8_t * out_buffer, const size_t out_length)
 {
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -99,7 +102,7 @@ CHIP_ERROR DRBG_get_bytes_h(uint8_t * out_buffer, const size_t out_length)
 
     return CHIP_NO_ERROR;
 }
-#endif //#if !ENABLE_SE05X_RND_GEN
+#endif //!ENABLE_SE05X_RND_GEN
 
 
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
