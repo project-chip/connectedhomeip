@@ -41,10 +41,11 @@ class TlsCertificateManagementClusterTLSCertStruct (
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CAID), caid)
-      if (certificate.isPresent) {
-      val optcertificate = certificate.get()
-      put(ContextSpecificTag(TAG_CERTIFICATE), optcertificate)
-    }
+      if (certificate.isPresent) 
+        val optcertificate = certificate.get()
+        put(ContextSpecificTag(TAG_CERTIFICATE), optcertificate)
+      }
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -57,12 +58,13 @@ class TlsCertificateManagementClusterTLSCertStruct (
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TlsCertificateManagementClusterTLSCertStruct {
       tlvReader.enterStructure(tlvTag)
       val caid = tlvReader.getUInt(ContextSpecificTag(TAG_CAID))
-      val certificate = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CERTIFICATE))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CERTIFICATE)))
-    } else {
-      Optional.empty()
-    }
-      
+      val certificate =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CERTIFICATE))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CERTIFICATE)))
+        } else {
+          Optional.empty()
+        }
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       tlvReader.exitContainer()
 
       return TlsCertificateManagementClusterTLSCertStruct(caid, certificate, fabricIndex)

@@ -24,13 +24,14 @@ import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
 
-class TlsCertificateManagementClusterTLSClientCertificateDetailStruct (
-    val ccdid: UInt,
-    val clientCertificate: Optional<ByteArray>,
-    val intermediateCertificates: Optional<List<ByteArray>>) {
-  override fun toString(): String  = buildString {
+class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
+  val ccdid: UInt,
+  val clientCertificate: Optional<ByteArray>,
+  val intermediateCertificates: Optional<List<ByteArray>>,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSClientCertificateDetailStruct {\n")
     append("\tccdid : $ccdid\n")
     append("\tclientCertificate : $clientCertificate\n")

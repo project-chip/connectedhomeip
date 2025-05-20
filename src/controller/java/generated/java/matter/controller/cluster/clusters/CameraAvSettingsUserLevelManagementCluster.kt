@@ -652,17 +652,13 @@ suspend fun readMPTZPresetsAttribute(): MPTZPresetsAttribute {val ATTRIBUTE_ID: 
   }
 suspend fun readDPTZRelativeMoveAttribute(): DPTZRelativeMoveAttribute {val ATTRIBUTE_ID: UInt = 3u
 
-    val attributePath = AttributePath(
-      endpointId = endpointId, 
-      clusterId = CLUSTER_ID,
-      attributeId = ATTRIBUTE_ID
-    )
+  suspend fun readDPTZStreamsAttribute(): DPTZStreamsAttribute {
+    val ATTRIBUTE_ID: UInt = 3u
 
-    val readRequest = ReadRequest(
-      eventPaths = emptyList(),
-      attributePaths = listOf(attributePath)
-    )
-    
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {

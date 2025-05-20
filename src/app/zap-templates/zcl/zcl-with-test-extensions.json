@@ -213,7 +213,7 @@
              "DeviceLocation"
         ],
         "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
+	"Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
         "Closure Dimension": [
             "CurrentState",
             "Target",
