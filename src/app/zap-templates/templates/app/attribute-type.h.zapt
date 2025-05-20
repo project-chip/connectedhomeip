@@ -1,4 +1,5 @@
 {{> header}}
+// This file is generated from attribute-type.h.zapt
 
 // Prevent multiple inclusion
 #pragma once

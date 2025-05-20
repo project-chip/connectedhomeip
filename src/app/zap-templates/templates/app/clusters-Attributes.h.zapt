@@ -1,4 +1,6 @@
 {{> header}}
+// This file is generated from clusters-Attributes.h.zapt
+
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
