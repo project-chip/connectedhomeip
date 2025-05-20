@@ -51,8 +51,8 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
             FeatureBitmapType::kAlarmSuppress, // feature bit 0x4
             FeatureBitmapType::kSensitivityLevel// feature bit 0x8
         },
-        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
-        .enabledCommands {detail::kEndpoint1EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint1EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint1EnabledCommands),
     },
 } };
 

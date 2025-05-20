@@ -86,15 +86,15 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kThreadNetworkInterface// feature bit 0x2
         },
-        .enabledAttributes {detail::kEndpoint0EnabledAttributes},
-        .enabledCommands {detail::kEndpoint0EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint0EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint0EnabledCommands),
     },
     {
         .endpointNumber = 65534,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint65534EnabledAttributes},
-        .enabledCommands {detail::kEndpoint65534EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint65534EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint65534EnabledCommands),
     },
 } };
 

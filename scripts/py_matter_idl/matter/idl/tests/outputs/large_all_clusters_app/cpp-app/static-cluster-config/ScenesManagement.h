@@ -83,16 +83,16 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kSceneNames// feature bit 0x1
         },
-        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
-        .enabledCommands {detail::kEndpoint1EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint1EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint1EnabledCommands),
     },
     {
         .endpointNumber = 2,
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kSceneNames// feature bit 0x1
         },
-        .enabledAttributes {detail::kEndpoint2EnabledAttributes},
-        .enabledCommands {detail::kEndpoint2EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint2EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint2EnabledCommands),
     },
 } };
 

@@ -89,22 +89,22 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
         .endpointNumber = 0,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint0EnabledAttributes},
-        .enabledCommands {detail::kEndpoint0EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint0EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint0EnabledCommands),
     },
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
-        .enabledCommands {detail::kEndpoint1EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint1EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint1EnabledCommands),
     },
     {
         .endpointNumber = 2,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint2EnabledAttributes},
-        .enabledCommands {detail::kEndpoint2EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint2EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint2EnabledCommands),
     },
 } };
 

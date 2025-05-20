@@ -110,8 +110,8 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
             FeatureBitmapType::kXY, // feature bit 0x8
             FeatureBitmapType::kColorTemperature// feature bit 0x10
         },
-        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
-        .enabledCommands {detail::kEndpoint1EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint1EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint1EnabledCommands),
     },
 } };
 

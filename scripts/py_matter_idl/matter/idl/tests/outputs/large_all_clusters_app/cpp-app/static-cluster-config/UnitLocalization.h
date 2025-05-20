@@ -35,8 +35,8 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kTemperatureUnit// feature bit 0x1
         },
-        .enabledAttributes {detail::kEndpoint0EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint0EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
 } };
 

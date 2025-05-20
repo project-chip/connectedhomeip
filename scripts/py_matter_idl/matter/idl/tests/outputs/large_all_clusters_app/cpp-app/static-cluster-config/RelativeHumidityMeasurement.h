@@ -41,15 +41,15 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
         .endpointNumber = 0,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint0EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint0EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint1EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
 } };
 

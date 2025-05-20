@@ -47,8 +47,8 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kLatchingSwitch// feature bit 0x1
         },
-        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint1EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
     {
         .endpointNumber = 3,
@@ -58,8 +58,8 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
             FeatureBitmapType::kMomentarySwitchMultiPress, // feature bit 0x10
             FeatureBitmapType::kActionSwitch// feature bit 0x20
         },
-        .enabledAttributes {detail::kEndpoint3EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint3EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
     {
         .endpointNumber = 4,
@@ -69,8 +69,8 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
             FeatureBitmapType::kMomentarySwitchLongPress, // feature bit 0x8
             FeatureBitmapType::kMomentarySwitchMultiPress// feature bit 0x10
         },
-        .enabledAttributes {detail::kEndpoint4EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint4EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
 } };
 

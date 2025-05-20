@@ -69,24 +69,24 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kBattery// feature bit 0x2
         },
-        .enabledAttributes {detail::kEndpoint0EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint0EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kBattery// feature bit 0x2
         },
-        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint1EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
     {
         .endpointNumber = 2,
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kBattery// feature bit 0x2
         },
-        .enabledAttributes {detail::kEndpoint2EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint2EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
 } };
 

@@ -46,8 +46,8 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
             FeatureBitmapType::kPacketCounts, // feature bit 0x1
             FeatureBitmapType::kErrorCounts// feature bit 0x2
         },
-        .enabledAttributes {detail::kEndpoint0EnabledAttributes},
-        .enabledCommands {detail::kEndpoint0EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint0EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint0EnabledCommands),
     },
 } };
 

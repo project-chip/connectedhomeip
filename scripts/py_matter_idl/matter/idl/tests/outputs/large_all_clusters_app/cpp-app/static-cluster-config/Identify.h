@@ -80,29 +80,29 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
-        .enabledCommands {detail::kEndpoint1EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint1EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint1EnabledCommands),
     },
     {
         .endpointNumber = 2,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint2EnabledAttributes},
-        .enabledCommands {detail::kEndpoint2EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint2EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint2EnabledCommands),
     },
     {
         .endpointNumber = 3,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint3EnabledAttributes},
-        .enabledCommands {detail::kEndpoint3EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint3EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint3EnabledCommands),
     },
     {
         .endpointNumber = 4,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .enabledAttributes {detail::kEndpoint4EnabledAttributes},
-        .enabledCommands {},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint4EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(),
     },
 } };
 

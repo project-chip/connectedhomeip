@@ -58,8 +58,8 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
             FeatureBitmapType::kNTPClient, // feature bit 0x2
             FeatureBitmapType::kTimeSyncClient// feature bit 0x8
         },
-        .enabledAttributes {detail::kEndpoint0EnabledAttributes},
-        .enabledCommands {detail::kEndpoint0EnabledCommands},
+        .enabledAttributes = Span<const AttributeId>(detail::kEndpoint0EnabledAttributes),
+        .enabledCommands = Span<const CommandId>(detail::kEndpoint0EnabledCommands),
     },
 } };
 
