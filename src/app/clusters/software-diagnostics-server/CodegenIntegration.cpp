@@ -26,7 +26,7 @@ using namespace chip::app::Clusters::SoftwareDiagnostics;
 
 // this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
 static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1,
-              "Exactly one softare diagnistics provider may exist on Endpoint 0");
+              "Exactly one software diagnostics cluster instance may exist");
 static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId,
               "Exactly one softare diagnistics provider may exist on Endpoint 0");
 
