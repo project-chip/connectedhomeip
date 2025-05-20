@@ -19,7 +19,7 @@
 #include "EnergyGatewayAppCommonMain.h"
 #include "CommodityPriceMain.h"
 #include "ElectricalGridConditionsMain.h"
-#include "meter-identification-instance.h"
+#include "MeterIdentificationInstance.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -81,6 +81,6 @@ void ElectricalEnergyTariffInit()
 
 void ElectricalEnergyTariffShutdown()
 {
-    MeterIdentificationShutdown();
     ChipLogDetail(AppServer, "Energy Gateway App : ElectricalEnergyTariffShutdown()");
+    MeterIdentificationShutdown();
 }
