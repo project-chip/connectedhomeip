@@ -731,44 +731,42 @@ CHIP_ERROR Storage::GetProvisionRequest(bool & value)
     // return Flash::Set(Parameters::ID::kProvisionRequest, value);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-#if defined(SL_MBEDTLS_USE_TINYCRYPT)
 CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
     // Tinycrypt doesn't support the key ID, so we need to store the key as a binary blob
     return Flash::Set(Parameters::ID::kOtaTlvEncryptionKey, value.data(), value.size());
+#else  // MBEDTLS_USE_PSA_CRYPTO
+    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key;
+    ReturnErrorOnFailure(key.Import(value.data(), value.size()));
+    return Flash::Set(Parameters::ID::kOtaTlvEncryptionKey, key.GetId());
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
 CHIP_ERROR Storage::GetOtaTlvEncryptionKey(uint32_t & keyId)
 {
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
     // Tinycrypt doesn't support the key ID
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // MBEDTLS_USE_PSA_CRYPTO
+    return Flash::Get(SilabsConfig::kOtaTlvEncryptionKey, keyId);
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
 
 CHIP_ERROR Storage::GetOtaTlvEncryptionKey(MutableByteSpan & keySpan)
 {
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
     size_t keyLen = 0;
     ReturnErrorOnFailure(Flash::Get(Parameters::ID::kOtaTlvEncryptionKey, keySpan.data(), keySpan.size(), keyLen));
     keySpan.reduce_size(keyLen);
     return CHIP_NO_ERROR;
-}
 #else  // MBEDTLS_USE_PSA_CRYPTO
-CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
-{
     return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR Storage::GetOtaTlvEncryptionKey(uint32_t & keyId)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR Storage::GetOtaTlvEncryptionKey(uint8_t * key, size_t max, size_t & keyLen)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
 #endif // SL_MBEDTLS_USE_TINYCRYPT
-#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+}
 
 #if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)

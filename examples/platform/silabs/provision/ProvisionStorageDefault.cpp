@@ -663,42 +663,39 @@ CHIP_ERROR Storage::GetProvisionRequest(bool & value)
 }
 
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-#if defined(SL_MBEDTLS_USE_TINYCRYPT)
 CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
     // Tinycrypt doesn't support the key ID, so we need to store the key as a binary blob
     return SilabsConfig::WriteConfigValueBin(SilabsConfig::kOtaTlvEncryption_KeyId, value.data(), value.size());
-}
-
-CHIP_ERROR Storage::GetOtaTlvEncryptionKey(uint32_t & keyId)
-{
-    // Tinycrypt doesn't support the key ID
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-CHIP_ERROR Storage::GetOtaTlvEncryptionKey(MutableByteSpan & keySpan)
-{
-    return SilabsConfig::ReadConfigValueBin(SilabsConfig::kOtaTlvEncryption_KeyId, keySpan.data(), keySpan.size());
-}
 #else  // MBEDTLS_USE_PSA_CRYPTO
-CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
-{
     chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key;
     ReturnErrorOnFailure(key.Import(value.data(), value.size()));
     return SilabsConfig::WriteConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, key.GetId());
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
 CHIP_ERROR Storage::GetOtaTlvEncryptionKey(uint32_t & keyId)
 {
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    // Tinycrypt doesn't support the key ID
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // MBEDTLS_USE_PSA_CRYPTO
+    // Read the key ID from the config
     return SilabsConfig::ReadConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, keyId);
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
 
 CHIP_ERROR Storage::GetOtaTlvEncryptionKey(MutableByteSpan & keySpan)
 {
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    // Tinycrypt doesn't support the key ID
+    return SilabsConfig::ReadConfigValueBin(SilabsConfig::kOtaTlvEncryption_KeyId, keySpan.data(), keySpan.size());
+#else  // MBEDTLS_USE_PSA_CRYPTO
     return CHIP_ERROR_NOT_IMPLEMENTED;
-}
 #endif // SL_MBEDTLS_USE_TINYCRYPT
-#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+}
 
 CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
 {
