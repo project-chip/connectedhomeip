@@ -28,7 +28,7 @@ using namespace chip::app::Clusters::SoftwareDiagnostics;
 static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1,
               "Exactly one software diagnostics cluster instance may exist");
 static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId,
-              "Exactly one softare diagnistics provider may exist on Endpoint 0");
+              "The software diagnostics cluster must be on endpoint 0");
 
 namespace {
 
