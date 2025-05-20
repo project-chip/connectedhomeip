@@ -214,6 +214,8 @@ app::Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInsta
 auto exampleAccessRestrictionProvider = std::make_unique<ExampleAccessRestrictionProvider>();
 #endif
 
+extern CHIP_ERROR se05x_close_session(void);
+
 void EnableThreadNetworkCommissioning()
 {
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
@@ -859,6 +861,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if ENABLE_TRACING
     tracing_setup.StopTracing();
 #endif
+
+    // Close SE05x session
+    se05x_close_session();
 
     Cleanup();
 }
