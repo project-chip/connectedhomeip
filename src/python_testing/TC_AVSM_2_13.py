@@ -223,7 +223,8 @@ class TC_AVSM_2_13(MatterBaseTest):
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )
-            asserts.assert_equal(videoStreamAllocateResponse.videoStreamID, aVideoStreamID, "The previous video stream is not reused")
+            asserts.assert_equal(videoStreamAllocateResponse.videoStreamID,
+                                 aVideoStreamID, "The previous video stream is not reused")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
@@ -234,6 +235,7 @@ class TC_AVSM_2_13(MatterBaseTest):
         )
         logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

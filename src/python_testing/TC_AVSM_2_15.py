@@ -164,7 +164,8 @@ class TC_AVSM_2_15(MatterBaseTest):
             asserts.assert_is_not_none(
                 snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
             )
-            asserts.assert_equal(snpStreamAllocateResponse.snapshotStreamID, aSnapshotStreamID, "The previous snapshot stream is not reused")
+            asserts.assert_equal(snpStreamAllocateResponse.snapshotStreamID, aSnapshotStreamID,
+                                 "The previous snapshot stream is not reused")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
@@ -175,6 +176,7 @@ class TC_AVSM_2_15(MatterBaseTest):
         )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
