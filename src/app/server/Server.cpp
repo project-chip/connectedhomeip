@@ -652,6 +652,12 @@ void Server::Shutdown()
     app::DnssdServer::Instance().SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+    /** Shutdown all active read handlers to ensure a clean shutdown of the Interaction Model.
+     * This is required before resetting the DataModelProvider, as ongoing reads may access it
+     * and lead to crashes or undefined behavior.
+     **/
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
     app::InteractionModelEngine::GetInstance()->SetDataModelProvider(nullptr);
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     Dnssd::ServiceAdvertiser::Instance().Shutdown();
