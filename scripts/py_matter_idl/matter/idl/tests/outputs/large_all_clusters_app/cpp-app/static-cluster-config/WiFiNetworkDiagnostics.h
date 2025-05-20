@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/WiFiNetworkDiagnostics/AttributeIds.h>
 #include <clusters/WiFiNetworkDiagnostics/CommandIds.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

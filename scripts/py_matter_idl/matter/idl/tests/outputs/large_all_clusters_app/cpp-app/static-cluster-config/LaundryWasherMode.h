@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/LaundryWasherMode/AttributeIds.h>
 #include <clusters/LaundryWasherMode/CommandIds.h>
 #include <clusters/LaundryWasherMode/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

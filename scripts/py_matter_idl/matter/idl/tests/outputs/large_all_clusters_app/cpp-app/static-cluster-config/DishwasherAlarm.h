@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/DishwasherAlarm/AttributeIds.h>
 #include <clusters/DishwasherAlarm/CommandIds.h>
 #include <clusters/DishwasherAlarm/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

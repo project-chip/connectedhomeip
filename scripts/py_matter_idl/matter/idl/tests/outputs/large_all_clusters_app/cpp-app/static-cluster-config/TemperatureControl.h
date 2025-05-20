@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/TemperatureControl/AttributeIds.h>
 #include <clusters/TemperatureControl/CommandIds.h>
 #include <clusters/TemperatureControl/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

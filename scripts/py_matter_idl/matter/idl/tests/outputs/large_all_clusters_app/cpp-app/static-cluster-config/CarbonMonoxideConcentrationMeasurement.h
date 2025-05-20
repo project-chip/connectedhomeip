@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/CarbonMonoxideConcentrationMeasurement/AttributeIds.h>
 #include <clusters/CarbonMonoxideConcentrationMeasurement/CommandIds.h>
 #include <clusters/CarbonMonoxideConcentrationMeasurement/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

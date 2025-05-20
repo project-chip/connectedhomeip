@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/Pm1ConcentrationMeasurement/AttributeIds.h>
 #include <clusters/Pm1ConcentrationMeasurement/CommandIds.h>
 #include <clusters/Pm1ConcentrationMeasurement/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/RvcCleanMode/AttributeIds.h>
 #include <clusters/RvcCleanMode/CommandIds.h>
 #include <clusters/RvcCleanMode/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/FanControl/AttributeIds.h>
 #include <clusters/FanControl/CommandIds.h>
 #include <clusters/FanControl/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/SmokeCoAlarm/AttributeIds.h>
 #include <clusters/SmokeCoAlarm/CommandIds.h>
 #include <clusters/SmokeCoAlarm/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

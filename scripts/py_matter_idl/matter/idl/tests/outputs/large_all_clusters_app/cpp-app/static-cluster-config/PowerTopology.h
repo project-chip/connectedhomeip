@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/PowerTopology/AttributeIds.h>
 #include <clusters/PowerTopology/CommandIds.h>
 #include <clusters/PowerTopology/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

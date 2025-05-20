@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/CommandIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

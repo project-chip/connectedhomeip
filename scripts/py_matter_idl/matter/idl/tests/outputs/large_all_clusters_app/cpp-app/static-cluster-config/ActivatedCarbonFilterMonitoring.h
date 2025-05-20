@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/AttributeIds.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/CommandIds.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

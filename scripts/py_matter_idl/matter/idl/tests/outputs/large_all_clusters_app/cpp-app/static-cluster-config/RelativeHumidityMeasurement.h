@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/RelativeHumidityMeasurement/AttributeIds.h>
 #include <clusters/RelativeHumidityMeasurement/CommandIds.h>
 #include <clusters/RelativeHumidityMeasurement/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

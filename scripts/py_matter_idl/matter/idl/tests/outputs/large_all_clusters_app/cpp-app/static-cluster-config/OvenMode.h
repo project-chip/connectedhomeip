@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/OvenMode/AttributeIds.h>
 #include <clusters/OvenMode/CommandIds.h>
 #include <clusters/OvenMode/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

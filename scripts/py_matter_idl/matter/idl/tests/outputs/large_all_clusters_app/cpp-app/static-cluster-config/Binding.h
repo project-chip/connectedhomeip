@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/Binding/AttributeIds.h>
 #include <clusters/Binding/CommandIds.h>
 #include <clusters/Binding/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

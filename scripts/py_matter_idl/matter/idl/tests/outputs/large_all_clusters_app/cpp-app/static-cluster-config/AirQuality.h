@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/AirQuality/AttributeIds.h>
 #include <clusters/AirQuality/CommandIds.h>
 #include <clusters/AirQuality/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

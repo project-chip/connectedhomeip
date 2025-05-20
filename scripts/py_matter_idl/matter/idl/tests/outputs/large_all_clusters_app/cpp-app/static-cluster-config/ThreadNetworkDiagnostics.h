@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/ThreadNetworkDiagnostics/AttributeIds.h>
 #include <clusters/ThreadNetworkDiagnostics/CommandIds.h>
 #include <clusters/ThreadNetworkDiagnostics/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

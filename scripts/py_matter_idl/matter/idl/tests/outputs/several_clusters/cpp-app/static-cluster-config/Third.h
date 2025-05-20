@@ -4,10 +4,10 @@
 // from inputs/several_clusters.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/Third/AttributeIds.h>
 #include <clusters/Third/CommandIds.h>
 #include <clusters/Third/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

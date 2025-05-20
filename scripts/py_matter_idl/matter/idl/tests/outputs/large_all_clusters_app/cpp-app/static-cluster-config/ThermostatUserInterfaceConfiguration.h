@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/AttributeIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/CommandIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

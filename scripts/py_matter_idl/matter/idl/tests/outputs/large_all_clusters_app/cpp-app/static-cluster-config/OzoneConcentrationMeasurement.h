@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/OzoneConcentrationMeasurement/AttributeIds.h>
 #include <clusters/OzoneConcentrationMeasurement/CommandIds.h>
 #include <clusters/OzoneConcentrationMeasurement/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

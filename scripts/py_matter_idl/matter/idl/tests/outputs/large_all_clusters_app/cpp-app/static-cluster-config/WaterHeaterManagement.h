@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/WaterHeaterManagement/AttributeIds.h>
 #include <clusters/WaterHeaterManagement/CommandIds.h>
 #include <clusters/WaterHeaterManagement/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

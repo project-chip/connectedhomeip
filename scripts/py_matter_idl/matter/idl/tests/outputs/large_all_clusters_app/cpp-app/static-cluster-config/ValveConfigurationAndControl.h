@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/ValveConfigurationAndControl/AttributeIds.h>
 #include <clusters/ValveConfigurationAndControl/CommandIds.h>
 #include <clusters/ValveConfigurationAndControl/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

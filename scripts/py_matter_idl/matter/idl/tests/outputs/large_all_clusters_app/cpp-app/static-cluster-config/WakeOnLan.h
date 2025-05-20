@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/WakeOnLan/AttributeIds.h>
 #include <clusters/WakeOnLan/CommandIds.h>
 #include <clusters/WakeOnLan/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

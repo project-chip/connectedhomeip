@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/MicrowaveOvenMode/AttributeIds.h>
 #include <clusters/MicrowaveOvenMode/CommandIds.h>
 #include <clusters/MicrowaveOvenMode/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

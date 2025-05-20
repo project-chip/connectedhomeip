@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/DeviceEnergyManagementMode/AttributeIds.h>
 #include <clusters/DeviceEnergyManagementMode/CommandIds.h>
 #include <clusters/DeviceEnergyManagementMode/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

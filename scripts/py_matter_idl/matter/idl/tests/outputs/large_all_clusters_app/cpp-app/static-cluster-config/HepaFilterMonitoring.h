@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/HepaFilterMonitoring/AttributeIds.h>
 #include <clusters/HepaFilterMonitoring/CommandIds.h>
 #include <clusters/HepaFilterMonitoring/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

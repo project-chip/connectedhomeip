@@ -4,10 +4,10 @@
 // from inputs/large_lighting_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/GeneralCommissioning/AttributeIds.h>
 #include <clusters/GeneralCommissioning/CommandIds.h>
 #include <clusters/GeneralCommissioning/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

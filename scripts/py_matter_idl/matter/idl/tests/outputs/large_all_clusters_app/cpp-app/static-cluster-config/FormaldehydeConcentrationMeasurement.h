@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/FormaldehydeConcentrationMeasurement/AttributeIds.h>
 #include <clusters/FormaldehydeConcentrationMeasurement/CommandIds.h>
 #include <clusters/FormaldehydeConcentrationMeasurement/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 

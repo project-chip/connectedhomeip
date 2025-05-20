@@ -4,10 +4,10 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
+#include <app/util/cluster-config.h>
 #include <clusters/RadonConcentrationMeasurement/AttributeIds.h>
 #include <clusters/RadonConcentrationMeasurement/CommandIds.h>
 #include <clusters/RadonConcentrationMeasurement/Enums.h>
-#include <app/util/cluster-config.h>
 
 #include <array>
 
