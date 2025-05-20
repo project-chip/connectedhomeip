@@ -26,9 +26,8 @@ namespace Access {
 // Using bitfield values so privilege set and auth mode can be stored together.
 // Privilege set can have more than one value expressed (e.g. View,
 // ProxyView, and Operate).
-// NOTE: Every time this enum class changes, we need to update the function
-// "IsValidAllPrivilegesMask" below.
-// In particular, we need to keep the array "privilegeValues[]" up to date ALWAYS.
+// NOTE: Every time this enum class changes, we need to update the constexpr
+// "kAllPrivilegeBits" below.
 enum class Privilege : uint8_t
 {
     kView       = 1 << 0,
@@ -38,24 +37,14 @@ enum class Privilege : uint8_t
     kAdminister = 1 << 4
 };
 
-// Function used to validate that the parameter 'mask' contains all the values
+// Constant expression that contains all the values
 // defined inside the enum class "Privilege", and only those values.
-constexpr auto IsValidAllPrivilegesMask(uint8_t mask)
-{
-
-    // Array of all current values defined inside the enum class "Privilege".
-    // For this validation to work, this array must ALWAYS match the listed contents
-    // of our enum class "Privilege".
-    constexpr Privilege privilegeValues[] = { Privilege::kView, Privilege::kProxyView, Privilege::kOperate, Privilege::kManage,
-                                              Privilege::kAdminister };
-
-    for (const auto & value : privilegeValues)
-    {
-        mask ^= static_cast<uint8_t>(value);
-    }
-
-    return (mask == 0);
-};
+constexpr uint8_t kAllPrivilegeBits =             //
+    static_cast<uint8_t>(Privilege::kView) |      //
+    static_cast<uint8_t>(Privilege::kProxyView) | //
+    static_cast<uint8_t>(Privilege::kOperate) |   //
+    static_cast<uint8_t>(Privilege::kManage) |    //
+    static_cast<uint8_t>(Privilege::kAdminister);
 
 } // namespace Access
 } // namespace chip
