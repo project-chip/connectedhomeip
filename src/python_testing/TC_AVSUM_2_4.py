@@ -176,7 +176,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
 
             # For now force a preset to be present so there is something to read
             self.step(12)
-            await self.send_save_presets_command(endpoint, name="newpreset", presetID=max_presets_dut)
+            await self.send_save_preset_command(endpoint, name="newpreset", presetID=max_presets_dut)
             stored_preset = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
 
             self.step(13)
