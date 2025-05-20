@@ -41,7 +41,6 @@ inline constexpr AttributeId kEndpoint4EnabledAttributes[] = {
 
 using FeatureBitmapType = Feature;
 
-
 inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 3> kFixedClusterConfig = { {
     {
         .endpointNumber = 1,

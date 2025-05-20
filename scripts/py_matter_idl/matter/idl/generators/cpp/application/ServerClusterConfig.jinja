@@ -45,7 +45,6 @@ using FeatureBitmapType = Feature;
 using FeatureBitmapType = Clusters::StaticApplicationConfig::NoFeatureFlagsDefined;
 {%- endif %}
 
-
 inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, {{config.endpoint_configs | length}}> kFixedClusterConfig = { {
 {%- for endpoint_config in config.endpoint_configs %}
     {
