@@ -115,6 +115,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworks::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<DataModel::Nullable<chip::ByteSpan>> ssid;
     Optional<uint64_t> breadcrumb;
@@ -131,9 +132,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworks::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<DataModel::Nullable<chip::ByteSpan>> ssid;
     Optional<uint64_t> breadcrumb;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworks
@@ -152,6 +155,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
@@ -170,11 +174,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     Optional<DataModel::DecodableList<Structs::WiFiInterfaceScanResultStruct::DecodableType>> wiFiScanResults;
     Optional<DataModel::DecodableList<Structs::ThreadInterfaceScanResultStruct::DecodableType>> threadScanResults;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworksResponse
@@ -195,6 +201,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateWiFiNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
@@ -215,6 +222,7 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateWiFiNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
@@ -222,6 +230,7 @@ public:
     Optional<chip::ByteSpan> networkIdentity;
     Optional<chip::ByteSpan> clientIdentifier;
     Optional<chip::ByteSpan> possessionNonce;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddOrUpdateWiFiNetwork
@@ -238,6 +247,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateThreadNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan operationalDataset;
     Optional<uint64_t> breadcrumb;
@@ -254,9 +264,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateThreadNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan operationalDataset;
     Optional<uint64_t> breadcrumb;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddOrUpdateThreadNetwork
@@ -273,6 +285,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan networkID;
     Optional<uint64_t> breadcrumb;
@@ -289,9 +302,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan networkID;
     Optional<uint64_t> breadcrumb;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveNetwork
@@ -311,6 +326,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
@@ -330,12 +346,14 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     Optional<uint8_t> networkIndex;
     Optional<chip::ByteSpan> clientIdentity;
     Optional<chip::ByteSpan> possessionSignature;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NetworkConfigResponse
@@ -352,6 +370,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan networkID;
     Optional<uint64_t> breadcrumb;
@@ -368,9 +387,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan networkID;
     Optional<uint64_t> breadcrumb;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ConnectNetwork
@@ -388,6 +409,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
@@ -405,10 +427,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     DataModel::Nullable<int32_t> errorValue;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ConnectNetworkResponse
@@ -426,6 +450,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ReorderNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan networkID;
     uint8_t networkIndex = static_cast<uint8_t>(0);
@@ -443,10 +468,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ReorderNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan networkID;
     uint8_t networkIndex = static_cast<uint8_t>(0);
     Optional<uint64_t> breadcrumb;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ReorderNetwork
@@ -463,6 +490,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::QueryIdentity::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan keyIdentifier;
     Optional<chip::ByteSpan> possessionNonce;
@@ -479,9 +507,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::QueryIdentity::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan keyIdentifier;
     Optional<chip::ByteSpan> possessionNonce;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace QueryIdentity
@@ -498,6 +528,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::QueryIdentityResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan identity;
     Optional<chip::ByteSpan> possessionSignature;
@@ -514,9 +545,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::QueryIdentityResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan identity;
     Optional<chip::ByteSpan> possessionSignature;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace QueryIdentityResponse

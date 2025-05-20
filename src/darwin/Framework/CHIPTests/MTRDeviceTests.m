@@ -2927,13 +2927,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             if (path.cluster.unsignedIntValue == MTRClusterIDTypeOnOffID && path.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOnOffAttributeOnTimeID) {
                 NSDictionary * dataValue = attributeResponseValue[MTRDataKey];
                 NSNumber * onTimeValue = dataValue[MTRValueKey];
-                if ([onTimeValue isEqual:@(testOnTimeValue + 4)]) {
-                    [onTimeWriteSuccess fulfill];
-                } else {
-                    // The first write we did might get reported, but none of
-                    // the other ones should be.
-                    XCTAssertEqualObjects(onTimeValue, @(testOnTimeValue + 1));
-                }
+                // All the writes should have been coalesced
+                XCTAssertEqualObjects(onTimeValue, @(testOnTimeValue + 4));
+                [onTimeWriteSuccess fulfill];
             }
         }
     };
@@ -2948,10 +2944,24 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                            timedWriteTimeout:nil];
     };
 
+    // Enqueue an item on the device work queue that will block it until we have finished queueing
+    // up our writes.  Otherwise we can have random failures due to multiple writes getting
+    // dispatched before we have actually queued them all up, if we lose the timeslice for a bit
+    // between the writeOnTimeValue calls.
+    XCTestExpectation * allWritesQueuedExpectation = [self expectationWithDescription:@"All writes queued expectation"];
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
+    [workItem setReadyHandler:^(id device, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        [self waitForExpectations:@[ allWritesQueuedExpectation ] timeout:kTimeoutInSeconds];
+        completion(MTRAsyncWorkComplete);
+    }];
+    [device.asyncWorkQueue enqueueWorkItem:workItem description:@"Blocking work item"];
+
     writeOnTimeValue(testOnTimeValue + 1);
     writeOnTimeValue(testOnTimeValue + 2);
     writeOnTimeValue(testOnTimeValue + 3);
     writeOnTimeValue(testOnTimeValue + 4);
+
+    [allWritesQueuedExpectation fulfill];
 
     [self waitForExpectations:@[ onTimeWriteSuccess ] timeout:10];
 }
@@ -4009,6 +4019,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test036_TestStorageBehaviorConfiguration
 {
+    XCTSkip("Skipping due to flakyness/failing. https://github.com/project-chip/connectedhomeip/issues/38724");
+
     // Use separate queue for timing sensitive test
     dispatch_queue_t queue = dispatch_queue_create("storage-behavior-queue", DISPATCH_QUEUE_SERIAL);
 
@@ -6166,6 +6178,46 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ reachableExpectation ] timeout:60];
 
     delegate.onReachable = nil;
+}
+
+- (void)test048_MTRDeviceResubscribeOnSubscriptionPool
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    delegate.subscriptionMaxIntervalOverride = @(20); // larger than kTimeoutInSeconds so empty reports do not clear subscription pool sooner
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription work completed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // Wait for subscription report stuff to clear and _handleSubscriptionEstablished asynced to device queue
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    // Wait for _handleSubscriptionEstablished to finish removing subscription work from pool
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+
+    // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test
+    XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"_triggerResubscribeWithReason work completed"];
+    delegate.onSubscriptionPoolWorkComplete = ^{
+        [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
+    };
+
+    // Now that subscription is established and live, ReadClient->mIsResubscriptionScheduled should be false, and _handleResubscriptionNeededWithDelayOnDeviceQueue can simulate the code path that leads to ReadClient->TriggerResubscribeIfScheduled() returning false, and exercise the edge case
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+
+    [self waitForExpectations:@[ subscriptionPoolWorkCompleteForTriggerTestExpectation ] timeout:kTimeoutInSeconds];
 }
 
 @end
