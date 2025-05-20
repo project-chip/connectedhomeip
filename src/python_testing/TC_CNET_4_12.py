@@ -212,7 +212,7 @@ class TC_CNET_4_12(MatterBaseTest):
 
         self.step(3)
         # TODO: This test currently uses a single endpoint for both threads.
-        # Issue #<issue_number> created to track follow-ups on problems with secondary networks,
+        # Issue #39069<https://github.com/project-chip/connectedhomeip/issues/39069> created to track follow-ups on problems with secondary networks,
         # since secondary network support is not implemented yet.
 
         # Find network index
@@ -280,7 +280,7 @@ class TC_CNET_4_12(MatterBaseTest):
             network_ids,
             f"Expected networkID {thread_network_id_bytes_th2} not found in networks."
         )
-        # TODO: PR #<PR_number> created PR test plan to verify that the Networks attribute list has an entry NetworkID=th_xpan_2 insted of th_xpan_1
+        # TODO: PR #<PR_number> created PR test plan to validate that the Networks attribute list has an entry NetworkID=th_xpan_2 insted of th_xpan_1
 
         self.step(7)
         cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
