@@ -34,7 +34,7 @@
 #       --int-arg PIXIT.REFALM.AlarmThreshold:1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --app-pipe /tmp/chip_all_clusters_fifo_${ALL_CLUSTERS_APP_ID}
+#       --app-pipe /tmp/chip_all_clusters_fifo_
 # === END CI TEST ARGUMENTS ===
 
 import logging
