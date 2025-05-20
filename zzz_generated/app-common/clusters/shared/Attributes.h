@@ -20,9 +20,9 @@
 
 #pragma once
 
-#include <app/common/GlobalIds.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
