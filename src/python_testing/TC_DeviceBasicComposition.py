@@ -680,7 +680,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         try:
             subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
                                                                    events=[('*')],
-                                                                   fabricFiltered=True,
+                                                                   fabricFiltered=False,
                                                                    reportInterval=(100, 1000))
         except Exception as e:
             self.record_error(self.get_test_name(),
