@@ -56,16 +56,16 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
             // feature bit {{ "0x%0X" | format(feature.value) }}
           {%- endfor %}
         },
-        .enabledAttributes {
+        .enabledAttributes = Span<const AttributeId>(
         {%- if endpoint_config.instance.attributes -%}
           detail::kEndpoint{{endpoint_config.endpoint_number}}EnabledAttributes
         {%- endif -%}
-        },
-        .enabledCommands {
+        ),
+        .enabledCommands = Span<const CommandId>(
         {%- if endpoint_config.instance.commands -%}
           detail::kEndpoint{{endpoint_config.endpoint_number}}EnabledCommands
         {%- endif -%}
-        },
+        ),
     },
 {%- endfor %}
 } };
