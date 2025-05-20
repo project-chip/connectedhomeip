@@ -58,9 +58,9 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
             TestStep(7, "Repeat step 5, sending a MPTZRemovePreset command for the already removed preset. Verify failurre. End the test case."),
             TestStep(8, "If MPTZPresets is empty, via the MPTZSavePreset command, create a new saved preset with PresetID of MaxPresets, name of 'newpreset'"),
             TestStep(9, "Read the value of MPTZPresets. Ensure it has an entry for a PresetID of MaxPresets with a name 'newpreset' that matches the saved MPTZPosition"),
-            TestStep(10,"Via MPTZRemovePreset remove the saved preset."),
-            TestStep(11,"Read MPTZPresets, verify this is empty."),
-            TestStep(12,"Repeat step 10, sending a MPTZRemovePreset command for a PresetID of MaxPresets. Verify failure."),
+            TestStep(10, "Via MPTZRemovePreset remove the saved preset."),
+            TestStep(11, "Read MPTZPresets, verify this is empty."),
+            TestStep(12, "Repeat step 10, sending a MPTZRemovePreset command for a PresetID of MaxPresets. Verify failure."),
         ]
         return steps
 
@@ -142,6 +142,7 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
         # Repeat removal of already removed value, verify Not Found
         self.step(12)
         await self.send_remove_preset_command(endpoint, max_presets_dut, expected_status=Status.NotFound)
+
 
 if __name__ == "__main__":
     default_matter_test_main()

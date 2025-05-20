@@ -58,9 +58,9 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
             TestStep(7, "Read the value of MPTZPresets. Ensure it has an entry for a PresetID of MaxPresets with a name 'newpreset' that matches the saved MPTZPosition"),
             TestStep(8, "Verify there is space in the preset list, if not, skip to step 12"),
             TestStep(9, "Save a new Preset via the MPTZSavePreset command, name 'newpreset-2', do not provide a PresetID"),
-            TestStep(10,"Read the value of MPTZPresets. Ensure it has an entry with a name 'newpreset-2' that matches the saved MPTZPosition"),
-            TestStep(11,"Repeatedly send MPTZSavePreset commands till the number of presets equals MaxPresets"),
-            TestStep(12,"Save a new Preset via the MPTZSavePreset command, name 'newpreset-fail', do not provide a PresetID. Verify Resource Exhausted failure. End the test case."),
+            TestStep(10, "Read the value of MPTZPresets. Ensure it has an entry with a name 'newpreset-2' that matches the saved MPTZPosition"),
+            TestStep(11, "Repeatedly send MPTZSavePreset commands till the number of presets equals MaxPresets"),
+            TestStep(12, "Save a new Preset via the MPTZSavePreset command, name 'newpreset-fail', do not provide a PresetID. Verify Resource Exhausted failure. End the test case."),
         ]
         return steps
 
@@ -154,6 +154,7 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
         name = "newpreset-fail"
         self.step(12)
         await self.send_save_preset_command(endpoint, name, expected_status=Status.ResourceExhausted)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
