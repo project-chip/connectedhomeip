@@ -48,7 +48,8 @@ class ServerClusterConfig:
             return []
 
         if not self.feature_bitmap_type:
-            raise Exception(f"No feature enumeration for cluster {self.cluster_name}")
+            raise Exception(
+                f"No feature enumeration for cluster {self.cluster_name}")
 
         result = []
         returned_values = 0
@@ -60,7 +61,8 @@ class ServerClusterConfig:
             returned_values = returned_values | entry.code
 
         if self.feature_map != returned_values:
-            raise Exception(f"Not all bits set in the feature map for {self.cluster_name} are defined: {self.feature_map}")
+            raise Exception(
+                f"Not all bits set in the feature map for {self.cluster_name} are defined: {self.feature_map}")
 
         return result
 

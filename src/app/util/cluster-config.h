@@ -16,8 +16,8 @@
 #pragma once
 
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/Span.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/Span.h>
 
 #include <cstdint>
 
