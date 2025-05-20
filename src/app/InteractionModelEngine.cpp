@@ -1795,7 +1795,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, entry.invokePrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, entry.GetInvokePrivilege());
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
@@ -1811,13 +1811,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest,
                                                                               const DataModel::AcceptedCommandEntry & entry)
 {
-    const bool commandNeedsTimedInvoke = entry.flags.Has(DataModel::CommandQualityFlags::kTimed);
-    const bool commandIsFabricScoped   = entry.flags.Has(DataModel::CommandQualityFlags::kFabricScoped);
-
-    if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
-    {
-        return Status::NeedsTimedInteraction;
-    }
+    const bool commandNeedsTimedInvoke = entry.HasFlags(DataModel::CommandQualityFlags::kTimed);
+    const bool commandIsFabricScoped   = entry.HasFlags(DataModel::CommandQualityFlags::kFabricScoped);
 
     if (commandIsFabricScoped)
     {
@@ -1832,12 +1827,17 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
         }
     }
 
+    if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
+    {
+        return Status::NeedsTimedInteraction;
+    }
+
     // Command that is marked as having a large payload must be sent over a
     // session that supports it.
-    if (entry.flags.Has(DataModel::CommandQualityFlags::kLargeMessage) &&
+    if (entry.HasFlags(DataModel::CommandQualityFlags::kLargeMessage) &&
         !CurrentExchange()->GetSessionHandle()->AllowsLargePayload())
     {
-        return Status::InvalidAction;
+        return Status::InvalidTransportType;
     }
 
     return Status::Success;
@@ -1929,6 +1929,9 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
 
+    // Ensure that DataModel::Provider has access to the exchange the message was received on.
+    CurrentExchangeValueScope scopedExchangeContext(*this, apExchangeContext);
+
     Status status = OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true);
     if (status != Status::Success)
     {
@@ -1948,6 +1951,9 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
 
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::WriteRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
+
+    // Ensure that DataModel::Provider has access to the exchange the message was received on.
+    CurrentExchangeValueScope scopedExchangeContext(*this, apExchangeContext);
 
     Status status = OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedWrite = */ true);
     if (status != Status::Success)

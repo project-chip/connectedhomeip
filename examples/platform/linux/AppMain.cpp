@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <string>
+
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -44,6 +46,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/RuntimeOptionsProvider.h>
 
+#include <AllClustersExampleDeviceInfoProviderImpl.h>
 #include <DeviceInfoProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -85,11 +88,20 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+#include <app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
+#include <app/clusters/electrical-grid-conditions-server/ElectricalGridConditionsTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
+#include <app/clusters/meter-identification-server/MeterIdentificationTestEventTriggerHandler.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
@@ -292,6 +304,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleDeviceInfoProvider;
 
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -415,7 +428,9 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    bool isAllClustersVariant = (std::string(argv[0]).find("all-clusters") != std::string::npos);
+
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
 #else  // CONFIG_NETWORK_LAYER_BLE
@@ -481,6 +496,16 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
+
+    // We need to set DeviceInfoProvider before Server::Init to set up the storage of DeviceInfoProvider properly.
+    if (isAllClustersVariant)
+    {
+        DeviceLayer::SetDeviceInfoProvider(&gAllClustersExampleDeviceInfoProvider);
+    }
+    else
+    {
+        DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    }
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -677,6 +702,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     static BooleanStateConfigurationTestEventTriggerHandler sBooleanStateConfigurationTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sBooleanStateConfigurationTestEventTriggerHandler);
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+    static CommodityPriceTestEventTriggerHandler sCommodityPriceTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
+    static ElectricalGridConditionsTestEventTriggerHandler sElectricalGridConditionsTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sElectricalGridConditionsTestEventTriggerHandler);
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
     static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
@@ -684,6 +717,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
     static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
+    static MeterIdentificationTestEventTriggerHandler sMeterIdentificationTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sMeterIdentificationTestEventTriggerHandler);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
     static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
@@ -698,9 +735,6 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #endif
 
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-
-    // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
-    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);

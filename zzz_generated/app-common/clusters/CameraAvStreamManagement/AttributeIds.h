@@ -12,9 +12,9 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 namespace Attributes {
-namespace MaxConcurrentVideoEncoders {
+namespace MaxConcurrentEncoders {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace MaxConcurrentVideoEncoders
+} // namespace MaxConcurrentEncoders
 
 namespace MaxEncodedPixelRate {
 inline constexpr AttributeId Id = 0x00000001;
@@ -24,9 +24,9 @@ namespace VideoSensorParams {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace VideoSensorParams
 
-namespace NightVisionCapable {
+namespace NightVisionUsesInfrared {
 inline constexpr AttributeId Id = 0x00000003;
-} // namespace NightVisionCapable
+} // namespace NightVisionUsesInfrared
 
 namespace MinViewport {
 inline constexpr AttributeId Id = 0x00000004;
@@ -52,9 +52,9 @@ namespace TwoWayTalkSupport {
 inline constexpr AttributeId Id = 0x00000009;
 } // namespace TwoWayTalkSupport
 
-namespace SupportedSnapshotParams {
+namespace SnapshotCapabilities {
 inline constexpr AttributeId Id = 0x0000000A;
-} // namespace SupportedSnapshotParams
+} // namespace SnapshotCapabilities
 
 namespace MaxNetworkBandwidth {
 inline constexpr AttributeId Id = 0x0000000B;
@@ -183,10 +183,6 @@ inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
-
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
 
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

@@ -32,6 +32,10 @@ namespace TagList {
 inline constexpr AttributeId Id = 0x00000004;
 } // namespace TagList
 
+namespace EndpointUniqueID {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace EndpointUniqueID
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -39,10 +43,6 @@ inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
-
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
 
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

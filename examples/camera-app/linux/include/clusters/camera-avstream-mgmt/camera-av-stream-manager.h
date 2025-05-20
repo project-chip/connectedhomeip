@@ -60,7 +60,8 @@ public:
 
     void OnAttributeChanged(AttributeId attributeId) override;
 
-    Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
+    Protocols::InteractionModel::Status CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
+                                                        const VideoResolutionStruct & resolution,
                                                         ImageSnapshot & outImageSnapshot) override;
 
     CHIP_ERROR
@@ -77,10 +78,10 @@ public:
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;
 
-    void SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDevice);
+    void SetCameraDeviceHAL(CameraDeviceInterface * aCameraDevice);
 
 private:
-    CameraDeviceInterface::CameraHALInterface * mCameraDeviceHAL = nullptr;
+    CameraDeviceInterface * mCameraDeviceHAL = nullptr;
 };
 
 } // namespace CameraAvStreamManagement

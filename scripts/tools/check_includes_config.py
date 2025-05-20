@@ -173,6 +173,9 @@ ALLOW: Dict[str, Set[str]] = {
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
     'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map', 'string'},
 
+    # esp32 diagnostic tracing
+    'src/tracing/esp32_diagnostic_trace/Counter.h': {'map'},
+
     # esp32 tracing
     'src/tracing/esp32_trace/esp32_tracing.h': {'unordered_map'},
 
@@ -195,4 +198,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
     # nrfconnect test runner
     'src/test_driver/nrfconnect/main/runner.cpp': {'vector'},
+
+    # Not intended for embedded clients
+    'src/app/server/JointFabricDatastore.cpp': {'vector'},
+    'src/app/server/JointFabricDatastore.h': {'vector'},
 }

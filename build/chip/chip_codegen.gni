@@ -149,6 +149,9 @@ template("_chip_build_time_zapgen") {
       "${_template_dir}/endpoint_config.zapt",
       "${_template_dir}/gen_config.zapt",
       "${_template_dir}/im-cluster-command-handler.zapt",
+
+      # config data controls template contents (specifically command handling)
+      "${chip_root}/src/app/common/templates/config-data.yaml",
     ]
 
     _output_subdir = "zap-generated"
