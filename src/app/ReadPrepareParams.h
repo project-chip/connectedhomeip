@@ -47,13 +47,13 @@ struct ReadPrepareParams
     uint16_t mMaxIntervalCeilingSeconds = 0;
     bool mKeepSubscriptions             = false;
     bool mIsFabricFiltered              = true;
-    bool mIsPeerLIT                     = false;
     // If Application knows the peer is LIT ICD, this can be set true. If application has subscribed
     // ICDManagementCluster::OperatingMode, its operation mode can be set automatically, it is not required to set mIsPeerLIT.
+    bool mIsPeerLIT                     = false;
 
-    bool mRegisteredCheckInToken = false;
     // If Application has registered the check-in token into the peer device, this mRegisteredCheckInToken needs to be true.
     // otherwise it should be false.
+    bool mRegisteredCheckInToken = false;
 
     ReadPrepareParams() {}
     ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }
