@@ -105,6 +105,11 @@ elseif(CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
         INCLUDE_SERVER
         ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/thermostat_matter_thread.zap
     )
+elseif(CONFIG_CHIP_ETHERNET)
+    chip_configure_data_model(app
+        INCLUDE_SERVER
+        ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/thermostat_matter_eth.zap
+    )
 endif()
 
 if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
