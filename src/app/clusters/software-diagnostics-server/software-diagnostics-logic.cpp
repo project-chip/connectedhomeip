@@ -45,7 +45,12 @@ public:
     CHIP_ERROR ReadThreadMetrics()
     {
         VerifyOrReturnError(mMetrics == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mProvider.GetThreadMetrics(&mMetrics);
+        CHIP_ERROR err = mProvider.GetThreadMetrics(&mMetrics);
+        if (err != CHIP_NO_ERROR)
+        {
+            mMetrics = nullptr; // do not assume it is valid, so we do not try to free later
+        }
+        return err;
     }
 
     const DeviceLayer::ThreadMetrics * ThreadMetrics() const { return mMetrics; }
