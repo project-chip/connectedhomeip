@@ -37,9 +37,6 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
-extern std::vector<Room *> gRooms;
-extern std::vector<Action *> gActions;
-
 namespace {
 
 class LinuxActionsDelegateImpl : public Actions::Delegate
@@ -119,12 +116,17 @@ bool LinuxActionsDelegateImpl::HaveActionWithId(uint16_t actionId, uint16_t & ac
 {
     std::vector<Action *> actionList = GetActionListInfo(mEndpointId);
 
+    uint16_t visibleCount = 0;
     for (size_t i = 0; i < actionList.size(); i++)
     {
-        if (actionList[i]->getActionId() == actionId)
+        if (actionList[i]->getIsVisible())
         {
-            actionIndex = static_cast<uint16_t>(i);
-            return true;
+            if (actionList[i]->getActionId() == actionId)
+            {
+                actionIndex = visibleCount;
+                return true;
+            }
+            visibleCount++;
         }
     }
 
@@ -135,10 +137,11 @@ Status LinuxActionsDelegateImpl::HandleInstantAction(uint16_t actionId, Optional
 {
     EndpointId endpointID  = mEndpointId;
     bool hasInvokeID       = invokeId.HasValue();
-    uint32_t invokeIDValue = invokeId.HasValue() ? invokeId.Value() : 0;
+    uint32_t invokeIDValue = invokeId.ValueOr(0);
 
-    Action * targetAction = nullptr;
-    for (auto * action : gActions)
+    Action * targetAction            = nullptr;
+    std::vector<Action *> actionList = GetActionListInfo(mEndpointId);
+    for (auto * action : actionList)
     {
         if (action->getActionId() == actionId && action->getIsVisible())
         {
@@ -154,7 +157,8 @@ Status LinuxActionsDelegateImpl::HandleInstantAction(uint16_t actionId, Optional
         bool turnOn       = true;
 
         // Find room with matching endpoint list ID
-        for (auto * room : gRooms)
+        std::vector<Room *> roomList = GetRoomListInfo(mEndpointId);
+        for (auto * room : roomList)
         {
             if (room->getEndpointListId() == targetAction->getEndpointListId())
             {

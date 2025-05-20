@@ -393,6 +393,11 @@ std::vector<Action *> GetActionListInfo(chip::EndpointId parentId)
     return gActions;
 }
 
+std::vector<Room *> GetRoomListInfo(chip::EndpointId parentId)
+{
+    return gRooms;
+}
+
 namespace {
 void CallReportingCallback(intptr_t closure)
 {
