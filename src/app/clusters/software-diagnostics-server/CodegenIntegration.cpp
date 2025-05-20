@@ -23,7 +23,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
-using chip::app::Clusters::SoftwareDiagnostics::StaticApplicationConfig::IsAttributeEnabledOnSomeEndpoint;
 
 // this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
 static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1,
@@ -35,6 +34,26 @@ namespace {
 
 LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>> gServer;
 
+// compile-time evaluated method if "is <EP>::SoftwareDiagnostics::<ATTR>" enabled
+constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
+{
+    for (auto & config : SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig)
+    {
+        if (config.endpointNumber != endpointId)
+        {
+            continue;
+        }
+        for (auto & attr : config.enabledAttributes)
+        {
+            if (attr == attributeId)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 } // namespace
 
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
@@ -42,16 +61,16 @@ void MatterSoftwareDiagnosticsPluginServerInitCallback()
     // NOTE: we assume code-generation logic is always correct here (we assert at least kFixedClusterConfig settings)
     //       so no error checks are done.
     const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = IsAttributeEnabledOnSomeEndpoint(Attributes::ThreadMetrics::Id),
-        .enableCurrentHeapFree   = IsAttributeEnabledOnSomeEndpoint(Attributes::CurrentHeapFree::Id),
-        .enableCurrentHeapUsed   = IsAttributeEnabledOnSomeEndpoint(Attributes::CurrentHeapUsed::Id),
-        .enableCurrentWatermarks = IsAttributeEnabledOnSomeEndpoint(Attributes::CurrentHeapHighWatermark::Id),
+        .enableThreadMetrics     = IsAttributeEnabled(kRootEndpointId, Attributes::ThreadMetrics::Id),
+        .enableCurrentHeapFree   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapFree::Id),
+        .enableCurrentHeapUsed   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapUsed::Id),
+        .enableCurrentWatermarks = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapHighWatermark::Id),
     };
-    gServer->Create(enabledAttributes);
-    (void) CodegenDataModelProvider::Instance().Registry().Register(gServer->Registration());
+    gServer.Create(enabledAttributes);
+    (void) CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
 }
 void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
 {
-    (void) CodegenDataModelProvider::Instance().Registry().Unregister(&gServer->Cluster());
-    gServer->Destroy();
+    (void) CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
+    gServer.Destroy();
 }
