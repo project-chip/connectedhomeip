@@ -4,7 +4,9 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
+#include <clusters/LowPower/AttributeIds.h>
+#include <clusters/LowPower/CommandIds.h>
+#include <clusters/LowPower/Enums.h>
 #include <app/util/cluster-config.h>
 
 #include <array>
@@ -14,16 +16,51 @@ namespace app {
 namespace Clusters {
 namespace LowPower {
 namespace StaticApplicationConfig {
+namespace detail {
+inline constexpr AttributeId kEndpoint1EnabledAttributes[] = {
+    Attributes::ClusterRevision::Id,
+    Attributes::FeatureMap::Id,
+};
+
+inline constexpr CommandId kEndpoint1EnabledCommands[] = {
+    Commands::Sleep::Id,
+};
+
+} // namespace detail
 
 using FeatureBitmapType = Clusters::StaticApplicationConfig::NoFeatureFlagsDefined;
+
 
 inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 1> kFixedClusterConfig = { {
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
+        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
+        .enabledCommands {detail::kEndpoint1EnabledCommands},
     },
 } };
+
+// If a specific attribute is supported at all across all endpoint static instantiations
+inline constexpr bool IsAttributeEnabledOnSomeEndpoint(AttributeId attributeId) {
+  switch (attributeId) {
+    case Attributes::ClusterRevision::Id:
+    case Attributes::FeatureMap::Id:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// If a specific command is supported at all across all endpoint static instantiations
+inline constexpr bool IsCommandEnabledOnSomeEndpoint(CommandId commandId) {
+  switch (commandId) {
+    case Commands::Sleep::Id:
+      return true;
+    default:
+      return false;
+  }
+}
 
 } // namespace StaticApplicationConfig
 } // namespace LowPower

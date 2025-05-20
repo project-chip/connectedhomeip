@@ -4,7 +4,9 @@
 // from inputs/large_all_clusters_app.matter
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
+#include <clusters/TemperatureControl/AttributeIds.h>
+#include <clusters/TemperatureControl/CommandIds.h>
+#include <clusters/TemperatureControl/Enums.h>
 #include <app/util/cluster-config.h>
 
 #include <array>
@@ -14,8 +16,25 @@ namespace app {
 namespace Clusters {
 namespace TemperatureControl {
 namespace StaticApplicationConfig {
+namespace detail {
+inline constexpr AttributeId kEndpoint1EnabledAttributes[] = {
+    Attributes::AcceptedCommandList::Id,
+    Attributes::AttributeList::Id,
+    Attributes::ClusterRevision::Id,
+    Attributes::FeatureMap::Id,
+    Attributes::GeneratedCommandList::Id,
+    Attributes::SelectedTemperatureLevel::Id,
+    Attributes::SupportedTemperatureLevels::Id,
+};
+
+inline constexpr CommandId kEndpoint1EnabledCommands[] = {
+    Commands::SetTemperature::Id,
+};
+
+} // namespace detail
 
 using FeatureBitmapType = Feature;
+
 
 inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 1> kFixedClusterConfig = { {
     {
@@ -23,8 +42,36 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kTemperatureLevel// feature bit 0x2
         },
+        .enabledAttributes {detail::kEndpoint1EnabledAttributes},
+        .enabledCommands {detail::kEndpoint1EnabledCommands},
     },
 } };
+
+// If a specific attribute is supported at all across all endpoint static instantiations
+inline constexpr bool IsAttributeEnabledOnSomeEndpoint(AttributeId attributeId) {
+  switch (attributeId) {
+    case Attributes::AcceptedCommandList::Id:
+    case Attributes::AttributeList::Id:
+    case Attributes::ClusterRevision::Id:
+    case Attributes::FeatureMap::Id:
+    case Attributes::GeneratedCommandList::Id:
+    case Attributes::SelectedTemperatureLevel::Id:
+    case Attributes::SupportedTemperatureLevels::Id:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// If a specific command is supported at all across all endpoint static instantiations
+inline constexpr bool IsCommandEnabledOnSomeEndpoint(CommandId commandId) {
+  switch (commandId) {
+    case Commands::SetTemperature::Id:
+      return true;
+    default:
+      return false;
+  }
+}
 
 } // namespace StaticApplicationConfig
 } // namespace TemperatureControl
