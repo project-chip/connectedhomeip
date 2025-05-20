@@ -35,6 +35,7 @@
 #include <app/server/AclStorage.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/TypeTraits.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -206,6 +207,19 @@ CHIP_ERROR AccessControlAttribute::ReadImpl(const ConcreteReadAttributePath & aP
     case AccessControlCluster::Attributes::Arl::Id:
         return ReadArl(aEncoder);
 #endif
+    case AccessControlCluster::Attributes::FeatureMap::Id: {
+        uint32_t featureMap = 0;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+        featureMap |= to_underlying(AccessControlCluster::Feature::kManagedDevice);
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+        featureMap |= to_underlying(AccessControlCluster::Feature::kExtension);
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+
+        return aEncoder.Encode(featureMap);
+    }
     case AccessControlCluster::Attributes::ClusterRevision::Id:
         return aEncoder.Encode(kClusterRevision);
     }

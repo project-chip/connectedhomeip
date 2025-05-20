@@ -179,7 +179,8 @@
             "ClusterRevision",
             "SubjectsPerAccessControlEntry",
             "TargetsPerAccessControlEntry",
-            "AccessControlEntriesPerFabric"
+            "AccessControlEntriesPerFabric",
+            "FeatureMap"
         ],
         "Administrator Commissioning": [
             "WindowStatus",
