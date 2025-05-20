@@ -42,10 +42,11 @@ public:
      * @return Returns an error if an soil measurement cluster has not been enabled in zap for the given endpoint ID or
      * if the AttributeHandler registration fails.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(const Globals::Structs::MeasurementAccuracyStruct::Type & measurementLimits);
+
     void Shutdown();
 
-    CHIP_ERROR SetSoilMeasurementAccuracy(const Globals::Structs::MeasurementAccuracyStruct::Type & accuracy, bool reportChange);
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     CHIP_ERROR SetSoilMeasuredValue(const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
 
@@ -58,8 +59,6 @@ private:
 
     EndpointId mEndpointId = 1;
     MeasurementData mSoilMeasurementData;
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
 } // namespace SoilMeasurement

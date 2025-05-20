@@ -28,26 +28,13 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
 using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 
-static const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
-    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
-};
-
-static const Globals::Structs::MeasurementAccuracyStruct::Type kDefaultSoilMoistureMeasurementLimits = {
-    .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
-    .measured         = true,
-    .minMeasuredValue = 0,
-    .maxMeasuredValue = 100,
-    .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
-        kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
-};
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace SoilMeasurement {
 
 Instance::Instance(EndpointId aEndpointId) :
-    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId)
+    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), SoilMeasurement::Id), mEndpointId(aEndpointId)
 {}
 
 Instance::~Instance()
@@ -55,14 +42,13 @@ Instance::~Instance()
     Shutdown();
 }
 
-CHIP_ERROR Instance::Init()
+CHIP_ERROR Instance::Init(const Globals::Structs::MeasurementAccuracyStruct::Type & measurementLimits)
 {
-    VerifyOrDie(emberAfContainsServer(mEndpointId, Id) == true);
+    VerifyOrDie(emberAfContainsServer(mEndpointId, SoilMeasurement::Id) == true);
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
-    // Initialize the soil moisture measurement limits to default values
-    mSoilMeasurementData.soilMoistureMeasurementLimits = kDefaultSoilMoistureMeasurementLimits;
+    mSoilMeasurementData.soilMoistureMeasurementLimits = measurementLimits;
     mSoilMeasurementData.soilMoistureMeasuredValue.SetNull();
 
     return CHIP_NO_ERROR;
@@ -71,24 +57,6 @@ CHIP_ERROR Instance::Init()
 void Instance::Shutdown()
 {
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-}
-
-// This function is intended for the application to set the soil measurement accuracy limits to the proper values during init.
-// Given the limits are fixed, it is not intended to be changes at runtime and the application should call this function only once
-// during init, where changes should not be reported. In case this does have to change during runtime, the application should call
-// this function with reportChange set to true to notify the change. Please note that in such a case, the application should also
-// take care of the ConfigurationVersion attribute to ensure the value is updated.
-CHIP_ERROR
-Instance::SetSoilMeasurementAccuracy(const Globals::Structs::MeasurementAccuracyStruct::Type & measurementLimits, bool reportChange)
-{
-    mSoilMeasurementData.soilMoistureMeasurementLimits = measurementLimits;
-
-    if (reportChange)
-    {
-        MatterReportingAttributeChangeCallback(mEndpointId, SoilMeasurement::Id, SoilMoistureMeasurementLimits::Id);
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR

@@ -19,8 +19,22 @@
 #include <soil-measurement-stub.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
+
+static const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
+    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
+};
+
+static const Globals::Structs::MeasurementAccuracyStruct::Type kDefaultSoilMoistureMeasurementLimits = {
+    .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
+    .measured         = true,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 100,
+    .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
+        kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
+};
 
 namespace {
 static std::unique_ptr<Instance> gSoilMeasurementInstance;
@@ -46,6 +60,6 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
     gSoilMeasurementInstance = std::make_unique<Instance>(endpointId);
     if (gSoilMeasurementInstance)
     {
-        gSoilMeasurementInstance->Init();
+        gSoilMeasurementInstance->Init(kDefaultSoilMoistureMeasurementLimits);
     }
 }
