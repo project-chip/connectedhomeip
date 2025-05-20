@@ -166,6 +166,9 @@ class TC_CNET_4_12(MatterBaseTest):
         # Validate the operational dataset structure (for both datasets)
         logger.info("Precondition: Validating THREAD operational datasets")
 
+        # TODO: Consider centralizing this function (maybe in matter_testing.py)
+        # Once CNET Thread tests are merged, Follow-up list of tests that might use this function:
+        # CNET 4.10, ... (add other tests here)
         thread_network_id_bytes_th1 = await self.validate_thread_dataset(thread_dataset_1_bytes, "THREAD_1ST_OPERATIONALDATASET")
         thread_network_id_bytes_th2 = await self.validate_thread_dataset(thread_dataset_2_bytes, "THREAD_2ND_OPERATIONALDATASET")
         logger.info('Precondition: NetworkID : '
