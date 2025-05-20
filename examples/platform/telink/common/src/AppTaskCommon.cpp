@@ -160,9 +160,9 @@ class AppFabricTableDelegate : public FabricTable::Delegate
                 {
                     ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
                 }
-                #ifdef CONFIG_TFLM_FEATURE
-                    AppTask::MicroSpeechProcessStop();
-                #endif
+#ifdef CONFIG_TFLM_FEATURE
+                AppTask::MicroSpeechProcessStop();
+#endif
             }
         }
     }

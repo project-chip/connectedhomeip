@@ -16,13 +16,18 @@ void audio_stream0_fade_dig_gain(codec_in_path_digital_gain_e gain)
 {
     codec_in_path_digital_gain_e value = audio_get_stream0_dig_gain();
 
-    if (gain > value) {
-        for (value += 4; (signed int)value <= (signed int)gain; value += 4) {
+    if (gain > value)
+    {
+        for (value += 4; (signed int) value <= (signed int) gain; value += 4)
+        {
             delay_ms(1);
             audio_set_stream0_dig_gain(value);
         }
-    } else if (gain < value) {
-        for (value -= 4; (signed int)value >= (signed int)gain; value -= 4) {
+    }
+    else if (gain < value)
+    {
+        for (value -= 4; (signed int) value >= (signed int) gain; value -= 4)
+        {
             delay_ms(1);
             audio_set_stream0_dig_gain(value);
         }

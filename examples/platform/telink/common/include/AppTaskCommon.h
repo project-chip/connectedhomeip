@@ -68,15 +68,9 @@ public:
     void PostEvent(AppEvent * event);
 
 #ifdef CONFIG_TFLM_FEATURE
-    void SetThreadStateChangedEventCapturedFlag(void)
-    {
-        mThreadStateChangedEventCaptured = true;
-    }
+    void SetThreadStateChangedEventCapturedFlag(void) { mThreadStateChangedEventCaptured = true; }
 
-    bool GetThreadStateChangedEventCapturedFlag(void)
-    {
-        return mThreadStateChangedEventCaptured;
-    }
+    bool GetThreadStateChangedEventCapturedFlag(void) { return mThreadStateChangedEventCaptured; }
 #endif
 
     static void IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect);

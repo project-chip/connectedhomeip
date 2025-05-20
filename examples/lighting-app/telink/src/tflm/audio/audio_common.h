@@ -9,8 +9,7 @@
 
 /* Enable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
-extern "C"
-{
+extern "C" {
 #endif
 
 #include "audio.h"

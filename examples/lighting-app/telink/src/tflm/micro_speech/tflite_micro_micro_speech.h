@@ -7,13 +7,11 @@
 #ifndef VENDOR_AUDIO_DEMO_TFLM_APP_MICRO_SPEECH_MICRO_SPEECH_TEST_H_
 #define VENDOR_AUDIO_DEMO_TFLM_APP_MICRO_SPEECH_MICRO_SPEECH_TEST_H_
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int micro_speech_process(int16_t *p_buff, uint16_t len);
+int micro_speech_process(int16_t * p_buff, uint16_t len);
 
 #ifdef __cplusplus
 }

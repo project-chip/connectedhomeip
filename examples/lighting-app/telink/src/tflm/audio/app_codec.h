@@ -9,12 +9,11 @@
 
 /* Enable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
-extern "C"
-{
+extern "C" {
 #endif
 
-#include "app_audio.h"
 #include "../micro_speech/tflite_micro_micro_speech.h"
+#include "app_audio.h"
 
 void app_codec_init(void);
 

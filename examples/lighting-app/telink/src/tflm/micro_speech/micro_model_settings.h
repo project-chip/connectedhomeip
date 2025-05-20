@@ -19,19 +19,19 @@ limitations under the License.
 // The following values are derived from values used during model training.
 // If you change the way you preprocess the input, update all these constants.
 constexpr int kAudioSampleFrequency = 16000;
-constexpr int kFeatureSize = 40;
-constexpr int kFeatureCount = 49;
-constexpr int kFeatureElementCount = (kFeatureSize * kFeatureCount);
-constexpr int kFeatureStrideMs = 20;
-constexpr int kFeatureDurationMs = 30;
+constexpr int kFeatureSize          = 40;
+constexpr int kFeatureCount         = 49;
+constexpr int kFeatureElementCount  = (kFeatureSize * kFeatureCount);
+constexpr int kFeatureStrideMs      = 20;
+constexpr int kFeatureDurationMs    = 30;
 
 // Variables for the model's output categories.
-constexpr int kCategoryCount = 4;
-constexpr const char* kCategoryLabels[kCategoryCount] = {
+constexpr int kCategoryCount                           = 4;
+constexpr const char * kCategoryLabels[kCategoryCount] = {
     "silence",
     "unknown",
     "yes",
     "no",
 };
 
-#endif  // TENSORFLOW_LITE_MICRO_EXAMPLES_MICRO_SPEECH_MICRO_MODEL_SETTINGS_H_
+#endif // TENSORFLOW_LITE_MICRO_EXAMPLES_MICRO_SPEECH_MICRO_MODEL_SETTINGS_H_
