@@ -19,6 +19,7 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
+import("${chip_root}/third_party/mbedtls/mbedtls.gni")
 
 config("se05x_config") {
   defines = [ "SSS_USE_FTR_FILE" ]
@@ -97,6 +98,16 @@ static_library("se05x") {
     "repo/sss/src/se05x/fsl_sss_se05x_mw.c",
     "repo/sss/src/se05x/fsl_sss_se05x_policy.c",
   ]
+
+  if(chip_se05x_auth == "scp03") {
+    sources += [
+      "repo/hostlib/hostLib/libCommon/nxScp/nxScp03_Com.c",
+      "repo/sss/ex/src/ex_sss_scp03_auth.c",
+      "repo/sss/src/se05x/fsl_sss_se05x_scp03.c",
+      "repo/sss/src/se05x/fsl_sss_se05x_eckey.c",
+    ]
+    public_deps = [ "${mbedtls_root}:mbedtls" ]
+  }
 
 
   if (chip_se05x_smcom == "vcom"){
