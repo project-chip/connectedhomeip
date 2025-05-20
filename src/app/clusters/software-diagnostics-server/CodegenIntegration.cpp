@@ -58,8 +58,7 @@ constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId
 
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
-    // NOTE: we assume code-generation logic is always correct here (we assert at least kFixedClusterConfig settings)
-    //       so no error checks are done.
+    // NOTE: Code already asserts that only kRootEndpointId is registered.
     const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
         .enableThreadMetrics     = IsAttributeEnabled(kRootEndpointId, Attributes::ThreadMetrics::Id),
         .enableCurrentHeapFree   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapFree::Id),
