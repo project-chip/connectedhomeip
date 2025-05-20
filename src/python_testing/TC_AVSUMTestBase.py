@@ -203,7 +203,7 @@ class AVSUMTestBase:
                 minFrameRate=30,
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
-                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=aVideoSensorParams.sensorWidth, 
+                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=aVideoSensorParams.sensorWidth,
                                                                                               height=aVideoSensorParams.sensorHeight),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
