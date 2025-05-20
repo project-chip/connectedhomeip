@@ -1189,9 +1189,10 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
     mPeerIsOperatingAsLIT                      = aReadPrepareParams.mIsPeerLIT;
     mReadPrepareParams.mRegisteredCheckInToken = aReadPrepareParams.mRegisteredCheckInToken;
-    if (aReadPrepareParams.mIsPeerLIT)
+    if (aReadPrepareParams.mIsPeerLIT && !aReadPrepareParams.mRegisteredCheckInToken)
     {
-        mReadPrepareParams.mRegisteredCheckInToken = true;
+        ChipLogProgress(DataManagement, "Error: LIT ICD needs set mRegisteredCheckInToken as true");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     if (aReadPrepareParams.mRegisteredCheckInToken)
     {
