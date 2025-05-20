@@ -1,6 +1,5 @@
 src/app/app-platform/ContentAppPlatform.cpp
 src/app/dynamic_server/DynamicDispatcher.cpp
-src/controller/python/chip/server/ServerInit.cpp
 src/controller/tests/TestEventCaching.cpp
 src/controller/tests/TestEventChunking.cpp
 src/controller/tests/TestEventNumberCaching.cpp
