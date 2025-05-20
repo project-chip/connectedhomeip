@@ -58,15 +58,17 @@ enum class Type : uint8_t
     kLast = kNfc, // This is not an actual transport type, it just refers to the last transport type
 };
 
+static constexpr uint16_t kUndefinedNFCShortId = 0;
+
 /**
  * Describes how a peer on a CHIP network can be addressed.
  */
 class PeerAddress
 {
 public:
-    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) { mId.mRemoteId = 0; }
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) { mId.mRemoteId = 0; }
-    PeerAddress(Type type) : mTransportType(type) { mId.mRemoteId = 0; }
+    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) { mId.mRemoteId = kUndefinedNodeId; }
+    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) { mId.mRemoteId = kUndefinedNodeId; }
+    PeerAddress(Type type) : mTransportType(type) { mId.mRemoteId = kUndefinedNodeId; }
     PeerAddress(Type type, NodeId remoteId) : mTransportType(type) { mId.mRemoteId = remoteId; }
 
     PeerAddress(PeerAddress &&)                  = default;
@@ -196,8 +198,8 @@ public:
     static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
 
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
-    static PeerAddress NFC() { return PeerAddress(Type::kNfc); }
-    static PeerAddress NFC(const uint16_t shortId) { return PeerAddress(Type::kNfc, shortId); }
+    static PeerAddress NFC() { return PeerAddress(kUndefinedNFCShortId); }
+    static PeerAddress NFC(const uint16_t shortId) { return PeerAddress(shortId); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
 
