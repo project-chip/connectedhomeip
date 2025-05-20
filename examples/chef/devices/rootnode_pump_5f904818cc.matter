@@ -1923,13 +1923,13 @@ endpoint 1 {
     ram      attribute maxPressure default = 32767;
     ram      attribute maxSpeed default = 65534;
     ram      attribute maxFlow default = 65534;
-    ram      attribute pumpStatus default = 5;
+    ram      attribute pumpStatus default = 32;
     persist  attribute effectiveOperationMode default = 0;
-    persist  attribute effectiveControlMode default = 5;
+    persist  attribute effectiveControlMode default = 7;
     ram      attribute capacity;
     ram      attribute speed default = 1000;
     persist  attribute operationMode default = 0;
-    persist  attribute controlMode default = 5;
+    persist  attribute controlMode default = 7;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
