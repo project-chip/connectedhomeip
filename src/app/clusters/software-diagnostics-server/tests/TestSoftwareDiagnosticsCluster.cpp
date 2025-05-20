@@ -256,6 +256,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
                       SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry,
                       SoftwareDiagnostics::Attributes::CurrentHeapFree::kMetadataEntry,
                       SoftwareDiagnostics::Attributes::CurrentHeapUsed::kMetadataEntry,
+                      SoftwareDiagnostics::Attributes::ThreadMetrics::kMetadataEntry,
                   }),
                   CHIP_NO_ERROR);
 
