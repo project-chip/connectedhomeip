@@ -69,6 +69,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CECKeyCodeEnum keyCode = static_cast<CECKeyCodeEnum>(0);
 
@@ -84,8 +85,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CECKeyCodeEnum keyCode = static_cast<CECKeyCodeEnum>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKey
@@ -101,6 +104,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
 
@@ -116,8 +120,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKeyResponse

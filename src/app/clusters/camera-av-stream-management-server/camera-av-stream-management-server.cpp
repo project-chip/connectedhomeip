@@ -28,7 +28,9 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <cmath>
 #include <cstring>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -45,7 +47,7 @@ namespace CameraAvStreamManagement {
 CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
     const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
-    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable, const VideoResolutionStruct & aMinViewPort,
+    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
     const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
     uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
     const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
@@ -54,12 +56,13 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
-    mMaxEncodedPixelRate(aMaxEncodedPixelRate), mVideoSensorParams(aVideoSensorParams), mNightVisionCapable(aNightVisionCapable),
-    mMinViewPort(aMinViewPort), mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints),
-    mMaxContentBufferSize(aMaxContentBufferSize), mMicrophoneCapabilities(aMicrophoneCapabilities),
-    mSpeakerCapabilities(aSpeakerCapabilities), mTwoWayTalkSupport(aTwoWayTalkSupport),
-    mSnapshotCapabilitiesList(aSnapshotCapabilities), mMaxNetworkBandwidth(aMaxNetworkBandwidth),
-    mSupportedStreamUsages(aSupportedStreamUsages), mRankedVideoStreamPriorities(aRankedStreamPriorities)
+    mMaxEncodedPixelRate(aMaxEncodedPixelRate), mVideoSensorParams(aVideoSensorParams),
+    mNightVisionUsesInfrared(aNightVisionUsesInfrared), mMinViewPort(aMinViewPort),
+    mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints), mMaxContentBufferSize(aMaxContentBufferSize),
+    mMicrophoneCapabilities(aMicrophoneCapabilities), mSpeakerCapabilities(aSpeakerCapabilities),
+    mTwoWayTalkSupport(aTwoWayTalkSupport), mSnapshotCapabilitiesList(aSnapshotCapabilities),
+    mMaxNetworkBandwidth(aMaxNetworkBandwidth), mSupportedStreamUsages(aSupportedStreamUsages),
+    mRankedVideoStreamPriorities(aRankedStreamPriorities)
 {
     mDelegate.SetCameraAVStreamMgmtServer(this);
 }
@@ -112,13 +115,13 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                                          mEndpointId));
     }
 
-    // Ensure Optional attribute bits have been correctly passed.
+    // Ensure Optional attribute bits have been correctly passed and have supporting feature bits set.
     if (SupportsOptAttr(OptionalAttribute::kNightVision) || SupportsOptAttr(OptionalAttribute::kNightVisionIllum))
     {
-        VerifyOrReturnError(HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
+        VerifyOrReturnError(HasFeature(Feature::kNightVision), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if NIghtVision is enabled, then "
-                                         "Video|Snapshot feature required",
+                                         "NightVision feature required",
                                          mEndpointId));
     }
 
@@ -361,11 +364,12 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
 
         ReturnErrorOnFailure(aEncoder.Encode(mVideoSensorParams));
         break;
-    case NightVisionCapable::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get VideoSensorParams, feature is not supported", mEndpointId));
-        ReturnErrorOnFailure(aEncoder.Encode(mNightVisionCapable));
+    case NightVisionUsesInfrared::Id:
+        VerifyOrReturnError(HasFeature(Feature::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get NightVisionUsesInfrared, feature is not supported",
+                                         mEndpointId));
+        ReturnErrorOnFailure(aEncoder.Encode(mNightVisionUsesInfrared));
         break;
     case MinViewport::Id:
         VerifyOrReturnError(
@@ -483,20 +487,20 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
     case HardPrivacyModeOn::Id:
         VerifyOrReturnError(
             SupportsOptAttr(OptionalAttribute::kHardPrivacyModeOn), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get HardPrivacyModeOn, feature is not supported", mEndpointId));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get HardPrivacyModeOn, attribute is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mHardPrivacyModeOn));
         break;
     case NightVision::Id:
         VerifyOrReturnError(
             SupportsOptAttr(OptionalAttribute::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVision, feature is not supported", mEndpointId));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVision, attribute is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVision));
         break;
     case NightVisionIllum::Id:
-        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kNightVisionIllum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt[ep=%d]: can not get NightVisionIllumination, feature is not supported",
-                                         mEndpointId));
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kNightVisionIllum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVisionIllumination, attribute is not supported",
+                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionIllum));
         break;
     case Viewport::Id:
@@ -838,6 +842,31 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetNightVisionIllum(TriStateAutoEnum aNight
 
 CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewport)
 {
+    // The following validation steps are required
+    // 1. the new viewport is not larger than the sensor max
+    // 2. the new viewport is not snaller than the sensor min
+    // 3. the new viewport has the same aspect ratio as the sensor
+    //
+    uint16_t requestedWidth  = static_cast<uint16_t>(aViewport.x2 - aViewport.x1);
+    uint16_t requestedHeight = static_cast<uint16_t>(aViewport.y2 - aViewport.y1);
+    if ((requestedWidth < mMinViewPort.width) || (requestedHeight < mMinViewPort.height) ||
+        (requestedWidth > mVideoSensorParams.sensorWidth) || (requestedHeight > mVideoSensorParams.sensorHeight))
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: SetViewport with invalid viewport dimensions", mEndpointId);
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    // Get the ARs to no more than 2DP.  Otherwise you get mismatches e.g. 16:9 ratio calculation for 480p isn't the same as
+    // 1080p beyond 2DP.
+    float requestedAR = floorf((static_cast<float>(requestedWidth) / requestedHeight) * 100) / 100;
+    float deviceAR    = floorf((static_cast<float>(mVideoSensorParams.sensorWidth) / mVideoSensorParams.sensorHeight) * 100) / 100;
+
+    // Ensure that the aspect ration of the viewport matches the aspect ratio of the sensor
+    if (requestedAR != deviceAR)
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: SetViewport with mismatching aspect ratio.", mEndpointId);
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
     mViewport = aViewport;
 
     StoreViewport(mViewport);
@@ -1759,6 +1788,8 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
     snapshotStreamArgs.minResolution    = commandData.minResolution;
     snapshotStreamArgs.maxResolution    = commandData.maxResolution;
     snapshotStreamArgs.quality          = commandData.quality;
+    snapshotStreamArgs.watermarkEnabled = commandData.watermarkEnabled;
+    snapshotStreamArgs.OSDEnabled       = commandData.OSDEnabled;
     snapshotStreamArgs.referenceCount   = 0;
 
     // Call the delegate

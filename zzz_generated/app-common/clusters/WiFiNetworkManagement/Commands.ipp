@@ -28,6 +28,7 @@ namespace Clusters {
 namespace WiFiNetworkManagement {
 namespace Commands {
 namespace NetworkPassphraseRequest {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -49,6 +50,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 } // namespace NetworkPassphraseRequest.
 namespace NetworkPassphraseResponse {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -69,9 +71,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kPassphrase))
         {
             err = DataModel::Decode(reader, passphrase);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

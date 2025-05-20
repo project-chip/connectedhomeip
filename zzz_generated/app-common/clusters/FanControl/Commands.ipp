@@ -28,6 +28,7 @@ namespace Clusters {
 namespace FanControl {
 namespace Commands {
 namespace Step {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -58,9 +59,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kLowestOff))
         {
             err = DataModel::Decode(reader, lowestOff);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
