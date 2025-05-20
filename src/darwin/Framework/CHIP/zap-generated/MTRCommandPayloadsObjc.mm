@@ -41932,7 +41932,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _endpointID = nil;
+        _endpointID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -41965,12 +41965,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.endpointID == nil) {
-            encodableStruct.endpointID.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.endpointID.SetNonNull();
-            nonNullValue_0 = self.endpointID.unsignedShortValue;
-        }
+        encodableStruct.endpointID = self.endpointID.unsignedShortValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -42016,7 +42011,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _endpoints = [NSArray array];
+        _endpoint = [MTRTLSClientManagementClusterTLSEndpointStruct new];
     }
     return self;
 }
@@ -42025,14 +42020,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRTLSClientManagementClusterFindEndpointResponseParams alloc] init];
 
-    other.endpoints = self.endpoints;
+    other.endpoint = self.endpoint;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpoints:%@; >", NSStringFromClass([self class]), _endpoints];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpoint:%@; >", NSStringFromClass([self class]), _endpoint];
     return descriptionString;
 }
 
@@ -42083,31 +42078,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsClientManagement::Commands::FindEndpointResponse::DecodableType &)decodableStruct
 {
     {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = decodableStruct.endpoints.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                MTRTLSClientManagementClusterTLSEndpointStruct * newElement_0;
-                newElement_0 = [MTRTLSClientManagementClusterTLSEndpointStruct new];
-                newElement_0.endpointID = [NSNumber numberWithUnsignedShort:entry_0.endpointID];
-                newElement_0.hostname = AsData(entry_0.hostname);
-                newElement_0.port = [NSNumber numberWithUnsignedShort:entry_0.port];
-                newElement_0.caid = [NSNumber numberWithUnsignedShort:entry_0.caid];
-                if (entry_0.ccdid.IsNull()) {
-                    newElement_0.ccdid = nil;
-                } else {
-                    newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid.Value()];
-                }
-                newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                return err;
-            }
-            self.endpoints = array_0;
+        self.endpoint = [MTRTLSClientManagementClusterTLSEndpointStruct new];
+        self.endpoint.endpointID = [NSNumber numberWithUnsignedShort:decodableStruct.endpoint.endpointID];
+        self.endpoint.hostname = AsData(decodableStruct.endpoint.hostname);
+        self.endpoint.port = [NSNumber numberWithUnsignedShort:decodableStruct.endpoint.port];
+        self.endpoint.caid = [NSNumber numberWithUnsignedShort:decodableStruct.endpoint.caid];
+        if (decodableStruct.endpoint.ccdid.IsNull()) {
+            self.endpoint.ccdid = nil;
+        } else {
+            self.endpoint.ccdid = [NSNumber numberWithUnsignedShort:decodableStruct.endpoint.ccdid.Value()];
         }
+        self.endpoint.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.endpoint.status)];
+        self.endpoint.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.endpoint.fabricIndex];
     }
     return CHIP_NO_ERROR;
 }

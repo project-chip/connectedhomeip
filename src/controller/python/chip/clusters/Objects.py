@@ -51570,6 +51570,16 @@ class TlsCertificateManagement(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+    class Enums:
+        class StatusCodeEnum(MatterIntEnum):
+            kCertificateAlreadyInstalled = 0x02
+            kDuplicateKey = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
     class Structs:
         @dataclass
         class TLSCertStruct(ClusterObject):
@@ -52024,6 +52034,17 @@ class TlsClientManagement(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class StatusCodeEnum(MatterIntEnum):
+            kEndpointAlreadyInstalled = 0x02
+            kRootCertificateNotFound = 0x03
+            kClientCertificateNotFound = 0x04
+            kEndpointInUse = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
         class TLSEndpointStatusEnum(MatterIntEnum):
             kProvisioned = 0x00
             kInUse = 0x01
@@ -52046,6 +52067,7 @@ class TlsClientManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="caid", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="status", Tag=5, Type=TlsClientManagement.Enums.TLSEndpointStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             endpointID: 'uint' = 0
@@ -52054,6 +52076,7 @@ class TlsClientManagement(Cluster):
             caid: 'uint' = 0
             ccdid: 'typing.Union[Nullable, uint]' = NullValue
             status: 'TlsClientManagement.Enums.TLSEndpointStatusEnum' = 0
+            fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -52107,10 +52130,10 @@ class TlsClientManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=0, Type=uint),
                     ])
 
-            endpointID: typing.Union[Nullable, uint] = NullValue
+            endpointID: uint = 0
 
         @dataclass
         class FindEndpointResponse(ClusterCommand):
@@ -52123,10 +52146,10 @@ class TlsClientManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="endpoints", Tag=0, Type=typing.List[TlsClientManagement.Structs.TLSEndpointStruct]),
+                        ClusterObjectFieldDescriptor(Label="endpoint", Tag=0, Type=TlsClientManagement.Structs.TLSEndpointStruct),
                     ])
 
-            endpoints: typing.List[TlsClientManagement.Structs.TLSEndpointStruct] = field(default_factory=lambda: [])
+            endpoint: TlsClientManagement.Structs.TLSEndpointStruct = field(default_factory=lambda: TlsClientManagement.Structs.TLSEndpointStruct())
 
         @dataclass
         class RemoveEndpoint(ClusterCommand):
