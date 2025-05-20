@@ -45,6 +45,7 @@
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
@@ -63,7 +64,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         """Return the PICS definitions associated with this test."""
         pics = [
             "SEPR.S",
-            "SEPR.F00"
+            "SEPR.F00",
+            "MCORE.SC.TCP",
         ]
         return pics
 
@@ -72,6 +74,8 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         steps = [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
+            TestStep("1a", "Create CASE session connection via TCP if the DUT claims to support TCP",
+                     "TCP connection established OK"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
@@ -135,38 +139,44 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
     async def test_TC_SEPR_2_3(self):
         """Run the test steps."""
         endpoint = self.get_endpoint()
+        tcp_support = self.check_pics("MCORE.SC.TCP")
 
         self.step("1")
         # Commission DUT - already done
-        try:
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
-                                                                      payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-        except TimeoutError:
-            asserts.fail("Unable to establish a CASE session over TCP to the device. Does the device support TCP?")
 
-        asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
+        self.step("1a")
+        if tcp_support:
+            try:
+                device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+                                                                          payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            except (TimeoutError, ChipStackError):
+                asserts.fail("Unable to establish a CASE session over TCP to the device. Does the device support TCP?")
+
+            asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
 
         self.step("2")
         # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster
         await self.check_test_event_triggers_enabled()
 
         self.step("3")
-        # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True,
-        # and Components set to False.
-        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
-        val = await self.send_get_detailed_forecast_request(details=details)
+        if tcp_support:
+            # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True,
+            # and Components set to False.
+            details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
+            val = await self.send_get_detailed_forecast_request(details=details)
 
-        self.check_CommodityPriceForecast(cluster=cluster,
-                                          priceForecast=val.priceForecast, details=details)
+            self.check_CommodityPriceForecast(cluster=cluster,
+                                              priceForecast=val.priceForecast, details=details)
 
         self.step("4")
-        # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False
-        # and Components set to True.
-        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
-        val = await self.send_get_detailed_forecast_request(details=details)
+        if tcp_support:
+            # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False
+            # and Components set to True.
+            details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
+            val = await self.send_get_detailed_forecast_request(details=details)
 
-        self.check_CommodityPriceForecast(cluster=cluster,
-                                          priceForecast=val.priceForecast, details=details)
+            self.check_CommodityPriceForecast(cluster=cluster,
+                                              priceForecast=val.priceForecast, details=details)
 
         self.step("5")
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey
@@ -176,41 +186,43 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         self.step("5a")
         # TH reads PriceForecast attribute.
-        # Verify that the DUT response contains a CommodityPriceStruct value.
-        # Verify that the value matches the NewCurrentPrice from step 6
+        # Verify that the DUT response contains a list of  CommodityPriceStruct (or empty).
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                              attribute=cluster.Attributes.PriceForecast)
 
         self.check_CommodityPriceForecast(cluster=cluster,
-                                          priceForecast=val, details=details)
+                                          priceForecast=val, details=Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0))
 
         self.step("6")
-        # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True,
-        # and Components set to False.
-        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
-        val = await self.send_get_detailed_forecast_request(details=details)
+        if tcp_support:
+            # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True,
+            # and Components set to False.
+            details = cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
+            val = await self.send_get_detailed_forecast_request(details=details)
 
-        self.check_CommodityPriceForecast(cluster=cluster,
-                                          priceForecast=val.priceForecast, details=details)
+            self.check_CommodityPriceForecast(cluster=cluster,
+                                              priceForecast=val.priceForecast, details=details)
 
         self.step("7")
-        # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False
-        # and Components set to True.
-        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
-        val = await self.send_get_detailed_forecast_request(details=details)
+        if tcp_support:
+            # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to False
+            # and Components set to True.
+            details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents
+            val = await self.send_get_detailed_forecast_request(details=details)
 
-        self.check_CommodityPriceForecast(cluster=cluster,
-                                          priceForecast=val.priceForecast, details=details)
+            self.check_CommodityPriceForecast(cluster=cluster,
+                                              priceForecast=val.priceForecast, details=details)
 
         self.step("8")
-        # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True
-        # and Components set to True.
-        details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents | cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
+        if tcp_support:
+            # TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True
+            # and Components set to True.
+            details = cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents | cluster.Bitmaps.CommodityPriceDetailBitmap.kDescription
 
-        val = await self.send_get_detailed_forecast_request(details=details)
+            val = await self.send_get_detailed_forecast_request(details=details)
 
-        self.check_CommodityPriceForecast(cluster=cluster,
-                                          priceForecast=val.priceForecast, details=details)
+            self.check_CommodityPriceForecast(cluster=cluster,
+                                              priceForecast=val.priceForecast, details=details)
 
 
 if __name__ == "__main__":

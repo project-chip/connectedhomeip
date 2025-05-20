@@ -7728,7 +7728,7 @@ cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -9962,10 +9962,15 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     int16u y2 = 3;
   }
 
+  struct DPTZStruct {
+    int16u videoStreamID = 0;
+    ViewportStruct viewport = 1;
+  }
+
   readonly attribute optional MPTZStruct MPTZPosition = 0;
   readonly attribute optional int8u maxPresets = 1;
   readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
-  readonly attribute optional int16u DPTZRelativeMove[] = 3;
+  readonly attribute optional DPTZStruct DPTZStreams[] = 3;
   readonly attribute optional int8u zoomMax = 4;
   readonly attribute optional int16s tiltMin = 5;
   readonly attribute optional int16s tiltMax = 6;
@@ -10016,7 +10021,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 
   /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
   command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
-  /** This command SHALL move the device by the delta values relative to the currently defined position. */
+  /** This command SHALL move the camera by the delta values relative to the currently defined position. */
   command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
   /** This command SHALL move the camera to the positions specified by the Preset passed. */
   command MPTZMoveToPreset(MPTZMoveToPresetRequest): DefaultSuccess = 2;
@@ -10026,7 +10031,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   command MPTZRemovePreset(MPTZRemovePresetRequest): DefaultSuccess = 4;
   /** This command allows for setting the digital viewport for a specific Video Stream. */
   command DPTZSetViewport(DPTZSetViewportRequest): DefaultSuccess = 5;
-  /** This command SHALL change the viewports location by the amount specified in a relative fashion. */
+  /** This command SHALL change the per stream viewport by the amount specified in a relative fashion. */
   command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
 }
 
@@ -11062,15 +11067,17 @@ provisional cluster JointFabricAdministrator = 1875 {
 provisional cluster TlsCertificateManagement = 2049 {
   revision 1;
 
-  struct TLSCertStruct {
+  fabric_scoped struct TLSCertStruct {
     int16u caid = 0;
     optional long_octet_string<3000> certificate = 1;
+    fabric_idx fabricIndex = 254;
   }
 
-  struct TLSClientCertificateDetailStruct {
+  fabric_scoped struct TLSClientCertificateDetailStruct {
     int16u ccdid = 0;
     optional long_octet_string<3000> clientCertificate = 1;
     optional octet_string intermediateCertificates[] = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute int8u maxRootCertificates = 0;
@@ -11158,7 +11165,7 @@ provisional cluster TlsCertificateManagement = 2049 {
   /** This command SHALL be generated to request the Node generates a Certificate Signing Request. */
   fabric command access(invoke: administer) TLSClientCSR(TLSClientCSRRequest): TLSClientCSRResponse = 7;
   /** This command SHALL be generated to request the Node provisions newly provided Client Certificate Details, or rotate an existing client certificate. */
-  command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): DefaultSuccess = 9;
+  fabric command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): DefaultSuccess = 9;
   /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID, or all TLS client certificates, based on the contents of the CCDID field. */
   fabric command FindClientCertificate(FindClientCertificateRequest): FindClientCertificateResponse = 10;
   /** This command SHALL return the CCDID for the passed in Fingerprint. */

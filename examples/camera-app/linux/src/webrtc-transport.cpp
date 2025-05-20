@@ -65,7 +65,7 @@ void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoSt
     int sampleDurationUs = 1000 * 1000 / 30;
     rtc::FrameInfo frameInfo(mVideoSampleTimestamp);
     frameInfo.payloadType = kH264CodecPayloadType;
-    mVideoSampleTimestamp += sampleDurationUs;
+    mVideoSampleTimestamp += static_cast<uint32_t>(sampleDurationUs);
     mVideoTrack->sendFrame(sample, frameInfo);
 }
 
@@ -80,7 +80,7 @@ void WebrtcTransport::SendAudio(const char * data, size_t size, uint16_t audioSt
     int samplesPerFrame = (48000 * 20) / 1000;
     rtc::FrameInfo frameInfo(mAudioSampleTimestamp);
     frameInfo.payloadType = kOpusCodecPayloadType;
-    mAudioSampleTimestamp += samplesPerFrame;
+    mAudioSampleTimestamp += static_cast<uint32_t>(samplesPerFrame);
     mAudioTrack->sendFrame(sample, frameInfo);
 }
 

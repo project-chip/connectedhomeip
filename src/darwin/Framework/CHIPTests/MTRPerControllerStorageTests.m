@@ -2963,8 +2963,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testSubscriptionPool
 {
-    XCTSkip("Skipping due to flakyness/failing.  https://github.com/project-chip/connectedhomeip/issues/38825");
-
     // QRCodes generated for discriminators 1111~1115 and passcodes 1001~1005
     NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
         @(101) : @"MT:00000UZ427U0D900000",
@@ -2989,8 +2987,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testSubscriptionPoolManyDevices
 {
-    XCTSkip("Skipping due to flakyness/failing.  https://github.com/project-chip/connectedhomeip/issues/38825");
-
     // QRCodes generated for discriminators 1111~1150 and passcodes 1001~1050
     NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
         @(101) : @"MT:00000I9K17U0D900000",
@@ -3672,9 +3668,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 - (void)testMTRDeviceDealloc
 {
-    // disabled:  see https://github.com/project-chip/connectedhomeip/issues/38715
-    XCTSkip("Skipping due to flakyness/failing.  (https://github.com/project-chip/connectedhomeip/issues/38715)");
-
     __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];

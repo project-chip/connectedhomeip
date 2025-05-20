@@ -59,9 +59,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, validUntil);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -95,9 +92,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
             err = DataModel::Decode(reader, endpoint);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -138,9 +132,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, name);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -179,9 +170,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
             err = DataModel::Decode(reader, endpoint);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

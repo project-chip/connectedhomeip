@@ -73,7 +73,9 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace TLSClientCSR
 namespace ProvisionClientCertificate {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(ProvisionClientCertificate::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
+    kMetadataEntry(ProvisionClientCertificate::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kAdminister);
 } // namespace ProvisionClientCertificate
 namespace FindClientCertificate {
 inline constexpr DataModel::AcceptedCommandEntry
