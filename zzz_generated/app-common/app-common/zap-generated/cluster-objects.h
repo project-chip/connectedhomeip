@@ -146,10 +146,6 @@
 #include <clusters/ContentLauncher/Commands.h>
 #include <clusters/ContentLauncher/Events.h>
 #include <clusters/ContentLauncher/Structs.h>
-#include <clusters/DemandResponseLoadControl/Attributes.h>
-#include <clusters/DemandResponseLoadControl/Commands.h>
-#include <clusters/DemandResponseLoadControl/Events.h>
-#include <clusters/DemandResponseLoadControl/Structs.h>
 #include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/Commands.h>
 #include <clusters/Descriptor/Events.h>
@@ -262,6 +258,14 @@
 #include <clusters/IlluminanceMeasurement/Commands.h>
 #include <clusters/IlluminanceMeasurement/Events.h>
 #include <clusters/IlluminanceMeasurement/Structs.h>
+#include <clusters/JointFabricAdministrator/Attributes.h>
+#include <clusters/JointFabricAdministrator/Commands.h>
+#include <clusters/JointFabricAdministrator/Events.h>
+#include <clusters/JointFabricAdministrator/Structs.h>
+#include <clusters/JointFabricDatastore/Attributes.h>
+#include <clusters/JointFabricDatastore/Commands.h>
+#include <clusters/JointFabricDatastore/Events.h>
+#include <clusters/JointFabricDatastore/Structs.h>
 #include <clusters/KeypadInput/Attributes.h>
 #include <clusters/KeypadInput/Commands.h>
 #include <clusters/KeypadInput/Events.h>

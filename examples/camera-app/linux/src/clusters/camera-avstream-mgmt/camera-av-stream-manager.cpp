@@ -36,7 +36,7 @@ using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvStreamManagement::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDeviceHAL)
+void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDeviceHAL)
 {
     mCameraDeviceHAL = aCameraDeviceHAL;
 }
@@ -47,7 +47,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
     outStreamID               = kInvalidStreamID;
     bool foundAvailableStream = false;
 
-    for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
+    for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (!stream.isAllocated)
         {
@@ -59,7 +59,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
                 outStreamID        = stream.videoStreamParams.videoStreamID;
 
                 // Start the video stream from HAL for serving.
-                mCameraDeviceHAL->StartVideoStream(outStreamID);
+                mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(outStreamID);
+
+                // Set the default viewport on the newly allocated stream
+                mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream,
+                                                                      mCameraDeviceHAL->GetCameraHALInterface().GetViewport());
+
+                // Inform DPTZ that there's an allocated stream
+                mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
                 return Status::Success;
             }
@@ -78,11 +85,18 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
                                                                              const chip::Optional<bool> waterMarkEnabled,
                                                                              const chip::Optional<bool> osdEnabled)
 {
-    // TODO : Needs Change
-    for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
+    for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
+            if (waterMarkEnabled.HasValue())
+            {
+                stream.videoStreamParams.watermarkEnabled = waterMarkEnabled;
+            }
+            if (osdEnabled.HasValue())
+            {
+                stream.videoStreamParams.OSDEnabled = osdEnabled;
+            }
             ChipLogError(Camera, "Modified video stream with ID: %d", streamID);
             return Status::Success;
         }
@@ -94,14 +108,16 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate(const uint16_t streamID)
 {
-    for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
+    for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
             // Stop the video stream
-            mCameraDeviceHAL->StopVideoStream(streamID);
+            mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(streamID);
 
             stream.isAllocated = false;
+
+            mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamDeallocated(streamID);
 
             break;
         }
@@ -116,7 +132,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
     outStreamID               = kInvalidStreamID;
     bool foundAvailableStream = false;
 
-    for (AudioStream & stream : mCameraDeviceHAL->GetAvailableAudioStreams())
+    for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
     {
         if (!stream.isAllocated)
         {
@@ -128,7 +144,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
                 outStreamID        = stream.audioStreamParams.audioStreamID;
 
                 // Start the audio stream from HAL for serving.
-                mCameraDeviceHAL->StartAudioStream(outStreamID);
+                mCameraDeviceHAL->GetCameraHALInterface().StartAudioStream(outStreamID);
 
                 return Status::Success;
             }
@@ -145,12 +161,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
 
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate(const uint16_t streamID)
 {
-    for (AudioStream & stream : mCameraDeviceHAL->GetAvailableAudioStreams())
+    for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
     {
         if (stream.audioStreamParams.audioStreamID == streamID && stream.isAllocated)
         {
             // Stop the audio stream
-            mCameraDeviceHAL->StopAudioStream(streamID);
+            mCameraDeviceHAL->GetCameraHALInterface().StopAudioStream(streamID);
 
             stream.isAllocated = false;
             break;
@@ -166,7 +182,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
     outStreamID               = kInvalidStreamID;
     bool foundAvailableStream = false;
 
-    for (SnapshotStream & stream : mCameraDeviceHAL->GetAvailableSnapshotStreams())
+    for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
     {
         if (!stream.isAllocated)
         {
@@ -178,7 +194,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
                 outStreamID        = stream.snapshotStreamParams.snapshotStreamID;
 
                 // Start the snapshot stream for serving.
-                mCameraDeviceHAL->StartSnapshotStream(outStreamID);
+                mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
 
                 return Status::Success;
             }
@@ -197,11 +213,18 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
                                                                                 const chip::Optional<bool> waterMarkEnabled,
                                                                                 const chip::Optional<bool> osdEnabled)
 {
-    // TODO : change
-    for (SnapshotStream & stream : mCameraDeviceHAL->GetAvailableSnapshotStreams())
+    for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
     {
         if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {
+            if (waterMarkEnabled.HasValue())
+            {
+                stream.snapshotStreamParams.watermarkEnabled = waterMarkEnabled;
+            }
+            if (osdEnabled.HasValue())
+            {
+                stream.snapshotStreamParams.OSDEnabled = osdEnabled;
+            }
             ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
             return Status::Success;
         }
@@ -213,12 +236,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDeallocate(const uint16_t streamID)
 {
-    for (SnapshotStream & stream : mCameraDeviceHAL->GetAvailableSnapshotStreams())
+    for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
     {
         if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {
             // Stop the snapshot stream for serving.
-            mCameraDeviceHAL->StopSnapshotStream(streamID);
+            mCameraDeviceHAL->GetCameraHALInterface().StopSnapshotStream(streamID);
 
             stream.isAllocated = false;
             break;
@@ -241,7 +264,7 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     {
     case HDRModeEnabled::Id: {
 
-        mCameraDeviceHAL->SetHDRMode(GetCameraAVStreamMgmtServer()->GetHDRModeEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetHDRMode(GetCameraAVStreamMgmtServer()->GetHDRModeEnabled());
         break;
     }
     case SoftRecordingPrivacyModeEnabled::Id: {
@@ -257,23 +280,34 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         break;
     }
     case Viewport::Id: {
-        mCameraDeviceHAL->SetViewport(GetCameraAVStreamMgmtServer()->GetViewport());
+        // Update the device default
+        mCameraDeviceHAL->GetCameraHALInterface().SetViewport(GetCameraAVStreamMgmtServer()->GetViewport());
+
+        // Update the per stream viewports on the camera
+        for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
+        {
+            mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream, GetCameraAVStreamMgmtServer()->GetViewport());
+        }
+
+        // Inform DPTZ (the server) that the camera default viewport has changed
+        mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().DefaultViewportUpdated(
+            GetCameraAVStreamMgmtServer()->GetViewport());
         break;
     }
     case SpeakerMuted::Id: {
-        mCameraDeviceHAL->SetSpeakerMuted(GetCameraAVStreamMgmtServer()->GetSpeakerMuted());
+        mCameraDeviceHAL->GetCameraHALInterface().SetSpeakerMuted(GetCameraAVStreamMgmtServer()->GetSpeakerMuted());
         break;
     }
     case SpeakerVolumeLevel::Id: {
-        mCameraDeviceHAL->SetSpeakerVolume(GetCameraAVStreamMgmtServer()->GetSpeakerVolumeLevel());
+        mCameraDeviceHAL->GetCameraHALInterface().SetSpeakerVolume(GetCameraAVStreamMgmtServer()->GetSpeakerVolumeLevel());
         break;
     }
     case MicrophoneMuted::Id: {
-        mCameraDeviceHAL->SetMicrophoneMuted(GetCameraAVStreamMgmtServer()->GetMicrophoneMuted());
+        mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneMuted(GetCameraAVStreamMgmtServer()->GetMicrophoneMuted());
         break;
     }
     case MicrophoneVolumeLevel::Id: {
-        mCameraDeviceHAL->SetMicrophoneVolume(GetCameraAVStreamMgmtServer()->GetMicrophoneVolumeLevel());
+        mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneVolume(GetCameraAVStreamMgmtServer()->GetMicrophoneVolumeLevel());
         break;
     }
     default:
@@ -285,7 +319,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
                                                                            const VideoResolutionStruct & resolution,
                                                                            ImageSnapshot & outImageSnapshot)
 {
-    if (mCameraDeviceHAL->CaptureSnapshot(streamID, resolution, outImageSnapshot) == CameraError::SUCCESS)
+    if (mCameraDeviceHAL->GetCameraHALInterface().CaptureSnapshot(streamID, resolution, outImageSnapshot) == CameraError::SUCCESS)
     {
         return Status::Success;
     }

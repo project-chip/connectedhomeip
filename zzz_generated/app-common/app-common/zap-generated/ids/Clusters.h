@@ -49,7 +49,6 @@
 #include <clusters/ContentAppObserver/ClusterId.h>
 #include <clusters/ContentControl/ClusterId.h>
 #include <clusters/ContentLauncher/ClusterId.h>
-#include <clusters/DemandResponseLoadControl/ClusterId.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/DeviceEnergyManagement/ClusterId.h>
 #include <clusters/DeviceEnergyManagementMode/ClusterId.h>
@@ -78,6 +77,8 @@
 #include <clusters/IcdManagement/ClusterId.h>
 #include <clusters/Identify/ClusterId.h>
 #include <clusters/IlluminanceMeasurement/ClusterId.h>
+#include <clusters/JointFabricAdministrator/ClusterId.h>
+#include <clusters/JointFabricDatastore/ClusterId.h>
 #include <clusters/KeypadInput/ClusterId.h>
 #include <clusters/LaundryDryerControls/ClusterId.h>
 #include <clusters/LaundryWasherControls/ClusterId.h>

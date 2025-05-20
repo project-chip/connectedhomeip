@@ -76,7 +76,7 @@ limitations under the License.
         <feature name="ST"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0007" name="BlockUnrated" define="ENABLED" type="boolean">
+    <attribute side="server" code="0x0007" name="BlockUnrated" define="ENABLED" type="boolean" optional="true">
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>

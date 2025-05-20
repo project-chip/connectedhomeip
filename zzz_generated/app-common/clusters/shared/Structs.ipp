@@ -56,9 +56,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, value);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -97,9 +94,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kModeTags))
         {
             err = DataModel::Decode(reader, modeTags);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -165,9 +159,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fixedTypical);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -217,9 +208,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, accuracyRanges);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -227,12 +215,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace MeasurementAccuracyStruct
 
-namespace DeviceTypeStruct {
+namespace ViewportStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kDeviceType), deviceType);
-    encoder.Encode(to_underlying(Fields::kRevision), revision);
+    encoder.Encode(to_underlying(Fields::kX1), x1);
+    encoder.Encode(to_underlying(Fields::kY1), y1);
+    encoder.Encode(to_underlying(Fields::kX2), x2);
+    encoder.Encode(to_underlying(Fields::kY2), y2);
     return encoder.Finalize();
 }
 
@@ -246,23 +236,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kDeviceType))
+        if (__context_tag == to_underlying(Fields::kX1))
         {
-            err = DataModel::Decode(reader, deviceType);
+            err = DataModel::Decode(reader, x1);
         }
-        else if (__context_tag == to_underlying(Fields::kRevision))
+        else if (__context_tag == to_underlying(Fields::kY1))
         {
-            err = DataModel::Decode(reader, revision);
+            err = DataModel::Decode(reader, y1);
         }
-        else
+        else if (__context_tag == to_underlying(Fields::kX2))
         {
+            err = DataModel::Decode(reader, x2);
+        }
+        else if (__context_tag == to_underlying(Fields::kY2))
+        {
+            err = DataModel::Decode(reader, y2);
         }
 
         ReturnErrorOnFailure(err);
     }
 }
 
-} // namespace DeviceTypeStruct
+} // namespace ViewportStruct
 
 namespace ApplicationStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -290,9 +285,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kApplicationID))
         {
             err = DataModel::Decode(reader, applicationID);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -332,9 +324,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kErrorStateDetails))
         {
             err = DataModel::Decode(reader, errorStateDetails);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -380,9 +369,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, caid);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -416,9 +402,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kValue))
         {
             err = DataModel::Decode(reader, value);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -454,62 +437,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, operationalStateLabel);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 
 } // namespace OperationalStateStruct
-
-namespace ViewportStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kX1), x1);
-    encoder.Encode(to_underlying(Fields::kY1), y1);
-    encoder.Encode(to_underlying(Fields::kX2), x2);
-    encoder.Encode(to_underlying(Fields::kY2), y2);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        uint8_t __context_tag = 0;
-        CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        if (__context_tag == to_underlying(Fields::kX1))
-        {
-            err = DataModel::Decode(reader, x1);
-        }
-        else if (__context_tag == to_underlying(Fields::kY1))
-        {
-            err = DataModel::Decode(reader, y1);
-        }
-        else if (__context_tag == to_underlying(Fields::kX2))
-        {
-            err = DataModel::Decode(reader, x2);
-        }
-        else if (__context_tag == to_underlying(Fields::kY2))
-        {
-            err = DataModel::Decode(reader, y2);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace ViewportStruct
 
 namespace WebRTCSessionStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -584,9 +517,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fabricIndex);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -627,9 +557,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, decimalPoints);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -663,9 +590,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kCurrency))
         {
             err = DataModel::Decode(reader, currency);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -731,9 +655,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fixedTypical);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -783,9 +704,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, accuracyRanges);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -819,9 +737,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kStatusCode))
         {
             err = DataModel::Decode(reader, statusCode);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -862,9 +777,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, areaType);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -904,9 +816,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, powerThresholdSource);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -945,9 +854,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMyEnum))
         {
             err = DataModel::Decode(reader, myEnum);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

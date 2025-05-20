@@ -49,7 +49,6 @@
 #include <clusters/ContentAppObserver/EventIds.h>
 #include <clusters/ContentControl/EventIds.h>
 #include <clusters/ContentLauncher/EventIds.h>
-#include <clusters/DemandResponseLoadControl/EventIds.h>
 #include <clusters/Descriptor/EventIds.h>
 #include <clusters/DeviceEnergyManagement/EventIds.h>
 #include <clusters/DeviceEnergyManagementMode/EventIds.h>
@@ -78,6 +77,8 @@
 #include <clusters/IcdManagement/EventIds.h>
 #include <clusters/Identify/EventIds.h>
 #include <clusters/IlluminanceMeasurement/EventIds.h>
+#include <clusters/JointFabricAdministrator/EventIds.h>
+#include <clusters/JointFabricDatastore/EventIds.h>
 #include <clusters/KeypadInput/EventIds.h>
 #include <clusters/LaundryDryerControls/EventIds.h>
 #include <clusters/LaundryWasherControls/EventIds.h>

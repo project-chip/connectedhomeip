@@ -51,7 +51,6 @@
 #include <clusters/ContentAppObserver/Enums.h>
 #include <clusters/ContentControl/Enums.h>
 #include <clusters/ContentLauncher/Enums.h>
-#include <clusters/DemandResponseLoadControl/Enums.h>
 #include <clusters/Descriptor/Enums.h>
 #include <clusters/DeviceEnergyManagement/Enums.h>
 #include <clusters/DeviceEnergyManagementMode/Enums.h>
@@ -80,6 +79,8 @@
 #include <clusters/IcdManagement/Enums.h>
 #include <clusters/Identify/Enums.h>
 #include <clusters/IlluminanceMeasurement/Enums.h>
+#include <clusters/JointFabricAdministrator/Enums.h>
+#include <clusters/JointFabricDatastore/Enums.h>
 #include <clusters/KeypadInput/Enums.h>
 #include <clusters/LaundryDryerControls/Enums.h>
 #include <clusters/LaundryWasherControls/Enums.h>

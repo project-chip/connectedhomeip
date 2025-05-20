@@ -64,9 +64,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, blindDuration);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -100,9 +97,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kSensitivity))
         {
             err = DataModel::Decode(reader, sensitivity);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -153,9 +147,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, maxPreRollLen);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -170,6 +161,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kChunkDuration), chunkDuration);
     encoder.Encode(to_underlying(Fields::kCENCKey), CENCKey);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
+    encoder.Encode(to_underlying(Fields::kCENCKeyID), CENCKeyID);
     return encoder.Finalize();
 }
 
@@ -195,8 +187,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, metadataEnabled);
         }
-        else
+        else if (__context_tag == to_underlying(Fields::kCENCKeyID))
         {
+            err = DataModel::Decode(reader, CENCKeyID);
         }
 
         ReturnErrorOnFailure(err);
@@ -232,9 +225,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, CMAFContainerOptions);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
@@ -253,7 +243,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kUrl), url);
     encoder.Encode(to_underlying(Fields::kTriggerOptions), triggerOptions);
     encoder.Encode(to_underlying(Fields::kIngestMethod), ingestMethod);
-    encoder.Encode(to_underlying(Fields::kContainerFormat), containerFormat);
     encoder.Encode(to_underlying(Fields::kContainerOptions), containerOptions);
     encoder.Encode(to_underlying(Fields::kExpiryTime), expiryTime);
     return encoder.Finalize();
@@ -297,10 +286,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ingestMethod);
         }
-        else if (__context_tag == to_underlying(Fields::kContainerFormat))
-        {
-            err = DataModel::Decode(reader, containerFormat);
-        }
         else if (__context_tag == to_underlying(Fields::kContainerOptions))
         {
             err = DataModel::Decode(reader, containerOptions);
@@ -308,9 +293,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kExpiryTime))
         {
             err = DataModel::Decode(reader, expiryTime);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);
@@ -351,15 +333,46 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transportOptions);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 
 } // namespace TransportConfigurationStruct
+
+namespace SupportedFormatStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kContainerFormat), containerFormat);
+    encoder.Encode(to_underlying(Fields::kIngestMethod), ingestMethod);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kContainerFormat))
+        {
+            err = DataModel::Decode(reader, containerFormat);
+        }
+        else if (__context_tag == to_underlying(Fields::kIngestMethod))
+        {
+            err = DataModel::Decode(reader, ingestMethod);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace SupportedFormatStruct
 } // namespace Structs
 } // namespace PushAvStreamTransport
 } // namespace Clusters
