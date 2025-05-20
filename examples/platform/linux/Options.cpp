@@ -639,7 +639,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_KVS:
         LinuxDeviceOptions::GetInstance().KVS = aValue;
         break;
-    
+
     case kDeviceOption_AppID:
         LinuxDeviceOptions::GetInstance().app_id = aValue;
         break;
