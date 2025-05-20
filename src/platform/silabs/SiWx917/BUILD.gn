@@ -75,7 +75,7 @@ static_library("SiWx917") {
   public_deps = [
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/platform:platform_base",
-    "../platformAbstraction:platform-abstraction",
+    "${silabs_platform_dir}/platformAbstraction:wisemcu",
   ]
   deps = [
     "${chip_root}/src/app/common:ids",

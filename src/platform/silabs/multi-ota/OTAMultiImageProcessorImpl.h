@@ -17,7 +17,6 @@
  */
 
 #pragma once
-
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <include/platform/CHIPDeviceLayer.h>

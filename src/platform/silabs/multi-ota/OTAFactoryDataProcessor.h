@@ -76,6 +76,6 @@ private:
     uint8_t * mFactoryData = nullptr;
 
 protected:
-    uint32_t GetAccumulatorSize() const override { return sizeof(mLength); }
+    uint32_t GetAccumulatorSize() const override { return mLength; }
 };
 } // namespace chip

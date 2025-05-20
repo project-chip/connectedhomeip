@@ -16,19 +16,16 @@
  *    limitations under the License.
  */
 
-#include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
+#include "OTAMultiImageProcessorImpl.h"
 #include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 // TODO: Add this dependency when integrating the multi-OTA encryption feature
 // #include <platform/silabs/SilabsConfig.h>
-#ifdef __cplusplus
+
 extern "C" {
-#endif
 #include "sl_si91x_driver.h"
-#ifdef __cplusplus
 }
-#endif
 
 namespace chip {
 

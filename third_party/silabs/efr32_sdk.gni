@@ -363,7 +363,6 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
