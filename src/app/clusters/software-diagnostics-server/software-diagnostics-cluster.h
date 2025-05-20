@@ -109,7 +109,7 @@ public:
     }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
+                                                               TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override
     {
         switch (request.path.mCommandId)
