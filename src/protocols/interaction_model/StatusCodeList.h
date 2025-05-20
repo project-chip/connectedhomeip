@@ -23,7 +23,7 @@
  */
 
 /// WARNING: If you touch this list,
-///          please update src/controller/python/chip/interaction_model/__init__.py
+///          please update src/controller/python/matter/interaction_model/__init__.py
 ///          please update src/controller/java/src/chip/devicecontroller/model/Status.java
 ///          please update src/controller/java/src/matter/controller/model/Status.kt
 

@@ -34,10 +34,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_ACL_2_5(MatterBaseTest):
@@ -157,7 +158,7 @@ class TC_ACL_2_5(MatterBaseTest):
         asserts.assert_equal(subscription_event.changeType,
                              Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
                              "Expected Added change type")
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(subscription_event.adminPasscodeID)),
+        asserts.assert_in('matter.clusters.Types.Nullable', str(type(subscription_event.adminPasscodeID)),
                           "AdminPasscodeID should be Null")
         asserts.assert_equal(subscription_event.adminNodeID,
                              self.default_controller.nodeId,
@@ -201,7 +202,7 @@ class TC_ACL_2_5(MatterBaseTest):
         asserts.assert_equal(event_data.changeType,
                              Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
                              "Expected Changed change type")
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
+        asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
                           "AdminPasscodeID should be Null")
         asserts.assert_equal(event_data.adminNodeID,
                              self.default_controller.nodeId,
@@ -305,7 +306,7 @@ class TC_ACL_2_5(MatterBaseTest):
         asserts.assert_equal(event_data.changeType,
                              Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
                              "Expected Removed change type")
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
+        asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
                           "AdminPasscodeID should be Null")
         asserts.assert_equal(event_data.adminNodeID,
                              self.default_controller.nodeId,

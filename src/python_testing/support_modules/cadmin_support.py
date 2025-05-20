@@ -24,12 +24,13 @@ from dataclasses import dataclass
 from time import sleep
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.interaction_model import Status
 from mdns_discovery import mdns_discovery
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.ChipDeviceCtrl import CommissioningParameters
+from matter.interaction_model import Status
 
 
 class CADMINSupport:
