@@ -1,29 +1,22 @@
 {{> header}}
-// This file is generated from clusters-shared-Attributes.h.zapt
-
 #pragma once
 
-#include <clusters/shared/GlobalIds.h>
-#include <app/data-model/DecodableList.h>
-#include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/core/TLV.h>
-#include <lib/support/BitMask.h>
-
-#include <clusters/shared/Enums.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
 namespace Globals {
 namespace Attributes {
+
 {{#zcl_attributes_server}}
 {{#unless clusterRef}}
 namespace {{asUpperCamelCase label}} {
-  {{> cluster_objects_attribute_typeinfo ns=""}}
+static constexpr AttributeId Id = {{asMEI manufacturerCode code}};
 } // namespace {{asUpperCamelCase label}}
-
 {{/unless}}
+
 {{/zcl_attributes_server}}
 } // namespace Attributes
 } // namespace Globals
