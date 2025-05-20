@@ -158,6 +158,21 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
 
   ///////////////////////////////////////////////////////////////////////////////////
 
+  // SW1=0x90 SW2=0x00 indicate a successful command
+  boolean IsStatusSuccess(byte sw1, byte sw2)
+  {
+    return ((sw1 == ((byte) 0x90)) && (sw2 == 0x00));
+  }
+
+  // SW1=0x61 SW2=0xXX indicate that the last command was successful and that the tag is transmitting
+  // a chained response. It is used when the response is too long to be transmitted in one shot.
+  // SW2 indicates the size of the data in the next block. It can be read by calling
+  // 'GetResponse' command.
+  boolean IsResponseBlockAvailable(byte sw1)
+  {
+    return (sw1 == ((byte) 0x61));
+  }
+
   private void setIsoDepTimeout(int timeout) throws IOException {
 
     if (mIsoDep == null) {
@@ -207,7 +222,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     byte sw1 = response[len - 2];
     byte sw2 = response[len - 1];
 
-    if ((sw1 == ((byte) 0x90)) && (sw2 == 0x00)) {
+    if (IsStatusSuccess(sw1, sw2)) {
       // Command OK
       if (len == 2) {
         // There are only the 2 status bytes
@@ -264,7 +279,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
         //   SW1=0x61 SW2=0xXX if the transmission was successful and the recipient has
         //     transmitted the first part of a chained response. SW2 indicates the size of
         //     the data in the next block.
-        if (((sw1 == ((byte) 0x90)) && (sw2 == 0x00)) || (sw1 == ((byte) 0x61))) {
+        if ((IsStatusSuccess(sw1, sw2)) || (IsResponseBlockAvailable(sw1))) {
           // Response will be processed outside of the while loop
         } else {
           // Any others values are an error
@@ -273,7 +288,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
         }
       } else {
         // This is an intermediate block so the only valid response is 0x90 0x00
-        if ((sw1 == ((byte) 0x90)) && (sw2 == 0x00)) {
+        if (IsStatusSuccess(sw1, sw2)) {
           // The command was successfully sent
           // Continue with the next block
         } else {
@@ -314,21 +329,22 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     byte sw1 = response[len - 2];
     byte sw2 = response[len - 1];
 
-    if ((sw1 == ((byte) 0x90)) && (sw2 == 0x00)) {
+    if (IsStatusSuccess(sw1, sw2)) {
       // Response fits in a single block.
       // Simply drop the 2 status bytes and return it
       byte[] result = new byte[len - 2];
       System.arraycopy(response, 0, result, 0, result.length);
       return result;
 
-    } else if (sw1 == ((byte) 0x61)) {
+    } else if (IsResponseBlockAvailable(sw1)) {
       // SW1=0x61 indicates a chained response.
 
       // Put the received bytes (without the 2 status bytes) into the ChainedResponseBuffer
       addDataToChainedResponseBuffer(response, len - 2);
 
+      // Loop until there is no more response block.
       // SW2 indicates the number of bytes contained in the next block.
-      while (sw1 == 0x61) {
+      while (IsResponseBlockAvailable(sw1)) {
         // If SW2 is 0x00 or if it is higher than TYPE4_SIMPLE_APDU_MAX_RX_SIZE, we clamp it to
         // TYPE4_SIMPLE_APDU_MAX_RX_SIZE.
         byte nextBlockLength =
@@ -345,13 +361,13 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
         sw1 = response[len - 2];
         sw2 = response[len - 1];
 
-        if ((sw1 == ((byte) 0x90)) && (sw2 == 0x00)) {
+        if (IsStatusSuccess(sw1, sw2)) {
           Log.d(TAG, "Chained response received successfully");
 
           // Put the received bytes (without the 2 status bytes) into the ChainedResponseBuffer
           addDataToChainedResponseBuffer(response, len - 2);
 
-        } else if (sw1 == (byte) 0x61) {
+        } else if (IsResponseBlockAvailable(sw1)) {
           // We have successfully received a block and it is not the last one
 
           // Put the received bytes (without the 2 status bytes) into the ChainedResponseBuffer

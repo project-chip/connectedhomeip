@@ -148,6 +148,21 @@ public:
 
     uint16_t GetDiscriminator() const { return discriminator; }
 
+    // SW1=0x90 SW2=0x00 indicate a successful command
+    bool IsStatusSuccess(uint8_t sw1, uint8_t sw2)
+    {
+        return ((sw1 == static_cast<uint8_t>(0x90)) && (sw2 == static_cast<uint8_t>(0x00)));
+    }
+
+    // SW1=0x61 SW2=0xXX indicate that the last command was successful and that the tag is transmitting
+    // a chained response. It is used when the response is too long to be transmitted in one shot.
+    // SW2 indicates the size of the data in the next block. It can be read by calling
+    // 'GetResponse' command.
+    bool IsResponseBlockAvailable(uint8_t sw1)
+    {
+        return (sw1 == static_cast<uint8_t>(0x61));
+    }
+
     CHIP_ERROR RetrieveDiscriminator()
     {
         // Discriminator can be found in the response to select application
@@ -201,9 +216,9 @@ public:
                 //   SW1=0x61 SW2=0xXX if the transmission was successful and the recipient has
                 //     transmitted the first part of a chained response (SW2 indicates the size of
                 //     the data in the next block).
-                if (((sw1 == static_cast<uint8_t>(0x90)) && (sw2 == 0x00)) || (sw1 == static_cast<uint8_t>(0x61)))
+                if (IsStatusSuccess(sw1, sw2) || IsResponseBlockAvailable(sw1))
                 {
-                    // Response will be processed outside of the while loop
+                    // Command successful. Response will be processed outside of the while loop
                 }
                 else
                 {
@@ -216,7 +231,7 @@ public:
             else
             {
                 // This is an intermediate block so the only valid response is 0x90 0x00
-                if ((sw1 == static_cast<uint8_t>(0x90)) && (sw2 == 0x00))
+                if (IsStatusSuccess(sw1, sw2))
                 {
                     // The command was successfully sent
                     // Continue with the next block
@@ -262,14 +277,14 @@ public:
         uint8_t sw1 = mAPDURxBuffer[mAPDUResponseLength - 2];
         uint8_t sw2 = mAPDURxBuffer[mAPDUResponseLength - 1];
 
-        if ((sw1 == static_cast<uint8_t>(0x90)) && (sw2 == 0x00))
+        if (IsStatusSuccess(sw1, sw2))
         {
             // Response fits in a single block.
             // Drop the 2 status bytes and return it
             NotifyResponse(mAPDURxBuffer, mAPDUResponseLength - 2);
             return;
         }
-        else if (sw1 == static_cast<uint8_t>(0x61))
+        else if (IsResponseBlockAvailable(sw1))
         {
             // SW1=0x61 indicates a chained response. it means that the response is too big to be transmitted in a single packet.
 
@@ -281,9 +296,10 @@ public:
                 return;
             }
 
-            // SW2 indicates the size of the data in the next response packet.
-            // The next response packet can be read thanks to a call to getResponse() command.
-            while (sw1 == 0x61)
+            // Loop until there is no more response block to read
+            // SW2 indicates the size of the data in the next response block.
+            // It can be read thanks to a call to getResponse() command.
+            while (IsResponseBlockAvailable(sw1))
             {
                 // If SW2 is 0x00 or if it is higher than TYPE4_SIMPLE_APDU_MAX_RX_SIZE, we clamp it to
                 // TYPE4_SIMPLE_APDU_MAX_RX_SIZE.
@@ -304,7 +320,7 @@ public:
                 sw1 = mAPDURxBuffer[mAPDUResponseLength - 2];
                 sw2 = mAPDURxBuffer[mAPDUResponseLength - 1];
 
-                if ((sw1 == static_cast<uint8_t>(0x90)) && (sw2 == 0x00))
+                if (IsStatusSuccess(sw1, sw2))
                 {
                     // Put the received bytes (without the 2 status bytes) into the ChainedResponseBuffer
                     res = AddDataToChainedResponseBuffer(mAPDURxBuffer, mAPDUResponseLength - 2);
@@ -314,7 +330,7 @@ public:
                         return;
                     }
                 }
-                else if (sw1 == static_cast<uint8_t>(0x61))
+                else if (IsResponseBlockAvailable(sw1))
                 {
                     // We have successfully received a block and it is not the last one
 
