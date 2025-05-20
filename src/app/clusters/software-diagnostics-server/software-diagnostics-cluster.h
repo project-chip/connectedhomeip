@@ -133,7 +133,6 @@ public:
     }
 
 private:
-
     // Encodes the `value` in `encoder`, while handling a potential `readError` that occured
     // when the input `value` was read:
     //   - CHIP_ERROR_NOT_IMPLEMENTED results in a 0 being encoded
