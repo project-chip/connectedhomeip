@@ -189,27 +189,17 @@ public:
     explicit CTC_BaseDataClass(T& aValueStorage) : mValue(aValueStorage) {
         if constexpr ( IsValueNullable() ) {
             mValue.SetNull();
+            mNewValue.SetNull();
         }
         else if constexpr ( IsValueList() )
         {
             mValue = ValueType();
+            mNewValue = ValueType();
         }
     }
 
     /// @brief Virtual destructor for proper cleanup
     virtual ~CTC_BaseDataClass() { CleanupValue(); };
-
-    /**
-     * @enum Error
-     * @brief Operation result codes
-     */
-    enum class Error : uint8_t {
-        kSuccess            = 0x00, ///< Operation succeeded
-        kInvalidJson,               ///< Invalid JSON input
-        kAllocationFailed,          ///< Memory allocation failed
-        kInconsistentData,          ///< Data consistency check failed
-        // ...
-    };
 
     /**
      * @brief Get mutable reference to stored value
@@ -226,106 +216,59 @@ public:
     WrappedType GetPayload() const { return unwrapValue(mValue); }
 
     /**
-     * @brief Check if value has changed
-     * @param newValue The new value to compare against
+     * @brief Indicates that the newValue has changed against current mValue
      * @return true if value has changed
-     * 
-     * Special handling for:
-     * - Nullable types: checks null state and value
-     * - List types: compares sizes
-     * - Others: always returns true (assume changed)
      */
-     bool HasChanged() {
-        if constexpr (IsValueNullable()) {
-            return NullableNotEqual(mNewValue, mValue);
-        }
-        else if constexpr (IsValueList()) {
-            return ListsNotEqual(mNewValue, mValue);
-        }
+    bool HasChanged()
+    {
+        return is_changed;
     }
 
     bool IsValid()
     {
-        return (mNewValue != nullptr);
+        return is_valid;
     }
 
     /**
-     * @brief Update the stored value if it has changed
-     * @param aValue New value to store
-     * @return true if value was updated, false if no change needed
-     * 
-     * Checks HasChanged() before applying the update
+     * @brief Performs a pre-validation of arguments value before assigning it as newValue
+     * @param aValue New value for future update mValue
      */
-     CHIP_ERROR UpdateBegin(const T & aValue) {
+     void UpdateBegin(const T & aValue) {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = ValidateValue(aValue)
+        err = ValidateValue(aValue);
 
         if (err != CHIP_NO_ERROR)
         {
-            return err;
+            return;
         };
 
         is_valid = true;
 
         mNewValue = aValue;
-
-        return err;
     };
 
     void UpdateCommit()
     {
-        if (!HasChanged(aValue))
+        if (!CompareValues())
         {
-            return CHIP_NO_ERROR;
+            return;
         }
 
-        value_is_changed = true;
-
+        is_changed = true;
 
         if constexpr (IsValueNullable()) {
-            //InspectTypes();
-            // Handling for other Nullable types (Struct, numeric, enum)
-            if (!aValue.IsNull()) {
-                if constexpr (IsList<WrappedType>::value)
-                {
-                    DataModel::List<PayloadType> newList;
-                    err = UpdateList(mNewValue.Value());
-                    if (err == CHIP_NO_ERROR)
-                    {
-                        CleanupValue();
-                        mValue.SetNonNull(newList);
-                    }
-                }
-                else if constexpr (IsStruct<WrappedType>::value) {
-                    WrappedType tempValue;
-                    err = UpdateStructValue(aValue.Value(), tempValue);
-                    if (err == CHIP_NO_ERROR)
-                    {
-                        CleanupValue();
-                        mValue.SetNonNull(tempValue);
-                    }
-                }
-                else if constexpr (IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value) {
-                    mValue.SetNonNull(aValue.Value());
-                }
-                else {
-                    static_assert(false, "Unexpected Nullable wrapped type");
-                }
+            if (!mNewValue.IsNull()) {
+                WrappedType & tempValue = mNewValue.Value();
+                CleanupValue();
+                mValue.SetNonNull(tempValue);
             } else {
                 mValue.SetNull();
             }
         }
         else if constexpr (IsValueList()) {
-            //InspectTypes();
-            // Handling for plain List<Struct>
-            //DataModel::List<PayloadType> newList;
-            err = UpdateList(aValue, mNewValue);
-            if (err == CHIP_NO_ERROR)
-            {
-                CleanupValue();
-                mValue = newList;
-            }
+            CleanupValue();
+            mValue = mNewValue;
         }
         else {
             InspectTypes();
@@ -338,15 +281,6 @@ public:
         is_valid = false;
         mNewValue = mValue;
     }
-
-    /**
-     * @brief Update the stored value
-     * @param aValue New value to store
-     * @return CHIP_NO_ERROR on success, error code otherwise
-     * 
-     * @note Derived classes can override for custom update logic
-     */
-     //virtual CHIP_ERROR UpdateValue(const T& aValue)
 
     /**
      * @brief Clean up the current value based on type
@@ -376,9 +310,9 @@ public:
     }
 protected:
     T & mValue; // Reference to the applied value storage
-    WrappedType & mNewValue = unwrapValue(mValue);;  // Reference to a value for updating
+    T & mNewValue = mValue;  // Reference to a value for updating
     bool is_valid = false;
-    bool value_is_changed = false;
+    bool is_changed = false;
 
     /**
      * @brief Validate a new value
@@ -387,7 +321,7 @@ protected:
      * 
      * @note Derived classes should override for custom validation
      */
-    virtual CHIP_ERROR ValidateValue(const WrappedType & newValue) const {
+    virtual CHIP_ERROR ValidateValue(const T & newValue) const {
         return CHIP_NO_ERROR;
     }
 
@@ -420,13 +354,14 @@ protected:
      * @param b Second value to compare
      * @return true if values are not equal (including null state)
      */
-    bool NullableNotEqual(const T& a, const T& b) {
+    bool NullableNotEqual(const T& a, const T& b)
+    {
         bool is_neq = false;
         if (a.IsNull() || b.IsNull()) {
             is_neq = a.IsNull() != b.IsNull();
         }
 
-        if (is_neq)
+        if (!is_neq)
         {
             if constexpr (IsList<WrappedType>::value)
             {
@@ -446,6 +381,16 @@ protected:
 
         LOG_VAR_CH(is_neq);
         return is_neq;
+    }
+
+    bool CompareValues()
+    {
+        if constexpr (IsValueNullable()) {
+            return NullableNotEqual(mNewValue, mValue);
+        }
+        else if constexpr (IsValueList()) {
+            return ListsNotEqual(mNewValue, mValue);
+        }
     }
 
     virtual CHIP_ERROR UpdateStructValue(const PayloadType& source, PayloadType& destination)

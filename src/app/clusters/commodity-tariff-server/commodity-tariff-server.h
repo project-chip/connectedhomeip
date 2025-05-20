@@ -1,19 +1,9 @@
 /**
+ * @file CommodityTariffServer.h
+ * @brief Header for Matter Commodity Tariff Cluster implementation
  *
- *    Copyright (c) 2025 Project CHIP Authors
- *    All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * This file contains the implementation of the Matter Commodity Tariff Cluster,
+ * including attribute management, data structures, and server-side handling.
  */
 
 #pragma once
@@ -24,6 +14,8 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/reporting/reporting.h>
+#include <cstdint>
+#include <functional>
 
 #include "CommodityTariffAttrsDataClassesTemplate.h"
 
@@ -32,26 +24,19 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
-typedef uint32_t epoch_s;
+typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
+
+/**
+ * @defgroup tariff_attributes Commodity Tariff Attribute Definitions
+ * @{
+ */
 
 /**
  * @def COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
  * @brief Macro defining Primary attributes for Commodity Tariff
  * 
- * Primary attributes are elements that can only be changed by a special trigger from the updater 
- * when new tariff data has been obtained. These represent the fundamental tariff configuration.
- * 
- * The macro defines the following attributes:
- * - TariffUnit: The unit of measurement for the tariff (nullable enum)
- * - StartDate: The starting date of the tariff (nullable uint32)
- * - DefaultRandomizationOffset: Default offset for randomization (nullable int16)
- * - DefaultRandomizationType: Default type of randomization (nullable enum)
- * - CalendarPeriods: List of calendar period structures
- * - DayPatterns: List of day pattern structures
- * - IndividualDays: List of individual day structures
- * - DayEntries: List of day entry structures
- * - TariffPeriods: List of tariff period structures
- * - TariffComponents: List of tariff component structures
+ * Primary attributes represent the fundamental tariff configuration that can only 
+ * be changed by authorized tariff updates. These are typically set by utility providers.
  */
 #define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES \
     X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>) \
@@ -70,18 +55,8 @@ typedef uint32_t epoch_s;
  * @def COMMODITY_TARIFF_CURRENT_ATTRIBUTES
  * @brief Macro defining Current attributes for Commodity Tariff
  * 
- * Current attributes change internally depending on the current time context. These represent
- * the dynamically changing state of the tariff system.
- * 
- * The macro defines the following attributes:
- * - CurrentDay: The current day structure (nullable)
- * - NextDay: The next day structure (nullable)
- * - CurrentDayEntry: The current day entry structure (nullable)
- * - NextDayEntry: The next day entry structure (nullable)
- * - CurrentDayEntryDate: The date of current day entry (nullable uint32)
- * - NextDayEntryDate: The date of next day entry (nullable uint32)
- * - CurrentTariffComponents: List of current tariff component structures
- * - NextTariffComponents: List of next tariff component structures
+ * Current attributes represent the dynamically changing state of the tariff system,
+ * automatically updated based on time context and primary attribute values.
  */
 #define COMMODITY_TARIFF_CURRENT_ATTRIBUTES \
     X(CurrentDay,                   DataModel::Nullable<Structs::DayStruct::Type>) \
@@ -93,181 +68,201 @@ typedef uint32_t epoch_s;
     X(CurrentTariffComponents,      DataModel::List<Structs::TariffComponentStruct::Type>) \
     X(NextTariffComponents,         DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)
 
+/** @} */ // end of tariff_attributes
+
+/**
+ * @defgroup attribute_management Attribute Management Classes
+ * @brief Macro-generated classes for type-safe attribute management
+ * 
+ * These templates provide consistent attribute handling with:
+ * - Type safety
+ * - Change detection
+ * - Validation
+ * - Memory management
+ * @{
+ */
+
 /**
  * @def X(attrName, attrType)
- * @brief Macro generating attribute-specific data management classes
+ * @brief Generates attribute-specific management classes
  * 
- * For each attribute in COMMODITY_TARIFF_PRIMARY_ATTRIBUTES, this macro generates a specialized
- * data management class that inherits from CTC_BaseDataClass. These classes provide:
- * - Type-safe storage and access to attribute values
- * - Change detection and validation mechanisms
- * - Memory management for complex types
+ * For each attribute in COMMODITY_TARIFF_PRIMARY_ATTRIBUTES, creates a dedicated class that:
+ * - Inherits from CTC_BaseDataClass<attrType>
+ * - Provides type-specific storage management
+ * - Enables attribute-specific validation
  * 
- * The generated classes follow this pattern:
+ * Example generated class:
  * @code
- * class attrName##DataClass : public CTC_BaseDataClass<attrType> {
+ * class TariffUnitDataClass : public CTC_BaseDataClass<Nullable<Globals::TariffUnitEnum>> {
  * public:
- *     attrName##DataClass(attrType& aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage) {}
- *     ~attrName##DataClass() = default;
+ *     TariffUnitDataClass(Nullable<Globals::TariffUnitEnum>& storage) 
+ *         : CTC_BaseDataClass(storage) {}
  * };
  * @endcode
- * 
- * @see CTC_BaseDataClass for base functionality
  */
 #define X(attrName, attrType) \
 class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
 public: \
     attrName##DataClass(attrType& aValueStorage) \
         : CTC_BaseDataClass<attrType>(aValueStorage) {} \
+    ~attrName##DataClass() override = default; \
 };
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
+/** @} */ // end of attribute_management
+
+/**
+ * @class CommodityTariffPrimaryData
+ * @brief Container for primary tariff attribute storage
+ * 
+ * This class holds the storage for all primary tariff attributes that define
+ * the tariff configuration. It serves as the data backbone for tariff operations.
+ */
 class CommodityTariffPrimaryData {
 public:
     CommodityTariffPrimaryData() = default;
     virtual ~CommodityTariffPrimaryData() = default;
 
-// 1. First declare storage
-#define X(attrName, attrType) \
-    attrType m##attrName;
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+    // Primary attribute storage
+#define X(attrName, attrType) attrType m##attrName;
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X    
 };
 
-class CommodityTariffDataProvider
-{
+/**
+ * @class CommodityTariffDataProvider
+ * @brief Core tariff data management and processing class
+ *
+ * This class provides:
+ * - Storage for both primary and current attributes
+ * - Tariff update processing pipeline
+ * - Attribute access methods
+ * - Data validation and change management
+ */
+class CommodityTariffDataProvider {
 public:
-    CommodityTariffDataProvider()          = default;
+    CommodityTariffDataProvider() = default;
     virtual ~CommodityTariffDataProvider() = default;
 
+    /**
+     * @brief Set the endpoint ID for this tariff instance
+     * @param aEndpoint The Matter endpoint identifier
+     */
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
+    // Pure virtual interface methods
+    virtual Protocols::InteractionModel::Status 
+    GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId,
+                    Structs::DayEntryStruct::Type & aDayEntry) = 0;
 
-    virtual Protocols::InteractionModel::Status GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId,
-                                                                Structs::DayEntryStruct::Type & aDayEntry) = 0;
+    virtual Protocols::InteractionModel::Status 
+    GetTariffComponentInfoById(DataModel::Nullable<uint32_t> aTariffComponentId,
+                              DataModel::Nullable<chip::CharSpan> & label,
+                              DataModel::List<const uint32_t> & dayEntryIDs,
+                              Structs::TariffComponentStruct::Type & aTariffComponent) = 0;
 
-    virtual Protocols::InteractionModel::Status GetTariffComponentInfoById(DataModel::Nullable<uint32_t>  aTariffComponentId,
-                                                                           DataModel::Nullable<chip::CharSpan> & label,
-                                                                           DataModel::List<const uint32_t> & dayEntryIDs,
-                                                                           Structs::TariffComponentStruct::Type & aTariffComponent) = 0;
+    /**
+     * @brief Process incoming tariff data updates
+     * @param newData The new tariff data to apply
+     * 
+     * This method implements a three-phase update process:
+     * 1. Initial validation (TariffDataUpd_Init)
+     * 2. Cross-field validation (TariffDataUpd_CrossValidator)
+     * 3. Commit or abort (TariffDataUpd_Commit/Abort)
+     */
+    void TariffDataUpdate(const CommodityTariffPrimaryData& newData);
 
-                              
-    void TariffDataUpdate(const CommodityTariffPrimaryData& newData)
-    {
-        if (!newData.IsValid())
-        {
-            ChipLogError(NotSpecified, "EGW-CTC: Tariff data rejected due to inconsistencies");
-        }
-        else
-        {
-    #define X(attrName, attrType) \
-            Set##attrName(newData.m##attrName);
-        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-    #undef X
-            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
-        }
-    }
-
-/**
- * @brief Standard getter methods for Primary attributes
- * 
- * These methods provide access to the Primary tariff attributes stored in mTariffData.
- * 
- * The following getters are generated (one for each attribute in COMMODITY_TARIFF_PRIMARY_ATTRIBUTES):
- * @code
- * attrType& Get<attrName>()
- * @endcode
- * Where:
- * - <attrName> is the name of each Primary attribute
- * - Returns a reference to the attribute's value
- */
+    // Attribute accessors
 #define X(attrName, attrType) \
-    attrType& Get##attrName() { return mTariffData.attrName.GetValue(); }
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+    attrType& Get##attrName() { return attrName##_MgmtObj.GetValue(); }
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
-/**
- * @brief Standard getter methods for Current attributes
- * 
- * These methods provide access to the Current tariff attributes stored in mCurrentData.
- */
 #define X(attrName, attrType) \
     attrType& Get##attrName() { return m##attrName; }
-COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
 #undef X
 
 private:
-    /*  */
+    // Current attribute storage
+#define X(attrName, attrType) attrType m##attrName;
+    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+#undef X
+
+    // Primary attribute storage and management
     CommodityTariffPrimaryData mTariffData;
 
-    /**
-     * @def X(attrName, attrType)
-     * @brief Macro generating attribute-specific data management objects
-     */
+    // Attribute management objects
 #define X(attrName, attrType) \
-    attrName##DataClass attrName{m##attrName};
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+    attrName##DataClass attrName##_MgmtObj{mTariffData.m##attrName};
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
+    //Primary attrs update pipeline methods
+    bool TariffDataUpd_Init(const CommodityTariffPrimaryData& aNewData);
+    void TariffDataUpd_Commit();
+    void TariffDataUpd_Abort();
+    virtual bool TariffDataUpd_CrossValidator();
 
-#define X(attrName, attrType) \
-    attrType m##attrName;
-COMMODITY_TARIFF_CURRENT_ATTRIBUTES
-#undef X
-
-/**
- * @brief Standard setter methods for Primary attributes
- **/
-#define X(attrName, attrType) \
-CHIP_ERROR Set##attrName(const attrType& newValue) { \
-    if (mTariffData.attrName.Update(newValue)) { \
-        ChipLogProgress(NotSpecified, "EGW-CTC: The attr %s updated", #attrName);\
-        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, Attributes::attrName::Id); \
-    } \
-    return CHIP_NO_ERROR; \
-}
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-
+    //Current attrs (time depended) update methods 
     void UpdateCurrentAttrs();
     static void MidnightTimerCallback(chip::System::Layer *, void * callbackContext);
+
 protected:
-    EndpointId mEndpointId = 0;
+    EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
 };
 
+/**
+ * @class CommodityTariffServer
+ * @brief Matter server implementation for the Commodity Tariff cluster
+ *
+ * This class handles:
+ * - Attribute access interface
+ * - Command handling
+ * - Cluster feature management
+ */
 class CommodityTariffServer : public AttributeAccessInterface,
-                              public CommandHandlerInterface
-{
+                             public CommandHandlerInterface {
 public:
-    CommodityTariffServer(EndpointId aEndpointId, CommodityTariffDataProvider & aDelegate, BitMask<Feature> aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mFeature(aFeature)
-    {
-        /* set the base class delegates endpointId */
-        mDelegate.SetEndpointId(aEndpointId);
-    }
+    /**
+     * @brief Construct a new Commodity Tariff Server instance
+     * @param aEndpointId The Matter endpoint ID
+     * @param aDelegate The data provider delegate
+     * @param aFeature Bitmask of supported features
+     */
+    CommodityTariffServer(EndpointId aEndpointId, 
+                         CommodityTariffDataProvider & aDelegate, 
+                         BitMask<Feature> aFeature);
 
     ~CommodityTariffServer() { Shutdown(); }
 
     CHIP_ERROR Init();
     void Shutdown();
 
+    /**
+     * @brief Check if a feature is supported
+     * @param aFeature The feature to check
+     * @return true if supported, false otherwise
+     */
     bool HasFeature(Feature aFeature) const;
 
 private:
     CommodityTariffDataProvider & mDelegate;
     BitMask<Feature> mFeature;
 
-    // Internal Application API to set attribute values
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    // AttributeAccessInterface implementation
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, 
+                   AttributeValueEncoder & aEncoder) override;
 
-    // CommandHandlerInterface
+    // CommandHandlerInterface implementation
     void InvokeCommand(HandlerContext & handlerContext) override;
 
-    void HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData);
-    void HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData);
+    // Command handlers
+    void HandleGetDayEntry(HandlerContext & ctx, 
+                          const Commands::GetDayEntry::DecodableType & commandData);
+    void HandleGetTariffComponent(HandlerContext & ctx, 
+                                 const Commands::GetTariffComponent::DecodableType & commandData);
 };
 
 } // namespace CommodityTariff
