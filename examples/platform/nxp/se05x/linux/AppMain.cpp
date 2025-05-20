@@ -143,6 +143,8 @@
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
 
+extern CHIP_ERROR se05x_close_session(void);
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -213,8 +215,6 @@ app::Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInsta
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 auto exampleAccessRestrictionProvider = std::make_unique<ExampleAccessRestrictionProvider>();
 #endif
-
-extern CHIP_ERROR se05x_close_session(void);
 
 void EnableThreadNetworkCommissioning()
 {
@@ -845,6 +845,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationShutdown();
 
+    // Close SE05x session
+    se05x_close_session();
+
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif
@@ -861,9 +864,6 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if ENABLE_TRACING
     tracing_setup.StopTracing();
 #endif
-
-    // Close SE05x session
-    se05x_close_session();
 
     Cleanup();
 }
