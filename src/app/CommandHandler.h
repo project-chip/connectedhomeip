@@ -33,10 +33,11 @@ namespace chip {
 namespace app {
 
 /**
- *  A handler for incoming Invoke interactions.
+ *  A handler for incoming Invoke interactions.  This handles incoming Invoke
+ *  Request messages and generates Invoke Response messages.
  *
- *  Allows adding responses to be sent in an InvokeResponse: see the various
- *  "Add*" methods.
+ *  Allows adding responses (status, or server to client command) to be sent in
+ *  the Invoke Response message: see the various "Add*" methods.
  *
  *  Allows adding the responses asynchronously when using `CommandHandler::Handle`
  *  (see documentation for `CommandHandler::Handle` for details)
