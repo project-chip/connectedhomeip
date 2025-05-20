@@ -18,6 +18,7 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/core/Global.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -32,7 +33,7 @@ static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[
 
 namespace {
 
-RegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>> gServer;
+Global<RegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>>> gServer;
 
 } // namespace
 
@@ -40,9 +41,9 @@ void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
     // NOTE: we assume code-generation logic is always correct here (we assert at least kFixedClusterConfig settings)
     //       so no error checks are done.
-    (void) CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
+    (void) CodegenDataModelProvider::Instance().Registry().Register(gServer->Registration());
 }
 void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
 {
-    (void) CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
+    (void) CodegenDataModelProvider::Instance().Registry().Unregister(&gServer->Cluster());
 }
