@@ -22,21 +22,15 @@
  *          for the Realtek platform.
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <crypto/CHIPCryptoPAL.h>
-// #include <platform/Bee/DiagnosticDataProviderImpl.h>
-#include <platform/FreeRTOS/SystemTimeSupport.h>
-// #include <platform/Bee/SystemTimeSupport.h>
 #include "chip_porting.h"
+#include <crypto/CHIPCryptoPAL.h>
+#include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 namespace chip {
 namespace DeviceLayer {
-// namespace Internal {
-// CHIP_ERROR InitLwIPCoreLock(void);
-// }
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
@@ -44,20 +38,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
-    // Make sure the LwIP core lock has been initialized
-    // err = Internal::InitLwIPCoreLock();
-
-    //    SuccessOrExit(err);
-
-    //    mStartTime = System::SystemClock().GetMonotonicTimestamp();
     err = System::Clock::InitClock_RealTime();
     SuccessOrExit(err);
-
-    // TODO Wi-Fi Initialzation currently done through the example app needs to be moved into here.
-    // for now we will let this happen that way and assume all is OK
-
-    // Initialize LwIP.
-    tcpip_init(NULL, NULL);
 
     chip::Crypto::add_entropy_source(app_entropy_source, NULL, 1);
 

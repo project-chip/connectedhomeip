@@ -58,6 +58,13 @@ config("openthread_k32w1_config") {
   } else if (nxp_nvm_component == "nvs") {
     defines += [ "CONFIG_SETTINGS_RUNTIME=1" ]
   }
+
+  cflags = [
+    "-Wno-shadow",
+    "-Wno-sign-compare",
+    "-Wno-address",
+    "-Wno-implicit-fallthrough",
+  ]
 }
 
 source_set("openthread_core_config_k32w1") {

@@ -1,5 +1,5 @@
 # Copyright (c) 2021 Project CHIP Authors
-# Copyright 2023-2024 NXP
+# Copyright 2023-2025 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 assert(chip_device_platform == "nxp")
 
 declare_args() {
+  # Enable secondary network interface
+  chip_enable_secondary_nwk_if = false
+
   # Enable OTA encryption
   chip_with_ota_encryption = false
 
@@ -183,10 +186,12 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    if (!nxp_build_matter_standalone_lib) {
-      deps += [ "${chip_root}/third_party/openthread:openthread" ]
-      public_deps +=
-          [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    deps += [ "${chip_root}/third_party/openthread:openthread" ]
+
+    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+
+    if (nxp_enable_matter_cli) {
+      public_deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
     }
 
     if (chip_mdns == "platform") {
@@ -207,6 +212,11 @@ static_library("nxp_platform") {
       }
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+  }
+
+  if (chip_enable_ethernet) {
+    include_dirs = [ "../../common/Ethernet/" ]
+    sources += [ "../../common/Ethernet/NxpEthDriver.cpp" ]
   }
 
   if (nxp_use_factory_data) {

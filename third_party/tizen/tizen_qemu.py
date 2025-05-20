@@ -113,7 +113,7 @@ if args.share:
     # Add directory sharing.
     qemu_args += [
         '-virtfs',
-        'local,path=%s,mount_tag=host0,security_model=none' % args.share
+        'local,path=%s,mount_tag=host0,security_model=mapped-xattr' % args.share
     ]
 
 if args.virtio_net:

@@ -28,6 +28,7 @@ namespace Clusters {
 namespace ColorControl {
 namespace Commands {
 namespace MoveToHue {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -69,15 +70,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToHue.
 namespace MoveHue {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -114,15 +113,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveHue.
 namespace StepHue {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -164,15 +161,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace StepHue.
 namespace MoveToSaturation {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -209,15 +204,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToSaturation.
 namespace MoveSaturation {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -254,15 +247,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveSaturation.
 namespace StepSaturation {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -304,15 +295,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace StepSaturation.
 namespace MoveToHueAndSaturation {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -354,15 +343,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToHueAndSaturation.
 namespace MoveToColor {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -404,15 +391,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToColor.
 namespace MoveColor {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -449,15 +434,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveColor.
 namespace StepColor {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -499,15 +482,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace StepColor.
 namespace MoveToColorTemperature {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -544,15 +525,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToColorTemperature.
 namespace EnhancedMoveToHue {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -594,15 +573,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedMoveToHue.
 namespace EnhancedMoveHue {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -639,15 +616,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedMoveHue.
 namespace EnhancedStepHue {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -689,15 +664,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedStepHue.
 namespace EnhancedMoveToHueAndSaturation {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -739,15 +712,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedMoveToHueAndSaturation.
 namespace ColorLoopSet {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -799,15 +770,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace ColorLoopSet.
 namespace StopMoveStep {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -834,15 +803,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace StopMoveStep.
 namespace MoveColorTemperature {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -889,15 +856,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
 
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveColorTemperature.
 namespace StepColorTemperature {
+
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -948,9 +913,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
             err = DataModel::Decode(reader, optionsOverride);
-        }
-        else
-        {
         }
 
         ReturnErrorOnFailure(err);

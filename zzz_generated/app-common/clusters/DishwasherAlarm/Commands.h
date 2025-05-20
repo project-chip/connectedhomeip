@@ -69,6 +69,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<AlarmBitmap> alarms = static_cast<chip::BitMask<AlarmBitmap>>(0);
 
@@ -84,8 +85,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<AlarmBitmap> alarms = static_cast<chip::BitMask<AlarmBitmap>>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Reset
@@ -101,6 +104,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ModifyEnabledAlarms::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<AlarmBitmap> mask = static_cast<chip::BitMask<AlarmBitmap>>(0);
 
@@ -116,8 +120,10 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ModifyEnabledAlarms::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<AlarmBitmap> mask = static_cast<chip::BitMask<AlarmBitmap>>(0);
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ModifyEnabledAlarms

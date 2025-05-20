@@ -42,6 +42,21 @@ public:
         mLastError = DataModel::Encode(mWriter, TLV::ContextTag(contextTag), std::forward<Args>(args)...);
     }
 
+    template <typename... Args>
+    void EncodeForWrite(uint8_t contextTag, Args &&... args)
+    {
+        VerifyOrReturn(mLastError == CHIP_NO_ERROR);
+        mLastError = DataModel::EncodeForWrite(mWriter, TLV::ContextTag(contextTag), std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    void EncodeForRead(uint8_t contextTag, FabricIndex accessingFabricIndex, Args &&... args)
+    {
+        VerifyOrReturn(mLastError == CHIP_NO_ERROR);
+        mLastError =
+            DataModel::EncodeForRead(mWriter, TLV::ContextTag(contextTag), accessingFabricIndex, std::forward<Args>(args)...);
+    }
+
     CHIP_ERROR Finalize();
 
 private:

@@ -54,32 +54,56 @@ public:
               chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * requestorServer);
 
     /**
+     * @brief Sends a SolicitOffer command to the remote device.
+     *
+     * This method populates the SolicitOffer command parameters, requests that the Provider initiates
+     * a new session with the Offer / Answer flow.
+     *
+     * @param streamUsage            An enum value describing how the stream is intended to be used.
+     * @param originatingEndpointId  The endpoint ID that initiates the offer.
+     * @param videoStreamId          Optional Video stream ID if relevant.
+     * @param audioStreamId          Optional Audio stream ID if relevant.
+     *
+     * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
+     */
+    CHIP_ERROR
+    SolicitOffer(chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+
+    /**
      * @brief Sends a ProvideOffer command to the remote device.
      *
      * This method populates the ProvideOffer command parameters, buffers the SDP locally to ensure
      * the data remains valid for the asynchronous command flow, and then requests a device connection
      * to eventually send the command.
      *
-     * @param webRTCSessionID        Nullable ID for the WebRTC session.
+     * @param webRTCSessionId        Nullable ID for the WebRTC session.
      * @param sdp                    The raw SDP (Session Description Protocol) data as a standard string.
      * @param streamUsage            An enum value describing how the stream is intended to be used.
-     * @param originatingEndpointID  The endpoint ID that initiates the offer.
-     * @param videoStreamID          Optional Video stream ID if relevant.
-     * @param audioStreamID          Optional Audio stream ID if relevant.
-     * @param ICEServers             Optional list of ICE server structures, if using custom STUN/TURN servers.
-     * @param ICETransportPolicy     Optional policy for ICE transport (e.g., 'all', 'relay', etc.).
+     * @param originatingEndpointId  The endpoint ID that initiates the offer.
+     * @param videoStreamId          Optional Video stream ID if relevant.
+     * @param audioStreamId          Optional Audio stream ID if relevant.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR
-    ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionID, std::string sdp,
-                 chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointID,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamID,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamID,
-                 chip::Optional<
-                     chip::app::DataModel::List<const chip::app::Clusters::WebRTCTransportProvider::Structs::ICEServerStruct::Type>>
-                     ICEServers,
-                 chip::Optional<chip::CharSpan> ICETransportPolicy);
+    ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp,
+                 chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+
+    /**
+     * @brief Sends a ProvideAnswer command to the remote device.
+     *
+     * Invoke this after you have received an *Offer* and generated the local SDP answer for the same WebRTC session.
+     *
+     * @param webRTCSessionId   The unique identifier for the established WebRTC session negotiated in the earlier *Offer*.
+     * @param sdp               The raw SDP (Session Description Protocol) data as a standard string.
+     *
+     * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
+     */
+    CHIP_ERROR ProvideAnswer(uint16_t webRTCSessionId, const std::string & sdp);
 
     /**
      * @brief Sends a ProvideICECandidates command to the remote device.
@@ -89,24 +113,34 @@ public:
      * to inform the remote side about potential network endpoints it can use to establish or
      * enhance a WebRTC session.
      *
-     * @param webRTCSessionID   The unique identifier for the WebRTC session to which these
+     * @param webRTCSessionId   The unique identifier for the WebRTC session to which these
      *                          ICE candidates apply.
      * @param ICECandidates     A list of ICE candidate strings. Each string typically follows
      *                          the "candidate:" syntax defined in the ICE specification.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
 
     /**
-     * @brief Notify WebRTCProviderClient that the remote decryptor has been received.
+     * @brief Notify WebRTCProviderClient that the Offer command has been received.
+     *
+     * Hanlde the stream requestor with WebRTC session details. It is sent following the receipt of a SolicitOffer
+     * command or a re-Offer initiated by the Provider.
+     *
+     * @param webRTCSessionId   The unique identifier for the WebRTC session.
+     */
+    void HandleOfferReceived(uint16_t webRTCSessionId);
+
+    /**
+     * @brief Notify WebRTCProviderClient that the Answer command has been received.
      *
      * This allows the client to take appropriate transitions upon receiving
      * confirmation that the remote decryptor has been received.
      *
-     * @param webRTCSessionID   The unique identifier for the WebRTC session.
+     * @param webRTCSessionId   The unique identifier for the WebRTC session.
      */
-    void NotifyRemoteDecryptorReceived(uint16_t webRTCSessionID);
+    void HandleAnswerReceived(uint16_t webRTCSessionId);
 
     /////////// CommandSender Callback Interface /////////
     virtual void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
@@ -134,6 +168,7 @@ private:
         Idle,             ///< Default state, no communication initiated yet
         Connecting,       ///< Waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
         AwaitingResponse, ///< Waiting for command response from camera
+        AwaitingOffer,    ///< Waiting for Offer command from camera
         AwaitingAnswer,   ///< Waiting for Answer command from camera
     };
 
@@ -169,6 +204,8 @@ private:
 
     static void OnSessionEstablishTimeout(chip::System::Layer * systemLayer, void * appState);
 
+    void HandleSolicitOfferResponse(chip::TLV::TLVReader & data);
+
     void HandleProvideOfferResponse(chip::TLV::TLVReader & data);
 
     // Private data members
@@ -183,8 +220,12 @@ private:
     chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * mRequestorServer = nullptr;
 
     // Data needed to send the WebRTCTransportProvider commands
+    chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Type mSolicitOfferData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
+    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
+    chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum mCurrentStreamUsage =
+        chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum::kUnknownEnumValue;
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;

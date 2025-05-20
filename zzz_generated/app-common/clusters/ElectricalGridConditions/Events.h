@@ -74,39 +74,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace CurrentConditionsChanged
-namespace ForecastConditionsChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kForecastConditions = 0,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::ForecastConditionsChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    DataModel::Nullable<DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>> forecastConditions;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::ForecastConditionsChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalGridConditions::Id; }
-
-    DataModel::Nullable<DataModel::DecodableList<Structs::ElectricalGridConditionsStruct::DecodableType>> forecastConditions;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace ForecastConditionsChanged
 } // namespace Events
 } // namespace ElectricalGridConditions
 } // namespace Clusters

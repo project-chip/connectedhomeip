@@ -12,9 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ClosureDimension {
 namespace Attributes {
-namespace Current {
+namespace CurrentState {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace Current
+} // namespace CurrentState
 
 namespace Target {
 inline constexpr AttributeId Id = 0x00000001;
@@ -63,10 +63,6 @@ inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
-
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
 
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

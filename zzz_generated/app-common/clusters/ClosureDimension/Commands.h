@@ -71,9 +71,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTarget::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::Percent100ths> position;
-    Optional<TargetLatchEnum> latch;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -88,10 +89,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetTarget::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::Percent100ths> position;
-    Optional<TargetLatchEnum> latch;
+    Optional<bool> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetTarget
@@ -109,6 +112,7 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
     uint16_t numberOfSteps      = static_cast<uint16_t>(0);
@@ -126,10 +130,12 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
     uint16_t numberOfSteps      = static_cast<uint16_t>(0);
     Optional<Globals::ThreeLevelAutoEnum> speed;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Step

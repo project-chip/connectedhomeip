@@ -36,6 +36,7 @@
 #include <clusters/OperationalCredentials/Attributes.h>
 #include <clusters/OperationalCredentials/Commands.h>
 #include <clusters/OperationalCredentials/Events.h>
+#include <clusters/OperationalCredentials/Metadata.h>
 #include <clusters/OperationalCredentials/Structs.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
@@ -63,12 +64,12 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
+constexpr auto kDACCertificate = CertificateChainTypeEnum::kDACCertificate;
+constexpr auto kPAICertificate = CertificateChainTypeEnum::kPAICertificate;
+
 void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, NodeOperationalCertStatusEnum status,
                      uint8_t index, const CharSpan & debug_text);
 NodeOperationalCertStatusEnum ConvertToNOCResponseStatus(CHIP_ERROR err);
-
-constexpr auto kDACCertificate = CertificateChainTypeEnum::kDACCertificate;
-constexpr auto kPAICertificate = CertificateChainTypeEnum::kPAICertificate;
 
 CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
                                                              FabricIndex fabricIndex, uint64_t subject)
@@ -247,10 +248,11 @@ OperationalCredentialsAttrAccess gAttrAccess;
 
 CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aPath.mClusterId == Clusters::OperationalCredentials::Id);
-
     switch (aPath.mAttributeId)
     {
+    case Attributes::ClusterRevision::Id: {
+        return aEncoder.Encode(kRevision);
+    }
     case Attributes::NOCs::Id: {
         return ReadNOCs(aPath.mEndpointId, aEncoder);
     }
@@ -299,6 +301,23 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
 
     FabricIndex fabricIndex = event->FailSafeTimerExpired.fabricIndex;
+
+    // Report Fabrics table change if SetVIDVerificationStatement had been called.
+    // There are 4 cases:
+    //   1- Fail-safe started, AddNOC/UpdateNOC for fabric A, VVS set for fabric A after that: Need to mark dirty here.
+    //   2- Fail-safe started, UpdateNOC/AddNOC for fabric A, VVS set for fabric B after that: No need to mark dirty.
+    //   3- Fail-safe started, no UpdateNOC/AddNOC, VVS set for fabric X: No need to mark dirty.
+    //   4- ail-safe started, VVS set for fabric A, UpdateNOC for fabric A: No need to mark dirty.
+    //
+    // Right now we will mark dirty no matter what, as the state-keeping logic for cases 2-4 above
+    // was very complex and more likely to be less maintainable than possibly over-reporting Fabrics
+    // attribute in this corner case of fail-safe expiry.
+    if (event->FailSafeTimerExpired.setVidVerificationStatementHasBeenInvoked)
+    {
+        // Opcreds cluster is always on Endpoint 0.
+        // Only `Fabrics` attribute is reported since `NOCs` is not reportable (`C` quality).```
+        MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+    }
 
     // If an AddNOC or UpdateNOC command has been successfully invoked, terminate all CASE sessions associated with the Fabric
     // whose Fabric Index is recorded in the Fail-Safe context (see ArmFailSafe Command) by clearing any associated Secure
@@ -1232,8 +1251,62 @@ bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::SetVIDVerificationStatement::DecodableType & commandData)
 {
-    (void) commandData;
-    commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+
+    FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
+    ChipLogProgress(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
+                    static_cast<unsigned>(fabricIndex));
+
+    if (!commandData.vendorID.HasValue() && !commandData.VIDVerificationStatement.HasValue() && !commandData.vvsc.HasValue())
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
+    if (commandData.vendorID.HasValue() && !IsVendorIdValidOperationally(commandData.vendorID.Value()))
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    auto & fabricTable = Server::GetInstance().GetFabricTable();
+
+    bool fabricChangesOccurred = false;
+    CHIP_ERROR err             = fabricTable.SetVIDVerificationStatementElements(
+        fabricIndex, commandData.vendorID, commandData.VIDVerificationStatement, commandData.vvsc, fabricChangesOccurred);
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+    }
+    else if (err == CHIP_ERROR_INCORRECT_STATE)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        // We have no idea what happened; just report failure.
+        StatusIB status(err);
+        commandObj->AddStatus(commandPath, status.mStatus);
+    }
+    else
+    {
+        commandObj->AddStatus(commandPath, Status::Success);
+    }
+
+    // Handle dirty-marking if anything changed. Only `Fabrics` attribute is reported since `NOCs`
+    // is not reportable (`C` quality).
+    if (fabricChangesOccurred)
+    {
+        auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+        failSafeContext.RecordSetVidVerificationStatementHasBeenInvoked();
+
+        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::Fabrics::Id);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "SetVIDVerificationStatement failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
     return true;
 }
 
