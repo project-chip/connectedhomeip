@@ -79,7 +79,7 @@ static_library("efr32") {
   public_deps = [
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",
-    "../platformAbstraction:platform-abstraction",
+    "${silabs_platform_dir}/platformAbstraction:gsdk",
   ]
   deps = [
     "${chip_root}/src/app/common:ids",

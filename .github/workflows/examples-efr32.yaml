@@ -42,6 +42,7 @@ jobs:
 
     container:
       image: ghcr.io/project-chip/chip-build-efr32:140
+
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:

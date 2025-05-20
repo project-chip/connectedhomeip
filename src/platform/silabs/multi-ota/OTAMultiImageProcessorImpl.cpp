@@ -22,9 +22,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_driver.h"
 #include "sl_si91x_hal_soc_soft_reset.h"
@@ -33,9 +31,7 @@ extern "C" {
 #include "btl_interface.h"
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
 #endif              // SLI_SI91X_MCU_INTERFACE
-#ifdef __cplusplus
 }
-#endif
 
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;

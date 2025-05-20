@@ -43,10 +43,13 @@ source_set("multi-ota") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${sl_provision_root}:headers",
-    "../platformAbstraction:platform-abstraction",
   ]
   if (chip_enable_wifi) {
     deps += [ "${silabs_platform_dir}/wifi:wifi-platform" ]
+  }
+
+  if (chip_enable_wifi && wifi_soc == true) {
+    deps += [ "../platformAbstraction:wisemcu" ]
   }
 
   #  OTA processor for SiWx917 family
@@ -58,6 +61,7 @@ source_set("multi-ota") {
   # OTA processor for EFR32 host
   if (wifi_soc == false) {
     sources += [ "OTAFirmwareProcessor.cpp" ]
+    deps += [ "../platformAbstraction:gsdk" ]
   }
 
   if (chip_enable_multi_ota_encryption) {

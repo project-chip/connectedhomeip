@@ -131,10 +131,17 @@ silabs_executable("window_app") {
   ]
 
   if (wifi_soc) {
-    deps += [ "${examples_plat_dir}:siwx917-common" ]
+    deps += [
+      "${chip_root}/src/platform/silabs/platformAbstraction:wisemcu",
+      "${examples_plat_dir}:siwx917-common",
+    ]
   } else {
-    deps += [ "${examples_plat_dir}:efr32-common" ]
+    deps += [
+      "${chip_root}/src/platform/silabs/platformAbstraction:gsdk",
+      "${examples_plat_dir}:efr32-common",
+    ]
   }
+
   ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]

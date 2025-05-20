@@ -124,8 +124,27 @@ public:
 
     virtual ~OTATlvProcessor() {}
 
+    /**
+     * @brief Initialize the TLV processor.
+     *
+     * Prepares the processor for use by verifying the descriptor callback is registered
+     * and initializing the data accumulator.
+     *
+     * @note If overridden, the implementation should ensure all necessary state is initialized
+     *       and ready for processing OTA data.
+     */
     virtual CHIP_ERROR Init();
+
+    /**
+     * @brief Clear the TLV processor state.
+     *
+     * Resets internal state, clears the data accumulator, and resets descriptor processing state.
+     *
+     * @note If overridden, the implementation should ensure all processor state is reset and
+     *       ready for reuse or deallocation.
+     */
     virtual CHIP_ERROR Clear();
+
     virtual CHIP_ERROR ApplyAction()    = 0;
     virtual CHIP_ERROR FinalizeAction() = 0;
     virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
