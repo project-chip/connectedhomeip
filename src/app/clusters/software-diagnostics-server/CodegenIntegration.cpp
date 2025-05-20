@@ -18,7 +18,6 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <lib/core/Global.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -34,7 +33,7 @@ static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[
 
 namespace {
 
-Global<LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>>> gServer;
+LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>> gServer;
 
 } // namespace
 
