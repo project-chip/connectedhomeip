@@ -1,3 +1,22 @@
+
+/**
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+ 
 /**
  * @file CommodityTariffServer.h
  * @brief Header for Matter Commodity Tariff Cluster implementation
@@ -38,18 +57,24 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
  * Primary attributes represent the fundamental tariff configuration that can only 
  * be changed by authorized tariff updates. These are typically set by utility providers.
  */
-#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES \
-    X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>) \
+#define COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS \
     X(TariffUnit,                   DataModel::Nullable<Globals::TariffUnitEnum>) \
     X(StartDate,                    DataModel::Nullable<uint32_t>) \
     X(DefaultRandomizationOffset,   DataModel::Nullable<int16_t>) \
-    X(DefaultRandomizationType,     DataModel::Nullable<DayEntryRandomizationTypeEnum>) \
+    X(DefaultRandomizationType,     DataModel::Nullable<DayEntryRandomizationTypeEnum>)
+
+#define COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES \
+    X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>) \
     X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>)  \
     X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>) \
     X(TariffPeriods,                DataModel::List<Structs::TariffPeriodStruct::Type>) \
     X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
     X(IndividualDays,               DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>) \
     X(CalendarPeriods,              DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>)
+
+#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES \
+    COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS \
+    COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 
 /**
  * @def COMMODITY_TARIFF_CURRENT_ATTRIBUTES
@@ -106,8 +131,24 @@ public: \
     attrName##DataClass(attrType& aValueStorage) \
         : CTC_BaseDataClass<attrType>(aValueStorage) {} \
     ~attrName##DataClass() override = default; \
+protected: \
+    CHIP_ERROR ValidateValue(const attrType& newValue) const override; \
 };
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
+#undef X
+
+#define X(attrName, attrType) \
+class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
+public: \
+    attrName##DataClass(attrType& aValueStorage) \
+        : CTC_BaseDataClass<attrType>(aValueStorage) {} \
+    ~attrName##DataClass() override = default; \
+protected: \
+    CHIP_ERROR ValidateValue(const attrType& newValue) const override; \
+    bool CompareStructValue(const PayloadType& source, const PayloadType& destination) const override; \
+    void CleanupStructValue(const PayloadType& aValue) override; \
+};
+COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 #undef X
 
 /** @} */ // end of attribute_management

@@ -62,7 +62,7 @@ CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, 
     {
     case TariffInfo::Id:
         return aEncoder.Encode(mDelegate.GetTariffInfo());
-    case TariffUnit::Id:
+    /*case TariffUnit::Id:
         return aEncoder.Encode(mDelegate.GetTariffUnit());
     case StartDate::Id:
         return aEncoder.Encode(mDelegate.GetStartDate());
@@ -106,7 +106,7 @@ CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, 
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
         return aEncoder.Encode(mDelegate.GetDefaultRandomizationType());
-
+*/
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return aEncoder.Encode(mFeature);

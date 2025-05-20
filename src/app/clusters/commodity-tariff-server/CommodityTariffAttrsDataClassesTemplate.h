@@ -28,8 +28,6 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
-#define LOG_VAR_CH(changed) ChipLogProgress(NotSpecified, "EGW-CTC: Attr value %s", changed ? "changed": "not changed" )
-
 /**
  * @class CTC_BaseDataClass
  * @tparam T The attribute value type (nullable, list, or primitive)
@@ -186,15 +184,13 @@ public:
      * - List types: initialized as empty list
      * - Others: left uninitialized
      */
-    explicit CTC_BaseDataClass(T& aValueStorage) : mValue(aValueStorage) {
+    explicit CTC_BaseDataClass(T& aValueStorage) : mValue(aValueStorage), mNewValue(mValue) {
         if constexpr ( IsValueNullable() ) {
             mValue.SetNull();
-            mNewValue.SetNull();
         }
         else if constexpr ( IsValueList() )
         {
             mValue = ValueType();
-            mNewValue = ValueType();
         }
     }
 
@@ -379,7 +375,6 @@ protected:
             }
         }
 
-        LOG_VAR_CH(is_neq);
         return is_neq;
     }
 
