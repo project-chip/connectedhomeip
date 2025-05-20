@@ -60,6 +60,7 @@ config("se05x_config") {
     "repo/hostlib/hostLib/platform/inc",
     "repo/hostlib/hostLib/libCommon/smCom",
     "repo/hostlib/hostLib/libCommon/smCom/T1oI2C",
+    "repo/hostlib/hostLib/accessManager/inc",
   ]
 
   if(chip_se05x_auth == "scp03") {
