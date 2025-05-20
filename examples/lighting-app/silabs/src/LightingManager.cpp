@@ -22,6 +22,7 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <clusters/ColorControl/AttributeIds.h>
 #include <clusters/LevelControl/AttributeIds.h>
 #include <lib/support/TypeTraits.h>

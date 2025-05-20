@@ -204,9 +204,9 @@ RgbColor_t RGBLEDWidget::ConvertXYZToRGB(float X, float Y, float Z)
     b = ApplyGammaCorrection(b);
 
     // Clamp the gamma-corrected RGB values to the range 0.0 to 1.0
-    r = clamp(r, 0.0f, 1.0f);
-    g = clamp(g, 0.0f, 1.0f);
-    b = clamp(b, 0.0f, 1.0f);
+    r = std::clamp(r, 0.0f, 1.0f);
+    g = std::clamp(g, 0.0f, 1.0f);
+    b = std::clamp(b, 0.0f, 1.0f);
 
     // Convert the clamped RGB values to the 0-255 range
     RgbColor_t rgb = NormalizeRgb(r, g, b);
