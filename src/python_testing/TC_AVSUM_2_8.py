@@ -69,7 +69,8 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ) and
-                             has_cluster(Clusters.CameraAvStreamManagement))
+                             has_feature(Clusters.CameraAvStreamManagement,
+                                         Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo))
     async def test_TC_AVSUM_2_8(self):
         clusterAVSTR = Clusters.Objects.CameraAvStreamManagement
         attributesAVSTR = clusterAVSTR.Attributes
