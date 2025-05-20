@@ -203,8 +203,8 @@
             "MaxPathsPerInvoke"
         ],
         "Bridged Device Basic Information": [
-             "ProductAppearance",
-             "DeviceLocation"
+            "ProductAppearance",
+            "DeviceLocation"
         ],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
@@ -790,3 +790,4 @@
         "showProfileId": false
     }
 }
+
