@@ -163,7 +163,7 @@ class TC_G_2_2(MatterBaseTest):
                     break
             asserts.assert_true(group_found, f"Group with name '{kGroupName1}' not found in the GroupTable")
         else:
-            logger.info("Skipping GroupName check: Feature GroupNames not supported by DUT")
+            self.mark_current_step_skipped()
 
         self.step("3")
         kGroupName2 = "Gp2"
@@ -186,10 +186,10 @@ class TC_G_2_2(MatterBaseTest):
                     break
             asserts.assert_true(group_found, f"Group with name '{kGroupName2}' not found in the GroupTable")
         else:
-            logger.info("Skipping GroupName check: Feature GroupNames not supported by DUT")
+            self.mark_current_step_skipped()
 
         self.step("5")
-        group_names = [f"Gp{i}" for i in range(3, 13)]  # ["Gp3", "Gp4", ..., "Gp12"]
+        group_names = [f"Gp{i}" for i in range(2, maxgroups)]  # ["Gp3", "Gp4", ..., "(maxgroups-1)"]
         for i, group_name in enumerate(group_names, start=2):
             result = await th1.SendCommand(
                 self.dut_node_id,
@@ -202,31 +202,30 @@ class TC_G_2_2(MatterBaseTest):
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
         # Get the group IDs that were added in step 5
-        added_group_ids = [groupKeyMapStruct[i].groupId for i in range(2, 12)]
+        added_group_ids = [groupKeyMapStruct[i].groupId for i in range(2, maxgroups - 1)]
         # Verify that each group ID is present in the GroupTable list
         for group_id in added_group_ids:
             found = any(entry.groupId == group_id for entry in groupTableList)
             asserts.assert_true(found, f"GroupTable does not contain expected groupId 0x{group_id:04X}")
 
         self.step("7a")
-        # TH binds GroupID (maxgroups+1) == 13 || 0x000d with GroupKeySetID 1
-        kGroupId13 = maxgroups + 1
+        kGroupIdUnused = maxgroups + 1
         groupKeyMapStructMaxGroup: Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct = [
-            {"groupId": kGroupId13, "groupKeySetID": kGroupKeySetID, "fabricIndex": 1}]
+            {"groupId": kGroupIdUnused, "groupKeySetID": kGroupKeySetID, "fabricIndex": 1}]
         resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStructMaxGroup))])
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
         self.step("7b")
-        kGroupName13 = "Gp13"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId13, kGroupName13))
+        kGroupNameInUnused = "Gp13"
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupIdUnused, kGroupNameInUnused))
         asserts.assert_equal(result.status, Status.ResourceExhausted,
                              "Returned status is different from expected ResourceExhausted")
 
         self.step("8")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_true(all(entry.groupId != kGroupId13 for entry in groupTableList),
-                            f"Group ID {kGroupId13} was unexpectedly found in the group table")
+        asserts.assert_true(all(entry.groupId != kGroupIdUnused for entry in groupTableList),
+                            f"Group ID {kGroupIdUnused} was unexpectedly found in the group table")
 
         self.step("9")
         kGroupId = 0x0000
@@ -249,7 +248,7 @@ class TC_G_2_2(MatterBaseTest):
         if group_name_supported:
             asserts.assert_equal(result.groupName, kGroupName1, "Unexpected error GroupName does not match written value")
         else:
-            logger.info("Skipping GroupName check: Feature GroupNames not supported by DUT")
+            self.mark_current_step_skipped()
 
         self.step("13")
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.ViewGroup(kGroupId))
@@ -304,7 +303,7 @@ class TC_G_2_2(MatterBaseTest):
             asserts.assert_equal(result.status, Status.ConstraintError,
                                  "Unexpected error status must be CONSTRAINT_ERROR as the groupName is of length > 16")
         else:
-            logger.info("Skipping GroupName check: Feature GroupNames not supported by DUT")
+            self.mark_current_step_skipped()
 
         self.step("24")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
