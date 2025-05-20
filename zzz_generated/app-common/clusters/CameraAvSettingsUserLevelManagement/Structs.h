@@ -88,6 +88,29 @@ using DecodableType = Type;
 
 } // namespace MPTZPresetStruct
 namespace ViewportStruct = Clusters::detail::Structs::ViewportStruct;
+namespace DPTZStruct {
+enum class Fields : uint8_t
+{
+    kVideoStreamID = 0,
+    kViewport      = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t videoStreamID = static_cast<uint16_t>(0);
+    Structs::ViewportStruct::Type viewport;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DPTZStruct
 } // namespace Structs
 } // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters
