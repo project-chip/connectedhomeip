@@ -3,6 +3,7 @@
 /**
  *  @file
  *    This file contains definitions for accessors around clusters attributes.
+ *    This file is generated from Accessors.cpp.zapt 
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
