@@ -322,6 +322,10 @@
 #include <clusters/ModeSelect/Commands.h>
 #include <clusters/ModeSelect/Events.h>
 #include <clusters/ModeSelect/Structs.h>
+#include <clusters/Multicast/Attributes.h>
+#include <clusters/Multicast/Commands.h>
+#include <clusters/Multicast/Events.h>
+#include <clusters/Multicast/Structs.h>
 #include <clusters/NetworkCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Events.h>

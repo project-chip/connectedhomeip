@@ -143,6 +143,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "RvcOperationalState";
     case chip::app::Clusters::ScenesManagement::Id:
         return "ScenesManagement";
+    case chip::app::Clusters::Multicast::Id:
+        return "Multicast";
     case chip::app::Clusters::HepaFilterMonitoring::Id:
         return "HepaFilterMonitoring";
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
@@ -2058,6 +2060,25 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ScenesManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ScenesManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Multicast::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Multicast::Attributes::Targets::Id:
+            return "Targets";
+        case chip::app::Clusters::Multicast::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::Multicast::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::Multicast::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::Multicast::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::Multicast::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5508,6 +5529,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "GetSceneMembership";
         case chip::app::Clusters::ScenesManagement::Commands::CopyScene::Id:
             return "CopyScene";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Multicast::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Multicast::Commands::SetTarget::Id:
+            return "SetTarget";
+        case chip::app::Clusters::Multicast::Commands::RemoveTarget::Id:
+            return "RemoveTarget";
         default:
             return "Unknown";
         }

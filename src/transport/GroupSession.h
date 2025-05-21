@@ -21,6 +21,7 @@
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/Pool.h>
 #include <transport/Session.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Transport {
@@ -85,6 +86,8 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
+    bool IsMulticast() const { return mGroupId & Header::kMulticastGroupMask; }
+
 private:
     const GroupId mGroupId;
     const NodeId mPeerNodeId;
@@ -144,6 +147,8 @@ public:
     }
 
     GroupId GetGroupId() const { return mGroupId; }
+
+    bool IsMulticast() const { return mGroupId & Header::kMulticastGroupMask; }
 
 private:
     const GroupId mGroupId;

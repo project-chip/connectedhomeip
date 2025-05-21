@@ -2992,6 +2992,46 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Stru
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Multicast::Structs::MulticastTargetStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("MulticastTargetStruct.groupId", "groupId", value.isMember("groupId")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("MulticastTargetStruct.endpoints", "endpoints", value.isMember("endpoints")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "groupId");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.groupId, value["groupId"]));
+    valueCopy.removeMember("groupId");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoints");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoints, value["endpoints"]));
+    valueCopy.removeMember("endpoints");
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Multicast::Structs::MulticastTargetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.groupId);
+    ComplexArgumentParser::Finalize(request.endpoints);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+}
+
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
                              chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type & request,

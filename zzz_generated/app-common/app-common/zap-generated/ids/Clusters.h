@@ -93,6 +93,7 @@
 #include <clusters/MicrowaveOvenControl/ClusterId.h>
 #include <clusters/MicrowaveOvenMode/ClusterId.h>
 #include <clusters/ModeSelect/ClusterId.h>
+#include <clusters/Multicast/ClusterId.h>
 #include <clusters/NetworkCommissioning/ClusterId.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/ClusterId.h>
 #include <clusters/OccupancySensing/ClusterId.h>

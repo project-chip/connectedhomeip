@@ -626,6 +626,16 @@ void emberAfScenesManagementClusterShutdownCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfMulticastClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfMulticastClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -3712,6 +3722,45 @@ MatterScenesManagementClusterServerPreAttributeChangedCallback(const chip::app::
  * @param endpoint  Endpoint that is being served
  */
 void emberAfScenesManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Multicast Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfMulticastClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterMulticastClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfMulticastClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterMulticastClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterMulticastClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfMulticastClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // HEPA Filter Monitoring Cluster
@@ -7206,6 +7255,18 @@ bool emberAfDishwasherAlarmClusterResetCallback(
 bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
+/**
+ * @brief Multicast Cluster SetTarget Command callback (from client)
+ */
+bool emberAfMulticastClusterSetTargetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Multicast::Commands::SetTarget::DecodableType & commandData);
+/**
+ * @brief Multicast Cluster RemoveTarget Command callback (from client)
+ */
+bool emberAfMulticastClusterRemoveTargetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Multicast::Commands::RemoveTarget::DecodableType & commandData);
 /**
  * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
  */

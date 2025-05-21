@@ -214,6 +214,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType & value);
 
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Multicast::Structs::MulticastTargetStruct::DecodableType & value);
+
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value);

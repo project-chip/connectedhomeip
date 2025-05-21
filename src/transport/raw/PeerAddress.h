@@ -219,6 +219,8 @@ public:
 
     static PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF, remoteId); }
 
+    static PeerAddress Multicast() { return Multicast(0xab, 0xcdef); }
+
     static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
     {
         constexpr uint8_t scope        = 0x05; // Site-Local

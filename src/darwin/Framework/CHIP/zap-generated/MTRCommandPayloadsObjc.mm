@@ -15133,6 +15133,238 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRMulticastClusterSetTargetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _endpoints = [NSArray array];
+
+        _key = [NSData data];
+
+        _gracePeriod = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMulticastClusterSetTargetParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.endpoints = self.endpoints;
+    other.key = self.key;
+    other.gracePeriod = self.gracePeriod;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; endpoints:%@; key:%@; gracePeriod:%@; >", NSStringFromClass([self class]), _groupId, _endpoints, [_key base64EncodedStringWithOptions:0], _gracePeriod];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMulticastClusterSetTargetParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Multicast::Commands::SetTarget::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupId = self.groupId.unsignedShortValue;
+    }
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.endpoints)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.endpoints.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.endpoints.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.endpoints.count; ++i_0) {
+                    auto element_0 = MTR_SAFE_CAST(self.endpoints[i_0], NSNumber);
+                    if (!element_0) {
+                        // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.endpoints[i_0], NSStringFromClass(NSNumber.class));
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+                }
+                encodableStruct.endpoints = ListType_0(listHolder_0->mList, self.endpoints.count);
+            } else {
+                encodableStruct.endpoints = ListType_0();
+            }
+        }
+    }
+    {
+        encodableStruct.key = AsByteSpan(self.key);
+    }
+    {
+        encodableStruct.gracePeriod = self.gracePeriod.unsignedIntValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRMulticastClusterRemoveTargetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _endpoints = [NSArray array];
+
+        _gracePeriod = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMulticastClusterRemoveTargetParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.endpoints = self.endpoints;
+    other.gracePeriod = self.gracePeriod;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; endpoints:%@; gracePeriod:%@; >", NSStringFromClass([self class]), _groupId, _endpoints, _gracePeriod];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMulticastClusterRemoveTargetParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Multicast::Commands::RemoveTarget::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupId = self.groupId.unsignedShortValue;
+    }
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.endpoints)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.endpoints.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.endpoints.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.endpoints.count; ++i_0) {
+                    auto element_0 = MTR_SAFE_CAST(self.endpoints[i_0], NSNumber);
+                    if (!element_0) {
+                        // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.endpoints[i_0], NSStringFromClass(NSNumber.class));
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+                }
+                encodableStruct.endpoints = ListType_0(listHolder_0->mList, self.endpoints.count);
+            } else {
+                encodableStruct.endpoints = ListType_0();
+            }
+        }
+    }
+    {
+        encodableStruct.gracePeriod = self.gracePeriod.unsignedIntValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRHEPAFilterMonitoringClusterResetConditionParams
 - (instancetype)init
 {

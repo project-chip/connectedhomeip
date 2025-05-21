@@ -7180,6 +7180,63 @@ static id _Nullable DecodeAttributeValueForScenesManagementCluster(AttributeId a
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForMulticastCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Multicast;
+    switch (aAttributeId) {
+    case Attributes::Targets::Id: {
+        using TypeInfo = Attributes::Targets::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRMulticastClusterMulticastTargetStruct * newElement_0;
+                newElement_0 = [MTRMulticastClusterMulticastTargetStruct new];
+                newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.endpoints.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.endpoints = array_2;
+                }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    default: {
+        // Not a known Multicast attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -22393,6 +22450,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::ScenesManagement::Id: {
         return DecodeAttributeValueForScenesManagementCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::Multicast::Id: {
+        return DecodeAttributeValueForMulticastCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeAttributeValueForHEPAFilterMonitoringCluster(aPath.mAttributeId, aReader, aError);

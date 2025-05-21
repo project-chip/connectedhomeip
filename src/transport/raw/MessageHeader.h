@@ -155,6 +155,10 @@ enum SecFlagMask
     kSessionTypeMask = 0b00000011, ///< Mask to extract sessionType
 };
 
+// Use a subset of GroupID range for multicast
+// Old groups may be replaced completely
+constexpr uint16_t kMulticastGroupMask = 0x8000;
+
 using MsgFlags = BitFlags<MsgFlagValues>;
 using SecFlags = BitFlags<SecFlagValues>;
 
@@ -251,6 +255,11 @@ public:
     {
         // Check is based on spec 4.11.2
         return (IsGroupSession() && HasSourceNodeId() && HasDestinationGroupId() && !IsSecureSessionControlMsg());
+    }
+
+    bool IsValidMulticastMsg() const
+    {
+        return (IsGroupSession() && HasSourceNodeId() && HasDestinationGroupId() && HasDestinationNodeId() && !IsSecureSessionControlMsg());
     }
 
     bool IsValidMCSPMsg() const

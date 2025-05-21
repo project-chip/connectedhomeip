@@ -1000,6 +1000,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRMulticastClusterSetTargetParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMulticastClusterRemoveTargetParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRHEPAFilterMonitoringClusterResetConditionParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

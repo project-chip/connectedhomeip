@@ -95,6 +95,7 @@
 #include <clusters/MicrowaveOvenControl/Enums.h>
 #include <clusters/MicrowaveOvenMode/Enums.h>
 #include <clusters/ModeSelect/Enums.h>
+#include <clusters/Multicast/Enums.h>
 #include <clusters/NetworkCommissioning/Enums.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Enums.h>
 #include <clusters/OccupancySensing/Enums.h>

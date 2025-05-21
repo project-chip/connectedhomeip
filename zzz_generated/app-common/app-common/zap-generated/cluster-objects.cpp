@@ -322,6 +322,10 @@
 #include <clusters/ModeSelect/Commands.ipp>
 #include <clusters/ModeSelect/Events.ipp>
 #include <clusters/ModeSelect/Structs.ipp>
+#include <clusters/Multicast/Attributes.ipp>
+#include <clusters/Multicast/Commands.ipp>
+#include <clusters/Multicast/Events.ipp>
+#include <clusters/Multicast/Structs.ipp>
 #include <clusters/NetworkCommissioning/Attributes.ipp>
 #include <clusters/NetworkCommissioning/Commands.ipp>
 #include <clusters/NetworkCommissioning/Events.ipp>
@@ -1000,6 +1004,17 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::ScenesManagement::Commands::GetSceneMembership::Id:
             return true;
         case Clusters::ScenesManagement::Commands::CopyScene::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::Multicast::Id: {
+        switch (aCommand)
+        {
+        case Clusters::Multicast::Commands::SetTarget::Id:
+            return true;
+        case Clusters::Multicast::Commands::RemoveTarget::Id:
             return true;
         default:
             return false;

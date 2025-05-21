@@ -71,6 +71,7 @@ Generally regenerate using one of:
 |         96 |       0x60 | OperationalState                                        |
 |         97 |       0x61 | RvcOperationalState                                     |
 |         98 |       0x62 | ScenesManagement                                        |
+|        100 |       0x64 | Multicast                                               |
 |        113 |       0x71 | HepaFilterMonitoring                                    |
 |        114 |       0x72 | ActivatedCarbonFilterMonitoring                         |
 |        128 |       0x80 | BooleanStateConfiguration                               |

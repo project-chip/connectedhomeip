@@ -196,13 +196,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
 
     auto destination = kUndefinedNodeId;
-    if (packetHeader.GetDestinationNodeId().HasValue())
-    {
-        destination = packetHeader.GetDestinationNodeId().Value();
-    }
-    else if (session->IsSecureSession())
+    if (session->IsSecureSession())
     {
         destination = session->AsSecureSession()->GetLocalNodeId();
+    }
+    else if (packetHeader.GetDestinationNodeId().HasValue())
+    {
+        destination = packetHeader.GetDestinationNodeId().Value();
     }
 
     //

@@ -85,6 +85,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/MicrowaveOvenControl" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/MicrowaveOvenMode" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ModeSelect" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/Multicast" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/NetworkCommissioning" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/NitrogenDioxideConcentrationMeasurement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/OccupancySensing" + invoker.target,

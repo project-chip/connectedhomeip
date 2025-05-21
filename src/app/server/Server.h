@@ -38,6 +38,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/MulticastDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
@@ -288,6 +289,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
+        chip::Multicast::DataProvider::Instance().Initialize(this->persistentStorageDelegate, this->sessionKeystore);
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));

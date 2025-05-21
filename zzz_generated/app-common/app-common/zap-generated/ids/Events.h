@@ -93,6 +93,7 @@
 #include <clusters/MicrowaveOvenControl/EventIds.h>
 #include <clusters/MicrowaveOvenMode/EventIds.h>
 #include <clusters/ModeSelect/EventIds.h>
+#include <clusters/Multicast/EventIds.h>
 #include <clusters/NetworkCommissioning/EventIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/EventIds.h>
 #include <clusters/OccupancySensing/EventIds.h>

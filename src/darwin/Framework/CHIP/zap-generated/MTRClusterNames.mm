@@ -195,6 +195,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeScenesManagementID:
         result = @"ScenesManagement";
         break;
+    case MTRClusterIDTypeMulticastID:
+        result = @"Multicast";
+        break;
     case MTRClusterIDTypeHEPAFilterMonitoringID:
         result = @"HEPAFilterMonitoring";
         break;
@@ -3731,6 +3734,42 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known ScenesManagement attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMulticastID:
+
+        switch (attributeID) {
+
+            // Cluster Multicast attributes
+        case MTRAttributeIDTypeClusterMulticastAttributeTargetsID:
+            result = @"Targets";
+            break;
+
+        case MTRAttributeIDTypeClusterMulticastAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMulticastAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMulticastAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterMulticastAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterMulticastAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known Multicast attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -10448,6 +10487,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeMulticastID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterMulticastCommandSetTargetID:
+            result = @"SetTarget";
+            break;
+
+        case MTRCommandIDTypeClusterMulticastCommandRemoveTargetID:
+            result = @"RemoveTarget";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeHEPAFilterMonitoringID:
 
         switch (commandID) {
@@ -13022,6 +13079,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeMulticastID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeHEPAFilterMonitoringID:
 
         switch (commandID) {
@@ -14936,6 +15003,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeScenesManagementID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMulticastID:
 
         switch (eventID) {
 

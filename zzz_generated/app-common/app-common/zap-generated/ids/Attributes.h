@@ -93,6 +93,7 @@
 #include <clusters/MicrowaveOvenControl/AttributeIds.h>
 #include <clusters/MicrowaveOvenMode/AttributeIds.h>
 #include <clusters/ModeSelect/AttributeIds.h>
+#include <clusters/Multicast/AttributeIds.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/AttributeIds.h>
 #include <clusters/OccupancySensing/AttributeIds.h>

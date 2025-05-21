@@ -20,6 +20,7 @@
 
 #include <commands/icd/ICDCommand.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <credentials/MulticastDataProvider.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -150,6 +151,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(sGroupDataProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupDataProvider);
     factoryInitParams.groupDataProvider = &sGroupDataProvider;
+    chip::Multicast::DataProvider::Instance().Initialize(&mDefaultStorage, factoryInitParams.sessionKeystore);
 
     uint16_t port = mDefaultStorage.GetListenPort();
     if (port != 0)

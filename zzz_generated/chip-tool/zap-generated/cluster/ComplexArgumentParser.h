@@ -347,6 +347,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagemen
 
 static void Finalize(chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Multicast::Structs::MulticastTargetStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Multicast::Structs::MulticastTargetStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
                         Json::Value & value);

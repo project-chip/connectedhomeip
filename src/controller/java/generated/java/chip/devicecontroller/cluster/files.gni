@@ -139,6 +139,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/MicrowaveOvenModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ModeSelectClusterModeOptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ModeSelectClusterSemanticTagStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/MulticastClusterMulticastTargetStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkCommissioningClusterNetworkInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkCommissioningClusterThreadInterfaceScanResultStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkCommissioningClusterWiFiInterfaceScanResultStruct.kt",
