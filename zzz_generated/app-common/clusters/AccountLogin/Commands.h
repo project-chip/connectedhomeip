@@ -120,8 +120,7 @@ public:
 
     chip::CharSpan setupPIN;
 
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
