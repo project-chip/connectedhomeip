@@ -14377,7 +14377,7 @@ private:
 | * MPTZPosition                                                      | 0x0000 |
 | * MaxPresets                                                        | 0x0001 |
 | * MPTZPresets                                                       | 0x0002 |
-| * DPTZRelativeMove                                                  | 0x0003 |
+| * DPTZStreams                                                       | 0x0003 |
 | * ZoomMax                                                           | 0x0004 |
 | * TiltMin                                                           | 0x0005 |
 | * TiltMax                                                           | 0x0006 |
@@ -29842,7 +29842,7 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<ReadAttribute>(Id, "mptzposition", Attributes::MPTZPosition::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "max-presets", Attributes::MaxPresets::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "mptzpresets", Attributes::MPTZPresets::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "dptzrelative-move", Attributes::DPTZRelativeMove::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "dptzstreams", Attributes::DPTZStreams::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "zoom-max", Attributes::ZoomMax::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "tilt-min", Attributes::TiltMin::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //
@@ -29861,8 +29861,9 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type>>>(
             Id, "mptzpresets", Attributes::MPTZPresets::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
-            Id, "dptzrelative-move", Attributes::DPTZRelativeMove::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type>>>(
+            Id, "dptzstreams", Attributes::DPTZStreams::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "zoom-max", 0, UINT8_MAX, Attributes::ZoomMax::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<int16_t>>(Id, "tilt-min", INT16_MIN, INT16_MAX, Attributes::TiltMin::Id,
@@ -29888,7 +29889,7 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<SubscribeAttribute>(Id, "mptzposition", Attributes::MPTZPosition::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "max-presets", Attributes::MaxPresets::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "mptzpresets", Attributes::MPTZPresets::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "dptzrelative-move", Attributes::DPTZRelativeMove::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "dptzstreams", Attributes::DPTZStreams::Id, credsIssuerConfig),                     //
         make_unique<SubscribeAttribute>(Id, "zoom-max", Attributes::ZoomMax::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "tilt-min", Attributes::TiltMin::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //

@@ -17787,7 +17787,7 @@ public class ClusterIDMapping {
             MPTZPosition(0L),
             MaxPresets(1L),
             MPTZPresets(2L),
-            DPTZRelativeMove(3L),
+            DPTZStreams(3L),
             ZoomMax(4L),
             TiltMin(5L),
             TiltMax(6L),
@@ -20430,12 +20430,12 @@ public class ClusterIDMapping {
             WriteOnlyInt8u(16426L),
             NullableGlobalEnum(16435L),
             NullableGlobalStruct(16436L),
-            MeiInt8u(4294070017L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
             FeatureMap(65532L),
-            ClusterRevision(65533L),;
+            ClusterRevision(65533L),
+            MeiInt8u(4294070017L),;
             private final long id;
             Attribute(long id) {
                 this.id = id;

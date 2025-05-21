@@ -18207,8 +18207,8 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         }
         return value;
     }
-    case Attributes::DPTZRelativeMove::Id: {
-        using TypeInfo = Attributes::DPTZRelativeMove::TypeInfo;
+    case Attributes::DPTZStreams::Id: {
+        using TypeInfo = Attributes::DPTZStreams::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -18220,8 +18220,14 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct * newElement_0;
+                newElement_0 = [MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct new];
+                newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID];
+                newElement_0.viewport = [MTRCameraAVSettingsUserLevelManagementClusterViewportStruct new];
+                newElement_0.viewport.x1 = [NSNumber numberWithUnsignedShort:entry_0.viewport.x1];
+                newElement_0.viewport.y1 = [NSNumber numberWithUnsignedShort:entry_0.viewport.y1];
+                newElement_0.viewport.x2 = [NSNumber numberWithUnsignedShort:entry_0.viewport.x2];
+                newElement_0.viewport.y2 = [NSNumber numberWithUnsignedShort:entry_0.viewport.y2];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -20294,6 +20300,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
                 } else {
                     newElement_0.certificate = nil;
                 }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -20357,6 +20364,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
                 } else {
                     newElement_0.intermediateCertificates = nil;
                 }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

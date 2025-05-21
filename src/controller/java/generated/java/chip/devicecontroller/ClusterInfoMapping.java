@@ -18543,7 +18543,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.DPTZRelativeMoveAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterDPTZStreamsAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.DPTZStreamsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -18551,9 +18551,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

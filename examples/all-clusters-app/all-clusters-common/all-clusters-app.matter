@@ -3113,12 +3113,12 @@ cluster ModeSelect = 80 {
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
   attribute optional nullable int8u onMode = 5;
-  readonly attribute optional int8u manufacturerExtension = 4293984257;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute optional int8u manufacturerExtension = 4293984257;
 
   request struct ChangeToModeRequest {
     int8u newMode = 0;
@@ -6298,7 +6298,7 @@ cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -7296,10 +7296,15 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     int16u y2 = 3;
   }
 
+  struct DPTZStruct {
+    int16u videoStreamID = 0;
+    ViewportStruct viewport = 1;
+  }
+
   readonly attribute optional MPTZStruct MPTZPosition = 0;
   readonly attribute optional int8u maxPresets = 1;
   readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
-  readonly attribute optional int16u DPTZRelativeMove[] = 3;
+  readonly attribute optional DPTZStruct DPTZStreams[] = 3;
   readonly attribute optional int8u zoomMax = 4;
   readonly attribute optional int16s tiltMin = 5;
   readonly attribute optional int16s tiltMax = 6;
@@ -7350,7 +7355,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 
   /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
   command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
-  /** This command SHALL move the device by the delta values relative to the currently defined position. */
+  /** This command SHALL move the camera by the delta values relative to the currently defined position. */
   command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
   /** This command SHALL move the camera to the positions specified by the Preset passed. */
   command MPTZMoveToPreset(MPTZMoveToPresetRequest): DefaultSuccess = 2;
@@ -7360,7 +7365,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   command MPTZRemovePreset(MPTZRemovePresetRequest): DefaultSuccess = 4;
   /** This command allows for setting the digital viewport for a specific Video Stream. */
   command DPTZSetViewport(DPTZSetViewportRequest): DefaultSuccess = 5;
-  /** This command SHALL change the viewports location by the amount specified in a relative fashion. */
+  /** This command SHALL change the per stream viewport by the amount specified in a relative fashion. */
   command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
 }
 
@@ -7625,12 +7630,12 @@ internal cluster UnitTesting = 4294048773 {
   attribute optional int8u writeOnlyInt8u = 16426;
   attribute nullable TestGlobalEnum nullableGlobalEnum = 16435;
   attribute nullable TestGlobalStruct nullableGlobalStruct = 16436;
-  attribute int8u meiInt8u = 4294070017;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  attribute int8u meiInt8u = 4294070017;
 
   response struct TestSpecificResponse = 0 {
     int8u returnValue = 0;
@@ -8217,7 +8222,7 @@ endpoint 0 {
     callback attribute currentHeapUsed;
     callback attribute currentHeapHighWatermark;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command ResetWatermarks;
   }
@@ -9708,7 +9713,7 @@ endpoint 1 {
     callback attribute MPTZPosition;
     ram      attribute maxPresets default = 5;
     callback attribute MPTZPresets;
-    callback attribute DPTZRelativeMove;
+    callback attribute DPTZStreams;
     ram      attribute zoomMax default = 100;
     ram      attribute tiltMin default = -90;
     ram      attribute tiltMax default = 90;
