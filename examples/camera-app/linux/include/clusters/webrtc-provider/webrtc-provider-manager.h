@@ -123,7 +123,7 @@ private:
 
     // Each string in this vector represents a local ICE candidate used to facilitate the negotiation
     // of peer-to-peer connections through NATs (Network Address Translators) and firewalls.
-    std::vector<ICECandidateStruct> mLocalCandidates;
+    std::vector<std::string> mLocalCandidates;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;

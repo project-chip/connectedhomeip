@@ -173,9 +173,8 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        auto candidateStr               = std::string(candidate);
-        ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidateStr.c_str()) };
-        mLocalCandidates.push_back(iceCandidate);
+        std::string candidateStr = std::string(candidate);
+        mLocalCandidates.push_back(candidateStr);
         ChipLogProgress(Camera, "Local Candidate:");
         ChipLogProgress(Camera, "%s", candidateStr.c_str());
     });
@@ -269,9 +268,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    auto ICECandidates = chip::app::DataModel::List<const ICECandidateStruct>(mLocalCandidates.data(), mLocalCandidates.size());
-
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, ICECandidates);
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, mLocalCandidates);
 
     if (err != CHIP_NO_ERROR)
     {

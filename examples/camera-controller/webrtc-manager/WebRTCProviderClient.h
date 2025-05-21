@@ -121,7 +121,7 @@ public:
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, chip::app::DataModel::List<const ICECandidateStruct> ICECandidates);
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<std::string> & iceCandidates);
 
     /**
      * @brief Notify WebRTCProviderClient that the Offer command has been received.
@@ -229,6 +229,10 @@ private:
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;
+
+    // Store the ICECandidates here to use to send asynchronously.
+    std::vector<std::string> mClientICECandidates;
+    std::vector<ICECandidateStruct> mICECandidateStructList;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;

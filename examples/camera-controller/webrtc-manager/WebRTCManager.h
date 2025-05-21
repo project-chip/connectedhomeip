@@ -68,5 +68,7 @@ private:
     std::shared_ptr<rtc::DataChannel> mDataChannel;
 
     std::string mLocalDescription;
-    std::vector<ICECandidateStruct> mLocalCandidates;
+    // Local vector to store the ICE Candidate strings coming from the WebRTC
+    // stack
+    std::vector<std::string> mLocalCandidates;
 };

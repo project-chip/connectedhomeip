@@ -78,9 +78,8 @@ void WebRTCProviderManager::Init()
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        auto candidateStr               = std::string(candidate);
-        ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidateStr.c_str()) };
-        mLocalCandidates.push_back(iceCandidate);
+        std::string candidateStr = std::string(candidate);
+        mLocalCandidates.push_back(candidateStr);
         ChipLogProgress(Camera, "Local Candidate:");
         ChipLogProgress(Camera, "%s", candidateStr.c_str());
     });
@@ -574,10 +573,15 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto iceCandidateList = DataModel::List<const ICECandidateStruct>(mLocalCandidates.data(), mLocalCandidates.size());
+    std::vector<ICECandidateStruct> iceCandidateStructList;
+    for (const auto & candidate : mLocalCandidates)
+    {
+        ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidate.c_str()) };
+        iceCandidateStructList.push_back(iceCandidate);
+    }
 
     command.webRTCSessionID = mCurrentSessionId;
-    command.ICECandidates   = iceCandidateList;
+    command.ICECandidates = DataModel::List<const ICECandidateStruct>(iceCandidateStructList.data(), iceCandidateStructList.size());
 
     // Now invoke the command using the found session handle
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);

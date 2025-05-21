@@ -162,8 +162,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideAnswer(uint16_t webRTCSessionId, const s
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId,
-                                                      DataModel::List<const ICECandidateStruct> ICECandidates)
+CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<std::string> & iceCandidates)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -176,9 +175,18 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId,
     // Store the command type
     mCommandType = CommandType::kProvideICECandidates;
 
+    // Store ICE Candidates.
+    mClientICECandidates = iceCandidates;
+
+    for (const auto & candidate : mClientICECandidates)
+    {
+        ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidate.c_str()) };
+        mICECandidateStructList.push_back(iceCandidate);
+    }
     // Stash data in class members so the CommandSender can safely reference them async
     mProvideICECandidatesData.webRTCSessionID = webRTCSessionId;
-    mProvideICECandidatesData.ICECandidates   = ICECandidates;
+    mProvideICECandidatesData.ICECandidates =
+        chip::app::DataModel::List<const ICECandidateStruct>(mICECandidateStructList.data(), mICECandidateStructList.size());
 
     // Attempt to find or establish a CASE session to the target PeerId.
     InteractionModelEngine * engine     = InteractionModelEngine::GetInstance();
