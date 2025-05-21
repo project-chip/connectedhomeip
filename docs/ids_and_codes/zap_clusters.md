@@ -143,6 +143,8 @@ Generally regenerate using one of:
 |       1792 |      0x700 | CommodityTariff                                         |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
+|       1874 |      0x752 | JointFabricDatastore                                    |
+|       1875 |      0x753 | JointFabricAdministrator                                |
 |       2049 |      0x801 | TlsCertificateManagement                                |
 |       2050 |      0x802 | TlsClientManagement                                     |
 |       2822 |      0xB06 | MeterIdentification                                     |
