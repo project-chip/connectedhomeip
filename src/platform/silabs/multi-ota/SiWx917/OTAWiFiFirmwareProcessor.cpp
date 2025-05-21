@@ -20,8 +20,6 @@
 #include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-// TODO: Add this dependency when integrating the multi-OTA encryption feature
-// #include <platform/silabs/SilabsConfig.h>
 
 extern "C" {
 #include "sl_si91x_driver.h"
@@ -46,26 +44,26 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
     }
 
 #if SL_MATTER_ENABLE_OTA_ENCRYPTION
-    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.GetData(), mAccumulator.GetThreshold());
-    memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
-    memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
+    MutableByteSpan byteblock = MutableByteSpan(mAccumulator.GetData(), mAccumulator.GetThreshold());
+    memcpy(&byteblock[0], &byteblock[requestedOtaMaxBlockSize], mUnalignmentNum);
+    memcpy(&byteblock[mUnalignmentNum], block.data(), block.size());
 
     if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
     {
-        uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
-        mAlignmentNum          = mAlignmentNum * 16;
-        mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
-        memcpy(&mBlock[requestedOtaMaxBlockSize], &mBlock[mAlignmentNum], mUnalignmentNum);
-        mBlock.reduce_size(mAlignmentNum);
+        uint32_t alignmentnum = (mUnalignmentNum + block.size()) / 16;
+        alignmentnum          = alignmentnum * 16;
+        mUnalignmentNum       = (mUnalignmentNum + block.size()) % 16;
+        memcpy(&byteblock[requestedOtaMaxBlockSize], &byteblock[alignmentnum], mUnalignmentNum);
+        byteblock.reduce_size(alignmentnum);
     }
     else
     {
         mUnalignmentNum = mUnalignmentNum + block.size() - requestedOtaMaxBlockSize;
-        mBlock.reduce_size(requestedOtaMaxBlockSize);
+        byteblock.reduce_size(requestedOtaMaxBlockSize);
     }
 
-    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
-    block = mBlock;
+    OTATlvProcessor::vOtaProcessInternalEncryption(byteblock);
+    block = byteblock;
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     if (mFWchunktype == SL_FWUP_RPS_HEADER)
@@ -75,8 +73,8 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
                             ChipLogError(SoftwareUpdate, "Block too small for RPS header"));
 
         // Use spans to reference header and content directly
-        ByteSpan rpsHeaderSpan(block.data(), kAlignmentBytes);
-        ByteSpan rpsContentSpan(block.data() + kAlignmentBytes, block.size() - kAlignmentBytes);
+        ByteSpan rpsHeaderSpan  = block.subSpan(0, kAlignmentBytes);
+        ByteSpan rpsContentSpan = block.subSpan(kAlignmentBytes);
 
         // Send RPS header
         status       = sl_si91x_fwup_start(rpsHeaderSpan.data());
@@ -100,10 +98,10 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
+CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(const ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.GetData())));
+    ReturnErrorOnFailure(mCallbackProcessDescriptor(reinterpret_cast<void *>(mAccumulator.GetData())));
 
     mDescriptorProcessed = true;
     mAccumulator.Clear();
