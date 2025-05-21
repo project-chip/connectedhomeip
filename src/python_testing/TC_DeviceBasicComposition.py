@@ -191,6 +191,7 @@ from chip.testing.taglist_and_topology_test import (create_device_type_list_for_
                                                     get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from chip.tlv import uint
 from TC_DeviceConformance import get_supersets
+from chip.exceptions import ChipStackError
 
 
 def get_vendor_id(mei: int) -> int:
@@ -676,22 +677,26 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         # Wildcard reads of events: event list MUST NOT be empty since at least a boot event should be registered.
         self.print_step(12, "Validate that event wildcard subscription works")
-        subscription = None
+
+        test_failure = None
         try:
             subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
                                                                    events=[('*')],
                                                                    fabricFiltered=False,
                                                                    reportInterval=(100, 1000))
-        except Exception as e:
-            self.record_error(self.get_test_name(),
-                              problem=f"Failed to wildcard subscribe events(*): {e}", location=UnknownProblemLocation())
+            if len(subscription.GetEvents()) == 0:
+                test_failure = 'Wildcard event subscription returned no events'
+        except ChipStackError as e:
+            # Connection over PASE will fail subscriptions with "Unsupported access"
+            # TODO: ideally we should SKIP this test for PASE connections
+            _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
+            if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
+                test_failure = f"Failed to wildcard subscribe events(*): {e}"
 
-        if subscription is None:
-            self.fail_current_test()
-            return
+        if test_failure:
+            self.record_error(self.get_test_name(), problem=test_failure, location=UnknownProblemLocation())
+            self.fail_current_test(test_failure)
 
-        if len(subscription.GetEvents()) == 0:
-            self.fail_current_test('Wildcard event subscription returned no events')
 
     def test_TC_IDM_11_1(self):
         success = True
