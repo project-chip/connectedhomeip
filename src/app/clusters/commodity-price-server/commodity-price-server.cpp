@@ -248,9 +248,9 @@ Instance::GetDetailedForecastRequest(BitMask<CommodityPriceDetailBitmap> details
 
     if (bufferSize == 0)
     {
-        /* Special case when no forcast entries exist - calling calloc(0) returns NULL
+        /* Special case when no forecast entries exist - calling calloc(0) returns NULL
            and results in an error on some platforms */
-        forecastList = DataModel::List<const Structs::CommodityPriceStruct::Type>(Span<Structs::CommodityPriceStruct::Type>());
+        forecastList = DataModel::List<const Structs::CommodityPriceStruct::Type>();
 
         return CHIP_NO_ERROR;
     }
