@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/ConnectivityUtils.h>

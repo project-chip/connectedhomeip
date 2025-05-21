@@ -150,14 +150,8 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
-public:
-    void
-    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
-    {
-        mpStatusChangeCallback = statusChangeCallback;
-    }
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-
+public:
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -202,7 +196,13 @@ private:
 
 public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
-    void ReportEthernetName();
+    void UpdateEthernetNetworkingStatus();
+
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }

@@ -19,7 +19,6 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <lib/support/SafePointerCast.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DeviceControlServer.h>
@@ -103,13 +102,16 @@ static void StopSignalHandler(int signum)
 }
 #endif
 
-void ConnectivityManagerImpl::ReportEthernetName()
+void ConnectivityManagerImpl::UpdateEthernetNetworkingStatus()
 {
     if (mpStatusChangeCallback != nullptr)
     {
-        ByteSpan ifNameSpan(reinterpret_cast<unsigned char *>(mEthIfName),
-                            strnlen(mEthIfName, Inet::InterfaceId::kMaxIfNameLength));
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ifNameSpan), NullOptional);
+        if (mEthIfName[0] != '\0')
+        {
+            ByteSpan ifNameSpan(reinterpret_cast<unsigned char *>(mEthIfName),
+                                strnlen(mEthIfName, Inet::InterfaceId::kMaxIfNameLength));
+            mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ifNameSpan), NullOptional);
+        }
     }
 }
 
