@@ -114,3 +114,5 @@ To enable SCP03 authentication with SE05x, build the example with option
 ```
 gn gen out --args="chip_se05x_auth=\"scp03\""
 ```
+
+Ensure to enable CMAC (MBEDTLS_CMAC_C) in mbedtls config file used.
