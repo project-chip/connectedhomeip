@@ -194,7 +194,6 @@ class AVSUMTestBase:
         aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
         aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
         aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
-        aMaxEncodedPixelRate = await self.read_avstr_attribute_expect_success(endpoint, attrs.MaxEncodedPixelRate)
 
         try:
             response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
