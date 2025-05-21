@@ -55,7 +55,7 @@ class DLL_EXPORT NFCBase : public Base
     enum class State
     {
         kNotReady    = 0, /**< State before initialization. */
-        kInitialized = 1, /**< State after class is connected and ready. */
+        kInitialized = 1, /**< State after initialization. */
         kConnected   = 2, /**< Endpoint connected. */
     };
 

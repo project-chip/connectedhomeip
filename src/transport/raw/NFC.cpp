@@ -62,9 +62,22 @@ CHIP_ERROR NFCBase::Init(const NfcListenParameters & params)
     return CHIP_NO_ERROR;
 }
 
+// Check if it is possible to communicate with this Peer
 bool NFCBase::CanSendToPeer(const Transport::PeerAddress & address)
 {
-    return chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().CanSendToPeer(address);
+    if (mState == State::kNotReady) {
+        ChipLogError(Controller, "Invalid state in NFCBase::CanSendToPeer()");
+        return false;
+    }
+
+    bool canSendToPeer = chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().CanSendToPeer(address);
+    if (canSendToPeer) {
+        mState = State::kConnected;
+    } else {
+        mState = State::kInitialized;
+    }
+
+    return canSendToPeer;
 }
 
 void NFCBase::OnNfcTagResponse(const Transport::PeerAddress & address, System::PacketBufferHandle && buffer)
@@ -82,7 +95,7 @@ void NFCBase::OnNfcTagError(const Transport::PeerAddress & address)
 CHIP_ERROR NFCBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     VerifyOrReturnError(address.GetTransportType() == Type::kNfc, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mState != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::kConnected, CHIP_ERROR_INCORRECT_STATE);
 
     chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().SendToNfcTag(address, std::move(msgBuf));
 
