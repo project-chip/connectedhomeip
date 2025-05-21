@@ -49,9 +49,9 @@ import time
 import typing
 import uuid
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 from enum import Enum, auto
 from pathlib import Path
+from datetime import datetime, timedelta
 
 import chip.clusters as Clusters
 import cv2
