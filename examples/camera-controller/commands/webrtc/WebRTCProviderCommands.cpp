@@ -21,7 +21,7 @@
 #include <commands/interactive/InteractiveCommands.h>
 #include <thread>
 #include <unistd.h>
-#include <webrtc_manager/WebRTCManager.h>
+#include <webrtc-manager/WebRTCManager.h>
 
 using namespace ::chip;
 

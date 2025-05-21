@@ -270,7 +270,7 @@
 
 - (BOOL)diagnosticLogTransferInProgress
 {
-    NSNumber * diagnosticLogTransferInProgressNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceCachePrimed], NSNumber);
+    NSNumber * diagnosticLogTransferInProgressNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress], NSNumber);
     return diagnosticLogTransferInProgressNumber.boolValue;
 }
 
