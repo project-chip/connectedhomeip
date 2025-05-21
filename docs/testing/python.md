@@ -521,21 +521,25 @@ self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 ```
 
 In the case that a test script requires the use of named-pipe commands to
-achieve the manual steps, you can use the `write_to_app_pipe(command,app_pipe)` to send
-these commands. This command requires value for `app_pipe`, if not sent in the method it will use 
+achieve the manual steps, you can use the method `write_to_app_pipe(command,app_pipe)` to send
+these commands. This method requires value for `app_pipe`, if not sent in the method it will use 
 argument from the CMD or CI argument `--app-pipe` which contains the
 string value with the name of the pipe. This value depends on how the app is set up.
 
-If you would like the name of the app_pipe to be dynamic you need to set up the ID of
-the application using an environment variable, for example for the app `ALL_CLUSTERS_APP` 
-the ID should be named as following `ALL_CLUSTERS_APP_ID` before the execution of the app
-and the test case.
+If you would like the name of the app_pipe to be dynamic you need to send the app-id to the application 
+and send the full path which includes the app-id to the test script.
 
 
+Default without `app-id`
 ```bash
-export ALL_CLUSTERS_APP_ID='11111'
 ./out/darwin-arm64-all-clusters/chip-all-clusters-app
-python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/chip_all_clusters_fifo_${ALL_CLUSTERS_APP_ID}  --int-arg PIXIT.REFALM.AlarmThreshold:1
+python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/chip_all_clusters_fifo_  --int-arg PIXIT.REFALM.AlarmThreshold:1
+```
+
+Using custom `app-id`.
+```bash
+./out/darwin-arm64-all-clusters/chip-all-clusters-app --app-id 9001
+python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/chip_all_clusters_fifo_9001  --int-arg PIXIT.REFALM.AlarmThreshold:1
 ```
 
 ### Running on a separate machines
