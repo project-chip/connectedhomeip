@@ -172,7 +172,7 @@ add_library(
 
 chip_configure_data_model(chip_main
     INCLUDE_SERVER
-    ZAP_FILE ${matter_example_path}/../../lock-common/lock-app.zap
+    ZAP_FILE ${matter_example_path}/../data_model/lock-app.zap
 )
 
 if (matter_enable_rpc)
