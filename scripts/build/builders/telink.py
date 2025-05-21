@@ -159,6 +159,7 @@ class TelinkBuilder(Builder):
                  enable_factory_data: bool = False,
                  enable_4mb_flash: bool = False,
                  mars_board_config: bool = False,
+                 tl7218x_ml7g_board_config: bool = False,
                  usb_board_config: bool = False,
                  compress_lzma_config: bool = False,
                  thread_analyzer_config: bool = False,
@@ -174,6 +175,7 @@ class TelinkBuilder(Builder):
         self.enable_factory_data = enable_factory_data
         self.enable_4mb_flash = enable_4mb_flash
         self.mars_board_config = mars_board_config
+        self.tl7218x_ml7g_board_config = tl7218x_ml7g_board_config
         self.usb_board_config = usb_board_config
         self.compress_lzma_config = compress_lzma_config
         self.thread_analyzer_config = thread_analyzer_config
@@ -218,6 +220,9 @@ class TelinkBuilder(Builder):
 
         if self.mars_board_config:
             flags.append("-DTLNK_MARS_BOARD=y")
+
+        if self.tl7218x_ml7g_board_config:
+            flags.append("-DTLNK_7218X_ML7G_BOARD=y")
 
         if self.usb_board_config:
             flags.append("-DTLNK_USB_DONGLE=y")
