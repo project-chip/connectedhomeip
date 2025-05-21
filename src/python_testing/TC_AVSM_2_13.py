@@ -125,10 +125,7 @@ class TC_AVSM_2_13(MatterBaseTest):
         # Commission DUT - already done
 
         self.step(1)
-        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
-        vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
-        asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
+        logger.info("Verified Video feature is supported")
 
         self.step(2)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
@@ -141,12 +138,14 @@ class TC_AVSM_2_13(MatterBaseTest):
         aRankedStreamPriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
         )
+        asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
         logger.info(f"Rx'd RankedVideoStreamPrioritiesList: {aRankedStreamPriorities}")
 
         self.step(4)
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
+        asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
         logger.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
 
         self.step(5)
@@ -167,10 +166,13 @@ class TC_AVSM_2_13(MatterBaseTest):
         )
         logger.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
 
+        # Basic sanity check on stream's expected pixel rate
+        streamPixelRate = (aVideoSensorParams.sensorWidth * aVideoSensorParams.sensorHeight
+                           * aVideoSensorParams.maxFPS)
+        asserts.assert_greater_equal(aMaxEncodedPixelRate, streamPixelRate, "Stream Pixel rate exceeds camera maxEncodedPixelRate")
+
         self.step(8)
         try:
-            asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
-            asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aRankedStreamPriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,

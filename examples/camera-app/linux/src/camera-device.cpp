@@ -839,8 +839,8 @@ void CameraDevice::InitializeAudioStreams()
 {
     // Create single audio stream with typical supported parameters
     AudioStream audioStream = { { 1 /* Id */, StreamUsageEnum::kLiveView /* StreamUsage */, AudioCodecEnum::kOpus,
-                                  2 /* ChannelCount */, 48000 /* SampleRate */, 20000 /* BitRate*/, 24 /* BitDepth */,
-                                  0 /* RefCount */ },
+                                  kMicrophoneMaxChannelCount /* ChannelCount(Max from Spec) */, 48000 /* SampleRate */,
+                                  20000 /* BitRate*/, 24 /* BitDepth */, 0 /* RefCount */ },
                                 false,
                                 nullptr };
 
