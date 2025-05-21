@@ -1755,21 +1755,24 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def user_verify_snap_shot(self,
                               prompt_msg: str,
-                              image_stream: str) -> Optional[str]:
+                              image: bytes) -> Optional[str]:
         """Show Image Verification Prompt and wait for user validation.
-        Used to verify WebRTC related TCs.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
             Indicates what is expected from the user.
+            image (bytes): Image data as bytes.
 
         Returns:
             str: User input or none if input is closed.
         """
+
+        # Convert bytes to comma separated hex string
+        hex_string = ', '.join(f'{byte:02x}' for byte in image)
         if self.runner_hook:
             self.runner_hook.show_image_prompt(
                 msg=prompt_msg,
-                img_hex_str=image_stream
+                img_hex_str=hex_string
             )
 
         logging.info("========= USER PROMPT for Image Verification =========")
@@ -1783,7 +1786,6 @@ class MatterBaseTest(base_test.BaseTestClass):
     def user_verify_video_stream(self,
                                  prompt_msg: str) -> Optional[str]:
         """Show Video Verification Prompt and wait for user validation.
-        Used to verify WebRTC related TCs.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
@@ -1792,6 +1794,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             str: User input or none if input is closed.
         """
+
         if self.runner_hook:
             self.runner_hook.show_video_prompt(msg=prompt_msg)
 
