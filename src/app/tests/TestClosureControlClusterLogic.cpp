@@ -220,7 +220,7 @@ TEST_F(TestClosureControlClusterLogic, GetFeatureMap_WithoutInit)
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
-    
+
     BitFlags<Feature> featureMap;
     EXPECT_EQ(logic->GetFeatureMap(featureMap), CHIP_ERROR_INCORRECT_STATE);
 
@@ -248,7 +248,7 @@ TEST_F(TestClosureControlClusterLogic, GetClusterRevision_WithoutInit)
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
-    
+
     Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
     EXPECT_EQ(logic->GetClusterRevision(clusterRevision), CHIP_ERROR_INCORRECT_STATE);
 
