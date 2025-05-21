@@ -43,6 +43,7 @@ from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                              evaluate_feature_choice_conformance)
 from chip.testing.conformance import ConformanceDecision, conformance_allowed
+from chip.testing.decorators import run_on_every_server_node
 from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                device_type_id_type, is_valid_device_type_id)
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -451,6 +452,7 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         super().setup_class()
         await self.setup_class_helper()
 
+    @run_on_every_server_node
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2
         # https://github.com/project-chip/connectedhomeip/issues/34615
@@ -461,6 +463,7 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         if not success:
             self.fail_current_test("Problems with conformance")
 
+    @run_on_every_server_node
     def test_TC_IDM_10_3(self):
         ignore_in_progress = self.user_params.get("ignore_in_progress", False)
         success, problems = self.check_revisions(ignore_in_progress)
@@ -468,6 +471,7 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         if not success:
             self.fail_current_test("Problems with cluster revision on at least one cluster")
 
+    @run_on_every_server_node
     def test_TC_IDM_10_5(self):
         fail_on_extra_clusters = self.user_params.get("fail_on_extra_clusters", True)
         allow_provisional = self.user_params.get("allow_provisional", False)
@@ -476,6 +480,7 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
 
+    @run_on_every_server_node
     def test_TC_IDM_10_6(self):
         success, problems = self.check_device_type_revisions()
         self.problems.extend(problems)
@@ -493,6 +498,7 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
     def desc_TC_DESC_2_3(self):
         return "[TC-DESC-2.3] Test for superset application device types"
 
+    @run_on_every_server_node
     def test_TC_DESC_2_3(self):
         self.step(0)  # done in setup class
         problems = []
