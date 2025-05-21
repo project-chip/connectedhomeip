@@ -107,12 +107,9 @@ void ConnectivityManagerImpl::ReportEthernetName()
 {
     if (mpStatusChangeCallback != nullptr)
     {
-        uint8_t interfaceName[kMaxNetworkIDLen];
-        uint8_t interfaceNameLen =
-            static_cast<uint8_t>(strnlen(SafePointerCast<char *>(mEthIfName), Inet::InterfaceId::kMaxIfNameLength));
-        memcpy(interfaceName, mEthIfName, interfaceNameLen);
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(interfaceName, interfaceNameLen)),
-                                                         NullOptional);
+        ByteSpan ifNameSpan(reinterpret_cast<unsigned char *>(mEthIfName),
+                            strnlen(mEthIfName, Inet::InterfaceId::kMaxIfNameLength));
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ifNameSpan), NullOptional);
     }
 }
 
