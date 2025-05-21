@@ -31,16 +31,16 @@ public:
     PushAVUploader();
     ~PushAVUploader();
 
-    void start();
-    void stop();
-    void add_uploadData(std::string & filename, std::string & url);
+    void Start();
+    void Stop();
+    void AddUploadData(const std::string & filename, const std::string & url);
 
 private:
-    void process_queue();
-    void upload_data(std::pair<std::string, std::string> data);
+    void ProcessQueue();
+    void UploadData(std::pair<std::string, std::string> data);
 
-    std::queue<std::pair<std::string, std::string>> av_data;
-    std::mutex queue_mutex;
-    std::atomic<bool> running;
-    std::thread uploader_thread;
+    std::queue<std::pair<std::string, std::string>> mAvData;
+    std::mutex mQueueMutex;
+    std::atomic<bool> mIsRunning;
+    std::thread mUploaderThread;
 };
