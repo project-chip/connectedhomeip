@@ -125,6 +125,11 @@
             "output": "../../clusters/shared/Attributes.h"
         },
         {
+            "path": "../../zap-templates/templates/app/clusters-shared-Global-Ids.h.zapt",
+            "name": "Shared global ids",
+            "output": "../../clusters/shared/GlobalIds.h"
+        },
+        {
             "path": "../../zap-templates/templates/app/clusters-Attributes.h.zapt",
             "name": "Cluster-specific attribute declarations",
             "iterator": "availableCluster",
