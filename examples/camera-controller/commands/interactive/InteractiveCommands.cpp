@@ -20,10 +20,11 @@
 
 #include <platform/logging/LogV.h>
 #include <system/SystemClock.h>
-#include <webrtc_manager/WebRTCManager.h>
+#include <webrtc-manager/WebRTCManager.h>
 
 #include <editline.h>
 
+#include <csignal>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
@@ -45,9 +46,19 @@ constexpr char kCategoryAutomation[]             = "Automation";
 // File pointer for the log file
 FILE * sLogFile = nullptr;
 
+// Global flag to signal shutdown
+std::atomic<bool> sShutdownRequested(false);
+
 std::queue<std::string> sCommandQueue;
 std::mutex sQueueMutex;
 std::condition_variable sQueueCondition;
+
+void StopSignalHandler(int signum)
+{
+    sShutdownRequested.store(true);
+
+    DeviceLayer::SystemLayer().ScheduleLambda([]() { sQueueCondition.notify_one(); });
+}
 
 void ReadCommandThread()
 {
@@ -117,11 +128,21 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 char * InteractiveStartCommand::GetCommand(char * command)
 {
     std::unique_lock<std::mutex> lock(sQueueMutex);
-    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty(); });
+
+    // Wait until queue is not empty OR shutdown is requested
+    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty() || sShutdownRequested.load(); });
+
+    if (sShutdownRequested.load())
+    {
+        if (command != nullptr)
+        {
+            free(command);
+        }
+        return nullptr;
+    }
 
     std::string cmd = sCommandQueue.front();
     sCommandQueue.pop();
-    lock.unlock();
 
     if (command != nullptr)
     {
@@ -165,6 +186,13 @@ std::string InteractiveStartCommand::GetHistoryFilePath() const
 
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
+    // Set up signal handler for SIGTERM
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = 0;
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
+
     read_history(GetHistoryFilePath().c_str());
 
     if (mLogFilePath.HasValue())
@@ -202,7 +230,12 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     while (true)
     {
         command = GetCommand(command);
-        if (command != nullptr && !ParseCommand(command, &status))
+        if (command == nullptr)
+        {
+            break;
+        }
+
+        if (!ParseCommand(command, &status))
         {
             break;
         }
