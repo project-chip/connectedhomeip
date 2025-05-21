@@ -45,7 +45,7 @@ RgbColor_t sLedRgb;
 k_timer sAudioProcessUpdateTimer;
 // Ensure the timer starts only after the commissioning
 // or reconnection process is finished.
-constexpr uint16_t kInitialAudioProcessUpdateTimerPeriodMs = 10000;
+constexpr uint16_t kInitialAudioProcessUpdateTimerPeriodMs = 15000;
 constexpr uint16_t kAudioProcessUpdateTimerPeriodMs        = 500; // 500ms timer period
 #endif
 } // namespace

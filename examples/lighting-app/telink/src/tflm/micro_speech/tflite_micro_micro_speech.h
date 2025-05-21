@@ -7,6 +7,8 @@
 #ifndef VENDOR_AUDIO_DEMO_TFLM_APP_MICRO_SPEECH_MICRO_SPEECH_TEST_H_
 #define VENDOR_AUDIO_DEMO_TFLM_APP_MICRO_SPEECH_MICRO_SPEECH_TEST_H_
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
