@@ -35,8 +35,6 @@ public:
 
     void Init();
 
-    void Shutdown();
-
     CHIP_ERROR HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args);
 
     CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdp);

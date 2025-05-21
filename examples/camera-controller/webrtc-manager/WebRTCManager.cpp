@@ -41,19 +41,6 @@ WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicE
 
 WebRTCManager::~WebRTCManager()
 {
-    Shutdown();
-}
-
-void WebRTCManager::Init()
-{
-    dynamic_server::InitAccessControl();
-    mWebRTCRequestorServer.Init();
-}
-
-void WebRTCManager::Shutdown()
-{
-    ChipLogProgress(Camera, "WebRTCManager::Shutdown");
-
     // Close the data channel and peer connection if they exist
     if (mDataChannel)
     {
@@ -66,6 +53,12 @@ void WebRTCManager::Shutdown()
         mPeerConnection->close();
         mPeerConnection.reset();
     }
+}
+
+void WebRTCManager::Init()
+{
+    dynamic_server::InitAccessControl();
+    mWebRTCRequestorServer.Init();
 }
 
 CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args)

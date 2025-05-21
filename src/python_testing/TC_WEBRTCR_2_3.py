@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_CONTROLLER_APP}
-#     app-args: --start-websocket-server 1
+#     app-args: interactive server
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json

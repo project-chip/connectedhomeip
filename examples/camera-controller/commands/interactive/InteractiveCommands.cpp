@@ -20,11 +20,9 @@
 
 #include <platform/logging/LogV.h>
 #include <system/SystemClock.h>
-#include <webrtc-manager/WebRTCManager.h>
 
 #include <editline.h>
 
-#include <csignal>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
@@ -53,13 +51,6 @@ std::queue<std::string> sCommandQueue;
 std::mutex sQueueMutex;
 std::condition_variable sQueueCondition;
 
-void StopSignalHandler(int signum)
-{
-    sShutdownRequested.store(true);
-
-    DeviceLayer::SystemLayer().ScheduleLambda([]() { sQueueCondition.notify_one(); });
-}
-
 void ReadCommandThread()
 {
     char * command;
@@ -68,10 +59,8 @@ void ReadCommandThread()
         command = readline(kInteractiveModePrompt);
         if (command != nullptr && *command)
         {
-            {
-                std::unique_lock<std::mutex> lock(sQueueMutex);
-                sCommandQueue.push(command);
-            }
+            std::unique_lock<std::mutex> lock(sQueueMutex);
+            sCommandQueue.push(command);
             free(command);
             sQueueCondition.notify_one();
         }
@@ -186,13 +175,6 @@ std::string InteractiveStartCommand::GetHistoryFilePath() const
 
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
-    // Set up signal handler for SIGTERM
-    struct sigaction sa = {};
-    sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = 0;
-    sigaction(SIGINT, &sa, nullptr);
-    sigaction(SIGTERM, &sa, nullptr);
-
     read_history(GetHistoryFilePath().c_str());
 
     if (mLogFilePath.HasValue())
@@ -201,25 +183,6 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
 
         // Redirect logs to the custom logging callback
         Logging::SetLogRedirectCallback(LoggingCallback);
-    }
-
-    bool startWebSocketServer = mStartWebSocketServer.ValueOr(false);
-    if (startWebSocketServer)
-    {
-        InteractiveServerCommand * command =
-            static_cast<InteractiveServerCommand *>(CommandMgr().GetCommandByName("interactive", "server"));
-        if (command == nullptr)
-        {
-            ChipLogError(NotSpecified, "Interactive server command not found.");
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        CHIP_ERROR err = command->RunCommand();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Failed to run interactive server command: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
     }
 
     std::thread readCommands(ReadCommandThread);
@@ -247,7 +210,6 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         command = nullptr;
     }
 
-    WebRTCManager::Instance().Shutdown();
     SetCommandExitStatus(CHIP_NO_ERROR);
     CloseLogFile();
 
@@ -256,8 +218,6 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
 
 bool InteractiveCommand::ParseCommand(char * command, int * status)
 {
-    ChipLogProgress(NotSpecified, "ParseCommand: %s", command);
-
     if (strcmp(command, kInteractiveModeStopCommand) == 0)
     {
         // If scheduling the cleanup fails, there is not much we can do.
@@ -495,6 +455,8 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
 
     gInteractiveServerResult.Reset();
     SetCommandExitStatus(CHIP_NO_ERROR);
+    CloseLogFile();
+
     return CHIP_NO_ERROR;
 }
 
@@ -523,6 +485,11 @@ bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
     return shouldStop;
 }
 
+void InteractiveServerCommand::StopCommand()
+{
+    mWebSocketServer.Stop();
+}
+
 CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
 {
     gInteractiveServerResult.MaybeAddResult(json);
@@ -532,4 +499,19 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
         gInteractiveServerResult.Reset();
     }
     return CHIP_NO_ERROR;
+}
+
+void StopInteractiveEventLoop()
+{
+    ChipLogProgress(NotSpecified, "Stop Interactive EventLoop, exiting...");
+
+    sShutdownRequested.store(true);
+    sQueueCondition.notify_one();
+
+    InteractiveServerCommand * command =
+        static_cast<InteractiveServerCommand *>(CommandMgr().GetCommandByName("interactive", "server"));
+    if (command)
+    {
+        command->StopCommand();
+    }
 }
