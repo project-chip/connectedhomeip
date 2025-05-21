@@ -4396,8 +4396,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MaxPresets";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MPTZPresets::Id:
             return "MPTZPresets";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::Id:
-            return "DPTZRelativeMove";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::DPTZStreams::Id:
+            return "DPTZStreams";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::Id:
             return "ZoomMax";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::TiltMin::Id:

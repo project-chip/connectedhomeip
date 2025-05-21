@@ -3201,12 +3201,12 @@ cluster ModeSelect = 80 {
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
   attribute optional nullable int8u onMode = 5;
-  readonly attribute optional int8u manufacturerExtension = 4293984257;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute optional int8u manufacturerExtension = 4293984257;
 
   request struct ChangeToModeRequest {
     int8u newMode = 0;
@@ -6386,7 +6386,7 @@ cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -7278,12 +7278,12 @@ internal cluster UnitTesting = 4294048773 {
   attribute optional int8u writeOnlyInt8u = 16426;
   attribute nullable TestGlobalEnum nullableGlobalEnum = 16435;
   attribute nullable TestGlobalStruct nullableGlobalStruct = 16436;
-  attribute int8u meiInt8u = 4294070017;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  attribute int8u meiInt8u = 4294070017;
 
   response struct TestSpecificResponse = 0 {
     int8u returnValue = 0;
