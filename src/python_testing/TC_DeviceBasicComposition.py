@@ -185,7 +185,11 @@ from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.decorators import run_on_every_server_node_async, run_on_every_server_node
 from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
                                                cluster_id_type, command_id_type)
+<<<<<<< HEAD
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+=======
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
+>>>>>>> ebd70a886f (check on test case list)
 from chip.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
