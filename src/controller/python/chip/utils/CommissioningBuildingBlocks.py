@@ -232,7 +232,6 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplet
         existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32), isForUpdateNOC=True))
     chainForUpdateNOC = await devCtrl.IssueNOCChain(csrForUpdateNOC, newNodeId)
     if (chainForUpdateNOC.rcacBytes is None or
-            chainForUpdateNOC.icacBytes is None or
             chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None):
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
