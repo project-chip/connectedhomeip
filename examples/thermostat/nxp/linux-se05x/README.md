@@ -15,13 +15,16 @@ Refer the below image to connect SE05x to i.MX 8M using I2C pins.
 
 # SE05x Integration Configuration
 
-By default the SE05x secure element is used for following cryptographic operations
+Following crypto operations can be offloaded to SE05x secure element,
 
 	1. Random number generation
 	2. EC Key Generate
 	3. ECDSA Sign
-	4. HKDF
-	5. HMAC
+	4. ECDSA Verify
+	5. HKDF
+	6. HMAC
+	7. Spake(Disabled by default)
+
 
 Other crypto operations are done on host (using mbed-TLS)
 
