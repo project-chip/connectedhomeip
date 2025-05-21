@@ -40,6 +40,7 @@ import asyncio
 import base64
 import hashlib
 import importlib
+import json
 import logging
 import os
 import shutil
@@ -50,6 +51,7 @@ import uuid
 from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
+from datetime import datetime, timedelta
 
 import chip.clusters as Clusters
 import cv2
@@ -149,10 +151,79 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.vid_pid_str = f'{self.vid_str} pid = 0x{self.pid:04X}'
         self.vid_pid_sv_str = f'{self.vid_pid_str} software version = {self.software_version}'
 
-    def get_DSL_data(self, url_path: str, force: bool = False):
-        """Retrieves DSL data and caches it. Returns JSON."""
-        full_url = f"{self.url.rstrip('/')}/{url_path.lstrip('/')}"
-        return requests.get(full_url).json()
+    def get_DSL_data(self, url_path: str, local_filepath: typing.Optional[str] = None, force_download: bool = False, max_age_hours: int = 24) -> typing.Any:
+        """
+        Downloads a JSON file from a URL if it's missing locally, older than max_age_hours,
+        or if the force_download flag is set.
+
+        Args:
+            url (str): The URL of the JSON file.
+            local_filepath (str, optional): The local path to save the file.
+            force_download (bool, optional): Flag to force download. Defaults to False.
+            max_age_hours (int, optional): Maximum age of the file in hours. Defaults to 24.
+
+        Returns:
+            bool: True if the file was downloaded or was already up-to-date, False in case of an error.
+            dict or None: The downloaded JSON data if the download was successful or the file already existed, otherwise None.
+        """
+        target_url = f"{self.url.rstrip('/')}/{url_path.lstrip('/')}"
+        if local_filepath is None:
+            local_filepath = f"{url_path.lstrip('/')}"
+
+        file_exists = os.path.exists(local_filepath)
+        should_download = False
+
+        if force_download:
+            print(f"Forcing download of file: {local_filepath}")
+            should_download = True
+        elif not file_exists:
+            print(f"File not found locally: {local_filepath}. Downloading...")
+            should_download = True
+        else:
+            # Check file age
+            try:
+                file_mod_time = os.path.getmtime(local_filepath)
+                # Convert modification time to a datetime object
+                file_mod_datetime = datetime.fromtimestamp(file_mod_time)
+                # Determine the maximum allowed age
+                max_age_delta = timedelta(hours=max_age_hours)
+
+                if datetime.now() - file_mod_datetime > max_age_delta:
+                    print(f"Local file {local_filepath} is outdated (older than {max_age_hours} hours). Downloading...")
+                    should_download = True
+                else:
+                    print(f"Local file {local_filepath} is up-to-date.")
+            except Exception as e:
+                print(f"Could not check age of file {local_filepath}: {e}. Attempting download...")
+                should_download = True  # If we can't check the age, it's better to download
+
+        if should_download:
+            print(f"Downloading data from {target_url}...")
+            response = requests.get(target_url, timeout=30)  # 30-second timeout
+            response.raise_for_status()  # Check for HTTP errors (4xx or 5xx)
+
+            data = response.json()  # Decode JSON
+
+            # Create directory if it doesn't exist
+            # This ensures that if the path is "data/subdir/file.json", "data/subdir" will be created.
+            dir_name = os.path.dirname(local_filepath)
+            if dir_name:  # Ensure dirname is not empty (e.g. if filepath is just "file.json")
+                os.makedirs(dir_name, exist_ok=True)
+
+            with open(local_filepath, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+            print(f"File successfully downloaded and saved as {local_filepath}")
+            return data
+        else:
+            # If not downloaded, try to read the existing file
+            if file_exists:
+                with open(local_filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                print(f"Using existing file: {local_filepath}")
+                return data
+            # This case (file_exists is False and should_download is False) should ideally not be reached
+            # if logic is correct, but as a fallback:
+            return None  # File does not exist, and no download was triggered.
 
     def steps_Vendor(self):
         return [TestStep(1, "Check if device VID is listed in the DCL vendor schema", "Listing found")]
