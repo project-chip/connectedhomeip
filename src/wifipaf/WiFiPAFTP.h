@@ -87,7 +87,7 @@ public:
         kEndMessage       = 0x04,
         kFragmentAck      = 0x08,
         kManagementOpcode = 0x20,
-        kHankshake        = 0x40,
+        kHandshake        = 0x40,
     };
 
     static const uint16_t sDefaultFragmentSize;
@@ -116,9 +116,8 @@ public:
 
     bool HasUnackedData() const;
 
-    CHIP_ERROR HandleCharacteristicReceived(System::PacketBufferHandle && data, SequenceNumber_t & receivedAck,
-                                            bool & didReceiveAck);
-    bool HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack);
+    CHIP_ERROR HandleFollowUpMsgReceived(System::PacketBufferHandle && data, SequenceNumber_t & receivedAck, bool & didReceiveAck);
+    bool HandleFollowUpMsgSend(System::PacketBufferHandle data, bool send_ack);
     CHIP_ERROR EncodeStandAloneAck(const PacketBufferHandle & data);
 
     PacketBufferHandle TakeRxPacket();

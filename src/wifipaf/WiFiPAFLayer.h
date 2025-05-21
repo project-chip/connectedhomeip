@@ -33,8 +33,8 @@ namespace WiFiPAF {
  *  @def NUM_PAFTP_SUPPORTED_PROTOCOL_VERSIONS
  *
  *  Number of unsigned 4-bit representations of supported transport protocol
- *  versions encapsulated in a BleTransportCapabilitiesRequest. Defined by CHIP
- *  over PAFTP protocol specification.
+ *  versions encapsulated in a PAFTransportCapabilitiesRequestMessage.
+ *  Defined by the Matter PAFTP protocol specification.
  */
 #define NUM_PAFTP_SUPPORTED_PROTOCOL_VERSIONS 8
 
@@ -49,10 +49,11 @@ typedef enum
     kWiFiPAFTransportProtocolVersion_V1   = 4 // PAFTP as defined by CHIP v1.5
 } WiFiPAFTransportProtocolVersion;
 
-inline constexpr size_t kCapabilitiesRequestMagicnumLength          = 2;
-inline constexpr size_t kCapabilitiesRequestL2capMtuLength          = 2;
-inline constexpr size_t kCapabilitiesRequestSupportedVersionsLength = 4;
-inline constexpr size_t kCapabilitiesRequestWindowSizeLength        = 1;
+inline constexpr size_t kCapabilitiesRequestMagicnumLength = 2;
+inline constexpr size_t kCapabilitiesRequestL2capMtuLength = 2;
+inline constexpr size_t kCapabilitiesRequestSupportedVersionsLength =
+    (NUM_PAFTP_SUPPORTED_PROTOCOL_VERSIONS / 2) + (NUM_PAFTP_SUPPORTED_PROTOCOL_VERSIONS % 2);
+inline constexpr size_t kCapabilitiesRequestWindowSizeLength = 1;
 constexpr size_t kCapabilitiesRequestLength = (kCapabilitiesRequestMagicnumLength + kCapabilitiesRequestL2capMtuLength +
                                                kCapabilitiesRequestSupportedVersionsLength + kCapabilitiesRequestWindowSizeLength);
 
@@ -74,7 +75,7 @@ public:
      * array elements. Counting up from the zero-index, the first zero-value
      * specifies the end of the list of supported protocol versions.
      */
-    uint8_t mSupportedProtocolVersions[(NUM_PAFTP_SUPPORTED_PROTOCOL_VERSIONS / 2) + (NUM_PAFTP_SUPPORTED_PROTOCOL_VERSIONS % 2)];
+    uint8_t mSupportedProtocolVersions[kCapabilitiesRequestSupportedVersionsLength];
 
     /**
      *  The MTU that has been negotiated for this PAF connection. Specified in
@@ -142,13 +143,6 @@ public:
  *  The State of the Wi-Fi-PAF connection
  *
  */
-enum class State
-{
-    kNotReady    = 0, /**< State before initialization. */
-    kInitialized = 1, /**< State after class is connected and ready. */
-    kConnected   = 2, /**< Endpoint connected. */
-};
-
 enum class PafInfoAccess
 {
     kAccNodeInfo,
@@ -163,19 +157,17 @@ class DLL_EXPORT WiFiPAFLayer
     friend class TestWiFiPAFLayer;
 
 public:
-    State mAppState                          = State::kNotReady;
     WiFiPAFLayerDelegate * mWiFiPAFTransport = nullptr;
 
     WiFiPAFLayer();
     static WiFiPAFLayer & GetWiFiPAFLayer();
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
 
-    typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAF::WiFiPafRole role);
-    void Shutdown(OnCancelDeviceHandle OnCancelDevice);
+    void Shutdown();
+    void CloseAllConnections();
+    void CloseConnection(PafInfoAccess accType, const WiFiPAFSession & PafSession);
     bool OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     CHIP_ERROR OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
-    State GetWiFiPAFState() { return mAppState; };
-    void SetWiFiPAFState(State state);
     CHIP_ERROR SendMessage(WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msg);
     CHIP_ERROR HandleWriteConfirmed(WiFiPAF::WiFiPAFSession & TxInfo, bool result);
     CHIP_ERROR NewEndPoint(WiFiPAFEndPoint ** retEndPoint, WiFiPAFSession & SessionInfo, WiFiPafRole role);
@@ -189,15 +181,15 @@ public:
     static WiFiPAFTransportProtocolVersion
     GetHighestSupportedProtocolVersion(const PAFTransportCapabilitiesRequestMessage & reqMsg);
 
-    CHIP_ERROR AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
-    CHIP_ERROR RmPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
-    WiFiPAFSession * GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
+    CHIP_ERROR AddPafSession(PafInfoAccess accType, const WiFiPAFSession & SessionInfo);
+    CHIP_ERROR RmPafSession(PafInfoAccess accType, const WiFiPAFSession & SessionInfo);
+    WiFiPAFSession * GetPAFInfo(PafInfoAccess accType, const WiFiPAFSession & SessionInfo);
 
 private:
     void InitialPafInfo();
     void CleanPafInfo(WiFiPAFSession & SessionInfo);
     WiFiPAFSession mPafInfoVect[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
-    chip::System::Layer * mSystemLayer;
+    chip::System::Layer * mSystemLayer = nullptr;
 };
 
 } /* namespace WiFiPAF */

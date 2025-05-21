@@ -65,7 +65,7 @@ public:
     void TearDown() override
     {
         mWiFiPAFTransport = nullptr;
-        Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {});
+        Shutdown();
     }
 
     CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
@@ -171,10 +171,11 @@ TEST_F(TestWiFiPAFLayer, CheckPafSession)
     // Remove the session
     sessionInfo.id = 0x1;
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
-    sessionInfo.id = 0x2;
-    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    sessionInfo.nodeId        = 0x2;
+    sessionInfo.discriminator = 0xF02;
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_NO_ERROR);
 
-    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_ERROR_NOT_FOUND);
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_NOT_FOUND);
 }
 
@@ -194,8 +195,6 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissioner)
     EXPECT_NE(newEndPoint, nullptr);
     SetEndPoint(newEndPoint);
     newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
-    SetWiFiPAFState(State::kInitialized);
-    EXPECT_EQ(GetWiFiPAFState(), State::kInitialized);
 
     EXPECT_EQ(newEndPoint->StartConnect(), CHIP_NO_ERROR);
     EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);

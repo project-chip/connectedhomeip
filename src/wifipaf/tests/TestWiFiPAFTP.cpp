@@ -92,7 +92,7 @@ TEST_F(TestWiFiPAFTP, CheckSendSingle)
     buf->SetDataLength(kShortPacketLength);
     memset(buf->Start(), 0, buf->DataLength());
     mRxNextSeqNum = 1;
-    EXPECT_TRUE(HandleCharacteristicSend(buf.Retain(), true));
+    EXPECT_TRUE(HandleFollowUpMsgSend(buf.Retain(), true));
     EXPECT_EQ(TxState(), kState_Complete);
     TakeTxPacket();
     EXPECT_EQ(TxState(), kState_Idle);
@@ -105,10 +105,10 @@ TEST_F(TestWiFiPAFTP, CheckSendMultiple)
     ASSERT_FALSE(buf.IsNull());
     buf->SetDataLength(kLongPacketLength);
     memset(buf->Start(), 0, buf->DataLength());
-    EXPECT_TRUE(HandleCharacteristicSend(buf.Retain(), false));
+    EXPECT_TRUE(HandleFollowUpMsgSend(buf.Retain(), false));
 
     EXPECT_EQ(TxState(), kState_InProgress);
-    EXPECT_TRUE(HandleCharacteristicSend(nullptr, false));
+    EXPECT_TRUE(HandleFollowUpMsgSend(nullptr, false));
     EXPECT_EQ(TxState(), kState_Complete);
     TakeTxPacket();
     EXPECT_EQ(TxState(), kState_Idle);
@@ -133,7 +133,7 @@ TEST_F(TestWiFiPAFTP, CheckRecv)
 
     receivedAck   = 0;
     didReceiveAck = false;
-    EXPECT_EQ(HandleCharacteristicReceived(std::move(packet0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(HandleFollowUpMsgReceived(std::move(packet0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
     EXPECT_EQ(RxState(), kState_Complete);
     TakeRxPacket();
     EXPECT_EQ(RxState(), kState_Idle);
@@ -157,7 +157,7 @@ TEST_F(TestWiFiPAFTP, CheckAckRecv)
     SequenceNumber_t receivedAck = 0;
     bool didReceiveAck           = true;
     mExpectingAck                = true;
-    EXPECT_EQ(HandleCharacteristicReceived(std::move(packet0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(HandleFollowUpMsgReceived(std::move(packet0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
     EXPECT_EQ(RxState(), kState_Idle);
 }
 
@@ -168,7 +168,7 @@ TEST_F(TestWiFiPAFTP, CheckErrorRecv)
 
     // Null-buffer
     auto nullbuf = System::PacketBufferHandle::New(0);
-    EXPECT_NE(HandleCharacteristicReceived(std::move(nullbuf), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_NE(HandleFollowUpMsgReceived(std::move(nullbuf), receivedAck, didReceiveAck), CHIP_NO_ERROR);
 
     // Reveived Invalid packet
     constexpr uint8_t packetData_invalid_ack[] = {
@@ -179,7 +179,7 @@ TEST_F(TestWiFiPAFTP, CheckErrorRecv)
         0xff, // payload
     };
     auto packet_invalid_ack = System::PacketBufferHandle::NewWithData(packetData_invalid_ack, sizeof(packetData_invalid_ack));
-    EXPECT_EQ(HandleCharacteristicReceived(std::move(packet_invalid_ack), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(HandleFollowUpMsgReceived(std::move(packet_invalid_ack), receivedAck, didReceiveAck), CHIP_NO_ERROR);
 }
 }; // namespace WiFiPAF
 }; // namespace chip
