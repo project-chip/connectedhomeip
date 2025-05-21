@@ -60566,6 +60566,11 @@ public class ChipClusters {
 
     public void readCurrentConnectionsAttribute(
         CurrentConnectionsAttributeCallback callback) {
+      readCurrentConnectionsAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readCurrentConnectionsAttributeWithFabricFilter(
+        CurrentConnectionsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_CONNECTIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -60574,7 +60579,7 @@ public class ChipClusters {
             List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, true);
+        }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeCurrentConnectionsAttribute(
@@ -65372,12 +65377,12 @@ public class ChipClusters {
     private static final long WRITE_ONLY_INT8U_ATTRIBUTE_ID = 16426L;
     private static final long NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID = 16435L;
     private static final long NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID = 16436L;
-    private static final long MEI_INT8U_ATTRIBUTE_ID = 4294070017L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+    private static final long MEI_INT8U_ATTRIBUTE_ID = 4294070017L;
 
     public UnitTestingCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId, CLUSTER_ID);
@@ -69821,41 +69826,6 @@ public class ChipClusters {
         }, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeiInt8uAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEI_INT8U_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, MEI_INT8U_ATTRIBUTE_ID, true);
-    }
-
-    public void writeMeiInt8uAttribute(DefaultClusterCallback callback, Integer value) {
-      writeMeiInt8uAttribute(callback, value, 0);
-    }
-
-    public void writeMeiInt8uAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), MEI_INT8U_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeMeiInt8uAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEI_INT8U_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, MEI_INT8U_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readGeneratedCommandListAttribute(
         GeneratedCommandListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
@@ -69984,6 +69954,41 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMeiInt8uAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEI_INT8U_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MEI_INT8U_ATTRIBUTE_ID, true);
+    }
+
+    public void writeMeiInt8uAttribute(DefaultClusterCallback callback, Integer value) {
+      writeMeiInt8uAttribute(callback, value, 0);
+    }
+
+    public void writeMeiInt8uAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), MEI_INT8U_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeMeiInt8uAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEI_INT8U_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MEI_INT8U_ATTRIBUTE_ID, minInterval, maxInterval);
     }
   }
 

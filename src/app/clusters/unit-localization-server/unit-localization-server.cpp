@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/reporting/reporting.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -132,7 +133,9 @@ CHIP_ERROR UnitLocalizationServer::SetTemperatureUnit(TempUnitEnum newTempUnit)
         }
     }
     VerifyOrReturnError(isValid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnValue(mTemperatureUnit != newTempUnit, CHIP_NO_ERROR);
     mTemperatureUnit = newTempUnit;
+    MatterReportingAttributeChangeCallback(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id);
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), to_underlying(mTemperatureUnit)));
     return CHIP_NO_ERROR;

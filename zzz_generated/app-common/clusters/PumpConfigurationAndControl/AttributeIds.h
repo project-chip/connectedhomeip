@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {

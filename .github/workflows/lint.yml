@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:129
+            image: ghcr.io/project-chip/chip-build:132
 
         steps:
             - name: Checkout
@@ -274,7 +274,7 @@ jobs:
                   type-safe getters
               if: always()
               run: |
-                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
+                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
@@ -295,7 +295,7 @@ jobs:
                       ':(exclude)src/app/util/attribute-table.cpp'                                           \
                       ':(exclude)src/app/util/attribute-table.h'                                             \
                       ':(exclude)src/app/util/mock/CodegenEmberMocks.cpp'                                    \
-                      ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt'          \
+                      ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt'          \
                       ':(exclude)src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm'                  \
                       ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' \
                       && exit 1 || exit 0
