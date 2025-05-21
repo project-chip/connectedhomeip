@@ -1,0 +1,37 @@
+{{> header}}
+// This file is generated from clusters-shared-Structs.ipp.zapt
+
+#include <clusters/shared/Structs.h>
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/StructDecodeIterator.h>
+#include <app/data-model/WrappedStructEncoder.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+// Structs shared across multiple clusters.
+namespace detail {
+namespace Structs {
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> cluster_objects_struct cluster="" header=false}}
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace detail
+
+namespace Globals {
+// Global structs
+namespace Structs {
+{{#zcl_structs}}
+{{#if has_no_clusters}}
+{{> cluster_objects_struct header=false}}
+
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace Globals
+} // namespace Clusters
+} // namespace app
+} // namespace chip

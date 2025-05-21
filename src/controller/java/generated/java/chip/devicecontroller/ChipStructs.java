@@ -15984,18 +15984,22 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
   public Integer connectionID;
   public Integer transportStatus;
   public Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions;
+  public Integer fabricIndex;
   private static final long CONNECTION_ID_ID = 0L;
   private static final long TRANSPORT_STATUS_ID = 1L;
   private static final long TRANSPORT_OPTIONS_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public PushAvStreamTransportClusterTransportConfigurationStruct(
     Integer connectionID,
     Integer transportStatus,
-    Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions
+    Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions,
+    Integer fabricIndex
   ) {
     this.connectionID = connectionID;
     this.transportStatus = transportStatus;
     this.transportOptions = transportOptions;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -16003,6 +16007,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
     values.add(new StructElement(TRANSPORT_STATUS_ID, new UIntType(transportStatus)));
     values.add(new StructElement(TRANSPORT_OPTIONS_ID, transportOptions.<BaseTLVType>map((nonOptionaltransportOptions) -> nonOptionaltransportOptions.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -16014,6 +16019,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     Integer connectionID = null;
     Integer transportStatus = null;
     Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions = Optional.empty();
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONNECTION_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16030,12 +16036,18 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
           StructType castingValue = element.value(StructType.class);
           transportOptions = Optional.of(ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct.decodeTlv(castingValue));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new PushAvStreamTransportClusterTransportConfigurationStruct(
       connectionID,
       transportStatus,
-      transportOptions
+      transportOptions,
+      fabricIndex
     );
   }
 
@@ -16051,6 +16063,9 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     output.append("\n");
     output.append("\ttransportOptions: ");
     output.append(transportOptions);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();

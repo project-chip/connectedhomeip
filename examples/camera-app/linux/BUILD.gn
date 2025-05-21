@@ -38,7 +38,7 @@ config("config") {
   include_dirs = [
     "include",
     "include/clusters/chime",
-    "include/clusters/webrtc_provider",
+    "include/clusters/webrtc-provider",
     "include/clusters/camera-avstream-mgmt",
     "include/clusters/camera-avsettingsuserlevel-mgmt",
     "include/media-controller",
@@ -69,7 +69,7 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avsettingsuserlevel-mgmt/camera-avsettingsuserlevel-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avstream-mgmt/camera-av-stream-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
-    "${chip_root}/examples/camera-app/linux/src/clusters/webrtc_provider/webrtc-provider-manager.cpp",
+    "${chip_root}/examples/camera-app/linux/src/clusters/webrtc-provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
     "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
     "${chip_root}/examples/camera-app/linux/src/webrtc-transport.cpp",
