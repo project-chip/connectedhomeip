@@ -459,7 +459,8 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                         continue
 
                     found_fabric_indices.add(noc_struct.fabricIndex)
-                    asserts.assert_true(noc_struct.noc is not None and len(noc_struct.noc) > 0, "`noc` field in NOCs attribute entry not found for fabric index {fabric_index}! Ensure you are running a Matter stack for >= 1.4.2 where NOCStruct fields are not fabric-sensitive.")
+                    asserts.assert_true(noc_struct.noc is not None and len(
+                        noc_struct.noc) > 0, "`noc` field in NOCs attribute entry not found for fabric index {fabric_index}! Ensure you are running a Matter stack for >= 1.4.2 where NOCStruct fields are not fabric-sensitive.")
 
                     try:
                         logging.info(f"Trying to parse NOC for fabric index {fabric_index}")
@@ -476,8 +477,10 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
             logging.info(f"Fabric IDs found: {fabric_ids_from_certs}")
 
-            asserts.assert_true(th1_fabric_index in found_fabric_indices, f"Expected to have seen entry for TH1's fabric (fabric Index {th1_fabric_index}) in NOCs attribute, but did not find it!")
-            asserts.assert_true(th2_fabric_index in found_fabric_indices, f"Expected to have seen entry for TH2's fabric (fabric Index {th2_fabric_index}) in NOCs attribute, but did not find it!")
+            asserts.assert_true(th1_fabric_index in found_fabric_indices,
+                                f"Expected to have seen entry for TH1's fabric (fabric Index {th1_fabric_index}) in NOCs attribute, but did not find it!")
+            asserts.assert_true(th2_fabric_index in found_fabric_indices,
+                                f"Expected to have seen entry for TH2's fabric (fabric Index {th2_fabric_index}) in NOCs attribute, but did not find it!")
 
             for controller_name, fabric_id in fabric_ids.items():
                 asserts.assert_in(controller_name, fabric_ids_from_certs.keys(),
