@@ -6420,13 +6420,13 @@ class GeneralCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="regulatoryConfig", Tag=0x00000002, Type=GeneralCommissioning.Enums.RegulatoryLocationTypeEnum),
                 ClusterObjectFieldDescriptor(Label="locationCapability", Tag=0x00000003, Type=GeneralCommissioning.Enums.RegulatoryLocationTypeEnum),
                 ClusterObjectFieldDescriptor(Label="supportsConcurrentConnection", Tag=0x00000004, Type=bool),
-                ClusterObjectFieldDescriptor(Label="TCAcceptedVersion", Tag=0x00000005, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="TCMinRequiredVersion", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="TCAcknowledgements", Tag=0x00000007, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="TCAcknowledgementsRequired", Tag=0x00000008, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="TCUpdateDeadline", Tag=0x00000009, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="recoveryIdentifier", Tag=0x0000000A, Type=typing.Optional[bytes]),
-                ClusterObjectFieldDescriptor(Label="networkRecoveryReason", Tag=0x0000000B, Type=typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum]),
+                ClusterObjectFieldDescriptor(Label="TCAcceptedVersion", Tag=0x00000005, Type=uint),
+                ClusterObjectFieldDescriptor(Label="TCMinRequiredVersion", Tag=0x00000006, Type=uint),
+                ClusterObjectFieldDescriptor(Label="TCAcknowledgements", Tag=0x00000007, Type=uint),
+                ClusterObjectFieldDescriptor(Label="TCAcknowledgementsRequired", Tag=0x00000008, Type=bool),
+                ClusterObjectFieldDescriptor(Label="TCUpdateDeadline", Tag=0x00000009, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="recoveryIdentifier", Tag=0x0000000A, Type=bytes),
+                ClusterObjectFieldDescriptor(Label="networkRecoveryReason", Tag=0x0000000B, Type=typing.Union[Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -6439,13 +6439,13 @@ class GeneralCommissioning(Cluster):
     regulatoryConfig: GeneralCommissioning.Enums.RegulatoryLocationTypeEnum = 0
     locationCapability: GeneralCommissioning.Enums.RegulatoryLocationTypeEnum = 0
     supportsConcurrentConnection: bool = False
-    TCAcceptedVersion: typing.Optional[uint] = None
-    TCMinRequiredVersion: typing.Optional[uint] = None
-    TCAcknowledgements: typing.Optional[uint] = None
-    TCAcknowledgementsRequired: typing.Optional[bool] = None
-    TCUpdateDeadline: typing.Union[None, Nullable, uint] = None
-    recoveryIdentifier: typing.Optional[bytes] = None
-    networkRecoveryReason: typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = None
+    TCAcceptedVersion: uint = 0
+    TCMinRequiredVersion: uint = 0
+    TCAcknowledgements: uint = 0
+    TCAcknowledgementsRequired: bool = False
+    TCUpdateDeadline: typing.Union[Nullable, uint] = NullValue
+    recoveryIdentifier: bytes = b""
+    networkRecoveryReason: typing.Union[Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = NullValue
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -6740,9 +6740,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: typing.Optional[uint] = None
+            value: uint = 0
 
         @dataclass
         class TCMinRequiredVersion(ClusterAttributeDescriptor):
@@ -6756,9 +6756,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: typing.Optional[uint] = None
+            value: uint = 0
 
         @dataclass
         class TCAcknowledgements(ClusterAttributeDescriptor):
@@ -6772,9 +6772,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: typing.Optional[uint] = None
+            value: uint = 0
 
         @dataclass
         class TCAcknowledgementsRequired(ClusterAttributeDescriptor):
@@ -6788,9 +6788,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+                return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: typing.Optional[bool] = None
+            value: bool = False
 
         @dataclass
         class TCUpdateDeadline(ClusterAttributeDescriptor):
@@ -6804,9 +6804,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: typing.Union[None, Nullable, uint] = None
+            value: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class RecoveryIdentifier(ClusterAttributeDescriptor):
@@ -6820,9 +6820,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[bytes])
+                return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: typing.Optional[bytes] = None
+            value: bytes = b""
 
         @dataclass
         class NetworkRecoveryReason(ClusterAttributeDescriptor):
@@ -6836,9 +6836,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum])
 
-            value: typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = None
+            value: typing.Union[Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
