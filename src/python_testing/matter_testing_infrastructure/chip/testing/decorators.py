@@ -22,6 +22,7 @@ and endpoint matching.
 """
 
 import asyncio
+import inspect
 import logging
 from enum import IntFlag
 from functools import partial
@@ -31,6 +32,7 @@ import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.pics import generate_device_element_pics_from_device_wildcard
 from mobly import asserts
 
 # conditional import to avoid circular dependency but still allow type checking
@@ -251,6 +253,21 @@ def async_test_body(body):
     """
 
     def async_runner(self: "MatterBaseTest", *args, **kwargs):
+        if self.user_params.get('test_case_list', False) and self.current_test_info.name.startswith('test'):
+            test_pics = self._get_defined_pics(self.current_test_info.name)
+            if not test_pics:
+                logging.error("No pics provided for test without runner decorator")
+                asserts.skip('Dry run only')
+            self._populate_wildcard()
+            self.build_spec_xmls()
+            if not self.device_pics_list:
+                # TODO: What do we do about problems with the PICS list at this stage
+                self.device_pics_list, _ = generate_device_element_pics_from_device_wildcard(
+                    self.stored_global_wildcard, self.xml_clusters)
+                self.applicable_endpoints = [ep for ep, device_ep_pics in self.device_pics_list if set(
+                    test_pics).issubset(set(device_ep_pics).issubset())]
+                logging.info(
+                    f"Run test {inspect.stack()[-1].filename} {body} on endpoints {self.applicable_endpoints} - required PICS {test_pics} device ep pics = {self.device_pics_list}")
         return _async_runner(body, self, *args, **kwargs)
     return async_runner
 
@@ -337,11 +354,20 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
         with any other --endpoint the decorator will call the on_skip function to
         notify the test harness that the test is not applicable to this node and the test will not be run.
 
-        Tests that use this decorator cannot use a pics_ method for test selection and should not reference any
-        PICS values internally.
+        Running this test with the test_case_list user parameter set will cause the applicable_endpoints
+        variable to be set and the test to be skipped.
+
+        Tests that use this decorator should not reference any PICS values internally.
     """
     def run_if_endpoint_matches_internal(body):
-        def per_endpoint_runner(test_instance, *args, **kwargs):
+        def per_endpoint_runner(test_instance: "MatterBaseTest", *args, **kwargs):
+            if test_instance.user_params.get('test_case_list', False):
+                matching_coroutine = asyncio.wait_for(_get_all_matching_endpoints(test_instance, accept_function), timeout=60)
+                matching = test_instance.event_loop.run_until_complete(matching_coroutine)
+                test_instance.applicable_endpoints = matching
+                logging.info(f"Run test {inspect.stack()[-1].filename} {body} on endpoints {matching}")
+                asserts.skip('Dry Run on tests')
+                return
             runner_with_timeout = asyncio.wait_for(
                 should_run_test_on_endpoint(test_instance, accept_function), timeout=60)
             should_run_test = test_instance.event_loop.run_until_complete(
@@ -351,6 +377,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
                     "Test is not applicable to this endpoint - skipping test")
                 asserts.skip('Endpoint does not match test requirements')
                 return
+
             logging.info(
                 f'Running test on endpoint {test_instance.matter_test_config.endpoint}')
             timeout = getattr(test_instance.matter_test_config,
@@ -359,3 +386,35 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
                 body(test_instance, *args, **kwargs), timeout=timeout))
         return per_endpoint_runner
     return run_if_endpoint_matches_internal
+
+
+def run_on_every_server_node(body):
+    """Decorator used for tests that are run on any node with a server on any endpoint.
+
+       These tests run once for the whole node, and check all the endpoints within in the test body.
+    """
+    def run_on_every_server_node_internal(test_instance: "MatterBaseTest", *args, **kwargs):
+        if test_instance.user_params.get('test_case_list', False):
+            if test_instance.get_endpoint(default=None) is None:
+                logging.info(f"Run test {inspect.stack()[-1].filename} {body}")
+                test_instance.applicable_endpoints = [None]
+            asserts.skip('Dry Run on tests')
+            return
+        body(test_instance, args, kwargs)
+    return run_on_every_server_node_internal
+
+
+def run_on_every_server_node_async(body):
+    """Decorator used for async tests that are run on any node with a server on any endpoint.
+
+       These tests run once for the whole node, and check all the endpoints within in the test body.
+    """
+    def run_on_every_server_node_async_internal(test_instance: "MatterBaseTest", *args, **kwargs):
+        if test_instance.user_params.get('test_case_list', False):
+            if test_instance.get_endpoint(default=None) is None:
+                logging.info(f"Run test {inspect.stack()[-1].filename} {body}")
+                test_instance.applicable_endpoints = [None]
+            asserts.skip('Dry Run on tests')
+            return
+        return _async_runner(body, test_instance, *args, **kwargs)
+    return run_on_every_server_node_async_internal

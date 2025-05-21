@@ -146,7 +146,8 @@ def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransac
                 if not is_standard_command_id(cmd_id):
                     continue
                 device_pics[endpoint_id].append(accepted_cmd_pics_str(cluster_pics, cmd_id))
-            for cmd_id in cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]:
+            # TODO: WTF
+            for cmd_id in cluster.get(GlobalAttributeIds.GENERATED_COMMAND_LIST_ID, []):
                 if not is_standard_command_id(cmd_id):
                     continue
                 device_pics[endpoint_id].append(generated_cmd_pics_str(cluster_pics, cmd_id))

@@ -68,9 +68,11 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
+from chip.testing.conformance import ConformanceException
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.pics import read_pics_from_file
+from chip.testing.pics import read_pics_from_file, generate_device_element_pics_from_device_wildcard
 from chip.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
+from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
@@ -1012,10 +1014,47 @@ class MatterBaseTest(base_test.BaseTestClass):
         return self.matter_test_config.dut_node_ids[0]
 
     def get_endpoint(self, default: Optional[int] = 0) -> int:
-        return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
+        # TODO: assess how difficult it would be to ask folks to be explicit here
+        # It would be SO much better to just run the tests on all applicable endpoints, but
+        # We're just not there yet since it messes up the logs for the ATLs.
+        if self._ep is not None:
+            return self._ep
+        self._ep = self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
+        return self._ep
+
+    def _get_dm(self) -> PrebuiltDataModelDirectory:
+        try:
+            if self.stored_global_wildcard:
+                spec_version = self.stored_global_wildcard.attributes[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+            else:
+                spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+        except KeyError:
+            asserts.fail(
+                "Specification Version not found on device - ensure device bas a basic information cluster on EP0 supporting Specification Version")
+        try:
+            return dm_from_spec_version(spec_version)
+        except ConformanceException as e:
+            asserts.fail(f"Unable to identify specification version: {e}")
+
+    def build_spec_xmls(self):
+        if self.xml_clusters is not None:
+            return
+        dm = self._get_dm()
+        logging.info("----------------------------------------------------------------------------------")
+        logging.info(f"-- Running tests against Specification version {dm.dirname}")
+        logging.info("----------------------------------------------------------------------------------")
+        self.xml_clusters, problems = build_xml_clusters(dm)
+        self.problems.extend(problems)
+        self.xml_device_types, problems = build_xml_device_types(dm)
+        self.problems.extend(problems)
+
+    def get_test_name(self) -> str:
+        """Return the function name of the caller. Used to create logging entries."""
+        return sys._getframe().f_back.f_code.co_name
 
     def setup_class(self):
         super().setup_class()
+        self.problems = []
 
         # Mappings of cluster IDs to names and metadata.
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
@@ -1027,13 +1066,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Because setup_class can be called before commissioning, this variable is lazy-initialized
         # where the read is deferred until the first guard function call that requires global attributes.
         self.stored_global_wildcard = None
+        self.xml_clusters = None
+        self.xml_device_types = None
+        self.device_pics_list = None
 
     def setup_test(self):
+        self.applicable_endpoints: Optional[List[int, None]] = None
         self.current_step_index = 0
         self.test_start_time = datetime.now(timezone.utc)
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
         self.failed = False
+        # TODO: Find a better way to do endpoints - this is a stopgap to test the PICS stuff
+        self._ep = None
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
@@ -1059,8 +1104,28 @@ class MatterBaseTest(base_test.BaseTestClass):
             logging.info("###########################################################")
         super().teardown_class()
 
+    def teardown_test(self):
+        if self.user_params.get('test_case_list', False):
+            # TODO: make configurable
+            with open('test_case_list.txt', 'a') as f:
+                filename = inspect.getfile(self.__class__)
+                test_name = self.current_test_info.name
+                f.write(f'{filename}, {test_name}, {self.applicable_endpoints}\n')
+
     def check_pics(self, pics_key: str) -> bool:
-        return self.matter_test_config.pics.get(pics_key.strip(), False)
+        def pics_from_file():
+            return self.matter_test_config.pics.get(pics_key.strip(), False)
+        self._populate_wildcard()
+        self.build_spec_xmls()
+        if not self.device_pics_list:
+            self.device_pics_list, problems = generate_device_element_pics_from_device_wildcard(
+                self.stored_global_wildcard, self.xml_clusters)
+            self.problems.extend(problems)
+        # TODO: if this is a device pics, we should only accept the generated pics
+        # TODO: add an override for the ICD unit tests
+        if pics_key in self.device_pics_list[self.get_endpoint()]:
+            return True
+        return pics_from_file()
 
     @property
     def is_pics_sdk_ci_only(self) -> bool:
@@ -1414,7 +1479,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def _populate_wildcard(self):
         """ Populates self.stored_global_wildcard if not already filled. """
         if self.stored_global_wildcard is None:
-            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
+            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(0, Clusters.BasicInformation.Attributes.SpecificationVersion), (Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
                 None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
             self.stored_global_wildcard = self.event_loop.run_until_complete(global_wildcard)
 

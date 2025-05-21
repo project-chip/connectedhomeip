@@ -182,6 +182,7 @@ from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObje
 from chip.clusters.Types import Nullable
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
+from chip.testing.decorators import run_on_every_server_node_async, run_on_every_server_node
 from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
                                                cluster_id_type, command_id_type)
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -273,6 +274,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.build_spec_xmls()
 
     # ======= START OF ACTUAL TESTS =======
+    @run_on_every_server_node
     def test_TC_SM_1_1(self):
         ROOT_NODE_DEVICE_TYPE = 0x16
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
@@ -316,6 +318,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                   problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
                 self.fail_current_test()
 
+    @run_on_every_server_node
     def test_TC_DT_1_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
         self.print_step(2, "Verify that each endpoint includes a descriptor cluster")
@@ -364,7 +367,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         got_expected_error = error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
         return got_expected_error
 
-    @async_test_body
+    @run_on_every_server_node_async
     async def test_TC_IDM_10_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
 
@@ -674,6 +677,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test(
                 "At least one cluster has failed the range and support checks for its listed attributes, commands or features")
 
+    @run_on_every_server_node
     def test_TC_IDM_11_1(self):
         success = True
         for endpoint_id, endpoint in self.endpoints_tlv.items():
@@ -714,6 +718,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
     #     asserts.skip(
     #         "TODO: Make a test that verifies each endpoint has valid set of device types, and that the device type conformance is respected for each")
 
+    @run_on_every_server_node
     def test_TC_SM_1_2(self):
         self.print_step(1, "Wildcard read of device - already done")
 
@@ -772,6 +777,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not ok:
             self.fail_current_test()
 
+    @run_on_every_server_node
     def test_TC_PS_3_1(self):
         BRIDGED_NODE_DEVICE_TYPE_ID = 0x13
         success = True
@@ -878,6 +884,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test("power source EndpointList attribute is incorrect")
 
+    @run_on_every_server_node
     def test_TC_DESC_2_2(self):
         self.print_step(0, "Wildcard read of device - already done")
 
@@ -916,10 +923,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if problems or root_problems:
             self.fail_current_test("Problems with tags lists")
 
+    @run_on_every_server_node
     def steps_TC_IDM_12_1(self):
         return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
                 TestStep(1, "TH creates a MatterTlvJson dump of the wildcard attributes for submission to certification.")]
 
+    @run_on_every_server_node
     def test_TC_IDM_12_1(self):
         # wildcard read - already done.
         self.step(0)
@@ -944,7 +953,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         log_structured_data('==== json: ', json_str)
         log_structured_data('==== txt: ', txt_str)
 
-    @async_test_body
+    @run_on_every_server_node_async
     async def test_TC_DESC_2_1(self):
 
         EP_RANGE_MIN = 1
