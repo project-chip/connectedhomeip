@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>

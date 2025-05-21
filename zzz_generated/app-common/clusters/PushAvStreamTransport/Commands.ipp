@@ -62,7 +62,7 @@ namespace AllocatePushTransportResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.EncodeForWrite(to_underlying(Fields::kTransportConfiguration), transportConfiguration);
+    encoder.Encode(to_underlying(Fields::kTransportConfiguration), transportConfiguration);
     return encoder.Finalize();
 }
 
@@ -250,7 +250,7 @@ namespace FindTransportResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.EncodeForWrite(to_underlying(Fields::kTransportConfigurations), transportConfigurations);
+    encoder.Encode(to_underlying(Fields::kTransportConfigurations), transportConfigurations);
     return encoder.Finalize();
 }
 

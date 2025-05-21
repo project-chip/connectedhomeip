@@ -10211,8 +10211,6 @@ NS_ASSUME_NONNULL_BEGIN
         _transportStatus = @(0);
 
         _transportOptions = nil;
-
-        _fabricIndex = @(0);
     }
     return self;
 }
@@ -10224,14 +10222,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.connectionID = self.connectionID;
     other.transportStatus = self.transportStatus;
     other.transportOptions = self.transportOptions;
-    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions];
     return descriptionString;
 }
 

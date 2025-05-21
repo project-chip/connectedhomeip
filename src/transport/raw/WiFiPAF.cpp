@@ -143,6 +143,11 @@ CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
     return CHIP_NO_ERROR;
 }
 
+bool WiFiPAFBase::WiFiPAFResourceAvailable(void)
+{
+    return DeviceLayer::ConnectivityMgr().WiFiPAFResourceAvailable();
+}
+
 CHIP_ERROR WiFiPAFBase::SendAfterConnect(PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;

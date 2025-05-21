@@ -10333,11 +10333,10 @@ provisional cluster PushAvStreamTransport = 1365 {
     optional epoch_s expiryTime = 8;
   }
 
-  fabric_scoped struct TransportConfigurationStruct {
+  struct TransportConfigurationStruct {
     int16u connectionID = 0;
     TransportStatusEnum transportStatus = 1;
     optional TransportOptionsStruct transportOptions = 2;
-    fabric_idx fabricIndex = 254;
   }
 
   struct SupportedFormatStruct {
@@ -11511,12 +11510,12 @@ internal cluster UnitTesting = 4294048773 {
   attribute optional int8u writeOnlyInt8u = 16426;
   attribute nullable TestGlobalEnum nullableGlobalEnum = 16435;
   attribute nullable TestGlobalStruct nullableGlobalStruct = 16436;
-  attribute int8u meiInt8u = 4294070017;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  attribute int8u meiInt8u = 4294070017;
 
   response struct TestSpecificResponse = 0 {
     int8u returnValue = 0;
