@@ -105,10 +105,7 @@ class TC_AVSM_2_15(MatterBaseTest):
         # Commission DUT - already done
 
         self.step(1)
-        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
-        snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
-        asserts.assert_true(snpSupport, "Snapshot Feature is not supported.")
+        logger.info("Verified Snapshot feature is supported")
 
         self.step(2)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(

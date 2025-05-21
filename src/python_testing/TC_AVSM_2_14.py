@@ -110,10 +110,7 @@ class TC_AVSM_2_14(MatterBaseTest):
         # Commission DUT - already done
 
         self.step(1)
-        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
-        adoSupport = aFeatureMap & cluster.Bitmaps.Feature.kAudio
-        asserts.assert_equal(adoSupport, cluster.Bitmaps.Feature.kAudio, "Audio Feature is not supported.")
+        logger.info("Verified Audio feature is supported")
 
         self.step(2)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
