@@ -60566,11 +60566,6 @@ public class ChipClusters {
 
     public void readCurrentConnectionsAttribute(
         CurrentConnectionsAttributeCallback callback) {
-      readCurrentConnectionsAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readCurrentConnectionsAttributeWithFabricFilter(
-        CurrentConnectionsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_CONNECTIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -60579,7 +60574,7 @@ public class ChipClusters {
             List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, isFabricFiltered);
+        }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, true);
     }
 
     public void subscribeCurrentConnectionsAttribute(
