@@ -379,6 +379,7 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/service/network_manager/inc",
 
         "${wifi_sdk_root}/components/protocol/wifi/si91x",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
       ]
     }
 
