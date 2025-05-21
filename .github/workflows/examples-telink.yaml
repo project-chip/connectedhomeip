@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:129
+            image: ghcr.io/project-chip/chip-build-telink:132
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -356,13 +356,10 @@ jobs:
             BUILD_TYPE: telink
 
         runs-on: ubuntu-latest
-        # TODO: disabled due to flakes. Enable back when flakes are root caused and fixed
-        #       https://github.com/project-chip/connectedhomeip/issues/38882
-        # if: github.actor != 'restyled-io[bot]'
-        if: false
+        if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:129
+            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:132
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
