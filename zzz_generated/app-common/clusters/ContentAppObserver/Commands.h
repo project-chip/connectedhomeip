@@ -117,7 +117,7 @@ public:
     Optional<chip::CharSpan> data;
     Optional<chip::CharSpan> encodingHint;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

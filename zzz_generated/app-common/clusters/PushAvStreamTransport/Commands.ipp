@@ -59,7 +59,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace AllocatePushTransport.
 namespace AllocatePushTransportResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kTransportConfiguration), transportConfiguration);
@@ -247,7 +247,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace FindTransport.
 namespace FindTransportResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kTransportConfigurations), transportConfigurations);

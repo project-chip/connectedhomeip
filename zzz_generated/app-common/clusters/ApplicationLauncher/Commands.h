@@ -195,7 +195,7 @@ public:
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::ByteSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

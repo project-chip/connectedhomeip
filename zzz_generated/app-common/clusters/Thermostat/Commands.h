@@ -154,7 +154,7 @@ public:
     chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
     DataModel::List<const Structs::WeeklyScheduleTransitionStruct::Type> transitions;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -378,7 +378,7 @@ public:
     DataModel::List<const Globals::Structs::AtomicAttributeStatusStruct::Type> attributeStatus;
     Optional<uint16_t> timeout;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

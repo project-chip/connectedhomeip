@@ -64,7 +64,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace ProvisionRootCertificate.
 namespace ProvisionRootCertificateResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCaid), caid);
@@ -177,7 +177,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace LookupRootCertificate.
 namespace LookupRootCertificateResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCaid), caid);
@@ -261,7 +261,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace TLSClientCSR.
 namespace TLSClientCSRResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
@@ -421,7 +421,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace LookupClientCertificate.
 namespace LookupClientCertificateResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCcdid), ccdid);

@@ -53,7 +53,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Ping.
 namespace AddArgumentsResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kReturnValue), returnValue);

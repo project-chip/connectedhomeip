@@ -302,16 +302,9 @@ protected:
     public:
         EncodableResponseCommandPayload(const CommandData & value) : mValue(value) {}
 
-        CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, [[maybe_unused]] FabricIndex aAccessingFabricIndex) const final
+        CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const final
         {
-            if constexpr (DataModel::IsFabricScoped<CommandData>::value)
-            {
-                return mValue.Encode(writer, tag, aAccessingFabricIndex);
-            }
-            else
-            {
-                return mValue.Encode(writer, tag);
-            }
+            return mValue.Encode(writer, tag, aAccessingFabricIndex);
         }
 
         CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const final

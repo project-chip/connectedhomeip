@@ -105,7 +105,7 @@ public:
 
     DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

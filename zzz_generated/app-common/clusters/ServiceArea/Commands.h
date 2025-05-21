@@ -122,7 +122,7 @@ public:
     SelectAreasStatus status = static_cast<SelectAreasStatus>(0);
     chip::CharSpan statusText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -195,7 +195,7 @@ public:
     SkipAreaStatus status = static_cast<SkipAreaStatus>(0);
     chip::CharSpan statusText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

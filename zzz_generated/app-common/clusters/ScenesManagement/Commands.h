@@ -191,7 +191,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -276,7 +276,7 @@ public:
     Optional<chip::CharSpan> sceneName;
     Optional<DataModel::List<const Structs::ExtensionFieldSetStruct::Type>> extensionFieldSetStructs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -358,7 +358,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -432,7 +432,7 @@ public:
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -510,7 +510,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -629,7 +629,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     Optional<DataModel::List<const uint8_t>> sceneList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -718,7 +718,7 @@ public:
     chip::GroupId groupIdentifierFrom = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierFrom       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

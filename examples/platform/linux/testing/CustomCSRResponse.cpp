@@ -28,6 +28,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::OperationalCredentials::Commands;
 
+#if 0
 constexpr size_t kMaxResponseLength = 900;
 constexpr size_t kCSRNonceLength    = 32;
 
@@ -137,7 +138,6 @@ CHIP_ERROR ConstructCustomAttestationSignature(TLV::TLVWriter & writer, TLV::Tag
 
     return DataModel::Encode(writer, tag, attestationSignature);
 }
-
 } // namespace
 
 namespace chip {
@@ -163,3 +163,5 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const CSRResponse::Type
 } // namespace DataModel
 } // namespace app
 } // namespace chip
+
+#endif

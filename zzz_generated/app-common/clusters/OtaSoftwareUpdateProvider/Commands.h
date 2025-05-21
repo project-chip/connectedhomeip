@@ -160,7 +160,7 @@ public:
     Optional<bool> userConsentNeeded;
     Optional<chip::ByteSpan> metadataForRequestor;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -242,7 +242,7 @@ public:
     ApplyUpdateActionEnum action = static_cast<ApplyUpdateActionEnum>(0);
     uint32_t delayedActionTime   = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

@@ -164,7 +164,7 @@ public:
     Optional<DataModel::List<const Structs::WiFiInterfaceScanResultStruct::Type>> wiFiScanResults;
     Optional<DataModel::List<const Structs::ThreadInterfaceScanResultStruct::Type>> threadScanResults;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -336,7 +336,7 @@ public:
     Optional<chip::ByteSpan> clientIdentity;
     Optional<chip::ByteSpan> possessionSignature;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -417,7 +417,7 @@ public:
     Optional<chip::CharSpan> debugText;
     DataModel::Nullable<int32_t> errorValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -535,7 +535,7 @@ public:
     chip::ByteSpan identity;
     Optional<chip::ByteSpan> possessionSignature;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

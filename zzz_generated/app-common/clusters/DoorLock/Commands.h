@@ -413,7 +413,7 @@ public:
     Optional<uint8_t> endHour;
     Optional<uint8_t> endMinute;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -583,7 +583,7 @@ public:
     Optional<uint32_t> localStartTime;
     Optional<uint32_t> localEndTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -747,7 +747,7 @@ public:
     Optional<uint32_t> localEndTime;
     Optional<OperatingModeEnum> operatingMode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -927,7 +927,7 @@ public:
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextUserIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1060,7 +1060,7 @@ public:
     DataModel::Nullable<uint16_t> userIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1142,7 +1142,7 @@ public:
     DataModel::Nullable<uint16_t> nextCredentialIndex;
     Optional<DataModel::Nullable<chip::ByteSpan>> credentialData;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

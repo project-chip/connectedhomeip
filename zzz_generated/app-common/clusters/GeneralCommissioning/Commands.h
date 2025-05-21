@@ -145,7 +145,7 @@ public:
     CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -224,7 +224,7 @@ public:
     CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -292,7 +292,7 @@ public:
     CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -366,7 +366,7 @@ public:
 
     CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

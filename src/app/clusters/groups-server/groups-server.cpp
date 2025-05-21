@@ -210,7 +210,7 @@ struct GroupMembershipResponse
     chip::EndpointId mEndpoint                      = kInvalidEndpointId;
     GroupDataProvider::EndpointIterator * mIterator = nullptr;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
     {
         TLV::TLVType outer;
 

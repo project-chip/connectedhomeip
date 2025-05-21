@@ -159,7 +159,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -260,7 +260,7 @@ public:
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

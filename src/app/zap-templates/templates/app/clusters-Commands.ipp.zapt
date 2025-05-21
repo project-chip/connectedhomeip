@@ -15,14 +15,10 @@ namespace Commands {
 {{#zcl_commands}}
 namespace {{asUpperCamelCase name}} {
 
-{{#if isFabricScoped~}}
-{{#if (isServer source)}}
+{{#if (isClient source)}}
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
+{{else}}
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const {
-{{else}}
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
-{{/if}}
-{{else}}
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
 {{/if}}
     DataModel::WrappedStructEncoder encoder{aWriter, aTag};
     {{#zcl_command_arguments~}}

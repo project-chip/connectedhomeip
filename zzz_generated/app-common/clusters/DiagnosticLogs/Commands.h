@@ -122,7 +122,7 @@ public:
     Optional<uint64_t> UTCTimeStamp;
     Optional<uint64_t> timeSinceBoot;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 

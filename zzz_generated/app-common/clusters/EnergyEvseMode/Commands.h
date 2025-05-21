@@ -112,7 +112,7 @@ public:
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
 
