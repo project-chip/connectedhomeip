@@ -56,7 +56,7 @@ private:
      *
      * @param block The ByteSpan containing the descriptor data to process.
      */
-    CHIP_ERROR ProcessDescriptor(const ByteSpan & block);
+    CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 };
 
 } // namespace chip

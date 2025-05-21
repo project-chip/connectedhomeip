@@ -73,8 +73,8 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
                             ChipLogError(SoftwareUpdate, "Block too small for RPS header"));
 
         // Use spans to reference header and content directly
-        ByteSpan rpsHeaderSpan  = block.subSpan(0, kAlignmentBytes);
-        ByteSpan rpsContentSpan = block.subSpan(kAlignmentBytes);
+        ByteSpan rpsHeaderSpan  = block.SubSpan(0, kAlignmentBytes);
+        ByteSpan rpsContentSpan = block.SubSpan(kAlignmentBytes);
 
         // Send RPS header
         status       = sl_si91x_fwup_start(rpsHeaderSpan.data());
@@ -98,7 +98,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(const ByteSpan & block)
+CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
     ReturnErrorOnFailure(mCallbackProcessDescriptor(reinterpret_cast<void *>(mAccumulator.GetData())));

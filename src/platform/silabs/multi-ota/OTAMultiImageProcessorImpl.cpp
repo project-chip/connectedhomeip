@@ -202,16 +202,16 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
 
 CHIP_ERROR OTAMultiImageProcessorImpl::RegisterProcessor(OTAProcessorTag tag, OTATlvProcessor * processor)
 {
-    VerifyOrReturnError(processor->IsValidTag(tag), ChipLogError(SoftwareUpdate, "Invalid processor tag: %u", tag),
-                        CHIP_ERROR_INVALID_ARGUMENT);
-    auto pair = mProcessorMap.find(tag);
+    VerifyOrReturnError(processor->IsValidTag(tag), CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(SoftwareUpdate, "Invalid processor tag: %lu", static_cast<uint32_t>(tag)));
+    auto pair = mProcessorMap.find(static_cast<uint32_t>(tag));
     if (pair != mProcessorMap.end())
     {
-        ChipLogError(SoftwareUpdate, "A processor for tag %u is already registered.", tag);
+        ChipLogError(SoftwareUpdate, "A processor for tag %lu is already registered.", static_cast<uint32_t>(tag));
         return CHIP_OTA_PROCESSOR_ALREADY_REGISTERED;
     }
 
-    mProcessorMap.insert({ tag, processor });
+    mProcessorMap.insert({ static_cast<uint32_t>(tag), processor });
 
     return CHIP_NO_ERROR;
 }
@@ -286,10 +286,10 @@ void OTAMultiImageProcessorImpl::AbortAllProcessors()
 bool OTAMultiImageProcessorImpl::IsFirstImageRun()
 {
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if requestor == nullptr)
-        {
-            return false;
-        }
+    if (requestor == nullptr)
+    {
+        return false;
+    }
 
     return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
 }
