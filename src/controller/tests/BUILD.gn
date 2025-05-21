@@ -50,7 +50,6 @@ chip_test_suite("tests") {
     # Not supported on efr32.
     if (chip_device_platform != "efr32") {
       test_sources += [
-        "TestAutoCommissioner.cpp",
         "TestCommissioningWindowOpener.cpp",
         "TestExampleOperationalCredentialsIssuer.cpp",
       ]
