@@ -69,7 +69,8 @@ CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & e
 {
     AutoFreeThreadMetrics metrics(GetDiagnosticDataProvider());
 
-    if (metrics.ReadThreadMetrics() != CHIP_NO_ERROR) {
+    if (metrics.ReadThreadMetrics() != CHIP_NO_ERROR)
+    {
         // TODO: silently dropping error is what we historically did. We may want to at least log this...
         return encoder.EncodeEmptyList();
     }
