@@ -41,11 +41,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-<<<<<<< HEAD
       image: ghcr.io/project-chip/chip-build-efr32:132
-=======
-      image: ghcr.io/project-chip/chip-build-efr32:127
->>>>>>> 3a7a7c033f (Resolved re-review comments)
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
