@@ -9781,6 +9781,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _videoStreamID = @(0);
+
+        _viewport = [MTRCameraAVSettingsUserLevelManagementClusterViewportStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct alloc] init];
+
+    other.videoStreamID = self.videoStreamID;
+    other.viewport = self.viewport;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; viewport:%@; >", NSStringFromClass([self class]), _videoStreamID, _viewport];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRWebRTCTransportProviderClusterICEServerStruct
 - (instancetype)init
 {
@@ -10181,6 +10211,8 @@ NS_ASSUME_NONNULL_BEGIN
         _transportStatus = @(0);
 
         _transportOptions = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -10192,13 +10224,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.connectionID = self.connectionID;
     other.transportStatus = self.transportStatus;
     other.transportOptions = self.transportOptions;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions, _fabricIndex];
     return descriptionString;
 }
 

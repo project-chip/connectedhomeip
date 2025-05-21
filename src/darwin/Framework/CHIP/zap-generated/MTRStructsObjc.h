@@ -2340,6 +2340,12 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRCameraAVSettingsUserLevelManagementClusterViewportStruct * _Nonnull viewport MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRWebRTCTransportProviderClusterICEServerStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull urls MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable username MTR_PROVISIONALLY_AVAILABLE;
@@ -2434,6 +2440,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull connectionID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull transportStatus MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRPushAVStreamTransportClusterTransportOptionsStruct * _Nullable transportOptions MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

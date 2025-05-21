@@ -150,7 +150,7 @@ buildconfig_header("system_buildconfig") {
       chip_system_config_use_network_framework) {
     defines += [ "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=1" ]
   } else {
-    defines += [ "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=0 " ]
+    defines += [ "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=0" ]
   }
 }
 
