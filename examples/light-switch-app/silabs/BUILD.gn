@@ -130,15 +130,9 @@ silabs_executable("light_switch_app") {
   ]
 
   if (wifi_soc) {
-    deps += [
-      "${chip_root}/src/platform/silabs/platformAbstraction:wisemcu",
-      "${examples_plat_dir}:siwx917-common",
-    ]
+    deps += [ "${examples_plat_dir}:siwx917-common" ]
   } else {
-    deps += [
-      "${chip_root}/src/platform/silabs/platformAbstraction:gsdk",
-      "${examples_plat_dir}:efr32-common",
-    ]
+    deps += [ "${examples_plat_dir}:efr32-common" ]
   }
 
   if (chip_build_libshell) {
