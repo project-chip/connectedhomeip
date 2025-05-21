@@ -36,6 +36,95 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
+void LockThreadTask(void)
+{
+
+}
+
+void UnlockThreadTask(void)
+{
+
+}
+
+bool CommodityTariffDataProvider::TariffDataUpd_Init(const CommodityTariffPrimaryData& aNewData)
+{
+        bool allValid = true;
+
+#define X(attrName, attrType) \
+        attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName);
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+#define X(attrName, attrType) \
+        if (!attrName##_MgmtObj.IsValid()) { \
+            ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) is invalid", Attributes::attrName::Id); \
+            allValid = false; \
+        }
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+        return allValid;
+}
+
+void CommodityTariffDataProvider::TariffDataUpd_Commit()
+{
+    std::vector<uint16_t> changedAttributes;
+
+#define X(attrName, attrType) \
+    attrName##_MgmtObj.UpdateCommit();
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+#define X(attrName, attrType) \
+    if (attrName##_MgmtObj.HasChanged()) { \
+        ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) updated", Attributes::attrName::Id); \
+        changedAttributes.push_back(Attributes::attrName::Id); \
+    }
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+    if (!changedAttributes.empty())
+    {
+        for (auto attrId : changedAttributes)
+        {
+            MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, attrId);
+        }
+    }
+}
+
+void CommodityTariffDataProvider::TariffDataUpd_Abort()
+{
+#define X(attrName, attrType) \
+        attrName##_MgmtObj.UpdateAbort();
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+}
+
+bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator()
+{
+    return true;
+}
+
+void CommodityTariffDataProvider::TariffDataUpdate(const CommodityTariffPrimaryData& newData)
+{
+    if (!TariffDataUpd_Init(newData))
+    {
+        ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
+    }
+    else if (!TariffDataUpd_CrossValidator())
+    {
+        ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
+    }
+    else
+    {
+        TariffDataUpd_Commit();
+        ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+        return;
+    }
+    TariffDataUpd_Abort();
+}
+
+
 CHIP_ERROR CommodityTariffServer::Init()
 {
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
@@ -62,7 +151,7 @@ CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, 
     {
     case TariffInfo::Id:
         return aEncoder.Encode(mDelegate.GetTariffInfo());
-    /*case TariffUnit::Id:
+    case TariffUnit::Id:
         return aEncoder.Encode(mDelegate.GetTariffUnit());
     case StartDate::Id:
         return aEncoder.Encode(mDelegate.GetStartDate());
@@ -106,7 +195,7 @@ CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, 
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
         return aEncoder.Encode(mDelegate.GetDefaultRandomizationType());
-*/
+
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return aEncoder.Encode(mFeature);

@@ -36,7 +36,7 @@
 #include <cstdint>
 #include <functional>
 
-#include "CommodityTariffAttrsDataClassesTemplate.h"
+#include "CommodityTariffAttrsDataMgmt.h"
 
 namespace chip {
 namespace app {
@@ -132,7 +132,7 @@ public: \
         : CTC_BaseDataClass<attrType>(aValueStorage) {} \
     ~attrName##DataClass() override = default; \
 protected: \
-    CHIP_ERROR ValidateValue(const attrType& newValue) const override; \
+    CHIP_ERROR ValidateScalarValue(const PayloadType& newValue) const override; \
 };
 COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
 #undef X
@@ -144,9 +144,9 @@ public: \
         : CTC_BaseDataClass<attrType>(aValueStorage) {} \
     ~attrName##DataClass() override = default; \
 protected: \
-    CHIP_ERROR ValidateValue(const attrType& newValue) const override; \
+    CHIP_ERROR ValidateStructValue(const PayloadType& newValue) const override; \
     bool CompareStructValue(const PayloadType& source, const PayloadType& destination) const override; \
-    void CleanupStructValue(const PayloadType& aValue) override; \
+    void CleanupStructValue(PayloadType& aValue) override; \
 };
 COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 #undef X
@@ -191,6 +191,12 @@ public:
      * @param aEndpoint The Matter endpoint identifier
      */
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
+
+    /**
+     * @brief Set the current feature map for this tariff instance
+     * @param aFeature The current feature map value
+     */
+    void SetFeatures(BitMask<Feature> aFeature) { mFeature = aFeature; }
 
     // Pure virtual interface methods
     virtual Protocols::InteractionModel::Status 
@@ -244,7 +250,7 @@ private:
     bool TariffDataUpd_Init(const CommodityTariffPrimaryData& aNewData);
     void TariffDataUpd_Commit();
     void TariffDataUpd_Abort();
-    virtual bool TariffDataUpd_CrossValidator();
+    bool TariffDataUpd_CrossValidator();
 
     //Current attrs (time depended) update methods 
     void UpdateCurrentAttrs();
@@ -252,6 +258,7 @@ private:
 
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
+    BitMask<Feature> mFeature;
 };
 
 /**

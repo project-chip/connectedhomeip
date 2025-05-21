@@ -293,7 +293,7 @@ public:
                 }
                 else if constexpr (IsStruct<WrappedType>::value)
                 {
-                    CleanupStructValue(unwrapValue(mValue.Value()));
+                    CleanupStructValue(mValue.Value());
                 }
             }
             mValue.SetNull();
@@ -301,7 +301,6 @@ public:
         else if constexpr ( IsValueList() )
         {
             CleanupList(mValue);
-            mValue=ValueType();
         }
     }
 protected:
@@ -317,8 +316,37 @@ protected:
      * 
      * @note Derived classes should override for custom validation
      */
-    virtual CHIP_ERROR ValidateValue(const T & newValue) const {
-        return CHIP_NO_ERROR;
+    CHIP_ERROR ValidateValue(const T & aValue) {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if constexpr (IsValueNullable())
+        {
+            if constexpr (IsList<WrappedType>::value)
+            {
+                err = ValidateList(aValue.Value());
+            }
+            else if constexpr (IsStruct<WrappedType>::value) {
+                err = ValidateStructValue(aValue.Value());
+            }
+            else if constexpr (IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value)
+            {
+                err = ValidateScalarValue(aValue.Value());
+            }
+            else {
+                static_assert(false, "Unexpected Nullable wrapped type");
+            }
+        }
+        else if constexpr (IsValueList())
+        {
+            ValidateList(mValue);
+        }
+        else
+        {
+            InspectTypes();
+            static_assert(false, "Unexpected type");
+        }
+
+        return err;
     }
 
 
@@ -388,37 +416,26 @@ protected:
         }
     }
 
-    virtual CHIP_ERROR UpdateStructValue(const PayloadType& source, PayloadType& destination)
-    {
-        memcpy(&destination, &source, sizeof(PayloadType));
+    virtual CHIP_ERROR ValidateScalarValue(const PayloadType & newValue) const {
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR UpdateList(const DataModel::List<PayloadType>& source, DataModel::List<PayloadType>& destination)
+    virtual CHIP_ERROR ValidateStructValue(const PayloadType & newValue) const {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ValidateList(const DataModel::List<PayloadType>& newList)
     {
-        auto* buffer = static_cast<PayloadType*>(
-            chip::Platform::MemoryCalloc(source.size(), sizeof(PayloadType))
-        );
-    
-        if (!buffer) {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    
-        for (size_t i = 0; i < source.size(); i++) {
-            new (&buffer[i]) PayloadType();
-            if (CHIP_NO_ERROR != UpdateStructValue(source[i], buffer[i]) )
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        for (const auto& item : newList) {
+            err = ValidateStructValue(item);
+            if (err != CHIP_NO_ERROR)
             {
-                for (size_t j = 0; j < i; j++)
-                {
-                    CleanupStructValue(buffer[i]);
-                }
-                return CHIP_ERROR_NO_MEMORY;
+                break;
             }
         }
 
-        destination = DataModel::List<PayloadType>(chip::Span<PayloadType>(buffer, source.size()));
-
-        return CHIP_NO_ERROR;
+        return err;
    }
 
     /**
@@ -428,11 +445,12 @@ protected:
      * Calls CleanupListItem for each element and frees the list memory
      */
     void CleanupList(DataModel::List<PayloadType>& list) {
-        for (const auto& item : list) {
+        for (auto& item : list) {
             CleanupStructValue(item);
         }
         if (list.data()) {
             chip::Platform::MemoryFree(list.data());
+            list = DataModel::List<PayloadType>();
         }
     }
 
@@ -442,7 +460,7 @@ protected:
      * 
      * @note Derived classes should override for complex list items
      */
-    virtual void CleanupStructValue(const PayloadType& aValue) {
+    virtual void CleanupStructValue(PayloadType& aValue) {
         (void)aValue;
     }
 };
