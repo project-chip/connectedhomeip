@@ -30,6 +30,14 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+struct NodeDataModelConfiguration
+{
+    uint32_t configurationVersion;
+    uint8_t maxPathPerInvoke;
+    uint32_t dataModelVersion;
+    uint32_t specVersion;
+};
+
 /// Provides metadata information for a data model
 ///
 /// The data model can be viewed as a tree of endpoint/cluster/(attribute+commands+events)
@@ -40,6 +48,10 @@ public:
     virtual ~ProviderMetadataTree() = default;
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+
+    // virtual CHIP_ERROR RegisterNodeDataModelConfigurationChangeListener()                    = 0;
+    virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & outConfig) = 0;
+    virtual CHIP_ERROR BumpConfigurationVersion()                                            = 0;
 
     virtual CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> & builder) = 0;
 

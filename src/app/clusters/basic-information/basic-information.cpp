@@ -23,11 +23,13 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SpecificationDefinedRevisions.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/Events.h>
 #include <clusters/BasicInformation/Metadata.h>
 #include <clusters/BasicInformation/Structs.h>
+#include <data-model-providers/codegen/NodeConfigurationListener.h>
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
@@ -48,6 +50,22 @@ using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
+
+class NodeConfigurationListenerImpl : public NodeConfigurationListener
+{
+public:
+    void OnConfigurationVersionChanged() override
+    {
+        ChipLogProgress(Zcl, "OnConfigurationVersionChanged");
+        MatterReportingAttributeChangeCallback(0, BasicInformation::Id, BasicInformation::Attributes::ConfigurationVersion::Id);
+    }
+
+    static NodeConfigurationListenerImpl & Instance()
+    {
+        static NodeConfigurationListenerImpl instance;
+        return instance;
+    }
+};
 
 constexpr size_t kExpectedFixedLocationLength = 2;
 static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength,
@@ -96,6 +114,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     CHIP_ERROR status         = CHIP_NO_ERROR;
     auto * deviceInfoProvider = GetDeviceInstanceInfoProvider();
     auto & configManager      = ConfigurationMgr();
+    DataModel::NodeDataModelConfiguration nodeConfig;
 
     switch (aPath.mAttributeId)
     {
@@ -104,7 +123,8 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         break;
 
     case DataModelRevision::Id:
-        status = aEncoder.Encode(Revision::kDataModelRevision);
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfiguration(nodeConfig);
+        status = aEncoder.Encode(nodeConfig.dataModelVersion);
         break;
 
     case Location::Id:
@@ -279,22 +299,20 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     }
 
     case SpecificationVersion::Id: {
-        status = ReadSpecificationVersion(aEncoder);
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfiguration(nodeConfig);
+        status = aEncoder.Encode(nodeConfig.specVersion);
         break;
     }
 
     case MaxPathsPerInvoke::Id: {
-        status = ReadMaxPathsPerInvoke(aEncoder);
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfiguration(nodeConfig);
+        status = aEncoder.Encode(nodeConfig.maxPathPerInvoke);
         break;
     }
 
     case ConfigurationVersion::Id: {
-        uint32_t configurationVersion = 0;
-        status                        = configManager.GetConfigurationVersion(configurationVersion);
-        if (status == CHIP_NO_ERROR)
-        {
-            status = aEncoder.Encode(configurationVersion);
-        }
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfiguration(nodeConfig);
+        status = aEncoder.Encode(nodeConfig.configurationVersion);
         break;
     }
 
@@ -382,17 +400,6 @@ CHIP_ERROR BasicAttrAccess::ReadProductAppearance(AttributeValueEncoder & aEncod
     return aEncoder.Encode(productAppearance);
 }
 
-CHIP_ERROR BasicAttrAccess::ReadSpecificationVersion(AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.Encode(Revision::kSpecificationVersion);
-}
-
-CHIP_ERROR BasicAttrAccess::ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder)
-{
-    uint16_t max_path_per_invoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
-    return aEncoder.Encode(max_path_per_invoke);
-}
-
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
     void OnStartUp(uint32_t softwareVersion) override
@@ -462,10 +469,22 @@ void MatterBasicInformationPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
+
+    // Register the NodeConfigurationListener
+    if (NodeConfigurationListener::GetNodeConfigurationListener() == nullptr)
+    {
+        NodeConfigurationListener::SetNodeConfigurationListener(&NodeConfigurationListenerImpl::Instance());
+    }
 }
 
 void MatterBasicInformationPluginServerShutdownCallback()
 {
     PlatformMgr().SetDelegate(nullptr);
     AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+
+    // Unregister the NodeConfigurationListener
+    if (NodeConfigurationListener::GetNodeConfigurationListener() == &NodeConfigurationListenerImpl::Instance())
+    {
+        NodeConfigurationListener::SetNodeConfigurationListener(nullptr);
+    }
 }

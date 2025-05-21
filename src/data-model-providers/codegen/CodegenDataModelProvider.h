@@ -69,6 +69,10 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
+    // CHIP_ERROR RegisterNodeDataModelConfigurationChangeListener() override;
+    CHIP_ERROR GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & outConfig) override;
+    CHIP_ERROR BumpConfigurationVersion() override;
+
     /// attribute tree iteration
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out) override;
     CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;

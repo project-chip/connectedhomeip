@@ -34,6 +34,8 @@ codegen_data_model_SOURCES = [
   "${chip_root}/src/data-model-providers/codegen/EmberMetadata.cpp",
   "${chip_root}/src/data-model-providers/codegen/EmberMetadata.h",
   "${chip_root}/src/data-model-providers/codegen/Instance.cpp",
+  "${chip_root}/src/data-model-providers/codegen/NodeConfigurationListener.cpp",
+  "${chip_root}/src/data-model-providers/codegen/NodeConfigurationListener.h"
 ]
 
 codegen_data_model_PUBLIC_DEPS = [

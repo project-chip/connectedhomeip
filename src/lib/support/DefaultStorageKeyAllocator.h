@@ -265,6 +265,10 @@ public:
     // Terms and Conditions Acceptance Key
     // Stores the terms and conditions acceptance including terms and conditions revision, TLV encoded
     static StorageKeyName TermsAndConditionsAcceptance() { return StorageKeyName::FromConst("g/tc"); }
+
+    // ConfigutationVersion Key
+    // Stores the configuration version of the device
+    static StorageKeyName ConfigurationVersion() { return StorageKeyName::FromConst("g/cv"); }
 };
 
 } // namespace chip

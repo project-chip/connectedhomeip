@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
@@ -558,14 +559,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SimulateConfigurationVersionChange")
     {
-        uint32_t configurationVersion = 0;
-        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
-        configurationVersion++;
-
-        if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
-        }
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->BumpConfigurationVersion();
     }
     else
     {

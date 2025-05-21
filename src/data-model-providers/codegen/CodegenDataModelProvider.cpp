@@ -27,6 +27,7 @@
 #include <app/EventPathParams.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server-cluster/ServerClusterContext.h>
@@ -40,7 +41,9 @@
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/EmberMetadata.h>
+#include <data-model-providers/codegen/NodeConfigurationListener.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -161,6 +164,16 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 
     InitDataModelForTesting();
 
+    // If no ConfigutationVersion is set, we will set it to 1
+    chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
+    if (!mPersistentStorageDelegate->SyncDoesKeyExist(kStorageKey.KeyName()))
+    {
+        uint32_t configurationVersion = 1;
+        uint16_t size                 = sizeof(configurationVersion);
+        mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size);
+        ChipLogProgress(DataManagement, "Initialize ConfigurationVersion to 1");
+    }
+
     return mRegistry.SetContext(ServerClusterContext{
         .provider           = this,
         .storage            = mPersistentStorageDelegate,
@@ -195,6 +208,38 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
     // Ember always sets the return in the handler
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
+}
+
+CHIP_ERROR CodegenDataModelProvider::GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & outConfig)
+{
+    uint32_t configurationVersion    = 0;
+    uint16_t size                    = sizeof(configurationVersion);
+    chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
+    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
+
+    outConfig.configurationVersion = configurationVersion;
+    outConfig.maxPathPerInvoke     = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
+    outConfig.dataModelVersion     = Revision::kDataModelRevision;
+    outConfig.specVersion          = Revision::kSpecificationVersion;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CodegenDataModelProvider::BumpConfigurationVersion()
+{
+    ChipLogProgress(NotSpecified, "Bumping configuration version");
+
+    uint32_t configurationVersion    = 0;
+    uint16_t size                    = sizeof(configurationVersion);
+    chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
+    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
+
+    configurationVersion++;
+    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
+    ChipLogProgress(NotSpecified, "Configuration version bumped to %u", configurationVersion);
+
+    NodeConfigurationListener::NotifyNodeConfigurationListener();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodegenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & builder)
