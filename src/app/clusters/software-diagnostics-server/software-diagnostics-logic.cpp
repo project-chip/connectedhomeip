@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/CHIPError.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -68,7 +69,10 @@ CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & e
 {
     AutoFreeThreadMetrics metrics(GetDiagnosticDataProvider());
 
-    ReturnErrorOnFailure(metrics.ReadThreadMetrics());
+    if (metrics.ReadThreadMetrics() != CHIP_NO_ERROR) {
+        // TODO: silently dropping error is what we historically did. We may want to at least log this...
+        return encoder.EncodeEmptyList();
+    }
 
     return encoder.EncodeList([&metrics](const auto & itemEncoder) -> CHIP_ERROR {
         for (const DeviceLayer::ThreadMetrics * thread = metrics.ThreadMetrics(); thread != nullptr; thread = thread->Next)
