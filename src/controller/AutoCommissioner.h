@@ -66,8 +66,8 @@ private:
     // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set
     void SetCASEFailsafeTimerIfNeeded();
 
-    ByteSpan GetDAC() const { return ByteSpan(mDAC.Get(), mDAC.AllocatedSize()); }
-    ByteSpan GetPAI() const { return ByteSpan(mPAI.Get(), mPAI.AllocatedSize()); }
+    const ByteSpan GetDAC() { return mDAC.Span(); }
+    const ByteSpan GetPAI() { return mPAI.Span(); }
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Crypto::IdentityProtectionKeySpan ipk,
                                  NodeId adminSubject);
@@ -80,6 +80,9 @@ private:
     // kThreadNetworkSetup or kCleanup, depending whether network information has
     // been provided that matches the thread/wifi endpoint of the target.
     CommissioningStage GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+
+    // Helper function to allocate memory for a scopedMemoryBuffer and populate it with the data from the input span
+    CHIP_ERROR AllocateMemoryAndCopySpan(Platform::ScopedMemoryBufferWithSize<uint8_t> & scopedBuffer, ByteSpan span);
 
     // Helper function to determine if a scan attempt should be made given the
     // scan attempt commissioning params and the corresponding network endpoint of

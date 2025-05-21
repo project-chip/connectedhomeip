@@ -3560,8 +3560,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
+
+    case CommissioningStage::kJFValidateNOC:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    case CommissioningStage::kJFValidateNOC: {
+    {
         if (!params.GetJFAdministratorFabricIndex().HasValue() || !params.GetJFAdminNOC().HasValue() ||
             params.GetJFAdministratorFabricIndex().Value() == kUndefinedFabricIndex)
         {
@@ -3581,8 +3583,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 
         break;
     }
+#endif
 
-    case CommissioningStage::kSendVIDVerificationRequest: {
+    case CommissioningStage::kSendVIDVerificationRequest:
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    {
         /* TODO: send SignVidVerificationRequest */
         CommissioningStageComplete(CHIP_NO_ERROR);
         break;

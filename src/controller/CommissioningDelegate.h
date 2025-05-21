@@ -51,10 +51,6 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
     kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
     kAttestationRevocationCheck, ///< Verify Revocation Status of device's DAC chain
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    kJFValidateNOC,              ///< Verify Admin NOC contains an Administrator CAT
-    kSendVIDVerificationRequest, ///< Send SignVIDVerificationRequest command to the device
-#endif                           // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
     kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
@@ -88,7 +84,9 @@ enum CommissioningStage : uint8_t
     kRemoveWiFiNetworkConfig,         ///< Remove Wi-Fi network config.
     kRemoveThreadNetworkConfig,       ///< Remove Thread network config.
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
-    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state
+    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state/
+    kJFValidateNOC,                   ///< Verify Admin NOC contains an Administrator CAT
+    kSendVIDVerificationRequest,      ///< Send SignVIDVerificationRequest command to the device
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -767,13 +765,8 @@ private:
     Optional<VendorId> mJFAdminVendorId;
 
     Optional<ByteSpan> mJFAdminNOC;
-    Optional<size_t> mJFAdminNOCLen;
-
     Optional<ByteSpan> mJFAdminICAC;
-    Optional<size_t> mJFAdminICACLen;
-
     Optional<ByteSpan> mJFAdminRCAC;
-    Optional<size_t> mJFAdminRCACLen;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 };
 
