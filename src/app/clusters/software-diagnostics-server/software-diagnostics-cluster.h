@@ -139,7 +139,7 @@ private:
     //   - any other read error is just forwarded
     CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
     {
-        if (readError == CHIP_ERROR_NOT_IMPLEMENTED)
+        if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
         {
             value = 0;
         }
