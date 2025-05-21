@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/core/CHIPError.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 
 #include <app/server-cluster/DefaultServerCluster.h>
