@@ -264,10 +264,12 @@ def async_test_body(body):
                 # TODO: What do we do about problems with the PICS list at this stage
                 self.device_pics_list, _ = generate_device_element_pics_from_device_wildcard(
                     self.stored_global_wildcard, self.xml_clusters)
-                self.applicable_endpoints = [ep for ep, device_ep_pics in self.device_pics_list if set(
-                    test_pics).issubset(set(device_ep_pics).issubset())]
-                logging.info(
-                    f"Run test {inspect.stack()[-1].filename} {body} on endpoints {self.applicable_endpoints} - required PICS {test_pics} device ep pics = {self.device_pics_list}")
+            self.applicable_endpoints = [ep for ep, device_ep_pics in self.device_pics_list.items() if set(
+                test_pics).issubset(set(device_ep_pics))]
+            logging.info(
+                f"Run test {inspect.stack()[-1].filename} {body} on endpoints {self.applicable_endpoints} - required PICS {test_pics} device ep pics = {self.device_pics_list}")
+            asserts.skip("Dry run")
+            return
         return _async_runner(body, self, *args, **kwargs)
     return async_runner
 
