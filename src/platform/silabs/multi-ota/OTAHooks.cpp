@@ -48,8 +48,7 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
 
     auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
     sFactoryDataProcessor.RegisterDescriptorCallback(ProcessDescriptor);
-    ReturnErrorOnFailure(
-        imageProcessor.RegisterProcessor(chip::to_underlying(OTAProcessorTag::kFactoryDataProcessor), &sFactoryDataProcessor));
+    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(OTAProcessorTag::kFactoryDataProcessor, &sFactoryDataProcessor));
 
 #ifdef SLI_SI91X_MCU_INTERFACE
     // 917SOC: TA is the OTA processor for application image
@@ -58,14 +57,13 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
     static chip::OTAFirmwareProcessor sApplicationProcessor;
 #endif // SLI_SI91X_MCU_INTERFACE
     sApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
-    ReturnErrorOnFailure(
-        imageProcessor.RegisterProcessor(chip::to_underlying(OTAProcessorTag::kApplicationProcessor), &sApplicationProcessor));
+    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(OTAProcessorTag::kApplicationProcessor, &sApplicationProcessor));
 
 #if defined(SL_WIFI) && defined(EXP_BOARD)
     // 917NCP: register OTA processor
     static chip::OTAWiFiFirmwareProcessor sWiFiProcessor;
     sWiFiProcessor.RegisterDescriptorCallback(ProcessDescriptor);
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(chip::to_underlying(OTAProcessorTag::kWiFiTAProcessor), &sWiFiProcessor));
+    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(OTAProcessorTag::kWiFiTAProcessor, &sWiFiProcessor));
 #endif // defined(SL_WIFI) && defined(EXP_BOARD)
 
 #if OTA_TEST_CUSTOM_TLVS
@@ -77,12 +75,9 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
     customProcessor2.RegisterDescriptorCallback(ProcessDescriptor);
     customProcessor3.RegisterDescriptorCallback(ProcessDescriptor);
 
-    ReturnErrorOnFailure(
-        imageProcessor.RegisterProcessor(chip::to_underlying(OTAProcessorTag::kCustomProcessor1), &customProcessor1));
-    ReturnErrorOnFailure(
-        imageProcessor.RegisterProcessor(chip::to_underlying(OTAProcessorTag::kCustomProcessor2), &customProcessor2));
-    ReturnErrorOnFailure(
-        imageProcessor.RegisterProcessor(chip::to_underlying(OTAProcessorTag::kCustomProcessor3), &customProcessor3));
+    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(OTAProcessorTag::kCustomProcessor1, &customProcessor1));
+    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(OTAProcessorTag::kCustomProcessor2, &customProcessor2));
+    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(OTAProcessorTag::kCustomProcessor3, &customProcessor3));
 #endif
 
     return CHIP_NO_ERROR;

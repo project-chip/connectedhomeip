@@ -45,7 +45,7 @@ private:
     static constexpr size_t kBlockSize      = 1024;
 
 #if SL_MATTER_ENABLE_OTA_ENCRYPTION
-    uint32_t mUnalignmentNum;
+    uint32_t mUnalignmentNum = 0;
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
@@ -56,7 +56,7 @@ private:
      *
      * @param block The ByteSpan containing the descriptor data to process.
      */
-    CHIP_ERROR ProcessDescriptor(ByteSpan & block);
+    CHIP_ERROR ProcessDescriptor(const ByteSpan & block);
 };
 
 } // namespace chip
