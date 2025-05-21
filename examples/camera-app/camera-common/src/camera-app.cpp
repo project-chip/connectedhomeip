@@ -45,6 +45,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     BitFlags<CameraAvStreamManagement::Feature> features;
     features.Set(CameraAvStreamManagement::Feature::kSnapshot);
     features.Set(CameraAvStreamManagement::Feature::kVideo);
+
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
         features.Set(CameraAvStreamManagement::Feature::kAudio);
@@ -95,7 +96,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzStreams,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,

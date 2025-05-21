@@ -18522,7 +18522,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.DPTZRelativeMoveAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterDPTZStreamsAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.DPTZStreamsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -18530,9 +18530,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -19863,9 +19863,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(ChipStructs.JointFabricDatastoreClusterDatastoreStatusStruct value) {
+    public void onSuccess(ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.JointFabricDatastoreClusterDatastoreStatusStruct");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -19926,9 +19926,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntry> valueList) {
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntry>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
