@@ -1,7 +1,0 @@
-{{> header}}
-#pragma once
-
-{{#zcl_clusters}}
-#include <clusters/{{asUpperCamelCase label}}/AttributeIds.h>
-{{/zcl_clusters}}
-
