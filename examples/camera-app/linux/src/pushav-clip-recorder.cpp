@@ -28,19 +28,9 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/timestamp.h>
 }
-// TODO: update mHasVideo, mHasAudio
-PushAVClipRecorder::PushAVClipRecorder(const std::string & id, const std::string & outputPath, bool hasVideo, bool hasAudio) :
-    mId(id), mOutputPath(outputPath), mHasVideo(hasVideo), mHasAudio(true), mRunning(false)
-{
-    ChipLogProgress(Camera, "PushAVClipRecorder initialized with ID: %s, output path: %s", mId.c_str(), mOutputPath.c_str());
-}
 
-PushAVClipRecorder::~PushAVClipRecorder()
-{
-    Stop();
-}
-
-static int read_packet(void * opaque, uint8_t * buf, int buf_size)
+namespace {
+int ReadPacket(void * opaque, uint8_t * buf, int buf_size)
 {
     struct buffer_data * bd = (struct buffer_data *) opaque;
     buf_size                = FFMIN(buf_size, bd->size);
@@ -55,6 +45,18 @@ static int read_packet(void * opaque, uint8_t * buf, int buf_size)
 
     return buf_size;
 }
+} // namespace
+
+PushAVClipRecorder::PushAVClipRecorder(const std::string & id, const std::string & outputPath, bool hasVideo, bool hasAudio) :
+    mId(id), mOutputPath(outputPath), mHasVideo(hasVideo), mHasAudio(hasAudio), mRunning(false)
+{
+    ChipLogProgress(Camera, "PushAVClipRecorder initialized with ID: %s, output path: %s", mId.c_str(), mOutputPath.c_str());
+}
+
+PushAVClipRecorder::~PushAVClipRecorder()
+{
+    Stop();
+}
 
 void PushAVClipRecorder::Start()
 {
@@ -65,7 +67,7 @@ void PushAVClipRecorder::Start()
     }
     mRunning = true;
     mWorker  = std::thread(&PushAVClipRecorder::StartClipRecord, this);
-    uploader.start();
+    uploader.Start();
     ChipLogProgress(Camera, "Recording started for ID: %s", mId.c_str());
 }
 
@@ -182,7 +184,7 @@ void PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         mVideoStream->codecpar->width     = 320;
         mVideoStream->codecpar->height    = 240;
 
-        mVideoStream->avg_frame_rate = (AVRational){ 15, 1 };
+        mVideoStream->avg_frame_rate = (AVRational) { 15, 1 };
     }
     else if (type == AVMEDIA_TYPE_AUDIO)
     {
@@ -194,7 +196,7 @@ void PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         // audio_enc_ctx->channels        = 2;
         audio_enc_ctx->bit_rate   = 20000;
         audio_enc_ctx->sample_fmt = audio_codec->sample_fmts[0];
-        audio_enc_ctx->time_base  = (AVRational){ 1, 48000 };
+        audio_enc_ctx->time_base  = (AVRational) { 1, 48000 };
         avcodec_open2(audio_enc_ctx, audio_codec, nullptr);
         avcodec_parameters_from_context(mAudioStream->codecpar, audio_enc_ctx);
         if (mFmtCtx->oformat->flags & AVFMT_GLOBALHEADER)
@@ -255,10 +257,9 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
         struct buffer_data data   = { 0 };
         data.ptr                  = (uint8_t *) pkt->data;
         data.size                 = pkt->size;
-        AVIOContext * avio_ctx =
-            avio_alloc_context(avio_ctx_buffer, avio_ctx_buffer_size, 0, &data, &read_packet, nullptr, nullptr);
-        mInFmtCtx->pb    = avio_ctx;
-        mInFmtCtx->flags = AVFMT_FLAG_CUSTOM_IO;
+        AVIOContext * avio_ctx = avio_alloc_context(avio_ctx_buffer, avio_ctx_buffer_size, 0, &data, &ReadPacket, nullptr, nullptr);
+        mInFmtCtx->pb          = avio_ctx;
+        mInFmtCtx->flags       = AVFMT_FLAG_CUSTOM_IO;
         if (useVideo)
         {
             AVInputFormat * ifmt = av_find_input_format("h264");
@@ -277,8 +278,8 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
     }
 
     AVStream * out_stream = useVideo ? mVideoStream : mAudioStream;
-    AVRational inputTb    = (AVRational){ 1, 1000000 };
-    AVRational outputTb   = useVideo ? (AVRational){ 1, 90000 } : (AVRational){ 1, 48000 };
+    AVRational inputTb    = (AVRational) { 1, 1000000 };
+    AVRational outputTb   = useVideo ? (AVRational) { 1, 90000 } : (AVRational) { 1, 48000 };
     int64_t currentPts    = AV_NOPTS_VALUE;
 
     if (pkt->pts != AV_NOPTS_VALUE)
@@ -332,7 +333,7 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
                         "MAX_CLIP_DURATION: [%ld]",
                         currentPts, mCurrentClipStartPts, MAX_CLIP_DURATION);
         currentFragmentId++;
-        finalize_current_clip();
+        FinalizeCurrentClip();
         mCurrentClipStartPts = currentPts;
     }
 
@@ -345,7 +346,7 @@ bool PushAVClipRecorder::ProcessBuffersAndWrite()
         sprintf(buffer, "%s_chunk-stream0-%05d.cmfv", mOutputPrefix.c_str(), currentFragmentId);
         std::string filename(buffer);
         std::string url = "https://localhost:1234/streams/1";
-        uploader.add_uploadData(filename, url);
+        uploader.AddUploadData(filename, url);
     }
     return true;
 }
@@ -373,7 +374,7 @@ void PushAVClipRecorder::CleanupOutput()
  *
  * Writes the trailer of the current clip and initializes a new output file.
  */
-void PushAVClipRecorder::finalize_current_clip()
+void PushAVClipRecorder::FinalizeCurrentClip()
 {
     CleanupOutput();
     mclipId++;
