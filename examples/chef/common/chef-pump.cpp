@@ -65,6 +65,9 @@ uint16_t getIndexFlowMeasurement(EndpointId endpointId)
 uint16_t kDefaultMinFlow = 1;
 uint16_t kDefaultMaxFlow = 10;
 
+int16_t kMinCapacity = 0;
+int16_t kMaxCapacity = 100;
+
 /**
  * @brief Sets all setpoints to Max if state is On else NULL.
  */
@@ -155,6 +158,23 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
         FlowMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedFlow);
         MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
     }
+
+    DataModel::Nullable<int16_t> capacity =
+        LevelToSetpoint(level, DataModel::Nullable<int16_t>(kMinCapacity), DataModel::Nullable<int16_t>(kMaxCapacity));
+    PumpConfigurationAndControl::Attributes::Capacity::Set(endpointId, capacity);
+    MatterReportingAttributeChangeCallback(endpointId, PumpConfigurationAndControl::Id,
+                                           PumpConfigurationAndControl::Attributes::Capacity::Id);
+}
+
+CHIP_ERROR setPumpStatus(EndpointId endpoint, uint16_t status)
+{
+
+    Status res = PumpConfigurationAndControl::Attributes::PumpStatus::Set(
+        endpoint, BitMask<PumpConfigurationAndControl::PumpStatusBitmap>(status));
+    VerifyOrReturnLogError(res == Status::Success, CHIP_ERROR_INTERNAL);
+    MatterReportingAttributeChangeCallback(endpoint, PumpConfigurationAndControl::Id,
+                                           PumpConfigurationAndControl::Attributes::PumpStatus::Id);
+    return CHIP_NO_ERROR;
 }
 } // namespace
 
@@ -204,6 +224,14 @@ void postOnOff(EndpointId endpoint, bool value)
     else
     {
         updateSetPointsOnOff(endpoint, value);
+    }
+    if (value)
+    {
+        setPumpStatus(endpoint, to_underlying(PumpConfigurationAndControl::PumpStatusBitmap::kRunning));
+    }
+    else
+    {
+        setPumpStatus(endpoint, 0);
     }
 }
 
@@ -289,8 +317,11 @@ void init()
 
         VerifyOrDieWithMsg(OnOff::Attributes::OnOff::Set(endpointId, false) == Status::Success, DeviceLayer,
                            "Failed to initialize OnOff to false for Endpoint: %d", endpointId);
+
+        setPumpStatus(endpointId, 0);
     }
 }
 
 } // namespace pump
 } // namespace chef
+
