@@ -26,8 +26,8 @@
 
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/Realtek_bee/BeeConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/realtek/BEE/BeeConfig.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 

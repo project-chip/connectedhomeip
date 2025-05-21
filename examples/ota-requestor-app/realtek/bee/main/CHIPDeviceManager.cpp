@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,9 +26,7 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
 #include <core/ErrorStr.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
@@ -82,6 +81,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = PlatformMgr().StartEventLoopTask();
     SuccessOrExit(err);
 
+    // chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 #if CHIP_ENABLE_OPENTHREAD
     ChipLogProgress(DeviceLayer, "Initializing OpenThread stack");
     err = ThreadStackMgr().InitThreadStack();
@@ -118,6 +118,15 @@ void CHIPDeviceManager::Shutdown()
 {
     PlatformMgr().Shutdown();
 }
-
 } // namespace DeviceManager
 } // namespace chip
+
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type, uint16_t size, uint8_t * value)
+{
+    chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
+        chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
+    if (cb != nullptr)
+    {
+        cb->PostAttributeChangeCallback(path.mEndpointId, path.mClusterId, path.mAttributeId, type, size, value);
+    }
+}

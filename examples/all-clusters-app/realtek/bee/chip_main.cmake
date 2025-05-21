@@ -28,9 +28,9 @@ pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.bee)
 pw_set_backend(pw_trace pw_trace_tokenized)
 
-add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/lighting-app/realtek/bee/out/pigweed)
-add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/lighting-app/realtek/bee/out/nanopb)
-add_subdirectory(${chip_dir}/examples/platform/realtek/bee/pw_sys_io ${chip_dir}/examples/lighting-app/realtek/bee/out/pw_sys_io)
+add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/all-clusters-app/realtek/bee/out/pigweed)
+add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/all-clusters-app/realtek/bee/out/nanopb)
+add_subdirectory(${chip_dir}/examples/platform/realtek/bee/pw_sys_io ${chip_dir}/examples/all-clusters-app/realtek/bee/out/pw_sys_io)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -132,7 +132,7 @@ list(
     ${chip_dir}/examples/platform/realtek/bee/PigweedLogger.cpp
     ${chip_dir}/examples/platform/realtek/bee/Rpc.cpp
     ${chip_dir}/examples/common/pigweed/RpcService.cpp
-    ${chip_dir}/examples/common/pigweed/realtek/PigweedLoggerMutex.cpp
+    ${chip_dir}/examples/common/pigweed/PigweedLoggerMutex.cpp
 )
 endif (matter_enable_rpc)
 
@@ -152,13 +152,45 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/examples/lighting-app/lighting-common/src/ColorFormat.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/AppTask.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/LightingManager.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/chipinterface.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/DeviceCallbacks.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/Globals.cpp
+    ${chip_dir}/src/app/clusters/microwave-oven-control-server/microwave-oven-control-server.cpp
+
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp
+
+    ${chip_dir}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp
+
+    ${chip_dir}/examples/all-clusters-app/realtek/bee/main/AppTask.cpp
+    ${chip_dir}/examples/all-clusters-app/realtek/bee/main/LightingManager.cpp
+    ${chip_dir}/examples/all-clusters-app/realtek/bee/main/chipinterface.cpp
+    ${chip_dir}/examples/all-clusters-app/realtek/bee/main/DeviceCallbacks.cpp
+    ${chip_dir}/examples/all-clusters-app/realtek/bee/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/all-clusters-app/realtek/bee/main/Globals.cpp 
     ${chip_dir}/examples/platform/realtek/bee/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
@@ -170,8 +202,7 @@ add_library(
 )
 
 chip_configure_data_model(chip_main
-#    INCLUDE_SERVER
-    ZAP_FILE ${matter_example_path}/../../lighting-common/lighting-app.zap
+    ZAP_FILE ${matter_example_path}/../../all-clusters-common/all-clusters-app.zap
 )
 
 if (matter_enable_rpc)
@@ -183,7 +214,7 @@ target_include_directories(
     ${chip_dir}/examples/platform/realtek/bee/pw_sys_io/public
     ${chip_dir}/examples/common
     ${chip_dir}/examples/common/pigweed
-    ${chip_dir}/examples/common/pigweed/realtek
+    ${chip_dir}/examples/common/pigweed/realtek/bee
     ${chip_dir}/src
     ${chip_dir}/src/lib/support
     ${pigweed_dir}/pw_rpc/nanopb/public
@@ -194,24 +225,30 @@ target_include_directories(
     ${chip_main}
     PUBLIC
     ${inc_path}
-      ${chip_dir}/zzz_generated/lighting-app
-      ${chip_dir}/zzz_generated/lighting-app/zap-generated
-      ${chip_dir}/zzz_generated/app-common
-      ${chip_dir}/examples/lighting-app/realtek/bee/main/include
-      ${chip_dir}/examples/lighting-app/lighting-common
-      ${chip_dir}/examples/lighting-app/lighting-common/include
-      ${chip_dir}/examples/platform/realtek/bee
-      ${chip_dir}/examples/providers
-      ${chip_dir_output}/gen/include
-      ${chip_dir}/src/include/
-      ${chip_dir}/src/lib/
-      ${chip_dir}/src/
-      ${chip_dir}/third_party/nlassert/repo/include/
-      ${chip_dir}/src/app/
-      ${chip_dir}/src/app/util/
-      ${chip_dir}/src/app/server/
-      ${chip_dir}/src/controller/data_model
-      ${chip_dir}/third_party/nlio/repo/include/
+    ${chip_dir}/zzz_generated/all-clusters-app
+    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated
+    ${chip_dir}/zzz_generated/app-common
+    ${chip_dir}/examples/all-clusters-app/realtek/bee/main/include
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
+    ${chip_dir}/examples/microwave-oven-app/microwave-oven-common
+    ${chip_dir}/examples/microwave-oven-app/microwave-oven-common/include
+    ${chip_dir}/examples/energy-management-app/energy-management-common/common/include
+    ${chip_dir}/examples/energy-management-app/energy-management-common/device-energy-management/include
+    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/include
+    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-reporting/include
+    ${chip_dir}/examples/platform/realtek/bee
+    ${chip_dir}/examples/providers
+    ${chip_dir_output}/gen/include
+    ${chip_dir}/src/include/
+    ${chip_dir}/src/lib/
+    ${chip_dir}/src/
+    ${chip_dir}/third_party/nlassert/repo/include/
+    ${chip_dir}/src/app/
+    ${chip_dir}/src/app/util/
+    ${chip_dir}/src/app/server/
+    ${chip_dir}/src/controller/data_model
+    ${chip_dir}/third_party/nlio/repo/include/
 )
 
 if (matter_enable_rpc)
@@ -251,7 +288,7 @@ list(
 if (matter_dac_key_encryption)
 list(
     APPEND chip_main_flags 
-
+    
     -DCONFIG_DAC_KEY_ENC=1
 )
 endif (matter_dac_key_encryption)

@@ -46,4 +46,4 @@ openthread_root = ""
 chip_openthread_target = "//config/realtek/bee/openthread:openthread"
 
 chip_config_network_layer_ble = true
-custom_toolchain ="//config/realtek/bee/toolchain:bee"
+custom_toolchain = "//config/realtek/bee/toolchain:bee"

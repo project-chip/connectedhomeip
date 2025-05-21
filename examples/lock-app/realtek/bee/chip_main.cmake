@@ -28,9 +28,9 @@ pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.bee)
 pw_set_backend(pw_trace pw_trace_tokenized)
 
-add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/lighting-app/realtek/bee/out/pigweed)
-add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/lighting-app/realtek/bee/out/nanopb)
-add_subdirectory(${chip_dir}/examples/platform/realtek/bee/pw_sys_io ${chip_dir}/examples/lighting-app/realtek/bee/out/pw_sys_io)
+add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/lock-app/realtek/bee/out/pigweed)
+add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/lock-app/realtek/bee/out/nanopb)
+add_subdirectory(${chip_dir}/examples/platform/realtek/bee/pw_sys_io ${chip_dir}/examples/lock-app/realtek/bee/out/pw_sys_io)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -152,14 +152,15 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/examples/lighting-app/lighting-common/src/ColorFormat.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/AppTask.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/LightingManager.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/chipinterface.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/DeviceCallbacks.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/lighting-app/realtek/bee/main/Globals.cpp
+    ${chip_dir}/examples/lock-app/realtek/bee/main/AppTask.cpp
+    ${chip_dir}/examples/lock-app/realtek/bee/main/BoltLockManager.cpp
+    ${chip_dir}/examples/lock-app/realtek/bee/main/chipinterface.cpp
+    ${chip_dir}/examples/lock-app/realtek/bee/main/DeviceCallbacks.cpp
+    ${chip_dir}/examples/lock-app/realtek/bee/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/lock-app/realtek/bee/main/Globals.cpp
     ${chip_dir}/examples/platform/realtek/bee/util/LEDWidget.cpp
+    
+
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
@@ -170,8 +171,8 @@ add_library(
 )
 
 chip_configure_data_model(chip_main
-#    INCLUDE_SERVER
-    ZAP_FILE ${matter_example_path}/../../lighting-common/lighting-app.zap
+    INCLUDE_SERVER
+    ZAP_FILE ${matter_example_path}/../../lock-common/lock-app.zap
 )
 
 if (matter_enable_rpc)
@@ -183,7 +184,7 @@ target_include_directories(
     ${chip_dir}/examples/platform/realtek/bee/pw_sys_io/public
     ${chip_dir}/examples/common
     ${chip_dir}/examples/common/pigweed
-    ${chip_dir}/examples/common/pigweed/realtek
+    ${chip_dir}/examples/common/pigweed/realtek/bee
     ${chip_dir}/src
     ${chip_dir}/src/lib/support
     ${pigweed_dir}/pw_rpc/nanopb/public
@@ -193,25 +194,25 @@ endif (matter_enable_rpc)
 target_include_directories(
     ${chip_main}
     PUBLIC
-    ${inc_path}
-      ${chip_dir}/zzz_generated/lighting-app
-      ${chip_dir}/zzz_generated/lighting-app/zap-generated
-      ${chip_dir}/zzz_generated/app-common
-      ${chip_dir}/examples/lighting-app/realtek/bee/main/include
-      ${chip_dir}/examples/lighting-app/lighting-common
-      ${chip_dir}/examples/lighting-app/lighting-common/include
-      ${chip_dir}/examples/platform/realtek/bee
-      ${chip_dir}/examples/providers
-      ${chip_dir_output}/gen/include
-      ${chip_dir}/src/include/
-      ${chip_dir}/src/lib/
-      ${chip_dir}/src/
-      ${chip_dir}/third_party/nlassert/repo/include/
-      ${chip_dir}/src/app/
-      ${chip_dir}/src/app/util/
-      ${chip_dir}/src/app/server/
-      ${chip_dir}/src/controller/data_model
-      ${chip_dir}/third_party/nlio/repo/include/
+	${inc_path}
+    ${chip_dir}/zzz_generated/lock-app
+    ${chip_dir}/zzz_generated/lock-app/zap-generated
+    ${chip_dir}/zzz_generated/app-common
+    ${chip_dir}/examples/lock-app/lock-common
+    ${chip_dir}/examples/lock-app/lock-common/include
+    ${chip_dir}/examples/lock-app/realtek/bee/main/include
+    ${chip_dir}/examples/platform/realtek/bee
+    ${chip_dir}/examples/providers
+    ${chip_dir_output}/gen/include
+    ${chip_dir}/src/include/
+    ${chip_dir}/src/lib/
+    ${chip_dir}/src/
+    ${chip_dir}/third_party/nlassert/repo/include/
+    ${chip_dir}/src/app/
+    ${chip_dir}/src/app/util/
+    ${chip_dir}/src/app/server/
+    ${chip_dir}/src/controller/data_model
+    ${chip_dir}/third_party/nlio/repo/include/
 )
 
 if (matter_enable_rpc)
@@ -251,7 +252,7 @@ list(
 if (matter_dac_key_encryption)
 list(
     APPEND chip_main_flags 
-
+    
     -DCONFIG_DAC_KEY_ENC=1
 )
 endif (matter_dac_key_encryption)
@@ -286,12 +287,21 @@ list(
 )
 endif (matter_enable_shell)
 
+
+if(matter_enable_dlps)
+list(
+    APPEND chip_main_flags
+
+    -DDLPS_EN=1
+)
+endif (matter_enable_dlps)
+
 list(
     APPEND chip_main_cpp_flags
 
-	  -Wno-unused-parameter
-	  -std=gnu++17
-	  -fno-rtti
+    -Wno-unused-parameter
+    -std=gnu++17
+    -fno-rtti
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})

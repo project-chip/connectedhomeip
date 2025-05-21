@@ -53,7 +53,7 @@ declare_args() {
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
       chip_device_platform == "cc13x4_26x4" ||
       chip_device_platform == "tizen" || chip_device_platform == "stm32" ||
-      chip_device_platform == "webos" || chip_device_platform == "bee" 
+      chip_device_platform == "webos" || chip_device_platform == "bee"
 }
 
 declare_args() {

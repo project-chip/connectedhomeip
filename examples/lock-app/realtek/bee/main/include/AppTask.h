@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "LightingManager.h"
+#include "BoltLockManager.h"
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
@@ -33,6 +33,10 @@
 
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 
+// Application-defined error codes in the CHIP_ERROR space.
+#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x01)
+
+#define APP_NAME "Lock-app"
 class AppTask
 {
 public:
@@ -42,7 +46,7 @@ public:
 
     static void AppTaskMain(void * pvParameter);
 
-    // void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);//for shell
+    // void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);//for shell
     void PostEvent(const AppEvent * event);
     void UpdateClusterState();
 
@@ -53,35 +57,39 @@ private:
 
     static void InitServer(intptr_t arg);
 
-    static void ActionInitiated(LightingManager::Action_t aAction);
-    static void ActionCompleted(LightingManager::Action_t aAction);
+    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(BoltLockManager::Action_t aAction);
 
-    void StartTimer(uint32_t aTimeoutMs);
     void CancelTimer(void);
 
     void DispatchEvent(AppEvent * event);
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
-
-    static void LightingActionEventHandler(AppEvent * aEvent);
+    static void LockActionEventHandler(AppEvent * aEvent);
+    static void JammedLockEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
 
-    static void BLEStartAdvertising(intptr_t arg);
-    static void BLEAdvEventHandler(AppEvent * aEvent);
+    // static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    // static void UpdateLEDs(void);
+
+    void StartTimer(uint32_t aTimeoutMs);
 
     enum Function_t
     {
         kFunction_NoneSelected = 0,
         kFunction_Reset        = 1,
-        kFunction_BLEAdv       = 2,
-        kFunction_FactoryReset = 3,
+        kFunction_FactoryReset = 2,
+
         kFunction_Invalid
     } Function;
 
-    Function_t mFunction;
-    bool mFunctionTimerActive;
-    bool mSyncClusterToButtonAction;
+    Function_t mFunction            = Function_t::kFunction_NoneSelected;
+    bool mFunctionTimerActive       = false;
+    bool mSyncClusterToButtonAction = false;
+    bool mNotifyState               = false;
+
+    chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
     static AppTask sAppTask;
 };

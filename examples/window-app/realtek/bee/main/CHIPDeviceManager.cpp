@@ -25,9 +25,7 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/af-types.h>
 #include <core/ErrorStr.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
@@ -121,3 +119,23 @@ void CHIPDeviceManager::Shutdown()
 
 } // namespace DeviceManager
 } // namespace chip
+
+void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    switch (attributePath.mClusterId)
+    {
+    case app::Clusters::Identify::Id:
+        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+        break;
+
+    case app::Clusters::WindowCovering::Id:
+        ChipLogProgress(Zcl, "Window covering cluster ID: " ChipLogFormatMEI " Type: %u Value: %u, length: %u",
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+        break;
+
+    default:
+        break;
+    }
+}

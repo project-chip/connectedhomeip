@@ -26,9 +26,9 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/Realtek_bee/CHIPDevicePlatformConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/realtek/BEE/CHIPDevicePlatformConfig.h>
 
 #define FACTORY_TEST 0
 

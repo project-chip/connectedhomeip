@@ -25,9 +25,6 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <core/ErrorStr.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
@@ -88,7 +85,6 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     SuccessOrExit(err);
 
     ChipLogProgress(DeviceLayer, "Set Thread Device Type");
-
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD

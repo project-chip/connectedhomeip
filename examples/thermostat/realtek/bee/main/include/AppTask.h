@@ -23,9 +23,8 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "LightingManager.h"
-
 #include "FreeRTOS.h"
+#include "TemperatureManager.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
@@ -42,9 +41,7 @@ public:
 
     static void AppTaskMain(void * pvParameter);
 
-    // void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);//for shell
     void PostEvent(const AppEvent * event);
-    void UpdateClusterState();
 
     static void ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed);
 
@@ -53,9 +50,6 @@ private:
 
     static void InitServer(intptr_t arg);
 
-    static void ActionInitiated(LightingManager::Action_t aAction);
-    static void ActionCompleted(LightingManager::Action_t aAction);
-
     void StartTimer(uint32_t aTimeoutMs);
     void CancelTimer(void);
 
@@ -63,25 +57,21 @@ private:
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
+    static void ThermostatHandler(AppEvent * aEvent);
 
-    static void LightingActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
-
-    static void BLEStartAdvertising(intptr_t arg);
-    static void BLEAdvEventHandler(AppEvent * aEvent);
 
     enum Function_t
     {
         kFunction_NoneSelected = 0,
         kFunction_Reset        = 1,
-        kFunction_BLEAdv       = 2,
-        kFunction_FactoryReset = 3,
+        kFunction_FactoryReset = 2,
+
         kFunction_Invalid
     } Function;
 
     Function_t mFunction;
     bool mFunctionTimerActive;
-    bool mSyncClusterToButtonAction;
 
     static AppTask sAppTask;
 };

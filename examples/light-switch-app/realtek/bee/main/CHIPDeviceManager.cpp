@@ -25,13 +25,12 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <core/ErrorStr.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+
+#include "Globals.h"
 
 using namespace ::chip;
 
