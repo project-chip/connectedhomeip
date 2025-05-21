@@ -36163,7 +36163,6 @@ NS_ASSUME_NONNULL_BEGIN
         } else {
             self.transportConfiguration.transportOptions = nil;
         }
-        self.transportConfiguration.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.transportConfiguration.fabricIndex];
     }
     return CHIP_NO_ERROR;
 }
@@ -36909,7 +36908,6 @@ NS_ASSUME_NONNULL_BEGIN
                 } else {
                     newElement_0.transportOptions = nil;
                 }
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
