@@ -59,8 +59,8 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                is_standard_command_id)
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
 from chip.testing.spec_parsing import XmlCluster
 from chip.tlv import uint
 
@@ -140,6 +140,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     async def teardown_test(self):
         await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[
             (0, Clusters.AccessControl.Attributes.Acl(self.default_acl))])
+        return super().teardown_test()
 
     async def _setup_acl(self, privilege: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]):
         if privilege is None:
