@@ -614,6 +614,11 @@ private:
 
     CHIP_ERROR StoreRankedVideoStreamPriorities();
     CHIP_ERROR LoadRankedVideoStreamPriorities();
+
+    void ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
+
+    void ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
+
     /**
      * @brief Inherited from CommandHandlerInterface
      */
