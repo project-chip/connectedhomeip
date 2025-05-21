@@ -159,7 +159,7 @@ private:
     /**
      * @brief Finalizes the current clip and prepares for a new one.
      */
-    void finalize_current_clip();
+    void FinalizeCurrentClip();
 };
 
 #endif // PUSHAV_CLIP_RECORDER_H

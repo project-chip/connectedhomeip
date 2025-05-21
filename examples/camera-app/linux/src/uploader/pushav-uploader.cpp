@@ -19,29 +19,29 @@
 #include "pushav-uploader.h"
 #include <lib/support/logging/CHIPLogging.h>
 
-PushAVUploader::PushAVUploader() : running(false) {}
+PushAVUploader::PushAVUploader() : mIsRunning(false) {}
 
 PushAVUploader::~PushAVUploader()
 {
-    stop();
+    Stop();
 }
 
-void PushAVUploader::process_queue()
+void PushAVUploader::ProcessQueue()
 {
-    while (running)
+    while (mIsRunning)
     {
-        std::pair<std::string, std::string> data;
+        std::pair<std::string, std::string> uploadJob;
         {
-            std::lock_guard<std::mutex> lock(queue_mutex);
-            if (!av_data.empty())
+            std::lock_guard<std::mutex> lock(mQueueMutex);
+            if (!mAvData.empty())
             {
-                data = av_data.front();
-                av_data.pop();
+                uploadJob = std::move(mAvData.front());
+                mAvData.pop();
             }
         }
-        if (!av_data.empty())
+        if (!uploadJob.first.empty() && !uploadJob.second.empty())
         {
-            upload_data(data);
+            UploadData(uploadJob);
         }
         else
         {
@@ -50,36 +50,36 @@ void PushAVUploader::process_queue()
     }
 }
 
-void PushAVUploader::start()
+void PushAVUploader::Start()
 {
-    if (!running)
+    if (!mIsRunning)
     {
-        running         = true;
-        uploader_thread = std::thread(&PushAVUploader::process_queue, this);
+        mIsRunning      = true;
+        mUploaderThread = std::thread(&PushAVUploader::ProcessQueue, this);
     }
 }
 
-void PushAVUploader::stop()
+void PushAVUploader::Stop()
 {
-    if (running)
+    if (mIsRunning)
     {
-        running = false;
-        if (uploader_thread.joinable())
+        mIsRunning = false;
+        if (mUploaderThread.joinable())
         {
-            uploader_thread.join();
+            mUploaderThread.join();
         }
     }
 }
 
-void PushAVUploader::add_uploadData(std::string & filename, std::string & url)
+void PushAVUploader::AddUploadData(const std::string & filename, const std::string & url)
 {
     ChipLogError(Camera, "Added file name %s to queue", filename.c_str());
-    std::lock_guard<std::mutex> lock(queue_mutex);
+    std::lock_guard<std::mutex> lock(mQueueMutex);
     auto data = make_pair(filename, url);
-    av_data.push(data);
+    mAvData.push(data);
 }
 
-void PushAVUploader::upload_data(std::pair<std::string, std::string> data)
+void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
 {
     CURL * curl = curl_easy_init();
     if (!curl)
