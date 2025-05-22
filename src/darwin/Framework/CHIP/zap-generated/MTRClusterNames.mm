@@ -10754,6 +10754,30 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"UnlockWithTimeout";
             break;
 
+        case MTRCommandIDTypeClusterDoorLockCommandSetPINCodeID:
+            result = @"SetPINCode";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandGetPINCodeID:
+            result = @"GetPINCode";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandClearPINCodeID:
+            result = @"ClearPINCode";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandClearAllPINCodesID:
+            result = @"ClearAllPINCodes";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandSetUserStatusID:
+            result = @"SetUserStatus";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandGetUserStatusID:
+            result = @"GetUserStatus";
+            break;
+
         case MTRCommandIDTypeClusterDoorLockCommandSetWeekDayScheduleID:
             result = @"SetWeekDaySchedule";
             break;
@@ -10788,6 +10812,30 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterDoorLockCommandClearHolidayScheduleID:
             result = @"ClearHolidaySchedule";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandSetUserTypeID:
+            result = @"SetUserType";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandGetUserTypeID:
+            result = @"GetUserType";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandSetRFIDCodeID:
+            result = @"SetRFIDCode";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandGetRFIDCodeID:
+            result = @"GetRFIDCode";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandClearRFIDCodeID:
+            result = @"ClearRFIDCode";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandClearAllRFIDCodesID:
+            result = @"ClearAllRFIDCodes";
             break;
 
         case MTRCommandIDTypeClusterDoorLockCommandSetUserID:
@@ -13220,6 +13268,14 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         switch (commandID) {
 
+        case MTRCommandIDTypeClusterDoorLockCommandGetPINCodeResponseID:
+            result = @"GetPINCodeResponse";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandGetUserStatusResponseID:
+            result = @"GetUserStatusResponse";
+            break;
+
         case MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleResponseID:
             result = @"GetWeekDayScheduleResponse";
             break;
@@ -13230,6 +13286,14 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleResponseID:
             result = @"GetHolidayScheduleResponse";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandGetUserTypeResponseID:
+            result = @"GetUserTypeResponse";
+            break;
+
+        case MTRCommandIDTypeClusterDoorLockCommandGetRFIDCodeResponseID:
+            result = @"GetRFIDCodeResponse";
             break;
 
         case MTRCommandIDTypeClusterDoorLockCommandGetUserResponseID:

@@ -10602,6 +10602,58 @@ public class ClusterInfoMapping {
   }
 
 
+  public static class DelegatedDoorLockClusterGetPINCodeResponseCallback implements ChipClusters.DoorLockCluster.GetPINCodeResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer userID, @Nullable Integer userStatus, @Nullable Integer userType, @Nullable byte[] PINCode) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo userIDResponseValue = new CommandResponseInfo("userID", "Integer");
+      responseValues.put(userIDResponseValue, userID);
+      CommandResponseInfo userStatusResponseValue = new CommandResponseInfo("userStatus", "Integer");
+      responseValues.put(userStatusResponseValue, userStatus);
+      CommandResponseInfo userTypeResponseValue = new CommandResponseInfo("userType", "Integer");
+      responseValues.put(userTypeResponseValue, userType);
+      CommandResponseInfo PINCodeResponseValue = new CommandResponseInfo("PINCode", "byte[]");
+      responseValues.put(PINCodeResponseValue, PINCode);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedDoorLockClusterGetUserStatusResponseCallback implements ChipClusters.DoorLockCluster.GetUserStatusResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer userID, Integer userStatus) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo userIDResponseValue = new CommandResponseInfo("userID", "Integer");
+      responseValues.put(userIDResponseValue, userID);
+      CommandResponseInfo userStatusResponseValue = new CommandResponseInfo("userStatus", "Integer");
+      responseValues.put(userStatusResponseValue, userStatus);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedDoorLockClusterGetWeekDayScheduleResponseCallback implements ChipClusters.DoorLockCluster.GetWeekDayScheduleResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -10676,7 +10728,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer holidayIndex, Integer status, Optional<Long> localStartTime, Optional<Long> localEndTime, Optional<Integer> operatingMode) {
+    public void onSuccess(Integer holidayIndex, Integer status, @Nullable Optional<Long> localStartTime, @Nullable Optional<Long> localEndTime, @Nullable Optional<Integer> operatingMode) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo holidayIndexResponseValue = new CommandResponseInfo("holidayIndex", "Integer");
@@ -10689,6 +10741,58 @@ public class ClusterInfoMapping {
       responseValues.put(localEndTimeResponseValue, localEndTime);
       CommandResponseInfo operatingModeResponseValue = new CommandResponseInfo("operatingMode", "Optional<Integer>");
       responseValues.put(operatingModeResponseValue, operatingMode);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedDoorLockClusterGetUserTypeResponseCallback implements ChipClusters.DoorLockCluster.GetUserTypeResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer userID, Integer userType) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo userIDResponseValue = new CommandResponseInfo("userID", "Integer");
+      responseValues.put(userIDResponseValue, userID);
+      CommandResponseInfo userTypeResponseValue = new CommandResponseInfo("userType", "Integer");
+      responseValues.put(userTypeResponseValue, userType);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedDoorLockClusterGetRFIDCodeResponseCallback implements ChipClusters.DoorLockCluster.GetRFIDCodeResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer userID, @Nullable Integer userStatus, @Nullable Integer userType, @Nullable byte[] RFIDCode) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo userIDResponseValue = new CommandResponseInfo("userID", "Integer");
+      responseValues.put(userIDResponseValue, userID);
+      CommandResponseInfo userStatusResponseValue = new CommandResponseInfo("userStatus", "Integer");
+      responseValues.put(userStatusResponseValue, userStatus);
+      CommandResponseInfo userTypeResponseValue = new CommandResponseInfo("userType", "Integer");
+      responseValues.put(userTypeResponseValue, userType);
+      CommandResponseInfo RFIDCodeResponseValue = new CommandResponseInfo("RFIDCode", "byte[]");
+      responseValues.put(RFIDCodeResponseValue, RFIDCode);
       callback.onSuccess(responseValues);
     }
 
@@ -10773,7 +10877,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex, @Nullable Optional<byte[]> credentialData) {
+    public void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Optional<Integer> nextCredentialIndex, @Nullable Optional<byte[]> credentialData) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo credentialExistsResponseValue = new CommandResponseInfo("credentialExists", "Boolean");
@@ -10784,7 +10888,7 @@ public class ClusterInfoMapping {
       responseValues.put(creatorFabricIndexResponseValue, creatorFabricIndex);
       CommandResponseInfo lastModifiedFabricIndexResponseValue = new CommandResponseInfo("lastModifiedFabricIndex", "Integer");
       responseValues.put(lastModifiedFabricIndexResponseValue, lastModifiedFabricIndex);
-      CommandResponseInfo nextCredentialIndexResponseValue = new CommandResponseInfo("nextCredentialIndex", "Integer");
+      CommandResponseInfo nextCredentialIndexResponseValue = new CommandResponseInfo("nextCredentialIndex", "Optional<Integer>");
       responseValues.put(nextCredentialIndexResponseValue, nextCredentialIndex);
       CommandResponseInfo credentialDataResponseValue = new CommandResponseInfo("credentialData", "Optional<byte[]>");
       responseValues.put(credentialDataResponseValue, credentialData);
@@ -26620,6 +26724,125 @@ public class ClusterInfoMapping {
     );
     doorLockClusterInteractionInfoMap.put("unlockWithTimeout", doorLockunlockWithTimeoutInteractionInfo);
 
+    Map<String, CommandParameterInfo> doorLocksetPINCodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLocksetPINCodeuserIDCommandParameterInfo = new CommandParameterInfo("userID", Integer.class, Integer.class);
+    doorLocksetPINCodeCommandParams.put("userID",doorLocksetPINCodeuserIDCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetPINCodeuserStatusCommandParameterInfo = new CommandParameterInfo("userStatus", Integer.class, Integer.class);
+    doorLocksetPINCodeCommandParams.put("userStatus",doorLocksetPINCodeuserStatusCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetPINCodeuserTypeCommandParameterInfo = new CommandParameterInfo("userType", Integer.class, Integer.class);
+    doorLocksetPINCodeCommandParams.put("userType",doorLocksetPINCodeuserTypeCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetPINCodepinCommandParameterInfo = new CommandParameterInfo("pin", byte[].class, byte[].class);
+    doorLocksetPINCodeCommandParams.put("pin",doorLocksetPINCodepinCommandParameterInfo);
+    InteractionInfo doorLocksetPINCodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .setPINCode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("userID")
+        , (Integer)
+        commandArguments.get("userStatus")
+        , (Integer)
+        commandArguments.get("userType")
+        , (byte[])
+        commandArguments.get("pin"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLocksetPINCodeCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("setPINCode", doorLocksetPINCodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLockgetPINCodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLockgetPINCodeuserIDCommandParameterInfo = new CommandParameterInfo("userID", Integer.class, Integer.class);
+    doorLockgetPINCodeCommandParams.put("userID",doorLockgetPINCodeuserIDCommandParameterInfo);
+    InteractionInfo doorLockgetPINCodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+          .getPINCode((ChipClusters.DoorLockCluster.GetPINCodeResponseCallback) callback
+           , (Integer)
+             commandArguments.get("userID")
+
+            );
+        },
+        () -> new DelegatedDoorLockClusterGetPINCodeResponseCallback(),
+        doorLockgetPINCodeCommandParams
+      );
+    doorLockClusterInteractionInfoMap.put("getPINCode", doorLockgetPINCodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLockclearPINCodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLockclearPINCodePINSlotIndexCommandParameterInfo = new CommandParameterInfo("PINSlotIndex", Integer.class, Integer.class);
+    doorLockclearPINCodeCommandParams.put("PINSlotIndex",doorLockclearPINCodePINSlotIndexCommandParameterInfo);
+    InteractionInfo doorLockclearPINCodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .clearPINCode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("PINSlotIndex"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLockclearPINCodeCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("clearPINCode", doorLockclearPINCodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLockclearAllPINCodesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo doorLockclearAllPINCodesInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .clearAllPINCodes((DefaultClusterCallback) callback, 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLockclearAllPINCodesCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("clearAllPINCodes", doorLockclearAllPINCodesInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLocksetUserStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLocksetUserStatususerIDCommandParameterInfo = new CommandParameterInfo("userID", Integer.class, Integer.class);
+    doorLocksetUserStatusCommandParams.put("userID",doorLocksetUserStatususerIDCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetUserStatususerStatusCommandParameterInfo = new CommandParameterInfo("userStatus", Integer.class, Integer.class);
+    doorLocksetUserStatusCommandParams.put("userStatus",doorLocksetUserStatususerStatusCommandParameterInfo);
+    InteractionInfo doorLocksetUserStatusInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .setUserStatus((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("userID")
+        , (Integer)
+        commandArguments.get("userStatus")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLocksetUserStatusCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("setUserStatus", doorLocksetUserStatusInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLockgetUserStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLockgetUserStatususerIDCommandParameterInfo = new CommandParameterInfo("userID", Integer.class, Integer.class);
+    doorLockgetUserStatusCommandParams.put("userID",doorLockgetUserStatususerIDCommandParameterInfo);
+    InteractionInfo doorLockgetUserStatusInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+          .getUserStatus((ChipClusters.DoorLockCluster.GetUserStatusResponseCallback) callback
+           , (Integer)
+             commandArguments.get("userID")
+
+            );
+        },
+        () -> new DelegatedDoorLockClusterGetUserStatusResponseCallback(),
+        doorLockgetUserStatusCommandParams
+      );
+    doorLockClusterInteractionInfoMap.put("getUserStatus", doorLockgetUserStatusInteractionInfo);
+
     Map<String, CommandParameterInfo> doorLocksetWeekDayScheduleCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
     CommandParameterInfo doorLocksetWeekDayScheduleweekDayIndexCommandParameterInfo = new CommandParameterInfo("weekDayIndex", Integer.class, Integer.class);
@@ -26857,6 +27080,125 @@ public class ClusterInfoMapping {
         doorLockclearHolidayScheduleCommandParams
     );
     doorLockClusterInteractionInfoMap.put("clearHolidaySchedule", doorLockclearHolidayScheduleInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLocksetUserTypeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLocksetUserTypeuserIDCommandParameterInfo = new CommandParameterInfo("userID", Integer.class, Integer.class);
+    doorLocksetUserTypeCommandParams.put("userID",doorLocksetUserTypeuserIDCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetUserTypeuserTypeCommandParameterInfo = new CommandParameterInfo("userType", Integer.class, Integer.class);
+    doorLocksetUserTypeCommandParams.put("userType",doorLocksetUserTypeuserTypeCommandParameterInfo);
+    InteractionInfo doorLocksetUserTypeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .setUserType((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("userID")
+        , (Integer)
+        commandArguments.get("userType")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLocksetUserTypeCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("setUserType", doorLocksetUserTypeInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLockgetUserTypeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLockgetUserTypeuserIDCommandParameterInfo = new CommandParameterInfo("userID", Integer.class, Integer.class);
+    doorLockgetUserTypeCommandParams.put("userID",doorLockgetUserTypeuserIDCommandParameterInfo);
+    InteractionInfo doorLockgetUserTypeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+          .getUserType((ChipClusters.DoorLockCluster.GetUserTypeResponseCallback) callback
+           , (Integer)
+             commandArguments.get("userID")
+
+            );
+        },
+        () -> new DelegatedDoorLockClusterGetUserTypeResponseCallback(),
+        doorLockgetUserTypeCommandParams
+      );
+    doorLockClusterInteractionInfoMap.put("getUserType", doorLockgetUserTypeInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLocksetRFIDCodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLocksetRFIDCodeuserIDCommandParameterInfo = new CommandParameterInfo("userID", Integer.class, Integer.class);
+    doorLocksetRFIDCodeCommandParams.put("userID",doorLocksetRFIDCodeuserIDCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetRFIDCodeuserStatusCommandParameterInfo = new CommandParameterInfo("userStatus", Integer.class, Integer.class);
+    doorLocksetRFIDCodeCommandParams.put("userStatus",doorLocksetRFIDCodeuserStatusCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetRFIDCodeuserTypeCommandParameterInfo = new CommandParameterInfo("userType", Integer.class, Integer.class);
+    doorLocksetRFIDCodeCommandParams.put("userType",doorLocksetRFIDCodeuserTypeCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetRFIDCodeRFIDCodeCommandParameterInfo = new CommandParameterInfo("RFIDCode", byte[].class, byte[].class);
+    doorLocksetRFIDCodeCommandParams.put("RFIDCode",doorLocksetRFIDCodeRFIDCodeCommandParameterInfo);
+    InteractionInfo doorLocksetRFIDCodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .setRFIDCode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("userID")
+        , (Integer)
+        commandArguments.get("userStatus")
+        , (Integer)
+        commandArguments.get("userType")
+        , (byte[])
+        commandArguments.get("RFIDCode"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLocksetRFIDCodeCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("setRFIDCode", doorLocksetRFIDCodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLockgetRFIDCodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLockgetRFIDCodeuserIDCommandParameterInfo = new CommandParameterInfo("userID", Integer.class, Integer.class);
+    doorLockgetRFIDCodeCommandParams.put("userID",doorLockgetRFIDCodeuserIDCommandParameterInfo);
+    InteractionInfo doorLockgetRFIDCodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+          .getRFIDCode((ChipClusters.DoorLockCluster.GetRFIDCodeResponseCallback) callback
+           , (Integer)
+             commandArguments.get("userID")
+
+            );
+        },
+        () -> new DelegatedDoorLockClusterGetRFIDCodeResponseCallback(),
+        doorLockgetRFIDCodeCommandParams
+      );
+    doorLockClusterInteractionInfoMap.put("getRFIDCode", doorLockgetRFIDCodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLockclearRFIDCodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLockclearRFIDCodeRFIDSlotIndexCommandParameterInfo = new CommandParameterInfo("RFIDSlotIndex", Integer.class, Integer.class);
+    doorLockclearRFIDCodeCommandParams.put("RFIDSlotIndex",doorLockclearRFIDCodeRFIDSlotIndexCommandParameterInfo);
+    InteractionInfo doorLockclearRFIDCodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .clearRFIDCode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("RFIDSlotIndex"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLockclearRFIDCodeCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("clearRFIDCode", doorLockclearRFIDCodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLockclearAllRFIDCodesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo doorLockclearAllRFIDCodesInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .clearAllRFIDCodes((DefaultClusterCallback) callback, 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLockclearAllRFIDCodesCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("clearAllRFIDCodes", doorLockclearAllRFIDCodesInteractionInfo);
 
     Map<String, CommandParameterInfo> doorLocksetUserCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

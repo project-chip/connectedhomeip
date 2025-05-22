@@ -118,6 +118,264 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace UnlockWithTimeout.
+namespace SetPINCode {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    encoder.Encode(to_underlying(Fields::kUserStatus), userStatus);
+    encoder.Encode(to_underlying(Fields::kUserType), userType);
+    encoder.Encode(to_underlying(Fields::kPin), pin);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserStatus))
+        {
+            err = DataModel::Decode(reader, userStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserType))
+        {
+            err = DataModel::Decode(reader, userType);
+        }
+        else if (__context_tag == to_underlying(Fields::kPin))
+        {
+            err = DataModel::Decode(reader, pin);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetPINCode.
+namespace GetPINCode {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetPINCode.
+namespace GetPINCodeResponse {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    encoder.Encode(to_underlying(Fields::kUserStatus), userStatus);
+    encoder.Encode(to_underlying(Fields::kUserType), userType);
+    encoder.Encode(to_underlying(Fields::kPINCode), PINCode);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserStatus))
+        {
+            err = DataModel::Decode(reader, userStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserType))
+        {
+            err = DataModel::Decode(reader, userType);
+        }
+        else if (__context_tag == to_underlying(Fields::kPINCode))
+        {
+            err = DataModel::Decode(reader, PINCode);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetPINCodeResponse.
+namespace ClearPINCode {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPINSlotIndex), PINSlotIndex);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kPINSlotIndex))
+        {
+            err = DataModel::Decode(reader, PINSlotIndex);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ClearPINCode.
+namespace ClearAllPINCodes {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ClearAllPINCodes.
+namespace SetUserStatus {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    encoder.Encode(to_underlying(Fields::kUserStatus), userStatus);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserStatus))
+        {
+            err = DataModel::Decode(reader, userStatus);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetUserStatus.
+namespace GetUserStatus {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetUserStatus.
+namespace GetUserStatusResponse {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    encoder.Encode(to_underlying(Fields::kUserStatus), userStatus);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserStatus))
+        {
+            err = DataModel::Decode(reader, userStatus);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetUserStatusResponse.
 namespace SetWeekDaySchedule {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -609,6 +867,264 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace ClearHolidaySchedule.
+namespace SetUserType {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    encoder.Encode(to_underlying(Fields::kUserType), userType);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserType))
+        {
+            err = DataModel::Decode(reader, userType);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetUserType.
+namespace GetUserType {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetUserType.
+namespace GetUserTypeResponse {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    encoder.Encode(to_underlying(Fields::kUserType), userType);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserType))
+        {
+            err = DataModel::Decode(reader, userType);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetUserTypeResponse.
+namespace SetRFIDCode {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    encoder.Encode(to_underlying(Fields::kUserStatus), userStatus);
+    encoder.Encode(to_underlying(Fields::kUserType), userType);
+    encoder.Encode(to_underlying(Fields::kRFIDCode), RFIDCode);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserStatus))
+        {
+            err = DataModel::Decode(reader, userStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserType))
+        {
+            err = DataModel::Decode(reader, userType);
+        }
+        else if (__context_tag == to_underlying(Fields::kRFIDCode))
+        {
+            err = DataModel::Decode(reader, RFIDCode);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetRFIDCode.
+namespace GetRFIDCode {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetRFIDCode.
+namespace GetRFIDCodeResponse {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserID), userID);
+    encoder.Encode(to_underlying(Fields::kUserStatus), userStatus);
+    encoder.Encode(to_underlying(Fields::kUserType), userType);
+    encoder.Encode(to_underlying(Fields::kRFIDCode), RFIDCode);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserID))
+        {
+            err = DataModel::Decode(reader, userID);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserStatus))
+        {
+            err = DataModel::Decode(reader, userStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserType))
+        {
+            err = DataModel::Decode(reader, userType);
+        }
+        else if (__context_tag == to_underlying(Fields::kRFIDCode))
+        {
+            err = DataModel::Decode(reader, RFIDCode);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetRFIDCodeResponse.
+namespace ClearRFIDCode {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kRFIDSlotIndex), RFIDSlotIndex);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kRFIDSlotIndex))
+        {
+            err = DataModel::Decode(reader, RFIDSlotIndex);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ClearRFIDCode.
+namespace ClearAllRFIDCodes {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ClearAllRFIDCodes.
 namespace SetUser {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const

@@ -8135,6 +8135,44 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
+ * Command SetPINCode
+ *
+ * Set a PIN Code into the lock.
+ */
+- (void)setPINCodeWithParams:(MTRDoorLockClusterSetPINCodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command GetPINCode
+ *
+ * Retrieve a PIN Code.
+ */
+- (void)getPINCodeWithParams:(MTRDoorLockClusterGetPINCodeParams *)params completion:(void (^)(MTRDoorLockClusterGetPINCodeResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command ClearPINCode
+ *
+ * Clear a PIN code or all PIN codes.
+ */
+- (void)clearPINCodeWithParams:(MTRDoorLockClusterClearPINCodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command ClearAllPINCodes
+ *
+ * Clear out all PINs on the lock.
+ */
+- (void)clearAllPINCodesWithParams:(MTRDoorLockClusterClearAllPINCodesParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)clearAllPINCodesWithCompletion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command SetUserStatus
+ *
+ * Set the status of a user ID.
+ */
+- (void)setUserStatusWithParams:(MTRDoorLockClusterSetUserStatusParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command GetUserStatus
+ *
+ * Get the status of a user.
+ */
+- (void)getUserStatusWithParams:(MTRDoorLockClusterGetUserStatusParams *)params completion:(void (^)(MTRDoorLockClusterGetUserStatusResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+/**
  * Command SetWeekDaySchedule
  *
  * Set a weekly repeating schedule for a specified user.
@@ -8188,6 +8226,44 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Clears the holiday schedule or all holiday schedules.
  */
 - (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+/**
+ * Command SetUserType
+ *
+ * Set the user type for a specified user.
+ */
+- (void)setUserTypeWithParams:(MTRDoorLockClusterSetUserTypeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command GetUserType
+ *
+ * Retrieve the user type for a specific user.
+ */
+- (void)getUserTypeWithParams:(MTRDoorLockClusterGetUserTypeParams *)params completion:(void (^)(MTRDoorLockClusterGetUserTypeResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command SetRFIDCode
+ *
+ * Set an ID for RFID access into the lock.
+ */
+- (void)setRFIDCodeWithParams:(MTRDoorLockClusterSetRFIDCodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command GetRFIDCode
+ *
+ * Retrieve an RFID code.
+ */
+- (void)getRFIDCodeWithParams:(MTRDoorLockClusterGetRFIDCodeParams *)params completion:(void (^)(MTRDoorLockClusterGetRFIDCodeResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command ClearRFIDCode
+ *
+ * Clear an RFID code or all RFID codes.
+ */
+- (void)clearRFIDCodeWithParams:(MTRDoorLockClusterClearRFIDCodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command ClearAllRFIDCodes
+ *
+ * Clear out all RFIDs on the lock.
+ */
+- (void)clearAllRFIDCodesWithParams:(MTRDoorLockClusterClearAllRFIDCodesParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)clearAllRFIDCodesWithCompletion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command SetUser
  *

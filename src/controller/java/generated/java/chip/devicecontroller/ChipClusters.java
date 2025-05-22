@@ -31930,6 +31930,177 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+
+    public void setPINCode(DefaultClusterCallback callback, Integer userID, @Nullable Integer userStatus, @Nullable Integer userType, byte[] pin, int timedInvokeTimeoutMs) {
+      final long commandId = 5L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long userIDFieldID = 0L;
+      BaseTLVType userIDtlvValue = new UIntType(userID);
+      elements.add(new StructElement(userIDFieldID, userIDtlvValue));
+
+      final long userStatusFieldID = 1L;
+      BaseTLVType userStatustlvValue = userStatus != null ? new UIntType(userStatus) : new NullType();
+      elements.add(new StructElement(userStatusFieldID, userStatustlvValue));
+
+      final long userTypeFieldID = 2L;
+      BaseTLVType userTypetlvValue = userType != null ? new UIntType(userType) : new NullType();
+      elements.add(new StructElement(userTypeFieldID, userTypetlvValue));
+
+      final long pinFieldID = 3L;
+      BaseTLVType pintlvValue = new ByteArrayType(pin);
+      elements.add(new StructElement(pinFieldID, pintlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void getPINCode(GetPINCodeResponseCallback callback, Integer userID) {
+      getPINCode(callback, userID, 0);
+    }
+
+    public void getPINCode(GetPINCodeResponseCallback callback, Integer userID, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long userIDFieldID = 0L;
+      BaseTLVType userIDtlvValue = new UIntType(userID);
+      elements.add(new StructElement(userIDFieldID, userIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long userIDFieldID = 0L;
+          Integer userID = null;
+          final long userStatusFieldID = 1L;
+          @Nullable Integer userStatus = null;
+          final long userTypeFieldID = 2L;
+          @Nullable Integer userType = null;
+          final long PINCodeFieldID = 3L;
+          @Nullable byte[] PINCode = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == userIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userID = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == userStatusFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userStatus = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == userTypeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userType = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == PINCodeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                PINCode = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(userID, userStatus, userType, PINCode);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+
+    public void clearPINCode(DefaultClusterCallback callback, Integer PINSlotIndex, int timedInvokeTimeoutMs) {
+      final long commandId = 7L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long PINSlotIndexFieldID = 0L;
+      BaseTLVType PINSlotIndextlvValue = new UIntType(PINSlotIndex);
+      elements.add(new StructElement(PINSlotIndexFieldID, PINSlotIndextlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+
+    public void clearAllPINCodes(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 8L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setUserStatus(DefaultClusterCallback callback, Integer userID, Integer userStatus) {
+      setUserStatus(callback, userID, userStatus, 0);
+    }
+
+    public void setUserStatus(DefaultClusterCallback callback, Integer userID, Integer userStatus, int timedInvokeTimeoutMs) {
+      final long commandId = 9L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long userIDFieldID = 0L;
+      BaseTLVType userIDtlvValue = new UIntType(userID);
+      elements.add(new StructElement(userIDFieldID, userIDtlvValue));
+
+      final long userStatusFieldID = 1L;
+      BaseTLVType userStatustlvValue = new UIntType(userStatus);
+      elements.add(new StructElement(userStatusFieldID, userStatustlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void getUserStatus(GetUserStatusResponseCallback callback, Integer userID) {
+      getUserStatus(callback, userID, 0);
+    }
+
+    public void getUserStatus(GetUserStatusResponseCallback callback, Integer userID, int timedInvokeTimeoutMs) {
+      final long commandId = 10L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long userIDFieldID = 0L;
+      BaseTLVType userIDtlvValue = new UIntType(userID);
+      elements.add(new StructElement(userIDFieldID, userIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long userIDFieldID = 0L;
+          Integer userID = null;
+          final long userStatusFieldID = 1L;
+          Integer userStatus = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == userIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userID = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == userStatusFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userStatus = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(userID, userStatus);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public void setWeekDaySchedule(DefaultClusterCallback callback, Integer weekDayIndex, Integer userIndex, Integer daysMask, Integer startHour, Integer startMinute, Integer endHour, Integer endMinute) {
       setWeekDaySchedule(callback, weekDayIndex, userIndex, daysMask, startHour, startMinute, endHour, endMinute, 0);
     }
@@ -32252,11 +32423,11 @@ public class ChipClusters {
           final long statusFieldID = 1L;
           Integer status = null;
           final long localStartTimeFieldID = 2L;
-          Optional<Long> localStartTime = Optional.empty();
+          @Nullable Optional<Long> localStartTime = null;
           final long localEndTimeFieldID = 3L;
-          Optional<Long> localEndTime = Optional.empty();
+          @Nullable Optional<Long> localEndTime = null;
           final long operatingModeFieldID = 4L;
-          Optional<Integer> operatingMode = Optional.empty();
+          @Nullable Optional<Integer> operatingMode = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == holidayIndexFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -32301,6 +32472,177 @@ public class ChipClusters {
       BaseTLVType holidayIndextlvValue = new UIntType(holidayIndex);
       elements.add(new StructElement(holidayIndexFieldID, holidayIndextlvValue));
 
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void setUserType(DefaultClusterCallback callback, Integer userID, Integer userType) {
+      setUserType(callback, userID, userType, 0);
+    }
+
+    public void setUserType(DefaultClusterCallback callback, Integer userID, Integer userType, int timedInvokeTimeoutMs) {
+      final long commandId = 20L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long userIDFieldID = 0L;
+      BaseTLVType userIDtlvValue = new UIntType(userID);
+      elements.add(new StructElement(userIDFieldID, userIDtlvValue));
+
+      final long userTypeFieldID = 1L;
+      BaseTLVType userTypetlvValue = new UIntType(userType);
+      elements.add(new StructElement(userTypeFieldID, userTypetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void getUserType(GetUserTypeResponseCallback callback, Integer userID) {
+      getUserType(callback, userID, 0);
+    }
+
+    public void getUserType(GetUserTypeResponseCallback callback, Integer userID, int timedInvokeTimeoutMs) {
+      final long commandId = 21L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long userIDFieldID = 0L;
+      BaseTLVType userIDtlvValue = new UIntType(userID);
+      elements.add(new StructElement(userIDFieldID, userIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long userIDFieldID = 0L;
+          Integer userID = null;
+          final long userTypeFieldID = 1L;
+          Integer userType = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == userIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userID = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == userTypeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userType = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(userID, userType);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+
+    public void setRFIDCode(DefaultClusterCallback callback, Integer userID, @Nullable Integer userStatus, @Nullable Integer userType, byte[] RFIDCode, int timedInvokeTimeoutMs) {
+      final long commandId = 22L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long userIDFieldID = 0L;
+      BaseTLVType userIDtlvValue = new UIntType(userID);
+      elements.add(new StructElement(userIDFieldID, userIDtlvValue));
+
+      final long userStatusFieldID = 1L;
+      BaseTLVType userStatustlvValue = userStatus != null ? new UIntType(userStatus) : new NullType();
+      elements.add(new StructElement(userStatusFieldID, userStatustlvValue));
+
+      final long userTypeFieldID = 2L;
+      BaseTLVType userTypetlvValue = userType != null ? new UIntType(userType) : new NullType();
+      elements.add(new StructElement(userTypeFieldID, userTypetlvValue));
+
+      final long RFIDCodeFieldID = 3L;
+      BaseTLVType RFIDCodetlvValue = new ByteArrayType(RFIDCode);
+      elements.add(new StructElement(RFIDCodeFieldID, RFIDCodetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void getRFIDCode(GetRFIDCodeResponseCallback callback, Integer userID) {
+      getRFIDCode(callback, userID, 0);
+    }
+
+    public void getRFIDCode(GetRFIDCodeResponseCallback callback, Integer userID, int timedInvokeTimeoutMs) {
+      final long commandId = 23L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long userIDFieldID = 0L;
+      BaseTLVType userIDtlvValue = new UIntType(userID);
+      elements.add(new StructElement(userIDFieldID, userIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long userIDFieldID = 0L;
+          Integer userID = null;
+          final long userStatusFieldID = 1L;
+          @Nullable Integer userStatus = null;
+          final long userTypeFieldID = 2L;
+          @Nullable Integer userType = null;
+          final long RFIDCodeFieldID = 3L;
+          @Nullable byte[] RFIDCode = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == userIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userID = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == userStatusFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userStatus = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == userTypeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                userType = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == RFIDCodeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                RFIDCode = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(userID, userStatus, userType, RFIDCode);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+
+    public void clearRFIDCode(DefaultClusterCallback callback, Integer RFIDSlotIndex, int timedInvokeTimeoutMs) {
+      final long commandId = 24L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long RFIDSlotIndexFieldID = 0L;
+      BaseTLVType RFIDSlotIndextlvValue = new UIntType(RFIDSlotIndex);
+      elements.add(new StructElement(RFIDSlotIndexFieldID, RFIDSlotIndextlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+
+    public void clearAllRFIDCodes(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 25L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -32546,7 +32888,7 @@ public class ChipClusters {
           final long lastModifiedFabricIndexFieldID = 3L;
           @Nullable Integer lastModifiedFabricIndex = null;
           final long nextCredentialIndexFieldID = 4L;
-          @Nullable Integer nextCredentialIndex = null;
+          @Nullable Optional<Integer> nextCredentialIndex = null;
           final long credentialDataFieldID = 5L;
           @Nullable Optional<byte[]> credentialData = null;
           for (StructElement element: invokeStructValue.value()) {
@@ -32573,7 +32915,7 @@ public class ChipClusters {
             } else if (element.contextTagNum() == nextCredentialIndexFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                nextCredentialIndex = castingValue.value(Integer.class);
+                nextCredentialIndex = Optional.of(castingValue.value(Integer.class));
               }
             } else if (element.contextTagNum() == credentialDataFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -32662,6 +33004,14 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public interface GetPINCodeResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer userID, @Nullable Integer userStatus, @Nullable Integer userType, @Nullable byte[] PINCode);
+    }
+
+    public interface GetUserStatusResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer userID, Integer userStatus);
+    }
+
     public interface GetWeekDayScheduleResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer weekDayIndex, Integer userIndex, Integer status, Optional<Integer> daysMask, Optional<Integer> startHour, Optional<Integer> startMinute, Optional<Integer> endHour, Optional<Integer> endMinute);
     }
@@ -32671,7 +33021,15 @@ public class ChipClusters {
     }
 
     public interface GetHolidayScheduleResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer holidayIndex, Integer status, Optional<Long> localStartTime, Optional<Long> localEndTime, Optional<Integer> operatingMode);
+      void onSuccess(Integer holidayIndex, Integer status, @Nullable Optional<Long> localStartTime, @Nullable Optional<Long> localEndTime, @Nullable Optional<Integer> operatingMode);
+    }
+
+    public interface GetUserTypeResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer userID, Integer userType);
+    }
+
+    public interface GetRFIDCodeResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer userID, @Nullable Integer userStatus, @Nullable Integer userType, @Nullable byte[] RFIDCode);
     }
 
     public interface GetUserResponseCallback extends BaseClusterCallback {
@@ -32683,7 +33041,7 @@ public class ChipClusters {
     }
 
     public interface GetCredentialStatusResponseCallback extends BaseClusterCallback {
-      void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex, @Nullable Optional<byte[]> credentialData);
+      void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Optional<Integer> nextCredentialIndex, @Nullable Optional<byte[]> credentialData);
     }
 
     public interface LockStateAttributeCallback extends BaseAttributeCallback {
