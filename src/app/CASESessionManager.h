@@ -84,6 +84,12 @@ public:
                                 uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
+    void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                Callback::Callback<OnDeviceConnectionFailure> * onFailure, Transport::PeerAddress & addr,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     /**
      * Find an existing session for the given node ID or trigger a new session request.
@@ -203,7 +209,14 @@ private:
                                       uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif
                                       TransportPayloadCapability transportPayloadCapability);
-
+    void FindOrEstablishSessionHelper(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                      Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
+                                      Transport::PeerAddress & addr,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                      uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
+#endif
+                                      TransportPayloadCapability transportPayloadCapability);
     CASESessionManagerConfig mConfig;
 };
 

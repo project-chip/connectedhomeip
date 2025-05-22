@@ -166,6 +166,7 @@ ALLOW: Dict[str, Set[str]] = {
     # Not really for embedded consumers; uses std::deque to keep track
     # of a list of discovered things.
     'src/controller/SetUpCodePairer.h': {'deque'},
+    'src/controller/NetworkRecover.h': {'deque', 'list'},
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
 
