@@ -12,19 +12,7 @@ namespace OtaTlvEncryptionKey {
 
 using SilabsConfig = chip::DeviceLayer::Internal::SilabsConfig;
 
-CHIP_ERROR OtaTlvEncryptionKey::Import(ByteSpan keySpan)
-{
-    VerifyOrReturnError(keySpan.size() == kOTAEncryptionKeyLength, CHIP_ERROR_INVALID_ARGUMENT,
-                        ChipLogError(DeviceLayer, "Invalid key length: %lu", (unsigned long) keySpan.size()));
-
-    // Store the key in a member variable for later use
-    memcpy(mKey, keySpan.data(), keySpan.size());
-    mKeyLen = keySpan.size();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVOffset)
+CHIP_ERROR OtaTlvEncryptionKey::Decrypt(const ByteSpan & key, MutableByteSpan & block, uint32_t & mIVOffset)
 {
     uint8_t iv[16]           = { AU8IV_INIT_VALUE };
     uint8_t stream_block[16] = { 0 };
@@ -44,7 +32,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVO
     mbedtls_aes_context aes_ctx;
     mbedtls_aes_init(&aes_ctx);
 
-    if (mbedtls_aes_setkey_enc(&aes_ctx, mKey, mKeyLen * 8) != 0)
+    if (mbedtls_aes_setkey_enc(&aes_ctx, key.data(), (key.size() * 8)) != 0)
     {
         ChipLogError(DeviceLayer, "Failed to set AES key");
         mbedtls_aes_free(&aes_ctx);
