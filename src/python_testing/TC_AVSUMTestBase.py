@@ -70,6 +70,10 @@ class AVSUMTestBase:
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    async def read_avstr_attribute_expect_success(self, endpoint, attribute):
+        cluster = Clusters.Objects.CameraAvStreamManagement
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
     async def check_avsum_attribute(self, attribute, expected_value, endpoint):
         value = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         asserts.assert_equal(value, expected_value,
@@ -91,6 +95,44 @@ class AVSUMTestBase:
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZMoveToPreset(
                 presetID=presetID),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_remove_preset_command(self, endpoint, presetID, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZRemovePreset(
+                presetID=presetID),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_dptz_set_viewport_command(self, endpoint, streamID, viewport, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.DPTZSetViewport(
+                videoStreamID=streamID,
+                viewport=viewport),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_dptz_relative_move_command(self, endpoint, streamID, deltaX: int = None, deltaY: int = None,
+                                              zoomDelta: int = None, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.DPTZRelativeMove(
+                videoStreamID=streamID,
+                deltaX=deltaX,
+                deltaY=deltaY,
+                zoomDelta=zoomDelta),
                 endpoint=endpoint)
 
             asserts.assert_equal(expected_status, Status.Success)
@@ -140,6 +182,37 @@ class AVSUMTestBase:
                 endpoint=endpoint)
 
             asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
+        attrs = Clusters.Objects.CameraAvStreamManagement.Attributes
+
+        # Get the parms from the device (those which are available)
+        aRankedStreamPriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.RankedVideoStreamPrioritiesList)
+        aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
+        aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
+        aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
+
+        try:
+            response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
+                streamUsage=aRankedStreamPriorities[0],
+                videoCodec=aRateDistortionTradeOffPoints[0].codec,
+                minFrameRate=30,
+                maxFrameRate=aVideoSensorParams.maxFPS,
+                minResolution=aMinViewport,
+                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=aVideoSensorParams.sensorWidth,
+                                                                                              height=aVideoSensorParams.sensorHeight),
+                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                minFragmentLen=2000,
+                maxFragmentLen=8000
+            ),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+            return response.videoStreamID
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")

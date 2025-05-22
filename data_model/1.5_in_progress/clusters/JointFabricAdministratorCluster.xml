@@ -80,7 +80,10 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="StatusCodeEnum">
-      <item value="0x02" name="JF_VID_NOT_VERIFIED" summary="ICACCSRRequest command has been invoked by a peer against which Fabric Table VID Verification hasn&apos;t been executed">
+      <item value="0x02" name="VIDNotVerified" summary="ICACCSRRequest command has been invoked by a peer against which Fabric Table VID Verification hasn&apos;t been executed">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="InvalidAdministratorFabricIndex" summary="OpenJointCommissioningWindow command has been invoked but the AdministratorFabricIndex field has the value of null.">
         <mandatoryConform/>
       </item>
     </enum>
@@ -99,30 +102,22 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="AdministratorFabricIndex" type="fabric-idx">
       <access read="true" readPrivilege="admin"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
       <constraint>
         <between>
           <from value="1"/>
-          <to value="255"/>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ICACCSRRequest" direction="responseFromServer">
-      <mandatoryConform/>
-    </command>
-    <command id="0x00" name="AddICAC" direction="responseFromServer">
-      <mandatoryConform/>
-      <field id="1" name="ICACValue" type="octstr">
-        <mandatoryConform/>
-        <constraint>
-          <maxLength value="400"/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x01" name="ICACCSRResponse" direction="commandToServer" response="N">
+    <command id="0x00" name="ICACCSRRequest" direction="commandToServer" response="ICACCSRResponse">
       <access invokePrivilege="admin"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x01" name="ICACCSRResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="ICACCSR" type="octstr">
         <mandatoryConform/>
@@ -131,14 +126,23 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </command>
-    <command id="0x01" name="ICACResponse" direction="commandToServer" response="N">
+    <command id="0x02" name="AddICAC" direction="commandToServer" response="ICACResponse">
       <access invokePrivilege="admin"/>
+      <mandatoryConform/>
+      <field id="1" name="ICACValue" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="400"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="ICACResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="StatusCode" type="ICACResponseStatusEnum">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x02" name="OpenJointCommissioningWindow" direction="commandToServer" response="Y">
+    <command id="0x04" name="OpenJointCommissioningWindow" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
       <field id="0" name="CommissioningTimeout" type="uint16">
@@ -175,21 +179,22 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </command>
-    <command id="0x03" name="TransferAnchorRequest" direction="commandToServer" response="TransferAnchorResponse">
+    <command id="0x05" name="TransferAnchorRequest" direction="commandToServer" response="TransferAnchorResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
     </command>
-    <command id="0x04" name="TransferAnchorResponse" direction="responseFromServer">
+    <command id="0x06" name="TransferAnchorResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="StatusCode" type="TransferAnchorResponseStatusEnum">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x05" name="TransferAnchorComplete" direction="commandToServer" response="Y">
+    <command id="0x07" name="TransferAnchorComplete" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
     </command>
-    <command id="0x06" name="AnnounceJointFabricAdministrator" direction="responseFromServer">
+    <command id="0x08" name="AnnounceJointFabricAdministrator" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
       <mandatoryConform/>
       <field id="0" name="EndpointID" type="endpoint-no">
         <mandatoryConform/>

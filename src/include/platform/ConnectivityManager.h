@@ -197,6 +197,7 @@ public:
     WiFiPAF::WiFiPAFLayer * GetWiFiPAF();
     void WiFiPafSetApFreq(const uint16_t freq);
     CHIP_ERROR WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
+    bool WiFiPAFResourceAvailable();
 #endif
 
     // WiFi AP methods
@@ -485,6 +486,11 @@ inline CHIP_ERROR ConnectivityManager::WiFiPAFSend(const WiFiPAF::WiFiPAFSession
 inline CHIP_ERROR ConnectivityManager::WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
 {
     return static_cast<ImplClass *>(this)->_WiFiPAFShutdown(id, role);
+}
+
+inline bool ConnectivityManager::WiFiPAFResourceAvailable()
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFResourceAvailable();
 }
 #endif
 

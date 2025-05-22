@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:127
+            image: ghcr.io/project-chip/chip-build-nxp:132
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -141,11 +141,10 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-iw416 \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-w8801 \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-ota-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-all-clusters-wifi-iw416-cmake \
+                      --target nxp-rt1060-freertos-all-clusters-wifi-w8801-no-ble-cmake \
+                      --target nxp-rt1060-freertos-all-clusters-wifi-ota-evkc-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1060 thermostat example app
               if:
@@ -154,21 +153,8 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-thermostat-thread-wifi-matter-shell-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-thermostat-thread-wifi-ota-evkc-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
-                  "
-            - name: Build RT1060 laundry-washer example app
-              if:
-                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
-                  == 'true'
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-laundry-washer-wifi-evkc-iwx12 \
-                      --target nxp-rt1060-freertos-laundry-washer-thread-evkc-iwx12 \
-                      build \
-                      --copy-artifacts-to out/artifacts \
                   "
 
             - name: clean build
@@ -181,29 +167,16 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-all-clusters-wifi-iwx12 \
-                      --target nxp-rt1170-freertos-all-clusters-wifi-ota-iwx12 \
+                      --target nxp-rt1170-freertos-all-clusters-wifi-iwx12-cmake \
+                      --target nxp-rt1170-freertos-all-clusters-wifi-ota-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1170 thermostat example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-thermostat-thread-wifi-matter-shell-iwx12 \
+                      --target nxp-rt1170-freertos-thermostat-thread-wifi-ota-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
-                  "
-            - name: Build RT1170 laundry-washer example app
-              if:
-                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
-                  == 'true'
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-laundry-washer-thread-iwx12 \
-                      build \
-                      --copy-artifacts-to out/artifacts \
                   "
 
             - name: clean build
@@ -213,28 +186,22 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-all-clusters-wifi \
+                      --target nxp-rw61x-freertos-all-clusters-wifi-ota-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
-            - name: Build RW61X thermostat example app
+            - name: Build RW61X thermostat OTBR example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-thermostat-thread-wifi-matter-shell \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
-            - name: Build RW61X laundry-washer example app
-              if:
-                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
-                  == 'true'
+            - name: Build RW61X thermostat ethernet example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-laundry-washer-wifi \
+                      --target nxp-rw61x-freertos-thermostat-ethernet-cmake-frdm \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
 
             - name: clean build
@@ -252,7 +219,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:125
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:132
 
         steps:
             - name: Checkout
@@ -278,6 +245,5 @@ jobs:
                       --target nxp-rw61x-zephyr-all-clusters \
                       --target nxp-rw61x-zephyr-thermostat \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
-                      --target nxp-rw61x_eth-zephyr-thermostat-ethernet \
                       build \
                   "
