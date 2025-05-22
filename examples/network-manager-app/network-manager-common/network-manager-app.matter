@@ -1634,7 +1634,6 @@ endpoint 0 {
     emits event AccessControlExtensionChanged;
     emits event FabricRestrictionReviewUpdate;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
@@ -1643,7 +1642,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command ReviewFabricRestrictions;

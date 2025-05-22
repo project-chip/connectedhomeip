@@ -429,7 +429,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
         # Read NOCs and validate that both the entry for TH1 and TH2 are readable
         # and have the right expected fabricId
-        with test_step(2, description="Read DUT's NOCs attribute and validate both fabrics have expected values extractable from their NOC."):
+        with test_step(2, description="Read DUT's NOCs attribute and validate both fabrics have expected values extractable from their NOC. The NOCs attribute must show the NOC for every fabric."):
             nocs_list = await self.read_single_attribute_check_success(
                 dev_ctrl=th1_dev_ctrl,
                 node_id=th1_dut_node_id,
@@ -451,10 +451,16 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 "TH2": th2_fabricId
             }
 
+            found_fabric_indices = set()
+
             for controller_name, fabric_index in fabric_indices.items():
                 for noc_struct in nocs_list:
                     if noc_struct.fabricIndex != fabric_index:
                         continue
+
+                    found_fabric_indices.add(noc_struct.fabricIndex)
+                    asserts.assert_true(noc_struct.noc is not None and len(
+                        noc_struct.noc) > 0, "`noc` field in NOCs attribute entry not found for fabric index {fabric_index}! Ensure you are running a Matter stack for >= 1.4.2 where NOCStruct fields are not fabric-sensitive.")
 
                     try:
                         logging.info(f"Trying to parse NOC for fabric index {fabric_index}")
@@ -470,6 +476,11 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                     logging.info(f"  -> NOC public key bytes: {to_octet_string(noc_public_keys_from_certs[controller_name])}")
 
             logging.info(f"Fabric IDs found: {fabric_ids_from_certs}")
+
+            asserts.assert_true(th1_fabric_index in found_fabric_indices,
+                                f"Expected to have seen entry for TH1's fabric (fabric Index {th1_fabric_index}) in NOCs attribute, but did not find it!")
+            asserts.assert_true(th2_fabric_index in found_fabric_indices,
+                                f"Expected to have seen entry for TH2's fabric (fabric Index {th2_fabric_index}) in NOCs attribute, but did not find it!")
 
             for controller_name, fabric_id in fabric_ids.items():
                 asserts.assert_in(controller_name, fabric_ids_from_certs.keys(),
