@@ -397,7 +397,7 @@ class TC_ACL_2_5(MatterBaseTest):
         return max([e.Header.EventNumber for e in events])
 
     def desc_TC_ACL_2_5(self) -> str:
-        return "[TC-ACL-2.5] Cluster endpoint"
+        return "[TC-ACL-2.5]  AccessControlExtensionChanged event"
 
     def steps_TC_ACL_2_5(self) -> list[TestStep]:
         steps = [
