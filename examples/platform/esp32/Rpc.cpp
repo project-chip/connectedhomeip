@@ -20,6 +20,7 @@
 
 #if CONFIG_ENABLE_PW_RPC
 #include "PigweedLoggerMutex.h"
+#include "Rpc.h"
 #include "RpcService.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
