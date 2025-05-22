@@ -28,6 +28,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <app/TestEventTriggerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -43,7 +44,7 @@ namespace ClosureControl {
  *
  * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
  */
-class PrintOnlyDelegate : public DelegateBase
+class PrintOnlyDelegate : public DelegateBase,  public TestEventTriggerHandler
 {
 public:
     PrintOnlyDelegate() {}
@@ -61,6 +62,25 @@ public:
     ElapsedS GetCalibrationCountdownTime() override;
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;
+
+    /**
+     * @brief TestEventTriggerHandler for the Closure Control
+     *
+     * @param[in] eventTrigger Event trigger to handle.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR - No erros during the processing
+     *                    CHIP_ERROR_INVALID_ARGUMENT - eventTrigger isn't a valid value
+     */
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
+
+    // Delegate specific functions and variables
+
+    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
+
+    ClusterLogic * GetLogic() const { return mLogic; }
+
+private:
+    ClusterLogic * mLogic;
 };
 
 /**
@@ -81,7 +101,9 @@ class ClosureControlEndpoint
 public:
     ClosureControlEndpoint(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
-    {}
+    {
+        mDelegate.SetLogic(&mLogic);
+    }
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
