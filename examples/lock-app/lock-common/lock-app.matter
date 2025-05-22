@@ -2209,7 +2209,7 @@ cluster IcdManagement = 70 {
 
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
-  revision 7;
+  revision 9;
 
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;
@@ -2338,6 +2338,12 @@ cluster DoorLock = 257 {
     kDoorAjar = 5;
   }
 
+  enum LEDSettingEnum : enum8 {
+    kNoLEDSignal = 0;
+    kNoLEDSignalAccessAllowed = 1;
+    kLEDSignalAll = 2;
+  }
+
   enum LockDataTypeEnum : enum8 {
     kUnspecified = 0;
     kProgrammingCode = 1;
@@ -2391,6 +2397,18 @@ cluster DoorLock = 257 {
     kRFID = 8 [spec_name = "RFID"];
     kBiometric = 9;
     kAliro = 10;
+  }
+
+  enum SoundVolumeEnum : enum8 {
+    kSilent = 0;
+    kLow = 1;
+    kHigh = 2;
+    kMedium = 3;
+  }
+
+  enum StatusCodeEnum : enum8 {
+    kDUPLICATE = 2 [spec_name = "DUPLICATE"];
+    kOCCUPIED = 3 [spec_name = "OCCUPIED"];
   }
 
   enum UserStatusEnum : enum8 {
@@ -2538,19 +2556,17 @@ cluster DoorLock = 257 {
   }
 
   bitmap Feature : bitmap32 {
-    kPINCredential = 0x1 [spec_name = "PIN Credential"];
-    kRFIDCredential = 0x2 [spec_name = "RFID Credential"];
+    kPINCredential = 0x1;
+    kRFIDCredential = 0x2;
     kFingerCredentials = 0x4;
-    kLogging = 0x8;
     kWeekDayAccessSchedules = 0x10;
     kDoorPositionSensor = 0x20;
     kFaceCredentials = 0x40;
-    kCredentialsOverTheAirAccess = 0x80;
+    kCredentialOverTheAirAccess = 0x80;
     kUser = 0x100;
-    kNotification = 0x200;
     kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
-    kUnbolt = 0x1000;
+    kUnbolting = 0x1000;
     kAliroProvisioning = 0x2000;
     kAliroBLEUWB = 0x4000;
   }

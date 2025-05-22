@@ -19758,6 +19758,12 @@ typedef NS_ENUM(uint8_t, MTRDoorLockDlDoorState) {
     MTRDoorLockDlDoorStateDoorAjar MTR_DEPRECATED("Please use MTRDoorLockDoorStateDoorAjar", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x05,
 } MTR_DEPRECATED("Please use MTRDoorLockDoorState", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
+typedef NS_ENUM(uint8_t, MTRDoorLockLEDSetting) {
+    MTRDoorLockLEDSettingNoLEDSignal MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDoorLockLEDSettingNoLEDSignalAccessAllowed MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDoorLockLEDSettingLEDSignalAll MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDoorLockLockDataType) {
     MTRDoorLockLockDataTypeUnspecified MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
     MTRDoorLockLockDataTypeProgrammingCode MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x01,
@@ -19860,6 +19866,18 @@ typedef NS_ENUM(uint8_t, MTRDoorLockDlOperationSource) {
     MTRDoorLockDlOperationSourceRFID MTR_DEPRECATED("Please use MTRDoorLockOperationSourceRFID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x08,
     MTRDoorLockDlOperationSourceBiometric MTR_DEPRECATED("Please use MTRDoorLockOperationSourceBiometric", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x09,
 } MTR_DEPRECATED("Please use MTRDoorLockOperationSource", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+
+typedef NS_ENUM(uint8_t, MTRDoorLockSoundVolume) {
+    MTRDoorLockSoundVolumeSilent MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDoorLockSoundVolumeLow MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDoorLockSoundVolumeHigh MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDoorLockSoundVolumeMedium MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDoorLockStatusCode) {
+    MTRDoorLockStatusCodeDUPLICATE MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDoorLockStatusCodeOCCUPIED MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockUserStatus) {
     MTRDoorLockUserStatusAvailable MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -20044,21 +20062,17 @@ typedef NS_OPTIONS(uint32_t, MTRDoorLockFeature) {
     MTRDoorLockFeatureRFIDCredential MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x2,
     MTRDoorLockFeatureRFIDCredentials MTR_DEPRECATED("Please use MTRDoorLockFeatureRFIDCredential", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x2,
     MTRDoorLockFeatureFingerCredentials MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
-    MTRDoorLockFeatureLogging MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
     MTRDoorLockFeatureWeekDayAccessSchedules MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x10,
     MTRDoorLockFeatureWeekDaySchedules MTR_DEPRECATED("Please use MTRDoorLockFeatureWeekDayAccessSchedules", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x10,
     MTRDoorLockFeatureDoorPositionSensor MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x20,
     MTRDoorLockFeatureFaceCredentials MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x40,
-    MTRDoorLockFeatureCredentialsOverTheAirAccess MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x80,
-    MTRDoorLockFeatureCredentialsOTA MTR_DEPRECATED("Please use MTRDoorLockFeatureCredentialsOverTheAirAccess", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x80,
+    MTRDoorLockFeatureCredentialOverTheAirAccess MTR_PROVISIONALLY_AVAILABLE = 0x80,
     MTRDoorLockFeatureUser MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x100,
     MTRDoorLockFeatureUsersManagement MTR_DEPRECATED("Please use MTRDoorLockFeatureUser", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x100,
-    MTRDoorLockFeatureNotification MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x200,
-    MTRDoorLockFeatureNotifications MTR_DEPRECATED("Please use MTRDoorLockFeatureNotification", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x200,
     MTRDoorLockFeatureYearDayAccessSchedules MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x400,
     MTRDoorLockFeatureYearDaySchedules MTR_DEPRECATED("Please use MTRDoorLockFeatureYearDayAccessSchedules", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x400,
     MTRDoorLockFeatureHolidaySchedules MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x800,
-    MTRDoorLockFeatureUnbolt MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x1000,
+    MTRDoorLockFeatureUnbolting MTR_PROVISIONALLY_AVAILABLE = 0x1000,
     MTRDoorLockFeatureAliroProvisioning MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x2000,
     MTRDoorLockFeatureAliroBLEUWB MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x4000,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));

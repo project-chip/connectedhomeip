@@ -246,6 +246,19 @@ enum class DoorStateEnum : uint8_t
     kUnknownEnumValue = 6,
 };
 
+// Enum for LEDSettingEnum
+enum class LEDSettingEnum : uint8_t
+{
+    kNoLEDSignal              = 0x00,
+    kNoLEDSignalAccessAllowed = 0x01,
+    kLEDSignalAll             = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Enum for LockDataTypeEnum
 enum class LockDataTypeEnum : uint8_t
 {
@@ -334,6 +347,32 @@ enum class OperationSourceEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 11,
+};
+
+// Enum for SoundVolumeEnum
+enum class SoundVolumeEnum : uint8_t
+{
+    kSilent = 0x00,
+    kLow    = 0x01,
+    kHigh   = 0x02,
+    kMedium = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kDuplicate = 0x02,
+    kOccupied  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
 };
 
 // Enum for UserStatusEnum
@@ -525,21 +564,19 @@ enum class DoorLockDayOfWeek : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kPinCredential               = 0x1,
-    kRfidCredential              = 0x2,
-    kFingerCredentials           = 0x4,
-    kLogging                     = 0x8,
-    kWeekDayAccessSchedules      = 0x10,
-    kDoorPositionSensor          = 0x20,
-    kFaceCredentials             = 0x40,
-    kCredentialsOverTheAirAccess = 0x80,
-    kUser                        = 0x100,
-    kNotification                = 0x200,
-    kYearDayAccessSchedules      = 0x400,
-    kHolidaySchedules            = 0x800,
-    kUnbolt                      = 0x1000,
-    kAliroProvisioning           = 0x2000,
-    kAliroBLEUWB                 = 0x4000,
+    kPINCredential              = 0x1,
+    kRFIDCredential             = 0x2,
+    kFingerCredentials          = 0x4,
+    kWeekDayAccessSchedules     = 0x10,
+    kDoorPositionSensor         = 0x20,
+    kFaceCredentials            = 0x40,
+    kCredentialOverTheAirAccess = 0x80,
+    kUser                       = 0x100,
+    kYearDayAccessSchedules     = 0x400,
+    kHolidaySchedules           = 0x800,
+    kUnbolting                  = 0x1000,
+    kAliroProvisioning          = 0x2000,
+    kAliroBLEUWB                = 0x4000,
 };
 } // namespace DoorLock
 } // namespace Clusters
