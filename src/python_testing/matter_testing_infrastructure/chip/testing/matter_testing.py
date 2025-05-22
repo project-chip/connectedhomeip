@@ -1013,6 +1013,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         return self.matter_test_config.dut_node_ids[0]
 
+    @property
+    def stored_global_wildcard(self) -> int:
+        return unstash_globally(self.matter_test_config.get("stored_global_wildcard"))
+
     def get_endpoint(self, default: Optional[int] = 0) -> int:
         # TODO: assess how difficult it would be to ask folks to be explicit here
         # It would be SO much better to just run the tests on all applicable endpoints, but
@@ -1065,7 +1069,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
         # Because setup_class can be called before commissioning, this variable is lazy-initialized
         # where the read is deferred until the first guard function call that requires global attributes.
-        self.stored_global_wildcard = None
         self.xml_clusters = None
         self.xml_device_types = None
         self.device_pics_list = None
@@ -2164,7 +2167,7 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
     return info
 
 
-def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
+def run_tests_no_exit(test_classes: list[MatterBaseTest], matter_test_config: MatterTestConfig,
                       event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
                       default_controller=None, external_stack=None) -> bool:
 
@@ -2172,16 +2175,17 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
     #       Mobly deep copies the user params before passing them to the test class and the event
     #       loop is not serializable. So, we are setting the event loop as a test class member.
     CommissionDeviceTest.event_loop = event_loop
-    test_class.event_loop = event_loop
+    for test_class in test_classes:
+        test_class.event_loop = event_loop
 
-    get_test_info(test_class, matter_test_config)
+    # get_test_info(test_class, matter_test_config)
 
     # Load test config file.
     test_config = generate_mobly_test_config(matter_test_config)
 
     # Parse test specifiers if exist.
     tests = None
-    if len(matter_test_config.tests) > 0:
+    if len(matter_test_config.tests) > 0 and len(test_classes) == 1:
         tests = matter_test_config.tests
 
     if external_stack:
@@ -2209,6 +2213,56 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
         test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
         test_config.user_params["hooks"] = stash_globally(hooks)
 
+        def get_code():
+            created_codes = []
+            for idx, discriminator in enumerate(matter_test_config.discriminators):
+                created_codes.append(default_controller.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
+
+            setup_codes = matter_test_config.qr_code_content + matter_test_config.manual_code + created_codes
+            if not setup_codes or len(setup_codes) != 1:
+                return None
+
+            return setup_codes[0]
+
+        async def populate_wildcard_before_test(dev_ctrl):
+            task_list = []
+            setup_code = get_code()
+            node_id = matter_test_config.dut_node_ids[0]
+            if setup_code:
+                pase_future = dev_ctrl.EstablishPASESession(setup_code, node_id)
+                task_list.append(asyncio.create_task(pase_future))
+
+            case_future = dev_ctrl.GetConnectedDevice(nodeid=node_id, allowPASE=False)
+            task_list.append(asyncio.create_task(case_future))
+
+            for task in task_list:
+                asyncio.ensure_future(task)
+
+            _, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
+
+            for task in pending:
+                try:
+                    task.cancel()
+                    await task
+                except asyncio.CancelledError:
+                    pass
+
+            return await dev_ctrl.Read(node_id, [(0, Clusters.BasicInformation.Attributes.SpecificationVersion), (Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
+                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
+
+        setup_controller = stack.certificate_authorities[0].adminList[0].NewController(
+            nodeId=matter_test_config.controller_node_id + 1,
+            paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+            catTags=matter_test_config.controller_cat_tags,
+            dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
+        )
+        stored_global_wildcard = asyncio.run(populate_wildcard_before_test(setup_controller))
+        setup_controller.Shutdown()
+        print('------------------------------------------------------------------')
+        print(stored_global_wildcard)
+        print('----------------------------------------------------------------------')
+        test_config.user_params["stored_global_wildcard"] = stash_globally(stored_global_wildcard)
+
         # Execute the test class with the config
         ok = True
 
@@ -2226,7 +2280,8 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:
-                runner.add_test_class(test_config, test_class, tests)
+                for test_class in test_classes:
+                    runner.add_test_class(test_config, test_class, tests)
 
             if hooks:
                 # Right now, we only support running a single test class at once,
@@ -2271,7 +2326,7 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
 def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
               hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
     with asyncio.Runner() as runner:
-        if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
+        if not run_tests_no_exit([test_class], matter_test_config, runner.get_loop(),
                                  hooks, default_controller, external_stack):
             sys.exit(1)
 

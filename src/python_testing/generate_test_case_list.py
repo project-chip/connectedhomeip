@@ -16,6 +16,10 @@
 #
 
 import subprocess
+import importlib
+import logging
+import os
+from pathlib import Path
 
 
 def main():
@@ -24,7 +28,21 @@ def main():
                  'TC_FAN_3_2.py', 'TC_VALCC_4_5.py', 'TC_CNET_4_3.py', 'TC_DRLK_2_5.py']
     for file in case_list:
         cmd = f'python src/python_testing/{file} --storage-path admin_storage.json --bool-arg test_case_list:True'
-        subprocess.run(cmd, shell=True)
+        # subprocess.run(cmd, shell=True)
+
+    for filename in case_list:
+        try:
+            module = importlib.import_module(Path(os.path.basename(filename)).stem)
+        except ModuleNotFoundError:
+            logging.error(f'Unable to load python module from {filename}. Please ensure this is a valid python file path')
+            return -1
+
+        try:
+            # TODO: find the real class by checking if this is a MatterBaseTest class
+            # For now we assume it's
+            test_class = getattr(module, filename)
+        except AttributeError:
+            logging.error(f'Unable to load the test class {filename}. Please ensure this class is implemented in {filename}')
 
 
 if __name__ == "__main__":

@@ -205,6 +205,9 @@ async def commission_devices(
     Returns:
         bool: True if all devices were successfully commissioned; False otherwise.
     """
+    print(f'node ids = {dut_node_ids}')
+    print(f'setup_payloads = {setup_payloads}')
+    print(f'commissioning_info = {commissioning_info}')
     commissioned = []
     for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
         logging.info(f"Commissioning method: {commissioning_info.commissioning_method}")
