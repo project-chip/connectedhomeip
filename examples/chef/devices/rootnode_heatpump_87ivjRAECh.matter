@@ -1577,7 +1577,7 @@ cluster GroupKeyManagement = 63 {
 
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
 cluster ElectricalPowerMeasurement = 144 {
-  revision 1;
+  revision 3;
 
   shared enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
@@ -1664,8 +1664,8 @@ cluster ElectricalPowerMeasurement = 144 {
   readonly attribute optional nullable amperage_ma reactiveCurrent = 6;
   readonly attribute optional nullable amperage_ma apparentCurrent = 7;
   readonly attribute nullable power_mw activePower = 8;
-  readonly attribute optional nullable power_mw reactivePower = 9;
-  readonly attribute optional nullable power_mw apparentPower = 10;
+  readonly attribute optional nullable power_mvar reactivePower = 9;
+  readonly attribute optional nullable power_mva apparentPower = 10;
   readonly attribute optional nullable voltage_mv RMSVoltage = 11;
   readonly attribute optional nullable amperage_ma RMSCurrent = 12;
   readonly attribute optional nullable power_mw RMSPower = 13;
@@ -2453,14 +2453,13 @@ endpoint 0 {
 
   server cluster AccessControl {
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
