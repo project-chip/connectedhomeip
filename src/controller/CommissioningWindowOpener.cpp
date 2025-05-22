@@ -58,7 +58,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
                                                               uint16_t discriminator, Optional<uint32_t> setupPIN,
                                                               Optional<ByteSpan> salt,
                                                               Callback::Callback<OnOpenCommissioningWindow> * callback,
-                                                              SetupPayload & payload, bool readVIDPIDAttributes)
+                                                              SetupPayload & payload, bool readVIDPIDAttributes,
+                                                              bool jointCommissioning)
 {
     return OpenCommissioningWindow(CommissioningWindowPasscodeParams()
                                        .SetNodeId(deviceId)
@@ -69,11 +70,11 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
                                        .SetSalt(salt)
                                        .SetReadVIDPIDAttributes(readVIDPIDAttributes)
                                        .SetCallback(callback),
-                                   payload);
+                                   payload, jointCommissioning);
 }
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params,
-                                                              SetupPayload & payload)
+                                                              SetupPayload & payload, bool jointCommissioning)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.HasNodeId(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -85,6 +86,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
                             (params.GetSalt().size() >= kSpake2p_Min_PBKDF_Salt_Length &&
                              params.GetSalt().size() <= kSpake2p_Max_PBKDF_Salt_Length),
                         CHIP_ERROR_INVALID_ARGUMENT);
+
+    mJointCommissioning = jointCommissioning;
 
     mSetupPayload = SetupPayload();
 
@@ -140,7 +143,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     return mController->GetConnectedDevice(mNodeId, &mDeviceConnected, &mDeviceConnectionFailure);
 }
 
-CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowVerifierParams & params)
+CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowVerifierParams & params,
+                                                              bool jointCommissioning)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.HasNodeId(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -163,7 +167,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     mPBKDFIterations                     = params.GetIteration();
     mCommissioningWindowOption           = CommissioningWindowOption::kTokenWithProvidedPIN;
     mDiscriminator.SetLongValue(params.GetDiscriminator());
-    mTargetEndpointId = params.GetEndpointId();
+    mTargetEndpointId   = params.GetEndpointId();
+    mJointCommissioning = jointCommissioning;
 
     mNextStep = Step::kOpenCommissioningWindow;
 
@@ -183,15 +188,30 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
         MutableByteSpan serializedVerifierSpan(serializedVerifier);
         ReturnErrorOnFailure(mVerifier.Serialize(serializedVerifierSpan));
 
-        AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
-        request.commissioningTimeout = mCommissioningWindowTimeout.count();
-        request.PAKEPasscodeVerifier = serializedVerifierSpan;
-        request.discriminator        = mDiscriminator.GetLongValue();
-        request.iterations           = mPBKDFIterations;
-        request.salt                 = mPBKDFSalt;
+        if (mJointCommissioning == false)
+        {
+            AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
+            request.commissioningTimeout = mCommissioningWindowTimeout.count();
+            request.PAKEPasscodeVerifier = serializedVerifierSpan;
+            request.discriminator        = mDiscriminator.GetLongValue();
+            request.iterations           = mPBKDFIterations;
+            request.salt                 = mPBKDFSalt;
 
-        ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
-                                                   OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
+            ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
+                                                       OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
+        }
+        else
+        {
+            JointFabricAdministrator::Commands::OpenJointCommissioningWindow::Type request;
+            request.commissioningTimeout = mCommissioningWindowTimeout.count();
+            request.PAKEPasscodeVerifier = serializedVerifierSpan;
+            request.discriminator        = mDiscriminator.GetLongValue();
+            request.iterations           = mPBKDFIterations;
+            request.salt                 = mPBKDFSalt;
+
+            ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
+                                                       OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
+        }
     }
     else
     {

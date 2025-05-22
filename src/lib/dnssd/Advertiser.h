@@ -48,6 +48,14 @@ enum class CommissioningMode
     kEnabledEnhanced // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
 };
 
+enum class JointFabricMode
+{
+    kAvailable,     // This device is capable of acting as a Joint Fabric Administrator.
+    kAdministrator, // This device is acting as a Joint Fabric Administrator.
+    kAnchor,        // This device is acting as a Joint Fabric Anchor Administrator.
+    kDatastore      // This device is acting as a Joint Fabric Datastore.
+};
+
 enum class ICDModeAdvertise : uint8_t
 {
     kNone, // The device does not support the LIT feature-set. No ICD= key is advertised in DNS-SD.
@@ -204,6 +212,13 @@ public:
     }
     CommissioningMode GetCommissioningMode() const { return mCommissioningMode; }
 
+    CommissionAdvertisingParameters & SetJointFabricMode(std::optional<JointFabricMode> mode)
+    {
+        mJointFabricMode = mode;
+        return *this;
+    }
+    std::optional<JointFabricMode> GetJointFabricMode() const { return mJointFabricMode; }
+
     CommissionAdvertisingParameters & SetDeviceType(std::optional<uint32_t> deviceType)
     {
         mDeviceType = deviceType;
@@ -291,6 +306,7 @@ private:
     uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
     CommssionAdvertiseMode mMode         = CommssionAdvertiseMode::kCommissionableNode;
     CommissioningMode mCommissioningMode = CommissioningMode::kEnabledBasic;
+    std::optional<JointFabricMode> mJointFabricMode;
     std::optional<uint16_t> mVendorId;
     std::optional<uint16_t> mProductId;
     std::optional<uint32_t> mDeviceType;

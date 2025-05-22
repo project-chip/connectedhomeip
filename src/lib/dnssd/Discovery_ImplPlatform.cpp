@@ -198,6 +198,11 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, CommissioningMod
     return CopyTextRecordValue(buffer, bufferLen, static_cast<uint16_t>(value));
 }
 
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, JointFabricMode value)
+{
+    return CopyTextRecordValue(buffer, bufferLen, static_cast<uint16_t>(value));
+}
+
 template <class T>
 CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, std::optional<T> value)
 {
@@ -294,6 +299,8 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     case TxtFieldKey::kCommissionerPasscode:
         return CopyTextRecordValue(buffer, bufferLen,
                                    static_cast<uint16_t>(params.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0));
+    case TxtFieldKey::kJointFabricMode:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetJointFabricMode());
     default:
         return CopyTxtRecord(key, buffer, bufferLen, static_cast<BaseAdvertisingParams<CommissionAdvertisingParameters>>(params));
     }

@@ -88,6 +88,9 @@ TEST(TestTxtFields, TestGetTxtFieldKey)
 
     strcpy(key, "CP");
     EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kCommissionerPasscode);
+
+    strcpy(key, "JF");
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kJointFabricMode);
 }
 
 TEST(TestTxtFields, TestGetTxtFieldKeyCaseInsensitive)
@@ -102,6 +105,13 @@ TEST(TestTxtFields, TestGetTxtFieldKeyCaseInsensitive)
     EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kVendorProduct);
     strcpy(key, "vP");
     EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kVendorProduct);
+
+    strcpy(key, "jf");
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kJointFabricMode);
+    strcpy(key, "jF");
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kJointFabricMode);
+    strcpy(key, "Jf");
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kJointFabricMode);
 
     strcpy(key, "Xx");
     EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kUnknown);
@@ -175,6 +185,26 @@ TEST(TestTxtFields, TestGetCommissioningMode)
     // overflow a uint8
     sprintf(cm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
     EXPECT_EQ(GetCommissioningMode(GetSpan(cm)), 0);
+}
+
+TEST(TestTxtFields, TestGetJointFabricMode)
+{
+    char jfm[64];
+    strcpy(jfm, "0");
+    EXPECT_EQ(GetJointFabricMode(GetSpan(jfm)), 0);
+
+    strcpy(jfm, "1");
+    EXPECT_EQ(GetJointFabricMode(GetSpan(jfm)), 1);
+
+    strcpy(jfm, "2");
+    EXPECT_EQ(GetJointFabricMode(GetSpan(jfm)), 2);
+
+    strcpy(jfm, "14");
+    EXPECT_EQ(GetJointFabricMode(GetSpan(jfm)), 14);
+
+    // overflow a uint8
+    sprintf(jfm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
+    EXPECT_EQ(GetJointFabricMode(GetSpan(jfm)), 0);
 }
 
 TEST(TestTxtFields, TestGetDeviceType)
@@ -407,6 +437,14 @@ TEST(TestTxtFields, TestFillDiscoveredNodeDataFromTxt)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     EXPECT_EQ(filled.pairingHint, 1);
     filled.pairingHint = 0;
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
+
+    // Joint Fabric mode
+    strcpy(key, "JF");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_EQ(filled.jointFabricMode, 1);
+    filled.jointFabricMode = 0;
     EXPECT_TRUE(NodeDataIsEmpty(filled));
 }
 

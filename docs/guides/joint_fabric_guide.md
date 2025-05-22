@@ -2,8 +2,11 @@
 
 -   [Joint Fabric Guide](#joint-fabric-guide)
     -   [Joint Fabric Example Applications](#joint-fabric-example-applications)
-        -   [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
-        -   [Run Joint Fabric Demo](#run-joint-fabric-demo)
+        -   [Building the Example Application](#building-the-example-application)
+    -   [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
+        -   [Initialize Ecosystem A (Vendor ID = 0xFFF1)](#initialize-ecosystem-a-vendor-id--0xfff1)
+        -   [Initialize Ecosystem B (Vendor ID = 0xFFF2)](#initialize-ecosystem-b-vendor-id--0xfff2)
+    -   [Run Joint Fabric Demo](#run-joint-fabric-demo)
 
 ## Joint Fabric Example Applications
 
@@ -251,3 +254,15 @@ A `Subjects` field equal to `18446744065119551489` (`FFFFFFFDFFFF0001` in hex)
 should be found.
 
 ## Run Joint Fabric Demo
+
+-   Open Joint Commissioning Window on JF Admin App of Ecosystem B
+
+```
+>>> jcm open-joint-commissioning-window 11 400 1000 1261 1
+```
+
+Check for the following logs on the jf-admin-app side:
+
+```
+>>> [DIS] Advertise commission parameter vendorID=65521 productID=32769 discriminator=1261/04 cm=2 cp=0 jf=14
+```
