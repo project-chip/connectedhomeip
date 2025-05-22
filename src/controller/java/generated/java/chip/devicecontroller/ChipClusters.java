@@ -32423,11 +32423,11 @@ public class ChipClusters {
           final long statusFieldID = 1L;
           Integer status = null;
           final long localStartTimeFieldID = 2L;
-          @Nullable Optional<Long> localStartTime = null;
+          Optional<Long> localStartTime = Optional.empty();
           final long localEndTimeFieldID = 3L;
-          @Nullable Optional<Long> localEndTime = null;
+          Optional<Long> localEndTime = Optional.empty();
           final long operatingModeFieldID = 4L;
-          @Nullable Optional<Integer> operatingMode = null;
+          Optional<Integer> operatingMode = Optional.empty();
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == holidayIndexFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -32888,7 +32888,7 @@ public class ChipClusters {
           final long lastModifiedFabricIndexFieldID = 3L;
           @Nullable Integer lastModifiedFabricIndex = null;
           final long nextCredentialIndexFieldID = 4L;
-          @Nullable Optional<Integer> nextCredentialIndex = null;
+          @Nullable Integer nextCredentialIndex = null;
           final long credentialDataFieldID = 5L;
           @Nullable Optional<byte[]> credentialData = null;
           for (StructElement element: invokeStructValue.value()) {
@@ -32915,7 +32915,7 @@ public class ChipClusters {
             } else if (element.contextTagNum() == nextCredentialIndexFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                nextCredentialIndex = Optional.of(castingValue.value(Integer.class));
+                nextCredentialIndex = castingValue.value(Integer.class);
               }
             } else if (element.contextTagNum() == credentialDataFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -33021,7 +33021,7 @@ public class ChipClusters {
     }
 
     public interface GetHolidayScheduleResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer holidayIndex, Integer status, @Nullable Optional<Long> localStartTime, @Nullable Optional<Long> localEndTime, @Nullable Optional<Integer> operatingMode);
+      void onSuccess(Integer holidayIndex, Integer status, Optional<Long> localStartTime, Optional<Long> localEndTime, Optional<Integer> operatingMode);
     }
 
     public interface GetUserTypeResponseCallback extends BaseClusterCallback {
@@ -33041,7 +33041,7 @@ public class ChipClusters {
     }
 
     public interface GetCredentialStatusResponseCallback extends BaseClusterCallback {
-      void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Optional<Integer> nextCredentialIndex, @Nullable Optional<byte[]> credentialData);
+      void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex, @Nullable Optional<byte[]> credentialData);
     }
 
     public interface LockStateAttributeCallback extends BaseAttributeCallback {

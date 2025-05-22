@@ -3553,9 +3553,9 @@ cluster DoorLock = 257 {
   response struct GetHolidayScheduleResponse = 18 {
     int8u holidayIndex = 0;
     DlStatus status = 1;
-    optional nullable epoch_s localStartTime = 2;
-    optional nullable epoch_s localEndTime = 3;
-    optional nullable OperatingModeEnum operatingMode = 4;
+    optional epoch_s localStartTime = 2;
+    optional epoch_s localEndTime = 3;
+    optional OperatingModeEnum operatingMode = 4;
   }
 
   request struct ClearHolidayScheduleRequest {
@@ -3601,7 +3601,7 @@ cluster DoorLock = 257 {
   request struct SetUserRequest {
     DataOperationTypeEnum operationType = 0;
     int16u userIndex = 1;
-    nullable char_string<10> userName = 2;
+    nullable char_string userName = 2;
     nullable int32u userUniqueID = 3;
     nullable UserStatusEnum userStatus = 4;
     nullable UserTypeEnum userType = 5;
@@ -3614,7 +3614,7 @@ cluster DoorLock = 257 {
 
   response struct GetUserResponse = 28 {
     int16u userIndex = 0;
-    nullable char_string<10> userName = 1;
+    nullable char_string userName = 1;
     nullable int32u userUniqueID = 2;
     nullable UserStatusEnum userStatus = 3;
     nullable UserTypeEnum userType = 4;
@@ -3653,7 +3653,7 @@ cluster DoorLock = 257 {
     nullable int16u userIndex = 1;
     nullable fabric_idx creatorFabricIndex = 2;
     nullable fabric_idx lastModifiedFabricIndex = 3;
-    optional nullable int16u nextCredentialIndex = 4;
+    nullable int16u nextCredentialIndex = 4;
     optional nullable octet_string credentialData = 5;
   }
 

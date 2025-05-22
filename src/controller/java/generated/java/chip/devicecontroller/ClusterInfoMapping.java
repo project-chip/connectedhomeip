@@ -10728,7 +10728,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer holidayIndex, Integer status, @Nullable Optional<Long> localStartTime, @Nullable Optional<Long> localEndTime, @Nullable Optional<Integer> operatingMode) {
+    public void onSuccess(Integer holidayIndex, Integer status, Optional<Long> localStartTime, Optional<Long> localEndTime, Optional<Integer> operatingMode) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo holidayIndexResponseValue = new CommandResponseInfo("holidayIndex", "Integer");
@@ -10877,7 +10877,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Optional<Integer> nextCredentialIndex, @Nullable Optional<byte[]> credentialData) {
+    public void onSuccess(Boolean credentialExists, @Nullable Integer userIndex, @Nullable Integer creatorFabricIndex, @Nullable Integer lastModifiedFabricIndex, @Nullable Integer nextCredentialIndex, @Nullable Optional<byte[]> credentialData) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo credentialExistsResponseValue = new CommandResponseInfo("credentialExists", "Boolean");
@@ -10888,7 +10888,7 @@ public class ClusterInfoMapping {
       responseValues.put(creatorFabricIndexResponseValue, creatorFabricIndex);
       CommandResponseInfo lastModifiedFabricIndexResponseValue = new CommandResponseInfo("lastModifiedFabricIndex", "Integer");
       responseValues.put(lastModifiedFabricIndexResponseValue, lastModifiedFabricIndex);
-      CommandResponseInfo nextCredentialIndexResponseValue = new CommandResponseInfo("nextCredentialIndex", "Optional<Integer>");
+      CommandResponseInfo nextCredentialIndexResponseValue = new CommandResponseInfo("nextCredentialIndex", "Integer");
       responseValues.put(nextCredentialIndexResponseValue, nextCredentialIndex);
       CommandResponseInfo credentialDataResponseValue = new CommandResponseInfo("credentialData", "Optional<byte[]>");
       responseValues.put(credentialDataResponseValue, credentialData);

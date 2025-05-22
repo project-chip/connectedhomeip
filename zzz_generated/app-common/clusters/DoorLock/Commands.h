@@ -1122,9 +1122,9 @@ public:
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
     DlStatus status      = static_cast<DlStatus>(0);
-    Optional<DataModel::Nullable<uint32_t>> localStartTime;
-    Optional<DataModel::Nullable<uint32_t>> localEndTime;
-    Optional<DataModel::Nullable<OperatingModeEnum>> operatingMode;
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
+    Optional<OperatingModeEnum> operatingMode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -1142,9 +1142,9 @@ public:
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
     DlStatus status      = static_cast<DlStatus>(0);
-    Optional<DataModel::Nullable<uint32_t>> localStartTime;
-    Optional<DataModel::Nullable<uint32_t>> localEndTime;
-    Optional<DataModel::Nullable<OperatingModeEnum>> operatingMode;
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
+    Optional<OperatingModeEnum> operatingMode;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1817,7 +1817,7 @@ public:
     DataModel::Nullable<uint16_t> userIndex;
     DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
-    Optional<DataModel::Nullable<uint16_t>> nextCredentialIndex;
+    DataModel::Nullable<uint16_t> nextCredentialIndex;
     Optional<DataModel::Nullable<chip::ByteSpan>> credentialData;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -1838,7 +1838,7 @@ public:
     DataModel::Nullable<uint16_t> userIndex;
     DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
-    Optional<DataModel::Nullable<uint16_t>> nextCredentialIndex;
+    DataModel::Nullable<uint16_t> nextCredentialIndex;
     Optional<DataModel::Nullable<chip::ByteSpan>> credentialData;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

@@ -1072,14 +1072,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             tlvReader.getNull(tag)
             null
           } else {
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(tag)) {
-                tlvReader.getUInt(tag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUInt(tag)
             } else {
-              tlvReader.getNull(tag)
               null
             }
           }
@@ -1091,14 +1086,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             tlvReader.getNull(tag)
             null
           } else {
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(tag)) {
-                tlvReader.getUInt(tag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUInt(tag)
             } else {
-              tlvReader.getNull(tag)
               null
             }
           }
@@ -1110,14 +1100,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             tlvReader.getNull(tag)
             null
           } else {
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(tag)) {
-                tlvReader.getUByte(tag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
             } else {
-              tlvReader.getNull(tag)
               null
             }
           }
@@ -1928,11 +1913,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             null
           } else {
             if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(tag)) {
-                tlvReader.getUShort(tag)
-              } else {
-                null
-              }
+              tlvReader.getUShort(tag)
             } else {
               tlvReader.getNull(tag)
               null

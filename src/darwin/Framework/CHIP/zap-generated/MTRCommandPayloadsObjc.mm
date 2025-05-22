@@ -20479,33 +20479,21 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.localStartTime.HasValue()) {
-            if (decodableStruct.localStartTime.Value().IsNull()) {
-                self.localStartTime = nil;
-            } else {
-                self.localStartTime = [NSNumber numberWithUnsignedInt:decodableStruct.localStartTime.Value().Value()];
-            }
+            self.localStartTime = [NSNumber numberWithUnsignedInt:decodableStruct.localStartTime.Value()];
         } else {
             self.localStartTime = nil;
         }
     }
     {
         if (decodableStruct.localEndTime.HasValue()) {
-            if (decodableStruct.localEndTime.Value().IsNull()) {
-                self.localEndTime = nil;
-            } else {
-                self.localEndTime = [NSNumber numberWithUnsignedInt:decodableStruct.localEndTime.Value().Value()];
-            }
+            self.localEndTime = [NSNumber numberWithUnsignedInt:decodableStruct.localEndTime.Value()];
         } else {
             self.localEndTime = nil;
         }
     }
     {
         if (decodableStruct.operatingMode.HasValue()) {
-            if (decodableStruct.operatingMode.Value().IsNull()) {
-                self.operatingMode = nil;
-            } else {
-                self.operatingMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.operatingMode.Value().Value())];
-            }
+            self.operatingMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.operatingMode.Value())];
         } else {
             self.operatingMode = nil;
         }
@@ -22222,14 +22210,10 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
     {
-        if (decodableStruct.nextCredentialIndex.HasValue()) {
-            if (decodableStruct.nextCredentialIndex.Value().IsNull()) {
-                self.nextCredentialIndex = nil;
-            } else {
-                self.nextCredentialIndex = [NSNumber numberWithUnsignedShort:decodableStruct.nextCredentialIndex.Value().Value()];
-            }
-        } else {
+        if (decodableStruct.nextCredentialIndex.IsNull()) {
             self.nextCredentialIndex = nil;
+        } else {
+            self.nextCredentialIndex = [NSNumber numberWithUnsignedShort:decodableStruct.nextCredentialIndex.Value()];
         }
     }
     {

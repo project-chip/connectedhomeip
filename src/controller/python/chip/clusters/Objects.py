@@ -27539,16 +27539,16 @@ class DoorLock(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="holidayIndex", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="status", Tag=1, Type=DoorLock.Enums.DlStatus),
-                        ClusterObjectFieldDescriptor(Label="localStartTime", Tag=2, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="localEndTime", Tag=3, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="operatingMode", Tag=4, Type=typing.Union[None, Nullable, DoorLock.Enums.OperatingModeEnum]),
+                        ClusterObjectFieldDescriptor(Label="localStartTime", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="localEndTime", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="operatingMode", Tag=4, Type=typing.Optional[DoorLock.Enums.OperatingModeEnum]),
                     ])
 
             holidayIndex: uint = 0
             status: DoorLock.Enums.DlStatus = 0
-            localStartTime: typing.Union[None, Nullable, uint] = None
-            localEndTime: typing.Union[None, Nullable, uint] = None
-            operatingMode: typing.Union[None, Nullable, DoorLock.Enums.OperatingModeEnum] = None
+            localStartTime: typing.Optional[uint] = None
+            localEndTime: typing.Optional[uint] = None
+            operatingMode: typing.Optional[DoorLock.Enums.OperatingModeEnum] = None
 
         @dataclass
         class ClearHolidaySchedule(ClusterCommand):
@@ -27902,7 +27902,7 @@ class DoorLock(Cluster):
                         ClusterObjectFieldDescriptor(Label="userIndex", Tag=1, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="creatorFabricIndex", Tag=2, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="lastModifiedFabricIndex", Tag=3, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="nextCredentialIndex", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="nextCredentialIndex", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="credentialData", Tag=5, Type=typing.Union[None, Nullable, bytes]),
                     ])
 
@@ -27910,7 +27910,7 @@ class DoorLock(Cluster):
             userIndex: typing.Union[Nullable, uint] = NullValue
             creatorFabricIndex: typing.Union[Nullable, uint] = NullValue
             lastModifiedFabricIndex: typing.Union[Nullable, uint] = NullValue
-            nextCredentialIndex: typing.Union[None, Nullable, uint] = None
+            nextCredentialIndex: typing.Union[Nullable, uint] = NullValue
             credentialData: typing.Union[None, Nullable, bytes] = None
 
         @dataclass

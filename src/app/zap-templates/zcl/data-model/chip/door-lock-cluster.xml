@@ -724,9 +724,9 @@ Git: 0.7-summer-2025-ncr-445-ge35f361e6
       <description>Returns the Holiday Schedule Entry for the specified Holiday ID.</description>
       <arg id="0" name="HolidayIndex" type="int8u" min="1" max="0xFD"/>
       <arg id="1" name="Status" type="DlStatus" default="0"/>
-      <arg id="2" name="LocalStartTime" type="epoch_s" optional="true" isNullable="true"/>
-      <arg id="3" name="LocalEndTime" type="epoch_s" optional="true" isNullable="true"/>
-      <arg id="4" name="OperatingMode" type="OperatingModeEnum" optional="true" isNullable="true" min="0x00" max="0x04"/>
+      <arg id="2" name="LocalStartTime" type="epoch_s" optional="true" />
+      <arg id="3" name="LocalEndTime" type="epoch_s" optional="true" />
+      <arg id="4" name="OperatingMode" type="OperatingModeEnum" optional="true" min="0x00" max="0x04"/>
       <mandatoryConform>
         <feature name="HDSCH"/>
       </mandatoryConform>
@@ -878,11 +878,11 @@ Git: 0.7-summer-2025-ncr-445-ge35f361e6
       <access op="invoke" role="administer"/>
       <arg id="0" name="OperationType" type="DataOperationTypeEnum" min="0x00" max="0x02"/>
       <arg id="1" name="UserIndex" type="int16u" min="1"/>
-      <arg id="2" name="UserName" type="char_string" isNullable="true" length="10"/>
-      <arg id="3" name="UserUniqueID" type="int32u" isNullable="true" default="0xFFFFFFFF"/>
-      <arg id="4" name="UserStatus" type="UserStatusEnum" isNullable="true" default="0x01" min="0x01" max="0x03"/>
-      <arg id="5" name="UserType" type="UserTypeEnum" isNullable="true" default="0x00" min="0x00" max="0x09"/>
-      <arg id="6" name="CredentialRule" type="CredentialRuleEnum" isNullable="true" default="0x00" min="0x00" max="0x02"/>
+      <arg id="2" name="UserName" type="char_string" isNullable="true"/>
+      <arg id="3" name="UserUniqueID" type="int32u" isNullable="true"/>
+      <arg id="4" name="UserStatus" type="UserStatusEnum" isNullable="true"/>
+      <arg id="5" name="UserType" type="UserTypeEnum" isNullable="true"/>
+      <arg id="6" name="CredentialRule" type="CredentialRuleEnum" isNullable="true"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
@@ -899,16 +899,16 @@ Git: 0.7-summer-2025-ncr-445-ge35f361e6
     <!-- Conformance feature USR - for now optional -->
     <command source="server" code="0x1C" name="GetUserResponse" disableDefaultResponse="true" optional="true">
       <description>Returns the user for the specified UserIndex.</description>
-      <arg id="0" name="UserIndex" type="int16u" min="1"/>
-      <arg id="1" name="UserName" type="char_string" isNullable="true" length="10"/>
-      <arg id="2" name="UserUniqueID" type="int32u" isNullable="true" default="0"/>
-      <arg id="3" name="UserStatus" type="UserStatusEnum" isNullable="true" default="0x00" min="0x00" max="0x03"/>
-      <arg id="4" name="UserType" type="UserTypeEnum" isNullable="true" default="0x00" min="0x00" max="0x09"/>
-      <arg id="5" name="CredentialRule" type="CredentialRuleEnum" isNullable="true" default="0x00" min="0x00" max="0x02"/>
-      <arg id="6" name="Credentials" type="CredentialStruct" array="true" isNullable="true"/>
-      <arg id="7" name="CreatorFabricIndex" type="fabric_idx" isNullable="true"/>
-      <arg id="8" name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true"/>
-      <arg id="9" name="NextUserIndex" type="int16u" isNullable="true" min="1"/>
+      <arg name="UserIndex" type="int16u" min="1"/>
+      <arg name="UserName" type="char_string" isNullable="true"/>
+      <arg name="UserUniqueID" type="int32u" isNullable="true"/>
+      <arg name="UserStatus" type="UserStatusEnum" isNullable="true"/>
+      <arg name="UserType" type="UserTypeEnum" isNullable="true"/>
+      <arg name="CredentialRule" type="CredentialRuleEnum" isNullable="true"/>
+      <arg name="Credentials" type="CredentialStruct" array="true" isNullable="true"/>
+      <arg name="CreatorFabricIndex" type="fabric_idx" isNullable="true"/>
+      <arg name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true"/>
+      <arg name="NextUserIndex" type="int16u" isNullable="true" min="1"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
@@ -966,7 +966,7 @@ Git: 0.7-summer-2025-ncr-445-ge35f361e6
       <arg id="1" name="UserIndex" type="int16u" isNullable="true" min="1"/>
       <arg id="2" name="CreatorFabricIndex" type="fabric_idx" isNullable="true"/>
       <arg id="3" name="LastModifiedFabricIndex" type="fabric_idx" isNullable="true"/>
-      <arg id="4" name="NextCredentialIndex" type="int16u" isNullable="true" optional="true"/>
+      <arg id="4" name="NextCredentialIndex" type="int16u" isNullable="true" />
       <arg id="5" name="CredentialData" type="octet_string" isNullable="true" optional="true"/>
       <mandatoryConform>
         <feature name="USR"/>
