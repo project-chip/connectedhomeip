@@ -119,13 +119,19 @@ namespace DeviceLayer {
         {
             assertChipStackLockedByCurrentThread();
 
+            NSMutableArray * discriminatorStrings = [NSMutableArray arrayWithCapacity:desiredDiscriminators.size()];
             for (auto & deviceDiscriminator : desiredDiscriminators) {
                 if (deviceDiscriminator.IsShortDiscriminator()) {
-                    ChipLogProgress(Ble, "ConnectionDelegate NewConnection with short discriminator %d (0x%x)", deviceDiscriminator.GetShortValue(), deviceDiscriminator.GetShortValue());
+                    [discriminatorStrings addObject:[NSString stringWithFormat:@"%d (short, 0x%x)", deviceDiscriminator.GetShortValue(), deviceDiscriminator.GetShortValue()]];
                 } else {
-                    ChipLogProgress(Ble, "ConnectionDelegate NewConnection with long discriminator %d (0x%x)", deviceDiscriminator.GetLongValue(), deviceDiscriminator.GetLongValue());
+                    [discriminatorStrings addObject:[NSString stringWithFormat:@"%d (long, 0x%03x)", deviceDiscriminator.GetLongValue(), deviceDiscriminator.GetLongValue()]];
                 }
             }
+
+            // Some consumers of this code (like chip-tool) don't seem to
+            // implement logging in a way that supports %@ so far.
+            ChipLogProgress(Ble, "ConnectionDelegate NewConnection with discriminator list: [ %s ]",
+                [discriminatorStrings componentsJoinedByString:@", "].UTF8String);
 
             // If the previous connection delegate was not a try to connect to something, just reuse it instead of
             // creating a brand new connection but update the discriminator and the ble layer members.
@@ -333,19 +339,18 @@ namespace DeviceLayer {
     auto * onConnectionComplete = _onConnectionComplete;
     auto * onConnectionCompleteWithDiscriminator = _onConnectionCompleteWithDiscriminator;
     auto * matchedLongDiscriminator = _matchedLongDiscriminator;
-    auto * onConnectionError = _onConnectionError;
     auto * appState = _appState;
     [self clearConnectionCallbacks];
     if (onConnectionCompleteWithDiscriminator != nullptr) {
+        // VerifyOrDie and VerifyOrDieWithMsg both seem to hit compiler errors:
+        // https://github.com/project-chip/connectedhomeip/issues/39135
         if (matchedLongDiscriminator == nil) {
-            // Very unexpected!  We should only have a peripheral without a
-            // discriminator if the NewConnection entrypoint took a
-            // BLE_CONNECTION_OBJECT, and in that case we would not be using
-            // onConnectionCompleteWithDiscriminator.
-            onConnectionError(appState, CHIP_ERROR_INCORRECT_STATE);
-        } else {
-            onConnectionCompleteWithDiscriminator(appState, matchedLongDiscriminator.unsignedShortValue, BleConnObjectFromCBPeripheral(peripheral));
+            ChipLogError(Ble, "We should only have a peripheral without a discriminator if the "
+                              "NewConnection entrypoint took a BLE_CONNECTION_OBJECT, and in that case "
+                              "we would not be using onConnectionCompleteWithDiscriminator.");
+            VerifyOrDieWithoutLogging(matchedLongDiscriminator != nil);
         }
+        onConnectionCompleteWithDiscriminator(appState, matchedLongDiscriminator.unsignedShortValue, BleConnObjectFromCBPeripheral(peripheral));
     } else if (onConnectionComplete != nullptr) {
         onConnectionComplete(appState, BleConnObjectFromCBPeripheral(peripheral));
     }
