@@ -9,7 +9,7 @@ can be found in this folder.
 ## Qorvo SDK
 
 More detailed information on the Qorvo SDK can be found in the
-[Qorvo Matter SDK](https://github.com/Qorvo/QMatter).
+[Qorvo Matter SDK](https://gitlab.com/qorvo_sdk/public/devkits/qpg6200-iot-sdk).
 
 ## More information
 
