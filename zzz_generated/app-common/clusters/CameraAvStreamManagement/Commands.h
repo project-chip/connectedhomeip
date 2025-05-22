@@ -138,12 +138,12 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
-    AudioCodecEnum audioCodec   = static_cast<AudioCodecEnum>(0);
-    uint8_t channelCount        = static_cast<uint8_t>(0);
-    uint32_t sampleRate         = static_cast<uint32_t>(0);
-    uint32_t bitRate            = static_cast<uint32_t>(0);
-    uint8_t bitDepth            = static_cast<uint8_t>(0);
+    Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
+    AudioCodecEnum audioCodec            = static_cast<AudioCodecEnum>(0);
+    uint8_t channelCount                 = static_cast<uint8_t>(0);
+    uint32_t sampleRate                  = static_cast<uint32_t>(0);
+    uint32_t bitRate                     = static_cast<uint32_t>(0);
+    uint8_t bitDepth                     = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -159,12 +159,12 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
-    AudioCodecEnum audioCodec   = static_cast<AudioCodecEnum>(0);
-    uint8_t channelCount        = static_cast<uint8_t>(0);
-    uint32_t sampleRate         = static_cast<uint32_t>(0);
-    uint32_t bitRate            = static_cast<uint32_t>(0);
-    uint8_t bitDepth            = static_cast<uint8_t>(0);
+    Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
+    AudioCodecEnum audioCodec            = static_cast<AudioCodecEnum>(0);
+    uint8_t channelCount                 = static_cast<uint8_t>(0);
+    uint32_t sampleRate                  = static_cast<uint32_t>(0);
+    uint32_t bitRate                     = static_cast<uint32_t>(0);
+    uint8_t bitDepth                     = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -264,10 +264,10 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
-    VideoCodecEnum videoCodec   = static_cast<VideoCodecEnum>(0);
-    uint16_t minFrameRate       = static_cast<uint16_t>(0);
-    uint16_t maxFrameRate       = static_cast<uint16_t>(0);
+    Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
+    VideoCodecEnum videoCodec            = static_cast<VideoCodecEnum>(0);
+    uint16_t minFrameRate                = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate                = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint32_t minBitRate     = static_cast<uint32_t>(0);
@@ -291,10 +291,10 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
-    VideoCodecEnum videoCodec   = static_cast<VideoCodecEnum>(0);
-    uint16_t minFrameRate       = static_cast<uint16_t>(0);
-    uint16_t maxFrameRate       = static_cast<uint16_t>(0);
+    Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
+    VideoCodecEnum videoCodec            = static_cast<VideoCodecEnum>(0);
+    uint16_t minFrameRate                = static_cast<uint16_t>(0);
+    uint16_t maxFrameRate                = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
     uint32_t minBitRate     = static_cast<uint32_t>(0);
@@ -596,7 +596,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const StreamUsageEnum> streamPriorities;
+    DataModel::List<const Globals::StreamUsageEnum> streamPriorities;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -612,7 +612,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::DecodableList<StreamUsageEnum> streamPriorities;
+    DataModel::DecodableList<Globals::StreamUsageEnum> streamPriorities;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

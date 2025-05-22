@@ -34,6 +34,9 @@
 class WebRTCProviderClient : public chip::app::CommandSender::Callback
 {
 public:
+    using ICECandidateStruct = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using StreamUsageEnum    = chip::app::Clusters::Globals::StreamUsageEnum;
+
     /**
      * @brief Construct a new WebRTCProviderClient object. Also initializes callbacks
      * for device connection success/failure events.
@@ -67,7 +70,7 @@ public:
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR
-    SolicitOffer(chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
+    SolicitOffer(StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
                  chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
                  chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
@@ -88,9 +91,8 @@ public:
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR
-    ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp,
-                 chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+    ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp, StreamUsageEnum streamUsage,
+                 chip::EndpointId originatingEndpointId, chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
                  chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
     /**
@@ -115,12 +117,11 @@ public:
      *
      * @param webRTCSessionId   The unique identifier for the WebRTC session to which these
      *                          ICE candidates apply.
-     * @param ICECandidates     A list of ICE candidate strings. Each string typically follows
-     *                          the "candidate:" syntax defined in the ICE specification.
+     * @param ICECandidates     A list of ICE candidate structs.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<std::string> & iceCandidates);
 
     /**
      * @brief Notify WebRTCProviderClient that the Offer command has been received.
@@ -224,11 +225,14 @@ private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
-    chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum mCurrentStreamUsage =
-        chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum::kUnknownEnumValue;
+    StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;
+
+    // Store the ICECandidates here to use to send asynchronously.
+    std::vector<std::string> mClientICECandidates;
+    std::vector<ICECandidateStruct> mICECandidateStructList;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;

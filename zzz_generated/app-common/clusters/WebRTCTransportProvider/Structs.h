@@ -36,10 +36,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
-namespace Structs {
-namespace ICEServerStruct     = Clusters::detail::Structs::ICEServerStruct;
-namespace WebRTCSessionStruct = Clusters::detail::Structs::WebRTCSessionStruct;
-} // namespace Structs
+namespace Structs {} // namespace Structs
 } // namespace WebRTCTransportProvider
 } // namespace Clusters
 } // namespace app
