@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 // enum used to track the type of occupancy sensor being implemented
 typedef enum

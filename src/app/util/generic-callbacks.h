@@ -19,7 +19,7 @@
 
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <app/ConcreteAttributePath.h>
 #include <protocols/interaction_model/Constants.h>

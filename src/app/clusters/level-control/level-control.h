@@ -28,7 +28,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/SceneTable.h>

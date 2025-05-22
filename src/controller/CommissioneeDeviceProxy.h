@@ -28,7 +28,7 @@
 
 #include <app/CommandSender.h>
 #include <app/DeviceProxy.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <lib/core/CHIPCallback.h>

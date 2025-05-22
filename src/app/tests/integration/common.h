@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <credentials/FabricTable.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>

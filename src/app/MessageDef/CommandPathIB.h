@@ -24,7 +24,7 @@
 #include <app/AppConfig.h>
 #include <app/CommandPathParams.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>

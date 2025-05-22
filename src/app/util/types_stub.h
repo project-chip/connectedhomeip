@@ -21,7 +21,7 @@
 
 #include <optional>
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");

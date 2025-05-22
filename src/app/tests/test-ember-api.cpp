@@ -16,7 +16,7 @@
 
 #include <app/tests/test-ember-api.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 

@@ -28,7 +28,7 @@
 
 #include "LEDWidget.h"
 #include <app/util/af-types.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceLayer.h>
 
 extern LEDWidget sStatusLED;

@@ -22,7 +22,7 @@
 #include "AppEvent.h"
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/bindings/bindings.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>

@@ -16,7 +16,7 @@
  */
 
 #include <app-common/zap-generated/callback.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/interaction_model/StatusCode.h>

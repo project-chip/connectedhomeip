@@ -26,7 +26,7 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/ConcreteAttributePath.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

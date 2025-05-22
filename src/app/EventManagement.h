@@ -33,7 +33,7 @@
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/data-model-provider/EventsGenerator.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/LinkedList.h>

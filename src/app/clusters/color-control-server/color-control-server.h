@@ -24,7 +24,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>

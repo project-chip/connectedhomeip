@@ -30,7 +30,7 @@
 #include <app/CASEClient.h>
 #include <app/CASEClientPool.h>
 #include <app/DeviceProxy.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/GroupedCallbackList.h>

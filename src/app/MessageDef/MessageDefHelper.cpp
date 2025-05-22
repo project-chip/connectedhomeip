@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <app/AppConfig.h>
 #include <app/SpecificationDefinedRevisions.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <inttypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <stdarg.h>
