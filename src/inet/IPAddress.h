@@ -54,6 +54,11 @@
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <openthread/icmp6.h>
 #include <openthread/ip6.h>
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+// Currently to use openthread endpoint in nRFConnect, we must fetch defines from zephyr's net
+// OpenThread header. It will be removed once the Zephyr version is updated to 4.2.0.
+#include <zephyr/net/openthread.h>
+#endif
 #endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
