@@ -2,7 +2,7 @@
 orphan: true
 ---
 
-# Matter QPG6105 SDK
+# Matter QPG6200 SDK
 
 ## Qorvo SDK
 

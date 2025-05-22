@@ -241,7 +241,7 @@ out of convenience.
 
     Describe in **DETAIL** how manual testing was done: what environment, what
     builds were used (`build-example` names are ok such as
-    `flashed qpg-qpg6105-light` and `used linux-x64-chip-tool-clang`). Describe
+    `flashed qpg-qpg6200-light` and `used linux-x64-chip-tool-clang`). Describe
     commands ran (often chip-tool) and physical interaction and what was
     observed.
 

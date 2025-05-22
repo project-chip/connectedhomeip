@@ -1,9 +1,9 @@
-# Matter QPG6105 Lighting Example Application
+# Matter QPG6200 Lighting Example Application
 
 ## Lighting-app
 
 A lighting example application showing the use of
-[Matter](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6105
+[Matter](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6200
 can be found in this folder.
 
 ## Qorvo SDK

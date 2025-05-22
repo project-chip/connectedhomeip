@@ -1,9 +1,9 @@
-# Matter QPG6105 Lock Example Application
+# Matter QPG6200 Lock Example Application
 
 ## Lock-app
 
 A lock example application showing the use of
-[Matter](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6105
+[Matter](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6200
 can be found in this folder.
 
 ## Qorvo SDK
