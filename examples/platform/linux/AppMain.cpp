@@ -537,11 +537,11 @@ public:
     // Once an attribute has been set with one of these Set methods, the
     // corresponding Get method will return the stored value instead of getting
     // the value from the default provider.
-    void SetVendorName(const Optional<std::string> buf) { mVendorName = buf; }
-    void SetProductName(const Optional<std::string> buf) { mProductName = buf; }
-    void SetSerialNumber(const Optional<std::string> buf) { mSerialNumber = buf; }
-    void SetHardwareVersionString(const Optional<std::string> buf) { mHardwareVersionString = buf; }
-    void SetSoftwareVersionString(const Optional<std::string> buf) { mSoftwareVersionString = buf; }
+    void SetVendorName(const std::string & buf) { mVendorName.SetValue(buf); }
+    void SetProductName(const std::string & buf) { mProductName.SetValue(buf); }
+    void SetSerialNumber(const std::string & buf) { mSerialNumber.SetValue(buf); }
+    void SetHardwareVersionString(const std::string & buf) { mHardwareVersionString.SetValue(buf); }
+    void SetSoftwareVersionString(const std::string & buf) { mSoftwareVersionString.SetValue(buf); }
 
 private:
     DeviceInstanceInfoProvider * mDefaultProvider;
@@ -746,21 +746,21 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     // Command line arguments to set attributes of the basic information cluster.
     if (LinuxDeviceOptions::GetInstance().vendorName.HasValue())
-        gExampleDeviceInstanceInfoProvider.SetVendorName(LinuxDeviceOptions::GetInstance().vendorName);
+        gExampleDeviceInstanceInfoProvider.SetVendorName(LinuxDeviceOptions::GetInstance().vendorName.Value());
 
     if (LinuxDeviceOptions::GetInstance().productName.HasValue())
-        gExampleDeviceInstanceInfoProvider.SetProductName(LinuxDeviceOptions::GetInstance().productName);
+        gExampleDeviceInstanceInfoProvider.SetProductName(LinuxDeviceOptions::GetInstance().productName.Value());
 
     if (LinuxDeviceOptions::GetInstance().serialNumber.HasValue())
-        gExampleDeviceInstanceInfoProvider.SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber);
+        gExampleDeviceInstanceInfoProvider.SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value());
 
     if (LinuxDeviceOptions::GetInstance().softwareVersionString.HasValue())
         gExampleDeviceInstanceInfoProvider.SetSoftwareVersionString(
-            LinuxDeviceOptions::GetInstance().softwareVersionString);
+            LinuxDeviceOptions::GetInstance().softwareVersionString.Value());
 
     if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
         gExampleDeviceInstanceInfoProvider.SetHardwareVersionString(
-            LinuxDeviceOptions::GetInstance().hardwareVersionString);
+            LinuxDeviceOptions::GetInstance().hardwareVersionString.Value());
 
 exit:
     if (err != CHIP_NO_ERROR)
