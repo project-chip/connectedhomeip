@@ -106,6 +106,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
 bool InterfaceIterator::Next()
 {
     // TODO : Cleanup #17346
+    mHasCurrent = false;
     return false;
 }
 
