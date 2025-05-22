@@ -232,7 +232,7 @@ config NRF_WIFI_FW_PATCH_DFU
 # ==============================================================================
 
 config NET_L2_OPENTHREAD
-    default y if !WIFI_NRF70
+    default y if !WIFI_NRF70 && NETWORKING
 
 if NET_L2_OPENTHREAD
 
