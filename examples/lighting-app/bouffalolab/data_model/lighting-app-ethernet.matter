@@ -2182,12 +2182,11 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -2309,7 +2308,7 @@ endpoint 0 {
     callback attribute currentHeapUsed;
     callback attribute currentHeapHighWatermark;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command ResetWatermarks;
   }

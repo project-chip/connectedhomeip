@@ -108,3 +108,8 @@
 // All clusters app has 3 group endpoints. This needs to defined here so that
 // CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3
+
+// Enable `Extension` attribute of ACL Cluster
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+#endif

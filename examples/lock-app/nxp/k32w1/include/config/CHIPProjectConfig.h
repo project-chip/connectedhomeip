@@ -222,3 +222,6 @@
 #define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 1
 #define CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE 1024
 #endif
+
+// Enable `Extension` attribute of ACL Cluster as required by door locks
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
