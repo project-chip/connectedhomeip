@@ -46,11 +46,6 @@ namespace CommonUtilities {
 
 // TariffInfoDataClass
 
-constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
-{
-    return ((lhs.currency != rhs.currency) || (lhs.decimalPoints != rhs.decimalPoints));
-}
-
 CHIP_ERROR TariffInfoDataClass::ValidateStructValue(const PayloadType& newValue) const {
     if (!newValue.tariffLabel.IsNull() && newValue.tariffLabel.Value().size() > kTariffInfoMaxLabelLength)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -65,16 +60,54 @@ CHIP_ERROR TariffInfoDataClass::ValidateStructValue(const PayloadType& newValue)
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    //If PRICE feature are supported
-    if (newValue.currency.HasValue() && !newValue.currency.Value().IsNull()) {
-        const auto &currency = newValue.currency.Value().Value();
-        if (currency.currency >= kMaxCurrencyValue) return CHIP_ERROR_INVALID_ARGUMENT;
+    if (mFeatureMap.Has(CommodityTariff::Feature::kPricing))
+    {
+        if (newValue.currency.HasValue() && !newValue.currency.Value().IsNull())
+        {
+            const auto &currency = newValue.currency.Value().Value();
+            if (currency.currency >= kMaxCurrencyValue) return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else
+        {
+            // If the pricing feature is enabled, the currency field is required!
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
     }
 
     return CHIP_NO_ERROR;
 }
 
-void TariffInfoDataClass::CleanupStructValue(PayloadType& aValue) {
+bool TariffInfoDataClass::CompareStructValue(const PayloadType &source, const PayloadType &destination) const {
+    if (source.tariffLabel.IsNull() != destination.tariffLabel.IsNull())
+        return false;
+    if (!source.tariffLabel.IsNull() && source.tariffLabel.Value() != destination.tariffLabel.Value())
+        return false;
+
+    if (source.providerName.IsNull() != destination.providerName.IsNull())
+        return false;
+    if (!source.providerName.IsNull() && source.providerName.Value() != destination.providerName.Value())
+        return false;
+
+    if (mFeatureMap.Has(CommodityTariff::Feature::kPricing))
+    {
+        if (source.currency.HasValue() != destination.currency.HasValue()) return false;
+        if (source.currency.HasValue()) {
+            if (source.currency.Value().IsNull() != destination.currency.Value().IsNull()) return false;
+            if (!source.currency.Value().IsNull() && (source.currency.Value().Value() != destination.currency.Value().Value()))
+                return false;
+        }
+    }
+
+    if (source.blockMode.IsNull() != destination.blockMode.IsNull())
+        return false;
+
+    return source.blockMode.IsNull() || source.blockMode.Value() == destination.blockMode.Value();
+}
+
+
+
+void TariffInfoDataClass::CleanupStructValue(PayloadType& aValue)
+{
     if (!aValue.tariffLabel.IsNull() && aValue.tariffLabel.Value().data())
     {
         MemoryFree(const_cast<char*>(aValue.tariffLabel.Value().data()));
@@ -88,10 +121,39 @@ void TariffInfoDataClass::CleanupStructValue(PayloadType& aValue) {
         tmp_label.SetNull();
     }
 
-    //If PRICE feature are supported
-    aValue.currency.ClearValue();
+    if (mFeatureMap.Has(CommodityTariff::Feature::kPricing))
+    {
+        aValue.currency.ClearValue();
+    }
 }
 
+//TariffPeriodsDataClass
+
+CHIP_ERROR TariffPeriodsDataClass::ValidateStructValue(const PayloadType &newValue) const {
+    if (!newValue.label.IsNull() && newValue.label.Value().size() > kDefaultStringValuesMaxBufLength)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    else if (newValue.label.Value().empty())
+    {
+        ChipLogError(NotSpecified, "TariffPeriod label must not be empty if present");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+
+    if (newValue.dayEntryIDs.empty())
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    if (newValue.tariffComponentIDs.empty())
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    return CHIP_NO_ERROR;
+}
+/*
+bool TariffPeriodsDataClass::CompareStructValue(const PayloadType &a, const PayloadType &b) const {
+    if (a.label.IsNull() != b.label.IsNull()) return false;
+    if (!a.label.IsNull() && a.label.Value() != b.label.Value()) return false;
+    return a.dayEntryIDs == b.dayEntryIDs && a.tariffComponentIDs == b.tariffComponentIDs;
+}
+*/
 void TariffPeriodsDataClass::CleanupStructValue(PayloadType& aValue) {
     if (!aValue.label.IsNull() && aValue.label.Value().data()) {
         auto& tmp_label = aValue.label;

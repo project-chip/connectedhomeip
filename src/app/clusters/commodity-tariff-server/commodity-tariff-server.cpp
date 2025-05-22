@@ -51,7 +51,7 @@ bool CommodityTariffDataProvider::TariffDataUpd_Init(const CommodityTariffPrimar
         bool allValid = true;
 
 #define X(attrName, attrType) \
-        attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName);
+        attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, mFeature);
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 

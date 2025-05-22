@@ -21,11 +21,30 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <cstring>
 #include <type_traits>
 
 namespace chip {
+
+constexpr bool operator!=(const Span<const char>& lhs, const Span<const char>& rhs)
+{
+    if (lhs.size() != rhs.size()) 
+        return true; // Different lengths → not equal
+    
+    if (lhs.data() == rhs.data()) 
+        return false; // Same pointer (or both null) → equal
+    
+    // Compare byte-by-byte (safe for non-null-terminated data)
+    return !std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
 namespace app {
 namespace Clusters {
+
+constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
+{
+    return ((lhs.currency != rhs.currency) || (lhs.decimalPoints != rhs.decimalPoints));
+}
+
 namespace CommodityTariff {
 
 /**
@@ -229,8 +248,10 @@ public:
      * @brief Performs a pre-validation of arguments value before assigning it as newValue
      * @param aValue New value for future update mValue
      */
-     void UpdateBegin(const T & aValue) {
+     void UpdateBegin(const T & aValue, BitMask<Feature> aFeatureMap) {
         CHIP_ERROR err = CHIP_NO_ERROR;
+
+        mFeatureMap = aFeatureMap;
 
         err = ValidateValue(aValue);
 
@@ -306,6 +327,7 @@ public:
 protected:
     T & mValue; // Reference to the applied value storage
     T & mNewValue = mValue;  // Reference to a value for updating
+    BitMask<Feature> mFeatureMap;
     bool is_valid = false;
     bool is_changed = false;
 
