@@ -99,6 +99,43 @@ class TC_CNET_4_12(MatterBaseTest):
         else:
             asserts.fail(f"{thread_network_name} Thread network not found.")
 
+    async def verify_thread_network_response(self, resp):
+        """
+        Validate the thread network response from the device under test (DUT).
+
+        This function performs the following checks:
+        1. Ensures that the NetworkingStatus is 'Success' (0).
+        2. Verifies that debugText is either None or an empty string if the status is success.
+        3. If debugText contains any text, confirms that its length does not exceed 512 characters.
+
+        Args:
+            resp: The response object from the DUT containing networkingStatus and debugText attributes.
+
+        Raises:
+            AssertionError: If any of the validation conditions fail.
+        """
+        debug_text = resp.debugText
+
+        # Validate that NetworkingStatus is 'Success' (0)
+        asserts.assert_equal(
+            resp.networkingStatus,
+            Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
+            "Expected NetworkingStatus to be 'Success' (0)"
+        )
+
+        # Validate that debugText is None or empty if status is success
+        asserts.assert_true(
+            debug_text is None or debug_text == '',
+            "debugText must be None or empty if status is success."
+        )
+
+        # If debugText is present and not empty, validate len does not exceed 512 char
+        if debug_text:
+            asserts.assert_true(
+                len(debug_text) <= 512,
+                "debugText must be a string with a max length of 512 characters."
+            )
+
     @property
     def default_timeout(self) -> int:
         return 900
@@ -303,16 +340,8 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         logger.info(f'Step #5: AddOrUpdateThreadNetwork response for THREAD_2ND: ({vars(resp)})')
         logger.info(f'Step #5: AddOrUpdateThreadNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
-        # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
-        debug_text = resp.debugText
-        if resp.networkingStatus == Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
-            # If Successful, 'debugText' should be empty or not included.
-            asserts.assert_true(debug_text is None or debug_text == '',
-                                "debugText must be None or empty if status is success.")
-        else:
-            # If fails, 'debugText' must be a string with a maximum length of 512 characters.
-            asserts.assert_true(len(debug_text) <= 512,
-                                "debugText must be a string with a max length of 512 characters if not success.")
+
+        await self.verify_thread_network_response(resp)
 
         self.step(6)
         networks = await self.read_single_attribute_check_success(
@@ -328,7 +357,6 @@ class TC_CNET_4_12(MatterBaseTest):
             network_ids,
             f"Expected networkID for THREAD_2ND {thread_network_id_bytes_th2} not found in Thread networks."
         )
-        # TODO: On /CHIP-Specifications repo, the PR #5187<https://github.com/CHIP-Specifications/chip-test-plans/pull/5187> created to validate that the Networks attribute list has an entry NetworkID=th_xpan_2 insted of th_xpan_1
 
         self.step(7)
         cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
@@ -452,9 +480,8 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         logger.info(f'Step #15: AddOrUpdateThreadNetwork response for THREAD_2ND: ({vars(resp)})')
         logger.info(f'Step #15: AddOrUpdateThreadNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
-        # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
-        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Failure status returned from AddThreadNetwork")
+
+        await self.verify_thread_network_response(resp)
 
         self.step(16)
         networks = await self.read_single_attribute_check_success(
@@ -566,16 +593,8 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         logger.info(f'Step #21: AddOrUpdateThreadNetwork response for THREAD_1ST: ({vars(resp)})')
         logger.info(f'Step #21: AddOrUpdateThreadNetwork Status for THREAD_1ST is success: ({resp.networkingStatus})')
-        # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
-        debug_text = resp.debugText
-        if resp.networkingStatus == Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
-            # If Successful, 'debugText' should be empty or not included.
-            asserts.assert_true(debug_text is None or debug_text == '',
-                                "debugText must be None or empty if status is success.")
-        else:
-            # If fails, 'debugText' must be a string with a maximum length of 512 characters.
-            asserts.assert_true(len(debug_text) <= 512,
-                                "debugText must be a string with a max length of 512 characters if not success.")
+
+        await self.verify_thread_network_response(resp)
 
         cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
             networkID=thread_network_id_bytes_th1
