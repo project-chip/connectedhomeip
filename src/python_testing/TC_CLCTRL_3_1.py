@@ -32,7 +32,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from random import choice
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -97,15 +96,16 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         # STEP 2a: TH sends command Calibrate to DUT
         self.step("2a")
 
+        status = Status.SUCCESS
         try:
             await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Calibrate)
         except InteractionModelError as e:
+            status = e.status
             asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
+                status, Status.Success, "Unexpected error returned")
         # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command Calibrate: {e.status}")
+        if not type_matches(status, Status.SUCCESS):
+            logging.error(f"Failed to send command Calibrate: {status}")
             return
         else:
             logging.info("Command Calibrate sent successfully")
@@ -258,7 +258,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             asserts.assert_equal(
                 e.status, Status.Success, "Unexpected error returned")
             pass
-        # Check if the command was sent invalid state
+        # Check if the command is invalid in the current state
         if e.status == Status.INVALID_IN_STATE:
             logging.info("Command Calibrate is invalid while moving")
             return
