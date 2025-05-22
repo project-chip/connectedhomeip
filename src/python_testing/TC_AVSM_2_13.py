@@ -56,36 +56,36 @@ class TC_AVSM_2_13(MatterBaseTest):
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(
-                1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER", "Verify VDO is supported."
+                1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT", "Verify VDO is supported."
             ),
             TestStep(
                 2,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 0.",
             ),
             TestStep(
                 3,
-                "TH reads RankedVideoStreamPrioritiesList attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "TH reads RankedVideoStreamPrioritiesList attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Store this value in aRankedStreamPriorities.",
             ),
             TestStep(
                 4,
-                "TH reads RateDistortionTradeOffPoints attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "TH reads RateDistortionTradeOffPoints attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Store this value in aRateDistortionTradeOffPoints.",
             ),
             TestStep(
                 5,
-                "TH reads MinViewport attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "TH reads MinViewport attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Store this value in aMinViewport.",
             ),
             TestStep(
                 6,
-                "TH reads VideoSensorParams attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "TH reads VideoSensorParams attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Store this value in aVideoSensorParams.",
             ),
             TestStep(
                 7,
-                "TH reads MaxEncodedPixelRate attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "TH reads MaxEncodedPixelRate attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Store this value in aMaxEncodedPixelRate.",
             ),
             TestStep(
@@ -96,7 +96,7 @@ class TC_AVSM_2_13(MatterBaseTest):
             ),
             TestStep(
                 9,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 1.",
             ),
             TestStep(
@@ -107,7 +107,7 @@ class TC_AVSM_2_13(MatterBaseTest):
             ),
             TestStep(
                 11,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 1.",
             ),
         ]
@@ -176,7 +176,7 @@ class TC_AVSM_2_13(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aRankedStreamPriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -209,7 +209,7 @@ class TC_AVSM_2_13(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aRankedStreamPriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
