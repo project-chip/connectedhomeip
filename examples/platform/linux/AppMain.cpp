@@ -438,7 +438,7 @@ public:
         // Check if it was set from the command line or fall back to default provider.
         if (mVendorName.HasValue())
         {
-            VerifyOrReturnError(mVendorName.Value().size() < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(CanFitInNullTerminatedString(mVendorName.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
             strcpy(buf, mVendorName.Value().c_str());
             return CHIP_NO_ERROR;
         }
@@ -453,7 +453,7 @@ public:
         // Check if it was set from the command line or fall back to default provider.
         if (mProductName.HasValue())
         {
-            VerifyOrReturnError(mProductName.Value().size() < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(CanFitInNullTerminatedString(mProductName.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
             strcpy(buf, mProductName.Value().c_str());
             return CHIP_NO_ERROR;
         }
@@ -471,7 +471,7 @@ public:
         // Check if it was set from the command line or fall back to default provider.
         if (mSerialNumber.HasValue())
         {
-            VerifyOrReturnError(mSerialNumber.Value().size() < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(CanFitInNullTerminatedString(mSerialNumber.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
             strcpy(buf, mSerialNumber.Value().c_str());
             return CHIP_NO_ERROR;
         }
@@ -492,7 +492,7 @@ public:
         // Check if it was set from the command line or fall back to default provider.
         if (mHardwareVersionString.HasValue())
         {
-            VerifyOrReturnError(mHardwareVersionString.Value().size() < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(CanFitInNullTerminatedString(mHardwareVersionString.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
             strcpy(buf, mHardwareVersionString.Value().c_str());
             return CHIP_NO_ERROR;
         }
@@ -505,7 +505,7 @@ public:
         // Check if it was set from the command line or fall back to default provider.
         if (mSoftwareVersionString.HasValue())
         {
-            VerifyOrReturnError(mSoftwareVersionString.Value().size() < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(CanFitInNullTerminatedString(mSoftwareVersionString.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
             strcpy(buf, mSoftwareVersionString.Value().c_str());
             return CHIP_NO_ERROR;
         }
@@ -554,6 +554,11 @@ private:
     Optional<std::string> mSerialNumber;
     Optional<std::string> mHardwareVersionString;
     Optional<std::string> mSoftwareVersionString;
+
+    static inline bool CanFitInNullTerminatedString(const std::string & candidate, size_t bufSizeIncludingNull)
+    {
+        return bufSizeIncludingNull >= (candidate.size() + 1);
+    }
 };
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
