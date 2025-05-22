@@ -25,10 +25,10 @@
 #include <app/clusters/closure-control-server/closure-control-server.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <app/TestEventTriggerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -44,7 +44,7 @@ namespace ClosureControl {
  *
  * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
  */
-class PrintOnlyDelegate : public DelegateBase,  public TestEventTriggerHandler
+class PrintOnlyDelegate : public DelegateBase, public TestEventTriggerHandler
 {
 public:
     PrintOnlyDelegate() {}
