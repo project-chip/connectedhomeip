@@ -140,8 +140,6 @@ private:
     /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
     ///
     /// Respects path expansion/values in mpAttributePath
-    ///
-    /// Handles Global attributes (which are returned at the end)
     std::optional<AttributeId> NextAttributeId();
 
     /// Get the next cluster ID in mOutputPath(endpoint) if one is available.

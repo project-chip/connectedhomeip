@@ -254,8 +254,8 @@ protected:
             //
             handlerContext.SetCommandHandled();
 
-            if (DataModel::Decode(handlerContext.mPayload, requestPayload,
-                                  handlerContext.mCommandHandler.GetAccessingFabricIndex()) != CHIP_NO_ERROR)
+            if (requestPayload.Decode(handlerContext.mPayload, handlerContext.mCommandHandler.GetAccessingFabricIndex()) !=
+                CHIP_NO_ERROR)
             {
                 handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
                                                          Protocols::InteractionModel::Status::InvalidCommand);

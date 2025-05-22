@@ -1699,14 +1699,13 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -1996,7 +1995,7 @@ endpoint 2 {
     ram      attribute temperatureSetpoint;
     ram      attribute minTemperature default = -18;
     ram      attribute maxTemperature default = -15;
-    ram      attribute step;
+    ram      attribute step default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2026,7 +2025,7 @@ endpoint 3 {
     ram      attribute temperatureSetpoint;
     ram      attribute minTemperature default = 0;
     ram      attribute maxTemperature default = 4;
-    ram      attribute step;
+    ram      attribute step default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
