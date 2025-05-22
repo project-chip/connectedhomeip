@@ -198,8 +198,8 @@ public:
     static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
 
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
-    static PeerAddress NFC() { return PeerAddress(kUndefinedNFCShortId); }
-    static PeerAddress NFC(const uint16_t shortId) { return PeerAddress(shortId); }
+    static constexpr PeerAddress NFC() { return PeerAddress(kUndefinedNFCShortId); }
+    static constexpr PeerAddress NFC(const uint16_t shortId) { return PeerAddress(shortId); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
 
@@ -246,7 +246,7 @@ public:
     }
 
 private:
-    PeerAddress(uint16_t shortId) : mTransportType(Type::kNfc) { mId.mNFCShortId = shortId; }
+    constexpr PeerAddress(uint16_t shortId) : mTransportType(Type::kNfc), mId{.mNFCShortId = shortId} {}
 
     static PeerAddress FromString(char * addrStr, uint16_t port, Type type)
     {
