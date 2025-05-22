@@ -29,7 +29,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    MutableByteSpan byteblock = MutableByteSpan(mAccumulator.GetData(), mAccumulator.GetThreshold());
+    MutableByteSpan byteblock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
     OTATlvProcessor::vOtaProcessInternalEncryption(byteblock);
 #endif
     error = DecodeTlv();
@@ -81,7 +81,7 @@ CHIP_ERROR OTAFactoryDataProcessor::FinalizeAction()
 CHIP_ERROR OTAFactoryDataProcessor::DecodeTlv()
 {
     TLV::TLVReader tlvReader;
-    tlvReader.Init(mAccumulator.GetData(), mLength);
+    tlvReader.Init(mAccumulator.data(), mLength);
     ReturnErrorOnFailure(tlvReader.Next(TLV::TLVType::kTLVType_Structure, TLV::AnonymousTag()));
 
     TLV::TLVType outerType;

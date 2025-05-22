@@ -53,7 +53,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 #endif
     }
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    MutableByteSpan byteblock = MutableByteSpan(mAccumulator.GetData(), mAccumulator.GetThreshold());
+    MutableByteSpan byteblock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
     memcpy(&byteblock[0], &byteblock[requestedOtaMaxBlockSize], mUnalignmentNum);
     memcpy(&byteblock[mUnalignmentNum], block.data(), block.size());
 
@@ -116,7 +116,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-    ReturnErrorOnFailure(mCallbackProcessDescriptor(reinterpret_cast<void *>(mAccumulator.GetData())));
+    ReturnErrorOnFailure(mCallbackProcessDescriptor(reinterpret_cast<void *>(mAccumulator.data())));
 
     mDescriptorProcessed = true;
     mAccumulator.Clear();
