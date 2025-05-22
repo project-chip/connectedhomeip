@@ -266,6 +266,7 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Precondition: ConnectMaxTimeSeconds value: {connect_max_time_seconds}')
 
         # Fudge factor to ensure the Thread networks are fully initialized before switching.
+        # TODO: Opened follow-up issue TC-CNET-4.12 Follow up - reconsider fudge factor, link: https://github.com/project-chip/matter-test-scripts/issues/583
         fudge_factor_seconds = 60
         logger.info(f'Precondition: fudge_factors_seconds value: {fudge_factor_seconds}')
 
