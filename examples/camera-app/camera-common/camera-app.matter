@@ -3195,6 +3195,11 @@ endpoint 1 {
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
+    handle command SolicitOffer;
+    handle command SolicitOfferResponse;
+    handle command ProvideOffer;
+    handle command ProvideOfferResponse;
+    handle command ProvideAnswer;
     handle command ProvideICECandidates;
     handle command EndSession;
   }
