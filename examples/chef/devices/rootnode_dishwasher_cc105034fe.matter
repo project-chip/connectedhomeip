@@ -1112,7 +1112,7 @@ cluster GeneralDiagnostics = 51 {
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster WiFiNetworkDiagnostics = 54 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AssociationFailureCauseEnum : enum8 {
     kUnknown = 0;
@@ -1182,7 +1182,7 @@ cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
+  /** This command is used to reset the count attributes. */
   command ResetCounts(): DefaultSuccess = 0;
 }
 
@@ -1677,14 +1677,13 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -1942,7 +1941,7 @@ endpoint 1 {
     ram      attribute temperatureSetpoint default = 0;
     ram      attribute minTemperature default = 4900;
     ram      attribute maxTemperature default = 8200;
-    ram      attribute step default = 0;
+    ram      attribute step default = 100;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

@@ -76,12 +76,12 @@ static_library("camera-controller-utils") {
     "commands/pairing/ToTLVCert.cpp",
     "commands/webrtc/WebRTCProviderCommands.cpp",
     "commands/webrtc/WebRTCProviderCommands.h",
-    "webrtc_manager/WebRTCManager.cpp",
-    "webrtc_manager/WebRTCManager.h",
-    "webrtc_manager/WebRTCProviderClient.cpp",
-    "webrtc_manager/WebRTCProviderClient.h",
-    "webrtc_manager/WebRTCRequestorDelegate.cpp",
-    "webrtc_manager/WebRTCRequestorDelegate.h",
+    "webrtc-manager/WebRTCManager.cpp",
+    "webrtc-manager/WebRTCManager.h",
+    "webrtc-manager/WebRTCProviderClient.cpp",
+    "webrtc-manager/WebRTCProviderClient.h",
+    "webrtc-manager/WebRTCRequestorDelegate.cpp",
+    "webrtc-manager/WebRTCRequestorDelegate.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]

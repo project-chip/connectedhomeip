@@ -1,0 +1,9 @@
+{{> header}}
+// This file is generated from Attributes.h.zapt
+
+#pragma once
+
+{{#zcl_clusters}}
+#include <clusters/{{asUpperCamelCase label}}/AttributeIds.h>
+{{/zcl_clusters}}
+

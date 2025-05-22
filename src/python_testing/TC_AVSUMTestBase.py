@@ -199,16 +199,25 @@ class AVSUMTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
+        attrs = Clusters.Objects.CameraAvStreamManagement.Attributes
+
+        # Get the parms from the device (those which are available)
+        aRankedStreamPriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.RankedVideoStreamPrioritiesList)
+        aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
+        aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
+        aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
+
         try:
             response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
-                streamUsage=1,
-                videoCodec=0,
+                streamUsage=aRankedStreamPriorities[0],
+                videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,
-                maxFrameRate=120,
-                minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=400, height=300),
-                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080),  # 16/9
-                minBitRate=20000,
-                maxBitRate=150000,
+                maxFrameRate=aVideoSensorParams.maxFPS,
+                minResolution=aMinViewport,
+                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=aVideoSensorParams.sensorWidth,
+                                                                                              height=aVideoSensorParams.sensorHeight),
+                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minFragmentLen=2000,
                 maxFragmentLen=8000
             ),

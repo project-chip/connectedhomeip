@@ -22,7 +22,7 @@
 #include <commands/interactive/Commands.h>
 #include <commands/pairing/Commands.h>
 #include <commands/webrtc/Commands.h>
-#include <webrtc_manager/WebRTCManager.h>
+#include <webrtc-manager/WebRTCManager.h>
 #include <zap-generated/cluster/Commands.h>
 
 #include <iostream>
