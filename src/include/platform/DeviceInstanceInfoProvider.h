@@ -194,6 +194,8 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    virtual CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 /**

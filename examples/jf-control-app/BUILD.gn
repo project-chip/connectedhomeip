@@ -66,10 +66,10 @@ config("config") {
 
 static_library("jfc-utils") {
   sources = [
-    "${chip_root}/examples/chip-tool/CHIPCommand.h",
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.cpp",
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
     "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/CHIPCommand.h",
     "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Command.h",
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
@@ -82,6 +82,8 @@ static_library("jfc-utils") {
     "${chip_root}/examples/chip-tool/commands/icd/ICDCommand.h",
     "${chip_root}/examples/chip-tool/commands/pairing/OpenCommissioningWindowCommand.cpp",
     "${chip_root}/examples/chip-tool/commands/pairing/OpenCommissioningWindowCommand.h",
+    "${chip_root}/examples/chip-tool/commands/pairing/OpenJointCommissioningWindowCommand.cpp",
+    "${chip_root}/examples/chip-tool/commands/pairing/OpenJointCommissioningWindowCommand.h",
     "${chip_root}/examples/chip-tool/commands/pairing/ToTLVCert.cpp",
     "${chip_root}/examples/platform/linux/RpcClientProcessor.cpp",
     "${chip_root}/examples/platform/linux/RpcClientProcessor.h",

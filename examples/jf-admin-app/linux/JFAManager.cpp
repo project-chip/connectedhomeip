@@ -40,6 +40,13 @@ CHIP_ERROR JFAManager::Init(Server & server)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR JFAManager::GetJointFabricMode(uint8_t & jointFabricMode)
+{
+    jointFabricMode = ((IsDeviceCommissioned() ? 0 : 1) << 0) | (IsDeviceCommissioned() ? (IsDeviceJFAdmin() ? (1 << 1) : 0) : 0) |
+        (IsDeviceCommissioned() ? (IsDeviceJFAnchor() ? (1 << 2) : 0) : 0) | (IsDeviceCommissioned() ? (1 << 3) : 0);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId)
 {
     if (jfFabricIndex == kUndefinedFabricId)
@@ -70,6 +77,46 @@ void JFAManager::HandleCommissioningCompleteEvent()
             }
         }
     }
+}
+
+bool JFAManager::IsDeviceJFAdmin()
+{
+    if (jfFabricIndex == kUndefinedFabricId)
+    {
+        return false;
+    }
+
+    CATValues cats;
+
+    if (mServer->GetFabricTable().FetchCATs(jfFabricIndex, cats) == CHIP_NO_ERROR)
+    {
+        if (cats.ContainsIdentifier(kAdminCATIdentifier))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool JFAManager::IsDeviceJFAnchor()
+{
+    if (jfFabricIndex == kUndefinedFabricId)
+    {
+        return false;
+    }
+
+    CATValues cats;
+
+    if (mServer->GetFabricTable().FetchCATs(jfFabricIndex, cats) == CHIP_NO_ERROR)
+    {
+        if (cats.ContainsIdentifier(kAnchorCATIdentifier))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void JFAManager::ReleaseSession()
