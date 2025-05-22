@@ -26,13 +26,11 @@ CHIP_ERROR OtaTlvEncryptionKey::Import(ByteSpan keySpan)
 
 CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVOffset)
 {
-    uint8_t iv[16];
+    uint8_t iv[16] = { AU8IV_INIT_VALUE };
     uint8_t stream_block[16] = { 0 };
     size_t nc_off            = 0;
     uint32_t offset          = 0;
     size_t remaining         = block.size();
-
-    memcpy(iv, au8Iv, sizeof(au8Iv));
 
     // Set IV based on mIVOffset
     uint32_t counter = ((uint32_t) iv[12] << 24) | ((uint32_t) iv[13] << 16) | ((uint32_t) iv[14] << 8) | (uint32_t) iv[15];

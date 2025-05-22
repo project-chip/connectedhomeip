@@ -54,7 +54,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Import(const uint8_t * key, size_t key_len)
 
 CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVOffset)
 {
-    uint8_t iv[16];
+    uint8_t iv[16] = { AU8IV_INIT_VALUE };
     psa_cipher_operation_t operation = PSA_CIPHER_OPERATION_INIT;
     psa_status_t status;
     uint8_t output[PSA_BLOCK_CIPHER_BLOCK_LENGTH(PSA_KEY_TYPE_AES)];
@@ -62,8 +62,6 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVO
     size_t total_output;
     uint32_t u32IVCount;
     uint32_t Offset = 0;
-
-    memcpy(iv, au8Iv, sizeof(au8Iv));
 
     u32IVCount = (((uint32_t) iv[12]) << 24) | (((uint32_t) iv[13]) << 16) | (((uint32_t) iv[14]) << 8) | (iv[15]);
     u32IVCount += (mIVOffset >> 4);
