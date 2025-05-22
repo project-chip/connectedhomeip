@@ -44,7 +44,8 @@ enum class ClosureControlTestEventTrigger : uint64_t
     // MainState Test clear Event | Returns the device to pre-test status for that test event.
     kClearEvent = 0x0104000000000003,
 
-    //MainState is Error(3) Test Event | Simulate that the device is in error state, add at least one element to the CurrentErrorList attribute
+    // MainState is Error(3) Test Event | Simulate that the device is in error state, add at least one element to the
+    // CurrentErrorList attribute
     kMainStateIsError = 0x0104000000000004,
 };
 
@@ -116,10 +117,10 @@ ElapsedS PrintOnlyDelegate::GetWaitingForMotionCountdownTime()
 
 CHIP_ERROR PrintOnlyDelegate::HandleEventTrigger(uint64_t eventTrigger)
 {
-    eventTrigger                     = clearEndpointInEventTrigger(eventTrigger);
+    eventTrigger                           = clearEndpointInEventTrigger(eventTrigger);
     ClosureControlTestEventTrigger trigger = static_cast<ClosureControlTestEventTrigger>(eventTrigger);
-    ClusterLogic * logic = GetLogic();
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    ClusterLogic * logic                   = GetLogic();
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
 
     switch (trigger)
     {
@@ -145,7 +146,6 @@ CHIP_ERROR PrintOnlyDelegate::HandleEventTrigger(uint64_t eventTrigger)
 
     return err;
 }
-
 
 CHIP_ERROR ClosureControlEndpoint::Init()
 {
