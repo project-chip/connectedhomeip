@@ -79,7 +79,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                      "Result is SUCCESS"),
             TestStep(9, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
                      "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
-            TestStep(8, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
+            TestStep(10, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
                      "DUT_CE windows status shows the window is closed"),
         ]
 
@@ -124,7 +124,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
 
         self.step(7)
         await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeid=self.dut_node_id, timeout=180, iteration=10000, discriminator=self.discriminator, option=1)
 
         self.step(8)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
