@@ -26,6 +26,7 @@ public:
 
     uint32_t GetId() { return mId; }
     CHIP_ERROR Import(const uint8_t * key, size_t key_len);
+    CHIP_ERROR Import(MutableByteSpan keySpan);
     CHIP_ERROR Decrypt(MutableByteSpan & block, uint32_t & mIVOffset);
 
 protected:
