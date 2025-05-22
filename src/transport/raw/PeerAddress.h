@@ -67,7 +67,10 @@ class PeerAddress
 {
 public:
     PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) { mId.mRemoteId = kUndefinedNodeId; }
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) { mId.mRemoteId = kUndefinedNodeId; }
+    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type)
+    {
+        mId.mRemoteId = kUndefinedNodeId;
+    }
     PeerAddress(Type type) : mTransportType(type) { mId.mRemoteId = kUndefinedNodeId; }
     PeerAddress(Type type, NodeId remoteId) : mTransportType(type) { mId.mRemoteId = remoteId; }
 
@@ -246,7 +249,7 @@ public:
     }
 
 private:
-    constexpr PeerAddress(uint16_t shortId) : mTransportType(Type::kNfc), mId{.mNFCShortId = shortId} {}
+    constexpr PeerAddress(uint16_t shortId) : mTransportType(Type::kNfc), mId{ .mNFCShortId = shortId } {}
 
     static PeerAddress FromString(char * addrStr, uint16_t port, Type type)
     {
@@ -265,7 +268,6 @@ private:
         NodeId mRemoteId;
         uint16_t mNFCShortId;
     } mId;
-
 };
 
 } // namespace Transport

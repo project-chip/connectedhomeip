@@ -158,10 +158,7 @@ public:
     // a chained response. It is used when the response is too long to be transmitted in one shot.
     // SW2 indicates the size of the data in the next block. It can be read by calling
     // 'GetResponse' command.
-    bool IsResponseBlockAvailable(uint8_t sw1)
-    {
-        return (sw1 == static_cast<uint8_t>(0x61));
-    }
+    bool IsResponseBlockAvailable(uint8_t sw1) { return (sw1 == static_cast<uint8_t>(0x61)); }
 
     CHIP_ERROR RetrieveDiscriminator()
     {
@@ -402,10 +399,7 @@ public:
         return res;
     }
 
-    void PrintSw1Sw2(uint8_t sw1, uint8_t sw2)
-    {
-        ChipLogProgress(DeviceLayer, "SW1=0x%x SW2=0x%x", sw1, sw2);
-    }
+    void PrintSw1Sw2(uint8_t sw1, uint8_t sw2) { ChipLogProgress(DeviceLayer, "SW1=0x%x SW2=0x%x", sw1, sw2); }
 
     void ProcessError(const char * msg)
     {
@@ -421,10 +415,7 @@ public:
         SendOnNfcTagResponse(std::move(buffer));
     }
 
-    void ResetChainedResponseBuffer(void)
-    {
-        mChainedResponseLength = 0;
-    }
+    void ResetChainedResponseBuffer(void) { mChainedResponseLength = 0; }
 
     CHIP_ERROR AddDataToChainedResponseBuffer(uint8_t * data, int dataLen)
     {
@@ -542,9 +533,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::_Init()
     return CHIP_NO_ERROR;
 }
 
-void NFCCommissioningManagerImpl::_Shutdown()
-{
-}
+void NFCCommissioningManagerImpl::_Shutdown() {}
 
 // ===== start implement virtual methods on NfcApplicationDelegate.
 

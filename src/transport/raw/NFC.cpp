@@ -65,15 +65,19 @@ CHIP_ERROR NFCBase::Init(const NfcListenParameters & params)
 // Check if it is possible to communicate with this Peer
 bool NFCBase::CanSendToPeer(const Transport::PeerAddress & address)
 {
-    if (mState == State::kNotReady) {
+    if (mState == State::kNotReady)
+    {
         ChipLogError(Controller, "Invalid state in NFCBase::CanSendToPeer()");
         return false;
     }
 
     bool canSendToPeer = chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().CanSendToPeer(address);
-    if (canSendToPeer) {
+    if (canSendToPeer)
+    {
         mState = State::kConnected;
-    } else {
+    }
+    else
+    {
         mState = State::kInitialized;
     }
 
