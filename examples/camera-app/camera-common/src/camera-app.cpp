@@ -46,12 +46,25 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     features.Set(CameraAvStreamManagement::Feature::kSnapshot);
     features.Set(CameraAvStreamManagement::Feature::kVideo);
 
+    // TODO: Set the Privacy feature to enable SoftRecording and SoftLivestream
+    // privacy attributes
+
+    // Check microphone support to set Audio feature
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
         features.Set(CameraAvStreamManagement::Feature::kAudio);
     }
 
-    features.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
+    // Check if camera has speaker
+    if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kSpeaker);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsHDR())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
+    }
 
     BitFlags<OptionalAttribute> optionalAttrs;
 
@@ -60,6 +73,11 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         features.Set(CameraAvStreamManagement::Feature::kNightVision);
         optionalAttrs.Set(OptionalAttribute::kNightVision);
         optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
+    {
+        optionalAttrs.Set(OptionalAttribute::kHardPrivacyModeOn);
     }
 
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
@@ -118,7 +136,16 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 void CameraApp::InitializeCameraAVStreamMgmt()
 {
     // Set the attribute defaults
-    mAVStreamMgmtServerPtr->SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode());
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsHDR())
+    {
+        mAVStreamMgmtServerPtr->SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
+    {
+        mAVStreamMgmtServerPtr->SetHardPrivacyModeOn(mCameraDevice->GetCameraHALInterface().GetHardPrivacyMode());
+    }
+
     mAVStreamMgmtServerPtr->SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
 
     mAVStreamMgmtServerPtr->Init();
