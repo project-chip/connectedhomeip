@@ -109,6 +109,7 @@ private:
 #endif
     bool mBLERadioInitialized;
     bool mReadyToAttachThread;
+    bool mNeedToResetFailSafeTimer;
 
     void DriveBLEState(void);
     CHIP_ERROR PrepareAdvertisingRequest(void);
@@ -168,6 +169,8 @@ public:
     static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
 #endif
 
+    bool NeedToResetFailSafeTimer(void);
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     // Switch context from BLE to Thread
     void SwitchToIeee802154(void);
@@ -210,6 +213,11 @@ inline BLEManager & BLEMgr(void)
 inline BLEManagerImpl & BLEMgrImpl(void)
 {
     return BLEManagerImpl::sInstance;
+}
+
+inline bool BLEManagerImpl::NeedToResetFailSafeTimer(void)
+{
+    return mNeedToResetFailSafeTimer;
 }
 
 inline BleLayer * BLEManagerImpl::_GetBleLayer()
