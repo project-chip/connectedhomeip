@@ -73,7 +73,11 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                      "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
             TestStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
                      "DUT_CE windows status shows the window is closed"),
-            TestStep(7, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
+            TestStep(7, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 180 seconds",
+                    "Result is SUCCESS"),
+            TestStep(8, "TH_CR1 sends a RevokeCommissioning command to the DUT_CE",
+                     "Result is SUCCESS"),
+            TestStep(9, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
                      "DUT_CE does not open its Commissioning window to allow a second commissioning. DUT_CE shows 'Failed to open commissioning window. Global status 0x85'"),
             TestStep(8, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
                      "DUT_CE windows status shows the window is closed"),
@@ -119,6 +123,16 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                              "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(7)
+        await self.th1.OpenCommissioningWindow(
+            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+
+        self.step(8)
+        revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
+        sleep(1)
+
+        self.step(9)
         try:
             await self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=179, iteration=10000, discriminator=self.discriminator, option=1)
@@ -131,7 +145,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
             asserts.assert_equal(e.err, _INVALID_COMMAND,
                                  "Expected to error as we provided failure value for opening commissioning window")
 
-        self.step(8)
+        self.step(10)
         window_status3 = await self.support.get_window_status(th=self.th1)
         asserts.assert_equal(window_status3, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
