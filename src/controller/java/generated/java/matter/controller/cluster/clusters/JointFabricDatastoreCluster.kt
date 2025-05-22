@@ -101,10 +101,10 @@ class JointFabricDatastoreCluster(
     object SubscriptionEstablished : AdminListAttributeSubscriptionState()
   }
 
-  class StatusAttribute(val value: JointFabricDatastoreClusterDatastoreStatusStruct)
+  class StatusAttribute(val value: JointFabricDatastoreClusterDatastoreStatusEntryStruct)
 
   sealed class StatusAttributeSubscriptionState {
-    data class Success(val value: JointFabricDatastoreClusterDatastoreStatusStruct) :
+    data class Success(val value: JointFabricDatastoreClusterDatastoreStatusEntryStruct) :
       StatusAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : StatusAttributeSubscriptionState()
@@ -141,11 +141,11 @@ class JointFabricDatastoreCluster(
   }
 
   class NodeKeySetListAttribute(
-    val value: List<JointFabricDatastoreClusterDatastoreNodeKeySetEntry>
+    val value: List<JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct>
   )
 
   sealed class NodeKeySetListAttributeSubscriptionState {
-    data class Success(val value: List<JointFabricDatastoreClusterDatastoreNodeKeySetEntry>) :
+    data class Success(val value: List<JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct>) :
       NodeKeySetListAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : NodeKeySetListAttributeSubscriptionState()
@@ -1569,8 +1569,8 @@ class JointFabricDatastoreCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: JointFabricDatastoreClusterDatastoreStatusStruct =
-      JointFabricDatastoreClusterDatastoreStatusStruct.fromTlv(AnonymousTag, tlvReader)
+    val decodedValue: JointFabricDatastoreClusterDatastoreStatusEntryStruct =
+      JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(AnonymousTag, tlvReader)
 
     return StatusAttribute(decodedValue)
   }
@@ -1614,8 +1614,8 @@ class JointFabricDatastoreCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: JointFabricDatastoreClusterDatastoreStatusStruct =
-            JointFabricDatastoreClusterDatastoreStatusStruct.fromTlv(AnonymousTag, tlvReader)
+          val decodedValue: JointFabricDatastoreClusterDatastoreStatusEntryStruct =
+            JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(AnonymousTag, tlvReader)
 
           emit(StatusAttributeSubscriptionState.Success(decodedValue))
         }
@@ -1866,11 +1866,16 @@ class JointFabricDatastoreCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<JointFabricDatastoreClusterDatastoreNodeKeySetEntry> =
-      buildList<JointFabricDatastoreClusterDatastoreNodeKeySetEntry> {
+    val decodedValue: List<JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct> =
+      buildList<JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct> {
         tlvReader.enterArray(AnonymousTag)
         while (!tlvReader.isEndOfContainer()) {
-          add(JointFabricDatastoreClusterDatastoreNodeKeySetEntry.fromTlv(AnonymousTag, tlvReader))
+          add(
+            JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct.fromTlv(
+              AnonymousTag,
+              tlvReader,
+            )
+          )
         }
         tlvReader.exitContainer()
       }
@@ -1919,12 +1924,12 @@ class JointFabricDatastoreCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<JointFabricDatastoreClusterDatastoreNodeKeySetEntry> =
-            buildList<JointFabricDatastoreClusterDatastoreNodeKeySetEntry> {
+          val decodedValue: List<JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct> =
+            buildList<JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct> {
               tlvReader.enterArray(AnonymousTag)
               while (!tlvReader.isEndOfContainer()) {
                 add(
-                  JointFabricDatastoreClusterDatastoreNodeKeySetEntry.fromTlv(
+                  JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct.fromTlv(
                     AnonymousTag,
                     tlvReader,
                   )

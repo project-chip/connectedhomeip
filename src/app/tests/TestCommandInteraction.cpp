@@ -150,6 +150,7 @@ public:
 
     // No significance with using 0x12 as the CommandId, just using a value.
     static constexpr chip::CommandId GetCommandId() { return 0x12; }
+
     CHIP_ERROR EncodeTo(TLV::TLVWriter & aWriter, TLV::Tag aTag) const override
     {
         VerifyOrReturnError(mBuffer, CHIP_ERROR_NO_MEMORY);
@@ -167,6 +168,8 @@ private:
 struct Fields
 {
     static constexpr chip::CommandId GetCommandId() { return 4; }
+    static constexpr bool kIsFabricScoped = false;
+
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     {
         TLV::TLVType outerContainerType;
@@ -179,6 +182,8 @@ struct Fields
 struct BadFields
 {
     static constexpr chip::CommandId GetCommandId() { return 4; }
+    static constexpr bool kIsFabricScoped = false;
+
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     {
         TLV::TLVType outerContainerType;

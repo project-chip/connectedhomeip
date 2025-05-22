@@ -28,7 +28,6 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
   val listID: UShort,
   val binding: JointFabricDatastoreClusterDatastoreBindingTargetStruct,
   val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
-  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct {\n")
@@ -37,7 +36,6 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
     append("\tlistID : $listID\n")
     append("\tbinding : $binding\n")
     append("\tstatusEntry : $statusEntry\n")
-    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -49,7 +47,6 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
       put(ContextSpecificTag(TAG_LIST_ID), listID)
       binding.toTlv(ContextSpecificTag(TAG_BINDING), this)
       statusEntry.toTlv(ContextSpecificTag(TAG_STATUS_ENTRY), this)
-      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -60,7 +57,6 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
     private const val TAG_LIST_ID = 2
     private const val TAG_BINDING = 3
     private const val TAG_STATUS_ENTRY = 4
-    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -80,7 +76,6 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
           ContextSpecificTag(TAG_STATUS_ENTRY),
           tlvReader,
         )
-      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -90,7 +85,6 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
         listID,
         binding,
         statusEntry,
-        fabricIndex,
       )
     }
   }
