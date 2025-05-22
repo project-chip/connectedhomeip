@@ -54,7 +54,8 @@ private:
      * This function accumulates the descriptor data from the provided block,
      * invokes the registered descriptor processing callback with the accumulated data
      *
-     * @param block The ByteSpan containing the descriptor data to process.
+     *  @param[in/out] block The ByteSpan containing the descriptor data to process. ByteSpan is used as output of the block
+     * processing as well.
      */
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 };

@@ -76,30 +76,6 @@ enum class OTAProcessorTag
 };
 
 /**
- * This class can be used to accumulate data until a given threshold.
- * Should be used by OTATlvProcessor derived classes if they need
- * metadata accumulation (e.g. for custom header decoding).
- */
-class OTADataAccumulator
-{
-public:
-    void Init(uint32_t threshold);
-    void Clear();
-    CHIP_ERROR Accumulate(ByteSpan & block);
-
-    uint8_t * GetData() { return data(); }
-
-    inline uint32_t GetThreshold() const { return mThreshold; }
-
-protected:
-    inline uint8_t * data() { return mBuffer.Get(); }
-
-    uint32_t mThreshold    = 0;
-    uint32_t mBufferOffset = 0;
-    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
-};
-
-/**
  * This class defines an interface for a Matter TLV processor.
  * Instances of derived classes can be registered as processors
  * in OTAMultiImageProcessorImpl. Based on the TLV type, a certain
@@ -203,6 +179,27 @@ protected:
     ProcessDescriptor mCallbackProcessDescriptor = nullptr;
     OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
+};
+
+/**
+ * This class can be used to accumulate data until a given threshold.
+ * Should be used by OTATlvProcessor derived classes if they need
+ * metadata accumulation (e.g. for custom header decoding).
+ */
+class OTADataAccumulator
+{
+public:
+    void Init(uint32_t threshold);
+    void Clear();
+    CHIP_ERROR Accumulate(ByteSpan & block);
+
+    inline uint8_t * data() { return mBuffer.Get(); }
+    inline uint32_t GetThreshold() { return mThreshold; }
+
+private:
+    uint32_t mThreshold;
+    uint32_t mBufferOffset;
+    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
 
 } // namespace chip
