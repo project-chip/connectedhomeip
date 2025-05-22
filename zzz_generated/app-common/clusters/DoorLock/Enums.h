@@ -564,19 +564,21 @@ enum class DoorLockDayOfWeek : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kPINCredential              = 0x1,
-    kRFIDCredential             = 0x2,
-    kFingerCredentials          = 0x4,
-    kWeekDayAccessSchedules     = 0x10,
-    kDoorPositionSensor         = 0x20,
-    kFaceCredentials            = 0x40,
-    kCredentialOverTheAirAccess = 0x80,
-    kUser                       = 0x100,
-    kYearDayAccessSchedules     = 0x400,
-    kHolidaySchedules           = 0x800,
-    kUnbolting                  = 0x1000,
-    kAliroProvisioning          = 0x2000,
-    kAliroBLEUWB                = 0x4000,
+    kPinCredential               = 0x1,
+    kRfidCredential              = 0x2,
+    kFingerCredentials           = 0x4,
+    kLogging                     = 0x8,
+    kWeekDayAccessSchedules      = 0x10,
+    kDoorPositionSensor          = 0x20,
+    kFaceCredentials             = 0x40,
+    kCredentialsOverTheAirAccess = 0x80,
+    kUser                        = 0x100,
+    kNotification                = 0x200,
+    kYearDayAccessSchedules      = 0x400,
+    kHolidaySchedules            = 0x800,
+    kUnbolt                      = 0x1000,
+    kAliroProvisioning           = 0x2000,
+    kAliroBLEUWB                 = 0x4000,
 };
 } // namespace DoorLock
 } // namespace Clusters

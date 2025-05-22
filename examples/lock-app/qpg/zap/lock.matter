@@ -2257,17 +2257,19 @@ cluster DoorLock = 257 {
   }
 
   bitmap Feature : bitmap32 {
-    kPINCredential = 0x1;
-    kRFIDCredential = 0x2;
+    kPINCredential = 0x1 [spec_name = "PIN Credential"];
+    kRFIDCredential = 0x2 [spec_name = "RFID Credential"];
     kFingerCredentials = 0x4;
+    kLogging = 0x8;
     kWeekDayAccessSchedules = 0x10;
     kDoorPositionSensor = 0x20;
     kFaceCredentials = 0x40;
-    kCredentialOverTheAirAccess = 0x80;
+    kCredentialsOverTheAirAccess = 0x80;
     kUser = 0x100;
+    kNotification = 0x200;
     kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
-    kUnbolting = 0x1000;
+    kUnbolt = 0x1000;
     kAliroProvisioning = 0x2000;
     kAliroBLEUWB = 0x4000;
   }
