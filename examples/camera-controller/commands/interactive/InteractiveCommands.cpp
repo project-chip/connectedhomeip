@@ -44,6 +44,9 @@ constexpr char kCategoryAutomation[]             = "Automation";
 // File pointer for the log file
 FILE * sLogFile = nullptr;
 
+// Global flag to signal shutdown
+std::atomic<bool> sShutdownRequested(false);
+
 std::queue<std::string> sCommandQueue;
 std::mutex sQueueMutex;
 std::condition_variable sQueueCondition;
@@ -114,7 +117,14 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 std::string InteractiveStartCommand::GetCommand() const
 {
     std::unique_lock<std::mutex> lock(sQueueMutex);
-    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty(); });
+
+    // Wait until queue is not empty OR shutdown is requested
+    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty() || sShutdownRequested.load(); });
+
+    if (sShutdownRequested.load())
+    {
+        return {}; // empty string signals caller to exit
+    }
 
     std::string command = sCommandQueue.front();
     sCommandQueue.pop();
@@ -161,25 +171,6 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         Logging::SetLogRedirectCallback(LoggingCallback);
     }
 
-    bool startWebSocketServer = mStartWebSocketServer.ValueOr(false);
-    if (startWebSocketServer)
-    {
-        InteractiveServerCommand * command =
-            static_cast<InteractiveServerCommand *>(CommandMgr().GetCommandByName("interactive", "server"));
-        if (command == nullptr)
-        {
-            ChipLogError(NotSpecified, "Interactive server command not found.");
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        CHIP_ERROR err = command->RunCommand();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Failed to run interactive server command: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
-    }
-
     std::thread readCommands(ReadCommandThread);
     readCommands.detach();
 
@@ -187,7 +178,12 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     while (true)
     {
         std::string command = GetCommand();
-        if (!command.empty() && !ParseCommand(command, &status))
+        if (command.empty())
+        {
+            break;
+        }
+
+        if (!ParseCommand(command, &status))
         {
             break;
         }
@@ -438,6 +434,8 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
 
     gInteractiveServerResult.Reset();
     SetCommandExitStatus(CHIP_NO_ERROR);
+    CloseLogFile();
+
     return CHIP_NO_ERROR;
 }
 
@@ -464,6 +462,11 @@ bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
     mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
     return shouldStop;
+}
+
+void InteractiveServerCommand::StopCommand()
+{
+    mWebSocketServer.Stop();
 }
 
 CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
