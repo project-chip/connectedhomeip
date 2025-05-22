@@ -22,10 +22,12 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Decode.h>
+#include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
 
+#include <type_traits>
 namespace chip {
 namespace app {
 
@@ -197,7 +199,8 @@ protected:
      * The provided function is expected to have the following signature:
      *  void Func(HandlerContext &handlerContext, const RequestT &requestPayload);
      */
-    template <typename RequestT, typename FuncT>
+    template <typename RequestT, typename FuncT,
+              typename std::enable_if_t<!DataModel::IsFabricScoped<RequestT>::value, bool> = true>
     void HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
         if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId()) &&
@@ -214,6 +217,45 @@ protected:
             handlerContext.SetCommandHandled();
 
             if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+            {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                         Protocols::InteractionModel::Status::InvalidCommand);
+                return;
+            }
+
+            func(handlerContext, requestPayload);
+        }
+    }
+
+    /*
+     * Helper function to automatically de-serialize the data payload into a cluster object
+     * of type RequestT if the Cluster ID and Command ID in the context match. Upon successful
+     * de-serialization, the provided function is invoked and passed in a reference to the cluster object.
+     *
+     * Any errors encountered in this function prior to calling func result in the automatic generation of a status response.
+     * If `func` is called, the responsibility for doing so shifts to the callee to handle any further errors that are encountered.
+     *
+     * The provided function is expected to have the following signature:
+     *  void Func(HandlerContext &handlerContext, const RequestT &requestPayload);
+     */
+    template <typename RequestT, typename FuncT, typename std::enable_if_t<DataModel::IsFabricScoped<RequestT>::value, bool> = true>
+    void HandleCommand(HandlerContext & handlerContext, FuncT func)
+    {
+        if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId()) &&
+            (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+        {
+            RequestT requestPayload;
+
+            //
+            // If the command matches what the caller is looking for, let's mark this as being handled
+            // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+            // to handle this command since at this point, the caller is taking responsibility for handling
+            // the command in its entirety, warts and all.
+            //
+            handlerContext.SetCommandHandled();
+
+            if (requestPayload.Decode(handlerContext.mPayload, handlerContext.mCommandHandler.GetAccessingFabricIndex()) !=
+                CHIP_NO_ERROR)
             {
                 handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
                                                          Protocols::InteractionModel::Status::InvalidCommand);
