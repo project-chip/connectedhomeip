@@ -28,7 +28,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::OperationalCredentials::Commands;
 
-#if 0
 constexpr size_t kMaxResponseLength = 900;
 constexpr size_t kCSRNonceLength    = 32;
 
@@ -145,7 +144,8 @@ namespace app {
 namespace DataModel {
 
 template <>
-CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const CSRResponse::Type & responseData)
+CHIP_ERROR EncodeResponseCommandPayload(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex,
+                                        const CSRResponse::Type & responseData)
 {
     auto tag1      = TLV::ContextTag(CSRResponse::Fields::kNOCSRElements);
     auto tag2      = TLV::ContextTag(CSRResponse::Fields::kAttestationSignature);
@@ -163,5 +163,3 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const CSRResponse::Type
 } // namespace DataModel
 } // namespace app
 } // namespace chip
-
-#endif

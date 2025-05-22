@@ -253,6 +253,19 @@ CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex acce
 #pragma GCC diagnostic pop
 }
 
+/**
+ * @brief
+ *
+ * Encodes a response command payload. This is a templated function to allow
+ * specializations to be created as needed to customize the behavior.
+ */
+template <typename PayloadType>
+CHIP_ERROR EncodeResponseCommandPayload(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex,
+                                        const PayloadType & payload)
+{
+    return payload.Encode(writer, tag, accessingFabricIndex);
+}
+
 } // namespace DataModel
 } // namespace app
 } // namespace chip
