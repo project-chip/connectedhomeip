@@ -431,7 +431,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         network_index = resp.networkIndex
-        logger.info(f'Step #14: RemoveNetwork Status for THREAD_1ST IisS success: ({resp.networkingStatus})')
+        logger.info(f'Step #14: RemoveNetwork Status for THREAD_1ST is success: ({resp.networkingStatus})')
         logger.info(f'Step #14: Network index for THREAD_1ST: ({network_index})')
 
         # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
@@ -554,6 +554,21 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #21: ArmFailSafeResponse with ErrorCode as OK: ({resp.errorCode})')
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
+
+        cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=thread_network_id_bytes_th2)
+        resp = await self.send_single_cmd(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            cmd=cmd
+        )
+        network_index = resp.networkIndex
+        logger.info(f'Step #21: RemoveNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
+        logger.info(f'Step #21: Network index for THREAD_2nd: ({network_index})')
+
+        # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
+        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             "Failure status returned from ReordeRemove Network")
+        asserts.assert_equal(network_index, 0, "The network index is not as expected.")
 
         cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
             operationalDataset=thread_dataset_1_bytes
