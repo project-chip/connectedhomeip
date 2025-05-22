@@ -232,6 +232,7 @@ target_include_directories(app PRIVATE
   ../../common/pigweed/nrfconnect)
 
 target_compile_options(app PRIVATE
+                       "-DPW_RPC_ACTIONS_SERVICE=1"
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BOOLEAN_STATE_SERVICE=1"
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
