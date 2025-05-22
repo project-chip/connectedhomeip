@@ -115,6 +115,8 @@ public:
 
     VideoSensorParamsStruct & GetVideoSensorParams() override;
 
+    bool GetCameraSupportsHDR() override;
+
     bool GetCameraSupportsNightVision() override;
 
     bool GetNightVisionUsesInfrared() override;
@@ -138,6 +140,8 @@ public:
     CameraError SetHDRMode(bool hdrMode) override;
     bool GetHDRMode() override { return mHDREnabled; }
 
+    bool GetHardPrivacyMode() override { return mHardPrivacyModeOn; }
+
     std::vector<StreamUsageEnum> & GetSupportedStreamUsages() override;
 
     std::vector<StreamUsageEnum> & GetRankedStreamPriorities() override { return mRankedStreamPriorities; }
@@ -156,6 +160,9 @@ public:
      * @param viewport the viewport to be set on the stream
      */
     CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewport) override;
+
+    // Currently, defaulting to not supporting hard privacy switch.
+    bool HasHardPrivacySwitch() override { return false; }
 
     // Currently, defaulting to not supporting speaker.
     bool HasSpeaker() override { return false; }
@@ -238,9 +245,10 @@ private:
     uint8_t mZoom = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
     chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 0, 0, 1920, 1080 };
-    uint16_t mCurrentVideoFrameRate                                         = 0;
+    uint16_t mCurrentVideoFrameRate                                         = kMinVideoFrameRate;
     bool mHDREnabled                                                        = false;
     bool mMicrophoneMuted                                                   = false;
+    bool mHardPrivacyModeOn                                                 = false;
     uint8_t mMicrophoneVol                                                  = kMicrophoneMinLevel;
     uint8_t mMicrophoneMinLevel                                             = kMicrophoneMinLevel;
     uint8_t mMicrophoneMaxLevel                                             = kMicrophoneMaxLevel;

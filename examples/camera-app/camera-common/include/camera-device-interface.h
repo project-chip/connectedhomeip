@@ -179,6 +179,9 @@ public:
         // capabilities)
         virtual VideoSensorParamsStruct & GetVideoSensorParams() = 0;
 
+        // Get indication whether camera supports high dynamic range for video
+        virtual bool GetCameraSupportsHDR() = 0;
+
         // Get indication whether camera supports night vision
         virtual bool GetCameraSupportsNightVision() = 0;
 
@@ -225,6 +228,12 @@ public:
         // Get Ranked stream priorities as an ordered list. This is expected to
         // be a subset of the SupportedStreamUsages.
         virtual std::vector<StreamUsageEnum> & GetRankedStreamPriorities() = 0;
+
+        // Does camera have a hard privacy switch
+        virtual bool HasHardPrivacySwitch() = 0;
+
+        // Get whether hard privacy mode is On
+        virtual bool GetHardPrivacyMode() = 0;
 
         // Does camera have a speaker
         virtual bool HasSpeaker() = 0;
