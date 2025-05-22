@@ -53,16 +53,38 @@ std::condition_variable sQueueCondition;
 
 void ReadCommandThread()
 {
-    char * command;
-    while (true)
+    for (;;)
     {
-        command = readline(kInteractiveModePrompt);
-        if (command != nullptr && *command)
+        // `readline()` allocates with `malloc()`.  Wrap it in a smart
+        // pointer so we cannot leak it on every early–return/throw path.
+        std::unique_ptr<char, decltype(&std::free)> rawLine{ readline(kInteractiveModePrompt), &std::free };
+
+        if (!rawLine) // EOF or fatal error → shut down cleanly
         {
-            std::unique_lock<std::mutex> lock(sQueueMutex);
-            sCommandQueue.push(command);
-            free(command);
+            std::lock_guard<std::mutex> lk{ sQueueMutex };
+            sCommandQueue.emplace(kInteractiveModeStopCommand);
             sQueueCondition.notify_one();
+            break;
+        }
+
+        // Ignore empty lines produced by just hitting <Enter>.
+        if (*rawLine == '\0')
+            continue;
+
+        // Copy into an owning `std::string` before the pointer vanishes.
+        std::string line{ rawLine.get() };
+
+        {
+            std::lock_guard<std::mutex> lk{ sQueueMutex };
+            sCommandQueue.push(line);
+        }
+        sQueueCondition.notify_one();
+
+        // Bail out when the user asks to quit.
+        if (line == kInteractiveModeStopCommand)
+        {
+            ChipLogProgress(NotSpecified, "ReadCommandThread exit on quit");
+            break;
         }
     }
 }
