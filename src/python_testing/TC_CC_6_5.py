@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -47,7 +47,7 @@ from mobly import asserts
 # Constants
 BOOT_WAIT_TIME = 10  # seconds
 MIN_STARTUP_COLOR_TEMP = 1
-MAX_STARTUP_COLOR_TEMP = 0xfeff
+MAX_STARTUP_COLOR_TEMP = 0xFEFF
 
 
 class TC_CC_6_5(MatterBaseTest):
@@ -130,30 +130,24 @@ class TC_CC_6_5(MatterBaseTest):
 
         # Step 0a: Write 0x00 to Options attribute
         self.step("0a")
-        try:
-            await self.TH1.WriteAttribute(
-                self.dut_node_id,
-                [(attributes.Options, attributes.Options.Type(0x00))]
-            )
-        except Exception as e:
-            self.logger.error(f"Failed to write Options attribute: {e}")
-            raise
+        await self.write_single_attribute(
+            attribute=attributes.Options(value=0x00),
+            endpoint=self.endpoint,
+            expect_success=True
+        )
 
         # Step 0b: Send On command and verify response
         self.step("0b")
-        try:
-            response = await self.TH1.WriteAttribute(
-                self.dut_node_id,
-                [(Clusters.Objects.OnOff.Attributes.OnOff, True)]
-            )
-            asserts.assert_equal(
-                response.status,
-                Status.Success,
-                f"Expected status Success (0x00), got {response.status}"
-            )
-        except Exception as e:
-            self.logger.error(f"Failed to send On command: {e}")
-            raise
+        response = await self.write_single_attribute(
+            attribute=attributes.OnOff(value=True),
+            endpoint=self.endpoint,
+            expect_success=True
+        )
+        asserts.assert_equal(
+            response.status,
+            Status.Success,
+            f"Expected status Success (0x00), got {response.status}"
+        )
 
         # Read and verify color temperature attributes
         self.step("0c")
