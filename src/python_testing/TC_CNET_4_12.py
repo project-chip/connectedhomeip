@@ -137,7 +137,7 @@ class TC_CNET_4_12(MatterBaseTest):
                      ". NetworkID is `th_xpan_2`\n"
                      ". Connected is of type bool and is FALSE"),
             TestStep(7, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb field set to 2",
-                     ""),
+                     "Wait for device to connect to the Thread network. A wait time of `connect_max_time_seconds + fudge_factor_seconds` is applied to allow Thread network connection and SRP record propagation"),
             TestStep(8, "TH discovers and connects to DUT on the PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET operational network",
                      "Verify that the TH successfully connects to the DUT"),
             TestStep(9, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT",
@@ -159,11 +159,12 @@ class TC_CNET_4_12(MatterBaseTest):
                      " . NetworkingStatus is success which is '0'\n"
                      ". DebugText is of type string with max length 512 or empty"),
             TestStep(16, "TH sends ConnectNetwork command to the DUT with NetworkID field set to the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb field set to 3",
-                     ""),
+                     "Wait for device to connect to the Thread network. A wait time of `connect_max_time_seconds + fudge_factor_seconds` is applied to allow Thread network connection and SRP record propagation"),
             TestStep(17, "TH discovers and connects to DUT on the PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET operational network",
                      "Verify that the TH successfully connects to the DUT"),
             TestStep(18, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT",
-                     "Verify that the breadcrumb value is set to 3"),
+                     "Verify that the breadcrumb value is set to 3. Note: Wait for device to connect to the Thread network. "
+                     "A wait time of `connect_max_time_seconds + fudge_factor_seconds` is applied to allow Thread network connection and SRP record propagation"),
             TestStep(19, "TH sends the CommissioningComplete command to the DUT",
                      "Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)"),
             TestStep(20, "TH reads Networks attribute from the DUT",
