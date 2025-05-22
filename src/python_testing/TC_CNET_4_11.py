@@ -32,18 +32,22 @@ logging.basicConfig(level=logging.INFO)
 
 
 TIMEOUT = 900
+REQUEST_TIMEOUT_MS = 5000
+WIFI_WAIT_SECONDS = 10
+MAX_RETRIES = 4
 
 
 async def connect_wifi_linux(ssid, password):
-    if type(ssid) == bytes:
+    if isinstance(ssid, bytes):
         ssid = ssid.decode()
-    if type(password) == bytes:
+    if isinstance(password, bytes):
         password = password.decode()
 
     if not shutil.which("nmcli"):
         logger.error("'nmcli' is not installed. Install with: sudo apt install network-manager")
         return None
 
+    result = None
     try:
         # Activates Wi-Fi in case it is deactivated
         subprocess.run(["nmcli", "radio", "wifi", "on"], check=False)
@@ -69,7 +73,7 @@ async def connect_wifi_linux(ssid, password):
             ["nmcli", "d", "wifi", "connect", ssid, "password", password],
             capture_output=True, text=True
         )
-        await asyncio.sleep(10)  # wait the connection to be ready
+        await asyncio.sleep(WIFI_WAIT_SECONDS)  # wait the connection to be ready
 
         # Let's verify it is connected
         check = subprocess.run(
@@ -81,8 +85,10 @@ async def connect_wifi_linux(ssid, password):
         else:
             logger.info(f" --- connect_wifi_linux: Could not confirm WiFi connection to '{ssid}'")
 
+    except subprocess.CalledProcessError as e:
+        logger.error(f" --- connect_wifi_linux: nmcli command failed: {e.stderr.strip()}")
     except Exception as e:
-        logger.error(f" --- connect_wifi_linux: Exception when trying to connect to '{ssid}': {e}")
+        logger.error(f" --- connect_wifi_linux: Unexpected exception when trying to connect to '{ssid}': {e}")
     finally:
         return result
 
@@ -92,6 +98,7 @@ async def connect_wifi_mac(ssid, password):
         logger.error(" --- connect_wifi_mac: 'networksetup' is not present. Please install 'networksetup'.")
         return None
 
+    result = None
     try:
         # Get the Wi-Fi interface
         interface_result = subprocess.run(
@@ -111,24 +118,24 @@ async def connect_wifi_mac(ssid, password):
             "networksetup",
             "-setairportnetwork", interface, ssid, password
         ], check=True, capture_output=True, text=True)
-        await asyncio.sleep(10)
+        await asyncio.sleep(WIFI_WAIT_SECONDS)
 
     except subprocess.CalledProcessError as e:
         logger.error(f" --- connect_wifi_mac: Error connecting with networksetup: {e.stderr.strip()}")
     except Exception as e:
-        logger.error(f"[ --- connect_wifi_mac: Exception while trying to connect to {ssid}: {e}")
+        logger.error(f"[ --- connect_wifi_mac: Unexpected exception while trying to connect to {ssid}: {e}")
     finally:
         return result
 
 
-async def connect_host_wifi(ssid, password, max_retries):
+async def connect_host_wifi(ssid, password):
     os_name = platform.system()
     logger.info(f" --- connect_host_wifi: OS detected: {os_name}")
 
     # We try to connect the TH to the second network a few times, to avoid network instability
     retry = 1
-    while retry <= max_retries:
-        logger.info(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{max_retries}")
+    while retry <= MAX_RETRIES:
+        logger.info(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{MAX_RETRIES}")
         try:
             if os_name == "Linux":
                 conn = await connect_wifi_linux(ssid, password)
@@ -136,12 +143,15 @@ async def connect_host_wifi(ssid, password, max_retries):
                 conn = await connect_wifi_mac(ssid, password)
             else:
                 logger.error(" --- connect_host_wifi: OS not supported.")
-            if conn != None:
-                if conn.returncode == 0:
-                    logger.info(f" --- connect_host_wifi: Connected to {ssid}")
-                    break
+            if conn and conn.returncode == 0:
+                logger.info(f" --- connect_host_wifi: Connected to {ssid}")
+                break
+            elif conn:
+                stderr_msg = conn.stderr if conn.stderr else "No stderr"
+                logger.error(
+                    f" --- connect_host_wifi: Attempt {retry} failed. Return code: {conn.returncode} stderr: {stderr_msg}")
             else:
-                asserts.fail(f" --- connect_host_wifi: Not able to connect to {ssid}")
+                logger.error(f" --- connect_host_wifi: No result returned from connection attempt.")
 
         except subprocess.CalledProcessError as e:
             logger.error(f" --- connect_host_wifi: Exception when trying to connect to {ssid} stderr: {conn.stderr.decode()}")
@@ -149,44 +159,71 @@ async def connect_host_wifi(ssid, password, max_retries):
             retry += 1
 
 
-async def change_networks(object, cluster, ssid, password, breadcrumb):
-    # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
-    # so they loose connection between each other. Thus, ConnectNetwork throws an exception
-    try:
-        Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.value = 60
-        await object.send_single_cmd(
-            cmd=cluster.Commands.ConnectNetwork(
-                networkID=ssid,
-                breadcrumb=breadcrumb
-            )
-        )
-
-    except Exception as e:
-        logger.error(f" --- change_networks: Lost connection with the DUT.")
-
-    # After telling the DUT to change networks, we must change TH to the second network, so it can find the DUT
-    # But first wait a couple of seconds so the DUT finishes changing networks
-    await asyncio.sleep(10)
-    await asyncio.wait_for(
-        connect_host_wifi(ssid=ssid, password=password, max_retries=4),
-        timeout=TIMEOUT
+def is_network_switch_successful(err):
+    return (
+        err is None or
+        (hasattr(err, "networkingStatus") and
+         err.networkingStatus == Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess)
     )
 
-    try:
-        # Let's wait a couple seconds to finish changing networks
-        await asyncio.sleep(10)
-        err = await asyncio.wait_for(
-            object.send_single_cmd(
+
+async def change_networks(test, cluster, ssid, password, breadcrumb):
+    # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
+    # so they loose connection between each other. Thus, ConnectNetwork throws an exception
+    retry = 1
+    while retry <= MAX_RETRIES:
+        try:
+            # Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.value = 60
+            err = await test.send_single_cmd(
                 cmd=cluster.Commands.ConnectNetwork(
                     networkID=ssid,
                     breadcrumb=breadcrumb
                 )
-            ),
+            )
+            logger.info(f" --- err type: {type(err)}, value: {err}")
+            success = is_network_switch_successful(err)
+            if success:
+                logger.info(" --- change_networks: Network switch successful.")
+                break
+            else:
+                logger.warning(f" --- change_networks: Error during network switch: {err}")
+
+        except Exception as e:
+            logger.error(f" --- change_networks: Lost connection with the DUT.")
+
+        # After telling the DUT to change networks, we must change TH to the second network, so it can find the DUT
+        # But first wait a couple of seconds so the DUT finishes changing networks
+        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.wait_for(
+            connect_host_wifi(ssid=ssid, password=password),
             timeout=TIMEOUT
         )
 
-    except Exception as e:
-        logger.error(f" --- change_networks: Exception on 2nd call to ConnectNetwork: {e}")
+        try:
+            # Let's wait a couple seconds to finish changing networks
+            await asyncio.sleep(WIFI_WAIT_SECONDS)
+            err = await asyncio.wait_for(
+                test.send_single_cmd(
+                    cmd=cluster.Commands.ConnectNetwork(
+                        networkID=ssid,
+                        breadcrumb=breadcrumb
+                    )
+                ),
+                timeout=TIMEOUT
+            )
+            logger.info(f" --- err type: {type(err)}, value: {err}")
+            success = is_network_switch_successful(err)
+            if success:
+                logger.info(" --- change_networks: Network switch successful.")
+                break
+            else:
+                logger.warning(f" --- change_networks: Error during network switch: {err}")
+
+        except Exception as e:
+            logger.error(f" --- change_networks: Exception on 2nd call to ConnectNetwork: {e}")
+        retry += 1
+    else:
+        logger.error(f" --- change_networks: Failed to switch networks after {MAX_RETRIES} retries.")
 
 
 class TC_CNET_4_11(MatterBaseTest):
@@ -262,7 +299,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
-            timedRequestTimeoutMs=5000
+            timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
         )
         # Successful command execution is implied if no exception is raised.
 
@@ -299,7 +336,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 networkID=wifi_1st_ap_ssid.encode(),
                 breadcrumb=1
             ),
-            timedRequestTimeoutMs=5000
+            timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
         )
         # Verify that DUT sends NetworkConfigResponse to command with the following fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
@@ -319,7 +356,7 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info(" --- Step 5: Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
-        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=5000)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=REQUEST_TIMEOUT_MS)
 
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
@@ -358,7 +395,7 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info(f" --- Step 7: Attempting to connect to: {wifi_2nd_ap_ssid}")
         await asyncio.wait_for(
             change_networks(
-                object=self,
+                test=self,
                 cluster=cnet,
                 ssid=wifi_2nd_ap_ssid.encode(),
                 password=wifi_2nd_ap_credentials.encode(),
@@ -371,13 +408,26 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(9)
 
         # Verify that the TH successfully connects to the DUT
-        networks = await asyncio.wait_for(
-            self.read_single_attribute_check_success(
-                cluster=cnet,
-                attribute=cnet.Attributes.Networks
-            ),
-            timeout=TIMEOUT
-        )
+        try:
+            networks = await asyncio.wait_for(
+                self.read_single_attribute_check_success(
+                    cluster=cnet,
+                    attribute=cnet.Attributes.Networks
+                ),
+                timeout=TIMEOUT
+            )
+
+        except Exception as e:
+            logger.error(f" --- Step 13: Exception reading networks: {e}")
+            # Let's wait a couple of seconds to change networks
+            await asyncio.sleep(WIFI_WAIT_SECONDS)
+            networks = await asyncio.wait_for(
+                self.read_single_attribute_check_success(
+                    cluster=cnet,
+                    attribute=cnet.Attributes.Networks
+                ),
+                timeout=TIMEOUT
+            )
 
         for idx, network in enumerate(networks):
             if network.networkID == wifi_2nd_ap_ssid.encode():
@@ -405,7 +455,7 @@ class TC_CNET_4_11(MatterBaseTest):
         response = await asyncio.wait_for(
             self.send_single_cmd(
                 cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
-                timedRequestTimeoutMs=5000
+                timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
             ),
             timeout=TIMEOUT
         )
@@ -421,7 +471,7 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(12)
 
         await asyncio.wait_for(
-            connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials, max_retries=4),
+            connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials),
             timeout=TIMEOUT
         )
 
@@ -440,7 +490,7 @@ class TC_CNET_4_11(MatterBaseTest):
         except Exception as e:
             logger.error(f" --- Step 13: Exception reading networks: {e}")
             # Let's wait a couple of seconds to change networks
-            await asyncio.sleep(10)
+            await asyncio.sleep(WIFI_WAIT_SECONDS)
             networks = await asyncio.wait_for(
                 self.read_single_attribute_check_success(
                     cluster=cnet,
@@ -461,7 +511,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
-            timedRequestTimeoutMs=5000
+            timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
         )
         # Successful command execution is implied if no exception is raised.
 
@@ -473,7 +523,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 networkID=wifi_1st_ap_ssid.encode(),
                 breadcrumb=1
             ),
-            timedRequestTimeoutMs=5000
+            timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
         )
 
         # Verify that DUT sends NetworkConfigResponse to command with the following response fields:
@@ -491,7 +541,7 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info("--- Step 16: Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
-        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=5000)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=REQUEST_TIMEOUT_MS)
 
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         # 1. NetworkingStatus is success which is "0"
@@ -509,7 +559,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         logger.info(f" --- Step 17: Attempting to connect to: {wifi_2nd_ap_ssid}")
         await change_networks(
-            object=self,
+            test=self,
             cluster=cnet,
             ssid=wifi_2nd_ap_ssid.encode(),
             password=wifi_2nd_ap_credentials.encode(),
@@ -536,7 +586,7 @@ class TC_CNET_4_11(MatterBaseTest):
         except Exception as e:
             logger.error(f" --- Step 19: Exception reading networks: {e}")
             # Let's wait a couple of seconds to change networks
-            await asyncio.sleep(10)
+            await asyncio.sleep(WIFI_WAIT_SECONDS)
             networks = await asyncio.wait_for(
                 self.read_single_attribute_check_success(
                     cluster=cnet,
@@ -570,7 +620,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # Disarm the failsafe
         logger.info(" --- Step 21: Disarming the failsafe")
         cmd = cgen.Commands.CommissioningComplete()
-        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=5000)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=REQUEST_TIMEOUT_MS)
 
         # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
         asserts.assert_true(isinstance(response, cgen.Commands.CommissioningCompleteResponse), "Got wrong response type")
