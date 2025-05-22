@@ -490,21 +490,6 @@ class TC_CNET_4_12(MatterBaseTest):
 
         await self.verify_thread_network_connected(networks, thread_network_id_bytes_th2, "THREAD_2ND", "#17")
 
-        # for n in networks:
-        #     if n.networkID == thread_network_id_bytes_th2:
-        #         logger.info("Step #17: Found expected networkID")
-        #         asserts.assert_true(n.connected,
-        #                             "THREAD_2ND network expected to be connected, but connection was not established.")
-        #         break
-        # else:
-        # #     asserts.fail("Thread network ID not found in Networks attribute.")
-
-        # logger.info(f'Step #17: THREAD_2ND network is connected successfully')
-
-        # Verify that the THREAD_2ND is connected
-        # asserts.assert_true(network.connected,
-        #                     "THREAD_2ND expected network to be connected, but the connection was not established.")
-
         self.step(18)
         breadcrumb_info = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning,
@@ -620,17 +605,6 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #21: Networks attribute: {networks}')
 
         await self.verify_thread_network_connected(networks, thread_network_id_bytes_th1, "THREAD_1ST", "#21")
-
-        # for n in networks:
-        #     if n.networkID == thread_network_id_bytes_th1:
-        #         logger.info("Step #20 - Back THREAD_1ST: Found expected THREAD_1ST networkID")
-        #         asserts.assert_true(n.connected,
-        #                             "THREAD_1ST network expected to be connected, but connection was not established.")
-        #         break
-        # else:
-        #     asserts.fail("Thread network ID not found in Networks attribute.")
-
-        # logger.info(f'Step #20 - Back THREAD_1ST: THREAD_1ST network is connected successfully')
 
 
 if __name__ == "__main__":
