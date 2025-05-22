@@ -1,9 +1,9 @@
-# Matter QPG6105 Light Switch Example Application
+# Matter QPG6200 Light Switch Example Application
 
 ## Light-switch-app
 
 A light switch example application showing the use of
-[Matter](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6105
+[Matter](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6200
 can be found in this folder.
 
 ## Qorvo SDK
