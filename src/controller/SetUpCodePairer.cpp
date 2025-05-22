@@ -451,6 +451,8 @@ void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
     param.SetPeerAddress(Transport::PeerAddress(Transport::Type::kWiFiPAF, mRemoteId));
     // TODO: This needs to support concatenated QR codes and set the relevant
     // long discriminator on param.
+    //
+    // See https://github.com/project-chip/connectedhomeip/issues/39134
     mDiscoveredParameters.emplace_back(param);
     ConnectToDiscoveredDevice();
 }
