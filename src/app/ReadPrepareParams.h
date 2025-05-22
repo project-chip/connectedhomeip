@@ -47,12 +47,14 @@ struct ReadPrepareParams
     uint16_t mMaxIntervalCeilingSeconds = 0;
     bool mKeepSubscriptions             = false;
     bool mIsFabricFiltered              = true;
-    // If Application knows the peer is LIT ICD, this can be set true. If application has subscribed
-    // ICDManagementCluster::OperatingMode, its operation mode can be set automatically, it is not required to set mIsPeerLIT.
+    // Indicates if the peer device is known to be a LIT ICD.
+    // This can be set by the application if it has prior knowledge of the peer's operating mode
+    // (e.g., through previous reads of the IcdManagementCluster::FeatureMap and know CheckInProtocolSupport and LongIdleTimeSupport are set, 
+    // and DynamicSitLitSupport is not set).
+    // Note: The peer's operating mode might also be pre-determined via the IcdManagementCluster::OperatingMode attribute.
     bool mIsPeerLIT                     = false;
 
-    // If Application has registered the check-in token into the peer device, this mRegisteredCheckInToken needs to be true.
-    // otherwise it should be false.
+    // If application has registered the check-in token into the peer device, this mRegisteredCheckInToken needs to be true.
     bool mRegisteredCheckInToken = false;
 
     ReadPrepareParams() {}
