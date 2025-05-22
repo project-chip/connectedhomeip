@@ -560,14 +560,6 @@ private:
     void SetStopSigmaHandshakeAt(Optional<State> state) { mStopHandshakeAtState = state; }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
-#if CHIP_WITH_NLFAULTINJECTION
-    /*
-     * This method is only used by the Fault Injection API, to allow us to safely inject a fault into the Initiator Ephemeral
-     * Public.
-     */
-    void TestOnlyInjectFaultIntoInitiatorEphemeralKey();
-#endif // CHIP_WITH_NLFAULTINJECTION
-
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
     Crypto::P256Keypair * mEphemeralKey = nullptr;

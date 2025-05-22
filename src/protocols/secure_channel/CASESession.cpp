@@ -1750,8 +1750,10 @@ CHIP_ERROR CASESession::SendSigma3a()
 
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3NOC, *data.nocCert.data() ^= 0xFF);
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ICAC, *data.icaCert.data() ^= 0xFF);
+
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3InitiatorEphPubKey,
-                          TestOnlyInjectFaultIntoInitiatorEphemeralKey());
+                          *(mEphemeralKey->TestOnlyMutablePubkey().Bytes()) ^= 0xFF);
+
         CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ResponderEphPubKey, *mRemotePubKey ^= 0xFF);
 
         // Prepare Sigma3 TBS Data Blob
@@ -2713,24 +2715,5 @@ SessionEstablishmentStage CASESession::MapCASEStateToSessionEstablishmentStage(S
         return SessionEstablishmentStage::kUnknown; // Default mapping
     }
 }
-
-#if CHIP_WITH_NLFAULTINJECTION
-
-// safely corrupt the ephemeral key by serializing it, modifying the serialized buffer, and deserializing into a new keypair.
-// This avoids using const_cast which could be unsafe and is guaranteed to work across all keystore implementations.
-void CASESession::TestOnlyInjectFaultIntoInitiatorEphemeralKey(void)
-{
-    Crypto::P256SerializedKeypair serializedKeypairToCorrupt;
-    mEphemeralKey->Serialize(serializedKeypairToCorrupt);
-
-    *serializedKeypairToCorrupt.Bytes() ^= 0xFF;
-    ChipLogProgress(SecureChannel, "Fault Injected into Sigma3 InitiatorEphPubKey");
-
-    Crypto::P256Keypair * corruptedKeyPair;
-    corruptedKeyPair = mFabricsTable->AllocateEphemeralKeypairForCASE();
-    corruptedKeyPair->Deserialize(serializedKeypairToCorrupt);
-    mEphemeralKey = corruptedKeyPair;
-}
-#endif // CHIP_WITH_NLFAULTINJECTION
 
 } // namespace chip
