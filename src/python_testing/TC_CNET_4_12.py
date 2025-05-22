@@ -80,6 +80,25 @@ class TC_CNET_4_12(MatterBaseTest):
 
         return thread_network_id_bytes
 
+    async def verify_thread_network_connected(self, networks, expected_thread_network_id, step_number, thread_network_name):
+        """
+        Verify that the expected Thread network is present in the list and is connected.
+
+        Args:
+            networks (list): List of network objects with 'networkID' and 'connected' attributes.
+            expected_thread_network_id (bytes): The expected Thread networkID to search for.
+            step_number (str): Step number for logging purposes starting with # (e.g., "#2").
+            thread_network_name (str): Descriptive name of the Thread network (e.g., "THREAD_1ST").
+        """
+        for network in networks:
+            if network.networkID == expected_thread_network_id:
+                asserts.assert_true(network.connected,
+                                    f"{thread_network_name} Thread network is not connected.")
+                logger.info(f"Step {step_number}: Thread network '{thread_network_name}' was found and is connected.")
+                break
+        else:
+            asserts.fail(f"{thread_network_name} Thread network not found.")
+
     @property
     def default_timeout(self) -> int:
         return 900
@@ -97,37 +116,64 @@ class TC_CNET_4_12(MatterBaseTest):
     def steps_TC_CNET_4_12(self) -> list[TestStep]:
         steps = [
             TestStep("precondition", "TH is commissioned", is_commissioning=True),
-            TestStep(1, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900'),
-            TestStep(2, 'TH reads Networks attribute from the DUT and saves the number of entries as NumNetworks'),
-            TestStep(3, 'TH saves the index of the Networks list entry from step 2 as Userth_netidx'),
-            TestStep(4, '''TH sends RemoveNetwork Command to the DUT 
-                     with NetworkID field set to th_xpan 
-                     and Breadcrumb field set to 1'''),
-            TestStep(5, '''TH sends AddOrUpdateThreadNetwork command to the DUT 
-                     with operational dataset field set to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET 
-                     and Breadcrumb field set to 1'''),
-            TestStep(6, 'TH reads Networks attribute from the DUT'),
-            TestStep(7, '''TH sends ConnectNetwork command to the DUT 
-                     with NetworkID field set to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET 
-                     and Breadcrumb field set to 2'''),
-            TestStep(8, 'TH discovers and connects to DUT on the PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET operational network'),
-            TestStep(9, 'TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT'),
-            TestStep(10, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0'),
-            TestStep(11, 'TH ensures it can communicate on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET'),
-            TestStep(12, 'TH discovers and connects to DUT on the PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET operational network'),
-            TestStep(13, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900'),
-            TestStep(14, '''TH sends RemoveNetwork Command to the DUT with NetworkID field set to th_xpan 
-                     and Breadcrumb field set to 1'''),
-            TestStep(15, '''TH sends AddOrUpdateThreadNetwork command to the DUT 
-                     with the OperationalDataset field set to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET 
-                     and Breadcrumb field set to 1'''),
-            TestStep(16, '''TH sends ConnectNetwork command to the DUT 
-                     with NetworkID field set to the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET 
-                     and Breadcrumb field set to 3'''),
-            TestStep(17, 'TH discovers and connects to DUT on the PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET operational network'),
-            TestStep(18, 'TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT'),
-            TestStep(19, 'TH sends the CommissioningComplete command to the DUT'),
-            TestStep(20, 'TH reads Networks attribute from the DUT')
+            TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
+                     "Verify that DUT responds with ArmFailSafeResponse to the TH"),
+            TestStep(2, "TH reads Networks attribute from the DUT and saves the number of entries as `NumNetworks`",
+                     "* Verify that the Networks attribute list has an entry with the following fields:\n"
+                     ". NetworkID is `th_xpan_1`\n"
+                     ". Connected is of type bool and is TRUE"),
+            TestStep(3, "TH saves the index of the Networks list entry from step 2 as `Userth_netidx`",
+                     ""),
+            TestStep(4, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to `th_xpan_1` and Breadcrumb field set to 1",
+                     "* Verify that DUT sends NetworkConfigResponse to command with the following response fields:\n"
+                     ". NetworkingStatus is success\n"
+                     ". NetworkIndex is `Userth_netidx`"),
+            TestStep(5, "TH sends AddOrUpdateThreadNetwork command to the DUT with operational dataset field set to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb field set to 1",
+                     "* Verify that DUT sends the NetworkConfigResponse command to the TH with the following fields:\n"
+                     ". NetworkingStatus is success which is '0'\n"
+                     ". DebugText is of type string with max length 512 or empty"),
+            TestStep(6, "TH reads Networks attribute from the DUT",
+                     "* Verify that the Networks attribute list has an entry with the following fields:\n"
+                     ". NetworkID is `th_xpan_2`\n"
+                     ". Connected is of type bool and is FALSE"),
+            TestStep(7, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb field set to 2",
+                     ""),
+            TestStep(8, "TH discovers and connects to DUT on the PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET operational network",
+                     "Verify that the TH successfully connects to the DUT"),
+            TestStep(9, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT",
+                     "Verify that the breadcrumb value is set to 2"),
+            TestStep(10, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0",
+                     "Verify that DUT sends ArmFailSafeResponse command to the TH"),
+            TestStep(11, "TH ensures it can communicate with THREAD_1ST_OPERATIONALDATASET operational network (from --thread-dataset-hex)",
+                     ""),
+            TestStep(12, "TH discovers and connects to DUT on the THREAD_1ST_OPERATIONALDATASET operational network (from --thread-dataset-hex)",
+                     "Verify that the TH successfully connects to the DUT"),
+            TestStep(13, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
+                     "Verify that DUT sends ArmFailSafeResponse command to the TH"),
+            TestStep(14, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to 'th_xpan_1' and Breadcrumb field set to 1",
+                     "* Verify that DUT sends NetworkConfigResponse to command with the following fields:"
+                     ". NetworkingStatus is success"
+                     ". NetworkIndex is `Userth_netidx`"),
+            TestStep(15, "TH sends AddOrUpdateThreadNetwork command to the DUT with the OperationalDataset field set to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb field set to 1",
+                     "* Verify that DUT sends the NetworkConfigResponse command to the TH with the following fields:\n"
+                     " . NetworkingStatus is success which is '0'\n"
+                     ". DebugText is of type string with max length 512 or empty"),
+            TestStep(16, "TH sends ConnectNetwork command to the DUT with NetworkID field set to the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb field set to 3",
+                     ""),
+            TestStep(17, "TH discovers and connects to DUT on the PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET operational network",
+                     "Verify that the TH successfully connects to the DUT"),
+            TestStep(18, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT",
+                     "Verify that the breadcrumb value is set to 3"),
+            TestStep(19, "TH sends the CommissioningComplete command to the DUT",
+                     "Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)"),
+            TestStep(20, "TH reads Networks attribute from the DUT",
+                     "* Verify that the Networks attribute list has an entry with the following values:\n"
+                     ". NetworkID field value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET\n"
+                     ". Connected field value is of type bool and is TRUE"),
+            TestStep(21, "TH switches back to THREAD_1ST_OPERATIONALDATASET operational network (from --thread-dataset-hex)",
+                     "* Verify that the Networks attribute list has an entry with the following values:\n"
+                     "  . NetworkID field value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET\n"
+                     "  . Connected field value is of type bool and is TRUE")
         ]
         return steps
 
@@ -141,7 +187,6 @@ class TC_CNET_4_12(MatterBaseTest):
         # Assign required endpoint and Threads dataset
         endpoint = self.get_endpoint()
         thread_dataset_1 = self.matter_test_config.thread_operational_dataset
-        # thread_dataset_1 = self.user_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
         thread_dataset_2 = self.user_params.get('PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET')
 
         # Validate required endpoint and Threads dataset
@@ -195,7 +240,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        logger.info(f'Step #1 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        logger.info(f'Step #1: ArmFailSafeResponse with ErrorCode as OK: ({resp.errorCode})')
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
@@ -210,6 +255,8 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #2: Number of Networks entries (NumNetworks): {num_networks}')
         asserts.assert_true(num_networks > 0, "Error: No networks found")
 
+        await self.verify_thread_network_connected(networks, thread_network_id_bytes_th1, "THREAD_1ST", "#2")
+
         self.step(3)
         # TODO: This test currently uses a single endpoint for both threads.
         # Issue #39069<https://github.com/project-chip/connectedhomeip/issues/39069> created to track follow-ups on problems with secondary networks,
@@ -222,10 +269,10 @@ class TC_CNET_4_12(MatterBaseTest):
                 userth_netidx = idx
                 asserts.assert_true(network.connected, "Thread network not connected")
                 break
-        logger.info(f'Step #3: Networks attribute: {network.networkID}')
-        logger.info(f'Step #3: Networks attribute: {thread_network_id_bytes_th1}')
-        logger.info(f'Step #3: Networks attribute: {userth_netidx}')
-        asserts.assert_true(userth_netidx is not None, "Thread network not found")
+        logger.info(f'Step #3: NetworkID from Networks attribute: {network.networkID}')
+        logger.info(f'Step #3: Expected NetworkID for THREAD_1ST: {thread_network_id_bytes_th1}')
+        logger.info(f'Step #3: Index of THREAD_1ST in Networks list (Userth_netidx): {userth_netidx}')
+        asserts.assert_true(userth_netidx is not None, "Thread network not found in Networks list")
 
         self.step(4)
         cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=thread_network_id_bytes_th1, breadcrumb=1)
@@ -234,14 +281,14 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #4: RemoveNetwork response ({vars(resp)})')
-        logger.info(f'Step #4: RemoveNetwork Status is success ({resp.networkingStatus})')
-        logger.info(f'Step #4: RemoveNetwork NetworkIndex: ({resp.networkIndex})')
+        logger.info(f'Step #4: RemoveNetwork response for THREAD_1ST: ({vars(resp)})')
+        logger.info(f'Step #4: RemoveNetwork Status for THREAD_1ST is success: ({resp.networkingStatus})')
+        logger.info(f'Step #4: RemoveNetwork NetworkIndex for THREAD_1ST: ({resp.networkIndex})')
 
         # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Network was not removed")
-        asserts.assert_equal(resp.networkIndex, userth_netidx, "The network index is not as expected.")
+                             "Thread network was not removed")
+        asserts.assert_equal(resp.networkIndex, userth_netidx, "Thread network index is not as expected.")
 
         self.step(5)
         cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
@@ -253,8 +300,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #5: AddOrUpdateThreadNetwork response ({vars(resp)})')
-        logger.info(f'Step #5: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
+        logger.info(f'Step #5: AddOrUpdateThreadNetwork response for THREAD_2ND: ({vars(resp)})')
+        logger.info(f'Step #5: AddOrUpdateThreadNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
         debug_text = resp.debugText
         if resp.networkingStatus == Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
@@ -274,11 +321,11 @@ class TC_CNET_4_12(MatterBaseTest):
         logger.info(f'Step #6: Networks attribute: {networks}')
 
         network_ids = [n.networkID for n in networks]
-        logger.info(f"Step #6: Found networkIDs: {network_ids}")
+        logger.info(f"Step #6: Found NetworkIDs: {network_ids}")
         asserts.assert_in(
             thread_network_id_bytes_th2,
             network_ids,
-            f"Expected networkID {thread_network_id_bytes_th2} not found in networks."
+            f"Expected networkID for THREAD_2ND {thread_network_id_bytes_th2} not found in Thread networks."
         )
         # TODO: On /CHIP-Specifications repo, the PR #5187<https://github.com/CHIP-Specifications/chip-test-plans/pull/5187> created to validate that the Networks attribute list has an entry NetworkID=th_xpan_2 insted of th_xpan_1
 
@@ -289,8 +336,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #7: ConnectNetwork resp VARS ({vars(resp)})')
-        logger.info(f'Step #7: ConnectNetwork Status is success ({resp.networkingStatus})')
+        logger.info(f'Step #7: ConnectNetwork resp for THREAD_2ND: ({vars(resp)})')
+        logger.info(f'Step #7: ConnectNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
@@ -308,6 +355,8 @@ class TC_CNET_4_12(MatterBaseTest):
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
         logger.info(f'Step #8: Networks attribute: {networks}')
+
+        await self.verify_thread_network_connected(networks, thread_network_id_bytes_th2, "THREAD_2ND", "#8")
 
         self.step(9)
         # Expired session is re-established the new session reading attribute (Breadcrum)
@@ -327,7 +376,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        logger.info(f'Step #10 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        logger.info(f'Step #10: ArmFailSafeResponse with ErrorCode as OK: ({resp.errorCode})')
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
@@ -335,7 +384,7 @@ class TC_CNET_4_12(MatterBaseTest):
         # Step 11: When the failsafe is disarmed, the device should automatically return to THREAD_1ST.
         # This means the THREAD_2ND network will be removed,
         # and the device will reconnect to Thread 1 without further intervention.
-        logger.info(f'Step #11 - DUT automatically return to Thread 1')
+        logger.info(f'Step #11: DUT automatically return to THREAD_1ST')
 
         self.step(12)
         networks = await self.read_single_attribute_check_success(
@@ -350,7 +399,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cluster=Clusters.GeneralCommissioning,
             attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb
         )
-        logger.info(f'Step #12:  Breadcrumb attribute: {breadcrumb_info}')
+        logger.info(f'Step #12: Breadcrumb attribute: {breadcrumb_info}')
 
         await asyncio.sleep(connect_max_time_seconds + 5)
         networks = await self.read_single_attribute_check_success(
@@ -358,6 +407,7 @@ class TC_CNET_4_12(MatterBaseTest):
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
         logger.info(f'Step #12: Networks attribute after read atribute: {networks}')
+        await self.verify_thread_network_connected(networks, thread_network_id_bytes_th1, "THREAD_1ST", "#12")
 
         self.step(13)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
@@ -369,7 +419,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        logger.info(f'Step #13 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        logger.info(f'Step #13: ArmFailSafeResponse with ErrorCode as OK: ({resp.errorCode})')
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
@@ -381,8 +431,8 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         network_index = resp.networkIndex
-        logger.info(f'Step #14: RemoveNetwork Status is success ({resp.networkingStatus})')
-        logger.info(f'Step #14: Network index: ({network_index})')
+        logger.info(f'Step #14: RemoveNetwork Status for THREAD_1ST IisS success: ({resp.networkingStatus})')
+        logger.info(f'Step #14: Network index for THREAD_1ST: ({network_index})')
 
         # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
@@ -399,8 +449,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #15: AddOrUpdateThreadNetwork response ({vars(resp)})')
-        logger.info(f'Step #15: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
+        logger.info(f'Step #15: AddOrUpdateThreadNetwork response for THREAD_2ND: ({vars(resp)})')
+        logger.info(f'Step #15: AddOrUpdateThreadNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from AddThreadNetwork")
@@ -418,8 +468,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #16: ConnectNetwork resp VARS ({vars(resp)})')
-        logger.info(f'Step #16: ConnectNetwork Status is success ({resp.networkingStatus})')
+        logger.info(f'Step #16: ConnectNetwork resp for THREAD_2ND: ({vars(resp)})')
+        logger.info(f'Step #16: ConnectNetwork Status for THREAD_2ND is success ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
@@ -437,20 +487,22 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         logger.info(f'Step #17: Networks attribute: {networks}')
 
-        for n in networks:
-            if n.networkID == thread_network_id_bytes_th2:
-                logger.info("Step #17: Found expected networkID")
-                asserts.assert_true(n.connected,
-                                    "THREAD_2ND network expected to be connected, but connection was not established.")
-                break
-        else:
-            asserts.fail("Thread network ID not found in Networks attribute.")
+        await self.verify_thread_network_connected(networks, thread_network_id_bytes_th2, "THREAD_2ND", "#17")
 
-        logger.info(f'Step #17: THREAD_2ND network is connected successfully')
+        # for n in networks:
+        #     if n.networkID == thread_network_id_bytes_th2:
+        #         logger.info("Step #17: Found expected networkID")
+        #         asserts.assert_true(n.connected,
+        #                             "THREAD_2ND network expected to be connected, but connection was not established.")
+        #         break
+        # else:
+        # #     asserts.fail("Thread network ID not found in Networks attribute.")
+
+        # logger.info(f'Step #17: THREAD_2ND network is connected successfully')
 
         # Verify that the THREAD_2ND is connected
-        asserts.assert_true(network.connected,
-                            "THREAD_2ND expected network to be connected, but the connection was not established.")
+        # asserts.assert_true(network.connected,
+        #                     "THREAD_2ND expected network to be connected, but the connection was not established.")
 
         self.step(18)
         breadcrumb_info = await self.read_single_attribute_check_success(
@@ -473,8 +525,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #19: CommissioningComplete response ({vars(resp)})')
-        logger.info(f'Step #19: CommissioningComplete Status is success ({resp.errorCode})')
+        logger.info(f'Step #19: CommissioningComplete response: ({vars(resp)})')
+        logger.info(f'Step #19: CommissioningComplete Status is success: ({resp.errorCode})')
         # Verify that the DUT responds with CommissioningComplete with ErrorCode as 'OK'(0)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from CommissioningComplete")
@@ -486,7 +538,10 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         logger.info(f'Step #20: Networks attribute: {networks}')
 
-        # Back to Thread 1
+        await self.verify_thread_network_connected(networks, thread_network_id_bytes_th2, "THREAD_2ND", "#20")
+
+        self.step(21)
+        # Back to THREAD_1ST
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
             expiryLengthSeconds=self.failsafe_expiration_seconds
         )
@@ -496,7 +551,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        logger.info(f'Step #20 - Back THREAD_1ST: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        logger.info(f'Step #21: ArmFailSafeResponse with ErrorCode as OK: ({resp.errorCode})')
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
@@ -508,8 +563,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #20 - Back THREAD_1ST: AddOrUpdateThreadNetwork response ({vars(resp)})')
-        logger.info(f'Step #20 - Back THREAD_1ST: AddOrUpdateThreadNetwork Status is success ({resp.networkingStatus})')
+        logger.info(f'Step #21: AddOrUpdateThreadNetwork response for THREAD_1ST: ({vars(resp)})')
+        logger.info(f'Step #21: AddOrUpdateThreadNetwork Status for THREAD_1ST is success: ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNetwork with NetworkingStatus as 'Success'(0)
         debug_text = resp.debugText
         if resp.networkingStatus == Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
@@ -530,7 +585,7 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f'Step #20 - Back THREAD_1ST: ConnectNetwork resp VARS ({vars(resp)})')
+        logger.info(f'Step #21: ConnectNetwork resp for for THREAD_1ST: ({vars(resp)})')
         # Verify that the DUT responds with ConnectNetwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
@@ -539,25 +594,27 @@ class TC_CNET_4_12(MatterBaseTest):
         # Wait for the device to establish connection with the new Thread network
         # Includes a fudge factor for SRP record propagation.
         await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
-        logger.info("Step #20 - Back THREAD_1ST: Sleep completed for Thread network connection and SRP record propagation")
+        logger.info("Step #21: Sleep completed for Thread network connection and SRP record propagation")
 
         # THREAD_1ST Successfully connects to the DUT from previous step
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
-        logger.info(f'Step #20 - Back THREAD_1ST: Networks attribute: {networks}')
+        logger.info(f'Step #21: Networks attribute: {networks}')
 
-        for n in networks:
-            if n.networkID == thread_network_id_bytes_th1:
-                logger.info("Step #20 - Back THREAD_1ST: Found expected THREAD_1ST networkID")
-                asserts.assert_true(n.connected,
-                                    "THREAD_1ST network expected to be connected, but connection was not established.")
-                break
-        else:
-            asserts.fail("Thread network ID not found in Networks attribute.")
+        await self.verify_thread_network_connected(networks, thread_network_id_bytes_th1, "THREAD_1ST", "#21")
 
-        logger.info(f'Step #20 - Back THREAD_1ST: THREAD_1ST network is connected successfully')
+        # for n in networks:
+        #     if n.networkID == thread_network_id_bytes_th1:
+        #         logger.info("Step #20 - Back THREAD_1ST: Found expected THREAD_1ST networkID")
+        #         asserts.assert_true(n.connected,
+        #                             "THREAD_1ST network expected to be connected, but connection was not established.")
+        #         break
+        # else:
+        #     asserts.fail("Thread network ID not found in Networks attribute.")
+
+        # logger.info(f'Step #20 - Back THREAD_1ST: THREAD_1ST network is connected successfully')
 
 
 if __name__ == "__main__":
