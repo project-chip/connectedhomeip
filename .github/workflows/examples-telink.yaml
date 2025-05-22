@@ -58,7 +58,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             - name: Update Zephyr version 3.7.0 (develop) to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 840b559584b01b663a8f81c9507991c2e8b3e765"
+              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py deb9deef8014c14dff216ec80da7c79d9d6204d3"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
@@ -187,6 +187,19 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tl7218x light-app-ota-shell-factory-data \
                     out/telink-tl7218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl721x) Lighting App with TFLM
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-tflm-newlib' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218x light-app-tflm-newlib \
+                    out/telink-tl7218x-light-tflm-newlib/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -378,7 +391,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py c3453912b6e7ca794aa24f407d7032485de1f3bf"
+              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 0457e76f4b5f66ba7fb3ba13d1f90204e4da8b7e"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
@@ -520,6 +533,19 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tl7218x light-app-ota-shell-factory-data \
                     out/telink-tl7218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl721x) Lighting App with TFLM
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-tflm' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218x light-app-tflm \
+                    out/telink-tl7218x-light-tflm/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
