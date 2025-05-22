@@ -33,6 +33,8 @@
 
 import logging
 import random
+import asyncio
+import subprocess
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -43,78 +45,44 @@ from mobly import asserts
 
 
 class TC_ACL_2_8(MatterBaseTest):
-    def _verify_acl_event(
-            self,
-            event,
-            admin_node_id,
-            admin_passcode_id,
-            change_type,
-            subjects,
-            fabric_index):
-        """Verifies ACL event contents"""
-        data = event.Data
-
-        # Verify admin IDs
-        asserts.assert_equal(data.adminNodeID, admin_node_id)
-        asserts.assert_equal(data.adminPasscodeID, admin_passcode_id)
-
-        # Verify event data
-        asserts.assert_equal(data.changeType, change_type)
-        asserts.assert_equal(data.latestValue.privilege, 5)
-        asserts.assert_equal(data.latestValue.authMode, 2)
-        asserts.assert_equal(
-            data.latestValue.subjects,
-            [subjects] if not isinstance(
-                subjects,
-                list) else subjects)
-        asserts.assert_equal(data.latestValue.targets, NullValue)
-        asserts.assert_equal(data.fabricIndex, fabric_index)
-
-    def desc_TC_ACL_2_8(self) -> str:
-        return "[TC-ACL-2.8] ACL multi-fabric"
-
-    def steps_TC_ACL_2_8(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "TH1 commissions DUT using admin node ID N1",
-                     "DUT is commissioned on TH1 fabric", is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
-                     "Result is SUCCESS, value is stored as F1"),
-            TestStep(3, "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin node ID N2",
-                     "DUT is commissioned on TH2 fabric"),
-            TestStep(4, "TH2 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
-                     "Result is SUCCESS, value is stored as F2"),
-            TestStep(5, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element",
-                     "Result is SUCCESS"),
-            TestStep(6, "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 1 element",
-                     "Result is SUCCESS"),
-            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2"),
-            TestStep(8, "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1"),
-            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F2"),
-            TestStep(10, "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F1"),
-        ]
-        return steps
-
-    @async_test_body
-    async def test_TC_ACL_2_8(self):
+    async def internal_test_TC_ACL_2_8(self, force_legacy_encoding: bool):
         self.step(1)
-        self.th1 = self.default_controller
+        # Open commissioning window with default controller
         self.discriminator = random.randint(0, 4095)
+        params = await self.default_controller.OpenCommissioningWindow(
+            nodeid=self.dut_node_id, 
+            timeout=900, 
+            iteration=10000, 
+            discriminator=self.discriminator, 
+            option=1
+        )
+        
+        # Create a new certificate authority and fabric admin for TH1
+        th1_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        th1_fabric_admin = th1_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=random.randint(1, 100000))
+        self.th1 = th1_fabric_admin.NewController(nodeId=1, useTestCommissioner=True)
+        
+        # Commission TH1 through the commissioning window
+        setupPinCode = params.setupPinCode
+        await self.th1.CommissionOnNetwork(
+            nodeId=self.dut_node_id, 
+            setupPinCode=setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, 
+            filter=self.discriminator
+        )
 
         self.step(2)
         # Read CurrentFabricIndex for TH1
         oc_cluster = Clusters.OperationalCredentials
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
-        f1 = await self.read_single_attribute_check_success(endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
+        f1 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
         logging.info(f"CurrentFabricIndex F1 {str(f1)}")
 
         self.step(3)
-        # Commission TH2
+        # Open commissioning window with TH1
         params = await self.th1.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+        # Commission TH2
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
             vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
@@ -137,11 +105,12 @@ class TC_ACL_2_8(MatterBaseTest):
             authMode=2,
             subjects=[self.th1.nodeId, 1111]
         )
-        acl_attr = Clusters.AccessControl.Attributes.Acl
         acl_list = [acl_struct]
+        acl_attr = Clusters.AccessControl.Attributes.Acl
         result = await self.th1.WriteAttribute(
             self.dut_node_id,
-            [(0, acl_attr(value=acl_list))]
+            [(0, acl_attr(value=acl_list))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         asserts.assert_equal(
             result[0].Status,
@@ -158,7 +127,8 @@ class TC_ACL_2_8(MatterBaseTest):
         acl_list = [acl_struct_th2]
         result = await self.th2.WriteAttribute(
             self.dut_node_id,
-            [(0, acl_attr(value=acl_list))]
+            [(0, acl_attr(value=acl_list))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         asserts.assert_equal(
             result[0].Status,
@@ -218,30 +188,68 @@ class TC_ACL_2_8(MatterBaseTest):
 
         self.step(9)
         # TH1 reads AccessControlEntryChanged events
-        events = await self.th1.ReadEvent(
-            self.dut_node_id,
-            [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
-            fabricFiltered=True
-        )
+        if force_legacy_encoding:
+            events = await self.th1.ReadEvent(
+                self.dut_node_id,
+                [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
+                fabricFiltered=True
+            )
 
-        asserts.assert_equal(
-            len(events), 2, "Should have exactly 2 events")
+        else:
+            events = await self.th1.ReadEvent(
+                self.dut_node_id,
+                [(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
+                fabricFiltered=True
+            )
+
+        if force_legacy_encoding:
+            logging.info(f"Step 9 legacy encoding Events {str(events)}")
+            asserts.assert_equal(
+                len(events), 3, "Should have exactly 3 events")
+        else:
+            asserts.assert_equal(
+                len(events), 2, "Should have exactly 2 events")
 
         # Verify event contents match expected sequence
-        self._verify_acl_event(
-            events[0],
-            NullValue,
-            0,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-            self.th1.nodeId,
-            f1)
-        self._verify_acl_event(
-            events[1],
-            self.th1.nodeId,
-            NullValue,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
-            [self.th1.nodeId, 1111],
-            f1)
+        if force_legacy_encoding:
+            self._verify_acl_event(
+                events[0],
+                NullValue,
+                0,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                self.th1.nodeId,
+                f1)
+            self._verify_acl_event(
+                events[1],
+                self.th1.nodeId,
+                NullValue,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                self.th1.nodeId,
+                f1)
+            self._verify_acl_event(
+                events[2],
+                self.th1.nodeId,
+                NullValue,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                [self.th1.nodeId, 1111],
+                f1)
+
+        else:
+            logging.info(f"Events {str(events)}")
+            self._verify_acl_event(
+                events[0],
+                NullValue,
+                0,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                self.th1.nodeId,
+                f1)
+            self._verify_acl_event(
+                events[1],
+                self.th1.nodeId,
+                NullValue,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
+                [self.th1.nodeId, 1111],
+                f1)
 
         for event in events:
             asserts.assert_not_equal(
@@ -257,25 +265,53 @@ class TC_ACL_2_8(MatterBaseTest):
             fabricFiltered=True
         )
 
-        asserts.assert_equal(
-            len(events), 2, "Should have exactly 2 events")
+        if force_legacy_encoding:
+            asserts.assert_equal(
+                len(events), 3, "Should have exactly 3 events")
+        else:
+            asserts.assert_equal(
+                len(events), 2, "Should have exactly 2 events")
 
         # Verify event contents match expected sequence
-        self._verify_acl_event(
-            events[0],
-            NullValue,
-            0,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-            self.th2.nodeId,
-            f2)
+        if force_legacy_encoding:
+            self._verify_acl_event(
+                events[0],
+                NullValue,
+                0,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                self.th2.nodeId,
+                f2)
+            self._verify_acl_event(
+                events[1],
+                self.th2.nodeId,
+                NullValue,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                self.th2.nodeId,
+                f2)
+            self._verify_acl_event(
+                events[2],
+                self.th2.nodeId,
+                NullValue,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                [self.th2.nodeId, 2222],
+                f2)
 
-        self._verify_acl_event(
-            events[1],
-            self.th2.nodeId,
-            NullValue,
-            Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
-            [self.th2.nodeId, 2222],
-            f2)
+        else:
+            self._verify_acl_event(
+                events[0],
+                NullValue,
+                0,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                self.th2.nodeId,
+                f2)
+
+            self._verify_acl_event(
+                events[1],
+                self.th2.nodeId,
+                NullValue,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
+                [self.th2.nodeId, 2222],
+                f2)
 
         for event in events:
             asserts.assert_not_equal(
@@ -283,6 +319,97 @@ class TC_ACL_2_8(MatterBaseTest):
                 f1,
                 "Should not contain event with FabricIndex F1")
 
+        self.step(11)
+        # Rerunning test with new list method
+        if force_legacy_encoding:
+            logging.info("Rerunning test with new list method")
+
+    def _verify_acl_event(
+            self,
+            event,
+            admin_node_id,
+            admin_passcode_id,
+            change_type,
+            subjects,
+            fabric_index):
+        """Verifies ACL event contents"""
+        data = event.Data
+
+        # Verify admin IDs
+        asserts.assert_equal(data.adminNodeID, admin_node_id)
+        asserts.assert_equal(data.adminPasscodeID, admin_passcode_id)
+
+        # Verify event data
+        asserts.assert_equal(data.changeType, change_type)
+        asserts.assert_equal(data.latestValue.privilege, 5)
+        asserts.assert_equal(data.latestValue.authMode, 2)
+        asserts.assert_equal(
+            data.latestValue.subjects,
+            [subjects] if not isinstance(
+                subjects,
+                list) else subjects)
+        asserts.assert_equal(data.latestValue.targets, NullValue)
+        asserts.assert_equal(data.fabricIndex, fabric_index)
+
+    def desc_TC_ACL_2_8(self) -> str:
+        return "[TC-ACL-2.8] ACL multi-fabric"
+
+    def steps_TC_ACL_2_8(self) -> list[TestStep]:
+        steps = [
+            TestStep(1, "TH1 commissions DUT using admin node ID N1",
+                     "DUT is commissioned on TH1 fabric", is_commissioning=True),
+            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
+                     "Result is SUCCESS, value is stored as F1"),
+            TestStep(3, "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin node ID N2",
+                     "DUT is commissioned on TH2 fabric"),
+            TestStep(4, "TH2 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
+                     "Result is SUCCESS, value is stored as F2"),
+            TestStep(5, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element",
+                     "Result is SUCCESS"),
+            TestStep(6, "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element",
+                     "Result is SUCCESS"),
+            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2"),
+            TestStep(8, "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1"),
+            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements if new list method else 3 elements if legacy list method used, and MUST NOT contain any element with FabricIndex F2"),
+            TestStep(10, "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements if new list method else 3 elements if legacy list method used, and MUST NOT contain any element with FabricIndex F1"),
+            TestStep(11, "Rerunning test with legacy write list method",
+                     "Rerunning test with legacy write list method"),
+        ]
+        return steps
+
+    @async_test_body
+    async def test_TC_ACL_2_8(self):
+        # First run with new list method
+        await self.internal_test_TC_ACL_2_8(force_legacy_encoding=False)
+        
+        # --- Simplified cleanup between test runs ---
+        logging.info("Cleaning up fabrics between test runs")
+        
+        # First, clean up TH1 and TH2 controllers
+        if hasattr(self, 'th1'):
+            try:
+                logging.info(f"Shutting down TH1 controller")
+                await self.th1.Shutdown()
+                delattr(self, 'th1')
+            except Exception as e:
+                logging.warning(f"Error cleaning up TH1: {e}")
+        
+        if hasattr(self, 'th2'):
+            try:
+                logging.info(f"Shutting down TH2 controller")
+                await self.th2.Shutdown()
+                delattr(self, 'th2')
+            except Exception as e:
+                logging.warning(f"Error cleaning up TH2: {e}")
+        
+        # Reset step counter and run second test with legacy encoding
+        self.current_step_index = 0
+        logging.info("Starting second test run with legacy encoding")
+        await self.internal_test_TC_ACL_2_8(force_legacy_encoding=True)
 
 if __name__ == "__main__":
     default_matter_test_main()
