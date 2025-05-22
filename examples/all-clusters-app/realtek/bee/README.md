@@ -74,11 +74,11 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
 -   To build the demo application:
 
     ```bash
-    $ ./scripts/build/build_examples.py --target realtek-rtl8777g-lighting build
+    $ ./scripts/build/build_examples.py --target realtek-rtl8777g-all-clusters build
     ```
 
     You can find the target built file called **matter-cli-ftd** under the
-    `out/realtek-rtl8777g-lighting/bin` directory.
+    `out/realtek-rtl8777g-all-clusters/bin` directory.
 
 ## More information
 
