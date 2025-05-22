@@ -19,11 +19,10 @@ package chip.platform;
 
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
-import android.util.Log;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-
+import android.util.Log;
 import java.io.IOException;
 
 public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
@@ -76,35 +75,36 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     Log.d(TAG, "NfcWorkerThread created");
 
     // Create a Handler associated with the HandlerThread's Looper
-    workerHandler = new Handler(handlerThread.getLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-          try {
-            Log.d(TAG, "handleMessage");
-            byte[] buf = (byte[]) msg.obj;
-            byte[] response = sendChainedAPDUs(buf);
-            if (response != null) {
-              mPlatform.onNfcTagResponse(response);
+    workerHandler =
+        new Handler(handlerThread.getLooper()) {
+          @Override
+          public void handleMessage(Message msg) {
+            try {
+              Log.d(TAG, "handleMessage");
+              byte[] buf = (byte[]) msg.obj;
+              byte[] response = sendChainedAPDUs(buf);
+              if (response != null) {
+                mPlatform.onNfcTagResponse(response);
+              }
+            } catch (Exception e) {
+              e.printStackTrace();
+              mPlatform.onNfcTagError();
             }
-          } catch (Exception e) {
-            e.printStackTrace();
-            mPlatform.onNfcTagError();
           }
-        }
-    };
+        };
 
     return 0;
   }
 
   @Override
   public void shutdown() {
-      if (handlerThread != null) {
-          handlerThread.quitSafely();
-          handlerThread = null;
-      }
+    if (handlerThread != null) {
+      handlerThread.quitSafely();
+      handlerThread = null;
+    }
 
-      // Prevent the use of the workerHandler
-      workerHandler = null;
+    // Prevent the use of the workerHandler
+    workerHandler = null;
   }
 
   @Override
@@ -159,17 +159,16 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
   ///////////////////////////////////////////////////////////////////////////////////
 
   // SW1=0x90 SW2=0x00 indicate a successful command
-  boolean IsStatusSuccess(byte sw1, byte sw2)
-  {
+  boolean IsStatusSuccess(byte sw1, byte sw2) {
     return ((sw1 == ((byte) 0x90)) && (sw2 == 0x00));
   }
 
-  // SW1=0x61 SW2=0xXX indicate that the last command was successful and that the tag is transmitting
+  // SW1=0x61 SW2=0xXX indicate that the last command was successful and that the tag is
+  // transmitting
   // a chained response. It is used when the response is too long to be transmitted in one shot.
   // SW2 indicates the size of the data in the next block. It can be read by calling
   // 'GetResponse' command.
-  boolean IsResponseBlockAvailable(byte sw1)
-  {
+  boolean IsResponseBlockAvailable(byte sw1) {
     return (sw1 == ((byte) 0x61));
   }
 
