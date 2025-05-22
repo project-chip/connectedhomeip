@@ -1533,7 +1533,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x1;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
