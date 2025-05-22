@@ -49,10 +49,10 @@ struct ReadPrepareParams
     bool mIsFabricFiltered              = true;
     // Indicates if the peer device is known to be a LIT ICD.
     // This can be set by the application if it has prior knowledge of the peer's operating mode
-    // (e.g., through previous reads of the IcdManagementCluster::FeatureMap and know CheckInProtocolSupport and LongIdleTimeSupport are set,
-    // and DynamicSitLitSupport is not set).
-    // Note: The peer's operating mode might also be pre-determined via the IcdManagementCluster::OperatingMode attribute.
-    bool mIsPeerLIT                     = false;
+    // (e.g., through previous reads of the IcdManagementCluster::FeatureMap and know CheckInProtocolSupport and LongIdleTimeSupport
+    // are set, and DynamicSitLitSupport is not set). Note: The peer's operating mode might also be pre-determined via the
+    // IcdManagementCluster::OperatingMode attribute.
+    bool mIsPeerLIT = false;
 
     // If application has registered the check-in token into the peer device, this mRegisteredCheckInToken needs to be true.
     bool mRegisteredCheckInToken = false;

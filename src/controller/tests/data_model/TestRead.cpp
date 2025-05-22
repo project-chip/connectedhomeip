@@ -2375,7 +2375,7 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
         readPrepareParams.mRegisteredCheckInToken    = true;
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2463,7 +2463,7 @@ TEST_F(TestRead, TestSubscribe_SubGoAwayInserverOnActiveModeNotification)
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
         readPrepareParams.mRegisteredCheckInToken    = true;
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2534,7 +2534,7 @@ TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotificati
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
         readPrepareParams.mRegisteredCheckInToken    = true;
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2590,7 +2590,7 @@ TEST_F(TestRead, TestSubscribeFailed_OnActiveModeNotification)
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
         readPrepareParams.mRegisteredCheckInToken    = true;
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
@@ -2660,7 +2660,7 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
         readPrepareParams.mRegisteredCheckInToken    = true;
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2771,7 +2771,7 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
         readPrepareParams.mRegisteredCheckInToken    = true;
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
