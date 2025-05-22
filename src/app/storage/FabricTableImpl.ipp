@@ -100,6 +100,29 @@ struct EndpointEntryCount : public PersistentData<kPersistentBufferEntryCountByt
     }
 };
 
+// Prevent mutations from happening in TableEntryData::Serialize
+// If we just used a raw reference for TableEntryData::mEntry, C++ allows us
+// to mutate mEntry.mStorageId & mEntry.mStorageData in TableEntryData::Serialize
+// without having to do a const_cast; as an example, if we were to accidentally introduce
+// the following code in TableEntryData::Serialize (a const method):
+//
+// this->mEntry->mStorageData = StorageData();
+//
+// If TableEntryData::mEntry is a reference, it allows this with no compilation error;
+// But with ConstCorrectRef, we get a compile-time error that TableEntryData::mEntry->mStorageData
+// cannot be modified because it is a const value
+template <typename T>
+class ConstCorrectRef
+{
+    T & mRef;
+
+public:
+    inline ConstCorrectRef(T & ref) : mRef(ref) {}
+
+    inline const T * operator->() const { return &mRef; }
+    inline T * operator->() { return &mRef; }
+};
+
 template <class StorageId, class StorageData>
 struct TableEntryData : DataAccessor
 {
@@ -110,7 +133,7 @@ struct TableEntryData : DataAccessor
     FabricIndex fabric_index = kUndefinedFabricIndex;
     EntryIndex index         = 0;
     bool first               = true;
-    Data::TableEntry<StorageId, StorageData> & mEntry;
+    ConstCorrectRef<Data::TableEntry<StorageId, StorageData>> mEntry;
 
     TableEntryData(EndpointId endpoint, FabricIndex fabric, TableEntry & entry, EntryIndex idx = 0) :
         endpoint_id(endpoint), fabric_index(fabric), index(idx), mEntry(entry)
@@ -124,16 +147,16 @@ struct TableEntryData : DataAccessor
         return CHIP_NO_ERROR;
     }
 
-    void Clear() override { this->mEntry.mStorageData.Clear(); }
+    void Clear() override { this->mEntry->mStorageData.Clear(); }
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
         TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
-        ReturnErrorOnFailure(Serializer::SerializeId(writer, this->mEntry.mStorageId));
+        ReturnErrorOnFailure(Serializer::SerializeId(writer, this->mEntry->mStorageId));
 
-        ReturnErrorOnFailure(Serializer::SerializeData(writer, this->mEntry.mStorageData));
+        ReturnErrorOnFailure(Serializer::SerializeData(writer, this->mEntry->mStorageData));
 
         return writer.EndContainer(container);
     }
@@ -145,9 +168,9 @@ struct TableEntryData : DataAccessor
         TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
-        ReturnErrorOnFailure(Serializer::DeserializeId(reader, this->mEntry.mStorageId));
+        ReturnErrorOnFailure(Serializer::DeserializeId(reader, this->mEntry->mStorageId));
 
-        ReturnErrorOnFailure(Serializer::DeserializeData(reader, this->mEntry.mStorageData));
+        ReturnErrorOnFailure(Serializer::DeserializeData(reader, this->mEntry->mStorageData));
 
         return reader.ExitContainer(container);
     }

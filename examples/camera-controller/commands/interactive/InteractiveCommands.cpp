@@ -111,27 +111,17 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 
 } // namespace
 
-char * InteractiveStartCommand::GetCommand(char * command)
+std::string InteractiveStartCommand::GetCommand() const
 {
     std::unique_lock<std::mutex> lock(sQueueMutex);
     sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty(); });
 
-    std::string cmd = sCommandQueue.front();
+    std::string command = sCommandQueue.front();
     sCommandQueue.pop();
 
-    if (command != nullptr)
+    if (!command.empty())
     {
-        free(command);
-        command = nullptr;
-    }
-
-    command = new char[cmd.length() + 1];
-    strcpy(command, cmd.c_str());
-
-    // Do not save empty lines
-    if (command != nullptr && *command)
-    {
-        add_history(command);
+        add_history(command.c_str());
         write_history(GetHistoryFilePath().c_str());
     }
 
@@ -193,21 +183,14 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     std::thread readCommands(ReadCommandThread);
     readCommands.detach();
 
-    char * command = nullptr;
     int status;
     while (true)
     {
-        command = GetCommand(command);
-        if (command != nullptr && !ParseCommand(command, &status))
+        std::string command = GetCommand();
+        if (!command.empty() && !ParseCommand(command, &status))
         {
             break;
         }
-    }
-
-    if (command != nullptr)
-    {
-        free(command);
-        command = nullptr;
     }
 
     SetCommandExitStatus(CHIP_NO_ERROR);
@@ -216,9 +199,9 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-bool InteractiveCommand::ParseCommand(char * command, int * status)
+bool InteractiveCommand::ParseCommand(const std::string & command, int * status)
 {
-    if (strcmp(command, kInteractiveModeStopCommand) == 0)
+    if (command == kInteractiveModeStopCommand)
     {
         // If scheduling the cleanup fails, there is not much we can do.
         // But if something went wrong while the application is leaving it could be because things have
@@ -229,7 +212,7 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 
     ClearLine();
 
-    *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
+    *status = mHandler->RunInteractive(command.c_str(), GetStorageDirectory(), NeedsOperationalAdvertising());
 
     return true;
 }

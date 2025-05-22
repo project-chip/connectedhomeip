@@ -179,6 +179,7 @@ void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
               CHIP_NO_ERROR);
 }
 
+#if !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 // Verify that platform DNS-SD implementation can browse and resolve services.
 //
 // This test case uses platform-independent mDNS server implementation based on
@@ -186,6 +187,10 @@ void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
 // A and AAAA queries without additional records. In order to pass this test,
 // the platform DNS-SD client implementation must be able to browse and resolve
 // services by querying for all of these records separately.
+//
+// However, when using Network.framework (on Darwin), we can't bind to port 5353
+// because SO_REUSEPORT is not supported. As a result, the minimal server cannot run,
+// even if it is compiled.
 TEST_F(TestDnssd, TestDnssdBrowse)
 {
     mdns::Minimal::SetDefaultAddressPolicy();
@@ -243,6 +248,7 @@ TEST_F(TestDnssd, TestDnssdBrowse)
 
     chip::Dnssd::ChipDnssdShutdown();
 }
+#endif // !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 static void HandlePublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error)
 {
