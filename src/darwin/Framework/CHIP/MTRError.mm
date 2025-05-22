@@ -282,6 +282,11 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
                                          "InvokeResponses of an Invoke Response action.",
             nil);
         break;
+    case Status::DynamicConstraintError:
+        description = NSLocalizedString(@"The value for the data type was not accepted due to runtime "
+                                         "validation issues. Command or action not carried out.",
+            nil);
+        break;
     case Status::InvalidTransportType:
         description = NSLocalizedString(@"Attempt to process on a transport type not valid for this "
                                          "element. Command or action not carried out.",
