@@ -675,17 +675,18 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test(
                 "At least one cluster has failed the range and support checks for its listed attributes, commands or features")
 
-        # Wildcard reads of events: event list MUST NOT be empty since at least a boot event should be registered.
         self.print_step(12, "Validate that event wildcard subscription works")
 
         test_failure = None
         try:
-            subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
-                                                                   events=[('*')],
-                                                                   fabricFiltered=False,
-                                                                   reportInterval=(100, 1000))
-            if len(subscription.GetEvents()) == 0:
-                test_failure = 'Wildcard event subscription returned no events'
+            _ = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
+                                                        events=[('*')],
+                                                        fabricFiltered=False,
+                                                        reportInterval=(100, 1000))
+            # above ReadEvent would fail if subscription fails
+            # We assume success if nothing is thrown. We considered checking that
+            # subscription.GetEvents() is non-empty however that relies on buffering assumptions
+            # (e.g. boot event should be there, but it could have been purged and list could be empty).
         except ChipStackError as e:
             # Connection over PASE will fail subscriptions with "Unsupported access"
             # TODO: ideally we should SKIP this test for PASE connections
