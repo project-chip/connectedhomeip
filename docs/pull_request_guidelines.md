@@ -142,7 +142,7 @@ Provide sufficient information for a reviewer to understand the change. Include:
     the problem and fix anyway, even with an issue link.
 -   Review context:
     -   if updating based on a test plan or spec issue, include the test plan or
-        issue PR that this depends on
+        issue PR that this depends on.
     -   Clearly explain if the PR is based on in progress work (often for Spec
         issues).
     -   Larger changes/features should include some design document link.
