@@ -144,7 +144,8 @@ Status CameraAVSettingsUserLevelManager::MPTZRemovePreset(uint8_t aPreset)
     return Status::Success;
 }
 
-Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID, chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport)
+Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID,
+                                                         chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with HAL to access the stream, validate the viewport
@@ -207,7 +208,7 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
     {
         if (stream.videoStreamParams.videoStreamID == aVideoStreamID && stream.isAllocated)
         {
-            chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewport             = stream.viewport;
+            chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewport = stream.viewport;
             VideoResolutionStruct minResolution = mCameraDeviceHAL->GetCameraHALInterface().GetMinViewport();
             VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetCameraHALInterface().GetVideoSensorParams();
 

@@ -669,7 +669,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         VerifyOrReturnError(
             HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set Viewport, feature is not supported", mEndpointId));
-            chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewPort;
+        chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewPort;
         ReturnErrorOnFailure(aDecoder.Decode(viewPort));
         return SetViewport(viewPort);
     }
@@ -1081,8 +1081,7 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     err = LoadStreamUsagePriorities();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StreamUsagePriorities from the KVS.",
-                      mEndpointId);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StreamUsagePriorities from the KVS.", mEndpointId);
     }
 
     // Load SoftRecordingPrivacyModeEnabled
@@ -1634,28 +1633,28 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
                        commandData.maxKeyFrameInterval <= kMaxKeyFrameIntervalMaxValue,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
-                                             [&commandData](const StreamUsageEnum & entry) {
-                                                 return entry == commandData.streamUsage;
-                                             }) != mStreamUsagePriorities.end();
+    bool streamUsageSupported =
+        std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(), [&commandData](const StreamUsageEnum & entry) {
+            return entry == commandData.streamUsage;
+        }) != mStreamUsagePriorities.end();
 
     VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     VideoStreamStruct videoStreamArgs;
-    videoStreamArgs.videoStreamID         = 0;
-    videoStreamArgs.streamUsage           = commandData.streamUsage;
-    videoStreamArgs.videoCodec            = commandData.videoCodec;
-    videoStreamArgs.minFrameRate          = commandData.minFrameRate;
-    videoStreamArgs.maxFrameRate          = commandData.maxFrameRate;
-    videoStreamArgs.minResolution         = commandData.minResolution;
-    videoStreamArgs.maxResolution         = commandData.maxResolution;
-    videoStreamArgs.minBitRate            = commandData.minBitRate;
-    videoStreamArgs.maxBitRate            = commandData.maxBitRate;
-    videoStreamArgs.minKeyFrameInterval   = commandData.minKeyFrameInterval;
-    videoStreamArgs.maxKeyFrameInterval   = commandData.maxKeyFrameInterval;
-    videoStreamArgs.watermarkEnabled      = commandData.watermarkEnabled;
-    videoStreamArgs.OSDEnabled            = commandData.OSDEnabled;
-    videoStreamArgs.referenceCount        = 0;
+    videoStreamArgs.videoStreamID       = 0;
+    videoStreamArgs.streamUsage         = commandData.streamUsage;
+    videoStreamArgs.videoCodec          = commandData.videoCodec;
+    videoStreamArgs.minFrameRate        = commandData.minFrameRate;
+    videoStreamArgs.maxFrameRate        = commandData.maxFrameRate;
+    videoStreamArgs.minResolution       = commandData.minResolution;
+    videoStreamArgs.maxResolution       = commandData.maxResolution;
+    videoStreamArgs.minBitRate          = commandData.minBitRate;
+    videoStreamArgs.maxBitRate          = commandData.maxBitRate;
+    videoStreamArgs.minKeyFrameInterval = commandData.minKeyFrameInterval;
+    videoStreamArgs.maxKeyFrameInterval = commandData.maxKeyFrameInterval;
+    videoStreamArgs.watermarkEnabled    = commandData.watermarkEnabled;
+    videoStreamArgs.OSDEnabled          = commandData.OSDEnabled;
+    videoStreamArgs.referenceCount      = 0;
 
     // Call the delegate
     status = mDelegate.VideoStreamAllocate(videoStreamArgs, videoStreamID);
@@ -1769,10 +1768,10 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
-                                             [&commandData](const StreamUsageEnum & entry) {
-                                                 return entry == commandData.streamUsage;
-                                             }) != mStreamUsagePriorities.end();
+    bool streamUsageSupported =
+        std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(), [&commandData](const StreamUsageEnum & entry) {
+            return entry == commandData.streamUsage;
+        }) != mStreamUsagePriorities.end();
 
     VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 

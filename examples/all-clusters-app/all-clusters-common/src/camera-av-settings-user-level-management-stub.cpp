@@ -61,7 +61,8 @@ void AVSettingsUserLevelManagementDelegate::VideoStreamDeallocated(uint16_t aStr
     this->GetServer()->RemoveMoveCapableVideoStream(aStreamID);
 }
 
-void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport)
+void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(
+    chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The app needs to invoke this whenever the AV Stream Manager updates the device level default Viewport.  This informs
     // the server of the new viewport that shall be appled to all known streams.
@@ -113,7 +114,8 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset(uint8_t aPreset)
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID, chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport)
+Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID,
+                                                              chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
@@ -122,9 +124,10 @@ Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStr
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                               chip::app::Clusters::Globals::Structs::ViewportStruct::Type & aViewport)
+Status
+AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
+                                                        Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
+                                                        chip::app::Clusters::Globals::Structs::ViewportStruct::Type & aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate

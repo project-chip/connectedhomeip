@@ -378,7 +378,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxKeyFrameInterval=4000,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinKeyFrameInterval > MaxKeyFrameInterval")
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinKeyFrameInterval > MaxKeyFrameInterval")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,

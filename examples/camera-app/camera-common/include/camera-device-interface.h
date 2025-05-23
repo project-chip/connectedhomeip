@@ -37,10 +37,11 @@ using chip::app::Clusters::Globals::StreamUsageEnum;
 struct VideoStream
 {
     VideoStreamStruct videoStreamParams;
-    bool isAllocated;        // Flag to indicate if the stream is allocated.
-    chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewport; // Stream specific viewport, defaults to the camera viewport
-    void * videoContext;     // Platform-specific context object associated with
-                             // video stream;
+    bool isAllocated; // Flag to indicate if the stream is allocated.
+    chip::app::Clusters::Globals::Structs::ViewportStruct::Type
+        viewport;        // Stream specific viewport, defaults to the camera viewport
+    void * videoContext; // Platform-specific context object associated with
+                         // video stream;
 
     bool IsCompatible(const VideoStreamStruct & inputParams) const
     {
@@ -235,7 +236,8 @@ public:
         virtual const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & GetViewport() = 0;
 
         // Set the viewport for a specific stream
-        virtual CameraError SetViewport(VideoStream & stream, const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) = 0;
+        virtual CameraError SetViewport(VideoStream & stream,
+                                        const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) = 0;
 
         // Mute/Unmute speaker.
         virtual CameraError SetSpeakerMuted(bool muteSpeaker) = 0;

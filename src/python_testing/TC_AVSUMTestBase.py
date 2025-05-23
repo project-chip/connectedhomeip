@@ -18,7 +18,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
 
