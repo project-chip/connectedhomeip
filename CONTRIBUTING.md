@@ -20,9 +20,9 @@ specification, please join Matter work group within the Connectivity Standards
 Alliance. The requirements to become an open source contributor of the
 [Matter Repository](https://github.com/project-chip/connectedhomeip) are:
 
-- Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
-- Agree to the [License](./LICENSE)
-- Have signed the
+-   Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
+-   Agree to the [License](./LICENSE)
+-   Have signed the
     [Matter Working Group CLA](https://gist.github.com/clapre/65aa9fc63981da765039e0bb7e8701be)
 
 # Contributing as a Connectivity Standards Alliance Matter Working Group Member
@@ -33,11 +33,11 @@ specification, and contribute code for approved updates to the specification.
 The requirements to become a member of the
 [Matter Repository](https://github.com/project-chip/connectedhomeip) are:
 
-- Must be a [Participant member](http://www.zigbeealliance.org/join) or higher
+-   Must be a [Participant member](http://www.zigbeealliance.org/join) or higher
     of the Connectivity Standards Alliance
-- Must be a Matter Working Group member
-- Have signed the Alliance Matter Working Group CLA
-- Have approval from your company's official approver
+-   Must be a Matter Working Group member
+-   Have signed the Alliance Matter Working Group CLA
+-   Have approval from your company's official approver
 
 # Bugs
 
@@ -56,13 +56,13 @@ You can request a new feature by
 If you would like to implement a new feature, please consider the scope of the
 new feature:
 
-- _Large feature_: first
+-   _Large feature_: first
     [submit a GitHub Issue](https://github.com/project-chip/connectedhomeip/issues/new)
     and communicate your proposal so that the community can review and provide
     feedback. Getting early feedback will help ensure your implementation work
     is accepted by the community. This will also allow us to better coordinate
     our efforts and minimize duplicated effort.
-- _Small feature_: can be implemented and directly
+-   _Small feature_: can be implemented and directly
     [submitted as a Pull Request](https://github.com/project-chip/connectedhomeip/blob/master/CONTRIBUTING.md#submitting-a-pull-request).
 
 # Contributing Code
@@ -174,43 +174,43 @@ be useful for quick filtering like `[TC-ABC-1.2]` to tag test changes.
 
 Examples of descriptive titles:
 
-- `[Silabs] Fix compile of SiWx917 if LED and BUTTON are disabled`
-- `[Telink] Update build Dockerfile with new Zephyr SHA: c05c4.....`
-- `General Commissioning Cluster: use AttributeAccessInterface/CommandHandlerInterface for processing`
-- `Scenes Management/CopyScene: set access as manage instead of default to match the spec`
-- `Fix build errors due to ChipDeviceEvent default constructor not being available`
-- `Fix crash during DNSSD processing due to malformed packet`
-- `[NRF] Fix crash due to stack overflow during logging for PW-RPC builds`
-- `[TC-ABC-2.3] added new python test case based on test plan`
-- `[TC-ABC] migrate tests from yaml to python`
+-   `[Silabs] Fix compile of SiWx917 if LED and BUTTON are disabled`
+-   `[Telink] Update build Dockerfile with new Zephyr SHA: c05c4.....`
+-   `General Commissioning Cluster: use AttributeAccessInterface/CommandHandlerInterface for processing`
+-   `Scenes Management/CopyScene: set access as manage instead of default to match the spec`
+-   `Fix build errors due to ChipDeviceEvent default constructor not being available`
+-   `Fix crash during DNSSD processing due to malformed packet`
+-   `[NRF] Fix crash due to stack overflow during logging for PW-RPC builds`
+-   `[TC-ABC-2.3] added new python test case based on test plan`
+-   `[TC-ABC] migrate tests from yaml to python`
 
 Examples of titles that are vague (not clear what the change is, one would need
 to open the pull request for details or open additional issue in GitHub)
 
-- `Work on issue 1234`
-- `Fix android JniTypeWrappers`
-- `Fix segfault in BLE`
-- `Fix TC-ABC-1.2`
-- `Update Readme`
+-   `Work on issue 1234`
+-   `Fix android JniTypeWrappers`
+-   `Fix segfault in BLE`
+-   `Fix TC-ABC-1.2`
+-   `Update Readme`
 
 ##### Summary contents
 
 Ensure that there is sufficient detail in issue summaries to make the content of
 the PR clear:
 
-- a `TLDR` of the change content. This is a judgment call on details,
+-   a `TLDR` of the change content. This is a judgment call on details,
     generally you should include a what was changed and why. The change is
     trivial/short, this can be very short (i.e. "fixed typos" is perfectly
     acceptable, however if changing 100-1000s of line, the areas of changes
     should be explained)
-- If a crash/error is fixed, explain the root cause and if the fix is not
+-   If a crash/error is fixed, explain the root cause and if the fix is not
     obvious (again, judgment call), explain why the given approach was taken.
-- Help the reviewer out with any notable information (specific platform
+-   Help the reviewer out with any notable information (specific platform
     issues, extra thoughts or requests for feedback or gotchas on tricky code,
     followup work or PR dependencies)
-- TIP: use the syntax of `Fixes #....` to mark issues completed on PR merge or
+-   TIP: use the syntax of `Fixes #....` to mark issues completed on PR merge or
     use `#...` to reference issues that are addressed.
-- TIP: prefer adding some brief description (especially about the content of
+-   TIP: prefer adding some brief description (especially about the content of
     the changes) instead of just referencing an issue (helps reviewers get
     context faster without extra clicks).
 
@@ -224,7 +224,7 @@ manual testing is acceptable, however the description has to be detailed
 intentionally to avoid a bias towards marking pull requests as "manually tested"
 out of convenience.
 
-- Automated testing
+-   Automated testing
 
     **AWESOME**. You can say "unit tests added/updated" or "Integration tests
     updated to cover functionality" or "existing tests already cover this" (make
@@ -233,7 +233,7 @@ out of convenience.
     Add any notes on not covered things. It is a judgment call on how much can
     be covered as 100% sounds great however not always possible.
 
-- Manual testing
+-   Manual testing
 
     Describe why automated testing is impossible in the current CI environment
     or difficult to add. If adding later, reference the issue to add automation
@@ -245,7 +245,7 @@ out of convenience.
     commands ran (often chip-tool) and physical interaction and what was
     observed.
 
-- Trivial/obvious change
+-   Trivial/obvious change
 
     In rare cases the change is trivial (e.g. fixing a typo in a `Readme.md`).
     Scripts still require a `#### Testing` section however you can be brief like
@@ -278,15 +278,16 @@ to make any adjustments to your pull request, just push the updates to GitHub.
 Your pull request will automatically track the changes on your development
 branch and update.
 
-Ensure that your pull request is easy to review by adhering to [pull request guidelines](./docs/pull_request_guidelines.md).
+Ensure that your pull request is easy to review by adhering to
+[pull request guidelines](./docs/pull_request_guidelines.md).
 
 #### Merge Requirements
 
-- Github Workflows pass
-- Builds pass
-- Tests pass
-- Linting passes
-- Code style passes
+-   Github Workflows pass
+-   Builds pass
+-   Tests pass
+-   Linting passes
+-   Code style passes
 
 When can I merge? After these have been satisfied, a reviewer will merge the PR
 into master
@@ -322,42 +323,42 @@ faster).
 Small changes or changes that do not affect the main functionality of the code
 can be fast tracked immediately. Examples:
 
-- Adding/removing documentation (.md files)
-- Adding tests (may include small reorganization/method adding/changes to
+-   Adding/removing documentation (.md files)
+-   Adding tests (may include small reorganization/method adding/changes to
     enable testability):
-  - certification tests
-  - stability tests
-  - integration tests
-  - functional tests
-  - Test scripts
-  - Additional tests following a pattern (e.g. YAML tests)
-- Adding/updating/fixing tooling to aid in development
-- Re-running code generation
-- Code readability refactors:
-  - renaming enum/classes/structure members
-  - moving constant header location
-  - Obviously trivial build rule changes (e.g. adding missing files to build
+    -   certification tests
+    -   stability tests
+    -   integration tests
+    -   functional tests
+    -   Test scripts
+    -   Additional tests following a pattern (e.g. YAML tests)
+-   Adding/updating/fixing tooling to aid in development
+-   Re-running code generation
+-   Code readability refactors:
+    -   renaming enum/classes/structure members
+    -   moving constant header location
+    -   Obviously trivial build rule changes (e.g. adding missing files to build
         rules)
-  - Changing comments
-  - Adding/removing includes (include what you need and only what you need
+    -   Changing comments
+    -   Adding/removing includes (include what you need and only what you need
         rules)
-- Pulling new third-party repo files
-- Platform vendors/maintainers adding platform features/logic/bug fixes to
+-   Pulling new third-party repo files
+-   Platform vendors/maintainers adding platform features/logic/bug fixes to
     their own platforms
-- Most changes to existing docker files (pulling new versions, reorganizing)
-- Most changes to new dockerfile version in workflows
+-   Most changes to existing docker files (pulling new versions, reorganizing)
+-   Most changes to new dockerfile version in workflows
 
 #### Fast track changes
 
 Larger functionality changes are allowed to be fast tracked with these
 requirements/restrictions:
 
-- Require at least 1 day to have passed since the creation of the PR
-- Require at least 1 checkmark from someone familiar with the code or problem
+-   Require at least 1 day to have passed since the creation of the PR
+-   Require at least 1 checkmark from someone familiar with the code or problem
     space
-  - This requirement shall be dropped after a PR is 3 days old with stale or
+    -   This requirement shall be dropped after a PR is 3 days old with stale or
         no feedback.
-- Code is sufficiently covered by automated tests (or impossible to
+-   Code is sufficiently covered by automated tests (or impossible to
     automatically test with a very solid reason for this - e.g. changes to BLE
     parameters cannot be automatically tested, but should have been manually
     verified)
@@ -370,5 +371,5 @@ Any "request for changes" marker will always be respected unless obviously
 resolved (i.e. author marked "requesting changes because of X and X was done in
 the PR")
 
-- This requirement shall be dropped after a PR is 3 days old with stale or no
+-   This requirement shall be dropped after a PR is 3 days old with stale or no
     feedback.
