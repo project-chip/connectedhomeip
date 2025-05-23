@@ -270,6 +270,7 @@ CodeGenerator
 CodeLab
 codelabs
 ColorControl
+Combinators
 Comcast
 Commandline
 CommandHandlerInterface
