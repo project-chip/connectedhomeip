@@ -19,6 +19,7 @@
 
 #include <platform/KeyValueStoreManager.h>
 
+#include <zephyr/settings/settings.h>
 #include <zephyr/sys/reboot.h>
 
 using namespace ::chip::DeviceLayer::PersistedStorage;
@@ -39,6 +40,8 @@ void Reboot(SoftwareRebootReason reason)
 SoftwareRebootReason GetSoftwareRebootReason()
 {
     SoftwareRebootReason reason = SoftwareRebootReason::kOther;
+
+    settings_subsys_init();
 
     if (KeyValueStoreMgr().Get(kRebootReason, &reason, sizeof(reason)) == CHIP_NO_ERROR)
     {
