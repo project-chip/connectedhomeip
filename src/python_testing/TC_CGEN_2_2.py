@@ -691,7 +691,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             # In CI environment, bypass the wait for the failsafe expiration to avoid unnecessary delays.
             logger.info(f'Step #38: {run_type} - Bypass steps from #38 onward ONLY in CI.')
-            self.skip_all_remaining_steps(39)
+            self.mark_all_remaining_steps_skipped(39)
             return
         else:
             t_start = time.time()

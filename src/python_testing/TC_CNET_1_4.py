@@ -78,7 +78,7 @@ class TC_CNET_1_4(MatterBaseTest):
         NumNetworkCommissioning = len(NetworkCommissioningResponse)
         if NumNetworkCommissioning == 0:
             logging.info('No endpoint has Network Commissioning Cluster, skipping remaining steps')
-            self.skip_all_remaining_steps(4)
+            self.mark_all_remaining_steps_skipped(4)
             return
 
         self.step(4)
@@ -90,7 +90,7 @@ class TC_CNET_1_4(MatterBaseTest):
 
         if NumNetworkCommissioning == 1:
             logging.info('Only endpoint 0 has Network Commissioning Cluster, skipping remaining steps')
-            self.skip_all_remaining_steps(5)
+            self.mark_all_remaining_steps_skipped(5)
             return
 
         self.step(5)

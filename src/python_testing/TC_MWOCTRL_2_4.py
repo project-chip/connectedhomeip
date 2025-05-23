@@ -89,7 +89,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
 
         if not only_watts_supported:
             logging.info("PowerInWatts is not supported so skipping the rest of the tests.")
-            self.skip_all_remaining_steps(2)
+            self.mark_all_remaining_steps_skipped(2)
             return
 
         self.step(2)
