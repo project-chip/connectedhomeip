@@ -85,7 +85,7 @@ Provide sufficient information for a reviewer to understand the change. Include:
 
 -   brief information on what changed
 -   brief information on **WHY** the change was made. Avoid just saying "Fix
-    compile error" but rather add a example of the error seen and under want
+    compile error" but rather add a example of the error seen and under what
     command. Avoid `Fixes #1234` as that requires the reviewer to open another
     issue and hope that the issue is well described. Have a brief description of
     the problem and fix anyway, even with an issue link.
