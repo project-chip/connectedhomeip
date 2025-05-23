@@ -74,7 +74,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
             TestStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed",
                      "DUT_CE windows status shows the window is closed"),
             TestStep(7, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 180 seconds",
-                    "Result is SUCCESS"),
+                     "Result is SUCCESS"),
             TestStep(8, "TH_CR1 sends a RevokeCommissioning command to the DUT_CE",
                      "Result is SUCCESS"),
             TestStep(9, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 179 seconds",
