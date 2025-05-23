@@ -37,8 +37,10 @@ static constexpr uint16_t kMaxClientCertificatesPerFabric = 5;
 #if defined(TLS_ROOT_CERTIFICATE_SIZE_PER_FABRIC) && TLS_ROOT_CERTIFICATE_SIZE_PER_FABRIC
 static constexpr uint16_t kMaxRootCertificatesPerFabric = TLS_ROOT_CERTIFICATE_SIZE_PER_FABRIC;
 #else
-static constexpr uint16_t kMaxRootCertificatesPerFabric = 5;
+static constexpr uint16_t kMaxRootCertificatesPerFabric   = 5;
 #endif
+
+inline constexpr uint16_t kUndefinedCertificateId = 0xffff;
 
 static_assert(kMaxClientCertificatesPerFabric >= 5, "Per spec, kMaxClientCertificatesPerFabric must be at least 5");
 static_assert(kMaxRootCertificatesPerFabric >= 5, "Per spec, kMaxRootCertificatesPerFabric must be at least 5");
@@ -48,19 +50,34 @@ static_assert(kMaxRootCertificatesPerFabric <= 254, "Per spec, kMaxRootCertifica
 // Limit is set per-fabric
 static constexpr uint16_t kMaxCertificatesPerEndpoint = MAX_INT16U_VALUE;
 
-class RootCertificateTable : public app::Storage::FabricTableImpl<TLSCAID, CertificateTable::RootCertStruct, 0>
+/// @brief struct used to identify a certificate ID
+struct CertificateId
+{
+    uint16_t mCertificateId = kUndefinedCertificateId;
+
+    CertificateId() = default;
+    CertificateId(uint16_t id) : mCertificateId(id) {}
+
+    void Clear() { mCertificateId = kUndefinedCertificateId; }
+
+    bool IsValid() { return (mCertificateId != kUndefinedCertificateId); }
+
+    bool operator==(const CertificateId & other) const { return (mCertificateId == other.mCertificateId); }
+};
+
+class RootCertificateTable : public app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct, 0>
 {
 public:
-    using Super = app::Storage::FabricTableImpl<TLSCAID, CertificateTable::RootCertStruct, 0>;
+    using Super = app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct, 0>;
 
     RootCertificateTable() : Super(kMaxRootCertificatesPerFabric, kMaxCertificatesPerEndpoint) {}
     ~RootCertificateTable() { Finish(); };
 };
 
-class ClientCertificateTable : public app::Storage::FabricTableImpl<TLSCCDID, CertificateTable::ClientCertStruct, 0>
+class ClientCertificateTable : public app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct, 0>
 {
 public:
-    using Super = app::Storage::FabricTableImpl<TLSCCDID, CertificateTable::ClientCertStruct, 0>;
+    using Super = app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct, 0>;
 
     ClientCertificateTable() : Super(kMaxClientCertificatesPerFabric, kMaxCertificatesPerEndpoint) {}
     ~ClientCertificateTable() { Finish(); };
@@ -78,9 +95,9 @@ public:
     void SetEndpoint(EndpointId endpoint);
 
     // Data
-    CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, RootCertStruct & entry) override;
+    CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry) override;
     CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id) override;
-    CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, ClientCertStruct & entry) override;
+    CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, BufferedClientCert & entry) override;
     CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id) override;
 
 private:

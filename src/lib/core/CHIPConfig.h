@@ -1961,21 +1961,8 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
  */
 #ifndef CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
-#define CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES 3200
+#define CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES 31000
 #endif // CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
-
-/**
- * @def CHIP_CONFIG_TLS_PERSISTED_CLIENT_INTERMEDIATE_CERT_BYTES
- *
- * @brief The maximum number bytes taken by the TLS intermediate certificate of the client certificate
- * in persistent storage. This needs to be increased if the size of IntermediateCertificates in
- * TLSClientCertificateDetailStruct changes.
- *
- * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
- */
-#ifndef CHIP_CONFIG_TLS_PERSISTED_CLIENT_INTERMEDIATE_CERT_BYTES
-#define CHIP_CONFIG_TLS_PERSISTED_CLIENT_INTERMEDIATE_CERT_BYTES 3200
-#endif // CHIP_CONFIG_TLS_PERSISTED_CLIENT_INTERMEDIATE_CERT_BYTES
 
 /**
  * @}

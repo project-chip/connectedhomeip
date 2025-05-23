@@ -19,21 +19,36 @@
 #pragma once
 
 #include <clusters/TlsCertificateManagement/Structs.h>
+#include <lib/support/PersistentData.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Tls {
 
-using TLSCAID = uint16_t;
+using TLSCAID  = uint16_t;
 using TLSCCDID = uint16_t;
 
 /// @brief CertificateTable is meant as an interface between the TLS clusters and certificates.
 class CertificateTable
 {
 public:
-    using RootCertStruct = TlsCertificateManagement::Structs::TLSCertStruct::DecodableType;
+    using RootCertStruct   = TlsCertificateManagement::Structs::TLSCertStruct::DecodableType;
     using ClientCertStruct = TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType;
+
+    /// @brief a root cert along with an associated buffer for the cert payload
+    struct BufferedRootCert
+    {
+        RootCertStruct cert;
+        PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
+    };
+
+    /// @brief a client cert along with an associated buffer for the cert payload
+    struct BufferedClientCert
+    {
+        ClientCertStruct cert;
+        PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
+    };
 
     CertificateTable(){};
 
@@ -48,10 +63,10 @@ public:
     virtual void Finish()                                        = 0;
 
     // Data
-    virtual CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, RootCertStruct& entry)       = 0;
-    virtual CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id)       = 0;
-    virtual CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, ClientCertStruct& entry)       = 0;
-    virtual CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id)       = 0;
+    virtual CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry)      = 0;
+    virtual CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id)                                = 0;
+    virtual CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, BufferedClientCert & entry) = 0;
+    virtual CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id)                             = 0;
 };
 
 } // namespace Tls

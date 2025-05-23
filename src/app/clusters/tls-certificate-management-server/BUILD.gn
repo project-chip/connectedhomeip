@@ -14,11 +14,7 @@
 import("//build_overrides/chip.gni")
 
 source_set("certificate-table") {
-  sources = [
-    "CertificateTable.h",
-    "CertificateTableImpl.cpp",
-    "CertificateTableImpl.h",
-  ]
+  public = [ "CertificateTable.h" ]
 
   deps = [ "${chip_root}/src/app" ]
 
@@ -26,5 +22,5 @@ source_set("certificate-table") {
 }
 
 group("tls-certificate-management-server") {
-  public_deps = [ ":certificate-table" ]
+  deps = [ ":certificate-table" ]
 }
