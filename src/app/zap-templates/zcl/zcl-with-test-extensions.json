@@ -318,7 +318,6 @@
             "RegisteredClients",
             "ICDCounter",
             "ClientsSupportedPerFabric",
-            "MaximumCheckInBackOff",
             "OperatingMode",
             "FeatureMap"
         ],
