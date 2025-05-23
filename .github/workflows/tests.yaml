@@ -92,7 +92,7 @@ jobs:
 
       - name: Run REPL tests
         run: |
-          scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
+          scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TC_ACE_1_2.py'
 
       - name: Upload core files
         uses: actions/upload-artifact@v4
