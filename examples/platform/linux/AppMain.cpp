@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright 2023, 2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -137,6 +138,24 @@
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
+
+#if CHIP_ATTESTATION_TRUSTY_OS
+#include "DeviceAttestationCredsTrusty.h"
+using namespace chip::Credentials::Trusty;
+#elif CHIP_ATTESTATION_ELE
+#include "DeviceAttestationCredsEle.h"
+using namespace chip::Credentials::ele;
+#endif
+
+#if CHIP_OP_KEYSTORE_TRUSTY_OS
+#include "PersistentStorageOperationalKeystoreTrusty.h"
+using namespace chip::Trusty;
+#endif
+
+#if CHIP_OP_KEYSTORE_ELE
+#include "PersistentStorageOperationalKeystoreEle.h"
+using namespace chip::ele;
+#endif
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -632,6 +651,16 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
+#if CHIP_OP_KEYSTORE_TRUSTY_OS
+    static chip::Trusty::PersistentStorageOperationalKeystoreTrusty sPersistentStorageOperationalKeystore;
+    initParams.operationalKeystore = &sPersistentStorageOperationalKeystore;
+#endif
+
+#if CHIP_OP_KEYSTORE_ELE
+    static chip::ele::PersistentStorageOperationalKeystoreEle sPersistentStorageOperationalKeystore;
+    initParams.operationalKeystore = &sPersistentStorageOperationalKeystore;
+#endif
+
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
     Shell::RegisterCommissioneeCommands();
@@ -788,7 +817,13 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
     // Initialize device attestation config
+#if CHIP_ATTESTATION_TRUSTY_OS
+    SetDeviceAttestationCredentialsProvider(&TrustyDACProvider::GetTrustyDACProvider());
+#elif CHIP_ATTESTATION_ELE
+    SetDeviceAttestationCredentialsProvider(&EleDACProvider::GetEleDACProvider());
+#else
     SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");
@@ -828,9 +863,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif
