@@ -348,7 +348,7 @@ protected:
                 err = ValidateList(aValue.Value());
             }
             else if constexpr (IsStruct<WrappedType>::value) {
-                err = ValidateStructValue(aValue.Value());
+                err = ValidateStructValue(aValue.Value(), false, nullptr);
             }
             else if constexpr (IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value)
             {
@@ -442,21 +442,23 @@ protected:
         return CHIP_NO_ERROR;
     }
 
-    virtual CHIP_ERROR ValidateStructValue(const PayloadType & newValue) const {
+    virtual CHIP_ERROR ValidateStructValue(const PayloadType & newValue, bool is_first_item, const WrappedType * owner) const {
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR ValidateList(const DataModel::List<PayloadType>& newList)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        CHIP_ERROR err = CHIP_ERROR_INVALID_LIST_LENGTH;
+        bool is_first_item = true;
+        
         for (const auto& item : newList) {
-            err = ValidateStructValue(item);
+            err = ValidateStructValue(item, is_first_item, &newList);
+            is_first_item = false;
             if (err != CHIP_NO_ERROR)
             {
                 break;
             }
         }
-
         return err;
    }
 

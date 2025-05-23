@@ -66,9 +66,9 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
 #define COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES \
     X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>) \
     X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>)  \
+    X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
     X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>) \
     X(TariffPeriods,                DataModel::List<Structs::TariffPeriodStruct::Type>) \
-    X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
     X(IndividualDays,               DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>) \
     X(CalendarPeriods,              DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>)
 
@@ -144,7 +144,7 @@ public: \
         : CTC_BaseDataClass<attrType>(aValueStorage) {} \
     ~attrName##DataClass() override = default; \
 protected: \
-    CHIP_ERROR ValidateStructValue(const PayloadType& newValue) const override; \
+    CHIP_ERROR ValidateStructValue(const PayloadType& newValue, bool is_first_item, const WrappedType * owner) const override; \
     bool CompareStructValue(const PayloadType& source, const PayloadType& destination) const override; \
     void CleanupStructValue(PayloadType& aValue) override; \
 };

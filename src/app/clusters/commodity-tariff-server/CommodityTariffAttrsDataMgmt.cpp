@@ -17,6 +17,7 @@
  */
 
 #include "commodity-tariff-server.h"
+#include <cassert>
 
 using namespace chip;
 using namespace chip::app;
@@ -29,10 +30,26 @@ using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 
 static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
+static constexpr size_t kDefaultListAttrMaxLength = 128u;
 constexpr uint16_t kMaxCurrencyValue = 999; // From spec
 
 static constexpr size_t kTariffInfoMaxLabelLength = kDefaultStringValuesMaxBufLength;
 static constexpr size_t kTariffInfoMaxProviderLength = kDefaultStringValuesMaxBufLength;
+
+//static constexpr size_t kDayEntriesAttrMaxLength = kDefaultListAttrMaxLength;
+//static constexpr size_t kDayPatternsAttrMaxLength = kDefaultListAttrMaxLength;
+//static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLength;
+static constexpr size_t kTariffPeriodsAttrMaxLength = kDefaultListAttrMaxLength;
+
+//static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
+//static constexpr size_t kIndividualDaysAttrMaxLength = 50;
+
+//static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
+//static constexpr size_t kDayStructItemMaxDayEntryIDs = 96;
+//static constexpr size_t kDayPatternItemMaxDayEntryIDs = kDayStructItemMaxDayEntryIDs;
+static constexpr size_t kTariffPeriodItemMaxIDs = 20;
+
+//static constexpr size_t kAuxSwitchesSettingsMax = 8;
 
 namespace CommonUtilities {
     static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
@@ -42,11 +59,24 @@ namespace CommonUtilities {
             IDs = DataModel::List<const uint32_t>();
         }
     }
+
+    static bool HasDuplicateIDs(const DataModel::List<const uint32_t>& IDs)
+    {
+        std::unordered_set<uint32_t> seen;
+        for (auto id : IDs)
+        {
+            if (!seen.insert(id).second)
+            {
+                return true; // Duplicate found
+            }
+        }
+        return false;
+    }
 };
 
 // TariffInfoDataClass
 
-CHIP_ERROR TariffInfoDataClass::ValidateStructValue(const PayloadType& newValue) const {
+CHIP_ERROR TariffInfoDataClass::ValidateStructValue(const PayloadType& newValue, bool is_first_item, const WrappedType * owner) const {
     if (!newValue.tariffLabel.IsNull() && newValue.tariffLabel.Value().size() > kTariffInfoMaxLabelLength)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
@@ -129,7 +159,35 @@ void TariffInfoDataClass::CleanupStructValue(PayloadType& aValue)
 
 //TariffPeriodsDataClass
 
-CHIP_ERROR TariffPeriodsDataClass::ValidateStructValue(const PayloadType &newValue) const {
+CHIP_ERROR TariffPeriodsDataClass::ValidateStructValue(const PayloadType& newValue, bool is_first_item, const WrappedType * owner) const {
+    assert(owner); // Here the new value is list item element and the owning list must be present to check for duplicate elements
+
+    if (is_first_item) // If lists case tis flag indicates first item of list
+    {
+        std::unordered_set<uint32_t> usedDayEntryIds;
+    
+        if (owner->size() > kTariffPeriodsAttrMaxLength)
+        {
+            return CHIP_ERROR_INVALID_LIST_LENGTH;
+        }
+
+        /*if (owner->size() > 1)
+        {
+            for(auto item : *owner)
+            {
+                auto next = std::next(item);
+
+                if (next)
+                {
+                    if (!item.label.Value().empty())
+                    {
+                        break;
+                    }  
+                }
+            }
+        }*/
+    }
+
     if (!newValue.label.IsNull() && newValue.label.Value().size() > kDefaultStringValuesMaxBufLength)
         return CHIP_ERROR_INVALID_ARGUMENT;
     else if (newValue.label.Value().empty())
@@ -138,12 +196,23 @@ CHIP_ERROR TariffPeriodsDataClass::ValidateStructValue(const PayloadType &newVal
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-
-    if (newValue.dayEntryIDs.empty())
+    if (newValue.dayEntryIDs.empty() || newValue.dayEntryIDs.size() > kTariffPeriodItemMaxIDs)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    if (newValue.tariffComponentIDs.empty())
+    if (newValue.tariffComponentIDs.empty()|| newValue.tariffComponentIDs.size() > kTariffPeriodItemMaxIDs)
         return CHIP_ERROR_INVALID_ARGUMENT;
+
+    // Check that the current period item has no duplicated dayEntryIDs
+    if (CommonUtilities::HasDuplicateIDs(newValue.dayEntryIDs))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Check that the current period item has no duplicated dayEntryIDs
+    if (CommonUtilities::HasDuplicateIDs(newValue.tariffComponentIDs))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     return CHIP_NO_ERROR;
 }
