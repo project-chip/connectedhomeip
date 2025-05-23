@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/access/access.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("server_config") {
   defines = []
@@ -57,11 +58,16 @@ static_library("server") {
     "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
-    "JointFabricDatastore.cpp",
-    "JointFabricDatastore.h",
     "Server.cpp",
     "Server.h",
   ]
+
+  if (chip_device_config_enable_joint_fabric) {
+    sources += [
+      "JointFabricDatastore.cpp",
+      "JointFabricDatastore.h",
+    ]
+  }
 
   public_configs = [ ":server_config" ]
 
