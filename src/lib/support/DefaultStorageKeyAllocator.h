@@ -269,7 +269,10 @@ public:
     // TLS Clusters Certs Keys
 
     // Number of root certs stored in table for a given endpoint, across all fabrics.
-    static StorageKeyName TlsRootCertEndpointCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/tlsr/e/%x", endpoint); }
+    static StorageKeyName TlsRootCertEndpointCountKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlsr/e/%x", endpoint);
+    }
 
     // Stores information about root certs for the given fabric & endpoint
     static StorageKeyName TlsRootCertFabricDataKey(FabricIndex fabric, EndpointId endpoint)
@@ -284,7 +287,10 @@ public:
     }
 
     // Number of client certs stored in table for a given endpoint, across all fabrics.
-    static StorageKeyName TlsClientCertEndpointCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/tlsc/e/%x", endpoint); }
+    static StorageKeyName TlsClientCertEndpointCountKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlsc/e/%x", endpoint);
+    }
 
     // Stores information about client certs for the given fabric & endpoint
     static StorageKeyName TlsClientCertFabricDataKey(FabricIndex fabric, EndpointId endpoint)
@@ -300,7 +306,8 @@ public:
     }
 
     // Stores an intermediate cert payload for a client cert for the given fabric & endpoint
-    static StorageKeyName TlsClientCertEntityIntermediateKey(FabricIndex fabric, EndpointId endpoint, uint16_t entity_idx, uint8_t intermediate_idx)
+    static StorageKeyName TlsClientCertEntityIntermediateKey(FabricIndex fabric, EndpointId endpoint, uint16_t entity_idx,
+                                                             uint8_t intermediate_idx)
     {
         return StorageKeyName::Formatted("f/%x/e/%x/tlsc/%x/%x", fabric, endpoint, entity_idx, intermediate_idx);
     }

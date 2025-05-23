@@ -20,6 +20,7 @@
 
 #include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/util/config.h>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -30,19 +31,34 @@ namespace Clusters {
  */
 class TlsClientManagementCommandDelegate : public TlsClientManagementDelegate
 {
+    struct Provisioned
+    {
+        FabricIndex fabric;
+        EndpointStructType payload;
+    };
+
     static TlsClientManagementCommandDelegate instance;
+    Tls::CertificateTable & mCertificateTable;
+    std::vector<Provisioned> mProvisioned;
+    uint16_t mNextId = 1;
 
 public:
-    TlsClientManagementCommandDelegate()  = default;
+    TlsClientManagementCommandDelegate(Tls::CertificateTable & certificateTable) : mCertificateTable(certificateTable) {}
     ~TlsClientManagementCommandDelegate() = default;
 
-    CHIP_ERROR GetProvisionedEndpointByIndex(size_t index, EndpointStructType & endpoint) override;
+    CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
+                                             EndpointStructType & endpoint) override;
 
-    Protocols::InteractionModel::Status ProvisionEndpoint(const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & endpoint, uint16_t & endpointID) override;
+    Protocols::InteractionModel::Status
+    ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
+                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq,
+                      uint16_t & endpointID) override;
 
-    Protocols::InteractionModel::Status FindProvisionedEndpointByID(uint16_t endpointID, EndpointStructType & endpoint) override;
+    Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                    uint16_t endpointID, EndpointStructType & endpoint) override;
 
-    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(uint16_t endpointID) override;
+    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      uint16_t endpointID) override;
 
     static inline TlsClientManagementCommandDelegate & getInstance() { return instance; }
 };
