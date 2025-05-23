@@ -39,7 +39,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: TH reads BootReason in General Diagnostics cluster from the DUT."
+          "Step 2: TH reads BootReason in General Diagnostics cluster from the
+          DUT."
       PICS: DGGEN.S.A0004
       verification: |
           ./chip-tool generaldiagnostics read boot-reason 321 0
