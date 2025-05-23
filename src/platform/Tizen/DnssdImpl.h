@@ -107,7 +107,7 @@ struct ResolveContext : public GenericContext
 
     // Resolved service
     DnssdService mResult               = {};
-    uint8_t * mResultTxtRecord         = nullptr;
+    GAutoPtr<uint8_t> mResultTxtRecord;
     unsigned short mResultTxtRecordLen = 0;
 
     ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
