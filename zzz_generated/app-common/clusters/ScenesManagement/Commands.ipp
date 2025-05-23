@@ -79,7 +79,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace AddScene.
 namespace AddSceneResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
+    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStatus), status);
@@ -150,7 +162,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace ViewScene.
 namespace ViewSceneResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
+    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
+    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
+    encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
+    encoder.Encode(to_underlying(Fields::kExtensionFieldSetStructs), extensionFieldSetStructs);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStatus), status);
@@ -236,7 +263,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace RemoveScene.
 namespace RemoveSceneResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
+    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStatus), status);
@@ -302,7 +341,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace RemoveAllScenes.
 namespace RemoveAllScenesResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStatus), status);
@@ -368,7 +418,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace StoreScene.
 namespace StoreSceneResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
+    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStatus), status);
@@ -472,7 +534,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace GetSceneMembership.
 namespace GetSceneMembershipResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kCapacity), capacity);
+    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
+    encoder.Encode(to_underlying(Fields::kSceneList), sceneList);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStatus), status);
@@ -563,7 +638,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace CopyScene.
 namespace CopySceneResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kGroupIdentifierFrom), groupIdentifierFrom);
+    encoder.Encode(to_underlying(Fields::kSceneIdentifierFrom), sceneIdentifierFrom);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStatus), status);

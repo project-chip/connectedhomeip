@@ -31,7 +31,17 @@ namespace EnergyEvse {
 namespace Commands {
 namespace GetTargetsResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kChargingTargetSchedules), chargingTargetSchedules);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kChargingTargetSchedules), chargingTargetSchedules);

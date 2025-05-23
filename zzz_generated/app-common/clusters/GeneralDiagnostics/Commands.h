@@ -151,6 +151,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
@@ -160,6 +162,12 @@ public:
     uint64_t systemTimeMs = static_cast<uint64_t>(0);
     DataModel::Nullable<uint64_t> posixTimeMs;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
@@ -229,6 +237,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PayloadTestResponse::Id; }
@@ -237,6 +247,12 @@ public:
 
     chip::ByteSpan payload;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;

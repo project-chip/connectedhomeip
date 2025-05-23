@@ -125,7 +125,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace SetTimeZone.
 namespace SetTimeZoneResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kDSTOffsetRequired), DSTOffsetRequired);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kDSTOffsetRequired), DSTOffsetRequired);

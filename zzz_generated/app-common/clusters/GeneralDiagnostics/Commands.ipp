@@ -86,7 +86,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TimeSnapshot.
 namespace TimeSnapshotResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSystemTimeMs), systemTimeMs);
+    encoder.Encode(to_underlying(Fields::kPosixTimeMs), posixTimeMs);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kSystemTimeMs), systemTimeMs);
@@ -157,7 +168,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace PayloadTestRequest.
 namespace PayloadTestResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPayload), payload);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kPayload), payload);

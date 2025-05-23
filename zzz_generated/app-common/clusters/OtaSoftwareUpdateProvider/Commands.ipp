@@ -94,7 +94,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace QueryImage.
 namespace QueryImageResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kDelayedActionTime), delayedActionTime);
+    encoder.Encode(to_underlying(Fields::kImageURI), imageURI);
+    encoder.Encode(to_underlying(Fields::kSoftwareVersion), softwareVersion);
+    encoder.Encode(to_underlying(Fields::kSoftwareVersionString), softwareVersionString);
+    encoder.Encode(to_underlying(Fields::kUpdateToken), updateToken);
+    encoder.Encode(to_underlying(Fields::kUserConsentNeeded), userConsentNeeded);
+    encoder.Encode(to_underlying(Fields::kMetadataForRequestor), metadataForRequestor);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStatus), status);
@@ -190,7 +207,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace ApplyUpdateRequest.
 namespace ApplyUpdateResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kAction), action);
+    encoder.Encode(to_underlying(Fields::kDelayedActionTime), delayedActionTime);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kAction), action);

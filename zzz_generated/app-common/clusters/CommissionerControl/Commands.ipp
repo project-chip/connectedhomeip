@@ -107,7 +107,21 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace CommissionNode.
 namespace ReverseOpenCommissioningWindow {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kCommissioningTimeout), commissioningTimeout);
+    encoder.Encode(to_underlying(Fields::kPAKEPasscodeVerifier), PAKEPasscodeVerifier);
+    encoder.Encode(to_underlying(Fields::kDiscriminator), discriminator);
+    encoder.Encode(to_underlying(Fields::kIterations), iterations);
+    encoder.Encode(to_underlying(Fields::kSalt), salt);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCommissioningTimeout), commissioningTimeout);

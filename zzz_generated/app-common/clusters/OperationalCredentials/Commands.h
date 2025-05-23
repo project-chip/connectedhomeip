@@ -168,6 +168,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AttestationResponse::Id; }
@@ -177,6 +179,12 @@ public:
     chip::ByteSpan attestationElements;
     chip::ByteSpan attestationSignature;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
@@ -240,6 +248,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CertificateChainResponse::Id; }
@@ -248,6 +258,12 @@ public:
 
     chip::ByteSpan certificate;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
@@ -314,6 +330,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CSRResponse::Id; }
@@ -323,6 +341,12 @@ public:
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
@@ -438,6 +462,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
@@ -448,6 +474,12 @@ public:
     Optional<chip::FabricIndex> fabricIndex;
     Optional<chip::CharSpan> debugText;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
@@ -663,6 +695,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationResponse::Id; }
@@ -673,6 +707,12 @@ public:
     uint8_t fabricBindingVersion  = static_cast<uint8_t>(0);
     chip::ByteSpan signature;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;

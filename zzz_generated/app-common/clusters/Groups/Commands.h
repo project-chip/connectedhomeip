@@ -146,6 +146,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddGroupResponse::Id; }
@@ -155,6 +157,12 @@ public:
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
@@ -220,6 +228,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ViewGroupResponse::Id; }
@@ -230,6 +240,12 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
@@ -295,6 +311,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
@@ -304,6 +322,12 @@ public:
     DataModel::Nullable<uint8_t> capacity;
     DataModel::List<const chip::GroupId> groupList;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
@@ -368,6 +392,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroupResponse::Id; }
@@ -377,6 +403,12 @@ public:
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;

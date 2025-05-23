@@ -157,6 +157,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
@@ -165,6 +167,12 @@ public:
 
     Structs::GroupKeySetStruct::Type groupKeySet;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;
@@ -257,6 +265,8 @@ enum class Fields : uint8_t
 
 struct Type
 {
+    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
+
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
@@ -265,6 +275,12 @@ public:
 
     DataModel::List<const uint16_t> groupKeySetIDs;
 
+    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
+              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     using ResponseType = DataModel::NullObjectType;

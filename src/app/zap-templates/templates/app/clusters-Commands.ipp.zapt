@@ -15,11 +15,10 @@ namespace Commands {
 {{#zcl_commands}}
 namespace {{asUpperCamelCase name}} {
 
-{{#if (isClient source)}}
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
-{{else}}
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const {
+{{#if (isServer source)}}
+template<>
 {{/if}}
+CHIP_ERROR Type::Encode{{#if (isServer source)}}<false /* needsAccessingFabricIndex */>{{/if}}(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
     DataModel::WrappedStructEncoder encoder{aWriter, aTag};
     {{#zcl_command_arguments~}}
 
@@ -27,7 +26,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAc
     {{#if (isClient parent.source)}}
     encoder.EncodeRequestCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
     {{else}}
-    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), aAccessingFabricIndex, {{asLowerCamelCase label}});
+    // A response command with a fabric-scoped struct field needs an accessing fabric index to encode.
+    ReturnErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
     {{/if}}
     {{else}}
     encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
@@ -37,8 +37,25 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAc
     return encoder.Finalize();
 }
 
-{{#if isFabricScoped~}}
+{{#if (isServer source)}}
+template<>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const {
+    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
+    {{#zcl_command_arguments~}}
+
+    {{~#if_is_fabric_scoped_struct type cluster=../../name~}}
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), aAccessingFabricIndex, {{asLowerCamelCase label}});
+    {{else}}
+    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    {{/if_is_fabric_scoped_struct}}
+
+    {{~/zcl_command_arguments}}
+    return encoder.Finalize();
+}
+{{/if}}
+
 {{#if (isClient source)}}
+{{#if isFabricScoped~}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader, FabricIndex aAccessingFabricIndex) {
 {{else}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {

@@ -64,7 +64,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace ScanNetworks.
 namespace ScanNetworksResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kNetworkingStatus), networkingStatus);
+    encoder.Encode(to_underlying(Fields::kDebugText), debugText);
+    encoder.Encode(to_underlying(Fields::kWiFiScanResults), wiFiScanResults);
+    encoder.Encode(to_underlying(Fields::kThreadScanResults), threadScanResults);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kNetworkingStatus), networkingStatus);
@@ -226,7 +239,21 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace RemoveNetwork.
 namespace NetworkConfigResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kNetworkingStatus), networkingStatus);
+    encoder.Encode(to_underlying(Fields::kDebugText), debugText);
+    encoder.Encode(to_underlying(Fields::kNetworkIndex), networkIndex);
+    encoder.Encode(to_underlying(Fields::kClientIdentity), clientIdentity);
+    encoder.Encode(to_underlying(Fields::kPossessionSignature), possessionSignature);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kNetworkingStatus), networkingStatus);
@@ -307,7 +334,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace ConnectNetwork.
 namespace ConnectNetworkResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kNetworkingStatus), networkingStatus);
+    encoder.Encode(to_underlying(Fields::kDebugText), debugText);
+    encoder.Encode(to_underlying(Fields::kErrorValue), errorValue);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kNetworkingStatus), networkingStatus);
@@ -416,7 +455,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace QueryIdentity.
 namespace QueryIdentityResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+template <>
+CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kIdentity), identity);
+    encoder.Encode(to_underlying(Fields::kPossessionSignature), possessionSignature);
+    return encoder.Finalize();
+}
+
+template <>
+CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
+                                                              FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kIdentity), identity);
