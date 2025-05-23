@@ -19,7 +19,7 @@
 #error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
 
-#include "InterfacesMonitor.h"
+#include "NetworkMonitor.h"
 
 #include <lib/support/CodeUtils.h>
 
@@ -199,14 +199,14 @@ namespace Inet {
             }
         } // namespace
 
-        InterfacesMonitor::~InterfacesMonitor()
+        NetworkMonitor::~NetworkMonitor()
         {
             if (mLivenessTracker != nullptr) {
                 *mLivenessTracker = false;
             }
         }
 
-        CHIP_ERROR InterfacesMonitor::Init(dispatch_queue_t workQueue, Inet::IPAddressType addressType, uint32_t interfaceId)
+        CHIP_ERROR NetworkMonitor::Init(dispatch_queue_t workQueue, Inet::IPAddressType addressType, uint32_t interfaceId)
         {
             mInterfaceId = interfaceId;
             mAddressType = addressType;
@@ -221,7 +221,7 @@ namespace Inet {
             return CHIP_NO_ERROR;
         }
 
-        nw_path_monitor_t InterfacesMonitor::CreatePathMonitor(nw_interface_type_t type, nw_path_monitor_update_handler_t handler, bool once)
+        nw_path_monitor_t NetworkMonitor::CreatePathMonitor(nw_interface_type_t type, nw_path_monitor_update_handler_t handler, bool once)
         {
             __auto_type monitor = nw_path_monitor_create_with_type(type);
             VerifyOrReturnValue(nullptr != monitor, nullptr);
@@ -235,7 +235,7 @@ namespace Inet {
             std::shared_ptr<bool> livenessTracker = mLivenessTracker;
 
             nw_path_monitor_set_update_handler(monitor, ^(nw_path_t path) {
-                VerifyOrReturn(*livenessTracker); // The InterfacesMonitor has been destroyed; just bail out.
+                VerifyOrReturn(*livenessTracker); // The NetworkMonitor has been destroyed; just bail out.
 
                 LogDetails(path);
 
@@ -251,7 +251,7 @@ namespace Inet {
             return monitor;
         }
 
-        void InterfacesMonitor::EnumeratePathInterfaces(nw_path_t path, InetInterfacesVector & out4, Inet6InterfacesVector & out6, bool searchLoopbackOnly)
+        void NetworkMonitor::EnumeratePathInterfaces(nw_path_t path, InetInterfacesVector & out4, Inet6InterfacesVector & out6, bool searchLoopbackOnly)
         {
             nw_path_enumerate_interfaces(path, ^(nw_interface_t interface) {
                 VerifyOrReturnValue(HasValidNetworkType(interface), true);
@@ -263,7 +263,7 @@ namespace Inet {
             });
         }
 
-        CHIP_ERROR InterfacesMonitor::StartMonitorPaths(OnPathChange pathChangeBlock)
+        CHIP_ERROR NetworkMonitor::StartMonitorPaths(OnPathChange pathChangeBlock)
         {
             VerifyOrReturnError(nullptr == mMonitor, CHIP_ERROR_INCORRECT_STATE);
 
@@ -278,7 +278,7 @@ namespace Inet {
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR InterfacesMonitor::StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock)
+        CHIP_ERROR NetworkMonitor::StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock)
         {
             VerifyOrReturnError(nullptr == mMonitor, CHIP_ERROR_INCORRECT_STATE);
 
@@ -307,7 +307,7 @@ namespace Inet {
             return CHIP_NO_ERROR;
         }
 
-        void InterfacesMonitor::Stop()
+        void NetworkMonitor::Stop()
         {
             if (mMonitor != nullptr) {
                 nw_path_monitor_cancel(mMonitor);

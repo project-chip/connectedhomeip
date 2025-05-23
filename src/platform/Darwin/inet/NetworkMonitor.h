@@ -35,9 +35,9 @@ namespace Inet {
         typedef void (^OnInterfaceChanges)(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces);
         typedef void (^OnPathChange)(nw_path_t path);
 
-        class InterfacesMonitor {
+        class NetworkMonitor {
         public:
-            ~InterfacesMonitor();
+            ~NetworkMonitor();
 
             CHIP_ERROR Init(dispatch_queue_t workQueue, IPAddressType addressType, InterfaceId interfaceId)
             {
