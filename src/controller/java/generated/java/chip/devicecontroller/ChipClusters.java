@@ -64452,33 +64452,33 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void findEndpoint(FindEndpointResponseCallback callback, Integer endpointID) {
+    public void findEndpoint(FindEndpointResponseCallback callback, @Nullable Integer endpointID) {
       findEndpoint(callback, endpointID, 0);
     }
 
-    public void findEndpoint(FindEndpointResponseCallback callback, Integer endpointID, int timedInvokeTimeoutMs) {
+    public void findEndpoint(FindEndpointResponseCallback callback, @Nullable Integer endpointID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long endpointIDFieldID = 0L;
-      BaseTLVType endpointIDtlvValue = new UIntType(endpointID);
+      BaseTLVType endpointIDtlvValue = endpointID != null ? new UIntType(endpointID) : new NullType();
       elements.add(new StructElement(endpointIDFieldID, endpointIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long endpointFieldID = 0L;
-          ChipStructs.TlsClientManagementClusterTLSEndpointStruct endpoint = null;
+          final long endpointsFieldID = 0L;
+          ArrayList<ChipStructs.TlsClientManagementClusterTLSEndpointStruct> endpoints = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == endpointFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-                StructType castingValue = element.value(StructType.class);
-                endpoint = ChipStructs.TlsClientManagementClusterTLSEndpointStruct.decodeTlv(castingValue);
+            if (element.contextTagNum() == endpointsFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+                ArrayType castingValue = element.value(ArrayType.class);
+                endpoints = castingValue.map((elementcastingValue) -> ChipStructs.TlsClientManagementClusterTLSEndpointStruct.decodeTlv(elementcastingValue));
               }
             }
           }
-          callback.onSuccess(endpoint);
+          callback.onSuccess(endpoints);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -64507,7 +64507,7 @@ public class ChipClusters {
     }
 
     public interface FindEndpointResponseCallback extends BaseClusterCallback {
-      void onSuccess(ChipStructs.TlsClientManagementClusterTLSEndpointStruct endpoint);
+      void onSuccess(ArrayList<ChipStructs.TlsClientManagementClusterTLSEndpointStruct> endpoints);
     }
 
     public interface ProvisionedEndpointsAttributeCallback extends BaseAttributeCallback {
@@ -64554,11 +64554,6 @@ public class ChipClusters {
 
     public void readProvisionedEndpointsAttribute(
         ProvisionedEndpointsAttributeCallback callback) {
-      readProvisionedEndpointsAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readProvisionedEndpointsAttributeWithFabricFilter(
-        ProvisionedEndpointsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_ENDPOINTS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -64567,7 +64562,7 @@ public class ChipClusters {
             List<ChipStructs.TlsClientManagementClusterTLSEndpointStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PROVISIONED_ENDPOINTS_ATTRIBUTE_ID, isFabricFiltered);
+        }, PROVISIONED_ENDPOINTS_ATTRIBUTE_ID, true);
     }
 
     public void subscribeProvisionedEndpointsAttribute(
