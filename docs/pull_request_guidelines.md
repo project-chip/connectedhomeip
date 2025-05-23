@@ -16,7 +16,7 @@ following items are met (and see below for details)
         summary (please include instructions and commands to test your PR)
     -   Strongly prefer automated tests to manual tests
 -   [ ] Good Pull request summary/description
-    -   Summary contains an accurate description of changes
+    -   Summary contains sufficient context for reviewers including links to relevant test plan and / or specification changes
     -   Summary contains sufficient context for reviewers
     -   Summary contains flash/ram overhead if changing core/common parts
 -   [ ] CI should pass (i.e. green or yellow/waiting for review)
