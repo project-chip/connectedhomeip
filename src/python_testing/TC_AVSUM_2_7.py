@@ -109,7 +109,8 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
 
         self.step(7)
         # Send a dptzsetviewport for the correct stream but with an invalid viewport larger than the sensor call deal with dimension viewport
-        largefailingviewport = Globals.Structs.ViewportStruct(x1=0, y1=0, x2=sensordimensions.sensorWidth+16, y2=sensordimensions.sensorHeight+9)
+        largefailingviewport = Globals.Structs.ViewportStruct(
+            x1=0, y1=0, x2=sensordimensions.sensorWidth+16, y2=sensordimensions.sensorHeight+9)
 
         self.step(8)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, largefailingviewport, expected_status=Status.ConstraintError)
@@ -128,7 +129,8 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
 
         self.step(11)
         # Deliberately mess with the aspect ratio, ensure that the viewport setting fails.
-        failingviewport = Globals.Structs.ViewportStruct(x1=x1, y1=viewportheight//2, x2=sensordimensions.sensorWidth, y2=viewportheight)
+        failingviewport = Globals.Structs.ViewportStruct(
+            x1=x1, y1=viewportheight//2, x2=sensordimensions.sensorWidth, y2=viewportheight)
         self.step(12)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, failingviewport, expected_status=Status.ConstraintError)
 
