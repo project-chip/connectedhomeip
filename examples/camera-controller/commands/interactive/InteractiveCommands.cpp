@@ -44,22 +44,47 @@ constexpr char kCategoryAutomation[]             = "Automation";
 // File pointer for the log file
 FILE * sLogFile = nullptr;
 
+// Global flag to signal shutdown
+std::atomic<bool> sShutdownRequested(false);
+
 std::queue<std::string> sCommandQueue;
 std::mutex sQueueMutex;
 std::condition_variable sQueueCondition;
 
 void ReadCommandThread()
 {
-    char * command;
-    while (true)
+    for (;;)
     {
-        command = readline(kInteractiveModePrompt);
-        if (command != nullptr && *command)
+        // `readline()` allocates with `malloc()`.  Wrap it in a smart
+        // pointer so we cannot leak it on every early–return/throw path.
+        std::unique_ptr<char, decltype(&std::free)> rawLine{ readline(kInteractiveModePrompt), &std::free };
+
+        if (!rawLine) // EOF or fatal error → shut down cleanly
         {
-            std::unique_lock<std::mutex> lock(sQueueMutex);
-            sCommandQueue.push(command);
-            free(command);
+            std::lock_guard<std::mutex> lk{ sQueueMutex };
+            sCommandQueue.emplace(kInteractiveModeStopCommand);
             sQueueCondition.notify_one();
+            break;
+        }
+
+        // Ignore empty lines produced by just hitting <Enter>.
+        if (*rawLine == '\0')
+            continue;
+
+        // Copy into an owning `std::string` before the pointer vanishes.
+        std::string line{ rawLine.get() };
+
+        {
+            std::lock_guard<std::mutex> lk{ sQueueMutex };
+            sCommandQueue.push(line);
+        }
+        sQueueCondition.notify_one();
+
+        // Bail out when the user asks to quit.
+        if (line == kInteractiveModeStopCommand)
+        {
+            ChipLogProgress(NotSpecified, "ReadCommandThread exit on quit");
+            break;
         }
     }
 }
@@ -114,13 +139,28 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 std::string InteractiveStartCommand::GetCommand() const
 {
     std::unique_lock<std::mutex> lock(sQueueMutex);
-    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty(); });
+
+<<<<<<< HEAD
+    std::string command = sCommandQueue.front();
+    sCommandQueue.pop();
+
+    if (!command.empty())
+    {
+=======
+    // Wait until queue is not empty OR shutdown is requested
+    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty() || sShutdownRequested.load(); });
+
+    if (sShutdownRequested.load())
+    {
+        return {}; // empty string signals caller to exit
+    }
 
     std::string command = sCommandQueue.front();
     sCommandQueue.pop();
 
     if (!command.empty())
     {
+>>>>>>> upstream/master
         add_history(command.c_str());
         write_history(GetHistoryFilePath().c_str());
     }
@@ -161,25 +201,6 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         Logging::SetLogRedirectCallback(LoggingCallback);
     }
 
-    bool startWebSocketServer = mStartWebSocketServer.ValueOr(false);
-    if (startWebSocketServer)
-    {
-        InteractiveServerCommand * command =
-            static_cast<InteractiveServerCommand *>(CommandMgr().GetCommandByName("interactive", "server"));
-        if (command == nullptr)
-        {
-            ChipLogError(NotSpecified, "Interactive server command not found.");
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        CHIP_ERROR err = command->RunCommand();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Failed to run interactive server command: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
-    }
-
     std::thread readCommands(ReadCommandThread);
     readCommands.detach();
 
@@ -187,12 +208,24 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     while (true)
     {
         std::string command = GetCommand();
+<<<<<<< HEAD
         if (!command.empty() && !ParseCommand(command, &status))
+=======
+        if (command.empty())
+>>>>>>> upstream/master
+        {
+            break;
+        }
+
+<<<<<<< HEAD
+=======
+        if (!ParseCommand(command, &status))
         {
             break;
         }
     }
 
+>>>>>>> upstream/master
     SetCommandExitStatus(CHIP_NO_ERROR);
     CloseLogFile();
 
@@ -438,6 +471,8 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
 
     gInteractiveServerResult.Reset();
     SetCommandExitStatus(CHIP_NO_ERROR);
+    CloseLogFile();
+
     return CHIP_NO_ERROR;
 }
 
@@ -464,6 +499,11 @@ bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
     mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
     return shouldStop;
+}
+
+void InteractiveServerCommand::StopCommand()
+{
+    mWebSocketServer.Stop();
 }
 
 CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
