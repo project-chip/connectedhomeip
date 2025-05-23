@@ -53,16 +53,38 @@ std::condition_variable sQueueCondition;
 
 void ReadCommandThread()
 {
-    char * command;
-    while (true)
+    for (;;)
     {
-        command = readline(kInteractiveModePrompt);
-        if (command != nullptr && *command)
+        // `readline()` allocates with `malloc()`.  Wrap it in a smart
+        // pointer so we cannot leak it on every early–return/throw path.
+        std::unique_ptr<char, decltype(&std::free)> rawLine{ readline(kInteractiveModePrompt), &std::free };
+
+        if (!rawLine) // EOF or fatal error → shut down cleanly
         {
-            std::unique_lock<std::mutex> lock(sQueueMutex);
-            sCommandQueue.push(command);
-            free(command);
+            std::lock_guard<std::mutex> lk{ sQueueMutex };
+            sCommandQueue.emplace(kInteractiveModeStopCommand);
             sQueueCondition.notify_one();
+            break;
+        }
+
+        // Ignore empty lines produced by just hitting <Enter>.
+        if (*rawLine == '\0')
+            continue;
+
+        // Copy into an owning `std::string` before the pointer vanishes.
+        std::string line{ rawLine.get() };
+
+        {
+            std::lock_guard<std::mutex> lk{ sQueueMutex };
+            sCommandQueue.push(line);
+        }
+        sQueueCondition.notify_one();
+
+        // Bail out when the user asks to quit.
+        if (line == kInteractiveModeStopCommand)
+        {
+            ChipLogProgress(NotSpecified, "ReadCommandThread exit on quit");
+            break;
         }
     }
 }
@@ -114,7 +136,7 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 
 } // namespace
 
-char * InteractiveStartCommand::GetCommand(char * command)
+std::string InteractiveStartCommand::GetCommand() const
 {
     std::unique_lock<std::mutex> lock(sQueueMutex);
 
@@ -123,29 +145,15 @@ char * InteractiveStartCommand::GetCommand(char * command)
 
     if (sShutdownRequested.load())
     {
-        if (command != nullptr)
-        {
-            free(command);
-        }
-        return nullptr;
+        return {}; // empty string signals caller to exit
     }
 
-    std::string cmd = sCommandQueue.front();
+    std::string command = sCommandQueue.front();
     sCommandQueue.pop();
 
-    if (command != nullptr)
+    if (!command.empty())
     {
-        free(command);
-        command = nullptr;
-    }
-
-    command = new char[cmd.length() + 1];
-    strcpy(command, cmd.c_str());
-
-    // Do not save empty lines
-    if (command != nullptr && *command)
-    {
-        add_history(command);
+        add_history(command.c_str());
         write_history(GetHistoryFilePath().c_str());
     }
 
@@ -188,12 +196,11 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     std::thread readCommands(ReadCommandThread);
     readCommands.detach();
 
-    char * command = nullptr;
     int status;
     while (true)
     {
-        command = GetCommand(command);
-        if (command == nullptr)
+        std::string command = GetCommand();
+        if (command.empty())
         {
             break;
         }
@@ -204,21 +211,15 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         }
     }
 
-    if (command != nullptr)
-    {
-        free(command);
-        command = nullptr;
-    }
-
     SetCommandExitStatus(CHIP_NO_ERROR);
     CloseLogFile();
 
     return CHIP_NO_ERROR;
 }
 
-bool InteractiveCommand::ParseCommand(char * command, int * status)
+bool InteractiveCommand::ParseCommand(const std::string & command, int * status)
 {
-    if (strcmp(command, kInteractiveModeStopCommand) == 0)
+    if (command == kInteractiveModeStopCommand)
     {
         // If scheduling the cleanup fails, there is not much we can do.
         // But if something went wrong while the application is leaving it could be because things have
@@ -229,7 +230,7 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 
     ClearLine();
 
-    *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
+    *status = mHandler->RunInteractive(command.c_str(), GetStorageDirectory(), NeedsOperationalAdvertising());
 
     return true;
 }

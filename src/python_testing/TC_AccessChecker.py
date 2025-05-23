@@ -219,6 +219,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             logging.warn('WARNING: Skipping OTA cluster check for CI. THIS IS DISALLOWED FOR CERTIFICATION')
             return
 
+        logging.info(f'Testing commands on {xml_cluster.name} at privilege {privilege}')
         for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.accepted_commands[command_id].privilege
             command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]
@@ -229,6 +230,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 # no side effects. Commands are checked with admin privilege in their cluster tests. The error that
                 # may be let through here is if the spec requires operate and the implementation requires admin.
                 continue
+            logging.info(
+                f'  Testing command {xml_cluster.accepted_commands[command_id].name} from cluster {xml_cluster.name} - at privilege {privilege}, requires {spec_requires}')
             try:
                 timed = None
                 if command.must_use_timed_invoke:
@@ -240,11 +243,15 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 self.record_error(test_name=name, location=location,
                                   problem=f"Unexpected success sending command {command} with privilege {privilege}")
                 self.success = False
+                logging.info('      Received unexpected SUCCESS')
             except InteractionModelError as e:
                 if e.status != Status.UnsupportedAccess:
                     self.record_error(test_name=name, location=location,
                                       problem=f'Unexpected error sending command {command} with privilege {privilege} - expected UNSUPPORTED_ACCESS, got {e.status}')
                     self.success = False
+                    logging.info(f'      Received unexpected error {e}')
+                else:
+                    logging.info('      Received expected error')
 
     async def _run_read_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, device_cluster_data, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
         # TODO: This assumes all attributes are readable. Which they are currently. But we don't have a general way to mark otherwise.
