@@ -60,13 +60,6 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="Equipment" value="0x02"/>
   </enum>
 
-  <enum name="SoftwareVersionCertificationStatusEnum" type="enum8">
-    <item name="dev-test" value="0x00"/>
-    <item name="provisional" value="0x01"/>
-    <item name="certified" value="0x02"/>
-    <item name="revoked" value="0x03"/>
-  </enum>
-
   <enum name="StreamUsageEnum" type="enum8">
     <item name="Internal" value="0x00"/>
     <item name="Recording" value="0x01"/>
@@ -102,20 +95,5 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="SomeValue" value="0x00"/>
     <item name="SomeOtherValue" value="0x01"/>
     <item name="FinalValue" value="0x02"/>
-  </enum>
-
-  <enum name="WebRTCEndReasonEnum" type="enum8">
-    <item name="IceFailed" value="0x00"/>
-    <item name="IceTimeout" value="0x01"/>
-    <item name="UserHangup" value="0x02"/>
-    <item name="UserBusy" value="0x03"/>
-    <item name="Replaced" value="0x04"/>
-    <item name="NoUserMedia" value="0x05"/>
-    <item name="InviteTimeout" value="0x06"/>
-    <item name="AnsweredElsewhere" value="0x07"/>
-    <item name="OutOfResources" value="0x08"/>
-    <item name="MediaTimeout" value="0x09"/>
-    <item name="LowPower" value="0x0A"/>
-    <item name="UnknownReason" value="0x0B"/>
   </enum>
 </configurator>

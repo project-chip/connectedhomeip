@@ -425,17 +425,6 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
-        class SoftwareVersionCertificationStatusEnum(MatterIntEnum):
-            kDevTest = 0x00
-            kProvisional = 0x01
-            kCertified = 0x02
-            kRevoked = 0x03
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4
-
         class StreamUsageEnum(MatterIntEnum):
             kInternal = 0x00
             kRecording = 0x01
@@ -488,25 +477,6 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
-
-        class WebRTCEndReasonEnum(MatterIntEnum):
-            kIceFailed = 0x00
-            kIceTimeout = 0x01
-            kUserHangup = 0x02
-            kUserBusy = 0x03
-            kReplaced = 0x04
-            kNoUserMedia = 0x05
-            kInviteTimeout = 0x06
-            kAnsweredElsewhere = 0x07
-            kOutOfResources = 0x08
-            kMediaTimeout = 0x09
-            kLowPower = 0x0A
-            kUnknownReason = 0x0B
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 12
 
     class Bitmaps:
         class TestGlobalBitmap(IntFlag):
