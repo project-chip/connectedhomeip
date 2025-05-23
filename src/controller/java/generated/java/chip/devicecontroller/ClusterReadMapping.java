@@ -5289,17 +5289,17 @@ public class ClusterReadMapping {
           readIcdManagementOperatingModeCommandParams
         );
         result.put("readOperatingModeAttribute", readIcdManagementOperatingModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readIcdManagementMaximumCheckInBackOffCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readIcdManagementMaximumCheckInBackOffAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readIcdManagementMaximumCheckInBackoffCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementMaximumCheckInBackoffAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.IcdManagementCluster) cluster).readMaximumCheckInBackOffAttribute(
+            ((ChipClusters.IcdManagementCluster) cluster).readMaximumCheckInBackoffAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readIcdManagementMaximumCheckInBackOffCommandParams
+          readIcdManagementMaximumCheckInBackoffCommandParams
         );
-        result.put("readMaximumCheckInBackOffAttribute", readIcdManagementMaximumCheckInBackOffAttributeInteractionInfo);
+        result.put("readMaximumCheckInBackoffAttribute", readIcdManagementMaximumCheckInBackoffAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readIcdManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIcdManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

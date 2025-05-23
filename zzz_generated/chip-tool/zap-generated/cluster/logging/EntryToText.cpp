@@ -1520,8 +1520,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "UserActiveModeTriggerInstruction";
         case chip::app::Clusters::IcdManagement::Attributes::OperatingMode::Id:
             return "OperatingMode";
-        case chip::app::Clusters::IcdManagement::Attributes::MaximumCheckInBackOff::Id:
-            return "MaximumCheckInBackOff";
+        case chip::app::Clusters::IcdManagement::Attributes::MaximumCheckInBackoff::Id:
+            return "MaximumCheckInBackoff";
         case chip::app::Clusters::IcdManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::IcdManagement::Attributes::AcceptedCommandList::Id:

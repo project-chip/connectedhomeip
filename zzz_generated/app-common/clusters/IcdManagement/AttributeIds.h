@@ -48,9 +48,9 @@ namespace OperatingMode {
 inline constexpr AttributeId Id = 0x00000008;
 } // namespace OperatingMode
 
-namespace MaximumCheckInBackOff {
+namespace MaximumCheckInBackoff {
 inline constexpr AttributeId Id = 0x00000009;
-} // namespace MaximumCheckInBackOff
+} // namespace MaximumCheckInBackoff
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

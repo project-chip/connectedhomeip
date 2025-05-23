@@ -14225,7 +14225,7 @@ class IcdManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="userActiveModeTriggerHint", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="userActiveModeTriggerInstruction", Tag=0x00000007, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="operatingMode", Tag=0x00000008, Type=typing.Optional[IcdManagement.Enums.OperatingModeEnum]),
-                ClusterObjectFieldDescriptor(Label="maximumCheckInBackOff", Tag=0x00000009, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="maximumCheckInBackoff", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -14242,7 +14242,7 @@ class IcdManagement(Cluster):
     userActiveModeTriggerHint: typing.Optional[uint] = None
     userActiveModeTriggerInstruction: typing.Optional[str] = None
     operatingMode: typing.Optional[IcdManagement.Enums.OperatingModeEnum] = None
-    maximumCheckInBackOff: typing.Optional[uint] = None
+    maximumCheckInBackoff: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -14549,7 +14549,7 @@ class IcdManagement(Cluster):
             value: typing.Optional[IcdManagement.Enums.OperatingModeEnum] = None
 
         @dataclass
-        class MaximumCheckInBackOff(ClusterAttributeDescriptor):
+        class MaximumCheckInBackoff(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000046

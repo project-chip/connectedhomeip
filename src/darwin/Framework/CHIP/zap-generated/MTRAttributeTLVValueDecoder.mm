@@ -5236,8 +5236,8 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
-    case Attributes::MaximumCheckInBackOff::Id: {
-        using TypeInfo = Attributes::MaximumCheckInBackOff::TypeInfo;
+    case Attributes::MaximumCheckInBackoff::Id: {
+        using TypeInfo = Attributes::MaximumCheckInBackoff::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

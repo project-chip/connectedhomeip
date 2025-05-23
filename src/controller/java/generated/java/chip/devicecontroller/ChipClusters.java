@@ -17291,7 +17291,7 @@ public class ChipClusters {
     private static final long USER_ACTIVE_MODE_TRIGGER_HINT_ATTRIBUTE_ID = 6L;
     private static final long USER_ACTIVE_MODE_TRIGGER_INSTRUCTION_ATTRIBUTE_ID = 7L;
     private static final long OPERATING_MODE_ATTRIBUTE_ID = 8L;
-    private static final long MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID = 9L;
+    private static final long MAXIMUM_CHECK_IN_BACKOFF_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -17671,9 +17671,9 @@ public class ChipClusters {
         }, OPERATING_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMaximumCheckInBackOffAttribute(
+    public void readMaximumCheckInBackoffAttribute(
         LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_CHECK_IN_BACKOFF_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -17681,12 +17681,12 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID, true);
+        }, MAXIMUM_CHECK_IN_BACKOFF_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMaximumCheckInBackOffAttribute(
+    public void subscribeMaximumCheckInBackoffAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_CHECK_IN_BACKOFF_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -17694,7 +17694,7 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAXIMUM_CHECK_IN_BACKOFF_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
