@@ -43,7 +43,6 @@ constexpr uint8_t kTagCoveringVenetian = 0x03;
 constexpr uint8_t kNamespaceClosurePanel = 0x45;
 constexpr uint8_t kTagClosurePanelLift   = 0x00;
 constexpr uint8_t kTagClosurePanelTilt   = 0x01;
-
 // Define the list of semantic tags for the endpoint
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp1TagList[] = {
     { .namespaceID = kNamespaceClosure,
@@ -75,9 +74,9 @@ void ClosureManager::Init()
     DeviceLayer::PlatformMgr().LockChipStack();
 
     // Closure endpoints initialization
-    ep1.Init();
-    ep2.Init();
-    ep3.Init();
+    kEp1.Init();
+    kEp2.Init();
+    kEp3.Init();
 
     // Set Taglist for Closure endpoints
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEp1TagList));
