@@ -372,12 +372,32 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH reads Networks attribute from the DUT
         self.step(6)
 
-        # Verify that the Networks attribute list has an entry with the following fields:
-        networks = await self.read_single_attribute_check_success(
+        # TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters)
+        connected_network_count = {}
+        networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=cnet,
             attribute=cnet.Attributes.Networks
         )
+        logger.info(f" --- Step 6: Networks by endpoint: {networks_dict}")
+        networks = await self.read
 
+        # Verify that there is a single connected network across ALL network commissioning clusters
+        for ep in networks_dict:
+            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            logger.info(f" --- Step 6: Connected networks count by endpoint: {connected_network_count}")
+            asserts.assert_equal(sum(connected_network_count.values()), 1,
+                                 "Verify that only one entry has connected status as TRUE across ALL endpoints")
+
+        endpoint = self.get_endpoint()
+        current_cluster_connected = connected_network_count[endpoint] == 1
+
+        if not current_cluster_connected:
+            asserts.fail("Current cluster is not connected, skipping all remaining test steps")
+            # logger.info("Current cluster is not connected, skipping all remaining test steps")
+            # self.skip_all_remaining_steps(4)
+            return
+
+        # Verify that the Networks attribute list has an entry with the following fields:
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is FALSE
         userwifi_2nd_netidx = None
