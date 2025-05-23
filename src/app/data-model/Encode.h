@@ -253,7 +253,7 @@ CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex acce
 #pragma GCC diagnostic pop
 }
 
-// TODO: Needs bettername?  And should it be declared in a separate header?
+// TODO: Needs better name?  And should it be declared in a separate header?
 struct TLVWriterWithAccessingFabricIndex
 {
     TLVWriterWithAccessingFabricIndex(TLV::TLVWriter & writer, FabricIndex accessingFabricIndex) :
