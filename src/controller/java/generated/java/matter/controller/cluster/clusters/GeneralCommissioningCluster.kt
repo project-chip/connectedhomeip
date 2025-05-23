@@ -809,7 +809,7 @@ class GeneralCommissioningCluster(
     }
   }
 
-  suspend fun readTCAcceptedVersionAttribute(): UShort {
+  suspend fun readTCAcceptedVersionAttribute(): UShort? {
     val ATTRIBUTE_ID: UInt = 5u
 
     val attributePath =
@@ -835,7 +835,12 @@ class GeneralCommissioningCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -881,9 +886,14 @@ class GeneralCommissioningCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+          val decodedValue: UShort? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(UShortSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UShortSubscriptionState.SubscriptionEstablished)
@@ -892,7 +902,7 @@ class GeneralCommissioningCluster(
     }
   }
 
-  suspend fun readTCMinRequiredVersionAttribute(): UShort {
+  suspend fun readTCMinRequiredVersionAttribute(): UShort? {
     val ATTRIBUTE_ID: UInt = 6u
 
     val attributePath =
@@ -918,7 +928,12 @@ class GeneralCommissioningCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -964,9 +979,14 @@ class GeneralCommissioningCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+          val decodedValue: UShort? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(UShortSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UShortSubscriptionState.SubscriptionEstablished)
@@ -975,7 +995,7 @@ class GeneralCommissioningCluster(
     }
   }
 
-  suspend fun readTCAcknowledgementsAttribute(): UShort {
+  suspend fun readTCAcknowledgementsAttribute(): UShort? {
     val ATTRIBUTE_ID: UInt = 7u
 
     val attributePath =
@@ -1001,7 +1021,12 @@ class GeneralCommissioningCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -1047,9 +1072,14 @@ class GeneralCommissioningCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+          val decodedValue: UShort? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(UShortSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UShortSubscriptionState.SubscriptionEstablished)
@@ -1058,7 +1088,7 @@ class GeneralCommissioningCluster(
     }
   }
 
-  suspend fun readTCAcknowledgementsRequiredAttribute(): Boolean {
+  suspend fun readTCAcknowledgementsRequiredAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 8u
 
     val attributePath =
@@ -1084,7 +1114,12 @@ class GeneralCommissioningCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -1130,9 +1165,14 @@ class GeneralCommissioningCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+          val decodedValue: Boolean? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getBoolean(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(BooleanSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -1169,7 +1209,11 @@ class GeneralCommissioningCluster(
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UInt? =
       if (!tlvReader.isNull()) {
-        tlvReader.getUInt(AnonymousTag)
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUInt(AnonymousTag)
+        } else {
+          null
+        }
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -1221,7 +1265,11 @@ class GeneralCommissioningCluster(
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UInt? =
             if (!tlvReader.isNull()) {
-              tlvReader.getUInt(AnonymousTag)
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                tlvReader.getUInt(AnonymousTag)
+              } else {
+                null
+              }
             } else {
               tlvReader.getNull(AnonymousTag)
               null
@@ -1236,7 +1284,7 @@ class GeneralCommissioningCluster(
     }
   }
 
-  suspend fun readRecoveryIdentifierAttribute(): ByteArray {
+  suspend fun readRecoveryIdentifierAttribute(): ByteArray? {
     val ATTRIBUTE_ID: UInt = 10u
 
     val attributePath =
@@ -1262,7 +1310,12 @@ class GeneralCommissioningCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ByteArray = tlvReader.getByteArray(AnonymousTag)
+    val decodedValue: ByteArray? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getByteArray(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -1308,9 +1361,14 @@ class GeneralCommissioningCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ByteArray = tlvReader.getByteArray(AnonymousTag)
+          val decodedValue: ByteArray? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getByteArray(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(ByteArraySubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(ByteArraySubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(ByteArraySubscriptionState.SubscriptionEstablished)
@@ -1347,7 +1405,11 @@ class GeneralCommissioningCluster(
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
       if (!tlvReader.isNull()) {
-        tlvReader.getUByte(AnonymousTag)
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          null
+        }
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -1399,7 +1461,11 @@ class GeneralCommissioningCluster(
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UByte? =
             if (!tlvReader.isNull()) {
-              tlvReader.getUByte(AnonymousTag)
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                tlvReader.getUByte(AnonymousTag)
+              } else {
+                null
+              }
             } else {
               tlvReader.getNull(AnonymousTag)
               null
