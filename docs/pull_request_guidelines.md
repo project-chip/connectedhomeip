@@ -6,24 +6,27 @@ Within the matter SDK, we are prioritizing long term code maintainability and
 ease of reviews of PRs. To create an easy to review pull request, ensure the
 following items are met (and see below for details)
 
-- [ ] Descriptive/clear title
-- [ ] Pull request size
-  - Change focuses on a single aspect/bug/feature
-  - Strongly prefer small PRs (even if several of them are needed to achieve
+-   [ ] Descriptive/clear title
+-   [ ] Pull request size
+    -   Change focuses on a single aspect/bug/feature
+    -   Strongly prefer small PRs (even if several of them are needed to achieve
         final goal)
-- [ ] Change is well tested
-  - testing is described in `### Testing` section in the pull request
+-   [ ] Change is well tested
+    -   testing is described in `### Testing` section in the pull request
         summary (please include instructions and commands to test your PR)
-  - Strongly prefer automated tests to manual tests
-- [ ] Good Pull request summary/description
-  - Summary contains sufficient context for reviewers including links to
+    -   Strongly prefer automated tests to manual tests
+-   [ ] Good Pull request summary/description
+    -   Summary contains sufficient context for reviewers including links to
         relevant test plan and / or specification changes
-  - Summary contains sufficient context for reviewers
-  - Summary contains flash/ram overhead if changing core/common parts
-- [ ] CI should pass (i.e. green or yellow/waiting for review)
-- [ ] Avoid force-pushes and squashing commits. By keeping your PR commit
+    -   Summary contains sufficient context for reviewers
+    -   Summary contains flash/ram overhead if changing core/common parts
+-   [ ] CI should pass (i.e. green or yellow/waiting for review)
+-   [ ] Avoid force-pushes and squashing commits. By keeping your PR commit
         history you make it easier for reviewers to see the diff between
-        versions and confirm the requested changes have been addressed.
+        versions and confirm the requested changes have been addressed. -
+        `merge with master` is fine, however it is _NOT_ a requirement for PR
+        merging. Only do this when needed (e.g. to fix a conflict) and not too
+        frequently as it triggers a 2+ hour CI run every time.
 
 ## Details and background on requirements
 
@@ -36,24 +39,24 @@ be useful for quick filtering like `[TC-ABC-1.2]` to tag test changes.
 
 Examples of descriptive titles:
 
-- `[Silabs] Fix compile of SiWx917 if LED and BUTTON are disabled`
-- `[Telink] Update build Dockerfile with new Zephyr SHA: c05c4.....`
-- `General Commissioning Cluster: use AttributeAccessInterface/CommandHandlerInterface for processing`
-- `Scenes Management/CopyScene: set access as manage instead of default to match the spec`
-- `Fix build errors due to ChipDeviceEvent default constructor not being available`
-- `Fix crash during DNSSD processing due to malformed packet`
-- `[NRF] Fix crash due to stack overflow during logging for PW-RPC builds`
-- `[TC-ABC-2.3] added new python test case based on test plan`
-- `[TC-ABC] migrate tests from yaml to python`
+-   `[Silabs] Fix compile of SiWx917 if LED and BUTTON are disabled`
+-   `[Telink] Update build Dockerfile with new Zephyr SHA: c05c4.....`
+-   `General Commissioning Cluster: use AttributeAccessInterface/CommandHandlerInterface for processing`
+-   `Scenes Management/CopyScene: set access as manage instead of default to match the spec`
+-   `Fix build errors due to ChipDeviceEvent default constructor not being available`
+-   `Fix crash during DNSSD processing due to malformed packet`
+-   `[NRF] Fix crash due to stack overflow during logging for PW-RPC builds`
+-   `[TC-ABC-2.3] added new python test case based on test plan`
+-   `[TC-ABC] migrate tests from yaml to python`
 
 Examples of titles that are vague (not clear what the change is, one would need
 to open the pull request for details or open additional issue in GitHub)
 
-- `Work on issue 1234`
-- `Fix android JniTypeWrappers`
-- `Fix segfault in BLE`
-- `Fix TC-ABC-1.2`
-- `Update Readme`
+-   `Work on issue 1234`
+-   `Fix android JniTypeWrappers`
+-   `Fix segfault in BLE`
+-   `Fix TC-ABC-1.2`
+-   `Update Readme`
 
 ### Pull request size
 
@@ -87,22 +90,22 @@ Add testing details in a `### Testing` heading in the pull request summary -
 there is a CI bot that checks for this. Within this section add the following
 details:
 
-- If automated unit tests, a brief mention like `added/updated unit tests` is
+-   If automated unit tests, a brief mention like `added/updated unit tests` is
     sufficient. Thank you for adding automated unit tests and we accept this
     area to be brief.
 
-- If automated integration tests, this can be brief as well saying
+-   If automated integration tests, this can be brief as well saying
     `TC_*.yaml/py` tests this, also add a brief text on why unit testing was not
     possible as well as unit tests are faster to iterate on and execute.
 
-- If manual testing was done, include **detailed** information about the tests
+-   If manual testing was done, include **detailed** information about the tests
     run (e.g. what chip-tool or `repl` commands were run) and the observed
     results. Also include an explanation why automated testing was NOT possible.
     This requirement is intentionally tedious to strongly encourage writing of
     automated tests. It is insufficient to reference an existing
     PR/document/plan/link and say "tested as described in XYZ".
 
-- Trivial/obvious change
+-   Trivial/obvious change
 
     In rare cases the change is trivial (e.g. fixing a typo in a `Readme.md`).
     Scripts still require a `#### Testing` section however you can be brief like
@@ -126,35 +129,35 @@ the PR clear:
 Reviewers are likely to have less context than someone actively working on a PR.
 Provide sufficient information for a reviewer to understand the change. Include:
 
-- a `TLDR` of the change content. This is a judgment call on details,
+-   a `TLDR` of the change content. This is a judgment call on details,
     generally you should include a what was changed and why. The change is
     trivial/short, this can be very short (i.e. "fixed typos" is perfectly
     acceptable, however if changing 100-1000s of line, the areas of changes
     should be explained)
-- If a crash/error is fixed, explain the root cause and if the fix is not
+-   If a crash/error is fixed, explain the root cause and if the fix is not
     obvious (again, judgment call), explain why the given approach was taken.
-- Help the reviewer out with any notable information (specific platform
+-   Help the reviewer out with any notable information (specific platform
     issues, extra thoughts or requests for feedback or gotchas on tricky code,
     followup work or PR dependencies)
-- brief information on **WHY** the change was made. Avoid just saying "Fix
+-   brief information on **WHY** the change was made. Avoid just saying "Fix
     compile error" but rather add a example of the error seen and under what
     command. Avoid `Fixes #1234` as that requires the reviewer to open another
     issue and hope that the issue is well described. Have a brief description of
     the problem and fix anyway, even with an issue link.
-- Review context:
-  - If updating based on a test plan or spec issue, include the test plan or
+-   Review context:
+    -   If updating based on a test plan or spec issue, include the test plan or
         issue PR that this depends on.
-  - Clearly explain if the PR is based on in progress work (often for Spec
+    -   Clearly explain if the PR is based on in progress work (often for Spec
         issues).
-  - Larger changes/features should include some design document link.
+    -   Larger changes/features should include some design document link.
         Reviewers may not be familiar with discussions from the many tiger teams
         that work on the matter SDK.
-- If changing common code, check where any RAM/FLASH overhead comes from. You
+-   If changing common code, check where any RAM/FLASH overhead comes from. You
     can use [size tooling](../scripts/tools/ELF_SIZE_TOOLING.md) to gather this
     information.
-- TIP: use the syntax of `Fixes #....` to mark issues completed on PR merge or
+-   TIP: use the syntax of `Fixes #....` to mark issues completed on PR merge or
     use `#...` to reference issues that are addressed.
-- TIP: prefer adding some brief description (especially about the content of
+-   TIP: prefer adding some brief description (especially about the content of
     the changes) instead of just referencing an issue (helps reviewers get
     context faster without extra clicks).
 
