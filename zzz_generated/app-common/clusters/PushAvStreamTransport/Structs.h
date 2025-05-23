@@ -193,7 +193,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     uint16_t endpointID = static_cast<uint16_t>(0);
@@ -211,7 +211,7 @@ public:
 struct DecodableType
 {
 public:
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     uint16_t endpointID = static_cast<uint16_t>(0);
