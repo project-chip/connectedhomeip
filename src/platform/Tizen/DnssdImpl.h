@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <dns-sd.h>
+#include <glib-object.h>
 #include <glib.h>
 
 #include <inet/IPAddress.h>
@@ -32,6 +33,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <platform/GLibTypeDeleter.h>
 
 namespace chip {
 namespace Dnssd {
