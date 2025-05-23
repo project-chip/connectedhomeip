@@ -664,7 +664,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     }
 #endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
-#if (defined(SL_MBEDTLS_USE_TINYCRYPT) && SL_MBEDTLS_USE_TINYCRYPT)
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
     uint8_t key_buffer[kDeviceAttestationKeySizeMax] = { 0 };
     MutableByteSpan private_key(key_buffer);
     AttestationKey::Unwrap(temp, size, private_key);
