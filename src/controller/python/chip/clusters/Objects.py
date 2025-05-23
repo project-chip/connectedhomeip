@@ -664,16 +664,11 @@ class Globals:
             myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
 
         @dataclass
-<<<<<<< HEAD
         class ViewportStruct(ClusterObject):
-=======
-        class WebRTCSessionStruct(ClusterObject):
->>>>>>> master
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-<<<<<<< HEAD
                         ClusterObjectFieldDescriptor(Label="x1", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="y1", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="x2", Tag=2, Type=uint),
@@ -684,7 +679,13 @@ class Globals:
             y1: 'uint' = 0
             x2: 'uint' = 0
             y2: 'uint' = 0
-=======
+
+        @dataclass
+        class WebRTCSessionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
                         ClusterObjectFieldDescriptor(Label="id", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=2, Type=uint),
@@ -703,9 +704,6 @@ class Globals:
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
             metadataEnabled: 'typing.Optional[bool]' = None
             fabricIndex: 'uint' = 0
->>>>>>> master
-
-
 
 @dataclass
 class Identify(Cluster):
@@ -55913,4 +55911,3 @@ class SampleMei(Cluster):
 
             count: uint = 0
             fabricIndex: uint = 0
-

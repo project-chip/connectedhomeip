@@ -329,13 +329,13 @@ struct TestGlobalStruct {
   optional nullable TestGlobalEnum myEnum = 2;
 }
 
-<<<<<<< HEAD
 struct ViewportStruct {
   int16u x1 = 0;
   int16u y1 = 1;
   int16u x2 = 2;
   int16u y2 = 3;
-=======
+}
+
 fabric_scoped struct WebRTCSessionStruct {
   int16u id = 0;
   node_id peerNodeID = 1;
@@ -345,7 +345,6 @@ fabric_scoped struct WebRTCSessionStruct {
   nullable int16u audioStreamID = 5;
   optional boolean metadataEnabled = 6;
   fabric_idx fabricIndex = 254;
->>>>>>> master
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -7386,5 +7385,3 @@ endpoint 65534 {
     handle command ReorderNetwork;
   }
 }
-
-

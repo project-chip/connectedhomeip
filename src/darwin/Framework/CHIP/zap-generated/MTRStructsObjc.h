@@ -95,13 +95,13 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-<<<<<<< HEAD
 @interface MTRDataTypeViewportStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull x1 MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull y1 MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull x2 MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull y2 MTR_PROVISIONALLY_AVAILABLE;
-=======
+@end
+
 @interface MTRDataTypeWebRTCSessionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull id MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull peerNodeID MTR_PROVISIONALLY_AVAILABLE;
@@ -111,7 +111,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nullable audioStreamID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable metadataEnabled MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
->>>>>>> master
 @end
 
 MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))

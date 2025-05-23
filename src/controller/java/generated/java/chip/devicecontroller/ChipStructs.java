@@ -14920,8 +14920,6 @@ public static class CameraAvSettingsUserLevelManagementClusterViewportStruct {
     return output.toString();
   }
 }
-<<<<<<< HEAD
-=======
 public static class CameraAvSettingsUserLevelManagementClusterDPTZStruct {
   public Integer videoStreamID;
   public ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport;
@@ -15059,7 +15057,6 @@ public static class WebRTCTransportProviderClusterICECandidateStruct {
     return output.toString();
   }
 }
->>>>>>> master
 public static class WebRTCTransportProviderClusterICEServerStruct {
   public ArrayList<String> URLs;
   public Optional<String> username;

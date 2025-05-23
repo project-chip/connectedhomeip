@@ -2494,7 +2494,6 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 provisional cluster WebRTCTransportProvider = 1363 {
   revision 1;
 
-<<<<<<< HEAD
   shared enum WebRTCEndReasonEnum : enum8 {
     kIceFailed = 0;
     kIceTimeout = 1;
@@ -2530,10 +2529,6 @@ provisional cluster WebRTCTransportProvider = 1363 {
     nullable int16u audioStreamID = 6;
     WebRTCMetadataOptionsBitmap metadataOptions = 7;
     fabric_idx fabricIndex = 254;
-=======
-  bitmap Feature : bitmap32 {
-    kMetadata = 0x1;
->>>>>>> master
   }
 
   readonly attribute access(read: manage) WebRTCSessionStruct currentSessions[] = 0;
@@ -2609,7 +2604,6 @@ provisional cluster WebRTCTransportProvider = 1363 {
 provisional cluster WebRTCTransportRequestor = 1364 {
   revision 1;
 
-<<<<<<< HEAD
   shared enum WebRTCEndReasonEnum : enum8 {
     kIceFailed = 0;
     kIceTimeout = 1;
@@ -2647,8 +2641,6 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     fabric_idx fabricIndex = 254;
   }
 
-=======
->>>>>>> master
   readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
