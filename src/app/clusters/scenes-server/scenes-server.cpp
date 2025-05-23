@@ -1153,12 +1153,15 @@ void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 
 void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
 {
-    uint16_t endpointTableSize = 0;
-    VerifyOrReturn(Status::Success == Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
+    // TODO: Remove the commented code.
+    // MatterScenesManagementClusterServerShutdownCallback was not being called before and in the sceneTable->RemoveEndpoint();
+    // it removes the SceneTableEntry from the persistent storage.
+    // uint16_t endpointTableSize = 0;
+    // VerifyOrReturn(Status::Success == Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
 
-    // Get Scene Table Instance
-    SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);
-    sceneTable->RemoveEndpoint();
+    // // Get Scene Table Instance
+    // SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);
+    // sceneTable->RemoveEndpoint();
 }
 
 void MatterScenesManagementPluginServerInitCallback()

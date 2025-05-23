@@ -211,6 +211,7 @@ void MatterMeterIdentificationPluginServerShutdownCallback() {}
 void MatterClosureDimensionPluginServerShutdownCallback() {}
 void MatterElectricalGridConditionsPluginServerShutdownCallback() {}
 void MatterCommodityPricePluginServerShutdownCallback() {}
+void MatterSoilMeasurementPluginServerShutdownCallback() {}
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {

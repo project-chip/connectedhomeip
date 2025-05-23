@@ -106,7 +106,12 @@ public:
 
 private:
     ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id), AttributeAccessInterface(Optional<EndpointId>(), Id) {}
-    ~ScenesServer() { Shutdown(); }
+    ~ScenesServer()
+    {
+        // TODO: Remove the commented code.
+        // ScenesServer::Shutdown is being called from MatterScenesManagementPluginServerShutdownCallback.
+        // Shutdown();
+    }
 
     bool mIsInitialized = false;
 
