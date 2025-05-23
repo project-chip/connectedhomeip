@@ -29,11 +29,11 @@ using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
 using chip::app::Clusters::CameraAvStreamManagement::RateDistortionTradeOffStruct;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;
-using chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum;
 using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
+using chip::app::Clusters::Globals::StreamUsageEnum;
 
 struct VideoStream
 {
@@ -179,8 +179,11 @@ public:
         // capabilities)
         virtual VideoSensorParamsStruct & GetVideoSensorParams() = 0;
 
-        // Get indication whether camera supports night vision mode
-        virtual bool GetNightVisionCapable() = 0;
+        // Get indication whether camera supports night vision
+        virtual bool GetCameraSupportsNightVision() = 0;
+
+        // Get indication whether camera night vision using infrared
+        virtual bool GetNightVisionUsesInfrared() = 0;
 
         // Get indication of the min resolution(pixels) that camera allows for
         // its viewport.
