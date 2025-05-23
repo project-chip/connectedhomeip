@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <string>
+
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -44,6 +46,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/RuntimeOptionsProvider.h>
 
+#include <AllClustersExampleDeviceInfoProviderImpl.h>
 #include <DeviceInfoProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -301,6 +304,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleDeviceInfoProvider;
 
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -424,7 +428,9 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    bool isAllClustersVariant = (std::string(argv[0]).find("all-clusters") != std::string::npos);
+
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
 #else  // CONFIG_NETWORK_LAYER_BLE
@@ -490,6 +496,16 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
+
+    // We need to set DeviceInfoProvider before Server::Init to set up the storage of DeviceInfoProvider properly.
+    if (isAllClustersVariant)
+    {
+        DeviceLayer::SetDeviceInfoProvider(&gAllClustersExampleDeviceInfoProvider);
+    }
+    else
+    {
+        DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    }
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -720,9 +736,6 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
-    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
     chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
 
@@ -792,15 +805,28 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationInit();
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    auto & platformMgr = chip::DeviceLayer::PlatformMgrImpl();
+    platformMgr.RegisterSignalHandler(SIGINT, ^{
+        platformMgr.UnregisterAllSignalHandlers();
+        StopSignalHandler(SIGINT);
+    });
+
+    platformMgr.RegisterSignalHandler(SIGTERM, ^{
+        platformMgr.UnregisterAllSignalHandlers();
+        StopSignalHandler(SIGTERM);
+    });
+#else
     // NOTE: For some reason, on Darwin, the signal handler is not called if the signal is
     //       registered with sigaction() call and TSAN is enabled. The problem seems to be
     //       related with the dispatch_semaphore_wait() function in the RunEventLoop() method.
     //       If this call is commented out, the signal handler is called as expected...
-#if defined(__APPLE__)
     // NOLINTBEGIN(bugprone-signal-handler)
     signal(SIGINT, StopSignalHandler);
     signal(SIGTERM, StopSignalHandler);
     // NOLINTEND(bugprone-signal-handler)
+#endif
 #else
     struct sigaction sa                        = {};
     sa.sa_handler                              = StopSignalHandler;

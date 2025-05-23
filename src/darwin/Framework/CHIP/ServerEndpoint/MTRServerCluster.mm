@@ -27,8 +27,8 @@
 #import <Matter/MTRServerCluster.h>
 
 #include <app/AttributeAccessInterface.h>
-#include <app/clusters/descriptor/descriptor.h>
 #include <app/data-model/PreEncodedValue.h>
+#include <clusters/Descriptor/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -126,7 +126,7 @@ MTR_DIRECT_MEMBERS
 
 + (MTRServerCluster *)newDescriptorCluster
 {
-    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(Clusters::Descriptor::kClusterRevision) accessGrants:[NSSet set] attributes:@[]];
+    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(Clusters::Descriptor::kRevision) accessGrants:[NSSet set] attributes:@[]];
 }
 
 - (instancetype)initInternalWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision accessGrants:(NSSet *)accessGrants attributes:(NSArray *)attributes

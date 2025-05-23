@@ -369,6 +369,7 @@ decrypt
 decrypted
 DEDEDEDE
 deepnote
+deepwiki
 DefaultOTAProviders
 DefaultOTARequestor
 DefaultOTARequestorDriver
@@ -1297,6 +1298,7 @@ semver
 SendButton
 SendNewInputEvent
 sendto
+SEPR
 seqdiag
 SERIALDEVICE
 serialno
