@@ -177,7 +177,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
             if cluster_id not in self.xml_clusters:
                 self.record_error(test_name="Access Checker", location=location, problem="Cluster not present in spec data")
-                self.success = True
+                self.success = False
                 continue
             if cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
                 self.record_error(test_name="Access Checker", location=location, problem="Unknown cluster")
