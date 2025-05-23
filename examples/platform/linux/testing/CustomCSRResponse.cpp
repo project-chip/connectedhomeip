@@ -28,6 +28,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::OperationalCredentials::Commands;
 
+#if 0
 constexpr size_t kMaxResponseLength = 900;
 constexpr size_t kCSRNonceLength    = 32;
 
@@ -163,3 +164,4 @@ CHIP_ERROR EncodeResponseCommandPayload(TLV::TLVWriter & writer, TLV::Tag tag, F
 } // namespace DataModel
 } // namespace app
 } // namespace chip
+#endif

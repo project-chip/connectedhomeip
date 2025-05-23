@@ -304,7 +304,7 @@ protected:
 
         CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const final
         {
-            return DataModel::EncodeResponseCommandPayload(writer, tag, aAccessingFabricIndex, mValue);
+            return mValue.Encode(writer, tag, aAccessingFabricIndex);
         }
 
         CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const final
