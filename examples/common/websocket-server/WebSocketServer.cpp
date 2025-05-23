@@ -182,24 +182,42 @@ CHIP_ERROR WebSocketServer::Run(chip::Optional<uint16_t> port, WebSocketServerDe
     };
     info.retry_and_idle_policy = &retry;
 
-    auto context = lws_create_context(&info);
-    VerifyOrReturnError(nullptr != context, CHIP_ERROR_INTERNAL);
+    mContext = lws_create_context(&info);
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INTERNAL);
 
     mRunning  = true;
     mDelegate = delegate;
 
     while (mRunning)
     {
-        lws_service(context, -1);
+        lws_service(mContext, -1);
 
         std::lock_guard<std::mutex> lock(gMutex);
-        if (gMessageQueue.size())
+        if (!gMessageQueue.empty())
         {
             lws_callback_on_writable(gWebSocketInstance);
         }
     }
-    lws_context_destroy(context);
+
+    lws_context_destroy(mContext);
+    mContext = nullptr;
     return CHIP_NO_ERROR;
+}
+
+void WebSocketServer::Stop()
+{
+    if (!mRunning)
+    {
+        return;
+    }
+
+    mRunning = false;
+
+    // Wake the poll/sleep inside lws_service()
+    if (mContext != nullptr)
+    {
+        lws_cancel_service(mContext);
+    }
 }
 
 bool WebSocketServer::OnWebSocketMessageReceived(char * msg)
