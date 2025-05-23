@@ -86,7 +86,7 @@ Add testing details in a `### Testing` heading in the pull request summary -
 there is a CI bot that checks for this. Within this section add the following
 details:
 
--   if automated unit tests, brief mention like `added/updated unit tests` is
+-   If automated unit tests, a brief mention like `added/updated unit tests` is
     sufficient. Thank you for adding automated unit tests and we accept this
     area to be brief
 
