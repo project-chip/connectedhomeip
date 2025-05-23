@@ -237,6 +237,9 @@ def cmd_list(context):
     '--all-clusters-app',
     help='what all clusters app to use')
 @click.option(
+    '--energy-gtw-app',
+    help='what energy gateway app to use')
+@click.option(
     '--lock-app',
     help='what lock app to use')
 @click.option(
@@ -296,7 +299,7 @@ def cmd_list(context):
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
+def cmd_run(context, iterations, all_clusters_app, energy_gtw_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, chip_repl_yaml_tester,
             chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
     if expected_failures != 0 and not keep_going:
@@ -309,6 +312,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if all_clusters_app is None:
         all_clusters_app = paths_finder.get('chip-all-clusters-app')
+
+    if energy_gtw_app is None:
+        energy_gtw_app = paths_finder.get('chip-energy-gateway-app')
 
     if lock_app is None:
         lock_app = paths_finder.get('chip-lock-app')
@@ -353,6 +359,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
         all_clusters_app=[all_clusters_app],
+        energy_gtw_app=[energy_gtw_app],
         lock_app=[lock_app],
         fabric_bridge_app=[fabric_bridge_app],
         ota_provider_app=[ota_provider_app],
