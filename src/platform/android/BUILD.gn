@@ -19,6 +19,7 @@ import("${chip_root}/src/platform/device.gni")
 
 import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 assert(chip_device_platform == "android")
 
@@ -83,14 +84,20 @@ static_library("android") {
   ]
 
   deps = [
-    ":tracing",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
   ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  if (matter_enable_tracing_support) {
+    deps += [ ":tracing" ]
+  }
+
+  public_deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/tracing:tracing_buildconfig",
+  ]
 
   public_configs = []
 }
