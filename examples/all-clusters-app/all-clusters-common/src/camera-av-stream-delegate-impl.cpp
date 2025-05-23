@@ -208,9 +208,9 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
     return Status::Success;
 }
 
-void CameraAVStreamManager::OnRankedStreamPrioritiesChanged()
+void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
 {
-    ChipLogProgress(Zcl, "Ranked stream priorities changed");
+    ChipLogProgress(Zcl, "Stream usage priorities changed");
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
@@ -352,13 +352,13 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
     uint32_t maxNetworkBandwidth                                 = 64;
     std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
-    std::vector<StreamUsageEnum> rankedStreamPriorities          = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<StreamUsageEnum> streamUsagePriorities           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
     sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamMgmtServer>(
         *sCameraAVStreamMgrInstance.get(), endpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
         sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
         spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
-        rankedStreamPriorities);
+        streamUsagePriorities);
     sCameraAVStreamMgmtClusterServerInstance->Init();
 }
 

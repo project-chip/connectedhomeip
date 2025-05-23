@@ -32,14 +32,13 @@ using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
-using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
 using chip::app::Clusters::Globals::StreamUsageEnum;
 
 struct VideoStream
 {
     VideoStreamStruct videoStreamParams;
     bool isAllocated;        // Flag to indicate if the stream is allocated.
-    ViewportStruct viewport; // Stream specific viewport, defaults to the camera viewport
+    chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewport; // Stream specific viewport, defaults to the camera viewport
     void * videoContext;     // Platform-specific context object associated with
                              // video stream;
 
@@ -230,13 +229,13 @@ public:
         virtual bool HasSpeaker() = 0;
 
         // Set the viewport for all streams
-        virtual CameraError SetViewport(const ViewportStruct & viewPort) = 0;
+        virtual CameraError SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) = 0;
 
         // Get the current camera viewport.
-        virtual const ViewportStruct & GetViewport() = 0;
+        virtual const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & GetViewport() = 0;
 
         // Set the viewport for a specific stream
-        virtual CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewPort) = 0;
+        virtual CameraError SetViewport(VideoStream & stream, const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) = 0;
 
         // Mute/Unmute speaker.
         virtual CameraError SetSpeakerMuted(bool muteSpeaker) = 0;

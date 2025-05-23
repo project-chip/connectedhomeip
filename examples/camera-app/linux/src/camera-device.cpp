@@ -732,14 +732,14 @@ std::vector<StreamUsageEnum> & CameraDevice::GetSupportedStreamUsages()
     return supportedStreamUsage;
 }
 
-CameraError CameraDevice::SetViewport(const ViewportStruct & viewPort)
+CameraError CameraDevice::SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort)
 {
     mViewport = viewPort;
 
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::SetViewport(VideoStream & stream, const ViewportStruct & viewport)
+CameraError CameraDevice::SetViewport(VideoStream & stream, const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport)
 {
     ChipLogDetail(Camera, "Setting per stream viewport for stream %d.", stream.videoStreamParams.videoStreamID);
     ChipLogDetail(Camera, "New viewport. x1=%d, x2=%d, y1=%d, y2=%d.", viewport.x1, viewport.x2, viewport.y1, viewport.y2);
@@ -821,8 +821,8 @@ void CameraDevice::InitializeVideoStreams()
                                   { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
                                   kMinBitRateBps /* MinBitRate */,
                                   kMaxBitRateBps /* MaxBitRate */,
-                                  kMinFragLenMsec /* MinFragmentLen */,
-                                  kMaxFragLenMsec /* MaxFragmentLen */,
+                                  kMinKeyFrameIntervalMsec /* MinKeyFrameInterval */,
+                                  kMaxKeyFrameIntervalMsec /* MaxKeyFrameInterval */,
                                   chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
                                   0 /* RefCount */ },
@@ -837,7 +837,7 @@ void CameraDevice::InitializeAudioStreams()
 {
     // Create single audio stream with typical supported parameters
     AudioStream audioStream = { { 1 /* Id */, StreamUsageEnum::kLiveView /* StreamUsage */, AudioCodecEnum::kOpus,
-                                  2 /* ChannelCount */, 48000 /* SampleRate */, 20000 /* BitRate*/, 24 /* BitDepth */,
+                                  kMicrophoneMaxChannelCount /* ChannelCount */, 48000 /* SampleRate */, 20000 /* BitRate*/, 24 /* BitDepth */,
                                   0 /* RefCount */ },
                                 false,
                                 nullptr };

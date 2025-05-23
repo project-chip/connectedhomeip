@@ -42,15 +42,14 @@ using AudioCapabilitiesStruct      = Structs::AudioCapabilitiesStruct::Type;
 using VideoSensorParamsStruct      = Structs::VideoSensorParamsStruct::Type;
 using SnapshotCapabilitiesStruct   = Structs::SnapshotCapabilitiesStruct::Type;
 using VideoResolutionStruct        = Structs::VideoResolutionStruct::Type;
-using ViewportStruct               = Structs::ViewportStruct::Type;
 using RateDistortionTradeOffStruct = Structs::RateDistortionTradeOffPointsStruct::Type;
 
-constexpr uint8_t kMaxSpeakerLevel          = 254;
-constexpr uint8_t kMaxMicrophoneLevel       = 254;
-constexpr uint16_t kMaxImageRotationDegrees = 359;
-constexpr uint8_t kMaxChannelCount          = 8;
-constexpr uint8_t kMaxImageQualityMetric    = 100;
-constexpr uint16_t kMaxFragmentLenMaxValue  = 65500;
+constexpr uint8_t kMaxSpeakerLevel               = 254;
+constexpr uint8_t kMaxMicrophoneLevel            = 254;
+constexpr uint16_t kMaxImageRotationDegrees      = 359;
+constexpr uint8_t kMaxChannelCount               = 8;
+constexpr uint8_t kMaxImageQualityMetric         = 100;
+constexpr uint16_t kMaxKeyFrameIntervalMaxValue  = 65500;
 // Conservative room for other fields (resolution + codec) in
 // capture snapshot response. TODO: Make a tighter bound.
 constexpr size_t kMaxSnapshotImageSize = kMaxLargeSecureSduLengthBytes - 100;
@@ -68,7 +67,7 @@ constexpr size_t kStreamUsageTlvSize = sizeof(Globals::StreamUsageEnum) + 1;
 // 1 control byte + end-of-array marker
 constexpr size_t kArrayTlvOverhead = 2;
 
-constexpr size_t kRankedVideoStreamPrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
+constexpr size_t kStreamUsagePrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
 
 class CameraAVStreamMgmtServer;
 
@@ -207,7 +206,7 @@ public:
      *   @brief Command Delegate for notifying change in StreamPriorities.
      *
      */
-    virtual void OnRankedStreamPrioritiesChanged() = 0;
+    virtual void OnStreamUsagePrioritiesChanged() = 0;
 
     /**
      *   @brief Delegate callback for notifying change in an attribute.
@@ -319,7 +318,7 @@ public:
      *                                          codec, the resolution and the maximum frame rate.
      * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume
      * @param aSupportedStreamUsages            Indicates the possible stream types available
-     * @param aRankedStreamPriorities           Indicates the priority ranking of the available streams
+     * @param aStreamUsagePriorities            Indicates the priority ranking of the available streams
      * for the transmission of its media streams.
      *
      */
@@ -332,7 +331,7 @@ public:
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
                              const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
                              const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-                             const std::vector<Globals::StreamUsageEnum> & aRankedStreamPriorities);
+                             const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -368,7 +367,7 @@ public:
 
     CHIP_ERROR SetNightVisionIllum(TriStateAutoEnum aNightVisionIllum);
 
-    CHIP_ERROR SetViewport(const ViewportStruct & aViewport);
+    CHIP_ERROR SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & aViewport);
 
     CHIP_ERROR SetSpeakerMuted(bool aSpeakerMuted);
 
@@ -442,7 +441,7 @@ public:
 
     const std::vector<SnapshotStreamStruct> & GetAllocatedSnapshotStreams() const { return mAllocatedSnapshotStreams; }
 
-    const std::vector<Globals::StreamUsageEnum> & GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
+    const std::vector<Globals::StreamUsageEnum> & GetStreamUsagePriorities() const { return mStreamUsagePriorities; }
 
     bool GetSoftRecordingPrivacyModeEnabled() const { return mSoftRecordingPrivacyModeEnabled; }
 
@@ -454,7 +453,7 @@ public:
 
     TriStateAutoEnum GetNightVisionIllum() const { return mNightVisionIllum; }
 
-    const ViewportStruct & GetViewport() const { return mViewport; }
+    const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & GetViewport() const { return mViewport; }
 
     bool GetSpeakerMuted() const { return mSpeakerMuted; }
 
@@ -492,7 +491,7 @@ public:
 
     // Add/Remove Management functions for streams
 
-    CHIP_ERROR SetRankedVideoStreamPriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
+    CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
@@ -533,7 +532,7 @@ private:
     bool mHardPrivacyModeOn                = false;
     TriStateAutoEnum mNightVision          = TriStateAutoEnum::kOn;
     TriStateAutoEnum mNightVisionIllum     = TriStateAutoEnum::kOn;
-    ViewportStruct mViewport               = { 0, 0, 0, 0 };
+    chip::app::Clusters::Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 0, 0 };
     bool mSpeakerMuted                     = false;
     uint8_t mSpeakerVolumeLevel            = 0;
     uint8_t mSpeakerMaxLevel               = kMaxSpeakerLevel;
@@ -555,7 +554,7 @@ private:
     // Managed lists
     std::vector<Globals::StreamUsageEnum> mSupportedStreamUsages;
 
-    std::vector<Globals::StreamUsageEnum> mRankedVideoStreamPriorities;
+    std::vector<Globals::StreamUsageEnum> mStreamUsagePriorities;
     std::vector<VideoStreamStruct> mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> mAllocatedAudioStreams;
     std::vector<SnapshotStreamStruct> mAllocatedSnapshotStreams;
@@ -607,13 +606,13 @@ private:
     CHIP_ERROR ReadAndEncodeAllocatedAudioStreams(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadAndEncodeAllocatedSnapshotStreams(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
-    CHIP_ERROR ReadAndEncodeRankedVideoStreamPrioritiesList(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR ReadAndEncodeStreamUsagePriorities(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
-    CHIP_ERROR StoreViewport(const ViewportStruct & viewport);
-    CHIP_ERROR LoadViewport(ViewportStruct & viewport);
+    CHIP_ERROR StoreViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport);
+    CHIP_ERROR LoadViewport(chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport);
 
-    CHIP_ERROR StoreRankedVideoStreamPriorities();
-    CHIP_ERROR LoadRankedVideoStreamPriorities();
+    CHIP_ERROR StoreStreamUsagePriorities();
+    CHIP_ERROR LoadStreamUsagePriorities();
 
     void ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
 

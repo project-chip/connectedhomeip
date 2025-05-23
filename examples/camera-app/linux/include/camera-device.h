@@ -53,8 +53,8 @@ static constexpr uint16_t kMaxVideoFrameRate         = 120;
 static constexpr uint16_t kMinVideoFrameRate         = 30;
 static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
 static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
-static constexpr uint32_t kMinFragLenMsec            = 1000;    // 1 sec
-static constexpr uint32_t kMaxFragLenMsec            = 10000;   // 10 sec
+static constexpr uint32_t kMinKeyFrameIntervalMsec   = 1000;    // 1 sec
+static constexpr uint32_t kMaxKeyFrameIntervalMsec   = 10000;   // 10 sec
 static constexpr uint16_t kVideoSensorWidthPixels    = 1920;    // 1080p resolution
 static constexpr uint16_t kVideoSensorHeightPixels   = 1080;    // 1080p resolution
 
@@ -143,8 +143,8 @@ public:
     std::vector<StreamUsageEnum> & GetRankedStreamPriorities() override { return mRankedStreamPriorities; }
 
     // Sets the Default Camera Viewport
-    CameraError SetViewport(const ViewportStruct & viewPort) override;
-    const ViewportStruct & GetViewport() override { return mViewport; }
+    CameraError SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) override;
+    const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & GetViewport() override { return mViewport; }
 
     /**
      * Sets the Viewport for a specific stream. The implementation of this HAL API is responsible
@@ -155,7 +155,7 @@ public:
      * @param stream   the currently allocated video stream on which the viewport is being set
      * @param viewport the viewport to be set on the stream
      */
-    CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewport) override;
+    CameraError SetViewport(VideoStream & stream, const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport) override;
 
     // Currently, defaulting to not supporting speaker.
     bool HasSpeaker() override { return false; }
@@ -237,7 +237,7 @@ private:
     int16_t mTilt = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultTilt;
     uint8_t mZoom = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
-    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 0, 0, 1920, 1080 };
+    chip::app::Clusters::Globals::Structs::ViewportStruct::Type mViewport   = { 0, 0, 1920, 1080 };
     uint16_t mCurrentVideoFrameRate                                         = 0;
     bool mHDREnabled                                                        = false;
     bool mMicrophoneMuted                                                   = false;
