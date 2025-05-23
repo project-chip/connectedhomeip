@@ -211,24 +211,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace GetWeekDaySchedule.
 namespace GetWeekDayScheduleResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kWeekDayIndex), weekDayIndex);
-    encoder.Encode(to_underlying(Fields::kUserIndex), userIndex);
-    encoder.Encode(to_underlying(Fields::kStatus), status);
-    encoder.Encode(to_underlying(Fields::kDaysMask), daysMask);
-    encoder.Encode(to_underlying(Fields::kStartHour), startHour);
-    encoder.Encode(to_underlying(Fields::kStartMinute), startMinute);
-    encoder.Encode(to_underlying(Fields::kEndHour), endHour);
-    encoder.Encode(to_underlying(Fields::kEndMinute), endMinute);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kWeekDayIndex), weekDayIndex);
@@ -400,21 +383,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace GetYearDaySchedule.
 namespace GetYearDayScheduleResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kYearDayIndex), yearDayIndex);
-    encoder.Encode(to_underlying(Fields::kUserIndex), userIndex);
-    encoder.Encode(to_underlying(Fields::kStatus), status);
-    encoder.Encode(to_underlying(Fields::kLocalStartTime), localStartTime);
-    encoder.Encode(to_underlying(Fields::kLocalEndTime), localEndTime);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kYearDayIndex), yearDayIndex);
@@ -566,21 +535,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace GetHolidaySchedule.
 namespace GetHolidayScheduleResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kHolidayIndex), holidayIndex);
-    encoder.Encode(to_underlying(Fields::kStatus), status);
-    encoder.Encode(to_underlying(Fields::kLocalStartTime), localStartTime);
-    encoder.Encode(to_underlying(Fields::kLocalEndTime), localEndTime);
-    encoder.Encode(to_underlying(Fields::kOperatingMode), operatingMode);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kHolidayIndex), holidayIndex);
@@ -742,26 +697,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace GetUser.
 namespace GetUserResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kUserIndex), userIndex);
-    encoder.Encode(to_underlying(Fields::kUserName), userName);
-    encoder.Encode(to_underlying(Fields::kUserUniqueID), userUniqueID);
-    encoder.Encode(to_underlying(Fields::kUserStatus), userStatus);
-    encoder.Encode(to_underlying(Fields::kUserType), userType);
-    encoder.Encode(to_underlying(Fields::kCredentialRule), credentialRule);
-    encoder.Encode(to_underlying(Fields::kCredentials), credentials);
-    encoder.Encode(to_underlying(Fields::kCreatorFabricIndex), creatorFabricIndex);
-    encoder.Encode(to_underlying(Fields::kLastModifiedFabricIndex), lastModifiedFabricIndex);
-    encoder.Encode(to_underlying(Fields::kNextUserIndex), nextUserIndex);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kUserIndex), userIndex);
@@ -915,19 +851,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace SetCredential.
 namespace SetCredentialResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStatus), status);
-    encoder.Encode(to_underlying(Fields::kUserIndex), userIndex);
-    encoder.Encode(to_underlying(Fields::kNextCredentialIndex), nextCredentialIndex);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStatus), status);
@@ -993,22 +917,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace GetCredentialStatus.
 namespace GetCredentialStatusResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kCredentialExists), credentialExists);
-    encoder.Encode(to_underlying(Fields::kUserIndex), userIndex);
-    encoder.Encode(to_underlying(Fields::kCreatorFabricIndex), creatorFabricIndex);
-    encoder.Encode(to_underlying(Fields::kLastModifiedFabricIndex), lastModifiedFabricIndex);
-    encoder.Encode(to_underlying(Fields::kNextCredentialIndex), nextCredentialIndex);
-    encoder.Encode(to_underlying(Fields::kCredentialData), credentialData);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCredentialExists), credentialExists);

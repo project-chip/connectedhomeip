@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -198,8 +199,6 @@ enum class Fields : uint8_t
 
 struct Type
 {
-    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
-
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTimeZoneResponse::Id; }
@@ -208,13 +207,7 @@ public:
 
     bool DSTOffsetRequired = static_cast<bool>(0);
 
-    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 

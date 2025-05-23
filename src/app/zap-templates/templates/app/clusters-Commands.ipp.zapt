@@ -15,10 +15,11 @@ namespace Commands {
 {{#zcl_commands}}
 namespace {{asUpperCamelCase name}} {
 
-{{#if (isServer source)}}
-template<>
+{{#if (isClient source)}}
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
+{{else}}
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const {
 {{/if}}
-CHIP_ERROR Type::Encode{{#if (isServer source)}}<false /* needsAccessingFabricIndex */>{{/if}}(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
     DataModel::WrappedStructEncoder encoder{aWriter, aTag};
     {{#zcl_command_arguments~}}
 
@@ -26,8 +27,7 @@ CHIP_ERROR Type::Encode{{#if (isServer source)}}<false /* needsAccessingFabricIn
     {{#if (isClient parent.source)}}
     encoder.EncodeRequestCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
     {{else}}
-    // A response command with a fabric-scoped struct field needs an accessing fabric index to encode.
-    ReturnErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), aWriter.mAccessingFabricIndex, {{asLowerCamelCase label}});
     {{/if}}
     {{else}}
     encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
@@ -36,23 +36,6 @@ CHIP_ERROR Type::Encode{{#if (isServer source)}}<false /* needsAccessingFabricIn
     {{~/zcl_command_arguments}}
     return encoder.Finalize();
 }
-
-{{#if (isServer source)}}
-template<>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const {
-    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
-    {{#zcl_command_arguments~}}
-
-    {{~#if_is_fabric_scoped_struct type cluster=../../name~}}
-    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), aAccessingFabricIndex, {{asLowerCamelCase label}});
-    {{else}}
-    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
-    {{/if_is_fabric_scoped_struct}}
-
-    {{~/zcl_command_arguments}}
-    return encoder.Finalize();
-}
-{{/if}}
 
 {{#if (isClient source)}}
 {{#if isFabricScoped~}}

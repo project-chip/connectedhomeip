@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -398,8 +399,6 @@ enum class Fields : uint8_t
 
 struct Type
 {
-    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
-
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
@@ -415,13 +414,7 @@ public:
     Optional<uint8_t> endHour;
     Optional<uint8_t> endMinute;
 
-    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -579,8 +572,6 @@ enum class Fields : uint8_t
 
 struct Type
 {
-    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
-
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
@@ -593,13 +584,7 @@ public:
     Optional<uint32_t> localStartTime;
     Optional<uint32_t> localEndTime;
 
-    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -751,8 +736,6 @@ enum class Fields : uint8_t
 
 struct Type
 {
-    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
-
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
@@ -765,13 +748,7 @@ public:
     Optional<uint32_t> localEndTime;
     Optional<OperatingModeEnum> operatingMode;
 
-    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -934,8 +911,6 @@ enum class Fields : uint8_t
 
 struct Type
 {
-    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
-
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetUserResponse::Id; }
@@ -953,13 +928,7 @@ public:
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextUserIndex;
 
-    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1082,8 +1051,6 @@ enum class Fields : uint8_t
 
 struct Type
 {
-    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
-
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetCredentialResponse::Id; }
@@ -1094,13 +1061,7 @@ public:
     DataModel::Nullable<uint16_t> userIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
 
-    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1169,8 +1130,6 @@ enum class Fields : uint8_t
 
 struct Type
 {
-    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
-
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatusResponse::Id; }
@@ -1184,13 +1143,7 @@ public:
     DataModel::Nullable<uint16_t> nextCredentialIndex;
     Optional<DataModel::Nullable<chip::ByteSpan>> credentialData;
 
-    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 

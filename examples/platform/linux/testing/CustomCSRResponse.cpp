@@ -144,8 +144,8 @@ namespace app {
 namespace DataModel {
 
 template <>
-CHIP_ERROR EncodeResponseCommandPayload(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex,
-                                        const CSRResponse::Type & responseData)
+CHIP_ERROR EncodeResponseCommandPayload(DataModel::TLVWriterWithAccessingFabricIndex & writer, TLV::Tag tag,
+                                        CSRResponse::Type & responseData)
 {
     auto tag1      = TLV::ContextTag(CSRResponse::Fields::kNOCSRElements);
     auto tag2      = TLV::ContextTag(CSRResponse::Fields::kAttestationSignature);

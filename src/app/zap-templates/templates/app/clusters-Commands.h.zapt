@@ -4,6 +4,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <app/data-model/NullObject.h>
@@ -55,13 +56,6 @@ enum class Fields : uint8_t {
 
 struct Type
 {
-{{#if (isServer source)}}
-{{! Hacky way to determine whether we have any fields that require an accessing fabric index to encode.
-    Maybe this should move into ZAP itself? }}
-static constexpr bool kNeedAccessingFabricIndexToEncode = false {{#zcl_command_arguments~}}
-{{~#if_is_fabric_scoped_struct type cluster=../../name}} || true{{~/if_is_fabric_scoped_struct~}}
-{{~/zcl_command_arguments}};
-{{/if}}
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::{{asUpperCamelCase name}}::Id; }
@@ -73,14 +67,10 @@ public:
     {{/zcl_command_arguments}}
 
 
-    {{#if (isServer source)}}
-    template<bool needsAccessingFabricIndex = kNeedAccessingFabricIndexToEncode, std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    {{/if}}
+    {{#if (isClient source)}}
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    {{#if (isServer source)}}
-    template<bool needsAccessingFabricIndex = kNeedAccessingFabricIndexToEncode, std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    {{else}}
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
     {{/if}}
 
     using ResponseType =

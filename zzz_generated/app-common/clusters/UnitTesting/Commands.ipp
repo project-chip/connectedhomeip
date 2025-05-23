@@ -53,17 +53,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Test.
 namespace TestSpecificResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kReturnValue), returnValue);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kReturnValue), returnValue);
@@ -113,17 +103,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestNotHandled.
 namespace TestAddArgumentsResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kReturnValue), returnValue);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kReturnValue), returnValue);
@@ -173,17 +153,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestSpecific.
 namespace TestSimpleArgumentResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kReturnValue), returnValue);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kReturnValue), returnValue);
@@ -233,22 +203,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestUnknownCommand.
 namespace TestStructArrayArgumentResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kArg1), arg1);
-    encoder.Encode(to_underlying(Fields::kArg2), arg2);
-    encoder.Encode(to_underlying(Fields::kArg3), arg3);
-    encoder.Encode(to_underlying(Fields::kArg4), arg4);
-    encoder.Encode(to_underlying(Fields::kArg5), arg5);
-    encoder.Encode(to_underlying(Fields::kArg6), arg6);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kArg1), arg1);
@@ -334,17 +289,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestAddArguments.
 namespace TestListInt8UReverseResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kArg1), arg1);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kArg1), arg1);
@@ -400,18 +345,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestSimpleArgumentRequest.
 namespace TestEnumsResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kArg1), arg1);
-    encoder.Encode(to_underlying(Fields::kArg2), arg2);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kArg1), arg1);
@@ -497,20 +431,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestStructArrayArgumentRequest.
 namespace TestNullableOptionalResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kWasPresent), wasPresent);
-    encoder.Encode(to_underlying(Fields::kWasNull), wasNull);
-    encoder.Encode(to_underlying(Fields::kValue), value);
-    encoder.Encode(to_underlying(Fields::kOriginalValue), originalValue);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kWasPresent), wasPresent);
@@ -581,44 +502,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestStructArgumentRequest.
 namespace TestComplexNullableOptionalResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kNullableIntWasNull), nullableIntWasNull);
-    encoder.Encode(to_underlying(Fields::kNullableIntValue), nullableIntValue);
-    encoder.Encode(to_underlying(Fields::kOptionalIntWasPresent), optionalIntWasPresent);
-    encoder.Encode(to_underlying(Fields::kOptionalIntValue), optionalIntValue);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalIntWasPresent), nullableOptionalIntWasPresent);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalIntWasNull), nullableOptionalIntWasNull);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalIntValue), nullableOptionalIntValue);
-    encoder.Encode(to_underlying(Fields::kNullableStringWasNull), nullableStringWasNull);
-    encoder.Encode(to_underlying(Fields::kNullableStringValue), nullableStringValue);
-    encoder.Encode(to_underlying(Fields::kOptionalStringWasPresent), optionalStringWasPresent);
-    encoder.Encode(to_underlying(Fields::kOptionalStringValue), optionalStringValue);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalStringWasPresent), nullableOptionalStringWasPresent);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalStringWasNull), nullableOptionalStringWasNull);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalStringValue), nullableOptionalStringValue);
-    encoder.Encode(to_underlying(Fields::kNullableStructWasNull), nullableStructWasNull);
-    encoder.Encode(to_underlying(Fields::kNullableStructValue), nullableStructValue);
-    encoder.Encode(to_underlying(Fields::kOptionalStructWasPresent), optionalStructWasPresent);
-    encoder.Encode(to_underlying(Fields::kOptionalStructValue), optionalStructValue);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalStructWasPresent), nullableOptionalStructWasPresent);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalStructWasNull), nullableOptionalStructWasNull);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalStructValue), nullableOptionalStructValue);
-    encoder.Encode(to_underlying(Fields::kNullableListWasNull), nullableListWasNull);
-    encoder.Encode(to_underlying(Fields::kNullableListValue), nullableListValue);
-    encoder.Encode(to_underlying(Fields::kOptionalListWasPresent), optionalListWasPresent);
-    encoder.Encode(to_underlying(Fields::kOptionalListValue), optionalListValue);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalListWasPresent), nullableOptionalListWasPresent);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalListWasNull), nullableOptionalListWasNull);
-    encoder.Encode(to_underlying(Fields::kNullableOptionalListValue), nullableOptionalListValue);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kNullableIntWasNull), nullableIntWasNull);
@@ -809,17 +693,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestNestedStructArgumentRequest.
 namespace BooleanResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kValue), value);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kValue), value);
@@ -875,17 +749,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestListStructArgumentRequest.
 namespace SimpleStructResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kArg1), arg1);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kArg1), arg1);
@@ -941,17 +805,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestListInt8UArgumentRequest.
 namespace TestEmitTestEventResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kValue), value);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kValue), value);
@@ -1007,17 +861,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestNestedStructListArgumentRequest.
 namespace TestEmitTestFabricScopedEventResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kValue), value);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kValue), value);
@@ -1073,17 +917,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestListNestedStructListArgumentRequest.
 namespace TestBatchHelperResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kBuffer), buffer);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kBuffer), buffer);
@@ -1139,17 +973,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestListInt8UReverseRequest.
 namespace StringEchoResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kPayload), payload);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kPayload), payload);
@@ -1210,18 +1034,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestEnumsRequest.
 namespace GlobalEchoResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kField1), field1);
-    encoder.Encode(to_underlying(Fields::kField2), field2);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kField1), field1);
@@ -1674,18 +1487,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestDifferentVendorMeiRequest.
 namespace TestDifferentVendorMeiResponse {
 
-template <>
-CHIP_ERROR Type::Encode<false /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kArg1), arg1);
-    encoder.Encode(to_underlying(Fields::kEventNumber), eventNumber);
-    return encoder.Finalize();
-}
-
-template <>
-CHIP_ERROR Type::Encode<true /* needsAccessingFabricIndex */>(TLV::TLVWriter & aWriter, TLV::Tag aTag,
-                                                              FabricIndex aAccessingFabricIndex) const
+CHIP_ERROR Type::Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kArg1), arg1);

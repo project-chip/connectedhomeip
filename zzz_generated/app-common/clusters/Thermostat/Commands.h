@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -143,8 +144,6 @@ enum class Fields : uint8_t
 
 struct Type
 {
-    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
-
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetWeeklyScheduleResponse::Id; }
@@ -156,13 +155,7 @@ public:
     chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
     DataModel::List<const Structs::WeeklyScheduleTransitionStruct::Type> transitions;
 
-    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -376,8 +369,6 @@ enum class Fields : uint8_t
 
 struct Type
 {
-    static constexpr bool kNeedAccessingFabricIndexToEncode = false;
-
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AtomicResponse::Id; }
@@ -388,13 +379,7 @@ public:
     DataModel::List<const Globals::Structs::AtomicAttributeStatusStruct::Type> attributeStatus;
     Optional<uint16_t> timeout;
 
-    template <bool needsAccessingFabricIndex                    = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<!needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    template <bool needsAccessingFabricIndex                   = kNeedAccessingFabricIndexToEncode,
-              std::enable_if_t<needsAccessingFabricIndex, int> = 0>
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 

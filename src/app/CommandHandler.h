@@ -302,9 +302,9 @@ protected:
     public:
         EncodableResponseCommandPayload(const CommandData & value) : mValue(value) {}
 
-        CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const final
+        CHIP_ERROR EncodeTo(DataModel::TLVWriterWithAccessingFabricIndex & writer, TLV::Tag tag) const final
         {
-            return DataModel::EncodeResponseCommandPayload(writer, tag, aAccessingFabricIndex, mValue);
+            return DataModel::EncodeResponseCommandPayload(writer, tag, mValue);
         }
 
         CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const final
