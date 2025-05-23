@@ -57,8 +57,8 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            - name: Update Zephyr version 3.7.0 (develop) to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py deb9deef8014c14dff216ec80da7c79d9d6204d3"
+            # - name: Update Zephyr version 3.7.0 (develop) to specific revision (for developers purpose)
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py deb9deef8014c14dff216ec80da7c79d9d6204d3"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
@@ -193,7 +193,8 @@ jobs:
               run: rm -rf ./out/telink*
 
             - name: Build example Telink (tl721x) Lighting App with TFLM
-              # Run test for master and all PRs
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x-light-tflm-newlib' build"
@@ -390,8 +391,8 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 0457e76f4b5f66ba7fb3ba13d1f90204e4da8b7e"
+            # - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 0457e76f4b5f66ba7fb3ba13d1f90204e4da8b7e"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
@@ -539,7 +540,8 @@ jobs:
               run: rm -rf ./out/telink*
 
             - name: Build example Telink (tl721x) Lighting App with TFLM
-              # Run test for master and all PRs
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x-light-tflm' build"
