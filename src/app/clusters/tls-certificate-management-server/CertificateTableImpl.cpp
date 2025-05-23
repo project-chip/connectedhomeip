@@ -21,15 +21,26 @@
 #include <stdlib.h>
 
 using namespace chip;
-using namespace chip::scenes;
 using namespace chip::app::Storage;
 using namespace chip::app::Clusters::Tls;
-using namespace chip:app::Clusters::TlsCertificateManagement::Structs;
+using namespace chip::app::Clusters::TlsCertificateManagement::Structs;
 
-using RootSerializer      = DefaultSerializer<TLSCAID, CertificateTable::RootCertStruct>;
-using ClientSerializer    = DefaultSerializer<TLSCCDID, CertificateTable::ClientCertStruct>;
+using RootSerializer   = DefaultSerializer<CertificateId, CertificateTable::RootCertStruct>;
+using ClientSerializer = DefaultSerializer<CertificateId, CertificateTable::ClientCertStruct>;
 
-typdef uint8_t IntermediateCertIndex;
+typedef uint8_t IntermediateCertIndex;
+
+namespace {
+/// @brief Tags Used to serialize certificates so they can be stored in flash memory;
+/// the field IDs from TlsCertificateManagement::Structs are generally used directly
+/// kCertificateId: Tag for the certificate ID
+/// kClientCertificateCount: Tag for the number of client certificates stored
+enum class TagCertificate : uint8_t
+{
+    kCertificateId,
+    kClientCertificateCount
+};
+} // namespace
 
 //
 // CertificateTable::RootCertStruct storage template specialization
@@ -79,9 +90,42 @@ constexpr size_t RootSerializer::kFabricMaxBytes()
     return 128;
 }
 
-template class chip::app::Storage::FabricTableImpl<TLSCAID, CertificateTable::RootCertStruct, 0>;
-using RootCertFabricData =
-    FabricEntryData<TLSCAID, CertificateTable::RootCertStruct, RootSerializer::kEntryMaxBytes(), RootSerializer::kFabricMaxBytes(), kMaxScenesPerFabric>;
+template <>
+CHIP_ERROR RootSerializer::SerializeId(TLV::TLVWriter & writer, const CertificateId & id)
+{
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagCertificate::kCertificateId), id.mCertificateId));
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR RootSerializer::DeserializeId(TLV::TLVReader & reader, CertificateId & id)
+{
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kCertificateId)));
+    ReturnErrorOnFailure(reader.Get(id.mCertificateId));
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR RootSerializer::SerializeData(TLV::TLVWriter & writer, const CertificateTable::RootCertStruct & data)
+{
+    return data.EncodeForWrite(writer, TLV::AnonymousTag());
+}
+
+template <>
+CHIP_ERROR RootSerializer::DeserializeData(TLV::TLVReader & reader, CertificateTable::RootCertStruct & data)
+{
+    return data.Decode(reader);
+}
+
+template <>
+void RootSerializer::Clear(CertificateTable::RootCertStruct & data)
+{
+    new (&data) CertificateTable::RootCertStruct();
+}
+
+template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct, 0>;
+using RootCertFabricData = FabricEntryData<CertificateId, CertificateTable::RootCertStruct, RootSerializer::kEntryMaxBytes(),
+                                           RootSerializer::kFabricMaxBytes(), kMaxRootCertificatesPerFabric>;
 
 //
 // CertificateTable::ClientCertStruct storage template specialization
@@ -106,19 +150,19 @@ StorageKeyName ClientSerializer::FabricEntryKey(FabricIndex fabric, EndpointId e
 }
 
 template <>
-constexpr size_t RootSerializer::kEntryMaxBytes()
+constexpr size_t ClientSerializer::kEntryMaxBytes()
 {
     return CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES;
 }
 
 template <>
-constexpr uint16_t RootSerializer::kMaxPerFabric()
+constexpr uint16_t ClientSerializer::kMaxPerFabric()
 {
     return kMaxClientCertificatesPerFabric;
 }
 
 template <>
-constexpr uint16_t RootSerializer::kMaxPerEndpoint()
+constexpr uint16_t ClientSerializer::kMaxPerEndpoint()
 {
     return kMaxCertificatesPerEndpoint;
 }
@@ -126,61 +170,56 @@ constexpr uint16_t RootSerializer::kMaxPerEndpoint()
 // Serialized TLV length is 88 bytes, 128 bytes gives some slack.  Calculated using
 // writer.GetLengthWritten after calling Serialize method of ClientCertFabricData
 template <>
-constexpr size_t RootSerializer::kFabricMaxBytes()
+constexpr size_t ClientSerializer::kFabricMaxBytes()
 {
     return 128;
 }
 
-// Serializes & deserializes individual intermediate certificate entries from TLSClientCertificateDetailStruct
-struct IntermediateCertificateEntry : DataAccessor
+template <>
+CHIP_ERROR ClientSerializer::SerializeId(TLV::TLVWriter & writer, const CertificateId & id)
 {
-    EndpointId endpoint_id   = kInvalidEndpointId;
-    FabricIndex fabric_index = kUndefinedFabricIndex;
-    EntryIndex cert_index    = 0;
-    IntermediateCertIndex intermediate_index = 0;
-    bool first               = true;
-    CertificateTable::ClientCertStruct& mEntry;
+    return writer.Put(TLV::ContextTag(TagCertificate::kCertificateId), id.mCertificateId);
+}
 
-    IntermediateCertificateEntry(EndpointId endpoint, FabricIndex fabric, TableEntry& entry, EntryIndex idx = 0) :
-        endpoint_id(endpoint), fabric_index(fabric), index(idx), mEntry(entry)
-    {}
+template <>
+CHIP_ERROR ClientSerializer::DeserializeId(TLV::TLVReader & reader, CertificateId & id)
+{
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kCertificateId)));
+    return reader.Get(id.mCertificateId);
+}
 
-    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
-    {
-        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
-        VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);
-        key = DefaultStorageKeyAllocator::TlsClientCertEntityIntermediateKey(fabric_index, endpoint_id, cert_index, intermediate_index);
-        return CHIP_NO_ERROR;
-    }
+template <>
+CHIP_ERROR ClientSerializer::SerializeData(TLV::TLVWriter & writer, const CertificateTable::ClientCertStruct & data)
+{
+    // TLSClientCertificateDetailStruct has an array, doesn't implement Encode; copy-pasted here
+    // from TLSClientCertificateDetailStruct::Type::Encode
 
-    void Clear() override { this->mEntry.mStorageData.Clear(); }
+    using chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Fields;
+    TLV::TLVType container;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kCcdid), data.ccdid));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kClientCertificate), data.clientCertificate));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(Fields::kIntermediateCertificates), data.intermediateCertificates));
+    // Fields::kFabricIndex filled from table in GetClientCertificateEntry
+    return writer.EndContainer(container);
+}
 
-    CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
-    {
-        TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
+template <>
+CHIP_ERROR ClientSerializer::DeserializeData(TLV::TLVReader & reader, CertificateTable::ClientCertStruct & data)
+{
+    return data.Decode(reader);
+}
 
-        ReturnErrorOnFailure(Serializer::SerializeData(writer, this->mEntry.mStorageData));
+template <>
+void ClientSerializer::Clear(CertificateTable::ClientCertStruct & data)
+{
+    new (&data) CertificateTable::ClientCertStruct();
+}
 
-        return writer.EndContainer(container);
-    }
-
-    CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
-    {
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-        TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        ReturnErrorOnFailure(Serializer::DeserializeData(reader, this->mEntry.mStorageData));
-
-        return reader.ExitContainer(container);
-    }
-};
-
-template class chip::app::Storage::FabricTableImpl<TLSCCDID, CertificateTable::ClientCertStruct, 0>;
-using ClientCertFabricData =
-    FabricEntryData<TLSCCDID, CertificateTable::ClientCertStruct, RootSerializer::kEntryMaxBytes(), RootSerializer::kFabricMaxBytes(), kMaxScenesPerFabric>;
+template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct, 0>;
+using ClientCertFabricData = FabricEntryData<CertificateId, CertificateTable::ClientCertStruct, ClientSerializer::kEntryMaxBytes(),
+                                             ClientSerializer::kFabricMaxBytes(), kMaxClientCertificatesPerFabric>;
 
 //
 // CertificateTableImpl implementation
@@ -189,6 +228,7 @@ CHIP_ERROR CertificateTableImpl::Init(PersistentStorageDelegate & storage)
 {
     ReturnErrorOnFailure(mRootCertificates.Init(storage));
     ReturnErrorOnFailure(mClientCertificates.Init(storage));
+    return CHIP_NO_ERROR;
 }
 
 void CertificateTableImpl::Finish()
@@ -197,27 +237,37 @@ void CertificateTableImpl::Finish()
     mClientCertificates.Finish();
 }
 
-
 void CertificateTableImpl::SetEndpoint(EndpointId endpoint)
 {
     mRootCertificates.SetEndpoint(endpoint);
-    mClientCertificates.SetEndpoint(endpoint);
     mRootCertificates.SetTableSize(kMaxCertificatesPerEndpoint, kMaxRootCertificatesPerFabric);
+    mClientCertificates.SetEndpoint(endpoint);
     mClientCertificates.SetTableSize(kMaxCertificatesPerEndpoint, kMaxClientCertificatesPerFabric);
 }
 
-CHIP_ERROR CertificateTableImpl::GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, CertificateTable::RootCertStruct & entry)
+CHIP_ERROR CertificateTableImpl::GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry)
 {
+    CertificateId id(certificate_id);
+    return mRootCertificates.GetTableEntry(fabric_index, id, entry.cert, entry.buffer);
 }
 
 CHIP_ERROR CertificateTableImpl::HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id)
 {
+    CertificateId id(certificate_id);
+    EntryIndex unused;
+    return mRootCertificates.FindTableEntry(fabric_index, id, unused);
 }
 
-CHIP_ERROR CertificateTableImpl::GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, CertificateTable::ClientCertStruct & entry)
+CHIP_ERROR CertificateTableImpl::GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id,
+                                                           BufferedClientCert & entry)
 {
+    CertificateId id(certificate_id);
+    return mClientCertificates.GetTableEntry(fabric_index, id, entry.cert, entry.buffer);
 }
 
 CHIP_ERROR CertificateTableImpl::HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id)
 {
+    CertificateId id(certificate_id);
+    EntryIndex unused;
+    return mClientCertificates.FindTableEntry(fabric_index, id, unused);
 }

@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("all-clusters-common") {
+  public_deps = [ "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table" ]
   zap_file = "all-clusters-app.zap"
   is_server = true
 }

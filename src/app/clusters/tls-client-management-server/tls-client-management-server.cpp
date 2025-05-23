@@ -41,9 +41,11 @@ using namespace chip::app::Clusters::TlsClientManagement::Structs;
 using namespace chip::app::Clusters::TlsClientManagement::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-TlsClientManagementServer::TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate, CertificateTable & certificateTable) :
+TlsClientManagementServer::TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate,
+                                                     CertificateTable & certificateTable) :
     AttributeAccessInterface(MakeOptional(endpointId), TlsClientManagement::Id),
-    CommandHandlerInterface(MakeOptional(endpointId), TlsClientManagement::Id), mDelegate(delegate), mCertificateTable(certificateTable), mMaxProvisioned(0)
+    CommandHandlerInterface(MakeOptional(endpointId), TlsClientManagement::Id), mDelegate(delegate),
+    mCertificateTable(certificateTable), mMaxProvisioned(0)
 {
     mDelegate.SetTlsClientManagementServer(this);
 }
@@ -70,7 +72,6 @@ CHIP_ERROR TlsClientManagementServer::Init()
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR TlsClientManagementServer::Finish()
 {
     mCertificateTable.Finish();
@@ -90,9 +91,8 @@ void TlsClientManagementServer::LoadPersistentAttributes()
     else
     {
         // otherwise defaults
-        ChipLogDetail(
-            Zcl, "TlsClientManagement: Unable to load the MaxProvisioned attribute from the KVS. Defaulting to %u",
-            mMaxProvisioned);
+        ChipLogDetail(Zcl, "TlsClientManagement: Unable to load the MaxProvisioned attribute from the KVS. Defaulting to %u",
+                      mMaxProvisioned);
     }
 }
 
@@ -107,8 +107,11 @@ CHIP_ERROR TlsClientManagementServer::Read(const ConcreteReadAttributePath & aPa
         return aEncoder.Encode(mMaxProvisioned);
     case ProvisionedEndpoints::Id:
         TlsClientManagementServer * server = this;
-        CHIP_ERROR err =
-            aEncoder.EncodeList([server](const auto & encoder) -> CHIP_ERROR { return server->EncodeProvisionedEndpoints(encoder); });
+        auto matterEndpoint                = aPath.mEndpointId;
+        auto fabric                        = aEncoder.AccessingFabricIndex();
+        CHIP_ERROR err = aEncoder.EncodeList([server, matterEndpoint, fabric](const auto & encoder) -> CHIP_ERROR {
+            return server->EncodeProvisionedEndpoints(matterEndpoint, fabric, encoder);
+        });
         return err;
     }
 
@@ -120,15 +123,16 @@ uint8_t TlsClientManagementServer::GetMaxProvisioned() const
     return mMaxProvisioned;
 }
 
-// helper method to get the TlsClientManagement Sounds one by one and encode into a list
+// helper method to get the TlsClientManagement provisioned endpoints encoded into a list
 CHIP_ERROR
-TlsClientManagementServer::EncodeProvisionedEndpoints(const AttributeValueEncoder::ListEncodeHelper & encoder)
+TlsClientManagementServer::EncodeProvisionedEndpoints(EndpointId matterEndpoint, FabricIndex fabric,
+                                                      const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     for (uint8_t i = 0; true; i++)
     {
         TLSEndpointStruct::Type endpoint;
 
-        auto err = mDelegate.GetProvisionedEndpointByIndex(i, endpoint);
+        auto err = mDelegate.GetProvisionedEndpointByIndex(matterEndpoint, fabric, i, endpoint);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             return CHIP_NO_ERROR;
@@ -199,19 +203,23 @@ void TlsClientManagementServer::InvokeCommand(HandlerContext & ctx)
     }
 }
 
-
-void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx, const Commands::ProvisionEndpoint::DecodableType & req)
+void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx,
+                                                        const Commands::ProvisionEndpoint::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsClientManagement: ProvisionEndpoint");
 
     Commands::ProvisionEndpointResponse::Type response;
-    Status status = mDelegate.ProvisionEndpoint(req, response.endpointID);
+    Status status = mDelegate.ProvisionEndpoint(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req,
+                                                response.endpointID);
 
-    if (status == Protocols::InteractionModel::Status::Success) {
+    if (status == Protocols::InteractionModel::Status::Success)
+    {
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    } else {
+    }
+    else
+    {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        }
+    }
 }
 
 void TlsClientManagementServer::HandleFindEndpoint(HandlerContext & ctx, const Commands::FindEndpoint::DecodableType & req)
@@ -219,20 +227,24 @@ void TlsClientManagementServer::HandleFindEndpoint(HandlerContext & ctx, const C
     ChipLogDetail(Zcl, "TlsClientManagement: FindEndpoint");
 
     Commands::FindEndpointResponse::Type response;
-    Status status = mDelegate.FindProvisionedEndpointByID(req.endpointID, response.endpoint);
+    Status status = mDelegate.FindProvisionedEndpointByID(ctx.mRequestPath.mEndpointId, req.endpointID, response.endpoint);
 
-    if (status == Protocols::InteractionModel::Status::Success) {
+    if (status == Protocols::InteractionModel::Status::Success)
+    {
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    } else {
+    }
+    else
+    {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        }
+    }
 }
 
 void TlsClientManagementServer::HandleRemoveEndpoint(HandlerContext & ctx, const Commands::RemoveEndpoint::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsClientManagement: RemoveEndpoint");
 
-    Status status = mDelegate.RemoveProvisionedEndpointByID(req.endpointID);
+    Status status = mDelegate.RemoveProvisionedEndpointByID(ctx.mRequestPath.mEndpointId,
+                                                            ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 

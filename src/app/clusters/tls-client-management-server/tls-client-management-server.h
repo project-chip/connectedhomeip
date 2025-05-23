@@ -45,7 +45,8 @@ public:
      * @param certificateTable A reference to the certificate table for looking up certiciates
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate, Tls::CertificateTable & certificateTable);
+    TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate,
+                              Tls::CertificateTable & certificateTable);
     ~TlsClientManagementServer();
 
     /**
@@ -102,7 +103,8 @@ private:
     void LoadPersistentAttributes();
 
     // Encodes all provisioned endpoints
-    CHIP_ERROR EncodeProvisionedEndpoints(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR EncodeProvisionedEndpoints(EndpointId matterEndpoint, FabricIndex fabric,
+                                          const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
 /** @brief
@@ -119,42 +121,54 @@ public:
 
     /**
      * @brief Get the TLSEndpointStruct at a given index
-     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric to query against
      * @param[in] index The index of the endpoint in the list.
      * @param[out] endpoint The endpoint at the given index in the list.
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the preset types list.
      */
-    virtual CHIP_ERROR GetProvisionedEndpointByIndex(size_t index, EndpointStructType& endpoint) = 0;
+    virtual CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
+                                                     EndpointStructType & endpoint) = 0;
 
     /**
      * @brief Finds the TLSEndpointStruct with the given EndpointID
      *
+     * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] endpointID The EndpoitnID to find.
      * @param[out] endpoint The endpoint at the given index in the list.
      * @return NOT_FOUND if no mapping is found.
      */
-    virtual Protocols::InteractionModel::Status FindProvisionedEndpointByID(uint16_t endpointID, EndpointStructType & endpoint) = 0;
+    virtual Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                            uint16_t endpointID, EndpointStructType & endpoint) = 0;
 
     /**
      * @brief Appends a TLSEndpointStruct to the provisioned endpoints list maintained by the delegate.
      *        The delegate must ensure it makes a copy of the provided preset and the data
      *        of its preset handle, if any.
      *
-     * @param[in] endpoint The endpoint to add to the list.
-     * @param[out] endpointID a reference to the uint16_t variable that is to contain the EndpointID value.
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the endpoint is associated with
+     * @param[in] provisionReq The request data specifying the endpoint to be provisioned
+     * @param[out] endpointID a reference to the uint16_t variable that is to contain the ID of the provisioned endpoint.
      *
      * @return CHIP_NO_ERROR if the endpoint was appended to the list successfully.
      * @return CHIP_ERROR if there was an error adding the endpoint to the list.
      */
-    virtual Protocols::InteractionModel::Status ProvisionEndpoint(const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & endpoint, uint16_t & endpointID) = 0;
+    virtual Protocols::InteractionModel::Status
+    ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
+                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq,
+                      uint16_t & endpointID) = 0;
 
     /**
      * @brief Removes the TLSEndpointStruct with the given EndpointID
      *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric to query against
      * @param[in] endpointID The ID of the endpoint to remove.
      * @return NOT_FOUND if no mapping is found.
      */
-    virtual Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(uint16_t endpointID) = 0;
+    virtual Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                              uint16_t endpointID) = 0;
 
 protected:
     friend class TlsClientManagementServer;
