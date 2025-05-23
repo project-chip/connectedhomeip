@@ -87,6 +87,8 @@ public:
     /////////// RemoteDataModelLoggerDelegate interface /////////
     CHIP_ERROR LogJSON(const char * json) override;
 
+    void StopCommand();
+
 private:
     WebSocketServer mWebSocketServer;
     chip::Optional<uint16_t> mPort;

@@ -621,11 +621,20 @@ public:
      **/
     const P256PublicKey & Pubkey() const override { return mPublicKey; }
 
+#if CHIP_WITH_NLFAULTINJECTION
+    P256PublicKey & TestOnlyMutablePubkey() { return mPublicKey; }
+#endif
+
     /** Release resources associated with this key pair */
     void Clear();
 
 protected:
+#if CHIP_WITH_NLFAULTINJECTION
+    mutable P256PublicKey mPublicKey;
+#else
     P256PublicKey mPublicKey;
+#endif
+    // P256PublicKey mPublicKey;
     mutable P256KeypairContext mKeypair;
     bool mInitialized = false;
 };
