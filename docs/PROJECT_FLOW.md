@@ -12,13 +12,13 @@ general, all work contributed to the repository in the form of pull requests
 in some cases duplicative, so consider these guidelines when deciding whether
 you can get away with not creating an issue:
 
-- Trivial fixes: issues can function as TODO lists, simple reminders that
+-   Trivial fixes: issues can function as TODO lists, simple reminders that
     something should be addressed. Sometimes, though, the work required to fix
     is smaller than the work required to write the issue.
-- Issues intended to be addressed by a PR may not actually be fixed or may
+-   Issues intended to be addressed by a PR may not actually be fixed or may
     regress.
-- Issues can span PRs (as PRs should be as small as possible, but no smaller).
-- Issues help form an important basis for release notes. Any PR that addresses
+-   Issues can span PRs (as PRs should be as small as possible, but no smaller).
+-   Issues help form an important basis for release notes. Any PR that addresses
     a problem that should have release visibility, please do open an issue.
 
 ### Pull requests
