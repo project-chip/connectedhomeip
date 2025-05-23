@@ -70,7 +70,6 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadAdministratorFabricIndex(AttributeValueEncoder & aEncoder);
 };
 
 JointFabricAdministratorAttrAccess gJointFabricAdministratorAttrAccess;
@@ -81,19 +80,11 @@ CHIP_ERROR JointFabricAdministratorAttrAccess::Read(const ConcreteReadAttributeP
 
     switch (aPath.mAttributeId)
     {
-    case JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id: {
-        return ReadAdministratorFabricIndex(aEncoder);
-    }
     default:
         break;
     }
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR JointFabricAdministratorAttrAccess::ReadAdministratorFabricIndex(AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.Encode(Server::GetInstance().GetJointFabricDatastore().GetAdministratorFabricIndex());
 }
 
 void MatterJointFabricAdministratorPluginServerInitCallback()
@@ -126,14 +117,66 @@ bool emberAfJointFabricAdministratorClusterAddICACCallback(
     return true;
 }
 
-// TODO
 bool emberAfJointFabricAdministratorClusterOpenJointCommissioningWindowCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricAdministrator::Commands::OpenJointCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenJointCommissioningWindow", "JointFabricAdministrator");
+    auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
+    auto & pakeVerifier       = commandData.PAKEPasscodeVerifier;
+    auto & discriminator      = commandData.discriminator;
+    auto & iterations         = commandData.iterations;
+    auto & salt               = commandData.salt;
+
+    Optional<AdministratorCommissioning::StatusCode> status = Optional<AdministratorCommissioning::StatusCode>::Missing();
+    Status globalStatus                                     = Status::Success;
+    Spake2pVerifier verifier;
 
     ChipLogProgress(Zcl, "Received command to open joint commissioning window");
+
+    FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
+    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
+    auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
+
+    VerifyOrExit(fabricInfo != nullptr, status.Emplace(AdministratorCommissioning::StatusCode::kPAKEParameterError));
+    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(AdministratorCommissioning::StatusCode::kBusy));
+
+    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(AdministratorCommissioning::StatusCode::kBusy));
+    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations,
+                 status.Emplace(AdministratorCommissioning::StatusCode::kPAKEParameterError));
+    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations,
+                 status.Emplace(AdministratorCommissioning::StatusCode::kPAKEParameterError));
+    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length,
+                 status.Emplace(AdministratorCommissioning::StatusCode::kPAKEParameterError));
+    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+                 status.Emplace(AdministratorCommissioning::StatusCode::kPAKEParameterError));
+    VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(), globalStatus = Status::InvalidCommand);
+    VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), globalStatus = Status::InvalidCommand);
+    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, globalStatus = Status::InvalidCommand);
+
+    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR,
+                 status.Emplace(AdministratorCommissioning::StatusCode::kPAKEParameterError));
+    VerifyOrExit(commissionMgr.OpenJointCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt,
+                                                            fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
+                 status.Emplace(AdministratorCommissioning::StatusCode::kPAKEParameterError));
+    ChipLogProgress(Zcl, "Commissioning window is now open");
+
+exit:
+    if (status.HasValue())
+    {
+        ChipLogError(Zcl, "Failed to open joint commissioning window. Cluster status 0x%02x", to_underlying(status.Value()));
+        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(status.Value()));
+    }
+    else
+    {
+        if (globalStatus != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to open joint commissioning window. Global status " ChipLogFormatIMStatus,
+                         ChipLogValueIMStatus(globalStatus));
+        }
+        commandObj->AddStatus(commandPath, globalStatus);
+    }
 
     return true;
 }

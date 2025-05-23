@@ -23,6 +23,7 @@
 #include "commands/pairing/GetCommissionerRootCertificateCommand.h"
 #include "commands/pairing/IssueNOCChainCommand.h"
 #include "commands/pairing/OpenCommissioningWindowCommand.h"
+#include "commands/pairing/OpenJointCommissioningWindowCommand.h"
 #include "commands/pairing/PairingCommand.h"
 
 #include <app/server/Dnssd.h>
@@ -272,6 +273,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
+        make_unique<OpenJointCommissioningWindowCommand>(credsIssuerConfig),
         make_unique<GetCommissionerNodeIdCommand>(credsIssuerConfig),
         make_unique<GetCommissionerRootCertificateCommand>(credsIssuerConfig),
         make_unique<IssueNOCChainCommand>(credsIssuerConfig),

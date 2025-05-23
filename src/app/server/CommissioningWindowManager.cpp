@@ -119,6 +119,7 @@ void CommissioningWindowManager::Shutdown()
 void CommissioningWindowManager::ResetState()
 {
     mUseECM = false;
+    mJCM    = false;
 
     mECMDiscriminator = 0;
     mECMIterations    = 0;
@@ -388,6 +389,14 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds32
     }
 
     return err;
+}
+
+CHIP_ERROR CommissioningWindowManager::OpenJointCommissioningWindow(Seconds32 commissioningTimeout, uint16_t discriminator,
+                                                                    Spake2pVerifier & verifier, uint32_t iterations, ByteSpan salt,
+                                                                    FabricIndex fabricIndex, VendorId vendorId)
+{
+    SetJCM(true);
+    return OpenEnhancedCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt, fabricIndex, vendorId);
 }
 
 void CommissioningWindowManager::CloseCommissioningWindow()

@@ -47,6 +47,7 @@ static constexpr size_t kKeyDeviceNameMaxLength           = 32;
 static constexpr size_t kKeyRotatingDeviceIdMaxLength     = 100;
 static constexpr size_t kKeyPairingInstructionMaxLength   = 128;
 static constexpr size_t kKeyPairingHintMaxLength          = 10;
+static constexpr size_t kKeyJointFabricModeMaxLength      = 3;
 static constexpr size_t kKeyCommissionerPasscodeMaxLength = 1;
 
 enum class TxtKeyUse : uint8_t
@@ -73,6 +74,7 @@ enum class TxtFieldKey : uint8_t
     kSessionActiveThreshold,
     kTcpSupported,
     kLongIdleTimeICD,
+    kJointFabricMode,
     kCount,
 };
 
@@ -101,6 +103,7 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { kKeySessionActiveThresholdMaxLength, TxtFieldKey::kSessionActiveThreshold, TxtKeyUse::kCommon, "SAT" },
     { kKeyTcpSupportedMaxLength, TxtFieldKey::kTcpSupported, TxtKeyUse::kCommon, "T" },
     { kKeyLongIdleTimeICDMaxLength, TxtFieldKey::kLongIdleTimeICD, TxtKeyUse::kCommon, "ICD" },
+    { kKeyJointFabricModeMaxLength, TxtFieldKey::kJointFabricMode, TxtKeyUse::kCommission, "JF" },
 };
 #ifdef CHIP_CONFIG_TEST
 
