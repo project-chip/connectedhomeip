@@ -2,14 +2,14 @@
 
 The following checklist can be used to write a new cluster
 
-- Generate the XML based on the specification
-- Define a new `src/app/clusters/<cluster-name>` folder for the cluster code
+-   Generate the XML based on the specification
+-   Define a new `src/app/clusters/<cluster-name>` folder for the cluster code
     and integrate this into the build system
-- Implement cluster logic and unit tests under the new folder
-- Integrate the cluster into an example application
-  - Add codegen-integration support for the cluster
-  - integrate into an example app (e.g. all-clusters app)
-- Add integration tests for the new cluster
+-   Implement cluster logic and unit tests under the new folder
+-   Integrate the cluster into an example application
+    -   Add codegen-integration support for the cluster
+    -   integrate into an example app (e.g. all-clusters app)
+-   Add integration tests for the new cluster
 
 ## Cluster definitions
 
@@ -45,20 +45,20 @@ see how an existing cluster implements this such as
 
 You will generally have 2 major classes:
 
-- `ClusterLogic` is intended to be type-safe implementation of the cluster.
-  - It contains all the logic for the cluster
-  - It contains all attribute storage for the cluster
-  - Is unit tested
-- `ClusterImplementation` that provides a translation between value
+-   `ClusterLogic` is intended to be type-safe implementation of the cluster.
+    -   It contains all the logic for the cluster
+    -   It contains all attribute storage for the cluster
+    -   Is unit tested
+-   `ClusterImplementation` that provides a translation between value
     encoders/decoders and a `ClusterLogic`
 
-  - This implements
+    -   This implements
         [DefaultServerCluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/DefaultServerCluster.h#L36)
         or more generally the
         [ServerClusterInterface](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterInterface.h#L41)
         interface.
 
-- (optional) a `ClusterDriver` that provides callbacks to an application for
+-   (optional) a `ClusterDriver` that provides callbacks to an application for
     cluster interactions. Within the sdk the name `Delegate` is often used,
     however since the delegate term is often overloaded, we suggest using the
     term `Driver` for this.
@@ -104,12 +104,12 @@ When using code generation for applications (i.e. a `*.zap` file), every
 application will have a source set that explicitly defines enabled items. To
 integrate with the following changes are needed:
 
-- create a `CodegenIntegration.cpp` file intended to make use of these
+-   create a `CodegenIntegration.cpp` file intended to make use of these
     application static configuration.
-- Add build system files: `app_config_dependent_sources.gni` and
+-   Add build system files: `app_config_dependent_sources.gni` and
     `app_config_dependent_sources.cmake` that contains this file and additional
     dependencies. See existing clusters for content.
-- Make use of static configuration data as described below
+-   Make use of static configuration data as described below
 
 #### Cluster-specific application configuration
 
@@ -118,11 +118,11 @@ These are generated files available for include as
 [ServerClusterConfig.jinja](https://github.com/project-chip/connectedhomeip/blob/master/scripts/py_matter_idl/matter/idl/generators/cpp/application/ServerClusterConfig.jinja)
 and provide the following information:
 
-- `chip::app::Clusters::<NAME>::kFixedClusterConfig` as an array of
+-   `chip::app::Clusters::<NAME>::kFixedClusterConfig` as an array of
     [ClusterConfiguration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/util/cluster-config.h#L39).
     Both initialization and static asserts can be done based on these
 
-- `chip::app::Clusters::<NAME>::IsAttributeEnabledOnSomeEndpoint` and
+-   `chip::app::Clusters::<NAME>::IsAttributeEnabledOnSomeEndpoint` and
     `chip::app::Clusters::<NAME>::IsCommandEnabledOnSomeEndpoint` are available
     to check if a specific item is enabled on _any_ endpoint. This can be useful
     for dynamic cluster support for code generation (e.g. to define the maximal
@@ -133,28 +133,28 @@ Further defines are available through inclusion of
 which will include `gen_config.h` and `endpoint_config.h` as generated files
 through `ZAP`. These provide:
 
-- `CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT` as a count of dynamic endpoints
+-   `CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT` as a count of dynamic endpoints
     for the ember framework
-- `MATTER_DM_<CLUSTER_DEFINE>_ENDPOINT_COUNT` for a count of static endpoints
+-   `MATTER_DM_<CLUSTER_DEFINE>_ENDPOINT_COUNT` for a count of static endpoints
     (same as the kFixedClusterConfig array size)
-- `MATTER_DM_<CLUSTER_DEFINE>_SERVER` definition as a flag if `CLUSTER` is in
+-   `MATTER_DM_<CLUSTER_DEFINE>_SERVER` definition as a flag if `CLUSTER` is in
     use by the application at all
-- `<CLUSTER_DEFINE>_ENABLE_<CMD_DEFINE>_CMD` to define if a specific command
+-   `<CLUSTER_DEFINE>_ENABLE_<CMD_DEFINE>_CMD` to define if a specific command
     is enabled on a cluster
 
 Beyond that, the following callbacks will be available to initialize and
 shutdown clusters. Implement these as needed inside the `CodegenIntegration.cpp`
 file:
 
-- `Matter<Cluster>ClusterServerInitCallback` - single callback for
+-   `Matter<Cluster>ClusterServerInitCallback` - single callback for
     initializing the cluster
-- `emberAf<Cluster>ClusterInitCallback` and
+-   `emberAf<Cluster>ClusterInitCallback` and
     `Matter<Cluster>ServerShutdownCallback` are called on endpoint startup and
     shutdown.
 
 Optional compatibility layers:
 
-- `Matter<Cluster>ClusterServerAttributeChangedCallback` is currently called
+-   `Matter<Cluster>ClusterServerAttributeChangedCallback` is currently called
     by ember-clusters after attribute changes. Consider if this should be called
     by a `Driver` registered to the cluster.
 
