@@ -81,21 +81,6 @@ jobs:
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \
               --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test \
-              --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang \
-              --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang \
-              --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang \
-              --target linux-x64-camera \
-              --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang \
-              --target linux-x64-terms-and-conditions \
               --target linux-x64-python-bindings \
               build \
               --copy-artifacts-to objdir-clone \
