@@ -58,7 +58,7 @@ public:
     CHIP_ERROR ProcessPayload(ByteSpan & block);
     CHIP_ERROR ProcessFinalize();
     CHIP_ERROR SelectProcessor(ByteSpan & block);
-    CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
+    CHIP_ERROR RegisterProcessor(OTAProcessorTag tag, OTATlvProcessor * processor);
 
     static void FetchNextData(uint32_t context);
     static OTAMultiImageProcessorImpl & GetDefaultInstance();
