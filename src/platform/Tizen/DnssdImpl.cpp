@@ -336,7 +336,8 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
         err == CHIP_NO_ERROR,
         ChipLogError(DeviceLayer, "chip::Inet::InterfaceId::InterfaceNameToId() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    ret = dnssd_service_get_all_txt_record(service, &rCtx->mResultTxtRecordLen, reinterpret_cast<void **>(rCtx->mResultTxtRecord.out()));
+    ret = dnssd_service_get_all_txt_record(service, &rCtx->mResultTxtRecordLen,
+                                           reinterpret_cast<void **>(rCtx->mResultTxtRecord.out()));
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed: %s", get_error_message(ret)));
 

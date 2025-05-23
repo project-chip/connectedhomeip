@@ -106,7 +106,7 @@ struct ResolveContext : public GenericContext
     bool mIsResolving              = false;
 
     // Resolved service
-    DnssdService mResult               = {};
+    DnssdService mResult = {};
     GAutoPtr<uint8_t> mResultTxtRecord;
     unsigned short mResultTxtRecordLen = 0;
 
