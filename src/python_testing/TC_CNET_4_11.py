@@ -474,30 +474,41 @@ class TC_CNET_4_11(MatterBaseTest):
             connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials),
             timeout=TIMEOUT
         )
+        # Let's wait a couple of seconds to change networks
+        await asyncio.sleep(WIFI_WAIT_SECONDS)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
         self.step(13)
 
-        try:
-            networks = await asyncio.wait_for(
-                self.read_single_attribute_check_success(
-                    cluster=cnet,
-                    attribute=cnet.Attributes.Networks
-                ),
-                timeout=TIMEOUT
-            )
+        retry = 1
+        while retry <= MAX_RETRIES:
+            try:
+                networks = await asyncio.wait_for(
+                    self.read_single_attribute_check_success(
+                        cluster=cnet,
+                        attribute=cnet.Attributes.Networks
+                    ),
+                    timeout=TIMEOUT
+                )
 
-        except Exception as e:
-            logger.error(f" --- Step 13: Exception reading networks: {e}")
-            # Let's wait a couple of seconds to change networks
-            await asyncio.sleep(WIFI_WAIT_SECONDS)
-            networks = await asyncio.wait_for(
-                self.read_single_attribute_check_success(
-                    cluster=cnet,
-                    attribute=cnet.Attributes.Networks
-                ),
-                timeout=TIMEOUT
-            )
+            except Exception as e:
+                logger.error(f" --- Step 13: Exception reading networks: {e}")
+                # Let's wait a couple of seconds to change networks
+                await asyncio.sleep(WIFI_WAIT_SECONDS)
+                networks = await asyncio.wait_for(
+                    self.read_single_attribute_check_success(
+                        cluster=cnet,
+                        attribute=cnet.Attributes.Networks
+                    ),
+                    timeout=TIMEOUT
+                )
+
+            finally:
+                logger.info(f" --- Step 13: networks: {networks}")
+                if networks and networks[0].connected:
+                    break
+                else:
+                    retry += 1
 
         # Verify that the TH successfully connects to the DUT
         for idx, network in enumerate(networks):
