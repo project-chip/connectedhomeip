@@ -77,7 +77,6 @@ private:
     uint8_t mStreamUsage = 0;
 };
 
-
 class ProvideIceCandidatesCommand : public CHIPCommand
 {
 public:
