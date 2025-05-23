@@ -141,35 +141,7 @@ enum class ProductIdentifierTypeEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for WebRTCEndReasonEnum
-enum class WebRTCEndReasonEnum : uint8_t
-{
-    kIceFailed         = 0x00,
-    kIceTimeout        = 0x01,
-    kUserHangup        = 0x02,
-    kUserBusy          = 0x03,
-    kReplaced          = 0x04,
-    kNoUserMedia       = 0x05,
-    kInviteTimeout     = 0x06,
-    kAnsweredElsewhere = 0x07,
-    kOutOfResources    = 0x08,
-    kMediaTimeout      = 0x09,
-    kLowPower          = 0x0A,
-    kUnknownReason     = 0x0B,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 12,
-};
-
 // Bitmaps shared across multiple clusters.
-
-// Bitmap for WebRTCMetadataOptionsBitmap
-enum class WebRTCMetadataOptionsBitmap : uint8_t
-{
-    kDataTLV = 0x1,
-};
 
 } // namespace detail
 
@@ -508,6 +480,28 @@ enum class ThreeLevelAutoEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
+};
+
+// Enum for WebRTCEndReasonEnum
+enum class WebRTCEndReasonEnum : uint8_t
+{
+    kIceFailed         = 0x00,
+    kIceTimeout        = 0x01,
+    kUserHangup        = 0x02,
+    kUserBusy          = 0x03,
+    kReplaced          = 0x04,
+    kNoUserMedia       = 0x05,
+    kInviteTimeout     = 0x06,
+    kAnsweredElsewhere = 0x07,
+    kOutOfResources    = 0x08,
+    kMediaTimeout      = 0x09,
+    kLowPower          = 0x0A,
+    kUnknownReason     = 0x0B,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 12,
 };
 
 // Global bitmaps.

@@ -478,6 +478,25 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
 
+        class WebRTCEndReasonEnum(MatterIntEnum):
+            kIceFailed = 0x00
+            kIceTimeout = 0x01
+            kUserHangup = 0x02
+            kUserBusy = 0x03
+            kReplaced = 0x04
+            kNoUserMedia = 0x05
+            kInviteTimeout = 0x06
+            kAnsweredElsewhere = 0x07
+            kOutOfResources = 0x08
+            kMediaTimeout = 0x09
+            kLowPower = 0x0A
+            kUnknownReason = 0x0B
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 12
+
     class Bitmaps:
         class TestGlobalBitmap(IntFlag):
             kFirstBit = 0x1
@@ -568,6 +587,38 @@ class Globals:
             statusCode: 'uint' = 0
 
         @dataclass
+        class ICECandidateStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="candidate", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="SDPMid", Tag=1, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="SDPMLineIndex", Tag=2, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            candidate: 'str' = ""
+            SDPMid: 'typing.Union[Nullable, str]' = NullValue
+            SDPMLineIndex: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class ICEServerStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="URLs", Tag=0, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="username", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="credential", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="caid", Tag=3, Type=typing.Optional[uint]),
+                    ])
+
+            URLs: 'typing.List[str]' = field(default_factory=lambda: [])
+            username: 'typing.Optional[str]' = None
+            credential: 'typing.Optional[str]' = None
+            caid: 'typing.Optional[uint]' = None
+
+        @dataclass
         class LocationDescriptorStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -613,11 +664,16 @@ class Globals:
             myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
 
         @dataclass
+<<<<<<< HEAD
         class ViewportStruct(ClusterObject):
+=======
+        class WebRTCSessionStruct(ClusterObject):
+>>>>>>> master
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+<<<<<<< HEAD
                         ClusterObjectFieldDescriptor(Label="x1", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="y1", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="x2", Tag=2, Type=uint),
@@ -628,6 +684,26 @@ class Globals:
             y1: 'uint' = 0
             x2: 'uint' = 0
             y2: 'uint' = 0
+=======
+                        ClusterObjectFieldDescriptor(Label="id", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=Globals.Enums.StreamUsageEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            id: 'uint' = 0
+            peerNodeID: 'uint' = 0
+            peerEndpointID: 'uint' = 0
+            streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
+            videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            metadataEnabled: 'typing.Optional[bool]' = None
+            fabricIndex: 'uint' = 0
+>>>>>>> master
 
 
 
@@ -45912,6 +45988,7 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="twoWayTalkSupport", Tag=0x00000009, Type=CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum),
                 ClusterObjectFieldDescriptor(Label="snapshotCapabilities", Tag=0x0000000A, Type=typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]),
                 ClusterObjectFieldDescriptor(Label="maxNetworkBandwidth", Tag=0x0000000B, Type=uint),
+<<<<<<< HEAD
                 ClusterObjectFieldDescriptor(Label="currentFrameRate", Tag=0x0000000C, Type=uint),
                 ClusterObjectFieldDescriptor(Label="HDRModeEnabled", Tag=0x0000000D, Type=bool),
                 ClusterObjectFieldDescriptor(Label="supportedStreamUsages", Tag=0x0000000E, Type=typing.List[Globals.Enums.StreamUsageEnum]),
@@ -45941,6 +46018,37 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="localSnapshotRecordingEnabled", Tag=0x00000026, Type=bool),
                 ClusterObjectFieldDescriptor(Label="statusLightEnabled", Tag=0x00000027, Type=bool),
                 ClusterObjectFieldDescriptor(Label="statusLightBrightness", Tag=0x00000028, Type=Globals.Enums.ThreeLevelAutoEnum),
+=======
+                ClusterObjectFieldDescriptor(Label="currentFrameRate", Tag=0x0000000C, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="HDRModeEnabled", Tag=0x0000000D, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="supportedStreamUsages", Tag=0x0000000E, Type=typing.List[Globals.Enums.StreamUsageEnum]),
+                ClusterObjectFieldDescriptor(Label="allocatedVideoStreams", Tag=0x0000000F, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="allocatedAudioStreams", Tag=0x00000010, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="allocatedSnapshotStreams", Tag=0x00000011, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="rankedVideoStreamPrioritiesList", Tag=0x00000012, Type=typing.Optional[typing.List[Globals.Enums.StreamUsageEnum]]),
+                ClusterObjectFieldDescriptor(Label="softRecordingPrivacyModeEnabled", Tag=0x00000013, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="softLivestreamPrivacyModeEnabled", Tag=0x00000014, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="hardPrivacyModeOn", Tag=0x00000015, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="nightVision", Tag=0x00000016, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="nightVisionIllum", Tag=0x00000017, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="viewport", Tag=0x00000018, Type=typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct]),
+                ClusterObjectFieldDescriptor(Label="speakerMuted", Tag=0x00000019, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="speakerVolumeLevel", Tag=0x0000001A, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="speakerMaxLevel", Tag=0x0000001B, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="speakerMinLevel", Tag=0x0000001C, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneMuted", Tag=0x0000001D, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="microphoneVolumeLevel", Tag=0x0000001E, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneMaxLevel", Tag=0x0000001F, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneMinLevel", Tag=0x00000020, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="microphoneAGCEnabled", Tag=0x00000021, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="imageRotation", Tag=0x00000022, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="imageFlipHorizontal", Tag=0x00000023, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="imageFlipVertical", Tag=0x00000024, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="localVideoRecordingEnabled", Tag=0x00000025, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="localSnapshotRecordingEnabled", Tag=0x00000026, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="statusLightEnabled", Tag=0x00000027, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="statusLightBrightness", Tag=0x00000028, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+>>>>>>> master
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -45960,6 +46068,7 @@ class CameraAvStreamManagement(Cluster):
     twoWayTalkSupport: CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum = 0
     snapshotCapabilities: typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct] = field(default_factory=lambda: [])
     maxNetworkBandwidth: uint = 0
+<<<<<<< HEAD
     currentFrameRate: uint = 0
     HDRModeEnabled: bool = False
     supportedStreamUsages: typing.List[Globals.Enums.StreamUsageEnum] = field(default_factory=lambda: [])
@@ -45989,6 +46098,37 @@ class CameraAvStreamManagement(Cluster):
     localSnapshotRecordingEnabled: bool = False
     statusLightEnabled: bool = False
     statusLightBrightness: Globals.Enums.ThreeLevelAutoEnum = 0
+=======
+    currentFrameRate: typing.Optional[uint] = None
+    HDRModeEnabled: typing.Optional[bool] = None
+    supportedStreamUsages: typing.List[Globals.Enums.StreamUsageEnum] = field(default_factory=lambda: [])
+    allocatedVideoStreams: typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]] = None
+    allocatedAudioStreams: typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]] = None
+    allocatedSnapshotStreams: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]] = None
+    rankedVideoStreamPrioritiesList: typing.Optional[typing.List[Globals.Enums.StreamUsageEnum]] = None
+    softRecordingPrivacyModeEnabled: typing.Optional[bool] = None
+    softLivestreamPrivacyModeEnabled: typing.Optional[bool] = None
+    hardPrivacyModeOn: typing.Optional[bool] = None
+    nightVision: typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum] = None
+    nightVisionIllum: typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum] = None
+    viewport: typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct] = None
+    speakerMuted: typing.Optional[bool] = None
+    speakerVolumeLevel: typing.Optional[uint] = None
+    speakerMaxLevel: typing.Optional[uint] = None
+    speakerMinLevel: typing.Optional[uint] = None
+    microphoneMuted: typing.Optional[bool] = None
+    microphoneVolumeLevel: typing.Optional[uint] = None
+    microphoneMaxLevel: typing.Optional[uint] = None
+    microphoneMinLevel: typing.Optional[uint] = None
+    microphoneAGCEnabled: typing.Optional[bool] = None
+    imageRotation: typing.Optional[uint] = None
+    imageFlipHorizontal: typing.Optional[bool] = None
+    imageFlipVertical: typing.Optional[bool] = None
+    localVideoRecordingEnabled: typing.Optional[bool] = None
+    localSnapshotRecordingEnabled: typing.Optional[bool] = None
+    statusLightEnabled: typing.Optional[bool] = None
+    statusLightBrightness: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
+>>>>>>> master
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -46817,9 +46957,15 @@ class CameraAvStreamManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+<<<<<<< HEAD
                 return ClusterObjectFieldDescriptor(Type=typing.List[Globals.Enums.StreamUsageEnum])
 
             value: typing.List[Globals.Enums.StreamUsageEnum] = field(default_factory=lambda: [])
+=======
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Globals.Enums.StreamUsageEnum]])
+
+            value: typing.Optional[typing.List[Globals.Enums.StreamUsageEnum]] = None
+>>>>>>> master
 
         @dataclass
         class SoftRecordingPrivacyModeEnabled(ClusterAttributeDescriptor):
@@ -47710,7 +47856,7 @@ class WebRTCTransportProvider(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="currentSessions", Tag=0x00000000, Type=typing.List[WebRTCTransportProvider.Structs.WebRTCSessionStruct]),
+                ClusterObjectFieldDescriptor(Label="currentSessions", Tag=0x00000000, Type=typing.List[Globals.Structs.WebRTCSessionStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -47718,13 +47864,14 @@ class WebRTCTransportProvider(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    currentSessions: typing.List[WebRTCTransportProvider.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
+    currentSessions: typing.List[Globals.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+<<<<<<< HEAD
     class Enums:
         class WebRTCEndReasonEnum(MatterIntEnum):
             kIceFailed = 0x00
@@ -47791,12 +47938,17 @@ class WebRTCTransportProvider(Cluster):
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
             metadataOptions: 'uint' = 0
             fabricIndex: 'uint' = 0
+=======
+    class Bitmaps:
+        class Feature(IntFlag):
+            kMetadata = 0x1
+>>>>>>> master
 
     class Commands:
         @dataclass
         class SolicitOffer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000001
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'SolicitOfferResponse'
 
@@ -47808,23 +47960,23 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="originatingEndpointID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=3, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=4, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
+                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=4, Type=typing.Optional[typing.List[Globals.Structs.ICEServerStruct]]),
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=5, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=6, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
                     ])
 
             streamUsage: Globals.Enums.StreamUsageEnum = 0
             originatingEndpointID: uint = 0
             videoStreamID: typing.Union[None, Nullable, uint] = None
             audioStreamID: typing.Union[None, Nullable, uint] = None
-            ICEServers: typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]] = None
+            ICEServers: typing.Optional[typing.List[Globals.Structs.ICEServerStruct]] = None
             ICETransportPolicy: typing.Optional[str] = None
-            metadataOptions: typing.Optional[uint] = None
+            metadataEnabled: typing.Optional[bool] = None
 
         @dataclass
         class SolicitOfferResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000002
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -47846,7 +47998,7 @@ class WebRTCTransportProvider(Cluster):
         @dataclass
         class ProvideOffer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000003
+            command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'ProvideOfferResponse'
 
@@ -47860,9 +48012,9 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="originatingEndpointID", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=6, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
+                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=6, Type=typing.Optional[typing.List[Globals.Structs.ICEServerStruct]]),
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=7, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=8, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=8, Type=typing.Optional[bool]),
                     ])
 
             webRTCSessionID: typing.Union[Nullable, uint] = NullValue
@@ -47871,14 +48023,14 @@ class WebRTCTransportProvider(Cluster):
             originatingEndpointID: uint = 0
             videoStreamID: typing.Union[None, Nullable, uint] = None
             audioStreamID: typing.Union[None, Nullable, uint] = None
-            ICEServers: typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]] = None
+            ICEServers: typing.Optional[typing.List[Globals.Structs.ICEServerStruct]] = None
             ICETransportPolicy: typing.Optional[str] = None
-            metadataOptions: typing.Optional[uint] = None
+            metadataEnabled: typing.Optional[bool] = None
 
         @dataclass
         class ProvideOfferResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000004
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -47898,7 +48050,7 @@ class WebRTCTransportProvider(Cluster):
         @dataclass
         class ProvideAnswer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000005
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -47916,6 +48068,24 @@ class WebRTCTransportProvider(Cluster):
         @dataclass
         class ProvideICECandidates(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000553
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[Globals.Structs.ICECandidateStruct]),
+                    ])
+
+            webRTCSessionID: uint = 0
+            ICECandidates: typing.List[Globals.Structs.ICECandidateStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class EndSession(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000553
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
@@ -47925,29 +48095,11 @@ class WebRTCTransportProvider(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=Globals.Enums.WebRTCEndReasonEnum),
                     ])
 
             webRTCSessionID: uint = 0
-            ICECandidates: typing.List[str] = field(default_factory=lambda: [])
-
-        @dataclass
-        class EndSession(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000553
-            command_id: typing.ClassVar[int] = 0x00000007
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=WebRTCTransportProvider.Enums.WebRTCEndReasonEnum),
-                    ])
-
-            webRTCSessionID: uint = 0
-            reason: WebRTCTransportProvider.Enums.WebRTCEndReasonEnum = 0
+            reason: Globals.Enums.WebRTCEndReasonEnum = 0
 
     class Attributes:
         @dataclass
@@ -47962,9 +48114,9 @@ class WebRTCTransportProvider(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[WebRTCTransportProvider.Structs.WebRTCSessionStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[Globals.Structs.WebRTCSessionStruct])
 
-            value: typing.List[WebRTCTransportProvider.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
+            value: typing.List[Globals.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -48055,7 +48207,7 @@ class WebRTCTransportRequestor(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="currentSessions", Tag=0x00000000, Type=typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct]),
+                ClusterObjectFieldDescriptor(Label="currentSessions", Tag=0x00000000, Type=typing.List[Globals.Structs.WebRTCSessionStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -48063,13 +48215,14 @@ class WebRTCTransportRequestor(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    currentSessions: typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
+    currentSessions: typing.List[Globals.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+<<<<<<< HEAD
     class Enums:
         class WebRTCEndReasonEnum(MatterIntEnum):
             kIceFailed = 0x00
@@ -48137,11 +48290,13 @@ class WebRTCTransportRequestor(Cluster):
             metadataOptions: 'uint' = 0
             fabricIndex: 'uint' = 0
 
+=======
+>>>>>>> master
     class Commands:
         @dataclass
         class Offer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
-            command_id: typing.ClassVar[int] = 0x00000001
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48151,19 +48306,19 @@ class WebRTCTransportRequestor(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
-                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=2, Type=typing.Optional[typing.List[WebRTCTransportRequestor.Structs.ICEServerStruct]]),
+                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=2, Type=typing.Optional[typing.List[Globals.Structs.ICEServerStruct]]),
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=3, Type=typing.Optional[str]),
                     ])
 
             webRTCSessionID: uint = 0
             sdp: str = ""
-            ICEServers: typing.Optional[typing.List[WebRTCTransportRequestor.Structs.ICEServerStruct]] = None
+            ICEServers: typing.Optional[typing.List[Globals.Structs.ICEServerStruct]] = None
             ICETransportPolicy: typing.Optional[str] = None
 
         @dataclass
         class Answer(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
-            command_id: typing.ClassVar[int] = 0x00000002
+            command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -48181,6 +48336,24 @@ class WebRTCTransportRequestor(Cluster):
         @dataclass
         class ICECandidates(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000554
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[Globals.Structs.ICECandidateStruct]),
+                    ])
+
+            webRTCSessionID: uint = 0
+            ICECandidates: typing.List[Globals.Structs.ICECandidateStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class End(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000554
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
@@ -48190,29 +48363,11 @@ class WebRTCTransportRequestor(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ICECandidates", Tag=1, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=Globals.Enums.WebRTCEndReasonEnum),
                     ])
 
             webRTCSessionID: uint = 0
-            ICECandidates: typing.List[str] = field(default_factory=lambda: [])
-
-        @dataclass
-        class End(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000554
-            command_id: typing.ClassVar[int] = 0x00000004
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=WebRTCTransportRequestor.Enums.WebRTCEndReasonEnum),
-                    ])
-
-            webRTCSessionID: uint = 0
-            reason: WebRTCTransportRequestor.Enums.WebRTCEndReasonEnum = 0
+            reason: Globals.Enums.WebRTCEndReasonEnum = 0
 
     class Attributes:
         @dataclass
@@ -48227,9 +48382,9 @@ class WebRTCTransportRequestor(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[Globals.Structs.WebRTCSessionStruct])
 
-            value: typing.List[WebRTCTransportRequestor.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
+            value: typing.List[Globals.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -51520,6 +51675,16 @@ class TlsCertificateManagement(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+    class Enums:
+        class StatusCodeEnum(MatterIntEnum):
+            kCertificateAlreadyInstalled = 0x02
+            kDuplicateKey = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
     class Structs:
         @dataclass
         class TLSCertStruct(ClusterObject):
@@ -51974,6 +52139,17 @@ class TlsClientManagement(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class StatusCodeEnum(MatterIntEnum):
+            kEndpointAlreadyInstalled = 0x02
+            kRootCertificateNotFound = 0x03
+            kClientCertificateNotFound = 0x04
+            kEndpointInUse = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
         class TLSEndpointStatusEnum(MatterIntEnum):
             kProvisioned = 0x00
             kInUse = 0x01
@@ -51996,6 +52172,7 @@ class TlsClientManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="caid", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="status", Tag=5, Type=TlsClientManagement.Enums.TLSEndpointStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             endpointID: 'uint' = 0
@@ -52004,6 +52181,7 @@ class TlsClientManagement(Cluster):
             caid: 'uint' = 0
             ccdid: 'typing.Union[Nullable, uint]' = NullValue
             status: 'TlsClientManagement.Enums.TLSEndpointStatusEnum' = 0
+            fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -52057,10 +52235,10 @@ class TlsClientManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=0, Type=uint),
                     ])
 
-            endpointID: typing.Union[Nullable, uint] = NullValue
+            endpointID: uint = 0
 
         @dataclass
         class FindEndpointResponse(ClusterCommand):
@@ -52073,10 +52251,10 @@ class TlsClientManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="endpoints", Tag=0, Type=typing.List[TlsClientManagement.Structs.TLSEndpointStruct]),
+                        ClusterObjectFieldDescriptor(Label="endpoint", Tag=0, Type=TlsClientManagement.Structs.TLSEndpointStruct),
                     ])
 
-            endpoints: typing.List[TlsClientManagement.Structs.TLSEndpointStruct] = field(default_factory=lambda: [])
+            endpoint: TlsClientManagement.Structs.TLSEndpointStruct = field(default_factory=lambda: TlsClientManagement.Structs.TLSEndpointStruct())
 
         @dataclass
         class RemoveEndpoint(ClusterCommand):

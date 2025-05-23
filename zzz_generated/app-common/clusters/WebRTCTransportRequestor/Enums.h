@@ -26,12 +26,16 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+<<<<<<< HEAD
 namespace WebRTCTransportRequestor {
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
 using WebRTCMetadataOptionsBitmap = Clusters::detail::WebRTCMetadataOptionsBitmap;
 } // namespace WebRTCTransportRequestor
+=======
+namespace WebRTCTransportRequestor {} // namespace WebRTCTransportRequestor
+>>>>>>> master
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -28,9 +28,17 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
+<<<<<<< HEAD
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
 using WebRTCMetadataOptionsBitmap = Clusters::detail::WebRTCMetadataOptionsBitmap;
+=======
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kMetadata = 0x1,
+};
+>>>>>>> master
 } // namespace WebRTCTransportProvider
 } // namespace Clusters
 } // namespace app

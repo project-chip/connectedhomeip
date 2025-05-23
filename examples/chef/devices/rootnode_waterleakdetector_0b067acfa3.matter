@@ -244,6 +244,21 @@ enum ThreeLevelAutoEnum : enum8 {
   kHigh = 3;
 }
 
+enum WebRTCEndReasonEnum : enum8 {
+  kIceFailed = 0;
+  kIceTimeout = 1;
+  kUserHangup = 2;
+  kUserBusy = 3;
+  kReplaced = 4;
+  kNoUserMedia = 5;
+  kInviteTimeout = 6;
+  kAnsweredElsewhere = 7;
+  kOutOfResources = 8;
+  kMediaTimeout = 9;
+  kLowPower = 10;
+  kUnknownReason = 11;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -283,6 +298,19 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
+struct ICECandidateStruct {
+  char_string candidate = 0;
+  nullable char_string SDPMid = 1;
+  nullable int16u SDPMLineIndex = 2;
+}
+
+struct ICEServerStruct {
+  char_string URLs[] = 0;
+  optional long_char_string<508> username = 1;
+  optional long_char_string<512> credential = 2;
+  optional int16u caid = 3;
+}
+
 struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
@@ -306,6 +334,17 @@ struct ViewportStruct {
   int16u y1 = 1;
   int16u x2 = 2;
   int16u y2 = 3;
+}
+
+fabric_scoped struct WebRTCSessionStruct {
+  int16u id = 0;
+  node_id peerNodeID = 1;
+  endpoint_no peerEndpointID = 2;
+  StreamUsageEnum streamUsage = 3;
+  nullable int16u videoStreamID = 4;
+  nullable int16u audioStreamID = 5;
+  optional boolean metadataEnabled = 6;
+  fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -2003,5 +2042,3 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
-
