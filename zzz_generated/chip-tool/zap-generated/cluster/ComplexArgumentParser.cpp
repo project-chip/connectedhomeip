@@ -450,34 +450,34 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::Test
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Globals::Structs::ViewportStruct::Type & request,
-    Json::Value & value)
+                                        Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
-    
+
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.x1", "x1", value.isMember("x1")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.y1", "y1", value.isMember("y1")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.x2", "x2", value.isMember("x2")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.y2", "y2", value.isMember("y2")));
-    
+
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "x1");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.x1, value["x1"]));
     valueCopy.removeMember("x1");
-    
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "y1");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.y1, value["y1"]));
     valueCopy.removeMember("y1");
-    
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "x2");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.x2, value["x2"]));
     valueCopy.removeMember("x2");
-    
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "y2");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.y2, value["y2"]));
-    valueCopy.removeMember("y2");    
+    valueCopy.removeMember("y2");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -552,7 +552,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
-
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & request)
 {

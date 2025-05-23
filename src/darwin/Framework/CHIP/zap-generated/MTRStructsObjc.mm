@@ -364,16 +364,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-<<<<<<< HEAD
 @implementation MTRDataTypeViewportStruct
-=======
-@implementation MTRDataTypeWebRTCSessionStruct
->>>>>>> master
 - (instancetype)init
 {
     if (self = [super init]) {
 
-<<<<<<< HEAD
         _x1 = @(0);
 
         _y1 = @(0);
@@ -381,7 +376,35 @@ NS_ASSUME_NONNULL_BEGIN
         _x2 = @(0);
 
         _y2 = @(0);
-=======
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeViewportStruct alloc] init];
+
+    other.x1 = self.x1;
+    other.y1 = self.y1;
+    other.x2 = self.x2;
+    other.y2 = self.y2;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeWebRTCSessionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
         _id = @(0);
 
         _peerNodeID = @(0);
@@ -397,21 +420,12 @@ NS_ASSUME_NONNULL_BEGIN
         _metadataEnabled = nil;
 
         _fabricIndex = @(0);
->>>>>>> master
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-<<<<<<< HEAD
-    auto other = [[MTRDataTypeViewportStruct alloc] init];
-
-    other.x1 = self.x1;
-    other.y1 = self.y1;
-    other.x2 = self.x2;
-    other.y2 = self.y2;
-=======
     auto other = [[MTRDataTypeWebRTCSessionStruct alloc] init];
 
     other.id = self.id;
@@ -422,18 +436,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.audioStreamID = self.audioStreamID;
     other.metadataEnabled = self.metadataEnabled;
     other.fabricIndex = self.fabricIndex;
->>>>>>> master
 
     return other;
 }
 
 - (NSString *)description
 {
-<<<<<<< HEAD
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
-=======
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataEnabled:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataEnabled, _fabricIndex];
->>>>>>> master
     return descriptionString;
 }
 

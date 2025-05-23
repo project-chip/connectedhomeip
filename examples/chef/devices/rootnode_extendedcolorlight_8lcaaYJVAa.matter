@@ -335,7 +335,7 @@ struct ViewportStruct {
   int16u x2 = 2;
   int16u y2 = 3;
 }
-S
+
 fabric_scoped struct WebRTCSessionStruct {
   int16u id = 0;
   node_id peerNodeID = 1;
@@ -2517,3 +2517,5 @@ endpoint 1 {
     handle command StepColorTemperature;
   }
 }
+
+

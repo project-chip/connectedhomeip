@@ -10070,41 +10070,8 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 provisional cluster WebRTCTransportProvider = 1363 {
   revision 1;
 
-  shared enum WebRTCEndReasonEnum : enum8 {
-    kIceFailed = 0;
-    kIceTimeout = 1;
-    kUserHangup = 2;
-    kUserBusy = 3;
-    kReplaced = 4;
-    kNoUserMedia = 5;
-    kInviteTimeout = 6;
-    kAnsweredElsewhere = 7;
-    kOutOfResources = 8;
-    kMediaTimeout = 9;
-    kLowPower = 10;
-    kUnknownReason = 11;
-  }
-
-  shared bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
-    kDataTLV = 0x1;
-  }
-
-  shared struct ICEServerStruct {
-    char_string urls[] = 1;
-    optional char_string username = 2;
-    optional char_string credential = 3;
-    optional int16u caid = 4;
-  }
-
-  shared fabric_scoped struct WebRTCSessionStruct {
-    int16u id = 1;
-    node_id peerNodeID = 2;
-    endpoint_no peerEndpointID = 3;
-    StreamUsageEnum streamUsage = 4;
-    nullable int16u videoStreamID = 5;
-    nullable int16u audioStreamID = 6;
-    WebRTCMetadataOptionsBitmap metadataOptions = 7;
-    fabric_idx fabricIndex = 254;
+  bitmap Feature : bitmap32 {
+    kMetadata = 0x1;
   }
 
   readonly attribute access(read: manage) WebRTCSessionStruct currentSessions[] = 0;
@@ -10179,43 +10146,6 @@ provisional cluster WebRTCTransportProvider = 1363 {
 /** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
 provisional cluster WebRTCTransportRequestor = 1364 {
   revision 1;
-
-  shared enum WebRTCEndReasonEnum : enum8 {
-    kIceFailed = 0;
-    kIceTimeout = 1;
-    kUserHangup = 2;
-    kUserBusy = 3;
-    kReplaced = 4;
-    kNoUserMedia = 5;
-    kInviteTimeout = 6;
-    kAnsweredElsewhere = 7;
-    kOutOfResources = 8;
-    kMediaTimeout = 9;
-    kLowPower = 10;
-    kUnknownReason = 11;
-  }
-
-  shared bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
-    kDataTLV = 0x1;
-  }
-
-  shared struct ICEServerStruct {
-    char_string urls[] = 1;
-    optional char_string username = 2;
-    optional char_string credential = 3;
-    optional int16u caid = 4;
-  }
-
-  shared fabric_scoped struct WebRTCSessionStruct {
-    int16u id = 1;
-    node_id peerNodeID = 2;
-    endpoint_no peerEndpointID = 3;
-    StreamUsageEnum streamUsage = 4;
-    nullable int16u videoStreamID = 5;
-    nullable int16u audioStreamID = 6;
-    WebRTCMetadataOptionsBitmap metadataOptions = 7;
-    fabric_idx fabricIndex = 254;
-  }
 
   readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -11905,3 +11835,4 @@ cluster SampleMei = 4294048800 {
   /** Command that takes two uint8 arguments and returns their sum. */
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
 }
+

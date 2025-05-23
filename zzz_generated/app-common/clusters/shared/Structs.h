@@ -631,8 +631,8 @@ private:
 
 using DecodableType = Type;
 
-
 } // namespace WebRTCSessionStruct
+
 } // namespace Structs
 } // namespace Globals
 } // namespace Clusters

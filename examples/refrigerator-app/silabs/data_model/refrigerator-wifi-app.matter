@@ -2088,3 +2088,5 @@ endpoint 3 {
     handle command SetTemperature;
   }
 }
+
+

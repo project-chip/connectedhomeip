@@ -138,7 +138,7 @@ namespace FindEndpointResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.EncodeForWrite(to_underlying(Fields::kEndpoint), endpoint);
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::kEndpoint), aAccessingFabricIndex, endpoint);
     return encoder.Finalize();
 }
 

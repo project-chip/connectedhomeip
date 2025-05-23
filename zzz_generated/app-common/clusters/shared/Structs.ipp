@@ -787,6 +787,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kY1), y1);
     encoder.Encode(to_underlying(Fields::kX2), x2);
     encoder.Encode(to_underlying(Fields::kY2), y2);
+    return encoder.Finalize();
 }
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)

@@ -705,6 +705,8 @@ class Globals:
             metadataEnabled: 'typing.Optional[bool]' = None
             fabricIndex: 'uint' = 0
 
+
+
 @dataclass
 class Identify(Cluster):
     id: typing.ClassVar[int] = 0x00000003
@@ -45986,7 +45988,6 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="twoWayTalkSupport", Tag=0x00000009, Type=CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum),
                 ClusterObjectFieldDescriptor(Label="snapshotCapabilities", Tag=0x0000000A, Type=typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct]),
                 ClusterObjectFieldDescriptor(Label="maxNetworkBandwidth", Tag=0x0000000B, Type=uint),
-<<<<<<< HEAD
                 ClusterObjectFieldDescriptor(Label="currentFrameRate", Tag=0x0000000C, Type=uint),
                 ClusterObjectFieldDescriptor(Label="HDRModeEnabled", Tag=0x0000000D, Type=bool),
                 ClusterObjectFieldDescriptor(Label="supportedStreamUsages", Tag=0x0000000E, Type=typing.List[Globals.Enums.StreamUsageEnum]),
@@ -46016,37 +46017,6 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="localSnapshotRecordingEnabled", Tag=0x00000026, Type=bool),
                 ClusterObjectFieldDescriptor(Label="statusLightEnabled", Tag=0x00000027, Type=bool),
                 ClusterObjectFieldDescriptor(Label="statusLightBrightness", Tag=0x00000028, Type=Globals.Enums.ThreeLevelAutoEnum),
-=======
-                ClusterObjectFieldDescriptor(Label="currentFrameRate", Tag=0x0000000C, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="HDRModeEnabled", Tag=0x0000000D, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="supportedStreamUsages", Tag=0x0000000E, Type=typing.List[Globals.Enums.StreamUsageEnum]),
-                ClusterObjectFieldDescriptor(Label="allocatedVideoStreams", Tag=0x0000000F, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]]),
-                ClusterObjectFieldDescriptor(Label="allocatedAudioStreams", Tag=0x00000010, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]]),
-                ClusterObjectFieldDescriptor(Label="allocatedSnapshotStreams", Tag=0x00000011, Type=typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]]),
-                ClusterObjectFieldDescriptor(Label="rankedVideoStreamPrioritiesList", Tag=0x00000012, Type=typing.Optional[typing.List[Globals.Enums.StreamUsageEnum]]),
-                ClusterObjectFieldDescriptor(Label="softRecordingPrivacyModeEnabled", Tag=0x00000013, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="softLivestreamPrivacyModeEnabled", Tag=0x00000014, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="hardPrivacyModeOn", Tag=0x00000015, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="nightVision", Tag=0x00000016, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
-                ClusterObjectFieldDescriptor(Label="nightVisionIllum", Tag=0x00000017, Type=typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum]),
-                ClusterObjectFieldDescriptor(Label="viewport", Tag=0x00000018, Type=typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct]),
-                ClusterObjectFieldDescriptor(Label="speakerMuted", Tag=0x00000019, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="speakerVolumeLevel", Tag=0x0000001A, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="speakerMaxLevel", Tag=0x0000001B, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="speakerMinLevel", Tag=0x0000001C, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="microphoneMuted", Tag=0x0000001D, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="microphoneVolumeLevel", Tag=0x0000001E, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="microphoneMaxLevel", Tag=0x0000001F, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="microphoneMinLevel", Tag=0x00000020, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="microphoneAGCEnabled", Tag=0x00000021, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="imageRotation", Tag=0x00000022, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="imageFlipHorizontal", Tag=0x00000023, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="imageFlipVertical", Tag=0x00000024, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="localVideoRecordingEnabled", Tag=0x00000025, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="localSnapshotRecordingEnabled", Tag=0x00000026, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="statusLightEnabled", Tag=0x00000027, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="statusLightBrightness", Tag=0x00000028, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
->>>>>>> master
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -46066,7 +46036,6 @@ class CameraAvStreamManagement(Cluster):
     twoWayTalkSupport: CameraAvStreamManagement.Enums.TwoWayTalkSupportTypeEnum = 0
     snapshotCapabilities: typing.List[CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct] = field(default_factory=lambda: [])
     maxNetworkBandwidth: uint = 0
-<<<<<<< HEAD
     currentFrameRate: uint = 0
     HDRModeEnabled: bool = False
     supportedStreamUsages: typing.List[Globals.Enums.StreamUsageEnum] = field(default_factory=lambda: [])
@@ -46096,37 +46065,6 @@ class CameraAvStreamManagement(Cluster):
     localSnapshotRecordingEnabled: bool = False
     statusLightEnabled: bool = False
     statusLightBrightness: Globals.Enums.ThreeLevelAutoEnum = 0
-=======
-    currentFrameRate: typing.Optional[uint] = None
-    HDRModeEnabled: typing.Optional[bool] = None
-    supportedStreamUsages: typing.List[Globals.Enums.StreamUsageEnum] = field(default_factory=lambda: [])
-    allocatedVideoStreams: typing.Optional[typing.List[CameraAvStreamManagement.Structs.VideoStreamStruct]] = None
-    allocatedAudioStreams: typing.Optional[typing.List[CameraAvStreamManagement.Structs.AudioStreamStruct]] = None
-    allocatedSnapshotStreams: typing.Optional[typing.List[CameraAvStreamManagement.Structs.SnapshotStreamStruct]] = None
-    rankedVideoStreamPrioritiesList: typing.Optional[typing.List[Globals.Enums.StreamUsageEnum]] = None
-    softRecordingPrivacyModeEnabled: typing.Optional[bool] = None
-    softLivestreamPrivacyModeEnabled: typing.Optional[bool] = None
-    hardPrivacyModeOn: typing.Optional[bool] = None
-    nightVision: typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum] = None
-    nightVisionIllum: typing.Optional[CameraAvStreamManagement.Enums.TriStateAutoEnum] = None
-    viewport: typing.Optional[CameraAvStreamManagement.Structs.ViewportStruct] = None
-    speakerMuted: typing.Optional[bool] = None
-    speakerVolumeLevel: typing.Optional[uint] = None
-    speakerMaxLevel: typing.Optional[uint] = None
-    speakerMinLevel: typing.Optional[uint] = None
-    microphoneMuted: typing.Optional[bool] = None
-    microphoneVolumeLevel: typing.Optional[uint] = None
-    microphoneMaxLevel: typing.Optional[uint] = None
-    microphoneMinLevel: typing.Optional[uint] = None
-    microphoneAGCEnabled: typing.Optional[bool] = None
-    imageRotation: typing.Optional[uint] = None
-    imageFlipHorizontal: typing.Optional[bool] = None
-    imageFlipVertical: typing.Optional[bool] = None
-    localVideoRecordingEnabled: typing.Optional[bool] = None
-    localSnapshotRecordingEnabled: typing.Optional[bool] = None
-    statusLightEnabled: typing.Optional[bool] = None
-    statusLightBrightness: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
->>>>>>> master
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -46955,15 +46893,9 @@ class CameraAvStreamManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-<<<<<<< HEAD
                 return ClusterObjectFieldDescriptor(Type=typing.List[Globals.Enums.StreamUsageEnum])
 
             value: typing.List[Globals.Enums.StreamUsageEnum] = field(default_factory=lambda: [])
-=======
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Globals.Enums.StreamUsageEnum]])
-
-            value: typing.Optional[typing.List[Globals.Enums.StreamUsageEnum]] = None
->>>>>>> master
 
         @dataclass
         class SoftRecordingPrivacyModeEnabled(ClusterAttributeDescriptor):
@@ -47869,78 +47801,9 @@ class WebRTCTransportProvider(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
-<<<<<<< HEAD
-    class Enums:
-        class WebRTCEndReasonEnum(MatterIntEnum):
-            kIceFailed = 0x00
-            kIceTimeout = 0x01
-            kUserHangup = 0x02
-            kUserBusy = 0x03
-            kReplaced = 0x04
-            kNoUserMedia = 0x05
-            kInviteTimeout = 0x06
-            kAnsweredElsewhere = 0x07
-            kOutOfResources = 0x08
-            kMediaTimeout = 0x09
-            kLowPower = 0x0A
-            kUnknownReason = 0x0B
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 12
-
-    class Bitmaps:
-        class WebRTCMetadataOptionsBitmap(IntFlag):
-            kDataTLV = 0x1
-
-    class Structs:
-        @dataclass
-        class ICEServerStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="urls", Tag=1, Type=typing.List[str]),
-                        ClusterObjectFieldDescriptor(Label="username", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="credential", Tag=3, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="caid", Tag=4, Type=typing.Optional[uint]),
-                    ])
-
-            urls: 'typing.List[str]' = field(default_factory=lambda: [])
-            username: 'typing.Optional[str]' = None
-            credential: 'typing.Optional[str]' = None
-            caid: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class WebRTCSessionStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=4, Type=Globals.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
-                    ])
-
-            id: 'uint' = 0
-            peerNodeID: 'uint' = 0
-            peerEndpointID: 'uint' = 0
-            streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
-            videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            metadataOptions: 'uint' = 0
-            fabricIndex: 'uint' = 0
-=======
     class Bitmaps:
         class Feature(IntFlag):
             kMetadata = 0x1
->>>>>>> master
 
     class Commands:
         @dataclass
@@ -48220,76 +48083,6 @@ class WebRTCTransportRequestor(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
-<<<<<<< HEAD
-    class Enums:
-        class WebRTCEndReasonEnum(MatterIntEnum):
-            kIceFailed = 0x00
-            kIceTimeout = 0x01
-            kUserHangup = 0x02
-            kUserBusy = 0x03
-            kReplaced = 0x04
-            kNoUserMedia = 0x05
-            kInviteTimeout = 0x06
-            kAnsweredElsewhere = 0x07
-            kOutOfResources = 0x08
-            kMediaTimeout = 0x09
-            kLowPower = 0x0A
-            kUnknownReason = 0x0B
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 12
-
-    class Bitmaps:
-        class WebRTCMetadataOptionsBitmap(IntFlag):
-            kDataTLV = 0x1
-
-    class Structs:
-        @dataclass
-        class ICEServerStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="urls", Tag=1, Type=typing.List[str]),
-                        ClusterObjectFieldDescriptor(Label="username", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="credential", Tag=3, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="caid", Tag=4, Type=typing.Optional[uint]),
-                    ])
-
-            urls: 'typing.List[str]' = field(default_factory=lambda: [])
-            username: 'typing.Optional[str]' = None
-            credential: 'typing.Optional[str]' = None
-            caid: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class WebRTCSessionStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=4, Type=Globals.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
-                    ])
-
-            id: 'uint' = 0
-            peerNodeID: 'uint' = 0
-            peerEndpointID: 'uint' = 0
-            streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
-            videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            metadataOptions: 'uint' = 0
-            fabricIndex: 'uint' = 0
-
-=======
->>>>>>> master
     class Commands:
         @dataclass
         class Offer(ClusterCommand):
@@ -55911,3 +55704,4 @@ class SampleMei(Cluster):
 
             count: uint = 0
             fabricIndex: uint = 0
+
