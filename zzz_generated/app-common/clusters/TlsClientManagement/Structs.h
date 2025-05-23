@@ -40,13 +40,12 @@ namespace Structs {
 namespace TLSEndpointStruct {
 enum class Fields : uint8_t
 {
-    kEndpointID  = 0,
-    kHostname    = 1,
-    kPort        = 2,
-    kCaid        = 3,
-    kCcdid       = 4,
-    kStatus      = 5,
-    kFabricIndex = 254,
+    kEndpointID = 0,
+    kHostname   = 1,
+    kPort       = 2,
+    kCaid       = 3,
+    kCcdid      = 4,
+    kStatus     = 5,
 };
 
 struct Type
@@ -57,22 +56,13 @@ public:
     uint16_t port = static_cast<uint16_t>(0);
     uint16_t caid = static_cast<uint16_t>(0);
     DataModel::Nullable<uint16_t> ccdid;
-    TLSEndpointStatusEnum status  = static_cast<TLSEndpointStatusEnum>(0);
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    TLSEndpointStatusEnum status = static_cast<TLSEndpointStatusEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 using DecodableType = Type;

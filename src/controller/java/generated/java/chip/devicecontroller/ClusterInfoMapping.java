@@ -20468,11 +20468,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(ChipStructs.TlsClientManagementClusterTLSEndpointStruct endpoint) {
+    public void onSuccess(ArrayList<ChipStructs.TlsClientManagementClusterTLSEndpointStruct> endpoints) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      // endpoint: Struct TLSEndpointStruct
+      // endpoints: TLSEndpointStruct
       // Conversion from this type to Java is not properly implemented yet
+
       callback.onSuccess(responseValues);
     }
 

@@ -93,7 +93,7 @@ CHIP_ERROR JointFabricAdministratorAttrAccess::Read(const ConcreteReadAttributeP
 
 CHIP_ERROR JointFabricAdministratorAttrAccess::ReadAdministratorFabricIndex(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(Server::GetInstance().GetJointFabricDatastore().GetAdministratorFabricIndex());
+    return CHIP_NO_ERROR;
 }
 
 void MatterJointFabricAdministratorPluginServerInitCallback()

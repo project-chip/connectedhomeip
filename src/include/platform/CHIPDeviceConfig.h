@@ -457,6 +457,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+ *
+ * Enable support for Joint Fabric in core SDK.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#define CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
  *
  * The min amount of time (in seconds) after which the chip platform will stop PAF advertisement

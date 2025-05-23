@@ -237,6 +237,7 @@ public:
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
     chip::app::reporting::ReportScheduler * GetReportScheduler() const { return mReportScheduler; }
+    SessionResumptionStorage * GetSessionResumptionStorage() const { return mSessionResumptionStorage; }
 
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
     void SetTempFabricTable(FabricTable * tempFabricTable, bool enableServerInteractions)

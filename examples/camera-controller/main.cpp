@@ -39,8 +39,8 @@ int main(int argc, char * argv[])
     // Convert command line arguments to a vector of strings for easier manipulation
     std::vector<std::string> args(argv, argv + argc);
 
-    // Check if "interactive" and "start" are not in the arguments
-    if (args.size() < 3 || args[1] != "interactive" || args[2] != "start")
+    // Check if "interactive" is not in the arguments
+    if (args.size() < 3 || args[1] != "interactive")
     {
         // Insert "interactive" and "start" after the executable name
         args.insert(args.begin() + 1, "interactive");
