@@ -19,7 +19,9 @@ following items are met (and see below for details)
     -   Summary contains sufficient context for reviewers
     -   Summary contains flash/ram overhead if changing core/common parts
 -   [ ] CI should pass (i.e. green or yellow/waiting for review)
--   [ ] Avoid force-pushes and squashing commits. By keeping your PR commit history you make it easier for reviewers to see the diff between versions and confirm the requested changes have been addressed.
+-   [ ] Avoid force-pushes and squashing commits. By keeping your PR commit
+        history you make it easier for reviewers to see the diff between
+        versions and confirm the requested changes have been addressed.
 
 ## Details and background on requirements
 
