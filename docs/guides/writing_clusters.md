@@ -22,8 +22,8 @@ In order to define a new cluster, use
 discouraged as we have found that mistakes are easy to make and hard to spot.
 
 Once you have a new or updated XML, run
-[code generation](.../zap_and_codegen/code_generation.md). It is often
-sufficient to `./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'`
+[code generation](../zap_and_codegen/code_generation.md). It is often sufficient
+to `./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'`
 
 ## Integrating into the build system
 
