@@ -294,6 +294,29 @@ class TC_CNET_4_11(MatterBaseTest):
             self.skip_all_remaining_steps(1)
             return
 
+        # TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters)
+        connected_network_count = {}
+        networks_dict = await self.read_single_attribute_all_endpoints(
+            cluster=cnet,
+            attribute=cnet.Attributes.Networks
+        )
+        logger.info(f" --- Networks by endpoint: {networks_dict}")
+
+        # Verify that there is a single connected network across ALL network commissioning clusters
+        for ep in networks_dict:
+            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            logger.info(f" --- Connected networks count by endpoint: {connected_network_count}")
+            asserts.assert_equal(sum(connected_network_count.values()), 1,
+                                 "Verify that only one entry has connected status as TRUE across ALL endpoints")
+
+        endpoint = self.get_endpoint()
+        current_cluster_connected = connected_network_count[endpoint] == 1
+
+        if not current_cluster_connected:
+            logger.info("Current cluster is not connected, skipping all remaining test steps")
+            self.skip_all_remaining_steps(4)
+            return
+
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(1)
 
@@ -372,32 +395,12 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH reads Networks attribute from the DUT
         self.step(6)
 
-        # TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters)
-        connected_network_count = {}
-        networks_dict = await self.read_single_attribute_all_endpoints(
+        # Verify that the Networks attribute list has an entry with the following fields:
+        networks = await self.read_single_attribute_check_success(
             cluster=cnet,
             attribute=cnet.Attributes.Networks
         )
-        logger.info(f" --- Step 6: Networks by endpoint: {networks_dict}")
-        networks = await self.read
 
-        # Verify that there is a single connected network across ALL network commissioning clusters
-        for ep in networks_dict:
-            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
-            logger.info(f" --- Step 6: Connected networks count by endpoint: {connected_network_count}")
-            asserts.assert_equal(sum(connected_network_count.values()), 1,
-                                 "Verify that only one entry has connected status as TRUE across ALL endpoints")
-
-        endpoint = self.get_endpoint()
-        current_cluster_connected = connected_network_count[endpoint] == 1
-
-        if not current_cluster_connected:
-            asserts.fail("Current cluster is not connected, skipping all remaining test steps")
-            # logger.info("Current cluster is not connected, skipping all remaining test steps")
-            # self.skip_all_remaining_steps(4)
-            return
-
-        # Verify that the Networks attribute list has an entry with the following fields:
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is FALSE
         userwifi_2nd_netidx = None
@@ -428,26 +431,35 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(9)
 
         # Verify that the TH successfully connects to the DUT
-        try:
-            networks = await asyncio.wait_for(
-                self.read_single_attribute_check_success(
-                    cluster=cnet,
-                    attribute=cnet.Attributes.Networks
-                ),
-                timeout=TIMEOUT
-            )
+        retry = 1
+        while retry <= MAX_RETRIES:
+            try:
+                networks = await asyncio.wait_for(
+                    self.read_single_attribute_check_success(
+                        cluster=cnet,
+                        attribute=cnet.Attributes.Networks
+                    ),
+                    timeout=TIMEOUT
+                )
 
-        except Exception as e:
-            logger.error(f" --- Step 13: Exception reading networks: {e}")
-            # Let's wait a couple of seconds to change networks
-            await asyncio.sleep(WIFI_WAIT_SECONDS)
-            networks = await asyncio.wait_for(
-                self.read_single_attribute_check_success(
-                    cluster=cnet,
-                    attribute=cnet.Attributes.Networks
-                ),
-                timeout=TIMEOUT
-            )
+            except Exception as e:
+                logger.error(f" --- Step 9: Exception reading networks: {e}")
+                # Let's wait a couple of seconds to change networks
+                await asyncio.sleep(WIFI_WAIT_SECONDS)
+                networks = await asyncio.wait_for(
+                    self.read_single_attribute_check_success(
+                        cluster=cnet,
+                        attribute=cnet.Attributes.Networks
+                    ),
+                    timeout=TIMEOUT
+                )
+
+            finally:
+                logger.info(f" --- Step 9: networks: {networks}")
+                if networks and networks[0].connected:
+                    break
+                else:
+                    retry += 1
 
         for idx, network in enumerate(networks):
             if network.networkID == wifi_2nd_ap_ssid.encode():
