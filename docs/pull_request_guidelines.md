@@ -88,7 +88,7 @@ details:
 
 -   If automated unit tests, a brief mention like `added/updated unit tests` is
     sufficient. Thank you for adding automated unit tests and we accept this
-    area to be brief
+    area to be brief.
 
 -   if automated integration tests, this can be brief as well saying
     `TC_*.yaml/py` tests this, also add a brief text on why unit testing was not
