@@ -95,7 +95,7 @@ Provide sufficient information for a reviewer to understand the change. Include:
     -   clearly explain if the PR is based on in progress work (often for Spec
         issues)
     -   larger changes/features should include some design document link.
-        Reviewers may not be familiar with discussions from the many timer teams
+        Reviewers may not be familiar with discussions from the many tiger teams
         that work on the matter SDK.
 -   If changing common code, check where any RAM/FLASH overhead comes from. You
     can use [size tooling](../scripts/tools/ELF_SIZE_TOOLING.md) to gather this
