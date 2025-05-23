@@ -309,6 +309,10 @@ CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+esp_netif_t *ap = NULL;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+esp_netif_t *sta = NULL;
 CHIP_ERROR ESP32Utils::InitWiFiStack(void)
 {
     wifi_init_config_t cfg;
@@ -324,7 +328,8 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     // Lets not create a default AP interface if already present
     if (!esp_netif_get_handle_from_ifkey(kDefaultWiFiAPNetifKey))
     {
-        if (!esp_netif_create_default_wifi_ap())
+        ap = esp_netif_create_default_wifi_ap();
+        if (!ap)
         {
             ChipLogError(DeviceLayer, "Failed to create the WiFi AP netif");
             return CHIP_ERROR_INTERNAL;
@@ -335,7 +340,8 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     // Lets not create a default station interface if already present
     if (!esp_netif_get_handle_from_ifkey(kDefaultWiFiStationNetifKey))
     {
-        if (!esp_netif_create_default_wifi_sta())
+        sta = esp_netif_create_default_wifi_sta();
+        if (!sta)
         {
             ChipLogError(DeviceLayer, "Failed to create the WiFi STA netif");
             return CHIP_ERROR_INTERNAL;
@@ -367,6 +373,38 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     {
         return ESP32Utils::MapError(err);
     }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ESP32Utils::ShutdownWiFiStack(void)
+{
+    esp_err_t err = esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent);
+    if (err != ESP_OK)
+    {
+        return ESP32Utils::MapError(err);
+    }
+
+    // Deinitialize the ESP WiFi layer.
+    err = esp_wifi_stop();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_wifi_stop (0x%x)", err);
+        return ESP32Utils::MapError(err);
+    }
+    err = esp_wifi_deinit();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_wifi_deinit (0x%x)", err);
+        return ESP32Utils::MapError(err);
+    }
+    if(sta) {
+        esp_netif_destroy_default_wifi(sta);
+    }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    if(ap) {
+        esp_netif_destroy_default_wifi(ap);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
