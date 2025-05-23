@@ -131,12 +131,16 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
 
 CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
 {
-    return this->SetTableEntry(fabric_index, entry);
+    return this->SetTableEntry(fabric_index, entry.mStorageId, entry.mStorageData);
 }
 
 CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
 {
-    return this->GetTableEntry(fabric_index, scene_id, entry);
+    // All data is copied to SceneTableEntry, buffer can be allocated on stack
+    PersistentStore<Serializer::kEntryMaxBytes()> store;
+    ReturnErrorOnFailure(this->GetTableEntry(fabric_index, scene_id, entry.mStorageData, store));
+    entry.mStorageId = scene_id;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
@@ -198,7 +202,7 @@ CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(FabricIndex fabric_inde
         if (fabric.entry_map[i].mGroupId == group_id)
         {
             // Removing each scene from the nvm and clearing their entry in the scene map
-            ReturnErrorOnFailure(fabric.RemoveEntry(mStorage, fabric.entry_map[i]));
+            ReturnErrorOnFailure(fabric.RemoveEntry(*mStorage, fabric.entry_map[i]));
         }
     }
 
