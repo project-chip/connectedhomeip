@@ -44,12 +44,12 @@ using SnapshotCapabilitiesStruct   = Structs::SnapshotCapabilitiesStruct::Type;
 using VideoResolutionStruct        = Structs::VideoResolutionStruct::Type;
 using RateDistortionTradeOffStruct = Structs::RateDistortionTradeOffPointsStruct::Type;
 
-constexpr uint8_t kMaxSpeakerLevel               = 254;
-constexpr uint8_t kMaxMicrophoneLevel            = 254;
-constexpr uint16_t kMaxImageRotationDegrees      = 359;
-constexpr uint8_t kMaxChannelCount               = 8;
-constexpr uint8_t kMaxImageQualityMetric         = 100;
-constexpr uint16_t kMaxKeyFrameIntervalMaxValue  = 65500;
+constexpr uint8_t kMaxSpeakerLevel              = 254;
+constexpr uint8_t kMaxMicrophoneLevel           = 254;
+constexpr uint16_t kMaxImageRotationDegrees     = 359;
+constexpr uint8_t kMaxChannelCount              = 8;
+constexpr uint8_t kMaxImageQualityMetric        = 100;
+constexpr uint16_t kMaxKeyFrameIntervalMaxValue = 65500;
 // Conservative room for other fields (resolution + codec) in
 // capture snapshot response. TODO: Make a tighter bound.
 constexpr size_t kMaxSnapshotImageSize = kMaxLargeSecureSduLengthBytes - 100;
@@ -525,29 +525,29 @@ private:
     const std::vector<SnapshotCapabilitiesStruct> mSnapshotCapabilitiesList;
     const uint32_t mMaxNetworkBandwidth;
 
-    uint16_t mCurrentFrameRate             = 0;
-    bool mHDRModeEnabled                   = false;
-    bool mSoftRecordingPrivacyModeEnabled  = false;
-    bool mSoftLivestreamPrivacyModeEnabled = false;
-    bool mHardPrivacyModeOn                = false;
-    TriStateAutoEnum mNightVision          = TriStateAutoEnum::kOn;
-    TriStateAutoEnum mNightVisionIllum     = TriStateAutoEnum::kOn;
+    uint16_t mCurrentFrameRate                                            = 0;
+    bool mHDRModeEnabled                                                  = false;
+    bool mSoftRecordingPrivacyModeEnabled                                 = false;
+    bool mSoftLivestreamPrivacyModeEnabled                                = false;
+    bool mHardPrivacyModeOn                                               = false;
+    TriStateAutoEnum mNightVision                                         = TriStateAutoEnum::kOn;
+    TriStateAutoEnum mNightVisionIllum                                    = TriStateAutoEnum::kOn;
     chip::app::Clusters::Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 0, 0 };
-    bool mSpeakerMuted                     = false;
-    uint8_t mSpeakerVolumeLevel            = 0;
-    uint8_t mSpeakerMaxLevel               = kMaxSpeakerLevel;
-    uint8_t mSpeakerMinLevel               = 0;
-    bool mMicrophoneMuted                  = false;
-    uint8_t mMicrophoneVolumeLevel         = 0;
-    uint8_t mMicrophoneMaxLevel            = kMaxMicrophoneLevel;
-    uint8_t mMicrophoneMinLevel            = 0;
-    bool mMicrophoneAGCEnabled             = false;
-    uint16_t mImageRotation                = 0;
-    bool mImageFlipHorizontal              = false;
-    bool mImageFlipVertical                = false;
-    bool mLocalVideoRecordingEnabled       = false;
-    bool mLocalSnapshotRecordingEnabled    = false;
-    bool mStatusLightEnabled               = false;
+    bool mSpeakerMuted                                                    = false;
+    uint8_t mSpeakerVolumeLevel                                           = 0;
+    uint8_t mSpeakerMaxLevel                                              = kMaxSpeakerLevel;
+    uint8_t mSpeakerMinLevel                                              = 0;
+    bool mMicrophoneMuted                                                 = false;
+    uint8_t mMicrophoneVolumeLevel                                        = 0;
+    uint8_t mMicrophoneMaxLevel                                           = kMaxMicrophoneLevel;
+    uint8_t mMicrophoneMinLevel                                           = 0;
+    bool mMicrophoneAGCEnabled                                            = false;
+    uint16_t mImageRotation                                               = 0;
+    bool mImageFlipHorizontal                                             = false;
+    bool mImageFlipVertical                                               = false;
+    bool mLocalVideoRecordingEnabled                                      = false;
+    bool mLocalSnapshotRecordingEnabled                                   = false;
+    bool mStatusLightEnabled                                              = false;
 
     Globals::ThreeLevelAutoEnum mStatusLightBrightness = Globals::ThreeLevelAutoEnum::kMedium;
 

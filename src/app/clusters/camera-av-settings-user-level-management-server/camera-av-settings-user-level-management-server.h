@@ -175,7 +175,8 @@ public:
      * Allows for a delegate or application to update the viewport of an already allocated video stream.
      * This should be invoked whenever a viewport is updated by DPTZSetVewport or DPTZRelativeMove
      */
-    void UpdateMoveCapableVideoStream(uint16_t aVideoStreamID, chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport);
+    void UpdateMoveCapableVideoStream(uint16_t aVideoStreamID,
+                                      chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport);
 
     /**
      * Allows for a delegate or application to update all of the viewports for all of the allocated video streams.
@@ -277,8 +278,8 @@ public:
      * allocated or deallocated stream, or the viewport when the device level viewport is updated.
      * The delegate shall invoke the appropriate MoveCapableVideoStream methods on its instance of the server
      */
-    virtual void VideoStreamAllocated(uint16_t aStreamID)                        = 0;
-    virtual void VideoStreamDeallocated(uint16_t aStreamID)                      = 0;
+    virtual void VideoStreamAllocated(uint16_t aStreamID)                                                      = 0;
+    virtual void VideoStreamDeallocated(uint16_t aStreamID)                                                    = 0;
     virtual void DefaultViewportUpdated(chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport) = 0;
 
     /**
@@ -346,8 +347,8 @@ public:
      * @param aVideoStreamID The ID for the videa stream that is subject to change
      * @param aViewport      The new values of Viewport that are to be set
      */
-    virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
-                                                                chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport) = 0;
+    virtual Protocols::InteractionModel::Status
+    DPTZSetViewport(uint16_t aVideoStreamID, chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport) = 0;
     /**
      * Informs the delegate that a request has been made to digitally alter the current rendered stream. The server has already
      * validated that the Zoom Delta (if provided) is in range, and that the video stream ID is valid. The app needs to work with
@@ -358,9 +359,9 @@ public:
      * @param aDeltaY        Number of pixels to move in the Y plane
      * @param aZoomDelta     Relative change of digital zoom
      */
-    virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                                 Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                                 chip::app::Clusters::Globals::Structs::ViewportStruct::Type & aViewport) = 0;
+    virtual Protocols::InteractionModel::Status
+    DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
+                     chip::app::Clusters::Globals::Structs::ViewportStruct::Type & aViewport) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
