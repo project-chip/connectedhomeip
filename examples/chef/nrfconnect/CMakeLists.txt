@@ -140,6 +140,19 @@ add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 
+pw_proto_library(actions_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/actions_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/actions_service.options
+  PREFIX
+  actions_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
 pw_proto_library(attributes_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.proto
@@ -232,6 +245,7 @@ target_include_directories(app PRIVATE
   ../../common/pigweed/nrfconnect)
 
 target_compile_options(app PRIVATE
+                       "-DPW_RPC_ACTIONS_SERVICE=1"
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BOOLEAN_STATE_SERVICE=1"
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
@@ -240,6 +254,7 @@ target_compile_options(app PRIVATE
 )
 
 target_link_libraries(app PRIVATE
+  actions_service.nanopb_rpc
   attributes_service.nanopb_rpc
   boolean_state_service.nanopb_rpc
   descriptor_service.nanopb_rpc

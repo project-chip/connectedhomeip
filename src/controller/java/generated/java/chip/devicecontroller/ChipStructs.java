@@ -14950,23 +14950,99 @@ public static class CameraAvSettingsUserLevelManagementClusterDPTZStruct {
     return output.toString();
   }
 }
+public static class WebRTCTransportProviderClusterICECandidateStruct {
+  public String candidate;
+  public @Nullable String SDPMid;
+  public @Nullable Integer SDPMLineIndex;
+  private static final long CANDIDATE_ID = 0L;
+  private static final long SDP_MID_ID = 1L;
+  private static final long SDPM_LINE_INDEX_ID = 2L;
+
+  public WebRTCTransportProviderClusterICECandidateStruct(
+    String candidate,
+    @Nullable String SDPMid,
+    @Nullable Integer SDPMLineIndex
+  ) {
+    this.candidate = candidate;
+    this.SDPMid = SDPMid;
+    this.SDPMLineIndex = SDPMLineIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CANDIDATE_ID, new StringType(candidate)));
+    values.add(new StructElement(SDP_MID_ID, SDPMid != null ? new StringType(SDPMid) : new NullType()));
+    values.add(new StructElement(SDPM_LINE_INDEX_ID, SDPMLineIndex != null ? new UIntType(SDPMLineIndex) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportProviderClusterICECandidateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String candidate = null;
+    @Nullable String SDPMid = null;
+    @Nullable Integer SDPMLineIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CANDIDATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          candidate = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SDP_MID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          SDPMid = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SDPM_LINE_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          SDPMLineIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new WebRTCTransportProviderClusterICECandidateStruct(
+      candidate,
+      SDPMid,
+      SDPMLineIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportProviderClusterICECandidateStruct {\n");
+    output.append("\tcandidate: ");
+    output.append(candidate);
+    output.append("\n");
+    output.append("\tSDPMid: ");
+    output.append(SDPMid);
+    output.append("\n");
+    output.append("\tSDPMLineIndex: ");
+    output.append(SDPMLineIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class WebRTCTransportProviderClusterICEServerStruct {
-  public ArrayList<String> urls;
+  public ArrayList<String> URLs;
   public Optional<String> username;
   public Optional<String> credential;
   public Optional<Integer> caid;
-  private static final long URLS_ID = 1L;
-  private static final long USERNAME_ID = 2L;
-  private static final long CREDENTIAL_ID = 3L;
-  private static final long CAID_ID = 4L;
+  private static final long UR_LS_ID = 0L;
+  private static final long USERNAME_ID = 1L;
+  private static final long CREDENTIAL_ID = 2L;
+  private static final long CAID_ID = 3L;
 
   public WebRTCTransportProviderClusterICEServerStruct(
-    ArrayList<String> urls,
+    ArrayList<String> URLs,
     Optional<String> username,
     Optional<String> credential,
     Optional<Integer> caid
   ) {
-    this.urls = urls;
+    this.URLs = URLs;
     this.username = username;
     this.credential = credential;
     this.caid = caid;
@@ -14974,7 +15050,7 @@ public static class WebRTCTransportProviderClusterICEServerStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(URLS_ID, ArrayType.generateArrayType(urls, (elementurls) -> new StringType(elementurls))));
+    values.add(new StructElement(UR_LS_ID, ArrayType.generateArrayType(URLs, (elementURLs) -> new StringType(elementURLs))));
     values.add(new StructElement(USERNAME_ID, username.<BaseTLVType>map((nonOptionalusername) -> new StringType(nonOptionalusername)).orElse(new EmptyType())));
     values.add(new StructElement(CREDENTIAL_ID, credential.<BaseTLVType>map((nonOptionalcredential) -> new StringType(nonOptionalcredential)).orElse(new EmptyType())));
     values.add(new StructElement(CAID_ID, caid.<BaseTLVType>map((nonOptionalcaid) -> new UIntType(nonOptionalcaid)).orElse(new EmptyType())));
@@ -14986,15 +15062,15 @@ public static class WebRTCTransportProviderClusterICEServerStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ArrayList<String> urls = null;
+    ArrayList<String> URLs = null;
     Optional<String> username = Optional.empty();
     Optional<String> credential = Optional.empty();
     Optional<Integer> caid = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == URLS_ID) {
+      if (element.contextTagNum() == UR_LS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          urls = castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class));
+          URLs = castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class));
         }
       } else if (element.contextTagNum() == USERNAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -15014,7 +15090,7 @@ public static class WebRTCTransportProviderClusterICEServerStruct {
       }
     }
     return new WebRTCTransportProviderClusterICEServerStruct(
-      urls,
+      URLs,
       username,
       credential,
       caid
@@ -15025,8 +15101,8 @@ public static class WebRTCTransportProviderClusterICEServerStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("WebRTCTransportProviderClusterICEServerStruct {\n");
-    output.append("\turls: ");
-    output.append(urls);
+    output.append("\tURLs: ");
+    output.append(URLs);
     output.append("\n");
     output.append("\tusername: ");
     output.append(username);
@@ -15048,15 +15124,15 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
-  public Integer metadataOptions;
+  public Optional<Boolean> metadataEnabled;
   public Integer fabricIndex;
-  private static final long ID_ID = 1L;
-  private static final long PEER_NODE_ID_ID = 2L;
-  private static final long PEER_ENDPOINT_ID_ID = 3L;
-  private static final long STREAM_USAGE_ID = 4L;
-  private static final long VIDEO_STREAM_ID_ID = 5L;
-  private static final long AUDIO_STREAM_ID_ID = 6L;
-  private static final long METADATA_OPTIONS_ID = 7L;
+  private static final long ID_ID = 0L;
+  private static final long PEER_NODE_ID_ID = 1L;
+  private static final long PEER_ENDPOINT_ID_ID = 2L;
+  private static final long STREAM_USAGE_ID = 3L;
+  private static final long VIDEO_STREAM_ID_ID = 4L;
+  private static final long AUDIO_STREAM_ID_ID = 5L;
+  private static final long METADATA_ENABLED_ID = 6L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportProviderClusterWebRTCSessionStruct(
@@ -15066,7 +15142,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
-    Integer metadataOptions,
+    Optional<Boolean> metadataEnabled,
     Integer fabricIndex
   ) {
     this.id = id;
@@ -15075,7 +15151,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
-    this.metadataOptions = metadataOptions;
+    this.metadataEnabled = metadataEnabled;
     this.fabricIndex = fabricIndex;
   }
 
@@ -15087,7 +15163,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
-    values.add(new StructElement(METADATA_OPTIONS_ID, new UIntType(metadataOptions)));
+    values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -15103,7 +15179,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
-    Integer metadataOptions = null;
+    Optional<Boolean> metadataEnabled = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ID_ID) {
@@ -15136,10 +15212,10 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
           UIntType castingValue = element.value(UIntType.class);
           audioStreamID = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == METADATA_OPTIONS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          metadataOptions = castingValue.value(Integer.class);
+      } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          metadataEnabled = Optional.of(castingValue.value(Boolean.class));
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15155,7 +15231,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
       streamUsage,
       videoStreamID,
       audioStreamID,
-      metadataOptions,
+      metadataEnabled,
       fabricIndex
     );
   }
@@ -15182,8 +15258,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     output.append("\taudioStreamID: ");
     output.append(audioStreamID);
     output.append("\n");
-    output.append("\tmetadataOptions: ");
-    output.append(metadataOptions);
+    output.append("\tmetadataEnabled: ");
+    output.append(metadataEnabled);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
@@ -15192,23 +15268,99 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     return output.toString();
   }
 }
+public static class WebRTCTransportRequestorClusterICECandidateStruct {
+  public String candidate;
+  public @Nullable String SDPMid;
+  public @Nullable Integer SDPMLineIndex;
+  private static final long CANDIDATE_ID = 0L;
+  private static final long SDP_MID_ID = 1L;
+  private static final long SDPM_LINE_INDEX_ID = 2L;
+
+  public WebRTCTransportRequestorClusterICECandidateStruct(
+    String candidate,
+    @Nullable String SDPMid,
+    @Nullable Integer SDPMLineIndex
+  ) {
+    this.candidate = candidate;
+    this.SDPMid = SDPMid;
+    this.SDPMLineIndex = SDPMLineIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CANDIDATE_ID, new StringType(candidate)));
+    values.add(new StructElement(SDP_MID_ID, SDPMid != null ? new StringType(SDPMid) : new NullType()));
+    values.add(new StructElement(SDPM_LINE_INDEX_ID, SDPMLineIndex != null ? new UIntType(SDPMLineIndex) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportRequestorClusterICECandidateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String candidate = null;
+    @Nullable String SDPMid = null;
+    @Nullable Integer SDPMLineIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CANDIDATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          candidate = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SDP_MID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          SDPMid = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SDPM_LINE_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          SDPMLineIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new WebRTCTransportRequestorClusterICECandidateStruct(
+      candidate,
+      SDPMid,
+      SDPMLineIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportRequestorClusterICECandidateStruct {\n");
+    output.append("\tcandidate: ");
+    output.append(candidate);
+    output.append("\n");
+    output.append("\tSDPMid: ");
+    output.append(SDPMid);
+    output.append("\n");
+    output.append("\tSDPMLineIndex: ");
+    output.append(SDPMLineIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class WebRTCTransportRequestorClusterICEServerStruct {
-  public ArrayList<String> urls;
+  public ArrayList<String> URLs;
   public Optional<String> username;
   public Optional<String> credential;
   public Optional<Integer> caid;
-  private static final long URLS_ID = 1L;
-  private static final long USERNAME_ID = 2L;
-  private static final long CREDENTIAL_ID = 3L;
-  private static final long CAID_ID = 4L;
+  private static final long UR_LS_ID = 0L;
+  private static final long USERNAME_ID = 1L;
+  private static final long CREDENTIAL_ID = 2L;
+  private static final long CAID_ID = 3L;
 
   public WebRTCTransportRequestorClusterICEServerStruct(
-    ArrayList<String> urls,
+    ArrayList<String> URLs,
     Optional<String> username,
     Optional<String> credential,
     Optional<Integer> caid
   ) {
-    this.urls = urls;
+    this.URLs = URLs;
     this.username = username;
     this.credential = credential;
     this.caid = caid;
@@ -15216,7 +15368,7 @@ public static class WebRTCTransportRequestorClusterICEServerStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(URLS_ID, ArrayType.generateArrayType(urls, (elementurls) -> new StringType(elementurls))));
+    values.add(new StructElement(UR_LS_ID, ArrayType.generateArrayType(URLs, (elementURLs) -> new StringType(elementURLs))));
     values.add(new StructElement(USERNAME_ID, username.<BaseTLVType>map((nonOptionalusername) -> new StringType(nonOptionalusername)).orElse(new EmptyType())));
     values.add(new StructElement(CREDENTIAL_ID, credential.<BaseTLVType>map((nonOptionalcredential) -> new StringType(nonOptionalcredential)).orElse(new EmptyType())));
     values.add(new StructElement(CAID_ID, caid.<BaseTLVType>map((nonOptionalcaid) -> new UIntType(nonOptionalcaid)).orElse(new EmptyType())));
@@ -15228,15 +15380,15 @@ public static class WebRTCTransportRequestorClusterICEServerStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ArrayList<String> urls = null;
+    ArrayList<String> URLs = null;
     Optional<String> username = Optional.empty();
     Optional<String> credential = Optional.empty();
     Optional<Integer> caid = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == URLS_ID) {
+      if (element.contextTagNum() == UR_LS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          urls = castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class));
+          URLs = castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class));
         }
       } else if (element.contextTagNum() == USERNAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -15256,7 +15408,7 @@ public static class WebRTCTransportRequestorClusterICEServerStruct {
       }
     }
     return new WebRTCTransportRequestorClusterICEServerStruct(
-      urls,
+      URLs,
       username,
       credential,
       caid
@@ -15267,8 +15419,8 @@ public static class WebRTCTransportRequestorClusterICEServerStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("WebRTCTransportRequestorClusterICEServerStruct {\n");
-    output.append("\turls: ");
-    output.append(urls);
+    output.append("\tURLs: ");
+    output.append(URLs);
     output.append("\n");
     output.append("\tusername: ");
     output.append(username);
@@ -15290,15 +15442,15 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
-  public Integer metadataOptions;
+  public Optional<Boolean> metadataEnabled;
   public Integer fabricIndex;
-  private static final long ID_ID = 1L;
-  private static final long PEER_NODE_ID_ID = 2L;
-  private static final long PEER_ENDPOINT_ID_ID = 3L;
-  private static final long STREAM_USAGE_ID = 4L;
-  private static final long VIDEO_STREAM_ID_ID = 5L;
-  private static final long AUDIO_STREAM_ID_ID = 6L;
-  private static final long METADATA_OPTIONS_ID = 7L;
+  private static final long ID_ID = 0L;
+  private static final long PEER_NODE_ID_ID = 1L;
+  private static final long PEER_ENDPOINT_ID_ID = 2L;
+  private static final long STREAM_USAGE_ID = 3L;
+  private static final long VIDEO_STREAM_ID_ID = 4L;
+  private static final long AUDIO_STREAM_ID_ID = 5L;
+  private static final long METADATA_ENABLED_ID = 6L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportRequestorClusterWebRTCSessionStruct(
@@ -15308,7 +15460,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
-    Integer metadataOptions,
+    Optional<Boolean> metadataEnabled,
     Integer fabricIndex
   ) {
     this.id = id;
@@ -15317,7 +15469,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
-    this.metadataOptions = metadataOptions;
+    this.metadataEnabled = metadataEnabled;
     this.fabricIndex = fabricIndex;
   }
 
@@ -15329,7 +15481,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
-    values.add(new StructElement(METADATA_OPTIONS_ID, new UIntType(metadataOptions)));
+    values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -15345,7 +15497,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
-    Integer metadataOptions = null;
+    Optional<Boolean> metadataEnabled = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ID_ID) {
@@ -15378,10 +15530,10 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
           UIntType castingValue = element.value(UIntType.class);
           audioStreamID = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == METADATA_OPTIONS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          metadataOptions = castingValue.value(Integer.class);
+      } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          metadataEnabled = Optional.of(castingValue.value(Boolean.class));
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15397,7 +15549,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
       streamUsage,
       videoStreamID,
       audioStreamID,
-      metadataOptions,
+      metadataEnabled,
       fabricIndex
     );
   }
@@ -15424,8 +15576,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     output.append("\taudioStreamID: ");
     output.append(audioStreamID);
     output.append("\n");
-    output.append("\tmetadataOptions: ");
-    output.append(metadataOptions);
+    output.append("\tmetadataEnabled: ");
+    output.append(metadataEnabled);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
