@@ -29972,8 +29972,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProvidersolicitOfferICETransportPolicyCommandParameterInfo = new CommandParameterInfo("ICETransportPolicy", Optional.class, String.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("ICETransportPolicy",webRTCTransportProvidersolicitOfferICETransportPolicyCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProvidersolicitOffermetadataOptionsCommandParameterInfo = new CommandParameterInfo("metadataOptions", Optional.class, Integer.class);
-    webRTCTransportProvidersolicitOfferCommandParams.put("metadataOptions",webRTCTransportProvidersolicitOffermetadataOptionsCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProvidersolicitOffermetadataEnabledCommandParameterInfo = new CommandParameterInfo("metadataEnabled", Optional.class, Boolean.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("metadataEnabled",webRTCTransportProvidersolicitOffermetadataEnabledCommandParameterInfo);
     InteractionInfo webRTCTransportProvidersolicitOfferInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
@@ -29996,8 +29996,8 @@ public class ClusterInfoMapping {
            , (Optional<String>)
              commandArguments.get("ICETransportPolicy")
 
-           , (Optional<Integer>)
-             commandArguments.get("metadataOptions")
+           , (Optional<Boolean>)
+             commandArguments.get("metadataEnabled")
 
             );
         },
@@ -30030,8 +30030,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideOfferICETransportPolicyCommandParameterInfo = new CommandParameterInfo("ICETransportPolicy", Optional.class, String.class);
     webRTCTransportProviderprovideOfferCommandParams.put("ICETransportPolicy",webRTCTransportProviderprovideOfferICETransportPolicyCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideOffermetadataOptionsCommandParameterInfo = new CommandParameterInfo("metadataOptions", Optional.class, Integer.class);
-    webRTCTransportProviderprovideOfferCommandParams.put("metadataOptions",webRTCTransportProviderprovideOffermetadataOptionsCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProviderprovideOffermetadataEnabledCommandParameterInfo = new CommandParameterInfo("metadataEnabled", Optional.class, Boolean.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("metadataEnabled",webRTCTransportProviderprovideOffermetadataEnabledCommandParameterInfo);
     InteractionInfo webRTCTransportProviderprovideOfferInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
@@ -30060,8 +30060,8 @@ public class ClusterInfoMapping {
            , (Optional<String>)
              commandArguments.get("ICETransportPolicy")
 
-           , (Optional<Integer>)
-             commandArguments.get("metadataOptions")
+           , (Optional<Boolean>)
+             commandArguments.get("metadataEnabled")
 
             );
         },
@@ -30097,15 +30097,13 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
     webRTCTransportProviderprovideICECandidatesCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideICECandidatesICECandidatesCommandParameterInfo = new CommandParameterInfo("ICECandidates", ArrayList.class, ArrayList.class);
-    webRTCTransportProviderprovideICECandidatesCommandParams.put("ICECandidates",webRTCTransportProviderprovideICECandidatesICECandidatesCommandParameterInfo);
     InteractionInfo webRTCTransportProviderprovideICECandidatesInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
         .provideICECandidates((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("webRTCSessionID")
-        , (ArrayList<String>)
+        , (ArrayList<ChipStructs.WebRTCTransportProviderClusterICECandidateStruct>)
         commandArguments.get("ICECandidates")
         );
       },
@@ -30197,15 +30195,13 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportRequestorICECandidateswebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
     webRTCTransportRequestorICECandidatesCommandParams.put("webRTCSessionID",webRTCTransportRequestorICECandidateswebRTCSessionIDCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportRequestorICECandidatesICECandidatesCommandParameterInfo = new CommandParameterInfo("ICECandidates", ArrayList.class, ArrayList.class);
-    webRTCTransportRequestorICECandidatesCommandParams.put("ICECandidates",webRTCTransportRequestorICECandidatesICECandidatesCommandParameterInfo);
     InteractionInfo webRTCTransportRequestorICECandidatesInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
         .ICECandidates((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("webRTCSessionID")
-        , (ArrayList<String>)
+        , (ArrayList<ChipStructs.WebRTCTransportRequestorClusterICECandidateStruct>)
         commandArguments.get("ICECandidates")
         );
       },
