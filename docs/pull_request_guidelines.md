@@ -12,7 +12,7 @@ following items are met (and see below for details)
         final goal)
 -   [ ] Change is well tested
     -   testing is described in `### Testing` section in the pull request
-        summary
+        summary (please include instructions and commands to test your PR)
     -   Strongly prefer automated tests to manual tests
 -   [ ] Good Pull request summary/description
     -   Summary contains an accurate description of changes
