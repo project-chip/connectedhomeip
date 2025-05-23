@@ -38,7 +38,7 @@ files under a `/generated/` folder like for darwin/kotlin/java/python)
 
 Change things that are related (e.g. code and documentation and tests), however
 do not combine unrelated changes (like unrelated documentation typo fixes,
-fixing multiple issues in one PR, implementing a full app withing first having
+fixing multiple issues in one PR, implementing a full app without first having
 the skeleton app).
 
 ### Testing
