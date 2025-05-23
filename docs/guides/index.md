@@ -13,10 +13,10 @@ and features.
 
 ## Build Guides
 
-- [Building](./BUILDING.md)
+-   [Building](./BUILDING.md)
 
 ## Development Guides
 
-- [Access Control](./access-control-guide.md)
-- [Matter IDL tooling and validation](./matter_idl_tooling.md)
-- [Writing clusters](./writing_clusters.md)
+-   [Access Control](./access-control-guide.md)
+-   [Matter IDL tooling and validation](./matter_idl_tooling.md)
+-   [Writing clusters](./writing_clusters.md)

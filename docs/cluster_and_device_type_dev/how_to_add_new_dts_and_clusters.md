@@ -37,10 +37,10 @@ directory:**
 
 You will need the ZAP tool to edit the ZAP file.
 
-- Unless you already have the tool installed, you can use one of the
+-   Unless you already have the tool installed, you can use one of the
     [nightly builds](https://github.com/project-chip/zap/releases)
-- [ZAP tool info](https://developers.home.google.com/matter/tools/zap)
-- [ZAP tool repo](https://github.com/project-chip/zap)
+-   [ZAP tool info](https://developers.home.google.com/matter/tools/zap)
+-   [ZAP tool repo](https://github.com/project-chip/zap)
 
 Use the ZAP GUI tool to edit the file above:
 
@@ -102,7 +102,8 @@ related SDK tests.
 1. Implement new clusters here:
    [src/app/clusters](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters)
 
-   Documentation [here](../guides/writing_clusters.md)
+    Documentation [here](../guides/writing_clusters.md)
+
 2. Implement tests here:
    [src/app/tests/suites](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites)
 3. Implement the example cluster server application:
