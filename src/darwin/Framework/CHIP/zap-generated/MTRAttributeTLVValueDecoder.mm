@@ -18181,8 +18181,8 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
         }
         return value;
     }
-    case Attributes::DPTZRelativeMove::Id: {
-        using TypeInfo = Attributes::DPTZRelativeMove::TypeInfo;
+    case Attributes::DPTZStreams::Id: {
+        using TypeInfo = Attributes::DPTZStreams::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -18194,8 +18194,14 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct * newElement_0;
+                newElement_0 = [MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct new];
+                newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID];
+                newElement_0.viewport = [MTRCameraAVSettingsUserLevelManagementClusterViewportStruct new];
+                newElement_0.viewport.x1 = [NSNumber numberWithUnsignedShort:entry_0.viewport.x1];
+                newElement_0.viewport.y1 = [NSNumber numberWithUnsignedShort:entry_0.viewport.y1];
+                newElement_0.viewport.x2 = [NSNumber numberWithUnsignedShort:entry_0.viewport.x2];
+                newElement_0.viewport.y2 = [NSNumber numberWithUnsignedShort:entry_0.viewport.y2];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -18288,8 +18294,8 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRWebRTCTransportProviderClusterWebRTCSessionStruct * newElement_0;
-                newElement_0 = [MTRWebRTCTransportProviderClusterWebRTCSessionStruct new];
+                MTRDataTypeWebRTCSessionStruct * newElement_0;
+                newElement_0 = [MTRDataTypeWebRTCSessionStruct new];
                 newElement_0.id = [NSNumber numberWithUnsignedShort:entry_0.id];
                 newElement_0.peerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.peerNodeID];
                 newElement_0.peerEndpointID = [NSNumber numberWithUnsignedShort:entry_0.peerEndpointID];
@@ -18304,7 +18310,11 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
                 } else {
                     newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
                 }
-                newElement_0.metadataOptions = [NSNumber numberWithUnsignedChar:entry_0.metadataOptions.Raw()];
+                if (entry_0.metadataEnabled.HasValue()) {
+                    newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled.Value()];
+                } else {
+                    newElement_0.metadataEnabled = nil;
+                }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -18343,8 +18353,8 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRWebRTCTransportRequestorClusterWebRTCSessionStruct * newElement_0;
-                newElement_0 = [MTRWebRTCTransportRequestorClusterWebRTCSessionStruct new];
+                MTRDataTypeWebRTCSessionStruct * newElement_0;
+                newElement_0 = [MTRDataTypeWebRTCSessionStruct new];
                 newElement_0.id = [NSNumber numberWithUnsignedShort:entry_0.id];
                 newElement_0.peerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.peerNodeID];
                 newElement_0.peerEndpointID = [NSNumber numberWithUnsignedShort:entry_0.peerEndpointID];
@@ -18359,7 +18369,11 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
                 } else {
                     newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
                 }
-                newElement_0.metadataOptions = [NSNumber numberWithUnsignedChar:entry_0.metadataOptions.Raw()];
+                if (entry_0.metadataEnabled.HasValue()) {
+                    newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled.Value()];
+                } else {
+                    newElement_0.metadataEnabled = nil;
+                }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -19851,7 +19865,6 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
                     newElement_0.groupCATVersion = [NSNumber numberWithUnsignedShort:entry_0.groupCATVersion.Value()];
                 }
                 newElement_0.groupPermission = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.groupPermission)];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -19889,7 +19902,6 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
                 newElement_0.commissioningStatusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.commissioningStatusEntry.state)];
                 newElement_0.commissioningStatusEntry.updateTimestamp = [NSNumber numberWithUnsignedInt:entry_0.commissioningStatusEntry.updateTimestamp];
                 newElement_0.commissioningStatusEntry.failureCode = [NSNumber numberWithUnsignedChar:entry_0.commissioningStatusEntry.failureCode];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -19925,7 +19937,6 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
                 }
                 newElement_0.vendorID = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorID)];
                 newElement_0.icac = AsData(entry_0.icac);
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -19944,12 +19955,11 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRJointFabricDatastoreClusterDatastoreStatusStruct * _Nonnull value;
-        value = [MTRJointFabricDatastoreClusterDatastoreStatusStruct new];
+        MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nonnull value;
+        value = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
         value.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.state)];
         value.updateTimestamp = [NSNumber numberWithUnsignedInt:cppValue.updateTimestamp];
         value.failureCode = [NSNumber numberWithUnsignedChar:cppValue.failureCode];
-        value.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
         return value;
     }
     case Attributes::EndpointGroupIDList::Id: {
@@ -19974,7 +19984,6 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
                 newElement_0.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.statusEntry.state)];
                 newElement_0.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedInt:entry_0.statusEntry.updateTimestamp];
                 newElement_0.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:entry_0.statusEntry.failureCode];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -20029,7 +20038,6 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
                 newElement_0.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.statusEntry.state)];
                 newElement_0.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedInt:entry_0.statusEntry.updateTimestamp];
                 newElement_0.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:entry_0.statusEntry.failureCode];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -20054,15 +20062,14 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRJointFabricDatastoreClusterDatastoreNodeKeySetEntry * newElement_0;
-                newElement_0 = [MTRJointFabricDatastoreClusterDatastoreNodeKeySetEntry new];
+                MTRJointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct * newElement_0;
+                newElement_0 = [MTRJointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct new];
                 newElement_0.nodeID = [NSNumber numberWithUnsignedLongLong:entry_0.nodeID];
                 newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
                 newElement_0.statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
                 newElement_0.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.statusEntry.state)];
                 newElement_0.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedInt:entry_0.statusEntry.updateTimestamp];
                 newElement_0.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:entry_0.statusEntry.failureCode];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -20153,7 +20160,6 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
                 newElement_0.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.statusEntry.state)];
                 newElement_0.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedInt:entry_0.statusEntry.updateTimestamp];
                 newElement_0.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:entry_0.statusEntry.failureCode];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -20276,6 +20282,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
                 } else {
                     newElement_0.certificate = nil;
                 }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -20339,6 +20346,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
                 } else {
                     newElement_0.intermediateCertificates = nil;
                 }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

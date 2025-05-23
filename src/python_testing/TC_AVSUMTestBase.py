@@ -79,7 +79,7 @@ class AVSUMTestBase:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
-    async def send_save_presets_command(self, endpoint, name: str, presetID: int = None, expected_status: Status = Status.Success):
+    async def send_save_preset_command(self, endpoint, name: str, presetID: int = None, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSavePreset(
                 name=name,
@@ -152,6 +152,18 @@ class AVSUMTestBase:
         pan = tilt = None
         await self.send_mptz_set_position_command(endpoint, pan, tilt, zoom, expected_status)
 
+    async def send_null_mptz_set_position_command(self, endpoint, expected_status: Status = Status.Success):
+        pan = tilt = zoom = None
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSetPosition(
+                pan=pan, tilt=tilt, zoom=zoom),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
     async def send_mptz_set_position_command(self, endpoint, pan, tilt, zoom, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZSetPosition(
@@ -175,6 +187,18 @@ class AVSUMTestBase:
         panDelta = tiltDelta = None
         await self.send_mptz_relative_move_command(endpoint, panDelta, tiltDelta, zoomDelta, expected_status)
 
+    async def send_null_mptz_relative_move_command(self, endpoint, expected_status: Status = Status.Success):
+        panDelta = tiltDelta = zoomDelta = None
+        try:
+            await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZRelativeMove(
+                panDelta=panDelta, tiltDelta=tiltDelta, zoomDelta=zoomDelta),
+                endpoint=endpoint)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
     async def send_mptz_relative_move_command(self, endpoint, panDelta, tiltDelta, zoomDelta, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.CameraAvSettingsUserLevelManagement.Commands.MPTZRelativeMove(
@@ -187,16 +211,25 @@ class AVSUMTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
+        attrs = Clusters.Objects.CameraAvStreamManagement.Attributes
+
+        # Get the parms from the device (those which are available)
+        aRankedStreamPriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.RankedVideoStreamPrioritiesList)
+        aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
+        aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
+        aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
+
         try:
             response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
-                streamUsage=1,
-                videoCodec=0,
+                streamUsage=aRankedStreamPriorities[0],
+                videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,
-                maxFrameRate=120,
-                minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=400, height=300),
-                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080),  # 16/9
-                minBitRate=20000,
-                maxBitRate=150000,
+                maxFrameRate=aVideoSensorParams.maxFPS,
+                minResolution=aMinViewport,
+                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=aVideoSensorParams.sensorWidth,
+                                                                                              height=aVideoSensorParams.sensorHeight),
+                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minFragmentLen=2000,
                 maxFragmentLen=8000
             ),

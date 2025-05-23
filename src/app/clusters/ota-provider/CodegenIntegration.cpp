@@ -19,7 +19,6 @@
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
-#include <array>
 #include <cstdint>
 
 using namespace chip;

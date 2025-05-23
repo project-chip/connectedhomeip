@@ -53,9 +53,8 @@ from time import sleep
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
 from chip.tlv import TLVReader
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
-                                                                       has_cluster, has_feature, run_if_endpoint_matches)
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 

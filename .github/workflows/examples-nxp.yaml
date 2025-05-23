@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:129
+            image: ghcr.io/project-chip/chip-build-nxp:132
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -189,11 +189,18 @@ jobs:
                       --target nxp-rw61x-freertos-all-clusters-wifi-ota-cmake \
                       build \
                   "
-            - name: Build RW61X thermostat example app
+            - name: Build RW61X thermostat OTBR example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory-cmake \
+                      build \
+                  "
+            - name: Build RW61X thermostat ethernet example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-thermostat-ethernet-cmake-frdm \
                       build \
                   "
 
@@ -212,7 +219,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:129
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:132
 
         steps:
             - name: Checkout

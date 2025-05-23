@@ -2431,7 +2431,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command ResetWatermarks
  *
- * Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute.
+ * This command is used to reset the high watermarks for heap and stack memory.
  */
 - (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)resetWatermarksWithCompletion:(MTRStatusCompletion)completion
@@ -2973,7 +2973,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command ResetCounts
  *
- * Reception of this command SHALL reset the Breacon and Packet related count attributes to 0
+ * This command is used to reset the count attributes.
  */
 - (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)resetCountsWithCompletion:(MTRStatusCompletion)completion
@@ -3115,7 +3115,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command ResetCounts
  *
- * Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0
+ * This command is used to reset the count attributes.
  */
 - (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)resetCountsWithCompletion:(MTRStatusCompletion)completion
@@ -14857,7 +14857,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command MPTZRelativeMove
  *
- * This command SHALL move the device by the delta values relative to the currently defined position.
+ * This command SHALL move the camera by the delta values relative to the currently defined position.
  */
 - (void)MPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)MPTZRelativeMoveWithCompletion:(MTRStatusCompletion)completion
@@ -14889,7 +14889,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command DPTZRelativeMove
  *
- * This command SHALL change the viewports location by the amount specified in a relative fashion.
+ * This command SHALL change the per stream viewport by the amount specified in a relative fashion.
  */
 - (void)DPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
@@ -14911,11 +14911,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeMPTZPresetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeDPTZRelativeMoveWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeDPTZRelativeMoveWithParams:(MTRSubscribeParams *)params
-                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeDPTZRelativeMoveWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeDPTZStreamsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeDPTZStreamsWithParams:(MTRSubscribeParams *)params
+                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeDPTZStreamsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeZoomMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeZoomMaxWithParams:(MTRSubscribeParams *)params
@@ -15109,7 +15109,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ICECandidates
  *
- * This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
+ * This command allows for the object based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
  */
 - (void)ICECandidatesWithParams:(MTRWebRTCTransportRequestorClusterICECandidatesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -15698,121 +15698,121 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command AddKeySet
  *
- * This command SHALL be used to add a KeySet to the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to add a KeySet to the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)addKeySetWithParams:(MTRJointFabricDatastoreClusterAddKeySetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command UpdateKeySet
  *
- * This command SHALL be used to update a KeySet in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to update a KeySet in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)updateKeySetWithParams:(MTRJointFabricDatastoreClusterUpdateKeySetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveKeySet
  *
- * This command SHALL be used to remove a KeySet from the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to remove a KeySet from the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)removeKeySetWithParams:(MTRJointFabricDatastoreClusterRemoveKeySetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command AddGroup
  *
- * This command SHALL be used to add a group to the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to add a group to the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)addGroupWithParams:(MTRJointFabricDatastoreClusterAddGroupParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command UpdateGroup
  *
- * This command SHALL be used to update a group in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to update a group in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)updateGroupWithParams:(MTRJointFabricDatastoreClusterUpdateGroupParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveGroup
  *
- * This command SHALL be used to remove a group from the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to remove a group from the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)removeGroupWithParams:(MTRJointFabricDatastoreClusterRemoveGroupParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command AddAdmin
  *
- * This command SHALL be used to add an admin to the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to add an admin to the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)addAdminWithParams:(MTRJointFabricDatastoreClusterAddAdminParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command UpdateAdmin
  *
- * This command SHALL be used to update an admin in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to update an admin in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)updateAdminWithParams:(MTRJointFabricDatastoreClusterUpdateAdminParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveAdmin
  *
- * This command SHALL be used to remove an admin from the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to remove an admin from the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)removeAdminWithParams:(MTRJointFabricDatastoreClusterRemoveAdminParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command AddPendingNode
  *
- * The command SHALL be used to add a node to the Joint Fabric Datastore Cluster.
+ * The command SHALL be used to add a node to the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)addPendingNodeWithParams:(MTRJointFabricDatastoreClusterAddPendingNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RefreshNode
  *
- * The command SHALL be used to request that Datastore information relating to a Node is refreshed.
+ * The command SHALL be used to request that Datastore information relating to a Node of the accessing fabric is refreshed.
  */
 - (void)refreshNodeWithParams:(MTRJointFabricDatastoreClusterRefreshNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command UpdateNode
  *
- * The command SHALL be used to update the friendly name for a node in the Joint Fabric Datastore Cluster.
+ * The command SHALL be used to update the friendly name for a node in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)updateNodeWithParams:(MTRJointFabricDatastoreClusterUpdateNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveNode
  *
- * This command SHALL be used to remove a node from the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to remove a node from the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)removeNodeWithParams:(MTRJointFabricDatastoreClusterRemoveNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command UpdateEndpointForNode
  *
- * This command SHALL be used to update the state of an endpoint for a node in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to update the state of an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)updateEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterUpdateEndpointForNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command AddGroupIDToEndpointForNode
  *
- * This command SHALL be used to add a Group ID to an endpoint for a node in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to add a Group ID to an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)addGroupIDToEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterAddGroupIDToEndpointForNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveGroupIDFromEndpointForNode
  *
- * This command SHALL be used to remove a Group ID from an endpoint for a node in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to remove a Group ID from an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)removeGroupIDFromEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterRemoveGroupIDFromEndpointForNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command AddBindingToEndpointForNode
  *
- * This command SHALL be used to add a binding to an endpoint for a node in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to add a binding to an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)addBindingToEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterAddBindingToEndpointForNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveBindingFromEndpointForNode
  *
- * This command SHALL be used to remove a binding from an endpoint for a node in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to remove a binding from an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)removeBindingFromEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterRemoveBindingFromEndpointForNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command AddACLToNode
  *
- * This command SHALL be used to add an ACL to a node in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to add an ACL to a node in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)addACLToNodeWithParams:(MTRJointFabricDatastoreClusterAddACLToNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveACLFromNode
  *
- * This command SHALL be used to remove an ACL from a node in the Joint Fabric Datastore Cluster.
+ * This command SHALL be used to remove an ACL from a node in the Joint Fabric Datastore Cluster of the accessing fabric.
  */
 - (void)removeACLFromNodeWithParams:(MTRJointFabricDatastoreClusterRemoveACLFromNodeParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
@@ -15846,49 +15846,49 @@ MTR_PROVISIONALLY_AVAILABLE
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeGroupKeySetListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeGroupListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeGroupListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGroupListWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeGroupListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeNodeListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeNodeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeNodeListWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeNodeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeAdminListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeAdminListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeAdminListWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeAdminListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeStatusWithCompletion:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeStatusWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                             reportHandler:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeStatusWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+                             reportHandler:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeStatusWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeEndpointGroupIDListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeEndpointGroupIDListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeEndpointGroupIDListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeEndpointGroupIDListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeEndpointBindingListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeEndpointBindingListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeEndpointBindingListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeEndpointBindingListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeNodeKeySetListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeNodeKeySetListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeNodeKeySetListWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeNodeKeySetListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeNodeACLListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeNodeACLListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeNodeACLListWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
@@ -16121,7 +16121,7 @@ MTR_PROVISIONALLY_AVAILABLE
                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeMaxRootCertificatesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeProvisionedRootCertificatesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeProvisionedRootCertificatesWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeProvisionedRootCertificatesWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
@@ -16133,7 +16133,7 @@ MTR_PROVISIONALLY_AVAILABLE
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeMaxClientCertificatesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeProvisionedClientCertificatesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeProvisionedClientCertificatesWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeProvisionedClientCertificatesWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
@@ -17711,6 +17711,13 @@ typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
     MTRDataTypeRelativePositionTagBehind MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
+    MTRDataTypeStreamUsageEnumInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeStreamUsageEnumRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeStreamUsageEnumAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeStreamUsageEnumLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeTariffPriceTypeEnum) {
     MTRDataTypeTariffPriceTypeEnumStandard MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeTariffPriceTypeEnumCritical MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -17735,6 +17742,21 @@ typedef NS_ENUM(uint8_t, MTRDataTypeThreeLevelAutoEnum) {
     MTRDataTypeThreeLevelAutoEnumLow MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeThreeLevelAutoEnumMedium MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRDataTypeThreeLevelAutoEnumHigh MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeWebRTCEndReasonEnum) {
+    MTRDataTypeWebRTCEndReasonEnumIceFailed MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeWebRTCEndReasonEnumIceTimeout MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeWebRTCEndReasonEnumUserHangup MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeWebRTCEndReasonEnumUserBusy MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeWebRTCEndReasonEnumReplaced MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeWebRTCEndReasonEnumNoUserMedia MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeWebRTCEndReasonEnumInviteTimeout MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeWebRTCEndReasonEnumAnsweredElsewhere MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeWebRTCEndReasonEnumOutOfResources MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeWebRTCEndReasonEnumMediaTimeout MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeWebRTCEndReasonEnumLowPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeWebRTCEndReasonEnumUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0B,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRIdentifyEffectIdentifier) {
@@ -21650,13 +21672,6 @@ typedef NS_ENUM(uint8_t, MTRCameraAVStreamManagementImageCodec) {
     MTRCameraAVStreamManagementImageCodecJPEG MTR_PROVISIONALLY_AVAILABLE = 0x00,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRCameraAVStreamManagementStreamUsage) {
-    MTRCameraAVStreamManagementStreamUsageInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRCameraAVStreamManagementStreamUsageRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRCameraAVStreamManagementStreamUsageAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRCameraAVStreamManagementStreamUsageLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_ENUM(uint8_t, MTRCameraAVStreamManagementTriStateAuto) {
     MTRCameraAVStreamManagementTriStateAutoOff MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRCameraAVStreamManagementTriStateAutoOn MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -21698,56 +21713,8 @@ typedef NS_OPTIONS(uint32_t, MTRCameraAVSettingsUserLevelManagementFeature) {
     MTRCameraAVSettingsUserLevelManagementFeatureMechanicalPresets MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRWebRTCTransportProviderStreamUsage) {
-    MTRWebRTCTransportProviderStreamUsageInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRWebRTCTransportProviderStreamUsageRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRWebRTCTransportProviderStreamUsageAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRWebRTCTransportProviderStreamUsageLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRWebRTCTransportProviderWebRTCEndReason) {
-    MTRWebRTCTransportProviderWebRTCEndReasonIceFailed MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRWebRTCTransportProviderWebRTCEndReasonIceTimeout MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRWebRTCTransportProviderWebRTCEndReasonUserHangup MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRWebRTCTransportProviderWebRTCEndReasonUserBusy MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRWebRTCTransportProviderWebRTCEndReasonReplaced MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRWebRTCTransportProviderWebRTCEndReasonNoUserMedia MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRWebRTCTransportProviderWebRTCEndReasonInviteTimeout MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRWebRTCTransportProviderWebRTCEndReasonAnsweredElsewhere MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRWebRTCTransportProviderWebRTCEndReasonOutOfResources MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRWebRTCTransportProviderWebRTCEndReasonMediaTimeout MTR_PROVISIONALLY_AVAILABLE = 0x09,
-    MTRWebRTCTransportProviderWebRTCEndReasonLowPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRWebRTCTransportProviderWebRTCEndReasonUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportProviderWebRTCMetadataOptionsBitmap) {
-    MTRWebRTCTransportProviderWebRTCMetadataOptionsBitmapDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRWebRTCTransportRequestorStreamUsage) {
-    MTRWebRTCTransportRequestorStreamUsageInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRWebRTCTransportRequestorStreamUsageRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRWebRTCTransportRequestorStreamUsageAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRWebRTCTransportRequestorStreamUsageLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRWebRTCTransportRequestorWebRTCEndReason) {
-    MTRWebRTCTransportRequestorWebRTCEndReasonIceFailed MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRWebRTCTransportRequestorWebRTCEndReasonIceTimeout MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRWebRTCTransportRequestorWebRTCEndReasonUserHangup MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRWebRTCTransportRequestorWebRTCEndReasonUserBusy MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRWebRTCTransportRequestorWebRTCEndReasonReplaced MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRWebRTCTransportRequestorWebRTCEndReasonNoUserMedia MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRWebRTCTransportRequestorWebRTCEndReasonInviteTimeout MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRWebRTCTransportRequestorWebRTCEndReasonAnsweredElsewhere MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRWebRTCTransportRequestorWebRTCEndReasonOutOfResources MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRWebRTCTransportRequestorWebRTCEndReasonMediaTimeout MTR_PROVISIONALLY_AVAILABLE = 0x09,
-    MTRWebRTCTransportRequestorWebRTCEndReasonLowPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRWebRTCTransportRequestorWebRTCEndReasonUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportRequestorWebRTCMetadataOptionsBitmap) {
-    MTRWebRTCTransportRequestorWebRTCMetadataOptionsBitmapDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint32_t, MTRWebRTCTransportProviderFeature) {
+    MTRWebRTCTransportProviderFeatureMetadata MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportContainerFormat) {
@@ -21766,13 +21733,6 @@ typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStatusCode) {
     MTRPushAVStreamTransportStatusCodeInvalidCombination MTR_PROVISIONALLY_AVAILABLE = 0x06,
     MTRPushAVStreamTransportStatusCodeInvalidTriggerType MTR_PROVISIONALLY_AVAILABLE = 0x07,
     MTRPushAVStreamTransportStatusCodeInvalidTransportStatus MTR_PROVISIONALLY_AVAILABLE = 0x08,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStreamUsage) {
-    MTRPushAVStreamTransportStreamUsageInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRPushAVStreamTransportStreamUsageRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRPushAVStreamTransportStreamUsageAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRPushAVStreamTransportStreamUsageLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTransportStatus) {
@@ -21875,7 +21835,6 @@ typedef NS_ENUM(uint8_t, MTRJointFabricDatastoreDatastoreGroupKeyMulticastPolicy
 
 typedef NS_ENUM(uint8_t, MTRJointFabricDatastoreDatastoreGroupKeySecurityPolicy) {
     MTRJointFabricDatastoreDatastoreGroupKeySecurityPolicyTrustFirst MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRJointFabricDatastoreDatastoreGroupKeySecurityPolicyCacheAndSync MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRJointFabricDatastoreDatastoreState) {

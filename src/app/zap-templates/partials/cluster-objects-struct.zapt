@@ -121,16 +121,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         ReturnErrorOnFailure(err);
 
         {{#zcl_struct_items}}
+        {{#not_first}}
+        else
+        {{/not_first}}
         {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
         if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
         {
-           err = DataModel::Decode(reader, {{asLowerCamelCase label}});
+          err = DataModel::Decode(reader, {{asLowerCamelCase label}});
         }
-        else
-        {{#last}}
-        {
-        }
-        {{/last}}
         {{/zcl_struct_items}}
 
         ReturnErrorOnFailure(err);

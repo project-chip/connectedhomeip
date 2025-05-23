@@ -24,8 +24,10 @@ extensions = [
 ]
 exclude_patterns = [
     "_build",
+    ".venv",
     "examples/android/*",
     "**/nxp/linux-imx/imx8m/README.md",
+    "**/esp32/managed_components",
     "examples/ota-requestor-app/efr32/README.md",
     "**/android/App/app/libs*",
     "examples/providers/README.md",
