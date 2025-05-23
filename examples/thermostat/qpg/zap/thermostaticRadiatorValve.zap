@@ -22,15 +22,15 @@
       "path": "../../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
-      "version": 1,
-      "description": "Matter SDK ZCL data"
+      "version": "chip-v1"
     },
     {
       "pathRelativity": "relativeToZap",
       "path": "../../../../src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
       "category": "matter",
-      "version": "chip-v1"
+      "version": 1,
+      "description": "Matter SDK ZCL data"
     }
   ],
   "endpointTypes": [
@@ -38,29 +38,41 @@
       "id": 1,
       "name": "MA-rootdevice",
       "deviceTypeRef": {
-        "code": 22,
+        "code": 18,
         "profileId": 259,
-        "label": "MA-rootdevice",
-        "name": "MA-rootdevice",
-        "deviceTypeOrder": 0
+        "label": "MA-otarequestor",
+        "name": "MA-otarequestor"
       },
       "deviceTypes": [
+        {
+          "code": 18,
+          "profileId": 259,
+          "label": "MA-otarequestor",
+          "name": "MA-otarequestor"
+        },
+        {
+          "code": 17,
+          "profileId": 259,
+          "label": "MA-powersource",
+          "name": "MA-powersource"
+        },
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice",
-          "deviceTypeOrder": 0
+          "name": "MA-rootdevice"
         }
       ],
       "deviceVersions": [
         3
       ],
       "deviceIdentifiers": [
+        18,
+        17,
         22
       ],
-      "deviceTypeName": "MA-rootdevice",
-      "deviceTypeCode": 22,
+      "deviceTypeName": "MA-otarequestor",
+      "deviceTypeCode": 18,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -3483,16 +3495,14 @@
         "code": 769,
         "profileId": 259,
         "label": "MA-thermostat",
-        "name": "MA-thermostat",
-        "deviceTypeOrder": 0
+        "name": "MA-thermostat"
       },
       "deviceTypes": [
         {
           "code": 769,
           "profileId": 259,
           "label": "MA-thermostat",
-          "name": "MA-thermostat",
-          "deviceTypeOrder": 0
+          "name": "MA-thermostat"
         }
       ],
       "deviceVersions": [
@@ -3876,6 +3886,38 @@
               "source": "client",
               "isIncoming": 1,
               "isEnabled": 1
+            },
+            {
+              "name": "SetActiveScheduleRequest",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SetActivePresetRequest",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "AtomicResponse",
+              "code": 253,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AtomicRequest",
+              "code": 254,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
             }
           ],
           "attributes": [
@@ -4101,6 +4143,166 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "PresetTypes",
+              "code": 72,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ScheduleTypes",
+              "code": 73,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "NumberOfPresets",
+              "code": 74,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "NumberOfSchedules",
+              "code": 75,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "NumberOfScheduleTransitions",
+              "code": 76,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "NumberOfScheduleTransitionPerDay",
+              "code": 77,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ActivePresetHandle",
+              "code": 78,
+              "mfgCode": null,
+              "side": "server",
+              "type": "octet_string",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ActiveScheduleHandle",
+              "code": 79,
+              "mfgCode": null,
+              "side": "server",
+              "type": "octet_string",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "Presets",
+              "code": 80,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "Schedules",
+              "code": 81,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
