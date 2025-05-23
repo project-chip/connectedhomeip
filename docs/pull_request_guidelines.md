@@ -27,6 +27,13 @@ following items are met (and see below for details)
         `merge with master` is fine, however it is _NOT_ a requirement for PR
         merging. Only do this when needed (e.g. to fix a conflict) and not too
         frequently as it triggers a 2+ hour CI run every time.
+-   [ ] Consistent style
+    -   The overall rule is "make the code feel consistent" (i.e. when changing
+        files keep existing rules consistent)
+    -   can use the [style guilde](./style/CODING_STYLE_GUIDE.md) for reference
+        (note that
+        [keep style constistent rule](https://en.wikipedia.org/wiki/When_in_Rome,_do_as_the_Romans_do)
+        is the first rule in this guide)
 
 ## Details and background on requirements
 
