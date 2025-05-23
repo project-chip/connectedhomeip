@@ -6,20 +6,20 @@ Within the matter SDK, we are prioritizing long term code maintainability and
 ease of reviews of PRs. To create an easy to review pull request, ensure the
 following items are met (and see below for details)
 
--   [ ] Pull request size
-    -   Change focuses on a single aspect/bug/feature
-    -   Strongly prefer small PRs (even if several of them are needed to achieve
+- [ ] Pull request size
+  - Change focuses on a single aspect/bug/feature
+  - Strongly prefer small PRs (even if several of them are needed to achieve
         final goal)
--   [ ] Change is well tested
-    -   testing is described in `### Testing` section in the pull request
+- [ ] Change is well tested
+  - testing is described in `### Testing` section in the pull request
         summary
-    -   Strongly prefer automated tests to manual tests
--   [ ] Good Pull request summary/description
-    -   Summary contains an accurate description of changes
-    -   Summary contains sufficient context for reviewers
-    -   Summary contains flash/ram overhead if changing core/common parts
--   [ ] CI should pass (i.e. green or yellow/waiting for review)
--   [ ] Avoid/limit force-pushes/merges with master
+  - Strongly prefer automated tests to manual tests
+- [ ] Good Pull request summary/description
+  - Summary contains an accurate description of changes
+  - Summary contains sufficient context for reviewers
+  - Summary contains flash/ram overhead if changing core/common parts
+- [ ] CI should pass (i.e. green or yellow/waiting for review)
+- [ ] Avoid/limit force-pushes/merges with master
 
 ## Details and background on requirements
 
@@ -55,15 +55,15 @@ Add testing details in a `### Testing` heading in the pull request summary -
 there is a CI bot that checks for this. Within this section add the following
 details:
 
--   if automated unit tests, brief mention like `added/updated unit tests` is
+- if automated unit tests, brief mention like `added/updated unit tests` is
     sufficient. Thank you for adding automated unit tests and we accept this
     area to be brief
 
--   if automated integration tests, this can be brief as well saying
+- if automated integration tests, this can be brief as well saying
     `TC_*.yaml/py` tests this, also add a brief text on why unit testing was not
     possible as well as unit tests are faster to iterate on and execute.
 
--   if manual testing was done, include **detailed** information about the tests
+- if manual testing was done, include **detailed** information about the tests
     run (e.g. what chip-tool or `repl` commands were run) and the observed
     results. Also include an explanation why automated testing was NOT possible.
     This requirement is intentionally tedious to strongly encourage writing of
@@ -83,18 +83,21 @@ We aim for around 85-90% coverage for automated testing.
 Reviewers are likely to have less context than someone actively working on a PR.
 Provide sufficient information for a reviewer to understand the change. Include:
 
--   brief information on what changed
--   brief information on **WHY** the change was made. Avoid just saying "Fix
+- brief information on what changed
+- brief information on **WHY** the change was made. Avoid just saying "Fix
     compile error" but rather add a example of the error seen and under want
     command. Avoid `Fixes #1234` as that requires the reviewer to open another
     issue and hope that the issue is well described. Have a brief description of
     the problem and fix anyway, even with an issue link.
--   Review context:
-    -   if updating based on a test plan or spec issue, include the test plan or
+- Review context:
+  - if updating based on a test plan or spec issue, include the test plan or
         issue PR that this depends on
-    -   clearly explain if the PR is based on in progress work (often for Spec
+  - clearly explain if the PR is based on in progress work (often for Spec
         issues)
--   If changing common code, check where any RAM/FLASH overhead comes from. You
+  - larger changes/features should include some design document link.
+        Reviewers may not be familiar with discussions from the many timer teams
+        that work on the matter SDK.
+- If changing common code, check where any RAM/FLASH overhead comes from. You
     can use [size tooling](../scripts/tools/ELF_SIZE_TOOLING.md) to gather this
     information.
 
