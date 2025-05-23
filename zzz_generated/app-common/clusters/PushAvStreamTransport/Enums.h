@@ -67,8 +67,6 @@ enum class StatusCodeEnum : uint8_t
     kUnknownEnumValue = 0,
 };
 
-using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
-
 // Enum for TransportStatusEnum
 enum class TransportStatusEnum : uint8_t
 {

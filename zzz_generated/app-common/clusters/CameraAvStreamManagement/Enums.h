@@ -51,8 +51,6 @@ enum class ImageCodecEnum : uint8_t
     kUnknownEnumValue = 1,
 };
 
-using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
-
 // Enum for TriStateAutoEnum
 enum class TriStateAutoEnum : uint8_t
 {
