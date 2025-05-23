@@ -267,6 +267,34 @@ void RvcDevice::HandleDockedMessage()
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked));
 }
 
+void RvcDevice::HandleEmptyingDustBinMessage()
+{
+    // TODO:  should we only allow this transition while we are docked?
+
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin));
+}
+
+void RvcDevice::HandleCleaningMopMessage()
+{
+    // TODO:  should we only allow this transition while we are docked?
+
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop));
+}
+
+void RvcDevice::HandleFillingWaterTankMessage()
+{
+    // TODO:  should we only allow this transition while we are docked?
+
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank));
+}
+
+void RvcDevice::HandleUpdatingMapsMessage()
+{
+    // TODO:  should we only allow this transition while we are docked?
+
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps));
+}
+
 void RvcDevice::HandleChargerFoundMessage()
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() !=
