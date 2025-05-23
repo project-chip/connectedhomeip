@@ -43071,13 +43071,24 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_audioStreamIDClassName.c_str(), newElement_0_audioStreamIDCtorSignature.c_str(),
                         jninewElement_0_audioStreamID, newElement_0_audioStreamID);
                 }
-                jobject newElement_0_metadataOptions;
-                std::string newElement_0_metadataOptionsClassName     = "java/lang/Integer";
-                std::string newElement_0_metadataOptionsCtorSignature = "(I)V";
-                jint jninewElement_0_metadataOptions                  = static_cast<jint>(entry_0.metadataOptions.Raw());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_metadataOptionsClassName.c_str(), newElement_0_metadataOptionsCtorSignature.c_str(),
-                    jninewElement_0_metadataOptions, newElement_0_metadataOptions);
+                jobject newElement_0_metadataEnabled;
+                if (!entry_0.metadataEnabled.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_metadataEnabled);
+                }
+                else
+                {
+                    jobject newElement_0_metadataEnabledInsideOptional;
+                    std::string newElement_0_metadataEnabledInsideOptionalClassName     = "java/lang/Boolean";
+                    std::string newElement_0_metadataEnabledInsideOptionalCtorSignature = "(Z)V";
+                    jboolean jninewElement_0_metadataEnabledInsideOptional = static_cast<jboolean>(entry_0.metadataEnabled.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                        newElement_0_metadataEnabledInsideOptionalClassName.c_str(),
+                        newElement_0_metadataEnabledInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_metadataEnabledInsideOptional, newElement_0_metadataEnabledInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_metadataEnabledInsideOptional,
+                                                                      newElement_0_metadataEnabled);
+                }
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -43101,7 +43112,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                        "Integer;Ljava/util/Optional;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -43113,7 +43124,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
                                                   newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
                                                   newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
-                                                  newElement_0_metadataOptions, newElement_0_fabricIndex);
+                                                  newElement_0_metadataEnabled, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -43307,13 +43318,24 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_audioStreamIDClassName.c_str(), newElement_0_audioStreamIDCtorSignature.c_str(),
                         jninewElement_0_audioStreamID, newElement_0_audioStreamID);
                 }
-                jobject newElement_0_metadataOptions;
-                std::string newElement_0_metadataOptionsClassName     = "java/lang/Integer";
-                std::string newElement_0_metadataOptionsCtorSignature = "(I)V";
-                jint jninewElement_0_metadataOptions                  = static_cast<jint>(entry_0.metadataOptions.Raw());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_metadataOptionsClassName.c_str(), newElement_0_metadataOptionsCtorSignature.c_str(),
-                    jninewElement_0_metadataOptions, newElement_0_metadataOptions);
+                jobject newElement_0_metadataEnabled;
+                if (!entry_0.metadataEnabled.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_metadataEnabled);
+                }
+                else
+                {
+                    jobject newElement_0_metadataEnabledInsideOptional;
+                    std::string newElement_0_metadataEnabledInsideOptionalClassName     = "java/lang/Boolean";
+                    std::string newElement_0_metadataEnabledInsideOptionalCtorSignature = "(Z)V";
+                    jboolean jninewElement_0_metadataEnabledInsideOptional = static_cast<jboolean>(entry_0.metadataEnabled.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                        newElement_0_metadataEnabledInsideOptionalClassName.c_str(),
+                        newElement_0_metadataEnabledInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_metadataEnabledInsideOptional, newElement_0_metadataEnabledInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_metadataEnabledInsideOptional,
+                                                                      newElement_0_metadataEnabled);
+                }
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -43337,7 +43359,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                        "Integer;Ljava/util/Optional;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -43349,7 +43371,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
                                                   newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
                                                   newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
-                                                  newElement_0_metadataOptions, newElement_0_fabricIndex);
+                                                  newElement_0_metadataEnabled, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

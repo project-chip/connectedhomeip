@@ -2857,6 +2857,13 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     for (NSNumber * deviceID in orderedDeviceIDs) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
         delegate.pretendThreadEnabled = YES;
+        // By default MTRDeviceTestDelegate sets a 2s MaxInterval.  But for this test, we don't
+        // really want that.  We don't care about getting incremental updates in this test, nor do
+        // we care about detecting subscription drops (and in fact, a subscription drop would mess
+        // up the counts in this test).
+        //
+        // Just use a 1 hour MaxInterval, for simplicity.
+        delegate.subscriptionMaxIntervalOverride = @(3600); // seconds
 
         delegate.onSubscriptionPoolDequeue = ^{
             // Count subscribing when dequeued from the subscription pool
@@ -2909,6 +2916,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         // fake device does, so keep it out of the @autoreleasepool block.
         MTRDeviceTestDelegate * fakeDeviceDelegate = [[MTRDeviceTestDelegate alloc] init];
         fakeDeviceDelegate.pretendThreadEnabled = YES;
+        // See comments in the loop that sets up the other delegates above for why we are overriding
+        // subscriptionMaxIntervalOverride.
+        fakeDeviceDelegate.subscriptionMaxIntervalOverride = @(3600); // seconds
 
         @autoreleasepool {
             // Create our fake device and have it dealloc before the blocking WorkItem
