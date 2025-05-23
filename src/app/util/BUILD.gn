@@ -34,7 +34,6 @@ source_set("types") {
   sources = [
     "attribute-metadata.cpp",
     "attribute-metadata.h",
-    "basic-types.h",
     "cluster-config.h",
     "ember-strings.cpp",
     "ember-strings.h",
