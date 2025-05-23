@@ -53,7 +53,7 @@ You will generally have 2 major classes:
     encoders/decoders and a `ClusterLogic`
 
   - This implements
-        [DefaultServerCluster](https://github.com/project-chip/connectedhomeip/blob/9e7a6824e570438d9d8d0969eabf768343abed4c/src/app/server-cluster/DefaultServerCluster.h#L36)
+        [DefaultServerCluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/DefaultServerCluster.h#L36)
         or more generally the
         [ServerClusterInterface](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterInterface.h#L41)
         interface.
@@ -84,7 +84,7 @@ to select available features/attributes and enabling.
 
 Ensure that every attribute update will notify via the context
 `inteactionContext->dataModelChangeListener`
-(<https://github.com/project-chip/connectedhomeip/blob/9e7a6824e570438d9d8d0969eabf768343abed4c/src/app/data-model-provider/Context.h#L35>).
+(<https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/Context.h#L35>).
 This is required for subscriptions to work and should be unit tested.
 
 ### Persistent storage
@@ -95,7 +95,7 @@ This is required for subscriptions to work and should be unit tested.
 > fixed.
 
 For general storage, the cluster context
-[provides](https://github.com/project-chip/connectedhomeip/blob/9e7a6824e570438d9d8d0969eabf768343abed4c/src/app/server-cluster/ServerClusterContext.h#L38)
+[provides](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterContext.h#L38)
 a `PersistentStorageDelegate`.
 
 ### Integration with application-specific code generation
@@ -119,7 +119,7 @@ These are generated files available for include as
 and provide the following information:
 
 - `chip::app::Clusters::<NAME>::kFixedClusterConfig` as an array of
-    [ClusterConfiguration](https://github.com/project-chip/connectedhomeip/blob/9e7a6824e570438d9d8d0969eabf768343abed4c/src/app/util/cluster-config.h#L39).
+    [ClusterConfiguration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/util/cluster-config.h#L39).
     Both initialization and static asserts can be done based on these
 
 - `chip::app::Clusters::<NAME>::IsAttributeEnabledOnSomeEndpoint` and
