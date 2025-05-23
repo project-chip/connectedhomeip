@@ -61,11 +61,11 @@ class CameraAvStreamManagementCluster(
   )
 
   class VideoSensorParamsAttribute(
-    val value: CameraAvStreamManagementClusterVideoSensorParamsStruct?
+    val value: CameraAvStreamManagementClusterVideoSensorParamsStruct
   )
 
   sealed class VideoSensorParamsAttributeSubscriptionState {
-    data class Success(val value: CameraAvStreamManagementClusterVideoSensorParamsStruct?) :
+    data class Success(val value: CameraAvStreamManagementClusterVideoSensorParamsStruct) :
       VideoSensorParamsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : VideoSensorParamsAttributeSubscriptionState()
@@ -73,10 +73,10 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : VideoSensorParamsAttributeSubscriptionState()
   }
 
-  class MinViewportAttribute(val value: CameraAvStreamManagementClusterVideoResolutionStruct?)
+  class MinViewportAttribute(val value: CameraAvStreamManagementClusterVideoResolutionStruct)
 
   sealed class MinViewportAttributeSubscriptionState {
-    data class Success(val value: CameraAvStreamManagementClusterVideoResolutionStruct?) :
+    data class Success(val value: CameraAvStreamManagementClusterVideoResolutionStruct) :
       MinViewportAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : MinViewportAttributeSubscriptionState()
@@ -85,12 +85,12 @@ class CameraAvStreamManagementCluster(
   }
 
   class RateDistortionTradeOffPointsAttribute(
-    val value: List<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct>?
+    val value: List<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct>
   )
 
   sealed class RateDistortionTradeOffPointsAttributeSubscriptionState {
     data class Success(
-      val value: List<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct>?
+      val value: List<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct>
     ) : RateDistortionTradeOffPointsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) :
@@ -100,11 +100,11 @@ class CameraAvStreamManagementCluster(
   }
 
   class MicrophoneCapabilitiesAttribute(
-    val value: CameraAvStreamManagementClusterAudioCapabilitiesStruct?
+    val value: CameraAvStreamManagementClusterAudioCapabilitiesStruct
   )
 
   sealed class MicrophoneCapabilitiesAttributeSubscriptionState {
-    data class Success(val value: CameraAvStreamManagementClusterAudioCapabilitiesStruct?) :
+    data class Success(val value: CameraAvStreamManagementClusterAudioCapabilitiesStruct) :
       MicrophoneCapabilitiesAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : MicrophoneCapabilitiesAttributeSubscriptionState()
@@ -113,11 +113,11 @@ class CameraAvStreamManagementCluster(
   }
 
   class SpeakerCapabilitiesAttribute(
-    val value: CameraAvStreamManagementClusterAudioCapabilitiesStruct?
+    val value: CameraAvStreamManagementClusterAudioCapabilitiesStruct
   )
 
   sealed class SpeakerCapabilitiesAttributeSubscriptionState {
-    data class Success(val value: CameraAvStreamManagementClusterAudioCapabilitiesStruct?) :
+    data class Success(val value: CameraAvStreamManagementClusterAudioCapabilitiesStruct) :
       SpeakerCapabilitiesAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : SpeakerCapabilitiesAttributeSubscriptionState()
@@ -126,13 +126,12 @@ class CameraAvStreamManagementCluster(
   }
 
   class SnapshotCapabilitiesAttribute(
-    val value: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>?
+    val value: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>
   )
 
   sealed class SnapshotCapabilitiesAttributeSubscriptionState {
-    data class Success(
-      val value: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>?
-    ) : SnapshotCapabilitiesAttributeSubscriptionState()
+    data class Success(val value: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>) :
+      SnapshotCapabilitiesAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : SnapshotCapabilitiesAttributeSubscriptionState()
 
@@ -150,11 +149,11 @@ class CameraAvStreamManagementCluster(
   }
 
   class AllocatedVideoStreamsAttribute(
-    val value: List<CameraAvStreamManagementClusterVideoStreamStruct>?
+    val value: List<CameraAvStreamManagementClusterVideoStreamStruct>
   )
 
   sealed class AllocatedVideoStreamsAttributeSubscriptionState {
-    data class Success(val value: List<CameraAvStreamManagementClusterVideoStreamStruct>?) :
+    data class Success(val value: List<CameraAvStreamManagementClusterVideoStreamStruct>) :
       AllocatedVideoStreamsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : AllocatedVideoStreamsAttributeSubscriptionState()
@@ -163,11 +162,11 @@ class CameraAvStreamManagementCluster(
   }
 
   class AllocatedAudioStreamsAttribute(
-    val value: List<CameraAvStreamManagementClusterAudioStreamStruct>?
+    val value: List<CameraAvStreamManagementClusterAudioStreamStruct>
   )
 
   sealed class AllocatedAudioStreamsAttributeSubscriptionState {
-    data class Success(val value: List<CameraAvStreamManagementClusterAudioStreamStruct>?) :
+    data class Success(val value: List<CameraAvStreamManagementClusterAudioStreamStruct>) :
       AllocatedAudioStreamsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : AllocatedAudioStreamsAttributeSubscriptionState()
@@ -176,11 +175,11 @@ class CameraAvStreamManagementCluster(
   }
 
   class AllocatedSnapshotStreamsAttribute(
-    val value: List<CameraAvStreamManagementClusterSnapshotStreamStruct>?
+    val value: List<CameraAvStreamManagementClusterSnapshotStreamStruct>
   )
 
   sealed class AllocatedSnapshotStreamsAttributeSubscriptionState {
-    data class Success(val value: List<CameraAvStreamManagementClusterSnapshotStreamStruct>?) :
+    data class Success(val value: List<CameraAvStreamManagementClusterSnapshotStreamStruct>) :
       AllocatedSnapshotStreamsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) :
@@ -189,22 +188,20 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : AllocatedSnapshotStreamsAttributeSubscriptionState()
   }
 
-  class RankedVideoStreamPrioritiesListAttribute(val value: List<UByte>?)
+  class StreamUsagePrioritiesAttribute(val value: List<UByte>)
 
-  sealed class RankedVideoStreamPrioritiesListAttributeSubscriptionState {
-    data class Success(val value: List<UByte>?) :
-      RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+  sealed class StreamUsagePrioritiesAttributeSubscriptionState {
+    data class Success(val value: List<UByte>) : StreamUsagePrioritiesAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) :
-      RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+    data class Error(val exception: Exception) : StreamUsagePrioritiesAttributeSubscriptionState()
 
-    object SubscriptionEstablished : RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+    object SubscriptionEstablished : StreamUsagePrioritiesAttributeSubscriptionState()
   }
 
-  class ViewportAttribute(val value: CameraAvStreamManagementClusterViewportStruct?)
+  class ViewportAttribute(val value: CameraAvStreamManagementClusterViewportStruct)
 
   sealed class ViewportAttributeSubscriptionState {
-    data class Success(val value: CameraAvStreamManagementClusterViewportStruct?) :
+    data class Success(val value: CameraAvStreamManagementClusterViewportStruct) :
       ViewportAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : ViewportAttributeSubscriptionState()
@@ -339,8 +336,8 @@ class CameraAvStreamManagementCluster(
     maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     minBitRate: UInt,
     maxBitRate: UInt,
-    minFragmentLen: UShort,
-    maxFragmentLen: UShort,
+    minKeyFrameInterval: UShort,
+    maxKeyFrameInterval: UShort,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
@@ -374,11 +371,11 @@ class CameraAvStreamManagementCluster(
     val TAG_MAX_BIT_RATE_REQ: Int = 7
     tlvWriter.put(ContextSpecificTag(TAG_MAX_BIT_RATE_REQ), maxBitRate)
 
-    val TAG_MIN_FRAGMENT_LEN_REQ: Int = 8
-    tlvWriter.put(ContextSpecificTag(TAG_MIN_FRAGMENT_LEN_REQ), minFragmentLen)
+    val TAG_MIN_KEY_FRAME_INTERVAL_REQ: Int = 8
+    tlvWriter.put(ContextSpecificTag(TAG_MIN_KEY_FRAME_INTERVAL_REQ), minKeyFrameInterval)
 
-    val TAG_MAX_FRAGMENT_LEN_REQ: Int = 9
-    tlvWriter.put(ContextSpecificTag(TAG_MAX_FRAGMENT_LEN_REQ), maxFragmentLen)
+    val TAG_MAX_KEY_FRAME_INTERVAL_REQ: Int = 9
+    tlvWriter.put(ContextSpecificTag(TAG_MAX_KEY_FRAME_INTERVAL_REQ), maxKeyFrameInterval)
 
     val TAG_WATERMARK_ENABLED_REQ: Int = 10
     watermarkEnabled?.let {
@@ -713,7 +710,7 @@ class CameraAvStreamManagementCluster(
     return CaptureSnapshotResponse(data_decoded, imageCodec_decoded, resolution_decoded)
   }
 
-  suspend fun readMaxConcurrentEncodersAttribute(): UByte? {
+  suspend fun readMaxConcurrentEncodersAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -739,12 +736,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -790,14 +782,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -806,7 +793,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMaxEncodedPixelRateAttribute(): UInt? {
+  suspend fun readMaxEncodedPixelRateAttribute(): UInt {
     val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
@@ -832,12 +819,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UInt? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUInt(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
 
     return decodedValue
   }
@@ -883,14 +865,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UInt? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUInt(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
 
-          decodedValue?.let { emit(UIntSubscriptionState.Success(it)) }
+          emit(UIntSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UIntSubscriptionState.SubscriptionEstablished)
@@ -925,12 +902,8 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: CameraAvStreamManagementClusterVideoSensorParamsStruct? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        CameraAvStreamManagementClusterVideoSensorParamsStruct.fromTlv(AnonymousTag, tlvReader)
-      } else {
-        null
-      }
+    val decodedValue: CameraAvStreamManagementClusterVideoSensorParamsStruct =
+      CameraAvStreamManagementClusterVideoSensorParamsStruct.fromTlv(AnonymousTag, tlvReader)
 
     return VideoSensorParamsAttribute(decodedValue)
   }
@@ -976,17 +949,10 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: CameraAvStreamManagementClusterVideoSensorParamsStruct? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              CameraAvStreamManagementClusterVideoSensorParamsStruct.fromTlv(
-                AnonymousTag,
-                tlvReader,
-              )
-            } else {
-              null
-            }
+          val decodedValue: CameraAvStreamManagementClusterVideoSensorParamsStruct =
+            CameraAvStreamManagementClusterVideoSensorParamsStruct.fromTlv(AnonymousTag, tlvReader)
 
-          decodedValue?.let { emit(VideoSensorParamsAttributeSubscriptionState.Success(it)) }
+          emit(VideoSensorParamsAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(VideoSensorParamsAttributeSubscriptionState.SubscriptionEstablished)
@@ -995,7 +961,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readNightVisionUsesInfraredAttribute(): Boolean? {
+  suspend fun readNightVisionUsesInfraredAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -1021,12 +987,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -1072,14 +1033,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -1114,12 +1070,8 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: CameraAvStreamManagementClusterVideoResolutionStruct? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(AnonymousTag, tlvReader)
-      } else {
-        null
-      }
+    val decodedValue: CameraAvStreamManagementClusterVideoResolutionStruct =
+      CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(AnonymousTag, tlvReader)
 
     return MinViewportAttribute(decodedValue)
   }
@@ -1163,14 +1115,10 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: CameraAvStreamManagementClusterVideoResolutionStruct? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(AnonymousTag, tlvReader)
-            } else {
-              null
-            }
+          val decodedValue: CameraAvStreamManagementClusterVideoResolutionStruct =
+            CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(AnonymousTag, tlvReader)
 
-          decodedValue?.let { emit(MinViewportAttributeSubscriptionState.Success(it)) }
+          emit(MinViewportAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(MinViewportAttributeSubscriptionState.SubscriptionEstablished)
@@ -1205,22 +1153,18 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(
-              CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct.fromTlv(
-                AnonymousTag,
-                tlvReader,
-              )
+    val decodedValue: List<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> =
+      buildList<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(
+            CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct.fromTlv(
+              AnonymousTag,
+              tlvReader,
             )
-          }
-          tlvReader.exitContainer()
+          )
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
     return RateDistortionTradeOffPointsAttribute(decodedValue)
@@ -1268,27 +1212,21 @@ class CameraAvStreamManagementCluster(
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue:
-            List<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(
-                    CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct.fromTlv(
-                      AnonymousTag,
-                      tlvReader,
-                    )
+            List<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> =
+            buildList<CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(
+                  CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct.fromTlv(
+                    AnonymousTag,
+                    tlvReader,
                   )
-                }
-                tlvReader.exitContainer()
+                )
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let {
-            emit(RateDistortionTradeOffPointsAttributeSubscriptionState.Success(it))
-          }
+          emit(RateDistortionTradeOffPointsAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(RateDistortionTradeOffPointsAttributeSubscriptionState.SubscriptionEstablished)
@@ -1406,12 +1344,8 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: CameraAvStreamManagementClusterAudioCapabilitiesStruct? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(AnonymousTag, tlvReader)
-      } else {
-        null
-      }
+    val decodedValue: CameraAvStreamManagementClusterAudioCapabilitiesStruct =
+      CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(AnonymousTag, tlvReader)
 
     return MicrophoneCapabilitiesAttribute(decodedValue)
   }
@@ -1457,17 +1391,10 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: CameraAvStreamManagementClusterAudioCapabilitiesStruct? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(
-                AnonymousTag,
-                tlvReader,
-              )
-            } else {
-              null
-            }
+          val decodedValue: CameraAvStreamManagementClusterAudioCapabilitiesStruct =
+            CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(AnonymousTag, tlvReader)
 
-          decodedValue?.let { emit(MicrophoneCapabilitiesAttributeSubscriptionState.Success(it)) }
+          emit(MicrophoneCapabilitiesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(MicrophoneCapabilitiesAttributeSubscriptionState.SubscriptionEstablished)
@@ -1502,12 +1429,8 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: CameraAvStreamManagementClusterAudioCapabilitiesStruct? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(AnonymousTag, tlvReader)
-      } else {
-        null
-      }
+    val decodedValue: CameraAvStreamManagementClusterAudioCapabilitiesStruct =
+      CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(AnonymousTag, tlvReader)
 
     return SpeakerCapabilitiesAttribute(decodedValue)
   }
@@ -1553,17 +1476,10 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: CameraAvStreamManagementClusterAudioCapabilitiesStruct? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(
-                AnonymousTag,
-                tlvReader,
-              )
-            } else {
-              null
-            }
+          val decodedValue: CameraAvStreamManagementClusterAudioCapabilitiesStruct =
+            CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(AnonymousTag, tlvReader)
 
-          decodedValue?.let { emit(SpeakerCapabilitiesAttributeSubscriptionState.Success(it)) }
+          emit(SpeakerCapabilitiesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(SpeakerCapabilitiesAttributeSubscriptionState.SubscriptionEstablished)
@@ -1572,7 +1488,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readTwoWayTalkSupportAttribute(): UByte? {
+  suspend fun readTwoWayTalkSupportAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 9u
 
     val attributePath =
@@ -1598,12 +1514,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -1649,14 +1560,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -1691,22 +1597,18 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(
-              CameraAvStreamManagementClusterSnapshotCapabilitiesStruct.fromTlv(
-                AnonymousTag,
-                tlvReader,
-              )
+    val decodedValue: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> =
+      buildList<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(
+            CameraAvStreamManagementClusterSnapshotCapabilitiesStruct.fromTlv(
+              AnonymousTag,
+              tlvReader,
             )
-          }
-          tlvReader.exitContainer()
+          )
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
     return SnapshotCapabilitiesAttribute(decodedValue)
@@ -1753,25 +1655,21 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(
-                    CameraAvStreamManagementClusterSnapshotCapabilitiesStruct.fromTlv(
-                      AnonymousTag,
-                      tlvReader,
-                    )
+          val decodedValue: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> =
+            buildList<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(
+                  CameraAvStreamManagementClusterSnapshotCapabilitiesStruct.fromTlv(
+                    AnonymousTag,
+                    tlvReader,
                   )
-                }
-                tlvReader.exitContainer()
+                )
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let { emit(SnapshotCapabilitiesAttributeSubscriptionState.Success(it)) }
+          emit(SnapshotCapabilitiesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(SnapshotCapabilitiesAttributeSubscriptionState.SubscriptionEstablished)
@@ -1863,7 +1761,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readCurrentFrameRateAttribute(): UShort? {
+  suspend fun readCurrentFrameRateAttribute(): UShort {
     val ATTRIBUTE_ID: UInt = 12u
 
     val attributePath =
@@ -1889,12 +1787,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
 
     return decodedValue
   }
@@ -1940,14 +1833,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UShort? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUShort(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
 
-          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
+          emit(UShortSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UShortSubscriptionState.SubscriptionEstablished)
@@ -1956,7 +1844,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readHDRModeEnabledAttribute(): Boolean? {
+  suspend fun readHDRModeEnabledAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 13u
 
     val attributePath =
@@ -1982,12 +1870,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -2073,14 +1956,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -2212,17 +2090,13 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<CameraAvStreamManagementClusterVideoStreamStruct>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<CameraAvStreamManagementClusterVideoStreamStruct> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(CameraAvStreamManagementClusterVideoStreamStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<CameraAvStreamManagementClusterVideoStreamStruct> =
+      buildList<CameraAvStreamManagementClusterVideoStreamStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(CameraAvStreamManagementClusterVideoStreamStruct.fromTlv(AnonymousTag, tlvReader))
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
     return AllocatedVideoStreamsAttribute(decodedValue)
@@ -2269,25 +2143,18 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<CameraAvStreamManagementClusterVideoStreamStruct>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<CameraAvStreamManagementClusterVideoStreamStruct> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(
-                    CameraAvStreamManagementClusterVideoStreamStruct.fromTlv(
-                      AnonymousTag,
-                      tlvReader,
-                    )
-                  )
-                }
-                tlvReader.exitContainer()
+          val decodedValue: List<CameraAvStreamManagementClusterVideoStreamStruct> =
+            buildList<CameraAvStreamManagementClusterVideoStreamStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(
+                  CameraAvStreamManagementClusterVideoStreamStruct.fromTlv(AnonymousTag, tlvReader)
+                )
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let { emit(AllocatedVideoStreamsAttributeSubscriptionState.Success(it)) }
+          emit(AllocatedVideoStreamsAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AllocatedVideoStreamsAttributeSubscriptionState.SubscriptionEstablished)
@@ -2322,17 +2189,13 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<CameraAvStreamManagementClusterAudioStreamStruct>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<CameraAvStreamManagementClusterAudioStreamStruct> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(CameraAvStreamManagementClusterAudioStreamStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<CameraAvStreamManagementClusterAudioStreamStruct> =
+      buildList<CameraAvStreamManagementClusterAudioStreamStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(CameraAvStreamManagementClusterAudioStreamStruct.fromTlv(AnonymousTag, tlvReader))
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
     return AllocatedAudioStreamsAttribute(decodedValue)
@@ -2379,25 +2242,18 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<CameraAvStreamManagementClusterAudioStreamStruct>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<CameraAvStreamManagementClusterAudioStreamStruct> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(
-                    CameraAvStreamManagementClusterAudioStreamStruct.fromTlv(
-                      AnonymousTag,
-                      tlvReader,
-                    )
-                  )
-                }
-                tlvReader.exitContainer()
+          val decodedValue: List<CameraAvStreamManagementClusterAudioStreamStruct> =
+            buildList<CameraAvStreamManagementClusterAudioStreamStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(
+                  CameraAvStreamManagementClusterAudioStreamStruct.fromTlv(AnonymousTag, tlvReader)
+                )
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let { emit(AllocatedAudioStreamsAttributeSubscriptionState.Success(it)) }
+          emit(AllocatedAudioStreamsAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AllocatedAudioStreamsAttributeSubscriptionState.SubscriptionEstablished)
@@ -2432,19 +2288,13 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<CameraAvStreamManagementClusterSnapshotStreamStruct>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<CameraAvStreamManagementClusterSnapshotStreamStruct> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(
-              CameraAvStreamManagementClusterSnapshotStreamStruct.fromTlv(AnonymousTag, tlvReader)
-            )
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<CameraAvStreamManagementClusterSnapshotStreamStruct> =
+      buildList<CameraAvStreamManagementClusterSnapshotStreamStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(CameraAvStreamManagementClusterSnapshotStreamStruct.fromTlv(AnonymousTag, tlvReader))
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
     return AllocatedSnapshotStreamsAttribute(decodedValue)
@@ -2491,25 +2341,21 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<CameraAvStreamManagementClusterSnapshotStreamStruct>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<CameraAvStreamManagementClusterSnapshotStreamStruct> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(
-                    CameraAvStreamManagementClusterSnapshotStreamStruct.fromTlv(
-                      AnonymousTag,
-                      tlvReader,
-                    )
+          val decodedValue: List<CameraAvStreamManagementClusterSnapshotStreamStruct> =
+            buildList<CameraAvStreamManagementClusterSnapshotStreamStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(
+                  CameraAvStreamManagementClusterSnapshotStreamStruct.fromTlv(
+                    AnonymousTag,
+                    tlvReader,
                   )
-                }
-                tlvReader.exitContainer()
+                )
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let { emit(AllocatedSnapshotStreamsAttributeSubscriptionState.Success(it)) }
+          emit(AllocatedSnapshotStreamsAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AllocatedSnapshotStreamsAttributeSubscriptionState.SubscriptionEstablished)
@@ -2518,8 +2364,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readRankedVideoStreamPrioritiesListAttribute():
-    RankedVideoStreamPrioritiesListAttribute {
+  suspend fun readStreamUsagePrioritiesAttribute(): StreamUsagePrioritiesAttribute {
     val ATTRIBUTE_ID: UInt = 18u
 
     val attributePath =
@@ -2541,32 +2386,26 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Rankedvideostreamprioritieslist attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Streamusagepriorities attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UByte>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<UByte> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<UByte> =
+      buildList<UByte> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUByte(AnonymousTag))
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
-    return RankedVideoStreamPrioritiesListAttribute(decodedValue)
+    return StreamUsagePrioritiesAttribute(decodedValue)
   }
 
-  suspend fun subscribeRankedVideoStreamPrioritiesListAttribute(
+  suspend fun subscribeStreamUsagePrioritiesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<RankedVideoStreamPrioritiesListAttributeSubscriptionState> {
+  ): Flow<StreamUsagePrioritiesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
       listOf(
@@ -2585,7 +2424,7 @@ class CameraAvStreamManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            RankedVideoStreamPrioritiesListAttributeSubscriptionState.Error(
+            StreamUsagePrioritiesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -2599,36 +2438,30 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Rankedvideostreamprioritieslist attribute not found in Node State update"
+            "Streamusagepriorities attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UByte>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<UByte> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUByte(AnonymousTag))
-                }
-                tlvReader.exitContainer()
+          val decodedValue: List<UByte> =
+            buildList<UByte> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUByte(AnonymousTag))
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let {
-            emit(RankedVideoStreamPrioritiesListAttributeSubscriptionState.Success(it))
-          }
+          emit(StreamUsagePrioritiesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(RankedVideoStreamPrioritiesListAttributeSubscriptionState.SubscriptionEstablished)
+          emit(StreamUsagePrioritiesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readSoftRecordingPrivacyModeEnabledAttribute(): Boolean? {
+  suspend fun readSoftRecordingPrivacyModeEnabledAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 19u
 
     val attributePath =
@@ -2656,12 +2489,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -2750,14 +2578,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -2766,7 +2589,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readSoftLivestreamPrivacyModeEnabledAttribute(): Boolean? {
+  suspend fun readSoftLivestreamPrivacyModeEnabledAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 20u
 
     val attributePath =
@@ -2794,12 +2617,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -2888,14 +2706,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -2904,7 +2717,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readHardPrivacyModeOnAttribute(): Boolean? {
+  suspend fun readHardPrivacyModeOnAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 21u
 
     val attributePath =
@@ -2930,12 +2743,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -2981,14 +2789,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -2997,7 +2800,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readNightVisionAttribute(): UByte? {
+  suspend fun readNightVisionAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 22u
 
     val attributePath =
@@ -3023,12 +2826,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -3112,14 +2910,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -3128,7 +2921,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readNightVisionIllumAttribute(): UByte? {
+  suspend fun readNightVisionIllumAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 23u
 
     val attributePath =
@@ -3154,12 +2947,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -3245,14 +3033,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -3287,12 +3070,8 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: CameraAvStreamManagementClusterViewportStruct? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        CameraAvStreamManagementClusterViewportStruct.fromTlv(AnonymousTag, tlvReader)
-      } else {
-        null
-      }
+    val decodedValue: CameraAvStreamManagementClusterViewportStruct =
+      CameraAvStreamManagementClusterViewportStruct.fromTlv(AnonymousTag, tlvReader)
 
     return ViewportAttribute(decodedValue)
   }
@@ -3379,14 +3158,10 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: CameraAvStreamManagementClusterViewportStruct? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              CameraAvStreamManagementClusterViewportStruct.fromTlv(AnonymousTag, tlvReader)
-            } else {
-              null
-            }
+          val decodedValue: CameraAvStreamManagementClusterViewportStruct =
+            CameraAvStreamManagementClusterViewportStruct.fromTlv(AnonymousTag, tlvReader)
 
-          decodedValue?.let { emit(ViewportAttributeSubscriptionState.Success(it)) }
+          emit(ViewportAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(ViewportAttributeSubscriptionState.SubscriptionEstablished)
@@ -3395,7 +3170,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readSpeakerMutedAttribute(): Boolean? {
+  suspend fun readSpeakerMutedAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 25u
 
     val attributePath =
@@ -3421,12 +3196,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -3510,14 +3280,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -3526,7 +3291,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readSpeakerVolumeLevelAttribute(): UByte? {
+  suspend fun readSpeakerVolumeLevelAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 26u
 
     val attributePath =
@@ -3552,12 +3317,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -3643,14 +3403,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -3659,7 +3414,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readSpeakerMaxLevelAttribute(): UByte? {
+  suspend fun readSpeakerMaxLevelAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 27u
 
     val attributePath =
@@ -3685,12 +3440,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -3736,14 +3486,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -3752,7 +3497,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readSpeakerMinLevelAttribute(): UByte? {
+  suspend fun readSpeakerMinLevelAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 28u
 
     val attributePath =
@@ -3778,12 +3523,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -3829,14 +3569,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -3845,7 +3580,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMicrophoneMutedAttribute(): Boolean? {
+  suspend fun readMicrophoneMutedAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 29u
 
     val attributePath =
@@ -3871,12 +3606,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -3962,14 +3692,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -3978,7 +3703,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMicrophoneVolumeLevelAttribute(): UByte? {
+  suspend fun readMicrophoneVolumeLevelAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 30u
 
     val attributePath =
@@ -4004,12 +3729,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -4098,14 +3818,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -4114,7 +3829,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMicrophoneMaxLevelAttribute(): UByte? {
+  suspend fun readMicrophoneMaxLevelAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 31u
 
     val attributePath =
@@ -4140,12 +3855,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -4191,14 +3901,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -4207,7 +3912,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMicrophoneMinLevelAttribute(): UByte? {
+  suspend fun readMicrophoneMinLevelAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 32u
 
     val attributePath =
@@ -4233,12 +3938,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -4284,14 +3984,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -4300,7 +3995,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMicrophoneAGCEnabledAttribute(): Boolean? {
+  suspend fun readMicrophoneAGCEnabledAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 33u
 
     val attributePath =
@@ -4326,12 +4021,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -4420,14 +4110,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -4436,7 +4121,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readImageRotationAttribute(): UShort? {
+  suspend fun readImageRotationAttribute(): UShort {
     val ATTRIBUTE_ID: UInt = 34u
 
     val attributePath =
@@ -4462,12 +4147,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
 
     return decodedValue
   }
@@ -4551,14 +4231,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UShort? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUShort(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
 
-          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
+          emit(UShortSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UShortSubscriptionState.SubscriptionEstablished)
@@ -4567,7 +4242,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readImageFlipHorizontalAttribute(): Boolean? {
+  suspend fun readImageFlipHorizontalAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 35u
 
     val attributePath =
@@ -4593,12 +4268,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -4687,14 +4357,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -4703,7 +4368,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readImageFlipVerticalAttribute(): Boolean? {
+  suspend fun readImageFlipVerticalAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 36u
 
     val attributePath =
@@ -4729,12 +4394,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -4820,14 +4480,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -4836,7 +4491,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readLocalVideoRecordingEnabledAttribute(): Boolean? {
+  suspend fun readLocalVideoRecordingEnabledAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 37u
 
     val attributePath =
@@ -4862,12 +4517,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -4956,14 +4606,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -4972,7 +4617,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readLocalSnapshotRecordingEnabledAttribute(): Boolean? {
+  suspend fun readLocalSnapshotRecordingEnabledAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 38u
 
     val attributePath =
@@ -5000,12 +4645,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -5094,14 +4734,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -5110,7 +4745,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readStatusLightEnabledAttribute(): Boolean? {
+  suspend fun readStatusLightEnabledAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 39u
 
     val attributePath =
@@ -5136,12 +4771,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
   }
@@ -5230,14 +4860,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+          emit(BooleanSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
@@ -5246,7 +4871,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readStatusLightBrightnessAttribute(): UByte? {
+  suspend fun readStatusLightBrightnessAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 40u
 
     val attributePath =
@@ -5272,12 +4897,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
@@ -5366,14 +4986,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)

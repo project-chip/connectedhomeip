@@ -104,7 +104,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    Globals::StreamUsageEnum streamUsage   = static_cast<Globals::StreamUsageEnum>(0);
     chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
@@ -126,7 +126,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    Globals::StreamUsageEnum streamUsage   = static_cast<Globals::StreamUsageEnum>(0);
     chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
@@ -205,7 +205,7 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    Globals::StreamUsageEnum streamUsage   = static_cast<Globals::StreamUsageEnum>(0);
     chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
@@ -229,7 +229,7 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    Globals::StreamUsageEnum streamUsage   = static_cast<Globals::StreamUsageEnum>(0);
     chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;

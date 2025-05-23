@@ -141,20 +141,6 @@ enum class ProductIdentifierTypeEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for StreamUsageEnum
-enum class StreamUsageEnum : uint8_t
-{
-    kInternal  = 0x00,
-    kRecording = 0x01,
-    kAnalysis  = 0x02,
-    kLiveView  = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
-};
-
 // Enum for WebRTCEndReasonEnum
 enum class WebRTCEndReasonEnum : uint8_t
 {
@@ -456,6 +442,34 @@ enum class RelativePositionTag : uint8_t
     kUnknownEnumValue = 7,
 };
 
+// Enum for SoftwareVersionCertificationStatusEnum
+enum class SoftwareVersionCertificationStatusEnum : uint8_t
+{
+    kDevTest     = 0x00,
+    kProvisional = 0x01,
+    kCertified   = 0x02,
+    kRevoked     = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for StreamUsageEnum
+enum class StreamUsageEnum : uint8_t
+{
+    kInternal  = 0x00,
+    kRecording = 0x01,
+    kAnalysis  = 0x02,
+    kLiveView  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
 // Enum for TariffPriceTypeEnum
 enum class TariffPriceTypeEnum : uint8_t
 {
@@ -508,6 +522,28 @@ enum class ThreeLevelAutoEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
+};
+
+// Enum for WebRTCEndReasonEnum
+enum class WebRTCEndReasonEnum : uint8_t
+{
+    kIceFailed         = 0x00,
+    kIceTimeout        = 0x01,
+    kUserHangup        = 0x02,
+    kUserBusy          = 0x03,
+    kReplaced          = 0x04,
+    kNoUserMedia       = 0x05,
+    kInviteTimeout     = 0x06,
+    kAnsweredElsewhere = 0x07,
+    kOutOfResources    = 0x08,
+    kMediaTimeout      = 0x09,
+    kLowPower          = 0x0A,
+    kUnknownReason     = 0x0B,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 12,
 };
 
 // Global bitmaps.

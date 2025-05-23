@@ -28,8 +28,6 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
-
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
 using WebRTCMetadataOptionsBitmap = Clusters::detail::WebRTCMetadataOptionsBitmap;

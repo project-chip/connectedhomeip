@@ -138,20 +138,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamUsageEnum val)
-{
-    using EnumType = detail::StreamUsageEnum;
-    switch (val)
-    {
-    case EnumType::kInternal:
-    case EnumType::kRecording:
-    case EnumType::kAnalysis:
-    case EnumType::kLiveView:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::WebRTCEndReasonEnum val)
 {
     using EnumType = detail::WebRTCEndReasonEnum;
@@ -440,6 +426,34 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SoftwareVersionCertificationStatusEnum val)
+{
+    using EnumType = Globals::SoftwareVersionCertificationStatusEnum;
+    switch (val)
+    {
+    case EnumType::kDevTest:
+    case EnumType::kProvisional:
+    case EnumType::kCertified:
+    case EnumType::kRevoked:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::StreamUsageEnum val)
+{
+    using EnumType = Globals::StreamUsageEnum;
+    switch (val)
+    {
+    case EnumType::kInternal:
+    case EnumType::kRecording:
+    case EnumType::kAnalysis:
+    case EnumType::kLiveView:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TariffPriceTypeEnum val)
 {
     using EnumType = Globals::TariffPriceTypeEnum;
@@ -489,6 +503,28 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ThreeLevelAuto
     case EnumType::kLow:
     case EnumType::kMedium:
     case EnumType::kHigh:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::WebRTCEndReasonEnum val)
+{
+    using EnumType = Globals::WebRTCEndReasonEnum;
+    switch (val)
+    {
+    case EnumType::kIceFailed:
+    case EnumType::kIceTimeout:
+    case EnumType::kUserHangup:
+    case EnumType::kUserBusy:
+    case EnumType::kReplaced:
+    case EnumType::kNoUserMedia:
+    case EnumType::kInviteTimeout:
+    case EnumType::kAnsweredElsewhere:
+    case EnumType::kOutOfResources:
+    case EnumType::kMediaTimeout:
+    case EnumType::kLowPower:
+    case EnumType::kUnknownReason:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
