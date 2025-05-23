@@ -263,8 +263,10 @@ CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex acce
 template <typename PayloadType,
           typename std::enable_if_t<
               std::is_class_v<PayloadType> &&
-              std::is_same_v<decltype(std::declval<PayloadType>().Encode(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>(), std::declval<FabricIndex>())),
-                             CHIP_ERROR>, PayloadType> * = nullptr>
+                  std::is_same_v<decltype(std::declval<PayloadType>().Encode(
+                                     std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>(), std::declval<FabricIndex>())),
+                                 CHIP_ERROR>,
+              PayloadType> * = nullptr>
 CHIP_ERROR EncodeResponseCommandPayload(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex,
                                         const PayloadType & payload)
 {
@@ -279,10 +281,11 @@ CHIP_ERROR EncodeResponseCommandPayload(TLV::TLVWriter & writer, TLV::Tag tag, F
  * allow specializations to be created as needed to customize the behavior.
  */
 template <typename PayloadType,
-          typename std::enable_if_t<
-              std::is_class_v<PayloadType> &&
-              std::is_same_v<decltype(std::declval<PayloadType>().Encode(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>())),
-                             CHIP_ERROR>, PayloadType> * = nullptr>
+          typename std::enable_if_t<std::is_class_v<PayloadType> &&
+                                        std::is_same_v<decltype(std::declval<PayloadType>().Encode(std::declval<TLV::TLVWriter &>(),
+                                                                                                   std::declval<TLV::Tag>())),
+                                                       CHIP_ERROR>,
+                                    PayloadType> * = nullptr>
 CHIP_ERROR EncodeResponseCommandPayload(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex,
                                         const PayloadType & payload)
 {
