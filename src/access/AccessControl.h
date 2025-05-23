@@ -47,9 +47,10 @@ public:
     struct DeviceTypeResolver
     {
     public:
-        virtual ~DeviceTypeResolver() = default;
-
         virtual bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) = 0;
+
+    protected:
+        ~DeviceTypeResolver() = default;
     };
 
     /**
@@ -76,11 +77,10 @@ public:
         {
         public:
             Delegate() = default;
+            virtual ~Delegate() = default;
 
             Delegate(const Delegate &)             = delete;
             Delegate & operator=(const Delegate &) = delete;
-
-            virtual ~Delegate() = default;
 
             virtual void Release() {}
 
@@ -257,11 +257,10 @@ public:
         {
         public:
             Delegate() = default;
+            virtual ~Delegate() = default;
 
             Delegate(const Delegate &)             = delete;
             Delegate & operator=(const Delegate &) = delete;
-
-            virtual ~Delegate() = default;
 
             virtual void Release() {}
 
@@ -311,8 +310,6 @@ public:
             kUpdated = 3
         };
 
-        virtual ~EntryListener() = default;
-
         /**
          * Notifies of a change in the access control list.
          *
@@ -329,6 +326,9 @@ public:
         virtual void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
                                     const Entry * entry, ChangeType changeType) = 0;
 
+    protected:
+        ~EntryListener() = default;
+
     private:
         EntryListener * mNext = nullptr;
 
@@ -342,8 +342,6 @@ public:
 
         Delegate(const Delegate &)             = delete;
         Delegate & operator=(const Delegate &) = delete;
-
-        virtual ~Delegate() = default;
 
         virtual void Release() {}
 
@@ -409,6 +407,9 @@ public:
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
+
+    protected:
+        ~Delegate() = default;
     };
 
     AccessControl() = default;
