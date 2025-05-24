@@ -28,7 +28,7 @@ public:
     ConnectCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("connect", credIssuerCommands)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mPeerNodeId);
-        AddArgument("endpointid", 0, UINT16_MAX, &mPeerEndpointId);
+        AddArgument("endpoint-id-ignored-for-group-commands", 0, UINT16_MAX, &mPeerEndpointId);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -77,4 +77,16 @@ private:
     uint8_t mStreamUsage = 0;
 };
 
+class ProvideIceCandidatesCommand : public CHIPCommand
+{
+public:
+    ProvideIceCandidatesCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("provide-ice-candidates", credIssuerCommands)
+    {}
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+};
 } // namespace webrtc

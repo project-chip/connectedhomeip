@@ -64,4 +64,10 @@ CHIP_ERROR SolicitOfferCommand::RunCommand()
     return WebRTCManager::Instance().SolicitOffer(streamUsage);
 }
 
+CHIP_ERROR ProvideIceCandidatesCommand::RunCommand()
+{
+    ChipLogProgress(Camera, "Run ProvideIceCandidatesCommand");
+    return WebRTCManager::Instance().ProvideICECandidates();
+}
+
 } // namespace webrtc

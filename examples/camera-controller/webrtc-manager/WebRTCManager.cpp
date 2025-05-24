@@ -19,11 +19,12 @@
 #include "WebRTCManager.h"
 
 #include <app/dynamic_server/AccessControl.h>
+#include <arpa/inet.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <crypto/RandUtils.h>
-#include <lib/support/StringBuilder.h>
-
 #include <cstdio>
+#include <lib/support/StringBuilder.h>
+#include <nlohmann/json.hpp>
 #include <string>
 
 using namespace chip;
@@ -36,6 +37,8 @@ namespace {
 constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
 
 } // namespace
+
+using nlohmann::json;
 
 WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate) {}
 
@@ -75,14 +78,8 @@ CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorD
 
     mPeerConnection->setRemoteDescription(rtc::Description{ args.sdp, "offer" });
 
-    if (mLocalDescription.empty())
-    {
-        ChipLogError(Camera, "No local SDP to send");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideAnswer(sessionId, mLocalDescription); });
+    // Schedule the ProvideAnswer() call to run asynchronously.
+    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideAnswer(sessionId); });
 
     return CHIP_NO_ERROR;
 }
@@ -101,9 +98,6 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
 
     rtc::Description answerDesc(sdp, rtc::Description::Type::Answer);
     mPeerConnection->setRemoteDescription(answerDesc);
-
-    // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
 
     return CHIP_NO_ERROR;
 }
@@ -162,18 +156,26 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 
+    VerifyOrReturnError(initializeSocket(), CHIP_ERROR_INTERNAL);
+
     // Create the peer connection
     rtc::Configuration config;
+
+    // directly configure stun servers for now
+    config.iceServers.emplace_back("stun:stun.l.google.com:19302");
+    config.iceServers.emplace_back("stun:stun1.l.google.com:19302");
+
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
     mPeerConnection->onLocalDescription([this](rtc::Description desc) {
         mLocalDescription = std::string(desc);
         ChipLogProgress(Camera, "Local Description:");
-        ChipLogProgress(Camera, "%s", mLocalDescription.c_str());
+        json offer = { { "offer", mLocalDescription } };
+        ChipLogProgress(Camera, "%s", offer.dump().c_str());
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        std::string candidateStr = std::string(candidate);
+        std::string candidateStr = candidate.candidate();
         mLocalCandidates.push_back(candidateStr);
         ChipLogProgress(Camera, "Local Candidate:");
         ChipLogProgress(Camera, "%s", candidateStr.c_str());
@@ -182,8 +184,40 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mPeerConnection->onStateChange(
         [](rtc::PeerConnection::State state) { ChipLogProgress(Camera, "[PeerConnection State: %d]", static_cast<int>(state)); });
 
-    mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+    mPeerConnection->onGatheringStateChange([this](rtc::PeerConnection::GatheringState state) {
         ChipLogProgress(Camera, "[Gathering State: %d]", static_cast<int>(state));
+        if (state == rtc::PeerConnection::GatheringState::Complete)
+        {
+            std::ostringstream oss;
+            oss << "[";
+            for (size_t i = 0; i < mLocalCandidates.size(); i++)
+            {
+                oss << "\"" << mLocalCandidates[i] << "\"";
+                if (i != mLocalCandidates.size() - 1)
+                    oss << ", ";
+            }
+            oss << "]";
+            ChipLogProgress(Camera, "IceCandidates: %s", oss.str().c_str());
+        }
+    });
+
+    // Add a media track so that controller can receive video
+    // TODO get track configuration from allocated streams
+    // use fixed values for now
+    mMedia = rtc::Description::Video("video", rtc::Description::Direction::RecvOnly);
+    mMedia.addH264Codec(VIDEO_H264_CODEC);
+    mMedia.setBitrate(VIDEO_BITRATE);
+    mTrack = mPeerConnection->addTrack(mMedia);
+
+    mDepacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
+    mTrack->setMediaHandler(mDepacketizer);
+    mTrack->onFrame([this](rtc::binary message, rtc::FrameInfo frameInfo) {
+        // send H264 frames to sock so that a client can pick it up to dispaly it.
+        if (sendto(sock, reinterpret_cast<const char *>(message.data()), int(message.size()), 0,
+                   reinterpret_cast<const struct sockaddr *>(&socket_address), sizeof(socket_address)) == -1)
+        {
+            ChipLogError(Camera, "Failed to send video frame");
+        }
     });
 
     // Create a data channel for this offerer
@@ -209,9 +243,27 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     return CHIP_NO_ERROR;
 }
 
+bool WebRTCManager::initializeSocket()
+{
+    sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0)
+    {
+        ChipLogError(Camera, "Socket creation failed");
+        return false;
+    }
+    socket_address                 = {};
+    socket_address.sin_family      = AF_INET;
+    socket_address.sin_addr.s_addr = inet_addr(LOCALHOST_IP);
+    socket_address.sin_port        = htons(VIDEO_STREAM_DEST_PORT);
+    // Since this is an outbound only socket, no need to bind
+    return true;
+}
+
 CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer command to the peer device");
+
+    mPeerConnection->setLocalDescription();
 
     CHIP_ERROR err =
         mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
@@ -244,11 +296,18 @@ CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage)
     return err;
 }
 
-CHIP_ERROR WebRTCManager::ProvideAnswer(uint16_t sessionId, const std::string & sdp)
+CHIP_ERROR WebRTCManager::ProvideAnswer(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "Sending ProvideAnswer command to the peer device");
+    std::string answer(mPeerConnection->createAnswer());
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideAnswer(sessionId, sdp);
+    if (answer.empty())
+    {
+        ChipLogError(Camera, "No answer SDP to send");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideAnswer(sessionId, answer);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -258,7 +317,7 @@ CHIP_ERROR WebRTCManager::ProvideAnswer(uint16_t sessionId, const std::string & 
     return err;
 }
 
-CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
+CHIP_ERROR WebRTCManager::ProvideICECandidates()
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates command to the peer device");
 
@@ -268,7 +327,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, mLocalCandidates);
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(mLocalCandidates);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -276,4 +335,9 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
     }
 
     return err;
+}
+
+void WebRTCManager::HandleWebRTCProviderResponse(const ConcreteCommandPath & path, const StatusIB & status, TLV::TLVReader * data)
+{
+    Instance().mWebRTCProviderClient.HandleWebRTCProviderResponse(path, status, data);
 }

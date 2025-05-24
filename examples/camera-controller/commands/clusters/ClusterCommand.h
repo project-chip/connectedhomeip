@@ -22,6 +22,7 @@
 
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
+#include "webrtc-manager/WebRTCManager.h"
 
 class ClusterCommand : public InteractionModelCommands, public ModelCommand, public chip::app::CommandSender::Callback
 {
@@ -81,9 +82,17 @@ public:
             return;
         }
 
-        if (data != nullptr)
+        if (data == nullptr)
         {
-            LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
+            return;
+        }
+
+        LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
+
+        // handle WebRTCTransportProvider responses explicitly
+        if (path.mClusterId == chip::app::Clusters::WebRTCTransportProvider::Id)
+        {
+            WebRTCManager::HandleWebRTCProviderResponse(path, status, data);
         }
     }
 
