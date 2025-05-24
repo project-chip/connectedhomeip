@@ -126,7 +126,6 @@ class TC_WebRTCRequestor_2_4(MatterBaseTest):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
-        await asyncio.sleep(3)
 
         self.step(1)
         # Prompt user with instructions
