@@ -69,13 +69,8 @@ limitations under the License.
             <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Administrator Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Operational Credentials" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Localization Configuration" client="false" server="true" clientLocked="true" serverLocked="false">
-                <requireAttribute>ACTIVE_LOCALE</requireAttribute>
-                <requireAttribute>SUPPORTED_LOCALES</requireAttribute>
-            </include>
-            <include cluster="Time Format Localization" client="false" server="false" clientLocked="true" serverLocked="false">
-                <requireAttribute>HOUR_FORMAT</requireAttribute>
-            </include>
+            <include cluster="Localization Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Time Format Localization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Unit Localization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>UP_TIME</requireAttribute>
@@ -2835,6 +2830,19 @@ limitations under the License.
             <include cluster="Ethernet Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Wi-Fi Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thread Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-joint-fabric-administrator</name>
+        <domain>CHIP</domain>
+        <typeName>Joint Fabric Administrator</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0130</deviceId>
+        <class>Utility</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Joint Fabric Datastore" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Joint Fabric Administrator" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>

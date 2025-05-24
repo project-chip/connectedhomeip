@@ -71,5 +71,6 @@ leak:_fetchInitializingClassList
 # TLS storage
 leak:CRYPTO_set_thread_local
 
-# Not our leak, clearly:
+# Not our leaks, clearly:
 leak:CFXNotificationRegistrarFind
+leak:NSManagedObjectModel
