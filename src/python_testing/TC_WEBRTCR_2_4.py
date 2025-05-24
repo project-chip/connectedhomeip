@@ -72,6 +72,7 @@ class TC_WebRTCRequestor_2_4(MatterBaseTest):
             storage_dir=self.storage.name,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode,
+            port=5681,            
             extra_args=["--camera-deferred-offer"]
         )
 
