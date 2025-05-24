@@ -21,7 +21,7 @@
 #include "EventLoggingTypes.h"
 
 #include <app/ConcreteEventPath.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {

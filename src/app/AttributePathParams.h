@@ -21,7 +21,7 @@
 #include <app/AppConfig.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/DataVersionFilter.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {

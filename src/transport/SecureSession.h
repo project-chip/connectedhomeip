@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <ble/Ble.h>
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ReliableMessageProtocolConfig.h>

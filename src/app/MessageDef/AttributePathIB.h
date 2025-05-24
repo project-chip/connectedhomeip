@@ -25,7 +25,7 @@
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/TLV.h>

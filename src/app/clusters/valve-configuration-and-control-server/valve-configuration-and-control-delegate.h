@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/CHIPError.h>
 
 namespace chip {

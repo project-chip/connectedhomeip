@@ -20,7 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/icd/server/ICDConfigurationData.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>

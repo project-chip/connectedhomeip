@@ -28,7 +28,7 @@
 
 #include <app/util/AttributesChangedListener.h>
 #include <app/util/MarkAttributeDirty.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <app/util/types_stub.h> // For various types.
 
 #include <app/util/attribute-metadata.h> // EmberAfAttributeMetadata

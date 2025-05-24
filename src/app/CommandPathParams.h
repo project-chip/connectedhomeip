@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/GroupId.h>
 #include <lib/support/BitFlags.h>
 

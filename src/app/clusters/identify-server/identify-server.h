@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 struct Identify
 {

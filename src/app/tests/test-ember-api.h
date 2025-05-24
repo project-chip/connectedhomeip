@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 /// test-ember-api was created to consolidate and centralize stub functions that are related to ember and are used by the unit-tests
 

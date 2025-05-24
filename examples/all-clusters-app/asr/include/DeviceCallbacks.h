@@ -27,7 +27,7 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/util/af-types.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceLayer.h>
 
 class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks

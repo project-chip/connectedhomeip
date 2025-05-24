@@ -28,7 +28,7 @@
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <data-model-providers/codegen/Instance.h>

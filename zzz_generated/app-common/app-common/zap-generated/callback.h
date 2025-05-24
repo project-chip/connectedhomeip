@@ -23,7 +23,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-types.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>

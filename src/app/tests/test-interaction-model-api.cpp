@@ -19,7 +19,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <data-model-providers/codegen/Instance.h>

@@ -21,7 +21,7 @@
 #include <sys/types.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/AttributeList.h>

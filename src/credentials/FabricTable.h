@@ -23,7 +23,7 @@
 
 #include <algorithm>
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPCertificateSet.h>
 #include <credentials/CertificateValidityPolicy.h>

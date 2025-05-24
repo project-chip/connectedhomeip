@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPCore.h>

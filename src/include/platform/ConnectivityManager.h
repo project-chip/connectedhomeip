@@ -30,7 +30,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>

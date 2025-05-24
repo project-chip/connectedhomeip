@@ -20,7 +20,7 @@
 #pragma once
 
 #include "matter_led.h"
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <cstdio>
 
 class LEDWidget

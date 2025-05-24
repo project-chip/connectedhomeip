@@ -27,7 +27,7 @@
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>

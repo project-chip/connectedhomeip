@@ -25,7 +25,7 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <inet/IPAddress.h>
 #include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>

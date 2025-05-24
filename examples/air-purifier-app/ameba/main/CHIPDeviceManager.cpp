@@ -26,7 +26,7 @@
 
 #include "CHIPDeviceManager.h"
 #include <air-purifier-manager.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <core/ErrorStr.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>

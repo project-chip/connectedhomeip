@@ -19,7 +19,7 @@
 
 #include "StructBuilder.h"
 #include <app/SpecificationDefinedRevisions.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
