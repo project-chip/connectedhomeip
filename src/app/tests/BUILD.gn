@@ -228,7 +228,6 @@ source_set("closure-control-test-srcs") {
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.cpp",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-objects.h",
   ]
 

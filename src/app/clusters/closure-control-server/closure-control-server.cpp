@@ -98,6 +98,16 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallTarget(ret); });
     }
 
+    case Attributes::FeatureMap::Id: {
+        typedef BitFlags<Feature> T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetFeatureMap(ret); });
+    }
+
+    case Attributes::ClusterRevision::Id: {
+        typedef Attributes::ClusterRevision::TypeInfo::Type T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetClusterRevision(ret); });
+    }
+
     default:
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
