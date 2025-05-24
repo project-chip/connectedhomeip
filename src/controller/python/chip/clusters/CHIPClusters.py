@@ -3880,7 +3880,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000009: {
-                "attributeName": "MaximumCheckInBackOff",
+                "attributeName": "MaximumCheckInBackoff",
                 "attributeId": 0x00000009,
                 "type": "int",
                 "reportable": True,

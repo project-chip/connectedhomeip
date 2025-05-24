@@ -60,10 +60,10 @@ namespace OperatingMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OperatingMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OperatingMode
-namespace MaximumCheckInBackOff {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumCheckInBackOff::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace MaximumCheckInBackoff {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumCheckInBackoff::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace MaximumCheckInBackOff
+} // namespace MaximumCheckInBackoff
 
 } // namespace Attributes
 
@@ -80,7 +80,7 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace UnregisterClient
 namespace StayActiveRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(StayActiveRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+                                                                Access::Privilege::kOperate);
 } // namespace StayActiveRequest
 
 } // namespace Commands

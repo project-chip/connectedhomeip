@@ -11630,8 +11630,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                        value);
             return value;
         }
-        case Attributes::MaximumCheckInBackOff::Id: {
-            using TypeInfo = Attributes::MaximumCheckInBackOff::TypeInfo;
+        case Attributes::MaximumCheckInBackoff::Id: {
+            using TypeInfo = Attributes::MaximumCheckInBackoff::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

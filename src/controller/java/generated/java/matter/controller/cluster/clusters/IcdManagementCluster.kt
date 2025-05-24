@@ -1056,7 +1056,7 @@ class IcdManagementCluster(
     }
   }
 
-  suspend fun readMaximumCheckInBackOffAttribute(): UInt? {
+  suspend fun readMaximumCheckInBackoffAttribute(): UInt? {
     val ATTRIBUTE_ID: UInt = 9u
 
     val attributePath =
@@ -1092,7 +1092,7 @@ class IcdManagementCluster(
     return decodedValue
   }
 
-  suspend fun subscribeMaximumCheckInBackOffAttribute(
+  suspend fun subscribeMaximumCheckInBackoffAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
