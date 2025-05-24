@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("//build_overrides/editline.gni")
+import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/examples/camera-controller/camera-controller.gni")
 import("${chip_root}/src/data-model-providers/codegen/model.gni")
@@ -28,6 +29,14 @@ config("config") {
     "-Wconversion",
     "-Wno-shadow",
   ]
+
+  if (is_clang) {
+    # libdatachannel has a lot of these like:
+    #   ...... libdatachannel/repo/include/rtc/h265nalunit.hpp:40:60: error: implicit conversion loses integer precision: 'int'
+    #   to 'uint8_t' (aka 'unsigned char') [-Werror,-Wimplicit-int-conversion]
+    #   40 |         uint8_t nuhLayerId() const { return ((_first & 0x1) << 5) | ((_second & 0b1111'1000) >> 3); }
+    cflags += [ "-Wno-implicit-int-conversion" ]
+  }
 
   include_dirs = [
     ".",
