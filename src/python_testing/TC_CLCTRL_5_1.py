@@ -1,0 +1,436 @@
+#
+#    Copyright (c) 2023 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
+import logging
+from random import choice
+
+import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from mobly import asserts
+
+
+class TC_CLCTRL_5_1(MatterBaseTest):
+    async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
+        cluster = Clusters.Objects.ClosureControl
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
+    def desc_TC_CLCTRL_5_1(self) -> str:
+        return "[TC_CLCTRL_5_1] Stop Command Primary Functionality with DUT as Server"
+
+    def steps_TC_CLCTRL_5_1(self) -> list[TestStep]:
+        steps = [
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep("2a", "TH sends command MoveTo to DUT, with Position = OpenInFull"),
+            TestStep("2b", "after 1 seconds, TH reads from the DUT the MainState attribute"),
+            TestStep("2c", "TH sends command Stop to DUT"),
+            TestStep("2d", "TH waits for PIXIT.CLCTRL.StopDuration seconds"),
+            TestStep("2e", "TH reads from the DUT the MainState attribute"),
+            TestStep("3a", "TH sends command Calibrate to DUT"),
+            TestStep("3b", "after 2 seconds, TH reads from the DUT the MainState attribute"),
+            TestStep("3c", "TH sends command Stop to DUT"),
+            TestStep("3d", "TH waits for PIXIT.CLCTRL.StopDuration seconds"),
+            TestStep("3e", "TH reads from the DUT the MainState attribute"),
+            TestStep("4a", "TH sends command Stop to DUT"),
+            TestStep("4b", "TH waits for PIXIT.CLCTRL.StopDuration seconds"),
+            TestStep("4c", "TH reads from the DUT the MainState attribute"),
+            TestStep("4d", "TH sends command Stop to DUT"),
+            TestStep("5a", "TH reads TestEventTriggersEnabled attribute from General Diagnostic Cluster"),
+            TestStep("5b", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is SetupRequired(7) Test Event"),
+            TestStep("5c", "TH reads from the DUT the MainState attribute"),
+            TestStep("5d", "TH sends command Stop to DUT"),
+            TestStep("5e", "TH waits for PIXIT.CLCTRL.StopDuration seconds"),
+            TestStep("5f", "TH reads from the DUT the MainState attribute"),
+            TestStep("6a", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Protected(5) Test Event"),
+            TestStep("6b", "TH reads from the DUT the MainState attribute"),
+            TestStep("6c", "TH sends command Stop to DUT"),
+            TestStep("6d", "TH waits for PIXIT.CLCTRL.StopDuration seconds"),
+            TestStep("6e", "TH reads from the DUT the MainState attribute"),
+            TestStep("7a", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged(6) Test Event"),
+            TestStep("7b", "TH reads from the DUT the MainState attribute"),
+            TestStep("7c", "TH sends command Stop to DUT"),
+            TestStep("7d", "TH waits for PIXIT.CLCTRL.StopDuration seconds"),
+            TestStep("7e", "TH reads from the DUT the MainState attribute"),
+            TestStep("8", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear"),
+        ]
+        return steps
+
+    def pics_TC_CLCTRL_5_1(self) -> list[str]:
+        pics = [
+            "CLCTRL.S",
+            "CLCTRL.S.C00.Rsp(Stop)"
+            "CLCTRL.S.F02(IS)"
+        ]
+        return pics
+
+    @async_test_body
+    async def test_TC_CLCTRL_5_1(self):
+        endpoint = self.get_endpoint(default=1)
+
+        # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
+        self.step(1)
+        attributes = Clusters.ClosureControl.Attributes
+
+        feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        logging.info(f"FeatureMap: {feature_map}")
+        is_is_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kIs
+        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPosition
+        is_cl_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kCalibration
+
+        if is_is_feature_supported:
+            logging.info("Instantanous feature is supported, skipping test case")
+
+            # Skipping all remainig steps
+            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
+                self.step(step.test_plan_number)
+                logging.info("Test step skipped")
+
+            return
+
+        # STEP 2a: TH sends command MoveTo to DUT, with Position = OpenInFull
+        self.step("2a")
+
+        if not is_ps_feature_supported:
+            logging.info("Position feature is not supported, skipping test case")
+            logging.info("Test step skipped")
+            return
+        try:
+            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
+                position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull
+            ))
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 2b: after 1 seconds, TH reads from the DUT the MainState attribute
+        self.step("2b")
+
+        await self.wait(1)
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        is_moving = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kMoving
+        is_waiting = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kWaiting
+        asserts.assert_true(is_moving or is_waiting, "MainState is not in the expected state")
+        if is_moving or is_waiting:
+            logging.info("MainState is in the moving or waiting state")
+
+        # STEP 2c: TH sends command Stop to DUT
+        self.step("2c")
+
+        try:
+            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Stop)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 2d: TH waits for PIXIT.CLCTRL.StopDuration seconds
+        self.step("2d")
+
+        stop_duration = self.matter_test_config.global_test_params['PIXIT.CLCTRL.StopDuration']
+        if stop_duration is None:
+            logging.error("PIXIT.CLCTRL.StopDuration is not defined")
+            return
+        if stop_duration < 0:
+            logging.error("PIXIT.CLCTRL.StopDuration is negative")
+            return
+        if stop_duration > 0:
+            await self.wait(stop_duration)
+        else:
+            logging.info("Stop duration is 0, skipping wait")
+
+        # STEP 2e: TH reads from the DUT the MainState attribute
+        self.step("2e")
+
+        # Read the MainState attribute from the DUT
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kStopped,
+                             "MainState is not in the expected state")
+
+        # STEP 3a: TH sends command Calibrate to DUT
+        self.step("3a")
+
+        if not is_cl_feature_supported:
+            logging.info("Calibration feature is not supported, skipping test case")
+            logging.info("Test step skipped")
+            return
+        try:
+            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Calibrate)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 3b: after 1 seconds, TH reads from the DUT the MainState attribute
+        self.step("3b")
+
+        await self.wait(1)
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kCalibrating,
+                             "MainState is not in the expected state")
+
+        # STEP 3c: TH sends command Stop to DUT
+        self.step("3c")
+
+        try:
+            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Stop)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 3d: TH waits for PIXIT.CLCTRL.StopDuration seconds
+        self.step("3d")
+
+        await self.wait(stop_duration)
+
+        # STEP 3e: TH reads from the DUT the MainState attribute
+        self.step("3e")
+
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kStopped, "MainState is not in the expected state")
+
+        # STEP 4a: TH sends command Stop to DUT
+        self.step("4a")
+
+        try:
+            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Stop)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 4b: TH waits for PIXIT.CLCTRL.StopDuration seconds
+        self.step("4b")
+
+        await self.wait(stop_duration)
+
+        # STEP 4c: TH reads from the DUT the MainState attribute
+        self.step("4c")
+
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kStopped,
+                             "MainState is not in the expected state")
+
+        # STEP 4d: TH sends command Stop to DUT
+        self.step("4d")
+
+        try:
+            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Stop)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 5a: TH reads TestEventTriggersEnabled attribute from General Diagnostic Cluster
+        self.step("5a")
+
+        try:
+            await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, attribute=Clusters.GeneralDiagnostic.Attributes.TestEventTriggersEnabled)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # Check if the attribute is enabled
+        test_event_triggers_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, attribute=Clusters.GeneralDiagnostic.Attributes.TestEventTriggersEnabled)
+        asserts.assert_not_equal(test_event_triggers_enabled, NullValue, "TestEventTriggersEnabled attribute is NullValue")
+        asserts.assert_true(test_event_triggers_enabled ==
+                            Clusters.GeneralDiagnostic.Bitmaps.TestEventTriggersEnabled.kEnabled, "TestEventTriggersEnabled is not enabled")
+        if test_event_triggers_enabled == Clusters.GeneralDiagnostic.Bitmaps.TestEventTriggersEnabled.kEnabled:
+            logging.info("TestEventTriggersEnabled is enabled")
+
+        # STEP 5b: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is SetupRequired(7) Test Event
+        self.step("5b")
+
+        try:
+            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, command=Clusters.GeneralDiagnostic.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostic.TestEventTriggerRequest(
+                enable_key=Clusters.GeneralDiagnostic.Bitmaps.EnableKey.kTestEventTriggerKey,
+                event_trigger=Clusters.GeneralDiagnostic.Bitmaps.EventTrigger.kMainStateSetupRequired
+            ))
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 5c: TH reads from the DUT the MainState attribute
+        self.step("5c")
+
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kSetupRequired,
+                             "MainState is not in the expected state")
+
+        # STEP 5d: TH sends command Stop to DUT
+        self.step("5d")
+
+        try:
+            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Stop)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 5e: TH waits for PIXIT.CLCTRL.StopDuration seconds
+        self.step("5e")
+
+        await self.wait(stop_duration)
+
+        # STEP 5f: TH reads from the DUT the MainState attribute
+        self.step("5f")
+
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kSetupRequired,
+                             "MainState is not in the expected state")
+
+        # STEP 6a: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Protected(5) Test Event
+        self.step("6a")
+
+        try:
+            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, command=Clusters.GeneralDiagnostic.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostic.TestEventTriggerRequest(
+                enable_key=Clusters.GeneralDiagnostic.Bitmaps.EnableKey.kTestEventTriggerKey,
+                event_trigger=Clusters.GeneralDiagnostic.Bitmaps.EventTrigger.kMainStateProtected
+            ))
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 6b: TH reads from the DUT the MainState attribute
+        self.step("6b")
+
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kProtected,
+                             "MainState is not in the expected state")
+
+        # STEP 6c: TH sends command Stop to DUT
+        self.step("6c")
+
+        try:
+            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Stop)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 6d: TH waits for PIXIT.CLCTRL.StopDuration seconds
+        self.step("6d")
+
+        await self.wait(stop_duration)
+
+        # STEP 6e: TH reads from the DUT the MainState attribute
+        self.step("6e")
+
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kProtected,
+                             "MainState is not in the expected state")
+
+        # STEP 7a: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged(6) Test Event
+        self.step("7a")
+
+        try:
+            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, command=Clusters.GeneralDiagnostic.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostic.TestEventTriggerRequest(
+                enable_key=Clusters.GeneralDiagnostic.Bitmaps.EnableKey.kTestEventTriggerKey,
+                event_trigger=Clusters.GeneralDiagnostic.Bitmaps.EventTrigger.kMainStateDisengaged
+            ))
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 7b: TH reads from the DUT the MainState attribute
+        self.step("7b")
+
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kDisengaged,
+                             "MainState is not in the expected state")
+
+        # STEP 7c: TH sends command Stop to DUT
+        self.step("7c")
+
+        try:
+            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.Stop)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # STEP 7d: TH waits for PIXIT.CLCTRL.StopDuration seconds
+        self.step("7d")
+
+        await self.wait(stop_duration)
+
+        # STEP 7e: TH reads from the DUT the MainState attribute
+        self.step("7e")
+
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Bitmaps.MainState.kDisengaged,
+                             "MainState is not in the expected state")
+
+        # STEP 8: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
+        self.step("8")
+
+        try:
+            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, command=Clusters.GeneralDiagnostic.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostic.TestEventTriggerRequest(
+                enable_key=Clusters.GeneralDiagnostic.Bitmaps.EnableKey.kTestEventTriggerKey,
+                event_trigger=Clusters.GeneralDiagnostic.Bitmaps.EventTrigger.kMainStateTestEventClear
+            ))
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Unexpected error returned")
+            pass
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
