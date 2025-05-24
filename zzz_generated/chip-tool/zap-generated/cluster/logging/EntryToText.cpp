@@ -840,6 +840,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "TCAcknowledgementsRequired";
         case chip::app::Clusters::GeneralCommissioning::Attributes::TCUpdateDeadline::Id:
             return "TCUpdateDeadline";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::RecoveryIdentifier::Id:
+            return "RecoveryIdentifier";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::Id:
+            return "NetworkRecoveryReason";
         case chip::app::Clusters::GeneralCommissioning::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::AcceptedCommandList::Id:

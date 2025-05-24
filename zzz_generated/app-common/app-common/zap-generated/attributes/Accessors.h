@@ -843,6 +843,31 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
                                         MarkAttributeDirty markDirty);
 } // namespace TCUpdateDeadline
 
+namespace RecoveryIdentifier {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
+} // namespace RecoveryIdentifier
+
+namespace NetworkRecoveryReason {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum> & value); // NetworkRecoveryReasonEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum> & value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum> & value,
+    MarkAttributeDirty markDirty);
+} // namespace NetworkRecoveryReason
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
