@@ -7262,6 +7262,42 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData);
 /**
+ * @brief Door Lock Cluster SetPINCode Command callback (from client)
+ */
+bool emberAfDoorLockClusterSetPINCodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetPINCode::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster GetPINCode Command callback (from client)
+ */
+bool emberAfDoorLockClusterGetPINCodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetPINCode::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster ClearPINCode Command callback (from client)
+ */
+bool emberAfDoorLockClusterClearPINCodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearPINCode::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster ClearAllPINCodes Command callback (from client)
+ */
+bool emberAfDoorLockClusterClearAllPINCodesCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearAllPINCodes::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster SetUserStatus Command callback (from client)
+ */
+bool emberAfDoorLockClusterSetUserStatusCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetUserStatus::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster GetUserStatus Command callback (from client)
+ */
+bool emberAfDoorLockClusterGetUserStatusCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetUserStatus::DecodableType & commandData);
+/**
  * @brief Door Lock Cluster SetWeekDaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterSetWeekDayScheduleCallback(
@@ -7315,6 +7351,42 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(
 bool emberAfDoorLockClusterClearHolidayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster SetUserType Command callback (from client)
+ */
+bool emberAfDoorLockClusterSetUserTypeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetUserType::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster GetUserType Command callback (from client)
+ */
+bool emberAfDoorLockClusterGetUserTypeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetUserType::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster SetRFIDCode Command callback (from client)
+ */
+bool emberAfDoorLockClusterSetRFIDCodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetRFIDCode::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster GetRFIDCode Command callback (from client)
+ */
+bool emberAfDoorLockClusterGetRFIDCodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetRFIDCode::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster ClearRFIDCode Command callback (from client)
+ */
+bool emberAfDoorLockClusterClearRFIDCodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearRFIDCode::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster ClearAllRFIDCodes Command callback (from client)
+ */
+bool emberAfDoorLockClusterClearAllRFIDCodesCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearAllRFIDCodes::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster SetUser Command callback (from client)
  */
