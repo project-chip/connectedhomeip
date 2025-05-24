@@ -39,6 +39,7 @@
 #include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
+#include <soil-measurement-stub.h>
 
 #include <memory>
 #include <string>
@@ -567,6 +568,24 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
         }
     }
+    else if (name == "SetSimulatedSoilMoisture")
+    {
+        uint8_t soilMoisture = static_cast<uint8_t>(self->mJsonValue["SoilMoistureValue"].asUInt());
+        EndpointId endpoint  = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+
+        if (endpoint != 1)
+        {
+            ChipLogError(NotSpecified, "Invalid EndpointId to set Soil Moisture value.");
+        }
+        else if (soilMoisture > 100)
+        {
+            ChipLogError(NotSpecified, "Invalid Soil Moisture value to set.");
+        }
+        else
+        {
+            self->OnSoilMoistureChange(endpoint, soilMoisture);
+        }
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
@@ -927,6 +946,19 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
     {
         ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
     }
+}
+
+void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, uint8_t soilMoisture)
+{
+    if (soilMoisture > 100)
+    {
+        ChipLogDetail(NotSpecified, "Invalid value/endpoint to set.");
+        return;
+    }
+
+    SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
+    soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture);
+    ChipLogDetail(NotSpecified, "Set Soil Moisture value to %u", soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)

@@ -7049,6 +7049,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Water Leak Detector";
     case 0x00000044:
         return "Rain Sensor";
+    case 0x00000045:
+        return "Soil Sensor";
     case 0x00000070:
         return "Refrigerator";
     case 0x00000071:

@@ -320,7 +320,7 @@
         "SERVICE_AREA_CLUSTER": ["service-area-server"],
         "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
-        "SOIL_MEASUREMENT_CLUSTER": [],
+        "SOIL_MEASUREMENT_CLUSTER": ["soil-measurement-server"],
         "SWITCH_CLUSTER": ["switch-server"],
         "TARGET_NAVIGATOR_CLUSTER": ["target-navigator-server"],
         "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],

@@ -51,6 +51,7 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x00000042, MTRDeviceTypeClass::Simple, @"Water Valve" },
     { 0x00000043, MTRDeviceTypeClass::Simple, @"Water Leak Detector" },
     { 0x00000044, MTRDeviceTypeClass::Simple, @"Rain Sensor" },
+    { 0x00000045, MTRDeviceTypeClass::Simple, @"Soil Sensor" },
     { 0x00000070, MTRDeviceTypeClass::Simple, @"Refrigerator" },
     { 0x00000071, MTRDeviceTypeClass::Simple, @"Temperature Controlled Cabinet" },
     { 0x00000072, MTRDeviceTypeClass::Simple, @"Room Air Conditioner" },
