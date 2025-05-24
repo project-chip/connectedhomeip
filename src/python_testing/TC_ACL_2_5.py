@@ -84,7 +84,8 @@ class TC_ACL_2_5(MatterBaseTest):
         extensions_list = [extension]
         result = await self.default_controller.WriteAttribute(
             self.dut_node_id,
-            [(0, extension_attr(value=extensions_list))]
+            [(0, extension_attr(value=extensions_list))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result {str(result)}")
         asserts.assert_equal(
@@ -118,18 +119,17 @@ class TC_ACL_2_5(MatterBaseTest):
         logging.info(f"Comparing subscription event: {subscription_event} with direct event: {direct_event}")
         asserts.assert_equal(subscription_event, direct_event.Data, "Subscription event should be in direct event")
 
-        # Verify the actual values
         asserts.assert_equal(subscription_event.changeType,
-                             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                             "Expected Added change type")
+                            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                            "Expected Added change type")
+        asserts.assert_equal(subscription_event.latestValue.data,
+                            D_OK_EMPTY,
+                            "LatestValue.Data should be D_OK_EMPTY")
         asserts.assert_in('chip.clusters.Types.Nullable', str(type(subscription_event.adminPasscodeID)),
                           "AdminPasscodeID should be Null")
         asserts.assert_equal(subscription_event.adminNodeID,
                              self.default_controller.nodeId,
                              "AdminNodeID should be the controller node ID")
-        asserts.assert_equal(subscription_event.latestValue.data,
-                             b'\x17\x18',
-                             "LatestValue.Data should be 1718")
         asserts.assert_equal(subscription_event.latestValue.fabricIndex,
                              f1,
                              "LatestValue.FabricIndex should be the current fabric index")
@@ -424,7 +424,7 @@ class TC_ACL_2_5(MatterBaseTest):
             TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list", "Result is SUCCESS"),
             TestStep(13, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
                      "Result is SUCCESS, value is list of AccessControlExtensionChanged containing at least 1 new element if new write list method is used LatestValue Field should be D_OK_EMPTY, else then the legacy list method is used value should be D_OK_SINGLE."),
-            TestStep(14, "Rerunning test with legacy list method", "Rerunning test with legacy list method"),
+            TestStep(14, "Rerunning test with new list method", "Rerunning test with new list method"),
             ]
         return steps
 
