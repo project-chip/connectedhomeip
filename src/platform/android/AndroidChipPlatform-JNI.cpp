@@ -34,6 +34,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/internal/NFCCommissioningManager.h>
 
 #include <android/log.h>
 
@@ -43,6 +44,7 @@
 #include "CommissionableDataProviderImpl.h"
 #include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
+#include "NFCCommissioningManagerImpl.h"
 #include "tracing.h"
 
 using namespace chip;
@@ -122,6 +124,51 @@ JNI_METHOD(void, initChipStack)(JNIEnv * env, jobject self)
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Error initializing CHIP stack: %s", ErrorStr(err)));
+}
+
+// for NFCCommissioningManager
+JNI_METHOD(void, nativeSetNFCCommissioningManager)(JNIEnv * env, jobject, jobject manager)
+{
+    ChipLogProgress(DeviceLayer, "(Android JNI) nativeSetNFCCommissioningManager()");
+
+    VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "nativeSetNFCCommissioningManager(): Invalid env"));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    chip::DeviceLayer::StackLock lock;
+    chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().InitializeWithObject(manager);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+}
+
+JNI_METHOD(void, onNfcTagResponse)(JNIEnv * env, jobject self, jbyteArray jbArray)
+{
+    ChipLogProgress(Controller, "%p (Android JNI) onNfcTagResponse()", self);
+
+    VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "onNfcTagResponse(): Invalid env"));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    chip::DeviceLayer::StackLock lock;
+
+    jbyte * data = env->GetByteArrayElements(jbArray, nullptr);
+    jsize length = env->GetArrayLength(jbArray);
+
+    System::PacketBufferHandle buffer =
+        System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(data), static_cast<size_t>(length));
+    VerifyOrReturn(!buffer.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer"));
+
+    chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagResponse(Transport::PeerAddress::NFC(), std::move(buffer));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+}
+
+JNI_METHOD(void, onNfcTagError)(JNIEnv * env, jobject self)
+{
+    ChipLogProgress(DeviceLayer, "(Android JNI) onNfcTagError()");
+
+    VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "onNfcTagError(): Invalid env"));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    chip::DeviceLayer::StackLock lock;
+    chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagError(Transport::PeerAddress::NFC());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 
 // for BLEManager

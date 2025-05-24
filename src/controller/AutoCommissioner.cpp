@@ -583,6 +583,9 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     auto transportType =
         mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
     mNeedsNetworkSetup = (transportType == Transport::Type::kBle);
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kNfc);
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kWiFiPAF);
 #endif
