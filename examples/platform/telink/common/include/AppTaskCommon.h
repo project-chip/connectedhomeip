@@ -67,6 +67,12 @@ public:
     CHIP_ERROR StartApp();
     void PostEvent(AppEvent * event);
 
+#ifdef CONFIG_TFLM_FEATURE
+    void SetThreadStateChangedEventCapturedFlag(void) { mThreadStateChangedEventCaptured = true; }
+
+    bool GetThreadStateChangedEventCapturedFlag(void) { return mThreadStateChangedEventCaptured; }
+#endif
+
     static void IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect);
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
@@ -83,6 +89,11 @@ public:
 #endif
         kButtonId_StartBleAdv
     } ButtonId;
+#endif
+
+#ifdef CONFIG_TFLM_FEATURE
+    static void TriggerMicroSpeechCallback();
+    static void TriggerMicroSpeechEventHandler(AppEvent * aEvent);
 #endif
 
 protected:
@@ -136,5 +147,9 @@ protected:
 #ifdef CONFIG_CHIP_PW_RPC
     friend class chip::rpc::TelinkButton;
     static void ButtonEventHandler(ButtonId_t btnId, bool btnPressed);
+#endif
+
+#ifdef CONFIG_TFLM_FEATURE
+    bool mThreadStateChangedEventCaptured;
 #endif
 };
