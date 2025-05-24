@@ -316,6 +316,20 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
+            - name: Build example Telink (tl7218x ml7g) Lighting App
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-ml7g' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218x_ml7g lighting-app \
+                    out/telink-tl7218x_ml7g-lighting-app/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
             - name: Build example Telink (B91) Thermostat App
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
