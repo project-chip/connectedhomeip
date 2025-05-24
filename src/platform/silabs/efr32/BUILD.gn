@@ -82,8 +82,8 @@ static_library("efr32") {
   if (chip_enable_multi_ota_requestor) {
     if (chip_enable_multi_ota_encryption) {
       sources += [
-        "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.cpp",
         "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.h",
+        "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKeyPSA.cpp",
       ]
     }
 
