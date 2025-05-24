@@ -431,6 +431,7 @@ config CHIP_OPENTHREAD_CONFIG
 
 config CHIP_OPENTHREAD_FTD
 	bool "App is an OpenThread FTD"
+	default y
 	help
 	  App is an OpenThread FTD
 
