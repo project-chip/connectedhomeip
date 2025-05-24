@@ -745,7 +745,6 @@
             "AllocatedVideoStreams",
             "AllocatedAudioStreams",
             "AllocatedSnapshotStreams",
-            "RankedVideoStreamPrioritiesList",
             "SoftRecordingPrivacyModeEnabled",
             "SoftLivestreamPrivacyModeEnabled",
             "HardPrivacyModeOn",

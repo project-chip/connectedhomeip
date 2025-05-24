@@ -103,12 +103,12 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace AllocatedSnapshotStreams
-namespace RankedVideoStreamPrioritiesList {
+namespace StreamUsagePriorities {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(RankedVideoStreamPrioritiesList::Id,
+    kMetadataEntry(StreamUsagePriorities::Id,
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
-} // namespace RankedVideoStreamPrioritiesList
+} // namespace StreamUsagePriorities
 namespace SoftRecordingPrivacyModeEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SoftRecordingPrivacyModeEnabled::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,

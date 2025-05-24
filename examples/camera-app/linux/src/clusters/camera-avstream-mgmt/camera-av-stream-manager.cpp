@@ -270,9 +270,9 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
     return Status::NotFound;
 }
 
-void CameraAVStreamManager::OnRankedStreamPrioritiesChanged()
+void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
 {
-    ChipLogProgress(Camera, "Ranked stream priorities changed");
+    ChipLogProgress(Camera, "Stream usage priorities changed");
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
