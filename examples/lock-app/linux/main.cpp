@@ -35,7 +35,13 @@ LockAppCommandDelegate sLockAppCommandDelegate;
 
 void ApplicationInit()
 {
-    auto path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    const char * app_id = LinuxDeviceOptions::GetInstance().app_id;
+    if (app_id == nullptr)
+    {
+        app_id = "";
+    }
+
+    std::string path = kChipEventFifoPathPrefix + std::string(app_id);
     if (sChipNamedPipeCommands.Start(path, &sLockAppCommandDelegate) != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
