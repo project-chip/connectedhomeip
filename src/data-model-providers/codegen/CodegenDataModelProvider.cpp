@@ -129,6 +129,7 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
     Reset();
+    ShutdownDataModelForTesting();
     mRegistry.ClearContext();
     return CHIP_NO_ERROR;
 }
@@ -594,6 +595,12 @@ void CodegenDataModelProvider::InitDataModelForTesting()
 {
     // Call the Ember-specific InitDataModelHandler
     InitDataModelHandler();
+}
+
+void CodegenDataModelProvider::ShutdownDataModelForTesting()
+{
+    // Call the Ember-specific ShutdownDataModelHandler
+    ShutdownDataModelHandler();
 }
 
 CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & builder)

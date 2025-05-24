@@ -343,6 +343,8 @@ CHIP_ERROR ScenesServer::Init()
 void ScenesServer::Shutdown()
 {
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+    sceneTable->Finish();
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
