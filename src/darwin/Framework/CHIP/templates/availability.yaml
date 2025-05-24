@@ -11630,6 +11630,9 @@
           - MeterIdentification
           - SoilMeasurement
           - TLSClientManagement
+          # In-progress for Joint Fabric feature
+          - JointFabricDatastore
+          - JointFabricAdministrator
       attributes:
           BasicInformation:
               # In-progress for maybe Matter 1.5
@@ -11726,3 +11729,5 @@
           - MountedDimmableLoadControl
           - MountedOnOffControl
           - ThermostatController
+          # In-progress for Joint Fabric feature
+          - JointFabricAdministrator

@@ -32,6 +32,12 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+
 using namespace Camera;
 
 namespace {
@@ -139,9 +145,6 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
 
-    // By spec, MetadataOptions SHALL be set to 0 and reserved for future use
-    outSession.metadataOptions.ClearAll();
-
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
     {
@@ -220,9 +223,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     outSession.peerNodeID  = args.peerNodeId;
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
-
-    // By spec, MetadataOptions SHALL be set to 0 and reserved for future use
-    outSession.metadataOptions.ClearAll();
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
@@ -312,7 +312,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)
+CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates)
 {
     ChipLogProgress(Camera, "HandleProvideICECandidates called with sessionId: %u", sessionId);
 
@@ -337,8 +337,19 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
 
     for (const auto & candidate : candidates)
     {
-        ChipLogProgress(Camera, "Applying candidate: %s", candidate.c_str());
-        mPeerConnection->addRemoteCandidate(candidate);
+        ChipLogProgress(Camera, "Applying candidate: %s",
+                        std::string(candidate.candidate.begin(), candidate.candidate.end()).c_str());
+        if (candidate.SDPMid.IsNull())
+        {
+            mPeerConnection->addRemoteCandidate(
+                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end())));
+        }
+        else
+        {
+            mPeerConnection->addRemoteCandidate(
+                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end()),
+                               std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end())));
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -562,18 +573,15 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Convert mLocalCandidates (std::vector<std::string>) into a list of CharSpans.
-    std::vector<chip::CharSpan> candidateSpans;
-    candidateSpans.reserve(mLocalCandidates.size());
+    std::vector<ICECandidateStruct> iceCandidateStructList;
     for (const auto & candidate : mLocalCandidates)
     {
-        candidateSpans.push_back(chip::CharSpan(candidate.c_str(), static_cast<uint16_t>(candidate.size())));
+        ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidate.c_str()) };
+        iceCandidateStructList.push_back(iceCandidate);
     }
 
-    auto ICECandidates = chip::app::DataModel::List<const chip::CharSpan>(candidateSpans.data(), candidateSpans.size());
-
     command.webRTCSessionID = mCurrentSessionId;
-    command.ICECandidates   = ICECandidates;
+    command.ICECandidates = DataModel::List<const ICECandidateStruct>(iceCandidateStructList.data(), iceCandidateStructList.size());
 
     // Now invoke the command using the found session handle
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);

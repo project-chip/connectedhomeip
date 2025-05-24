@@ -82,6 +82,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kEndTimestamp), endTimestamp);
     encoder.Encode(to_underlying(Fields::kStartSystime), startSystime);
     encoder.Encode(to_underlying(Fields::kEndSystime), endSystime);
+    encoder.Encode(to_underlying(Fields::kApparentEnergy), apparentEnergy);
+    encoder.Encode(to_underlying(Fields::kReactiveEnergy), reactiveEnergy);
     return encoder.Finalize();
 }
 
@@ -114,6 +116,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEndSystime))
         {
             err = DataModel::Decode(reader, endSystime);
+        }
+        else if (__context_tag == to_underlying(Fields::kApparentEnergy))
+        {
+            err = DataModel::Decode(reader, apparentEnergy);
+        }
+        else if (__context_tag == to_underlying(Fields::kReactiveEnergy))
+        {
+            err = DataModel::Decode(reader, reactiveEnergy);
         }
 
         ReturnErrorOnFailure(err);

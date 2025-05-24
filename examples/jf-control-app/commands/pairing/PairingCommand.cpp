@@ -54,6 +54,12 @@ CHIP_ERROR PairingCommand::RunCommand()
         {
             chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
 
+            if (mExecuteJCM.ValueOr(false))
+            {
+                ChipLogError(JointFabric, "--anchor and --execute-jcm options are not allowed simultaneously!");
+                return CHIP_ERROR_BAD_REQUEST;
+            }
+
             // JFA will be issued a NOC with Anchor CAT and Administrator CAT
             mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
         }
@@ -147,6 +153,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
+    params.SetExecuteJCM(mExecuteJCM.ValueOr(false));
     if (mBypassAttestationVerifier.ValueOr(false))
     {
         params.SetDeviceAttestationDelegate(this);

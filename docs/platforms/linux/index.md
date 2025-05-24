@@ -8,4 +8,5 @@
 *
 ```
 
-[BLE Settings](ble_settings.md)
+-   [BLE Settings](ble_settings.md)
+-   [Debugging Tips](debugging_tips.md)

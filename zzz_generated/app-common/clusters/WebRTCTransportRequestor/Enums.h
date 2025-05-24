@@ -26,14 +26,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace WebRTCTransportRequestor {
-
-using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
-
-using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
-
-using WebRTCMetadataOptionsBitmap = Clusters::detail::WebRTCMetadataOptionsBitmap;
-} // namespace WebRTCTransportRequestor
+namespace WebRTCTransportRequestor {} // namespace WebRTCTransportRequestor
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -1647,7 +1647,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // expected value interval is 20s but expect it get reverted immediately as the write fails because it's writing to a
     // nonexistent attribute
-    [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation, nonexistentAttributeValueWaitExpectation ] timeout:5 enforceOrder:YES];
+    [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
+
+    // Don't enforce order between the attribute value waiter and the expected value expectations
+    // the expected values are driven off an async process that can race the waiter.
+    [self waitForExpectations:@[ nonexistentAttributeValueWaitExpectation ] timeout:kTimeoutInSeconds];
 
     // Get the current OnTime value, to make sure we are writing a different one.
     __auto_type * currentOnTimeValueDictionary = [device readAttributeWithEndpointID:@(1)

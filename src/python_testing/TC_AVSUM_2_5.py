@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
@@ -55,9 +56,11 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
             TestStep(5, "If the size of MPTZPresets is greater than MaxPresets, fail"),
             TestStep(6, "Via the MPTZSavePreset command, create a new saved preset with PresetID of MaxPresets, name of 'newpreset'"),
             TestStep(7, "Read the value of MPTZPresets. Ensure it has an entry for a PresetID of MaxPresets with a name 'newpreset' that matches the saved MPTZPosition"),
-            TestStep(8, "Verify there is space in the preset list, if not, end the test case"),
-            TestStep(9, "save a new Preset via the MPTZSavePreset command, name 'newpreset-2', do not provide a PresetID"),
+            TestStep(8, "Verify there is space in the preset list, if not, skip to step 12"),
+            TestStep(9, "Save a new Preset via the MPTZSavePreset command, name 'newpreset-2', do not provide a PresetID"),
             TestStep(10, "Read the value of MPTZPresets. Ensure it has an entry with a name 'newpreset-2' that matches the saved MPTZPosition"),
+            TestStep(11, "Repeatedly send MPTZSavePreset commands till the number of presets equals MaxPresets"),
+            TestStep(12, "Save a new Preset via the MPTZSavePreset command, name 'newpreset-fail', do not provide a PresetID. Verify Resource Exhausted failure. End the test case."),
         ]
         return steps
 
@@ -97,7 +100,7 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
 
         self.step(6)
         name = "newpreset"
-        await self.send_save_presets_command(endpoint, name, presetID=max_presets_dut)
+        await self.send_save_preset_command(endpoint, name, presetID=max_presets_dut)
         mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
 
         match_found = False
@@ -118,7 +121,7 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
         if len(mptz_presets_dut) < max_presets_dut:
             name = "newpreset-2"
             self.step(9)
-            await self.send_save_presets_command(endpoint, name)
+            await self.send_save_preset_command(endpoint, name)
 
             self.step(10)
             mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
@@ -134,9 +137,23 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
 
             if not match_found:
                 asserts.assert_fail("No matching preset found for saved preset")
+
+            # fill the preset list to its max allowed number of values
+            self.step(11)
+            count = len(mptz_presets_dut)
+            while count < max_presets_dut:
+                name = "newpreset-"+str(count)
+                await self.send_save_preset_command(endpoint, name)
+                count += 1
         else:
             self.skip_step(9)
             self.skip_step(10)
+            self.skip_step(11)
+
+        # presets should now be full
+        name = "newpreset-fail"
+        self.step(12)
+        await self.send_save_preset_command(endpoint, name, expected_status=Status.ResourceExhausted)
 
 
 if __name__ == "__main__":

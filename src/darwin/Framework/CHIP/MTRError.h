@@ -155,6 +155,7 @@ typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     MTRInteractionErrorCodeFailsafeRequired                                                                   = 0xca,
     MTRInteractionErrorCodeInvalidInState MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))    = 0xcb,
     MTRInteractionErrorCodeNoCommandResponse MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0xcc,
+    MTRDynamicConstraintError MTR_NEWLY_AVAILABLE                                                             = 0xcf,
     MTRInteractionErrorCodeInvalidTransportType MTR_NEWLY_AVAILABLE                                           = 0xd1,
 };
 
