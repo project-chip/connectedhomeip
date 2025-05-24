@@ -35,22 +35,30 @@ namespace Inet {
         typedef void (^OnInterfaceChanges)(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces);
         typedef void (^OnPathChange)(nw_path_t path);
 
-        class InterfacesMonitor {
+        class NetworkMonitor {
         public:
-            ~InterfacesMonitor();
+            ~NetworkMonitor();
+
+            CHIP_ERROR Init(dispatch_queue_t workQueue, IPAddressType addressType, InterfaceId interfaceId)
+            {
+                return Init(workQueue, addressType, interfaceId.GetPlatformInterface());
+            }
 
             CHIP_ERROR Init(dispatch_queue_t workQueue, IPAddressType addressType, uint32_t interfaceId);
 
             bool IsLocalOnly() const { return mInterfaceId == kDNSServiceInterfaceIndexLocalOnly; };
 
+            InterfaceId GetInterfaceId() const { return InterfaceId(static_cast<InterfaceId::PlatformType>(mInterfaceId)); };
+
             CHIP_ERROR StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock);
-            void StopMonitorInterfaces();
+            CHIP_ERROR StartMonitorPaths(OnPathChange pathChangeBlock);
+            void Stop();
 
         private:
             nw_path_monitor_t CreatePathMonitor(nw_interface_type_t type, nw_path_monitor_update_handler_t handler, bool once);
             void EnumeratePathInterfaces(nw_path_t path, InetInterfacesVector & out4, Inet6InterfacesVector & out6, bool searchLoopBackOnly);
 
-            nw_path_monitor_t mInterfaceMonitor = nullptr;
+            nw_path_monitor_t mMonitor = nullptr;
 
             // Default to kDNSServiceInterfaceIndexLocalOnly so we don't mess around
             // with un-registration if we never get Init() called.

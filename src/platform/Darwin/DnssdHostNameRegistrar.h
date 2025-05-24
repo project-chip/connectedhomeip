@@ -22,12 +22,12 @@
 
 #include <string>
 
-#include "inet/InterfacesMonitor.h"
+#include "inet/NetworkMonitor.h"
 
 namespace chip {
 namespace Dnssd {
 
-class HostNameRegistrar : public Inet::Darwin::InterfacesMonitor
+class HostNameRegistrar : public Inet::Darwin::NetworkMonitor
 {
 public:
     ~HostNameRegistrar();
