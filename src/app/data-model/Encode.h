@@ -253,6 +253,31 @@ CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex acce
 #pragma GCC diagnostic pop
 }
 
+// TODO: Needs better name?  And should it be declared in a separate header?
+struct TLVWriterWithAccessingFabricIndex
+{
+    TLVWriterWithAccessingFabricIndex(TLV::TLVWriter & writer, FabricIndex accessingFabricIndex) :
+        mTLVWriter(writer), mAccessingFabricIndex(accessingFabricIndex)
+    {}
+
+    operator TLV::TLVWriter &() { return mTLVWriter; }
+
+    TLV::TLVWriter & mTLVWriter;
+    const FabricIndex mAccessingFabricIndex;
+};
+
+/**
+ * @brief
+ *
+ * Encodes a response command payload. This is a templated function to allow
+ * specializations to be created as needed to customize the behavior.
+ */
+template <typename PayloadType>
+CHIP_ERROR EncodeResponseCommandPayload(TLVWriterWithAccessingFabricIndex & writer, TLV::Tag tag, const PayloadType & payload)
+{
+    return payload.Encode(writer, tag);
+}
+
 } // namespace DataModel
 } // namespace app
 } // namespace chip

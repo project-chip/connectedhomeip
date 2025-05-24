@@ -4,6 +4,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <app/data-model/NullObject.h>
@@ -66,14 +67,10 @@ public:
     {{/zcl_command_arguments}}
 
 
-    {{#if isFabricScoped~}}
-    {{#if (isServer source)}}
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-    {{else}}
+    {{#if (isClient source)}}
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    {{/if}}
     {{else}}
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::TLVWriterWithAccessingFabricIndex & aWriter, TLV::Tag aTag) const;
     {{/if}}
 
     using ResponseType =
@@ -96,8 +93,8 @@ public:
     {{zapTypeToDecodableClusterObjectType type cluster=../../name}} {{asLowerCamelCase label}}{{> cluster_objects_field_init cluster=../../name}};
     {{/zcl_command_arguments}}
 
-    {{#if isFabricScoped~}}
     {{#if (isClient source)}}
+    {{#if isFabricScoped~}}
     CHIP_ERROR Decode(TLV::TLVReader &reader, FabricIndex aAccessingFabricIndex);
     {{else}}
     CHIP_ERROR Decode(TLV::TLVReader &reader);
