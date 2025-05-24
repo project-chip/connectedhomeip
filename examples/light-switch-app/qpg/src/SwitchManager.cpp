@@ -19,7 +19,6 @@
 
 #include "SwitchManager.h"
 #include "binding-handler.h"
-#include "qvIO.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 

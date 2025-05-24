@@ -22,6 +22,7 @@ import("//build/chip/tests.gni")
 assert(current_os == "freertos")
 
 declare_args() {
+  thread_certified = false
 }
 
 examples_plat_dir = "//examples/platform/qpg"
@@ -50,13 +51,54 @@ static_library("qpg") {
   complete_static_lib = true
 }
 
+if (thread_certified) {
+  template("qpg_ar_lib") {
+    forward_variables_from(invoker,
+                           [
+                             "type",
+                             "tcp",
+                           ])
+    out = "${root_out_dir}/lib/libopenthread-qpg.a"
+    action(target_name) {
+      script = "${qpg_sdk_root}/Binaries/openthread/create_libopenthread.py"
+      sources = []
+      outputs = [ "${out}" ]
+      args = [
+        "${out}",
+        qpg_target_ic,
+        type,
+        tcp,
+      ]
+    }
+  }
+
+  if (chip_openthread_ftd) {
+    qpg_ar_lib("openthread-certified") {
+      type = "ftd"
+      tcp = "1"
+    }
+  } else {
+    qpg_ar_lib("openthread-certified") {
+      type = "mtd"
+      tcp = "0"
+    }
+  }
+}
+
 group("default") {
   deps = [
     ":qpg",
     "//src/setup_payload",
     "//third_party/openthread/platforms:libopenthread-platform",
     "//third_party/openthread/platforms:libopenthread-platform-utils",
-    "//third_party/openthread/repo:libopenthread-cli-mtd",
-    "//third_party/openthread/repo:libopenthread-mtd",
   ]
+  if (thread_certified) {
+    deps += [ ":openthread-certified" ]
+  } else {
+    if (chip_openthread_ftd) {
+      deps += [ "//third_party/openthread/repo:libopenthread-ftd" ]
+    } else {
+      deps += [ "//third_party/openthread/repo:libopenthread-mtd" ]
+    }
+  }
 }
