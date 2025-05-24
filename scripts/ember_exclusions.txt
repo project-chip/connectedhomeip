@@ -1,0 +1,11 @@
+src/app/app-platform/ContentAppPlatform.cpp
+src/app/dynamic_server/DynamicDispatcher.cpp
+src/controller/tests/TestEventCaching.cpp
+src/controller/tests/TestEventChunking.cpp
+src/controller/tests/TestEventNumberCaching.cpp
+src/controller/tests/TestReadChunking.cpp
+src/controller/tests/TestServerCommandDispatch.cpp
+src/controller/tests/TestWriteChunking.cpp
+src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm
+src/darwin/Framework/CHIP/ServerEndpoint/MTRServerEndpoint.mm
+src/app/storage/FabricTableImpl.ipp
