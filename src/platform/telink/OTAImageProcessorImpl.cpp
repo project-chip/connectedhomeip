@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  */
 
 #include "OTAImageProcessorImpl.h"
+
+#include "Reboot.h"
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
@@ -123,7 +125,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
             [](System::Layer *, void * /* context */) {
                 PlatformMgr().HandleServerShuttingDown();
                 k_msleep(CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS);
-                sys_reboot(SYS_REBOOT_WARM);
+                Reboot(SoftwareRebootReason::kSoftwareUpdate);
             },
             nullptr /* context */);
     }

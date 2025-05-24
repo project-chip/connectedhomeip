@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022,2024 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@
 
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <platform/nrfconnect/Reboot.h>
+#elif CHIP_DEVICE_LAYER_TARGET_TELINK
+#include <platform/telink/Reboot.h>
 #elif defined(CONFIG_MCUBOOT_IMG_MANAGER)
 #include <zephyr/dfu/mcuboot.h>
 #endif
@@ -123,7 +125,7 @@ BootReasonType DetermineBootReason()
 
     if (reason & RESET_SOFTWARE)
     {
-#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT || CHIP_DEVICE_LAYER_TARGET_TELINK
         if (GetSoftwareRebootReason() == SoftwareRebootReason::kSoftwareUpdate)
         {
             return BootReasonType::kSoftwareUpdateCompleted;
