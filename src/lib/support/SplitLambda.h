@@ -32,10 +32,10 @@ struct SplitLambdaCallerImpl<TReturn (TLambda::*)(TArgs...) const>
 ///         SplitLambda on_api_update_my_vars = [&](int value){
 ///             local_api_value = value;
 ///             other_local_variable = value +3;
-///         }
+///         };
 ///
 ///         /*Call API */
-///         return api_function(on_api_update_my_vars.Caller(), on_api_update_my_vars.Context())
+///         return api_function(on_api_update_my_vars.Caller(), on_api_update_my_vars.Context());
 ///     }
 template <class TLambda>
 struct SplitLambda : detail::SplitLambdaCallerImpl<decltype(&TLambda::operator())>

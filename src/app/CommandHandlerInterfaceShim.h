@@ -28,9 +28,10 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
     using CommandHandlerInterface::CommandHandlerInterface;
     DataModel::AcceptedCommandEntry GetEntry(const ConcreteClusterPath & cluster, CommandId command)
     {
-        if constexpr (sizeof...(TClusterIds) == 0)
+        if constexpr (sizeof...(TClusterIds) == 1)
         {
-            return DataModel::AcceptedCommandEntryFor(cluster.mClusterId, command);
+            using Entry = DataModel::AcceptedCommandEntry;
+            return ClusterMetadataProvider<Entry, TClusterIds...>::EntryFor(command);
         }
         else
         {

@@ -255,6 +255,7 @@ static_library("support") {
     "logging/BinaryLogging.cpp",
     "logging/BinaryLogging.h",
     "logging/CHIPLogging.h",
+    "meta/MetaObjects.h",
     "utf8.cpp",
     "utf8.h",
     "verhoeff/Verhoeff.cpp",

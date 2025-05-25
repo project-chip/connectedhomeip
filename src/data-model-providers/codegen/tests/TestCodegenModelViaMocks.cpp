@@ -289,32 +289,20 @@ public:
 
     void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
         VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
+        VerifyOrReturnError(builder.ReferenceExisting(mAccepted));
 
-        for (auto id : mAccepted)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
     {
         VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
 
-        for (auto id : mGenerated)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
+        return builder.AppendElements(mGenerated);
     }
 
     void SetOverrideAccepted(bool o) { mOverrideAccepted = o; }
