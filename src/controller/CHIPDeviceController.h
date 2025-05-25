@@ -181,7 +181,7 @@ public:
     DeviceController();
     ~DeviceController() override {}
 
-    CHIP_ERROR Init(ControllerInitParams params);
+    virtual CHIP_ERROR Init(ControllerInitParams params);
 
     /**
      * @brief
@@ -602,7 +602,7 @@ public:
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The commissioning parameters
      */
-    CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
+    virtual CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
     CHIP_ERROR Commission(NodeId remoteDeviceId);
 
     /**
@@ -834,6 +834,32 @@ public:
                                          /* fireAndForget = */ true);
     }
 
+protected:
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
+    virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info) {return CHIP_NO_ERROR;};
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+    template <typename RequestObjectT>
+    CHIP_ERROR SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
+                                        CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
+                                        CommandResponseFailureCallback failureCb, EndpointId endpoint,
+                                        Optional<System::Clock::Timeout> timeout = NullOptional, bool fireAndForget = false);
+    void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
+                                    app::AttributePathParams * readPaths, size_t readPathsSize);
+    template <typename AttrType>
+    CHIP_ERROR SendCommissioningWriteRequest(DeviceProxy * device, EndpointId endpoint, ClusterId cluster, AttributeId attribute,
+                                            const AttrType & requestData, WriteResponseSuccessCallback successCb,
+                                            WriteResponseFailureCallback failureCb);
+    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
+    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
+    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the
+    // PairingDelegate. In this case, it does not disarm the failsafe or close the pase connection. For failures up through AddNOC,
+    // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
+    // to the PairingDelegate upon arm failsafe command completion.
+    virtual void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
+
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
 
@@ -1042,18 +1068,6 @@ private:
     bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                    Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                                    OnExtendFailsafeFailure onFailure, bool fireAndForget);
-
-    template <typename RequestObjectT>
-    CHIP_ERROR SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
-                                        CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
-                                        CommandResponseFailureCallback failureCb, EndpointId endpoint,
-                                        Optional<System::Clock::Timeout> timeout = NullOptional, bool fireAndForget = false);
-    void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
-                                      app::AttributePathParams * readPaths, size_t readPathsSize);
-    template <typename AttrType>
-    CHIP_ERROR SendCommissioningWriteRequest(DeviceProxy * device, EndpointId endpoint, ClusterId cluster, AttributeId attribute,
-                                             const AttrType & requestData, WriteResponseSuccessCallback successCb,
-                                             WriteResponseFailureCallback failureCb);
     void CancelCommissioningInteractions();
     void CancelCASECallbacks();
 
@@ -1080,14 +1094,6 @@ private:
     // OnCommissioningComplete and either OnCommissioningSuccess or OnCommissioningFailure depending on the given completion status.
     void SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus);
 
-    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
-    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
-    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the
-    // PairingDelegate. In this case, it does not disarm the failsafe or close the pase connection. For failures up through AddNOC,
-    // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
-    // to the PairingDelegate upon arm failsafe command completion.
-    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
-
     // Extend the fail-safe before trying to do network-enable (since after that
     // point, for non-concurrent-commissioning devices, we may not have a way to
     // extend it).
@@ -1112,11 +1118,6 @@ private:
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
     CompletionStatus mCommissioningCompletionStatus;
-
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
-    Platform::UniquePtr<app::ReadClient> mReadClient;
-#endif
     Credentials::AttestationVerificationResult mAttestationResult;
     Platform::UniquePtr<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo> mAttestationDeviceInfo;
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;

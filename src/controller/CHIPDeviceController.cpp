@@ -2337,7 +2337,7 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                 Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
-
+                                        
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         if (params.GetExecuteJCM().ValueOr(false))
         {
@@ -2398,6 +2398,7 @@ void DeviceCommissioner::FinishReadingCommissioningInfo()
     AccumulateErrors(err, ParseTimeSyncInfo(info));
     AccumulateErrors(err, ParseFabrics(info));
     AccumulateErrors(err, ParseICDInfo(info));
+    AccumulateErrors(err, ParseExtraCommissioningInfo(info));
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     AccumulateErrors(err, ParseJFAdministratorInfo(info));
 #endif

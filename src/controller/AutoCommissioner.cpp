@@ -676,6 +676,25 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
     return CHIP_NO_ERROR;
 }
 
+void AutoCommissioner::CleanupCommissioning()
+{
+    if (IsSecondaryNetworkSupported() && TryingSecondaryNetwork())
+    {
+        ResetTryingSecondaryNetwork();
+    }
+    mPAI.Free();
+    mDAC.Free();
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    mJFAdminRCAC.Free();
+    mJFAdminICAC.Free();
+    mJFAdminNOC.Free();
+#endif
+    mCommissioneeDeviceProxy = nullptr;
+    mOperationalDeviceProxy  = OperationalDeviceProxy();
+    mDeviceCommissioningInfo = ReadCommissioningInfo();
+    mNeedsDST                = false;
+}
+
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     CompletionStatus completionStatus;
@@ -804,7 +823,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
-            break;
+             break;
         }
         case CommissioningStage::kConfigureTimeZone:
             mNeedsDST = report.Get<TimeZoneResponseInfo>().requiresDSTOffsets;
@@ -884,21 +903,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
         case CommissioningStage::kCleanup:
-            if (IsSecondaryNetworkSupported() && TryingSecondaryNetwork())
-            {
-                ResetTryingSecondaryNetwork();
-            }
-            mPAI.Free();
-            mDAC.Free();
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-            mJFAdminRCAC.Free();
-            mJFAdminICAC.Free();
-            mJFAdminNOC.Free();
-#endif
-            mCommissioneeDeviceProxy = nullptr;
-            mOperationalDeviceProxy  = OperationalDeviceProxy();
-            mDeviceCommissioningInfo = ReadCommissioningInfo();
-            mNeedsDST                = false;
+            CleanupCommissioning();
             return CHIP_NO_ERROR;
         default:
             break;
