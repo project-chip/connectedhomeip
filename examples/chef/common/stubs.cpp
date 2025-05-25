@@ -311,12 +311,17 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
 
 #ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include "channel/ChannelManager.h"
-static ChannelManager channelManager;
+static ChannelManager channelManager[MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
-    Channel::SetDefaultDelegate(endpoint, &channelManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        channelManager[ep].SetEndpoint(endpoint);
+        Channel::SetDefaultDelegate(endpoint, &channelManager[ep]);
+    }
 }
 #endif
 
