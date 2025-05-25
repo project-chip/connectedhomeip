@@ -42,10 +42,18 @@ private:
 class LiveViewStopCommand : public CHIPCommand
 {
 public:
-    LiveViewStopCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("stop", credIssuerCommands) {}
+    LiveViewStopCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("stop", credIssuerCommands)
+    {
+        AddArgument("node-id", 0, UINT64_MAX, &mPeerNodeId);
+        AddArgument("video-stream-id", 0, UINT16_MAX, &mVideoStreamID);
+    }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+
+private:
+    chip::NodeId mPeerNodeId = chip::kUndefinedNodeId;
+    uint16_t mVideoStreamID  = 0;
 };

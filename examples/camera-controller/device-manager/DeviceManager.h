@@ -35,7 +35,11 @@ public:
         return instance;
     }
 
+    static void VideoStreamSignalHandler(int sig);
+
     CHIP_ERROR Init(chip::Controller::DeviceCommissioner * commissioner);
+
+    void Shutdown();
 
     /**
      * @brief Sends a VideoStreamAllocate command to the device.
@@ -61,13 +65,17 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
+    void StopVideoStreamProcess(uint16_t streamID);
+
 private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
-    uint16_t mActiveVideoStreamId                        = 0;
+    std::map<uint16_t, pid_t> mVideoStreamProcesses; // Stream ID -> Process ID mapping
 
     AVStreamManagement mAVStreamManagment;
 
     void HandleVideoStreamAllocateResponse(chip::TLV::TLVReader & data);
+
+    void StartVideoStreamProcess(uint16_t streamID);
 };
 
 } // namespace camera

@@ -24,6 +24,7 @@
 #include <commands/liveview/Commands.h>
 #include <commands/pairing/Commands.h>
 #include <commands/webrtc/Commands.h>
+#include <device-manager/DeviceManager.h>
 #include <webrtc-manager/WebRTCManager.h>
 #include <zap-generated/cluster/Commands.h>
 
@@ -49,12 +50,19 @@ void StopSignalHandler(int signum)
 // ================================================================================
 int main(int argc, char * argv[])
 {
-    // Set up signal handler for SIGTERM
-    struct sigaction sa = {};
-    sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = 0;
-    sigaction(SIGINT, &sa, nullptr);
-    sigaction(SIGTERM, &sa, nullptr);
+    // ── SIGINT / SIGTERM: stop event‑loop ────────────────────────────────
+    struct sigaction saStop = {};
+    saStop.sa_handler       = StopSignalHandler;
+    sigemptyset(&saStop.sa_mask);
+    sigaction(SIGINT, &saStop, nullptr);
+    sigaction(SIGTERM, &saStop, nullptr);
+
+    // ── SIGCHLD: reap exited children (video pipelines) ─────────────────
+    struct sigaction saChld = {};
+    saChld.sa_handler       = camera::DeviceManager::VideoStreamSignalHandler;
+    saChld.sa_flags         = SA_NOCLDSTOP; // ignore SIGSTOP/CONT
+    sigemptyset(&saChld.sa_mask);
+    sigaction(SIGCHLD, &saChld, nullptr);
 
     // Convert command line arguments to a vector of strings for easier manipulation
     std::vector<std::string> args(argv, argv + argc);
@@ -83,7 +91,7 @@ int main(int argc, char * argv[])
     std::vector<char *> c_args;
     for (auto & arg : args)
     {
-        ChipLogError(NotSpecified, "Args: %s", arg.c_str());
+        ChipLogError(Camera, "Args: %s", arg.c_str());
         c_args.push_back(const_cast<char *>(arg.c_str()));
     }
 
