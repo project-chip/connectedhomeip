@@ -1821,7 +1821,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.runner_hook:
             self.runner_hook.show_video_prompt(msg=prompt_msg)
 
-        logging.info(f"========= USER PROMPT for Video Stream Verification =========")
+        logging.info("========= USER PROMPT for Video Stream Verification =========")
         logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
             return input()
