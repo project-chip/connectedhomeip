@@ -67,7 +67,7 @@ from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
-from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
+from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices, get_setup_codes
 from chip.testing.conformance import ConformanceException
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file, generate_device_element_pics_from_device_wildcard
@@ -1158,7 +1158,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def commission_devices(self) -> bool:
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
         dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
-        setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        setup_payloads: List[SetupPayloadInfo] = get_setup_codes(dev_ctrl=self.default_controller, discriminators=self.matter_test_config.discriminators,
+                                                                 passcodes=self.matter_test_config.setup_passcodes, qr_codes=self.matter_test_config.qr_code_content, manual_codes=self.matter_test_config.manual_code)
         commissioning_info: CommissioningInfo = CommissioningInfo(
             commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
             commissioning_method=self.matter_test_config.commissioning_method,
@@ -2250,14 +2251,7 @@ def run_tests_no_exit(test_classes: list[MatterBaseTest], matter_test_config: Ma
             return await dev_ctrl.Read(node_id, [(0, Clusters.BasicInformation.Attributes.SpecificationVersion), (Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
                 None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
 
-        setup_controller = stack.certificate_authorities[0].adminList[0].NewController(
-            nodeId=matter_test_config.controller_node_id + 1,
-            paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-            catTags=matter_test_config.controller_cat_tags,
-            dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
-        )
-        stored_global_wildcard = asyncio.run(populate_wildcard_before_test(setup_controller))
-        setup_controller.Shutdown()
+        stored_global_wildcard = asyncio.run(populate_wildcard_before_test(default_controller))
         print('------------------------------------------------------------------')
         print(stored_global_wildcard)
         print('----------------------------------------------------------------------')

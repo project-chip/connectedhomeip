@@ -34,6 +34,22 @@ logger.setLevel(logging.INFO)
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
 
+def get_setup_codes(dev_ctrl: ChipDeviceCtrl, discriminators: list[int], passcodes: list[int], qr_codes: list[str], manual_codes: list[str]) -> list[str]:
+    ''' Returns a list of all setup codes. Will create manual codes for discriminator / passcode combinations.
+    '''
+    # TODO: At this point the original code should already have checked that the discriminators and passcodes match,
+    # but we should probably throw an exception here regardless. Which one?
+    created_codes = []
+    for discriminator, passcode in zip(discriminators, passcodes):
+        created_codes.append(dev_ctrl.CreateManualCode(discriminator, passcode))
+
+    setup_codes = qr_codes + manual_codes + created_codes
+    if not setup_codes:
+        return None
+
+    return setup_codes
+
+
 @dataclass
 class SetupPayloadInfo:
     """
@@ -118,7 +134,7 @@ class PairingStatus:
 
 
 async def commission_device(
-    dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, setup_code: str, commissioning_info: CommissioningInfo
 ) -> PairingStatus:
     """
     Starts the commissioning process of a chip device.
@@ -145,50 +161,26 @@ async def commission_device(
         )
         dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
 
-    if commissioning_info.commissioning_method == "on-network":
-        try:
-            await dev_ctrl.CommissionOnNetwork(
-                nodeId=node_id, setupPinCode=info.passcode, filterType=info.filter_type, filter=info.filter_value
-            )
-            return PairingStatus()
-        except ChipStackError as e:
-            logging.error("Commissioning failed: %s" % e)
-            return PairingStatus(exception=e)
-    elif commissioning_info.commissioning_method == "ble-wifi":
-        try:
-            await dev_ctrl.CommissionWiFi(
-                info.filter_value,
-                info.passcode,
-                node_id,
-                commissioning_info.wifi_ssid,
-                commissioning_info.wifi_passphrase,
-                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
-            )
-            return PairingStatus()
-        except ChipStackError as e:
-            logging.error("Commissioning failed: %s" % e)
-            return PairingStatus(exception=e)
+    if commissioning_info.commissioning_method == "ble-wifi":
+        dev_ctrl.SetWiFiCredentials(commissioning_info.wifi_ssid, commissioning_info.wifi_passphrase)
     elif commissioning_info.commissioning_method == "ble-thread":
-        try:
-            await dev_ctrl.CommissionThread(
-                info.filter_value,
-                info.passcode,
-                node_id,
-                commissioning_info.thread_operational_dataset,
-                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
-            )
-            return PairingStatus()
-        except ChipStackError as e:
-            logging.error("Commissioning failed: %s" % e)
-            return PairingStatus(exception=e)
-    else:
+        dev_ctrl.SetThreadOperationalDataset(commissioning_info.thread_operational_dataset)
+    elif commissioning_info.commissioning_method != "on-network":
         raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
+
+    try:
+        await dev_ctrl.FindOrEstablishPASESession(setupCode=setup_code, nodeid=node_id)
+        await dev_ctrl.Commission(node_id)
+        return PairingStatus()
+    except ChipStackError as e:
+        logging.error("Commissioning failed: %s" % e)
+        return PairingStatus(exception=e)
 
 
 async def commission_devices(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     dut_node_ids: List[int],
-    setup_payloads: List[SetupPayloadInfo],
+    setup_codes: List[str],
     commissioning_info: CommissioningInfo,
 ) -> bool:
     """
@@ -206,11 +198,11 @@ async def commission_devices(
         bool: True if all devices were successfully commissioned; False otherwise.
     """
     print(f'node ids = {dut_node_ids}')
-    print(f'setup_payloads = {setup_payloads}')
+    print(f'setup_payloads = {setup_codes}')
     print(f'commissioning_info = {commissioning_info}')
     commissioned = []
-    for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
+    for node_id, setup_code in zip(dut_node_ids, setup_codes):
         logging.info(f"Commissioning method: {commissioning_info.commissioning_method}")
-        commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
+        commissioned.append(await commission_device(dev_ctrl, node_id, setup_code, commissioning_info))
 
     return all(commissioned)
