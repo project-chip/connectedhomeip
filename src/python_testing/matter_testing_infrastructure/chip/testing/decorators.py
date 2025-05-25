@@ -258,7 +258,6 @@ def async_test_body(body):
             if not test_pics:
                 logging.error("No pics provided for test without runner decorator")
                 asserts.skip('Dry run only')
-            self._populate_wildcard()
             self.build_spec_xmls()
             if not self.device_pics_list:
                 # TODO: What do we do about problems with the PICS list at this stage
