@@ -83,7 +83,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
         ThreadScanResponse{
             .panId           = 123,
             .extendedPanId   = 234,
-            .networkName     = "foobarbaz",
+            .networkName     = { 'f', 'o', 'o', 'b', 'a', 'r', 'b', 'a', 'z', 0 },
             .networkNameLen  = 9,
             .channel         = 12,
             .version         = 10,
@@ -94,7 +94,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
         ThreadScanResponse{
             .panId           = 321,
             .extendedPanId   = 112233,
-            .networkName     = "test",
+            .networkName     = { 't', 'e', 's', 't', 0 },
             .networkNameLen  = 4,
             .channel         = 1,
             .version         = 100,
