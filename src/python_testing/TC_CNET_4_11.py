@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-MAX_RETRIES = 4
+MAX_RETRIES = 5
 TIMEOUT = 900
 TIMED_REQUEST_TIMEOUT_MS = 5000
 WIFI_WAIT_SECONDS = 10
@@ -174,11 +174,17 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
     retry = 1
     while retry <= MAX_RETRIES:
         try:
-            err = await test.send_single_cmd(
-                cmd=cluster.Commands.ConnectNetwork(
-                    networkID=ssid,
-                    breadcrumb=breadcrumb
-                )
+            if retry > 1:
+                # Let's wait a couple seconds to finish changing networks
+                await asyncio.sleep(WIFI_WAIT_SECONDS)
+            err = await asyncio.wait_for(
+                test.send_single_cmd(
+                    cmd=cluster.Commands.ConnectNetwork(
+                        networkID=ssid,
+                        breadcrumb=breadcrumb
+                    )
+                ),
+                timeout=TIMEOUT
             )
             logger.info(f" --- change_networks: err type: {type(err)}, value: {err}")
             success = is_network_switch_successful(err)
@@ -198,29 +204,6 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             connect_host_wifi(ssid=ssid, password=password),
             timeout=TIMEOUT
         )
-
-        try:
-            # Let's wait a couple seconds to finish changing networks
-            await asyncio.sleep(WIFI_WAIT_SECONDS)
-            err = await asyncio.wait_for(
-                test.send_single_cmd(
-                    cmd=cluster.Commands.ConnectNetwork(
-                        networkID=ssid,
-                        breadcrumb=breadcrumb
-                    )
-                ),
-                timeout=TIMEOUT
-            )
-            logger.info(f" --- err type: {type(err)}, value: {err}")
-            success = is_network_switch_successful(err)
-            if success:
-                logger.info(" --- change_networks: Network switch successful.")
-                break
-            else:
-                logger.warning(f" --- change_networks: Error during network switch: {err}")
-
-        except Exception as e:
-            logger.error(f" --- change_networks: Exception on 2nd call to ConnectNetwork: {e}")
         retry += 1
     else:
         logger.error(f" --- change_networks: Failed to switch networks after {MAX_RETRIES} retries.")
