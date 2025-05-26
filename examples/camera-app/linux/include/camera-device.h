@@ -41,6 +41,9 @@ static constexpr uint32_t kMaxContentBufferSizeBytes = 4096;
 static constexpr uint32_t kMaxNetworkBandwidthMbps   = 128;
 static constexpr uint8_t kMaxConcurrentEncoders      = 1;
 static constexpr uint32_t kMaxEncodedPixelRate       = 27648000; // 720p at 30fps
+static constexpr uint8_t kSpeakerMinLevel            = 1;
+static constexpr uint8_t kSpeakerMaxLevel            = 254;  // Spec constraint
+static constexpr uint8_t kSpeakerMaxChannelCount     = 8;    // Same as Microphone
 static constexpr uint8_t kMicrophoneMinLevel         = 1;
 static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
 static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
@@ -121,6 +124,12 @@ public:
 
     bool GetNightVisionUsesInfrared() override;
 
+    bool GetCameraSupportsWatermark() override;
+
+    bool GetCameraSupportsOSD() override;
+
+    bool GetCameraSupportsSoftPrivacy() override;
+
     VideoResolutionStruct & GetMinViewport() override;
 
     std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() override;
@@ -168,14 +177,16 @@ public:
     bool HasSpeaker() override { return false; }
 
     // Mute/Unmute speaker.
-    CameraError SetSpeakerMuted(bool muteSpeaker) override { return CameraError::ERROR_NOT_IMPLEMENTED; }
+    CameraError SetSpeakerMuted(bool muteSpeaker) override;
+    bool GetSpeakerMuted() override { return mSpeakerMuted; }
 
     // Set speaker volume level.
-    CameraError SetSpeakerVolume(uint8_t speakerVol) override { return CameraError::ERROR_NOT_IMPLEMENTED; }
+    CameraError SetSpeakerVolume(uint8_t speakerVol) override;
+    uint8_t GetSpeakerVolume() override { return mSpeakerVol; }
 
     // Get the speaker max and min levels.
-    uint8_t GetSpeakerMaxLevel() override { return INVALID_SPKR_LEVEL; }
-    uint8_t GetSpeakerMinLevel() override { return INVALID_SPKR_LEVEL; }
+    uint8_t GetSpeakerMaxLevel() override { return mSpeakerMaxLevel; }
+    uint8_t GetSpeakerMinLevel() override { return mSpeakerMinLevel; }
 
     // Does camera have a microphone
     bool HasMicrophone() override { return true; }
@@ -247,8 +258,14 @@ private:
     chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 0, 0, 1920, 1080 };
     uint16_t mCurrentVideoFrameRate                                         = kMinVideoFrameRate;
     bool mHDREnabled                                                        = false;
+    bool mWatermarkEnabled                                                  = false;
+    bool mOSDEnabled                                                        = false;
+    bool mSpeakerMuted                                                      = false;
     bool mMicrophoneMuted                                                   = false;
     bool mHardPrivacyModeOn                                                 = false;
+    uint8_t mSpeakerVol                                                     = kSpeakerMinLevel;
+    uint8_t mSpeakerMinLevel                                                = kSpeakerMinLevel;
+    uint8_t mSpeakerMaxLevel                                                = kSpeakerMaxLevel;
     uint8_t mMicrophoneVol                                                  = kMicrophoneMinLevel;
     uint8_t mMicrophoneMinLevel                                             = kMicrophoneMinLevel;
     uint8_t mMicrophoneMaxLevel                                             = kMicrophoneMaxLevel;

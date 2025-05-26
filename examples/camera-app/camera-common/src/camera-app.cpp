@@ -46,8 +46,21 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     features.Set(CameraAvStreamManagement::Feature::kSnapshot);
     features.Set(CameraAvStreamManagement::Feature::kVideo);
 
-    // TODO: Set the Privacy feature to enable SoftRecording and SoftLivestream
-    // privacy attributes
+    // Enable the Watermark and OSD fealtures if camera supports
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsWatermark())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kWatermark);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsOSD())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kOnScreenDisplay);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kPrivacy);
+    }
 
     // Check microphone support to set Audio feature
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())

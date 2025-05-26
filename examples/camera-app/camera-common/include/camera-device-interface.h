@@ -188,6 +188,18 @@ public:
         // Get indication whether camera night vision using infrared
         virtual bool GetNightVisionUsesInfrared() = 0;
 
+        // Get indication whether camera supports watermark for video and
+        // snapshot
+        virtual bool GetCameraSupportsWatermark() = 0;
+
+        // Get indication whether camera supports on-screen display for video and
+        // snapshot
+        virtual bool GetCameraSupportsOSD() = 0;
+
+        // Get indication whether camera supports soft recording and livestream
+        // privacy modes
+        virtual bool GetCameraSupportsSoftPrivacy() = 0;
+
         // Get indication of the min resolution(pixels) that camera allows for
         // its viewport.
         virtual VideoResolutionStruct & GetMinViewport() = 0;
@@ -235,9 +247,6 @@ public:
         // Get whether hard privacy mode is On
         virtual bool GetHardPrivacyMode() = 0;
 
-        // Does camera have a speaker
-        virtual bool HasSpeaker() = 0;
-
         // Set the viewport for all streams
         virtual CameraError SetViewport(const ViewportStruct & viewPort) = 0;
 
@@ -247,11 +256,16 @@ public:
         // Set the viewport for a specific stream
         virtual CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewPort) = 0;
 
+        // Does camera have a speaker
+        virtual bool HasSpeaker() = 0;
+
         // Mute/Unmute speaker.
         virtual CameraError SetSpeakerMuted(bool muteSpeaker) = 0;
+        virtual bool GetSpeakerMuted()                        = 0;
 
         // Set speaker volume level.
         virtual CameraError SetSpeakerVolume(uint8_t speakerVol) = 0;
+        virtual uint8_t GetSpeakerVolume()                       = 0;
 
         // Get the speaker max and min levels.
         virtual uint8_t GetSpeakerMaxLevel() = 0;
