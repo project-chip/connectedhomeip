@@ -119,9 +119,9 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
     }
 
     // We just have one command id.
-    builder.EnsureAppendCapacity(1);
-    builder.Append({ Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, {}, {} });
-    ++return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+    ReturnErrorOnFailure(builder.Append({ Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, {}, {} }));
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
