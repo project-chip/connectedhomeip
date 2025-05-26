@@ -2166,7 +2166,7 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
 
 
 def run_tests_no_exit(test_classes: list[MatterBaseTest], matter_test_config: MatterTestConfig,
-                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
+                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks = InternalTestRunnerHooks(),
                       default_controller=None, external_stack=None) -> bool:
 
     # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
