@@ -1735,29 +1735,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             logging.info("========= EOF on STDIN =========")
             return None
 
-    def user_verify_video_stream(self,
-                                 prompt_msg: str) -> Optional[str]:
-        """Show Video Verification Prompt and wait for user validation.
-        Used to verify WebRTC related TCs.
-
-        Args:
-            prompt_msg (str): Message for TH UI prompt and input function.
-            Indicates what is expected from the user.
-
-        Returns:
-            str: User input or none if input is closed.
-        """
-        if self.runner_hook:
-            self.runner_hook.show_video_prompt(msg=prompt_msg)
-
-        logging.info("========= USER PROMPT for Video Stream Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
-
 
 def _find_test_class():
     """Finds the test class in a test script.
