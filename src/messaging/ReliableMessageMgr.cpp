@@ -221,7 +221,6 @@ void ReliableMessageMgr::ExecuteActions()
                         Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination));
         MATTER_LOG_METRIC(Tracing::kMetricDeviceRMPRetryCount, entry->sendCount);
 
-        CalculateNextRetransTime(*entry);
         SendFromRetransTable(entry);
 
         return Loop::Continue;
@@ -378,6 +377,8 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
+        CalculateNextRetransTime(*entry);
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER

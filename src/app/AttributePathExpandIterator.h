@@ -19,11 +19,11 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/LinkedList.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 
 #include <limits>
@@ -121,13 +121,13 @@ private:
     DataModel::Provider * mDataModelProvider;
     Position & mPosition;
 
-    DataModel::ReadOnlyBuffer<DataModel::EndpointEntry> mEndpoints; // all endpoints
+    ReadOnlyBuffer<DataModel::EndpointEntry> mEndpoints; // all endpoints
     size_t mEndpointIndex = kInvalidIndex;
 
-    DataModel::ReadOnlyBuffer<DataModel::ServerClusterEntry> mClusters; // all clusters ON THE CURRENT endpoint
+    ReadOnlyBuffer<DataModel::ServerClusterEntry> mClusters; // all clusters ON THE CURRENT endpoint
     size_t mClusterIndex = kInvalidIndex;
 
-    DataModel::ReadOnlyBuffer<DataModel::AttributeEntry> mAttributes; // all attributes ON THE CURRENT cluster
+    ReadOnlyBuffer<DataModel::AttributeEntry> mAttributes; // all attributes ON THE CURRENT cluster
     size_t mAttributeIndex = kInvalidIndex;
 
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
@@ -140,8 +140,6 @@ private:
     /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
     ///
     /// Respects path expansion/values in mpAttributePath
-    ///
-    /// Handles Global attributes (which are returned at the end)
     std::optional<AttributeId> NextAttributeId();
 
     /// Get the next cluster ID in mOutputPath(endpoint) if one is available.

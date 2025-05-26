@@ -89,7 +89,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SET"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="20"/>
+      <constraint>
+        <maxCount value="20"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="ActiveEndpoints" type="list">
       <entry type="endpoint-no"/>
@@ -98,7 +100,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="DYPF"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="20"/>
+      <constraint>
+        <maxCount value="20"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

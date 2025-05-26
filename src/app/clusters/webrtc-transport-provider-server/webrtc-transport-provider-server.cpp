@@ -37,6 +37,12 @@ using namespace chip;
 using namespace chip::app;
 using chip::Protocols::InteractionModel::Status;
 
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+
 namespace {
 
 static constexpr uint16_t kMaxSessionId = 65534;
@@ -220,7 +226,7 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
 
 uint16_t WebRTCTransportProviderServer::GenerateSessionId()
 {
-    static uint16_t lastSessionId = 0;
+    static uint16_t lastSessionId = 1;
 
     do
     {
@@ -229,7 +235,7 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionId()
         // Handle wrap-around per spec
         if (lastSessionId > kMaxSessionId)
         {
-            lastSessionId = 0;
+            lastSessionId = 1;
         }
 
         if (FindSession(candidateId) == nullptr)
@@ -271,12 +277,13 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 
     // Prepare the arguments for the delegate.
     Delegate::OfferRequestArgs args;
-    args.sessionId       = GenerateSessionId();
-    args.streamUsage     = req.streamUsage;
-    args.videoStreamId   = req.videoStreamID;
-    args.audioStreamId   = req.audioStreamID;
-    args.metadataOptions = req.metadataOptions;
-    args.peerNodeId      = GetNodeIdFromCtx(ctx.mCommandHandler);
+    args.sessionId             = GenerateSessionId();
+    args.streamUsage           = req.streamUsage;
+    args.videoStreamId         = req.videoStreamID;
+    args.audioStreamId         = req.audioStreamID;
+    args.peerNodeId            = GetNodeIdFromCtx(ctx.mCommandHandler);
+    args.fabricIndex           = ctx.mCommandHandler.GetAccessingFabricIndex();
+    args.originatingEndpointId = req.originatingEndpointID;
 
     if (req.ICEServers.HasValue())
     {
@@ -391,15 +398,18 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
+        FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+
         // Prepare delegate arguments.
         Delegate::ProvideOfferRequestArgs args;
-        args.sessionId       = GenerateSessionId();
-        args.streamUsage     = req.streamUsage;
-        args.videoStreamId   = videoStreamID;
-        args.audioStreamId   = audioStreamID;
-        args.metadataOptions = req.metadataOptions;
-        args.peerNodeId      = peerNodeId;
-        args.sdp             = std::string(req.sdp.data(), req.sdp.size());
+        args.sessionId             = GenerateSessionId();
+        args.streamUsage           = req.streamUsage;
+        args.videoStreamId         = videoStreamID;
+        args.audioStreamId         = audioStreamID;
+        args.peerNodeId            = peerNodeId;
+        args.fabricIndex           = peerFabricIndex;
+        args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
+        args.originatingEndpointId = req.originatingEndpointID;
 
         // Convert ICE servers list from DecodableList to vector.
         if (req.ICEServers.HasValue())
@@ -501,13 +511,13 @@ void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & 
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
 
-    std::vector<std::string> candidates;
+    std::vector<ICECandidateStruct> candidates;
     auto iter = req.ICECandidates.begin();
     while (iter.Next())
     {
-        // Get current candidate CharSpan and convert to std::string.
-        const CharSpan & candidateSpan = iter.GetValue();
-        candidates.emplace_back(candidateSpan.data(), candidateSpan.size());
+        // Get current candidate.
+        const ICECandidateStruct & candidate = iter.GetValue();
+        candidates.push_back(candidate);
     }
 
     // Check the validity of the list.
@@ -570,4 +580,9 @@ void WebRTCTransportProviderServer::HandleEndSession(HandlerContext & ctx, const
 void MatterWebRTCTransportProviderPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initializing WebRTC Transport Provider cluster.");
+}
+
+void MatterWebRTCTransportProviderPluginServerShutdownCallback()
+{
+    ChipLogProgress(Zcl, "Shutdown WebRTC Transport Provider cluster.");
 }

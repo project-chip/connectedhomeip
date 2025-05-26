@@ -40,11 +40,10 @@ using AudioStreamStruct            = Structs::AudioStreamStruct::Type;
 using SnapshotStreamStruct         = Structs::SnapshotStreamStruct::Type;
 using AudioCapabilitiesStruct      = Structs::AudioCapabilitiesStruct::Type;
 using VideoSensorParamsStruct      = Structs::VideoSensorParamsStruct::Type;
-using SnapshotParamsStruct         = Structs::SnapshotParamsStruct::Type;
+using SnapshotCapabilitiesStruct   = Structs::SnapshotCapabilitiesStruct::Type;
 using VideoResolutionStruct        = Structs::VideoResolutionStruct::Type;
 using ViewportStruct               = Structs::ViewportStruct::Type;
 using RateDistortionTradeOffStruct = Structs::RateDistortionTradeOffPointsStruct::Type;
-using SnapshotParamsStruct         = Structs::SnapshotParamsStruct::Type;
 
 constexpr uint8_t kMaxSpeakerLevel          = 254;
 constexpr uint8_t kMaxMicrophoneLevel       = 254;
@@ -64,7 +63,7 @@ constexpr size_t kNumOfStreamUsageTypes = 4;
 
 // StreamUsageEnum + Anonymous tag (1 byte).
 // Assumes min-size encoding (1 byte) for the integer.
-constexpr size_t kStreamUsageTlvSize = sizeof(StreamUsageEnum) + 1;
+constexpr size_t kStreamUsageTlvSize = sizeof(Globals::StreamUsageEnum) + 1;
 
 // 1 control byte + end-of-array marker
 constexpr size_t kArrayTlvOverhead = 2;
@@ -226,7 +225,8 @@ public:
      *   @return Success if the processing of the Command is successful; otherwise, the command SHALL be rejected with an
      * appropriate error.
      */
-    virtual Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
+    virtual Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
+                                                                const VideoResolutionStruct & resolution,
                                                                 ImageSnapshot & outImageSnapshot) = 0;
 
     /**
@@ -300,10 +300,10 @@ public:
      * @param aFeatures                         The bitflags value that identifies which features are supported by this instance.
      * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
      *                                          instance.
-     * @param aMaxConcurrentVideoEncoders       The maximum number of video encoders supported by camera.
+     * @param aMaxConcurrentEncoders            The maximum number of video encoders supported by camera.
      * @param aMaxEncodedPixelRate              The maximum data rate (encoded pixels/sec) supported by camera.
      * @param aVideoSensorParams                The set of video sensor parameters for the camera.
-     * @param aNightVisionCapable               Indicates whether the camera supports night vision.
+     * @param aNightVisionUsesInfrared          Indicates whether nightvision mode does or does not use infrared
      * @param aMinViewPort                      Indicates minimum resolution (width/height) in pixels allowed for camera viewport.
      * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
      *                                          encoders.
@@ -315,21 +315,24 @@ public:
      *                                          supported sample rates and the number of channels.
      * @param aTwoWayTalkSupport                Indicates the type of two-way talk support the device has, e.g., half-duplex,
      *                                          full-duplex, etc.
-     * @param aSupportedSnapshotParams          Indicates the set of supported snapshot parameters by the device, e.g., the image
+     * @param aSnapshotCapabilities             Indicates the set of supported snapshot capabilities by the device, e.g., the image
      *                                          codec, the resolution and the maximum frame rate.
      * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume
+     * @param aSupportedStreamUsages            Indicates the possible stream types available
+     * @param aRankedStreamPriorities           Indicates the priority ranking of the available streams
      * for the transmission of its media streams.
      *
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                             const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentVideoEncoders,
+                             const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders,
                              uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
-                             bool aNightVisionCapable, const VideoResolutionStruct & aMinViewPort,
+                             bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
                              const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
-                             const std::vector<SnapshotParamsStruct> & aSupportedSnapshotParams, uint32_t aMaxNetworkBandwidth,
-                             const std::vector<StreamUsageEnum> & aSupportedStreamUsages);
+                             const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
+                             const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
+                             const std::vector<Globals::StreamUsageEnum> & aRankedStreamPriorities);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -358,6 +361,8 @@ public:
     CHIP_ERROR SetSoftLivestreamPrivacyModeEnabled(bool aSoftLivestreamPrivacyModeEnabled);
 
     CHIP_ERROR SetHardPrivacyModeOn(bool aHardPrivacyModeOn);
+
+    CHIP_ERROR SetNightVisionUsesInfrared(bool aNightVisionUsesInfrared);
 
     CHIP_ERROR SetNightVision(TriStateAutoEnum aNightVision);
 
@@ -398,13 +403,13 @@ public:
     CHIP_ERROR SetStatusLightBrightness(Globals::ThreeLevelAutoEnum aStatusLightBrightness);
 
     // Attribute Getters
-    uint8_t GetMaxConcurrentVideoEncoders() const { return mMaxConcurrentVideoEncoders; }
+    uint8_t GetMaxConcurrentEncoders() const { return mMaxConcurrentEncoders; }
 
     uint32_t GetMaxEncodedPixelRate() const { return mMaxEncodedPixelRate; }
 
     const VideoSensorParamsStruct & GetVideoSensorParams() const { return mVideoSensorParams; }
 
-    bool GetNightVisionCapable() const { return mNightVisionCapable; }
+    bool GetNightVisionUsesInfrared() const { return mNightVisionUsesInfrared; }
 
     const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
 
@@ -421,7 +426,7 @@ public:
 
     TwoWayTalkSupportTypeEnum GetTwoWayTalkSupport() const { return mTwoWayTalkSupport; }
 
-    const std::vector<SnapshotParamsStruct> & GetSupportedSnapshotParams() const { return mSupportedSnapshotParamsList; }
+    const std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities() const { return mSnapshotCapabilitiesList; }
 
     uint32_t GetMaxNetworkBandwidth() const { return mMaxNetworkBandwidth; }
 
@@ -429,7 +434,7 @@ public:
 
     bool GetHDRModeEnabled() const { return mHDRModeEnabled; }
 
-    const std::vector<StreamUsageEnum> & GetSupportedStreamUsages() const { return mSupportedStreamUsages; }
+    const std::vector<Globals::StreamUsageEnum> & GetSupportedStreamUsages() const { return mSupportedStreamUsages; }
 
     const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const { return mAllocatedVideoStreams; }
 
@@ -437,7 +442,7 @@ public:
 
     const std::vector<SnapshotStreamStruct> & GetAllocatedSnapshotStreams() const { return mAllocatedSnapshotStreams; }
 
-    const std::vector<StreamUsageEnum> & GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
+    const std::vector<Globals::StreamUsageEnum> & GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
 
     bool GetSoftRecordingPrivacyModeEnabled() const { return mSoftRecordingPrivacyModeEnabled; }
 
@@ -487,7 +492,7 @@ public:
 
     // Add/Remove Management functions for streams
 
-    CHIP_ERROR SetRankedVideoStreamPriorities(const std::vector<StreamUsageEnum> & newPriorities);
+    CHIP_ERROR SetRankedVideoStreamPriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
@@ -508,17 +513,17 @@ private:
     const BitFlags<OptionalAttribute> mOptionalAttrs;
 
     // Attributes
-    const uint8_t mMaxConcurrentVideoEncoders;
+    const uint8_t mMaxConcurrentEncoders;
     const uint32_t mMaxEncodedPixelRate;
     const VideoSensorParamsStruct mVideoSensorParams;
-    const bool mNightVisionCapable;
+    const bool mNightVisionUsesInfrared;
     const VideoResolutionStruct mMinViewPort;
     const std::vector<RateDistortionTradeOffStruct> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;
     const AudioCapabilitiesStruct mMicrophoneCapabilities;
     const AudioCapabilitiesStruct mSpeakerCapabilities;
     const TwoWayTalkSupportTypeEnum mTwoWayTalkSupport;
-    const std::vector<SnapshotParamsStruct> mSupportedSnapshotParamsList;
+    const std::vector<SnapshotCapabilitiesStruct> mSnapshotCapabilitiesList;
     const uint32_t mMaxNetworkBandwidth;
 
     uint16_t mCurrentFrameRate             = 0;
@@ -548,9 +553,9 @@ private:
     Globals::ThreeLevelAutoEnum mStatusLightBrightness = Globals::ThreeLevelAutoEnum::kMedium;
 
     // Managed lists
-    std::vector<StreamUsageEnum> mSupportedStreamUsages;
+    std::vector<Globals::StreamUsageEnum> mSupportedStreamUsages;
 
-    std::vector<StreamUsageEnum> mRankedVideoStreamPriorities;
+    std::vector<Globals::StreamUsageEnum> mRankedVideoStreamPriorities;
     std::vector<VideoStreamStruct> mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> mAllocatedAudioStreams;
     std::vector<SnapshotStreamStruct> mAllocatedSnapshotStreams;
@@ -594,7 +599,7 @@ private:
 
     // Helpers to read list items via delegate APIs
     CHIP_ERROR ReadAndEncodeRateDistortionTradeOffPoints(const AttributeValueEncoder::ListEncodeHelper & encoder);
-    CHIP_ERROR ReadAndEncodeSupportedSnapshotParams(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR ReadAndEncodeSnapshotCapabilities(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     CHIP_ERROR ReadAndEncodeSupportedStreamUsages(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
@@ -609,6 +614,11 @@ private:
 
     CHIP_ERROR StoreRankedVideoStreamPriorities();
     CHIP_ERROR LoadRankedVideoStreamPriorities();
+
+    void ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
+
+    void ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
+
     /**
      * @brief Inherited from CommandHandlerInterface
      */

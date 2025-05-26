@@ -17,21 +17,31 @@
 #   INPUT     - the name of the ".matter" file to use for generation
 #   GENERATOR - generator to use for codegen.py
 #   OUTPUTS   - EXPECTED output names. MUST match actual outputs
-# 
+#
 #   OUTPUT_PATH  - [OUT] output variable will contain the directory where the
 #                  files will be generated
 #   OUTPUT_FILES - [OUT] output variable will contain the path of generated files.
 #                  suitable to be added within a build target
 #
 function(chip_codegen TARGET_NAME)
-    cmake_parse_arguments(ARG 
-         "" 
-         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES" 
-         "OUTPUTS" 
+    cmake_parse_arguments(ARG
+         ""
+         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES"
+         "OUTPUTS"
          ${ARGN}
     )
 
     set(CHIP_CODEGEN_PREGEN_DIR "" CACHE PATH "Pre-generated directory to use instead of compile-time code generation.")
+
+    # Output paths can contain placeholders such as
+    # {{defined_cluster_name}} or {{server_cluster_name}}
+    #
+    # This translates them to the actually fully expanded path.
+    execute_process(
+            COMMAND "${CHIP_ROOT}/scripts/codegen_paths.py" "--idl" "${ARG_INPUT}" ${ARG_OUTPUTS}
+            OUTPUT_VARIABLE GENERATED_PATHS_OUT
+    )
+    string(REPLACE "\n" ";" GENERATED_PATHS "${GENERATED_PATHS_OUT}")
 
     if ("${CHIP_CODEGEN_PREGEN_DIR}" STREQUAL "")
         set(GEN_FOLDER "${CMAKE_BINARY_DIR}/gen/${TARGET_NAME}/${ARG_GENERATOR}")
@@ -46,7 +56,7 @@ function(chip_codegen TARGET_NAME)
 
 
         set(OUT_NAMES)
-        foreach(NAME IN LISTS ARG_OUTPUTS)
+        foreach(NAME IN LISTS GENERATED_PATHS)
             list(APPEND OUT_NAMES "${GEN_FOLDER}/${NAME}")
         endforeach()
 
@@ -87,7 +97,7 @@ function(chip_codegen TARGET_NAME)
 
         # Here we have ${CHIP_CODEGEN_PREGEN_DIR}
         set(OUT_NAMES)
-        foreach(NAME IN LISTS ARG_OUTPUTS)
+        foreach(NAME IN LISTS GENERATED_PATHS)
             list(APPEND OUT_NAMES "${GEN_FOLDER}/${NAME}")
         endforeach()
 
@@ -103,7 +113,7 @@ endfunction()
 # Run chip code generation using zap
 #
 # Example usage:
-#   chip_codegen("app"
+#   chip_zapgen("app"
 #      INPUT     "some_file.zap"
 #      GENERATOR "app-templates"
 #      OUTPUTS

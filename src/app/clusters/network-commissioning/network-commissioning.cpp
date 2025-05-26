@@ -148,6 +148,11 @@ public:
         mStatus(status), mDebugText(debugText), mNetworks(networks)
     {}
 
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
+    {
+        return EncodeTo(writer, tag);
+    }
+
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override;
 
 private:
@@ -213,6 +218,11 @@ public:
     ThreadScanResponseToTLV(Status status, CharSpan debugText, ThreadScanResponseIterator * networks) :
         mStatus(status), mDebugText(debugText), mNetworks(networks)
     {}
+
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
+    {
+        return EncodeTo(writer, tag);
+    }
 
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override;
 
@@ -1448,3 +1458,4 @@ void MatterNetworkCommissioningPluginServerInitCallback()
 {
     // Nothing to do, the server init routine will be done in Instance::Init()
 }
+void MatterNetworkCommissioningPluginServerShutdownCallback() {}

@@ -369,6 +369,7 @@ decrypt
 decrypted
 DEDEDEDE
 deepnote
+deepwiki
 DefaultOTAProviders
 DefaultOTARequestor
 DefaultOTARequestorDriver
@@ -755,10 +756,12 @@ itsfoss
 IW
 JDK
 jinja
+JCM
 JLink
 JLinkExe
 JLinkRTTClient
 JN
+jf
 jni
 jpg
 jre
@@ -1295,6 +1298,7 @@ semver
 SendButton
 SendNewInputEvent
 sendto
+SEPR
 seqdiag
 SERIALDEVICE
 serialno

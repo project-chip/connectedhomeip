@@ -11,13 +11,49 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/build.gni")
+import("${build_root}/config/compiler/compiler.gni")
 
 action("build_libdatachannel") {
   script = "scripts/build_libdatachannel.py"
   outputs = [ "$target_gen_dir/repo/build/libdatachannel.so" ]
   args = []
+
+  if (is_clang) {
+    args += [ "--clang" ]
+  }
 }
 
-shared_library("libdatachannel") {
+config("datachannel_config") {
+  libs = [
+    "datachannel",
+    "usrsctp",
+    "srtp2",
+    "juice",
+  ]
+
+  if (is_clang) {
+    _compiler_subdir = "clang"
+
+    # We build static libraries and srtp2 depends on openssl
+    # TODO: can we somehow query this dynamically?
+    libs += [
+      "ssl",
+      "crypto",
+    ]
+  } else {
+    _compiler_subdir = "gcc"
+  }
+
+  lib_dirs = [
+    rebase_path("repo/build/${_compiler_subdir}"),
+    rebase_path("repo/build/${_compiler_subdir}/deps/usrsctp/usrsctplib"),
+    rebase_path("repo/build/${_compiler_subdir}/deps/libsrtp"),
+    rebase_path("repo/build/${_compiler_subdir}/deps/libjuice"),
+  ]
+}
+
+static_library("libdatachannel") {
   deps = [ ":build_libdatachannel" ]
+  public_configs = [ ":datachannel_config" ]
 }

@@ -103,7 +103,12 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="ModeTags">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="8"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="8"/>
+          </between>
+        </constraint>
       </field>
     </struct>
   </dataTypes>

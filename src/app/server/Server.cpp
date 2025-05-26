@@ -241,7 +241,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                            ,
-                           Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
+                           Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
+                               DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
 #endif
     );
 
@@ -354,7 +355,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow());
+        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(initParams.discoveryTimeout));
 #endif
     }
 

@@ -45,6 +45,7 @@ declare install_virtual_env
 declare clean_virtual_env=yes
 declare install_pytest_requirements=yes
 declare install_jupyterlab=no
+declare -a extra_packages
 
 help() {
 
@@ -68,8 +69,9 @@ Input Options:
                                                             src/python_testing scripts.
                                                             Defaults to yes.
   -j, --jupyter-lab                                         Install jupyterlab requirements.
-  --extra_packages PACKAGES                                 Install extra Python packages from PyPI
-  -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
+  -E, --extra_packages PACKAGE                              Install extra Python packages from PyPI.
+                                                            May be specified multiple times.
+  -z, --pregen_dir DIRECTORY                                Directory where generated zap files have been pre-generated.
 "
 }
 
@@ -125,8 +127,8 @@ while (($#)); do
             fi
             shift
             ;;
-        --extra_packages)
-            extra_packages=$2
+        --extra_packages | -E)
+            extra_packages+=("$2")
             shift
             ;;
         --pregen_dir | -z)
@@ -185,12 +187,16 @@ WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing*.whl)
 
 if [ "$install_pytest_requirements" = "yes" ]; then
-    # Add the matter_yamltests_distribution wheel
-    WHEEL+=("$OUTPUT_ROOT"/obj/scripts/matter_yamltests_distribution._build_wheel/matter_yamltests-*.whl)
+    # Add wheels with YAML testing support.
+    WHEEL+=(
+        # Add matter-idl as well as matter-yamltests depends on it.
+        "$OUTPUT_ROOT"/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl
+        "$OUTPUT_ROOT"/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl
+    )
 fi
 
 if [ -n "$extra_packages" ]; then
-    WHEEL+=("$extra_packages")
+    WHEEL+=("${extra_packages[@]}")
 fi
 
 if [ -n "$install_virtual_env" ]; then

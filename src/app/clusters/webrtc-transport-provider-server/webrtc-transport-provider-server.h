@@ -28,8 +28,11 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-using ICEServerDecodableStruct = Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = Structs::WebRTCSessionStruct::Type;
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
 /**
  * @brief
@@ -50,8 +53,9 @@ public:
         Optional<DataModel::Nullable<uint16_t>> audioStreamId;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
-        Optional<BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
         NodeId peerNodeId;
+        FabricIndex fabricIndex;
+        EndpointId originatingEndpointId;
     };
 
     struct ProvideOfferRequestArgs : OfferRequestArgs
@@ -156,13 +160,15 @@ public:
      *   (i.e., Trickle ICE).
      *
      * @param[in] sessionId  The current session ID.
-     * @param[in] candidates A list of ICE candidate strings.
+     * @param[in] candidates A list of ICE candidate structs.
+     * Note: The callee cannot reference the `candidates` vector after this call
+     * returns, and must copy the contents over for later use, if required.
      *
      * @return CHIP_ERROR
      *   - CHIP_NO_ERROR on success
      *   - An error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) = 0;
+    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) = 0;
 
     /**
      * @brief
