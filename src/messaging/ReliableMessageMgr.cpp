@@ -117,7 +117,6 @@ void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & en
         return;
     }
 
-
     uint32_t messageCounter                               = entry.retainedBuf.GetMessageCounter();
     auto fabricIndex                                      = sessionHandle->GetFabricIndex();
     auto destination                                      = secureSession->GetPeerNodeId();
@@ -132,9 +131,10 @@ void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & en
     {
         event.retransmissionCount = entry.sendCount;
     }
-    if (eventType == ReliableMessageAnalyticsDelegate::EventType::kAcknowledged) {
-        auto now = System::SystemClock().GetMonotonicTimestamp();
-        auto latency = now - entry.initialSentTime;
+    if (eventType == ReliableMessageAnalyticsDelegate::EventType::kAcknowledged)
+    {
+        auto now         = System::SystemClock().GetMonotonicTimestamp();
+        auto latency     = now - entry.initialSentTime;
         event.ackLatency = latency.count();
     }
 

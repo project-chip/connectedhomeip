@@ -69,7 +69,7 @@ public:
                                                        including both successfully and failure send. */
 #if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
         System::Clock::Timestamp initialSentTime; /**< Timestamp when the initial message was sent */
-#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+#endif                                            // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     };
 
     ReliableMessageMgr(ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
