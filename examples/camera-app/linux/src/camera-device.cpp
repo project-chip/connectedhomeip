@@ -771,6 +771,20 @@ CameraError CameraDevice::SetViewport(VideoStream & stream, const ViewportStruct
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode)
+{
+    mSoftRecordingPrivacyModeEnabled = softRecordingPrivacyMode;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode)
+{
+    mSoftLivestreamPrivacyModeEnabled = softLivestreamPrivacyMode;
+
+    return CameraError::SUCCESS;
+}
+
 // Mute/Unmute speaker.
 CameraError CameraDevice::SetSpeakerMuted(bool muteSpeaker)
 {

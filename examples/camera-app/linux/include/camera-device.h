@@ -170,6 +170,14 @@ public:
      */
     CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewport) override;
 
+    // Get/Set SoftRecordingPrivacyMode.
+    CameraError SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode) override;
+    bool GetSoftRecordingPrivacyModeEnabled() override { return mSoftRecordingPrivacyModeEnabled; }
+
+    // Get/Set SoftLivestreamPrivacyMode.
+    CameraError SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode) override;
+    bool GetSoftLivestreamPrivacyModeEnabled() override { return mSoftLivestreamPrivacyModeEnabled; }
+
     // Currently, defaulting to not supporting hard privacy switch.
     bool HasHardPrivacySwitch() override { return false; }
 
@@ -258,11 +266,11 @@ private:
     chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 0, 0, 1920, 1080 };
     uint16_t mCurrentVideoFrameRate                                         = kMinVideoFrameRate;
     bool mHDREnabled                                                        = false;
-    bool mWatermarkEnabled                                                  = false;
-    bool mOSDEnabled                                                        = false;
     bool mSpeakerMuted                                                      = false;
     bool mMicrophoneMuted                                                   = false;
     bool mHardPrivacyModeOn                                                 = false;
+    bool mSoftRecordingPrivacyModeEnabled                                   = false;
+    bool mSoftLivestreamPrivacyModeEnabled                                  = false;
     uint8_t mSpeakerVol                                                     = kSpeakerMinLevel;
     uint8_t mSpeakerMinLevel                                                = kSpeakerMinLevel;
     uint8_t mSpeakerMaxLevel                                                = kSpeakerMaxLevel;

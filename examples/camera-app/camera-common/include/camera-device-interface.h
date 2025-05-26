@@ -241,6 +241,14 @@ public:
         // be a subset of the SupportedStreamUsages.
         virtual std::vector<StreamUsageEnum> & GetRankedStreamPriorities() = 0;
 
+        // Get/Set SoftRecordingPrivacyMode.
+        virtual CameraError SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode) = 0;
+        virtual bool GetSoftRecordingPrivacyModeEnabled()                                     = 0;
+
+        // Get/Set SoftLivestreamPrivacyMode.
+        virtual CameraError SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode) = 0;
+        virtual bool GetSoftLivestreamPrivacyModeEnabled()                                      = 0;
+
         // Does camera have a hard privacy switch
         virtual bool HasHardPrivacySwitch() = 0;
 
