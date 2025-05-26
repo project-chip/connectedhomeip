@@ -217,7 +217,6 @@ CHIP_ERROR CodegenDataModelProvider::GetNodeDataModelConfiguration(DataModel::No
     ReturnErrorOnFailure(mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
 
     outConfig.configurationVersion = configurationVersion;
-    outConfig.maxPathPerInvoke     = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
     outConfig.dataModelVersion     = Revision::kDataModelRevision;
     outConfig.specVersion          = Revision::kSpecificationVersion;
 

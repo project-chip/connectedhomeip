@@ -91,13 +91,10 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
-    CHIP_ERROR ReadDataModelRevision(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadLocation(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteLocation(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadProductAppearance(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSpecificationVersion(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadConfigurationVersion(AttributeValueEncoder & aEncoder);
 };
 
 BasicAttrAccess gAttrAccess;
@@ -303,7 +300,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     }
 
     case MaxPathsPerInvoke::Id: {
-        status = aEncoder.Encode(nodeConfig.maxPathPerInvoke);
+        status = ReadMaxPathsPerInvoke(aEncoder);
         break;
     }
 
@@ -394,6 +391,12 @@ CHIP_ERROR BasicAttrAccess::ReadProductAppearance(AttributeValueEncoder & aEncod
     }
 
     return aEncoder.Encode(productAppearance);
+}
+
+CHIP_ERROR BasicAttrAccess::ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder)
+{
+    uint16_t max_path_per_invoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
+    return aEncoder.Encode(max_path_per_invoke);
 }
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate

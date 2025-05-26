@@ -33,7 +33,6 @@ namespace DataModel {
 struct NodeDataModelConfiguration
 {
     uint32_t configurationVersion;
-    uint8_t maxPathPerInvoke;
     uint32_t dataModelVersion;
     uint32_t specVersion;
 };
