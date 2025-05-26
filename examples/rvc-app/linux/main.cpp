@@ -38,10 +38,6 @@ RvcDevice * gRvcDevice = nullptr;
 void ApplicationInit()
 {
     const char * app_id = LinuxDeviceOptions::GetInstance().app_id;
-    if (app_id == nullptr)
-    {
-        app_id = "";
-    }
 
     std::string path = kChipEventFifoPathPrefix + std::string(app_id);
 
