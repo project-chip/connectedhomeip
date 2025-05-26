@@ -822,6 +822,8 @@ def BuildTelinkTarget():
     target.AppendModifier('compress-lzma', compress_lzma_config=True)
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
+    target.AppendModifier('tflm', tflm_config=True)
+    target.AppendModifier('newlib', newlib_libc_config=True)
 
     return target
 
