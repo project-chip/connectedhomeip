@@ -401,7 +401,7 @@ def run_on_every_server_node(body):
                 test_instance.applicable_endpoints = [None]
             asserts.skip('Dry Run on tests')
             return
-        body(test_instance, args, kwargs)
+        body(test_instance, *args, **kwargs)
     return run_on_every_server_node_internal
 
 

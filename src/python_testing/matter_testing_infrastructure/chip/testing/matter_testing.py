@@ -18,6 +18,7 @@
 import argparse
 import asyncio
 import builtins
+import copy
 import inspect
 import json
 import logging
@@ -77,6 +78,7 @@ from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+from mobly.records import TestResult
 
 try:
     from matter.yamltests.hooks import TestRunnerHooks
@@ -840,6 +842,7 @@ class TestInfo:
 @dataclass
 class TestRequirement:
     filename: str
+    test_class: str
     test: str
     # If this isn't populated, it means we couldn't determine for this test
     # A list of ints [1, 2, 3] is the list of applicable endpoints
@@ -1120,7 +1123,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.user_params.get('dry_run', False):
             filename = inspect.getfile(self.__class__)
             test_name = self.current_test_info.name
-            self.test_requirements.append(TestRequirement(filename=filename, test=test_name,
+            self.test_requirements.append(TestRequirement(filename=filename, test_class=(self.__class__), test=test_name,
                                           applicable_endpoints=self.applicable_endpoints))
 
     def check_pics(self, pics_key: str) -> bool:
@@ -2165,9 +2168,9 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
     return info
 
 
-def run_tests_no_exit(test_classes: list[MatterBaseTest], matter_test_config: MatterTestConfig,
-                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks = InternalTestRunnerHooks(),
-                      default_controller=None, external_stack=None) -> bool:
+def _run_tests_no_exit_internal(test_classes: list[MatterBaseTest], matter_test_config: MatterTestConfig,
+                                event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
+                                default_controller, external_stack) -> tuple[bool, TestRequirement, TestResult]:
 
     # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
     #       Mobly deep copies the user params before passing them to the test class and the event
@@ -2288,6 +2291,7 @@ def run_tests_no_exit(test_classes: list[MatterBaseTest], matter_test_config: Ma
                 ok = runner.results.is_all_pass and ok
                 if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
                     ok = False
+                test_results = copy.deepcopy(runner.results)
             except TimeoutError:
                 ok = False
             except signals.TestAbortAll:
@@ -2308,18 +2312,33 @@ def run_tests_no_exit(test_classes: list[MatterBaseTest], matter_test_config: Ma
         # during the initialization.
         event_loop.run_until_complete(shutdown())
 
+    test_requirements = unstash_globally(test_config.user_params.get("test_requirements"))
     if test_config.user_params.get("dry_run", False):
         logging.info('--------------------------------------------------')
         logging.info('The following tests should be run for this device:')
-        for test in unstash_globally(test_config.user_params.get("test_requirements")):
-            logging.info(f'{test.filename} {test.test} {test.applicable_endpoints}')
-        return True
+        for test in test_requirements:
+            logging.info(f'{test.filename} {test.test_class} {test.test} {test.applicable_endpoints}')
+        return (True, test_requirements, test_results)
 
     if ok:
         logging.info("Final result: PASS !")
     else:
         logging.error("Final result: FAIL !")
+    return (ok, test_requirements, test_results)
+
+
+def run_tests_no_exit(test_classes: list[MatterBaseTest], matter_test_config: MatterTestConfig,
+                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks = InternalTestRunnerHooks(),
+                      default_controller=None, external_stack=None) -> bool:
+    ok, _, _ = _run_tests_no_exit_internal(
+        test_classes, matter_test_config, event_loop, hooks, default_controller, external_stack)
     return ok
+
+
+def run_tests_return_results(test_classes: list[MatterBaseTest], matter_test_config: MatterTestConfig,
+                             event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks = InternalTestRunnerHooks(),
+                             default_controller=None, external_stack=None) -> tuple[bool, TestRequirement, TestResult]:
+    return _run_tests_no_exit_internal(test_classes, matter_test_config, event_loop, hooks, default_controller, external_stack)
 
 
 def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
