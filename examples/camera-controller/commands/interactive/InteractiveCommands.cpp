@@ -32,6 +32,12 @@
 
 using namespace chip;
 
+// Global flag to signal shutdown
+std::atomic<bool> gShutdownRequested{ false };
+
+// Global handle for ReadCommandThread 
+pthread_t gReadThreadId;
+
 namespace {
 
 constexpr char kInteractiveModePrompt[]          = ">>> ";
@@ -45,15 +51,14 @@ constexpr char kCategoryAutomation[]             = "Automation";
 // File pointer for the log file
 FILE * sLogFile = nullptr;
 
-// Global flag to signal shutdown
-std::atomic<bool> sShutdownRequested(false);
-
 std::queue<std::string> sCommandQueue;
 std::mutex sQueueMutex;
 std::condition_variable sQueueCondition;
 
 void ReadCommandThread()
 {
+    gReadThreadId = pthread_self();
+
     for (;;)
     {
         // `readline()` allocates with `malloc()`.  Wrap it in a smart
@@ -65,6 +70,12 @@ void ReadCommandThread()
             std::lock_guard<std::mutex> lk{ sQueueMutex };
             sCommandQueue.emplace(kInteractiveModeStopCommand);
             sQueueCondition.notify_one();
+            break;
+        }
+
+        // Leaving because another thread asked us to stop (Ctrl‑C).
+        if (gShutdownRequested.load())
+        {
             break;
         }
 
@@ -142,9 +153,9 @@ std::string InteractiveStartCommand::GetCommand() const
     std::unique_lock<std::mutex> lock(sQueueMutex);
 
     // Wait until queue is not empty OR shutdown is requested
-    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty() || sShutdownRequested.load(); });
+    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty() || gShutdownRequested.load(); });
 
-    if (sShutdownRequested.load())
+    if (gShutdownRequested.load())
     {
         return {}; // empty string signals caller to exit
     }
@@ -195,7 +206,6 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     }
 
     std::thread readCommands(ReadCommandThread);
-    readCommands.detach();
 
     int status;
     while (true)
@@ -211,6 +221,8 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
             break;
         }
     }
+
+    readCommands.join(); // wait for readline to restore the terminal
 
     camera::DeviceManager::Instance().Shutdown();
     SetCommandExitStatus(CHIP_NO_ERROR);
@@ -508,7 +520,6 @@ void StopInteractiveEventLoop()
 {
     ChipLogProgress(NotSpecified, "Stop Interactive EventLoop, exiting...");
 
-    sShutdownRequested.store(true);
     sQueueCondition.notify_one();
 
     InteractiveServerCommand * command =

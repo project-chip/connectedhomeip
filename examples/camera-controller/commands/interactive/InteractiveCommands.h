@@ -27,6 +27,9 @@
 
 class Commands;
 
+extern std::atomic<bool> gShutdownRequested;
+extern pthread_t gReadThreadId;
+
 class InteractiveCommand : public CHIPCommand
 {
 public:

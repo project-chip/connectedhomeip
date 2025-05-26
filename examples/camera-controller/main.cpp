@@ -40,6 +40,12 @@ namespace {
 
 void StopSignalHandler(int signum)
 {
+    // Tell every thread a shutdown is underway *right now*.
+    gShutdownRequested.store(true);
+
+    /* wake the readline thread right now */
+    pthread_kill(gReadThreadId, SIGUSR1);
+
     DeviceLayer::SystemLayer().ScheduleLambda([]() { StopInteractiveEventLoop(); });
 }
 
