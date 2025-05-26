@@ -56,7 +56,6 @@ class NodeConfigurationListenerImpl : public NodeConfigurationListener
 public:
     void OnConfigurationVersionChanged() override
     {
-        ChipLogProgress(Zcl, "OnConfigurationVersionChanged");
         MatterReportingAttributeChangeCallback(0, BasicInformation::Id, BasicInformation::Attributes::ConfigurationVersion::Id);
     }
 

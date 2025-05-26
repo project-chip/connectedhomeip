@@ -171,7 +171,6 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
         uint32_t configurationVersion = 1;
         uint16_t size                 = sizeof(configurationVersion);
         mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size);
-        ChipLogProgress(DataManagement, "Initialize ConfigurationVersion to 1");
     }
 
     return mRegistry.SetContext(ServerClusterContext{
@@ -225,10 +224,8 @@ CHIP_ERROR CodegenDataModelProvider::GetNodeDataModelConfiguration(DataModel::No
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CodegenDataModelProvider::BumpConfigurationVersion()
+CHIP_ERROR CodegenDataModelProvider::BumpNodeDataModelConfigurationVersion()
 {
-    ChipLogProgress(NotSpecified, "Bumping configuration version");
-
     uint32_t configurationVersion    = 0;
     uint16_t size                    = sizeof(configurationVersion);
     chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
@@ -236,7 +233,6 @@ CHIP_ERROR CodegenDataModelProvider::BumpConfigurationVersion()
 
     configurationVersion++;
     ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
-    ChipLogProgress(NotSpecified, "Configuration version bumped to %u", configurationVersion);
 
     NodeConfigurationListener::NotifyNodeConfigurationListener();
     return CHIP_NO_ERROR;

@@ -559,7 +559,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SimulateConfigurationVersionChange")
     {
-        InteractionModelEngine::GetInstance()->GetDataModelProvider()->BumpConfigurationVersion();
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->BumpNodeDataModelConfigurationVersion();
     }
     else
     {

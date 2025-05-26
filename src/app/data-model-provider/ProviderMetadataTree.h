@@ -49,9 +49,8 @@ public:
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
-    // virtual CHIP_ERROR RegisterNodeDataModelConfigurationChangeListener()                    = 0;
     virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & outConfig) = 0;
-    virtual CHIP_ERROR BumpConfigurationVersion()                                            = 0;
+    virtual CHIP_ERROR BumpNodeDataModelConfigurationVersion()                               = 0;
 
     virtual CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> & builder) = 0;
 
