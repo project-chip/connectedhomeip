@@ -837,6 +837,17 @@ class TestInfo:
     pics: list[str]
 
 
+@dataclass
+class TestRequirement:
+    filename: str
+    test: str
+    # If this isn't populated, it means we couldn't determine for this test
+    # A list of ints [1, 2, 3] is the list of applicable endpoints
+    # An empty list [] means this test does not apply to this device
+    # [None] means the device applies to the node
+    applicable_endpoints: Optional[list[int, None]]
+
+
 class MatterBaseTest(base_test.BaseTestClass):
     def __init__(self, *args):
         super().__init__(*args)
@@ -1015,7 +1026,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     @property
     def stored_global_wildcard(self) -> int:
-        return unstash_globally(self.matter_test_config.get("stored_global_wildcard"))
+        return unstash_globally(self.user_params.get("stored_global_wildcard"))
+
+    @property
+    def test_requirements(self) -> list[TestRequirement]:
+        return unstash_globally(self.user_params.get("test_requirements"))
 
     def get_endpoint(self, default: Optional[int] = 0) -> int:
         # TODO: assess how difficult it would be to ask folks to be explicit here
@@ -1102,12 +1117,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         super().teardown_class()
 
     def teardown_test(self):
-        if self.user_params.get('test_case_list', False):
-            # TODO: make configurable
-            with open('test_case_list.txt', 'a') as f:
-                filename = inspect.getfile(self.__class__)
-                test_name = self.current_test_info.name
-                f.write(f'{filename}, {test_name}, {self.applicable_endpoints}\n')
+        if self.user_params.get('dry_run', False):
+            filename = inspect.getfile(self.__class__)
+            test_name = self.current_test_info.name
+            self.test_requirements.append(TestRequirement(filename=filename, test=test_name,
+                                          applicable_endpoints=self.applicable_endpoints))
 
     def check_pics(self, pics_key: str) -> bool:
         def pics_from_file():
@@ -2239,6 +2253,7 @@ def run_tests_no_exit(test_classes: list[MatterBaseTest], matter_test_config: Ma
         print(stored_global_wildcard)
         print('----------------------------------------------------------------------')
         test_config.user_params["stored_global_wildcard"] = stash_globally(stored_global_wildcard)
+        test_config.user_params["test_requirements"] = stash_globally([])
 
         # Execute the test class with the config
         ok = True
@@ -2292,6 +2307,13 @@ def run_tests_no_exit(test_classes: list[MatterBaseTest], matter_test_config: Ma
         # during the shutdown callbacks can use tha same async context which was used
         # during the initialization.
         event_loop.run_until_complete(shutdown())
+
+    if test_config.user_params.get("dry_run", False):
+        logging.info('--------------------------------------------------')
+        logging.info('The following tests should be run for this device:')
+        for test in unstash_globally(test_config.user_params.get("test_requirements")):
+            logging.info(f'{test.filename} {test.test} {test.applicable_endpoints}')
+        return True
 
     if ok:
         logging.info("Final result: PASS !")
