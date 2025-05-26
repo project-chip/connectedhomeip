@@ -140,13 +140,6 @@ std::string InteractiveStartCommand::GetCommand() const
 {
     std::unique_lock<std::mutex> lock(sQueueMutex);
 
-<<<<<<< HEAD
-    std::string command = sCommandQueue.front();
-    sCommandQueue.pop();
-
-    if (!command.empty())
-    {
-=======
     // Wait until queue is not empty OR shutdown is requested
     sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty() || sShutdownRequested.load(); });
 
@@ -160,7 +153,6 @@ std::string InteractiveStartCommand::GetCommand() const
 
     if (!command.empty())
     {
->>>>>>> upstream/master
         add_history(command.c_str());
         write_history(GetHistoryFilePath().c_str());
     }
@@ -517,3 +509,23 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         }
         return CHIP_NO_ERROR;
     }
+<<<<<<< HEAD
+=======
+    return CHIP_NO_ERROR;
+}
+
+void StopInteractiveEventLoop()
+{
+    ChipLogProgress(NotSpecified, "Stop Interactive EventLoop, exiting...");
+
+    sShutdownRequested.store(true);
+    sQueueCondition.notify_one();
+
+    InteractiveServerCommand * command =
+        static_cast<InteractiveServerCommand *>(CommandMgr().GetCommandByName("interactive", "server"));
+    if (command)
+    {
+        command->StopCommand();
+    }
+}
+>>>>>>> de4e5a2785 (Automate python test WEBRTCR_2_3 in CI (#38810))
