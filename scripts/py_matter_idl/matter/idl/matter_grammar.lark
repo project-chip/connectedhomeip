@@ -95,7 +95,7 @@ bool_default: "true"i  -> bool_default_true
             | "false"i -> bool_default_false
 ?default_value: "default"i "=" (integer | ESCAPED_STRING | bool_default)
 
-constant_entry: [maturity] id "=" positive_integer ";"
+constant_entry: [maturity] id "=" positive_integer ["[" "spec_name" "=" ESCAPED_STRING "]"] ";"
 positive_integer: POSITIVE_INTEGER | HEX_INTEGER
 negative_integer: "-" positive_integer
 

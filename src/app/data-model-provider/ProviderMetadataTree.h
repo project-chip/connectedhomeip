@@ -34,18 +34,6 @@ namespace DataModel {
 ///
 /// The data model can be viewed as a tree of endpoint/cluster/(attribute+commands+events)
 /// where each element can be iterated through independently.
-///
-/// Iteration rules:
-///   - Invalid paths will be returned when iteration ends (IDs will be kInvalid* and in particular
-///     mEndpointId will be kInvalidEndpointId). See `::kInvalid` constants for entries and
-///     can use ::IsValid() to determine if the entry is valid or not.
-///   - Global Attributes are NOT returned since they are implied
-///   - Any internal iteration errors are just logged (callers do not handle iteration CHIP_ERROR)
-///   - Iteration order is NOT guaranteed globally. Only the following is guaranteed:
-///     - Complete tree iteration (e.g. when iterating an endpoint, ALL clusters of that endpoint
-///       are returned, when iterating over a cluster, all attributes/commands are iterated over)
-///     - uniqueness and completeness (iterate over all possible distinct values as long as no
-///       internal structural changes occur)
 class ProviderMetadataTree
 {
 public:
@@ -59,6 +47,9 @@ public:
     virtual CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DeviceTypeEntry> & builder)       = 0;
     virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)          = 0;
     virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ServerClusterEntry> & builder) = 0;
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    virtual CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) = 0;
+#endif
 
     /// Attribute lists contain all attributes. This MUST include all global
     /// attributes (See SPEC 7.13 Global Elements / Global Attributes Table).

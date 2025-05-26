@@ -20,6 +20,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "CHIPProjectConfig.h"
 #if defined(ENABLE_CHIP_SHELL)
 #include "EventHandlerLibShell.h"
 #endif // ENABLE_CHIP_SHELL
@@ -66,7 +67,7 @@ using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
-using namespace EFR32DoorLock::LockInitParams;
+using namespace SilabsDoorLock::LockInitParams;
 
 namespace {
 LEDWidget sLockLED;
@@ -195,7 +196,8 @@ CHIP_ERROR AppTask::AppInit()
                              .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
                              .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
                              .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
-                             .GetLockParam());
+                             .GetLockParam(),
+                         &Server::GetInstance().GetPersistentStorage());
 
     if (err != CHIP_NO_ERROR)
     {
@@ -254,9 +256,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 #endif
 
     SILABS_LOG("App Task started");
-
-    // Users and credentials should be checked once from nvm flash on boot
-    LockMgr().ReadConfigValues();
 
     while (true)
     {
