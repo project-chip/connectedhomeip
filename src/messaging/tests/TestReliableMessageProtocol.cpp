@@ -2053,7 +2053,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
 }
 
 #if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
-TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEventualSuccessForEsablishedCase)
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEventualSuccessForEstablishedCase)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Make sure we are using CASE sessions, because there is no defunct-marking for PASE.
@@ -2076,9 +2076,10 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     TestReliablityAnalyticDelegate testAnalyticsDelegate;
     rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
 
+    constexpr auto kTestRetryInterval = 30_ms32;
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     const auto expectedFabricIndex = exchange->GetSessionHandle()->GetFabricIndex();
@@ -2102,7 +2103,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
 
-    // Wait for the initial message to fail (should take 330-413ms)
+    // Wait for the initial message to fail (should take less than 50ms)
     GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     DrainAndServiceIO();
 
@@ -2145,6 +2146,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(firstTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(firstTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
     EXPECT_EQ(firstTransmitEvent.retransmissionCount, std::nullopt);
+    EXPECT_EQ(firstTransmitEvent.ackLatency, std::nullopt);
     // We have no way of validating the first messageCounter since this is a randomly generated value, but it should
     // remain constant for all subsequent transmit events in this test.
     const uint32_t messageCounter = firstTransmitEvent.messageCounter;
@@ -2155,6 +2157,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(secondTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(secondTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(secondTransmitEvent.retransmissionCount, 1);
+    EXPECT_EQ(secondTransmitEvent.ackLatency, std::nullopt);
     EXPECT_EQ(messageCounter, secondTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2163,6 +2166,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(thirdTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(thirdTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(thirdTransmitEvent.retransmissionCount, 2);
+    EXPECT_EQ(thirdTransmitEvent.ackLatency, std::nullopt);
     EXPECT_EQ(messageCounter, thirdTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2171,6 +2175,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(fourthTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(fourthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(fourthTransmitEvent.retransmissionCount, 3);
+    EXPECT_EQ(fourthTransmitEvent.ackLatency, std::nullopt);
     EXPECT_EQ(messageCounter, fourthTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2179,6 +2184,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(fifthTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(fifthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(fifthTransmitEvent.retransmissionCount, 4);
+    EXPECT_EQ(fifthTransmitEvent.ackLatency, std::nullopt);
     EXPECT_EQ(messageCounter, fifthTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2187,10 +2193,13 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(sixthTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(sixthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kAcknowledged);
     EXPECT_EQ(sixthTransmitEvent.retransmissionCount, std::nullopt);
+    EXPECT_TRUE(sixthTransmitEvent.ackLatency.has_value());
+    auto expectedMinimumAckLatencyTime = kTestRetryInterval * 5;
+    EXPECT_GT(sixthTransmitEvent.ackLatency, expectedMinimumAckLatencyTime.count());
     EXPECT_EQ(messageCounter, sixthTransmitEvent.messageCounter);
 }
 
-TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFailureForEsablishedCase)
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFailureForEstablishedCase)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Make sure we are using CASE sessions, because there is no defunct-marking for PASE.
@@ -2332,7 +2341,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFail
     EXPECT_EQ(messageCounter, sixthTransmitEvent.messageCounter);
 }
 
-TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEsablishedPase)
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEstablishedPase)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));

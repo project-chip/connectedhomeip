@@ -117,6 +117,7 @@ void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & en
         return;
     }
 
+
     uint32_t messageCounter                               = entry.retainedBuf.GetMessageCounter();
     auto fabricIndex                                      = sessionHandle->GetFabricIndex();
     auto destination                                      = secureSession->GetPeerNodeId();
@@ -130,6 +131,11 @@ void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & en
     if (eventType == ReliableMessageAnalyticsDelegate::EventType::kRetransmission)
     {
         event.retransmissionCount = entry.sendCount;
+    }
+    if (eventType == ReliableMessageAnalyticsDelegate::EventType::kAcknowledged) {
+        auto now = System::SystemClock().GetMonotonicTimestamp();
+        auto latency = now - entry.initialSentTime;
+        event.ackLatency = latency.count();
     }
 
     mAnalyticsDelegate->OnTransmitEvent(event);
@@ -325,6 +331,7 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     CalculateNextRetransTime(*entry);
 #if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    entry->initialSentTime = System::SystemClock().GetMonotonicTimestamp();
     NotifyMessageSendAnalytics(*entry, entry->ec->GetSessionHandle(), ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
 #endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     StartTimer();

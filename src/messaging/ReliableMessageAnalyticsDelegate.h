@@ -71,6 +71,10 @@ public:
         // retransmission attempt. A value of 1 indicates the first retransmission (i.e. the second
         // transmission of the message). This value should never be 0.
         std::optional<uint8_t> retransmissionCount;
+        // When eventType is kAcknowledged, this will be populated with the number of milliseconds
+        // that have elapsed between when the initial message was sent and when we received
+        // acknowledgment for the message.
+        std::optional<uint64_t> ackLatency;
     };
 
     virtual void OnTransmitEvent(const TransmitEvent & event) = 0;
