@@ -97,12 +97,6 @@ struct GAutoPtrDeleter<char>
 };
 
 template <>
-struct GAutoPtrDeleter<unsigned char>
-{
-    using deleter = GFree;
-};
-
-template <>
 struct GAutoPtrDeleter<const char *>
 {
     using deleter = GFree;
