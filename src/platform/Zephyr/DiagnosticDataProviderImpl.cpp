@@ -336,7 +336,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         else
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        if (interfaceType == Inet::InterfaceType::Thread)
+            if (interfaceType == Inet::InterfaceType::Thread)
         {
             ifp->isOperational = ConnectivityMgr().IsThreadAttached();
 
