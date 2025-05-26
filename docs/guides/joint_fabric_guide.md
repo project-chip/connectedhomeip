@@ -60,7 +60,7 @@ $ rm -rf /tmp/chip_*
 ```
 $ cd ~/connectedhomeip/examples/jf-admin-app/linux/out/debug
 $ rm -rf jfa_a_kvs && touch jfa_a_kvs
-$ ./jfa-app --capabilities 0x4 --passcode 110220033 --secured-device-port 5533 --rpc-server-port 33033 --KVS jfa_a_kvs
+$ ./jfa-app --capabilities 0x4 --passcode 110220033 --discriminator 3840  --secured-device-port 5533 --rpc-server-port 33033 --KVS jfa_a_kvs
 ```
 
 -   Start jf-control-app
@@ -74,7 +74,7 @@ $ ./jfc-app --rpc-server-port 33033 --storage-directory jfc_a_storage_directory 
 -   Commission jf-admin-app
 
 ```
->>> pairing onnetwork 1 110220033 --anchor true
+>>> pairing onnetwork-long 1 110220033 3840 --anchor true
 ```
 
 Check for the following logs on the jf-control-app side:
@@ -158,7 +158,7 @@ should be found.
 ```
 $ cd ~/connectedhomeip/examples/jf-admin-app/linux/out/debug
 $ rm -rf jfa_b_kvs && touch jfa_b_kvs
-$ ./jfa-app --capabilities 0x4 --passcode 110220055 --secured-device-port 5555 --rpc-server-port 33055 --KVS jfa_b_kvs
+$ ./jfa-app --capabilities 0x4 --passcode 110220055 --discriminator 384 --secured-device-port 5555 --rpc-server-port 33055 --KVS jfa_b_kvs
 ```
 
 -   Start jf-control-app
@@ -172,7 +172,7 @@ $ ./jfc-app --rpc-server-port 33055 --storage-directory jfc_b_storage_directory 
 -   Commission jf-admin-app
 
 ```
->>> pairing onnetwork 11 110220055 --anchor true
+>>> pairing onnetwork-long 11 110220055 3841 --anchor true
 ```
 
 Check for the following logs on the jf-control-app side:
@@ -250,4 +250,22 @@ jf-admin-app has been installed:
 A `Subjects` field equal to `18446744065119551489` (`FFFFFFFDFFFF0001` in hex)
 should be found.
 
-## Run Joint Fabric Demo
+## Manually Testing JCM Commissioning
+
+Execute all the initialization steps for Ecosystem A and Ecosystem B above.
+
+On JFC B
+
+TODO: Update the follow command to open the joint commissioning window
+
+```
+pairing open-commissioning-window 11 1 400 1000 1261
+```
+
+Note: Capture the [manual pairing code]
+
+On JFC A
+
+```
+pairing code 10 [manual pairing code] --jcm true
+```

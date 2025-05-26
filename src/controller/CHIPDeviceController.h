@@ -860,6 +860,12 @@ protected:
     // to the PairingDelegate upon arm failsafe command completion.
     virtual void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    /* This function start the JCM verification steps
+     */
+    virtual CHIP_ERROR StartJCMTrustVerification(DeviceProxy * device) { return CHIP_ERROR_NOT_IMPLEMENTED; };
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
 
@@ -1081,11 +1087,6 @@ private:
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
-
-#if (CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC)
-    CHIP_ERROR ParseJFAdministratorInfo(ReadCommissioningInfo & info);
-    CHIP_ERROR ValidateJFAdminNOC(const ByteSpan & adminNOC);
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     static CHIP_ERROR
     ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum err);

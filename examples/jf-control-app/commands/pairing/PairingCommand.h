@@ -83,7 +83,7 @@ public:
         AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
         AddArgument("anchor", 0, 1, &mAnchor, "If set to true then a NOC with Anchor and Administrator CAT is issued");
-        AddArgument("execute-jcm", 0, 1, &mExecuteJCM, "Set it to true in order to commission a Joint Fabric Administrator");
+        AddArgument("jcm", 0, 1, &mJCM, "Set it to true in order to commission a Joint Fabric Administrator");
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -265,6 +265,7 @@ private:
     chip::Optional<bool> mPaseOnly;
     chip::Optional<bool> mSkipCommissioningComplete;
     chip::Optional<bool> mAnchor;
+    chip::Optional<bool> mJCM;
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     chip::Optional<char *> mCountryCode;
@@ -307,8 +308,6 @@ private:
 
     bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
-
-    chip::Optional<bool> mExecuteJCM;
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;

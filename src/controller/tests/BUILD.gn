@@ -37,6 +37,10 @@ chip_test_suite("tests") {
       "TestServerCommandDispatch.cpp",
     ]
 
+    if (chip_device_config_enable_joint_fabric) {
+      test_sources += [ "TestJCMCommissioner.cpp" ]
+    }
+
     # At some instances, this Test end ups allocating more than 32 Timers, and since the fake platform doesn`t use the heap, the maximum number of allowed timers is 32.
     # So we get failures because we can't allocate any more timers, in the log it looks like:
     # SendMessage() to UDP:[::1]:5541 failed: b

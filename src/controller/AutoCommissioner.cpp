@@ -16,9 +16,8 @@
  *    limitations under the License.
  */
 
-#include <controller/AutoCommissioner.h>
-
 #include <app/InteractionModelTimeout.h>
+#include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
@@ -383,16 +382,15 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        if (mParams.GetExecuteJCM().ValueOr(false))
-        {
-            return CommissioningStage::kJFValidateNOC;
+        if (mParams.UseJCM().ValueOr(false)) {
+            return CommissioningStage::kJCMTrustVerification;
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         return CommissioningStage::kSendOpCertSigningRequest;
-    case CommissioningStage::kJFValidateNOC:
-        return CommissioningStage::kSendVIDVerificationRequest;
-    case CommissioningStage::kSendVIDVerificationRequest:
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    case CommissioningStage::kJCMTrustVerification:
         return CommissioningStage::kSendOpCertSigningRequest;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kValidateCSR;
     case CommissioningStage::kValidateCSR:
@@ -684,11 +682,6 @@ void AutoCommissioner::CleanupCommissioning()
     }
     mPAI.Free();
     mDAC.Free();
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    mJFAdminRCAC.Free();
-    mJFAdminICAC.Free();
-    mJFAdminNOC.Free();
-#endif
     mCommissioneeDeviceProxy = nullptr;
     mOperationalDeviceProxy  = OperationalDeviceProxy();
     mDeviceCommissioningInfo = ReadCommissioningInfo();
@@ -802,26 +795,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                     mParams.ClearICDStayActiveDurationMsec();
                 }
             }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-            if (mParams.GetExecuteJCM().ValueOr(false) &&
-                (mDeviceCommissioningInfo.JFAdministratorFabricIndex != kUndefinedFabricIndex))
-            {
-                ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mJFAdminRCAC, mDeviceCommissioningInfo.JFAdminRCAC));
-                mParams.SetJFAdminRCAC(mJFAdminRCAC.Span());
-
-                ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mJFAdminICAC, mDeviceCommissioningInfo.JFAdminICAC));
-                mParams.SetJFAdminICAC(mJFAdminICAC.Span());
-
-                ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mJFAdminNOC, mDeviceCommissioningInfo.JFAdminNOC));
-                mParams.SetJFAdminNOC(mJFAdminNOC.Span());
-
-                mParams.SetJFAdminEndpointId(mDeviceCommissioningInfo.JFAdminEndpointId)
-                    .SetJFAdministratorFabricIndex(mDeviceCommissioningInfo.JFAdministratorFabricIndex)
-                    .SetJFAdminFabricId(mDeviceCommissioningInfo.JFAdminFabricTable.fabricId)
-                    .SetJFAdminVendorId(mDeviceCommissioningInfo.JFAdminFabricTable.vendorId);
-            }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
              break;
         }

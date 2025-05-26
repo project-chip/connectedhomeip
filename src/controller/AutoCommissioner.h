@@ -163,12 +163,6 @@ private:
     uint8_t mAttestationElements[Credentials::kMaxRspLen];
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
-
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminRCAC;
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminICAC;
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminNOC;
-#endif
 };
 } // namespace Controller
 } // namespace chip

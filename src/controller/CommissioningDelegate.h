@@ -22,6 +22,9 @@
 #include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#include <controller/JCMTrustVerification.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -51,6 +54,9 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
     kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
     kAttestationRevocationCheck, ///< Verify Revocation Status of device's DAC chain
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    kJCMTrustVerification,       ///< Perform JCM trust verification steps
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
     kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
@@ -85,8 +91,6 @@ enum CommissioningStage : uint8_t
     kRemoveThreadNetworkConfig,       ///< Remove Thread network config.
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
     kCleanup,                         ///< Call delegates with status, free memory, clear timers and state/
-    kJFValidateNOC,                   ///< Verify Admin NOC contains an Administrator CAT
-    kSendVIDVerificationRequest,      ///< Send SignVIDVerificationRequest command to the device
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -553,6 +557,18 @@ public:
         return *this;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // Check for Joint Commissioning Method
+    Optional<bool> UseJCM() const { return mUseJCM; }
+
+    // Set the Joint Commissioning Method
+    CommissioningParameters & SetUseJCM(bool useJCM)
+    {
+        mUseJCM = MakeOptional(useJCM);
+        return *this;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     ICDRegistrationStrategy GetICDRegistrationStrategy() const { return mICDRegistrationStrategy; }
     CommissioningParameters & SetICDRegistrationStrategy(ICDRegistrationStrategy icdRegistrationStrategy)
     {
@@ -608,74 +624,6 @@ public:
         return *this;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    // Execute Joint Commissioning Method
-    Optional<bool> GetExecuteJCM() const { return mExecuteJCM; }
-
-    CommissioningParameters & SetExecuteJCM(bool executeJCM)
-    {
-        mExecuteJCM = MakeOptional(executeJCM);
-        return *this;
-    }
-
-    const Optional<ByteSpan> GetJFAdminNOC() const { return mJFAdminNOC; }
-
-    CommissioningParameters & SetJFAdminNOC(const ByteSpan & JFAdminNOC)
-    {
-        mJFAdminNOC = MakeOptional(JFAdminNOC);
-        return *this;
-    }
-
-    const Optional<ByteSpan> GetJFAdminICAC() const { return mJFAdminICAC; }
-
-    CommissioningParameters & SetJFAdminICAC(const ByteSpan & JFAdminICAC)
-    {
-        mJFAdminICAC = MakeOptional(JFAdminICAC);
-        return *this;
-    }
-
-    const Optional<ByteSpan> GetJFAdminRCAC() const { return mJFAdminRCAC; }
-
-    CommissioningParameters & SetJFAdminRCAC(const ByteSpan & JFAdminRCAC)
-    {
-        mJFAdminRCAC = MakeOptional(JFAdminRCAC);
-        return *this;
-    }
-
-    const Optional<EndpointId> GetJFAdminEndpointId() const { return mJFAdminEndpointId; }
-
-    CommissioningParameters & SetJFAdminEndpointId(const EndpointId JFAdminEndpointId)
-    {
-        mJFAdminEndpointId = MakeOptional(JFAdminEndpointId);
-        return *this;
-    }
-
-    const Optional<FabricIndex> GetJFAdministratorFabricIndex() const { return mJFAdministratorFabricIndex; }
-
-    CommissioningParameters & SetJFAdministratorFabricIndex(const FabricIndex JFAdministratorFabricIndex)
-    {
-        mJFAdministratorFabricIndex = MakeOptional(JFAdministratorFabricIndex);
-        return *this;
-    }
-
-    const Optional<FabricId> GetJFAdminFabricId() const { return mJFAdminFabricId; }
-
-    CommissioningParameters & SetJFAdminFabricId(const FabricId JFAdminFabricId)
-    {
-        mJFAdminFabricId = MakeOptional(JFAdminFabricId);
-        return *this;
-    }
-
-    const Optional<VendorId> GetJFAdminVendorId() const { return mJFAdminVendorId; }
-
-    CommissioningParameters & SetJFAdminVendorId(const VendorId JFAdminVendorId)
-    {
-        mJFAdminVendorId = MakeOptional(JFAdminVendorId);
-        return *this;
-    }
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -699,11 +647,6 @@ public:
         mDefaultNTP.ClearValue();
         mICDSymmetricKey.ClearValue();
         mExtraReadPaths = decltype(mExtraReadPaths)();
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        mJFAdminNOC.ClearValue();
-        mJFAdminICAC.ClearValue();
-        mJFAdminRCAC.ClearValue();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     }
 
 private:
@@ -755,18 +698,8 @@ private:
     bool mCheckForMatchingFabric                     = false;
     Span<const app::AttributePathParams> mExtraReadPaths;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    Optional<bool> mExecuteJCM;
-
-    Optional<EndpointId> mJFAdminEndpointId;
-    Optional<FabricIndex> mJFAdministratorFabricIndex;
-
-    Optional<FabricId> mJFAdminFabricId;
-    Optional<VendorId> mJFAdminVendorId;
-
-    Optional<ByteSpan> mJFAdminNOC;
-    Optional<ByteSpan> mJFAdminICAC;
-    Optional<ByteSpan> mJFAdminRCAC;
+ #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    Optional<bool> mUseJCM;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 };
 
@@ -866,15 +799,6 @@ struct ICDManagementClusterInfo
     CharSpan userActiveModeTriggerInstruction;
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-struct JFFabricTableInfo
-{
-    VendorId vendorId = VendorId::Common;
-    FabricId fabricId = kUndefinedFabricId;
-};
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-
 struct ReadCommissioningInfo
 {
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
@@ -892,17 +816,6 @@ struct ReadCommissioningInfo
     NodeId remoteNodeId               = kUndefinedNodeId;
     bool supportsConcurrentConnection = true;
     ICDManagementClusterInfo icd;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    EndpointId JFAdminEndpointId           = kInvalidEndpointId;
-    FabricIndex JFAdministratorFabricIndex = kUndefinedFabricIndex;
-
-    JFFabricTableInfo JFAdminFabricTable;
-
-    ByteSpan JFAdminNOC;
-    ByteSpan JFAdminICAC;
-    ByteSpan JFAdminRCAC;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 };
 
 struct TimeZoneResponseInfo
@@ -947,6 +860,7 @@ public:
      * kSendAttestationRequest: AttestationResponse
      * kAttestationVerification: AttestationErrorInfo if there is an error
      * kAttestationRevocationCheck: AttestationErrorInfo if there is an error
+     * kJCMTrustVerification: JCMTrustVerificationError if there is an error
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
@@ -964,8 +878,13 @@ public:
      * kCleanup: None
      */
     struct CommissioningReport
-        : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
-                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
+        : Variant<
+            RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
+            AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+            ,JCMTrustVerificationError
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        >
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
