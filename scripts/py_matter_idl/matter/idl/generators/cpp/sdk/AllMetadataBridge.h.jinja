@@ -4,9 +4,6 @@
 // based on {{input_name}}
 #pragma once
 
-#include <lib/support/meta/MetaObjects.h>
-
-
 {%- for cluster in clusters | sort(attribute='name') %}
 #include <clusters/{{cluster.name | name_for_id_usage}}/Ids.h>
 #include <clusters/{{cluster.name | name_for_id_usage}}/MetadataBridge.h>

@@ -3,7 +3,6 @@
 // This file provides an interface to bridge the gap when doing Ember decoupling
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
-
 #include <clusters/AccessControl/Ids.h>
 #include <clusters/AccessControl/MetadataBridge.h>
 #include <clusters/AccountLogin/Ids.h>
@@ -284,16 +283,14 @@
 #include <clusters/WindowCovering/MetadataBridge.h>
 #include <clusters/ZoneManagement/Ids.h>
 #include <clusters/ZoneManagement/MetadataBridge.h>
-#include <lib/support/meta/MetaObjects.h>
 
 namespace chip {
 namespace app {
 namespace DataModel {
 
+// Implements a Search for the AcceptedCommandEntry in multiple clusters
 template <ClusterId... TClusterIds>
-DataModel::AcceptedCommandEntry
-AcceptedCommandEntryFor(ClusterId id, CommandId command,
-                        Meta::ObjectList<TClusterIds...> clusterIdList = {} /*For easy template deduction*/)
+DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command)
 {
     using namespace chip::app::Clusters;
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AccessControl::Id) || ...))
