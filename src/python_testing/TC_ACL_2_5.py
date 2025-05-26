@@ -41,44 +41,7 @@ from mobly import asserts
 
 
 class TC_ACL_2_5(MatterBaseTest):
-    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
-        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
-        return max([e.Header.EventNumber for e in events])
-
-    def desc_TC_ACL_2_5(self) -> str:
-        return "[TC-ACL-2.5] Cluster endpoint"
-
-    def steps_TC_ACL_2_5(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "TH1 commissions DUT using admin node ID",
-                     is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
-                     "Result is SUCCESS, value is a valid index"),
-            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events and create subscription for new events",
-                     "Result is SUCCESS, value is empty list, new event subscription is created"),
-            TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element", "Result is SUCCESS"),
-            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events",
-                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element"),
-            TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element", "Result is SUCCESS"),
-            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events",
-                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element"),
-            TestStep(8, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element",
-                     "Result is 0x87 (CONSTRAINT_ERROR)-Data value exceeds maximum length."),
-            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
-                     "Result is SUCCESS, value is empty list (received ReportData Message should have no/empty EventReportIB list)"),
-            TestStep(10, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements",
-                     "Result is 0x87 (CONSTRAINT_ERROR)-as there are more than 1 entry associated with the given accessing fabric index in the extension list"),
-            TestStep(11, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
-                     "Result is SUCCESS, value is empty list (received ReportData Message should have no/empty EventReportIB list) since the entire list of Test Step 10 was rejected."),
-            TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list", "Result is SUCCESS"),
-            TestStep(13, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
-                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing at least 1 new element"),
-        ]
-        return steps
-
-    @async_test_body
-    async def test_TC_ACL_2_5(self):
+    async def internal_test_TC_ACL_2_5(self, force_legacy_encoding: bool):
         self.step(1)
         self.th1 = self.default_controller
 
@@ -99,9 +62,11 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Extract events from the response
         logging.info(f"Found {len(events_response)} initial events")
-        asserts.assert_equal(len(events_response), 0, "Expected 0 events")
+        if not force_legacy_encoding:
+            # if new list method is used we will have 0 events, however since we created events during prior run with new list method then we would have events already
+            asserts.assert_equal(len(events_response), 0, "Expected 0 events")
 
-        # Set up event subscription before making changes
+        # Set up event subscription before making change
         logging.info("Setting up event subscription...")
         events_callback = EventChangeCallback(Clusters.AccessControl)
         await events_callback.start(self.default_controller, self.dut_node_id, 0)
@@ -119,7 +84,8 @@ class TC_ACL_2_5(MatterBaseTest):
         extensions_list = [extension]
         result = await self.default_controller.WriteAttribute(
             self.dut_node_id,
-            [(0, extension_attr(value=extensions_list))]
+            [(0, extension_attr(value=extensions_list))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result {str(result)}")
         asserts.assert_equal(
@@ -153,18 +119,17 @@ class TC_ACL_2_5(MatterBaseTest):
         logging.info(f"Comparing subscription event: {subscription_event} with direct event: {direct_event}")
         asserts.assert_equal(subscription_event, direct_event.Data, "Subscription event should be in direct event")
 
-        # Verify the actual values
         asserts.assert_equal(subscription_event.changeType,
-                             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                             "Expected Added change type")
+                            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                            "Expected Added change type")
+        asserts.assert_equal(subscription_event.latestValue.data,
+                            D_OK_EMPTY,
+                            "LatestValue.Data should be D_OK_EMPTY")
         asserts.assert_in('chip.clusters.Types.Nullable', str(type(subscription_event.adminPasscodeID)),
                           "AdminPasscodeID should be Null")
         asserts.assert_equal(subscription_event.adminNodeID,
                              self.default_controller.nodeId,
                              "AdminNodeID should be the controller node ID")
-        asserts.assert_equal(subscription_event.latestValue.data,
-                             b'\x17\x18',
-                             "LatestValue.Data should be 1718")
         asserts.assert_equal(subscription_event.latestValue.fabricIndex,
                              f1,
                              "LatestValue.FabricIndex should be the current fabric index")
@@ -186,7 +151,8 @@ class TC_ACL_2_5(MatterBaseTest):
         extensions_list = [new_extension]
         result = await self.default_controller.WriteAttribute(
             self.dut_node_id,
-            [(0, extension_attr(value=extensions_list))]
+            [(0, extension_attr(value=extensions_list))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {result}")
         asserts.assert_equal(
@@ -195,27 +161,68 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(7)
         # Wait for and verify the event
         logging.info("Waiting for AccessControlExtensionChanged event...")
-        event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+        event_data1 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
 
-        # Verify event data
-        asserts.assert_equal(event_data.changeType,
-                             Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
-                             "Expected Changed change type")
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
-                          "AdminPasscodeID should be Null")
-        asserts.assert_equal(event_data.adminNodeID,
-                             self.default_controller.nodeId,
-                             "AdminNodeID should be the controller node ID")
-        asserts.assert_equal(event_data.latestValue.data,
-                             D_OK_SINGLE,
-                             "LatestValue.Data should match D_OK_SINGLE")
-        asserts.assert_equal(event_data.latestValue.fabricIndex,
-                             f1,
-                             "LatestValue.FabricIndex should be the current fabric index")
-        asserts.assert_equal(event_data.fabricIndex,
-                             f1,
-                             "FabricIndex should be the current fabric index")
+        if not force_legacy_encoding:
+            # Verify event data
+            asserts.assert_equal(event_data1.changeType,
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
+                                 "Expected Changed change type")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data1.adminPasscodeID)),
+                            "AdminPasscodeID should be Null")
+            asserts.assert_equal(event_data1.adminNodeID,
+                                self.default_controller.nodeId,
+                                "AdminNodeID should be the controller node ID")
+            asserts.assert_equal(event_data1.latestValue.data,
+                                D_OK_SINGLE,
+                                "LatestValue.Data should match D_OK_SINGLE")
+            asserts.assert_equal(event_data1.latestValue.fabricIndex,
+                                f1,
+                                "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(event_data1.fabricIndex,
+                                f1,
+                                "FabricIndex should be the current fabric index")
 
+        if force_legacy_encoding:
+            # Verify event data 1 struct
+            asserts.assert_equal(event_data1.changeType,
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                                 "Expected Removed change type")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data1.adminPasscodeID)),
+                            "AdminPasscodeID should be Null")
+            asserts.assert_equal(event_data1.adminNodeID,
+                                self.default_controller.nodeId,
+                                "AdminNodeID should be the controller node ID")
+            asserts.assert_equal(event_data1.latestValue.data,
+                                D_OK_EMPTY,
+                                "LatestValue.Data should match D_OK_EMPTY")
+            asserts.assert_equal(event_data1.latestValue.fabricIndex,
+                                f1,
+                                "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(event_data1.fabricIndex,
+                                f1,
+                                "FabricIndex should be the current fabric index")
+            
+            event_data2 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+            # Verify event data 2 struct
+            asserts.assert_equal(event_data2.changeType,
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                                 "Expected Added change type")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data2.adminPasscodeID)),
+                            "AdminPasscodeID should be Null")
+            asserts.assert_equal(event_data2.adminNodeID,
+                                self.default_controller.nodeId,
+                                "AdminNodeID should be the controller node ID")
+            asserts.assert_equal(event_data2.latestValue.data,
+                                D_OK_SINGLE,
+                                "LatestValue.Data should match D_OK_SINGLE")
+            asserts.assert_equal(event_data2.latestValue.fabricIndex,
+                                f1,
+                                "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(event_data2.fabricIndex,
+                                f1,
+                                "FabricIndex should be the current fabric index")
+            
         self.step(8)
         # Try to write an extension that exceeds max length (128 bytes)
         # Value is from test plan and is a valid top-level anonymous list with a length of 129 (too long)
@@ -230,7 +237,8 @@ class TC_ACL_2_5(MatterBaseTest):
         extensions_list = [too_long_extension]
         a = await self.default_controller.WriteAttribute(
             self.dut_node_id,
-            [(0, extension_attr(value=extensions_list))]
+            [(0, extension_attr(value=extensions_list))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result {str(a)}")
         asserts.assert_equal(a[0].Status, Status.ConstraintError,
@@ -253,7 +261,29 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Extract events from the response
         logging.info(f"Found {len(events_response2)} events")
-        asserts.assert_equal(len(events_response2), 0, "There should be no events found")
+        if not force_legacy_encoding:
+            asserts.assert_equal(len(events_response2), 0, "There should be no events found")
+
+        if force_legacy_encoding:
+            event_data3 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+            # Verify event data 1 struct
+            asserts.assert_equal(event_data3.changeType,
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                                 "Expected Removed change type")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data3.adminPasscodeID)),
+                            "AdminPasscodeID should be Null")
+            asserts.assert_equal(event_data3.adminNodeID,
+                                self.default_controller.nodeId,
+                                "AdminNodeID should be the controller node ID")
+            asserts.assert_equal(event_data3.latestValue.data,
+                                D_OK_SINGLE,
+                                "LatestValue.Data should match D_OK_SINGLE")
+            asserts.assert_equal(event_data3.latestValue.fabricIndex,
+                                f1,
+                                "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(event_data3.fabricIndex,
+                                f1,
+                                "FabricIndex should be the current fabric index")            
 
         self.step(10)
         # This should fail with CONSTRAINT_ERROR
@@ -261,7 +291,8 @@ class TC_ACL_2_5(MatterBaseTest):
         extensions_list = [extension, new_extension]
         b = await self.default_controller.WriteAttribute(
             self.dut_node_id,
-            [(0, extension_attr(value=extensions_list))]
+            [(0, extension_attr(value=extensions_list))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result {str(b)}")
         asserts.assert_equal(b[0].Status, Status.ConstraintError,
@@ -283,7 +314,28 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Extract events from the response
         logging.info(f"Found {len(events_response3)} events")
-        asserts.assert_equal(len(events_response3), 0, "There should be no events found")
+        if not force_legacy_encoding:
+            asserts.assert_equal(len(events_response3), 0, "There should be no events found")
+        else:
+            event_data4 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+            # Verify event data 2 struct
+            asserts.assert_equal(event_data4.changeType,
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                                 "Expected Added change type")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data4.adminPasscodeID)),
+                            "AdminPasscodeID should be Null")
+            asserts.assert_equal(event_data4.adminNodeID,
+                                self.default_controller.nodeId,
+                                "AdminNodeID should be the controller node ID")
+            asserts.assert_equal(event_data4.latestValue.data,
+                                D_OK_EMPTY,
+                                "LatestValue.Data should match D_OK_EMPTY")
+            asserts.assert_equal(event_data4.latestValue.fabricIndex,
+                                f1,
+                                "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(event_data4.fabricIndex,
+                                f1,
+                                "FabricIndex should be the current fabric index")
 
         self.step(12)
         # Write an empty list to clear all extensions
@@ -291,7 +343,8 @@ class TC_ACL_2_5(MatterBaseTest):
         extensions_list2 = []
         result = await self.default_controller.WriteAttribute(
             self.dut_node_id,
-            [(0, extension_attr(value=extensions_list2))]
+            [(0, extension_attr(value=extensions_list2))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result {str(result)}")
         asserts.assert_equal(
@@ -299,32 +352,87 @@ class TC_ACL_2_5(MatterBaseTest):
 
         self.step(13)
         logging.info("Waiting for AccessControlExtensionChanged event...")
-        event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+        event_data5 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
 
-        # Verify event data
-        asserts.assert_equal(event_data.changeType,
-                             Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
-                             "Expected Removed change type")
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data.adminPasscodeID)),
-                          "AdminPasscodeID should be Null")
-        asserts.assert_equal(event_data.adminNodeID,
+        if not force_legacy_encoding:
+            # Verify event data
+            asserts.assert_equal(event_data5.latestValue.data,
+                                D_OK_SINGLE,
+                                "LatestValue.Data should match D_OK_SINGLE")
+
+        if force_legacy_encoding:
+            # Verify event data 1 struct
+            asserts.assert_equal(event_data5.latestValue.data,
+                                D_OK_EMPTY,
+                                "LatestValue.Data should match D_OK_EMPTY")
+
+        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data5.adminPasscodeID)),
+                        "AdminPasscodeID should be Null")
+
+        asserts.assert_equal(event_data5.changeType,
+                            Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                            "Expected Removed change type")
+
+        asserts.assert_equal(event_data5.adminNodeID,
                              self.default_controller.nodeId,
                              "AdminNodeID should be the controller node ID")
-        asserts.assert_equal(event_data.latestValue.data,
-                             D_OK_SINGLE,
-                             "LatestValue.Data should match D_OK_SINGLE")
-        asserts.assert_equal(event_data.latestValue.fabricIndex,
+
+        asserts.assert_equal(event_data5.latestValue.fabricIndex,
                              f1,
                              "LatestValue.FabricIndex should be the current fabric index")
-        asserts.assert_equal(event_data.fabricIndex,
+
+        asserts.assert_equal(event_data5.fabricIndex,
                              f1,
                              "FabricIndex should be the current fabric index")
 
-        # After all attempts, check if we found the valid event
-        asserts.assert_true(
-            True, "Did not find the expected REMOVE event with specified fields")
-        logging.info("Successfully verified the expected REMOVE event")
+        self.step(14)
+        # Rerunning test with new list method
+        if not force_legacy_encoding:
+            logging.info("Rerunning test with new list method now")
 
+
+    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
+        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        return max([e.Header.EventNumber for e in events])
+
+    def desc_TC_ACL_2_5(self) -> str:
+        return "[TC-ACL-2.5]  AccessControlExtensionChanged event"
+
+    def steps_TC_ACL_2_5(self) -> list[TestStep]:
+        steps = [
+            TestStep(1, "TH1 commissions DUT using admin node ID",
+                     is_commissioning=True),
+            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
+                     "Result is SUCCESS, value is a valid index"),
+            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events and create subscription for new events",
+                     "Result is SUCCESS, value is empty list, new event subscription is created"),
+            TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element", "Result is SUCCESS"),
+            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events",
+                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element"),
+            TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element", "Result is SUCCESS"),
+            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events",
+                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element if new list method is used; If legacy list method is used, the event should be REMOVED and ADDED"),
+            TestStep(8, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element",
+                     "Result is 0x87 (CONSTRAINT_ERROR)-Data value exceeds maximum length."),
+            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
+                     "Result is SUCCESS, value is empty list (received ReportData Message should have no/empty EventReportIB list) if new list method is used; If legacy list method is used, the event should be REMOVED"),
+            TestStep(10, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements",
+                     "Result is 0x87 (CONSTRAINT_ERROR)-as there are more than 1 entry associated with the given accessing fabric index in the extension list"),
+            TestStep(11, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
+                     "Result is SUCCESS, value is empty list (received ReportData Message should have no/empty EventReportIB list) since the entire list of Test Step 10 was rejected if new write list method is used, else then the legacy list method is used and the event ADDED."),
+            TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list", "Result is SUCCESS"),
+            TestStep(13, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
+                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing at least 1 new element if new write list method is used LatestValue Field should be D_OK_EMPTY, else then the legacy list method is used value should be D_OK_SINGLE."),
+            TestStep(14, "Rerunning test with new list method", "Rerunning test with new list method"),
+            ]
+        return steps
+
+    @async_test_body
+    async def test_TC_ACL_2_5(self):
+        await self.internal_test_TC_ACL_2_5(force_legacy_encoding=False)
+        self.current_step_index = 0
+        await self.internal_test_TC_ACL_2_5(force_legacy_encoding=True)
 
 if __name__ == "__main__":
     default_matter_test_main()
