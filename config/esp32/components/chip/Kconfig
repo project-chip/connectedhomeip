@@ -712,7 +712,7 @@ menu "CHIP Device Layer"
                 should not start advertising automatically after power-up.
 
         config USE_BLE_ONLY_FOR_COMMISSIONING
-            depends on BT_ENABLED
+            depends on ENABLE_CHIPOBLE
             bool "Use BLE only for commissioning"
             default y
             help
@@ -1252,4 +1252,12 @@ menu "CHIP Device Layer"
 
     endmenu
 
+    menu "Cluster Configuration Options"
+        config ENABLE_ACCESS_RESTRICTIONS
+            bool "Enable Access Restrictions of Access Control Cluster"
+            default n
+            help
+                Enable this option to enable Access Restrictions on the device.
+
+    endmenu
 endmenu

@@ -68,24 +68,27 @@ static_library("camera-controller-utils") {
     "commands/common/HexConversion.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
+    "commands/delay/SleepCommand.cpp",
+    "commands/delay/WaitForCommissioneeCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/ToTLVCert.cpp",
     "commands/webrtc/WebRTCProviderCommands.cpp",
     "commands/webrtc/WebRTCProviderCommands.h",
-    "webrtc_manager/WebRTCManager.cpp",
-    "webrtc_manager/WebRTCManager.h",
-    "webrtc_manager/WebRTCProviderClient.cpp",
-    "webrtc_manager/WebRTCProviderClient.h",
-    "webrtc_manager/WebRTCRequestorDelegate.cpp",
-    "webrtc_manager/WebRTCRequestorDelegate.h",
+    "webrtc-manager/WebRTCManager.cpp",
+    "webrtc-manager/WebRTCManager.h",
+    "webrtc-manager/WebRTCProviderClient.cpp",
+    "webrtc-manager/WebRTCProviderClient.h",
+    "webrtc-manager/WebRTCRequestorDelegate.cpp",
+    "webrtc-manager/WebRTCRequestorDelegate.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]
 
   sources += [ "commands/interactive/InteractiveCommands.cpp" ]
   deps += [
+    "${chip_root}/examples/common/websocket-server",
     "${chip_root}/src/platform/logging:headers",
     "${editline_root}:editline",
   ]

@@ -104,6 +104,7 @@ public:
 
     CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
 
+    void SetVendorId(VendorId vendorId) { mVendorId = vendorId; }
     VendorId GetVendorId() const { return mVendorId; }
 
     bool IsInitialized() const { return (mFabricIndex != kUndefinedFabricIndex) && IsOperationalNodeId(mNodeId); }
@@ -921,6 +922,7 @@ public:
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if the `fabricIndex` is not an existing fabric
      * @retval CHIP_ERROR_INCORRECT_STATE if this is called in an inconsistent order
+     *                                    or if ICAC cannot be set due to VVSC presence (maps to INVALID_COMMAND).
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to store the pending updates
      * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds.
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
@@ -954,6 +956,7 @@ public:
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if the `fabricIndex` is not an existing fabric
      * @retval CHIP_ERROR_INCORRECT_STATE if this is called in an inconsistent order
+     *                                    or if ICAC cannot be set due to VVSC presence (maps to INVALID_COMMAND).
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to store the pending updates
      * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds.
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
@@ -1097,6 +1100,25 @@ public:
      */
     CHIP_ERROR SignVIDVerificationRequest(FabricIndex fabricIndex, ByteSpan clientChallenge, ByteSpan attestationChallenge,
                                           SignVIDVerificationResponseData & outResponse);
+
+    /**
+     * @brief Handle setting data related to Fabric Table VID Verification.
+     *
+     * This is on purpose structured to mirror the SetVIDVerificationStatement Operational Credentials Cluster command
+     *
+     * @param[in] fabricIndex - Fabric Index for which to produce the response.
+     * @param[in] vendorID - New VendorID to set on the Fabric (ignored if missing)
+     * @param[in] VIDVerificationStatement - VID Verification Statement to add/remove (ignored if missing)
+     * @param[in] VVSC - VID Verification Signing Certificate to add/remove (ignored if missing)
+     * @param[out] outFabricTableWasChanged - This is set to true if FabricTable saw a change from prior value, even if
+     *                                        method returns an error (appies to VIDVerificationStatement and VendorID)
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INVALID_ARGUMENT if vendorID, VVSC or VIDVerificationStatement are not correct (maps to CONSTRAINT_ERROR)
+     * @retval CHIP_ERROR_INCORRECT_STATE if VVSC cannot be set due to ICAC presence (maps to INVALID_COMMAND)
+     */
+    CHIP_ERROR SetVIDVerificationStatementElements(FabricIndex fabricIndex, Optional<uint16_t> vendorId,
+                                                   Optional<ByteSpan> VIDVerificationStatement, Optional<ByteSpan> VVSC,
+                                                   bool & outFabricTableWasChanged);
 
 private:
     enum class StateFlags : uint16_t

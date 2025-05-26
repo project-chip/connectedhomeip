@@ -24,6 +24,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <string>
+#include <sys/types.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::Actions;
@@ -32,9 +33,10 @@ Device::Device(const char * szDeviceName, std::string szLocation)
 {
     chip::Platform::CopyString(mName, szDeviceName);
     chip::Platform::CopyString(mUniqueId, "");
-    mLocation   = szLocation;
-    mReachable  = false;
-    mEndpointId = 0;
+    mLocation             = szLocation;
+    mReachable            = false;
+    mConfigurationVersion = 1;
+    mEndpointId           = 0;
 }
 
 bool Device::IsReachable()
@@ -112,6 +114,25 @@ void Device::GenerateUniqueId()
     }
 
     mUniqueId[kDeviceUniqueIdSize] = '\0'; // Ensure null-termination
+}
+
+uint32_t Device::GetConfigurationVersion()
+{
+    return mConfigurationVersion;
+}
+
+void Device::SetConfigurationVersion(uint32_t configurationVersion)
+{
+    bool changed = (mConfigurationVersion != configurationVersion);
+
+    mConfigurationVersion = configurationVersion;
+
+    ChipLogProgress(DeviceLayer, "Device[%s]: New Configuration Version=\"%d\"", mName, mConfigurationVersion);
+
+    if (changed)
+    {
+        HandleDeviceChange(this, kChanged_ConfigurationVersion);
+    }
 }
 
 DeviceOnOff::DeviceOnOff(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation)
