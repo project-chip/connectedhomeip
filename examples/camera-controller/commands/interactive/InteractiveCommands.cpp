@@ -501,3 +501,18 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
     }
     return CHIP_NO_ERROR;
 }
+
+void StopInteractiveEventLoop()
+{
+    ChipLogProgress(NotSpecified, "Stop Interactive EventLoop, exiting...");
+
+    sShutdownRequested.store(true);
+    sQueueCondition.notify_one();
+
+    InteractiveServerCommand * command =
+        static_cast<InteractiveServerCommand *>(CommandMgr().GetCommandByName("interactive", "server"));
+    if (command)
+    {
+        command->StopCommand();
+    }
+}
