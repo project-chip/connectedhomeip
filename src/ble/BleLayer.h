@@ -57,6 +57,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/SetupDiscriminator.h>
+#include <lib/support/Span.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -241,6 +242,11 @@ public:
     bool IsBleClosing() { return mState == kState_Disconnecting; }
     void Shutdown();
 
+    /**
+     * CancelBleIncompleteConnection will ensure that no more success/error
+     * callbacks will happen until the next call to one of the NewBleConnection*
+     * APIs.
+     */
     CHIP_ERROR CancelBleIncompleteConnection();
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
                                                BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
@@ -249,6 +255,26 @@ public:
                                         BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                         BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
+
+    /**
+     * Attempt to create a connection for any of the discriminators in the provided list of
+     * discriminators.
+     *
+     * The implementation is allowed to call onSuccess multiple times if multiple connections are
+     * created.
+     *
+     * A call to onError indicates that no more calls to onSuccess will happen.
+     *
+     * Callers are expected to call CancelBleIncompleteConnection once they no longer want results
+     * reported.
+     *
+     * The implementation must not assume that the memory backing the "discriminators" argument will
+     * outlive this call returning.
+     */
+    CHIP_ERROR NewBleConnectionByDiscriminators(const Span<const SetupDiscriminator> & discriminators, void * appState,
+                                                BleConnectionDelegate::OnConnectionByDiscriminatorsCompleteFunct onSuccess,
+                                                BleConnectionDelegate::OnConnectionErrorFunct onError);
+
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
     void CloseAllBleConnections();

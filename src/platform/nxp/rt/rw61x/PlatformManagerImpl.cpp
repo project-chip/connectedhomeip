@@ -229,6 +229,12 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 #endif
 
+#if CONFIG_CHIP_ETHERNET
+    /* Initialize platform services */
+    err = ServiceInit();
+    SuccessOrExit(err);
+#endif // CONFIG_CHIP_ETHERNET
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();

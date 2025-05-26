@@ -31,14 +31,14 @@ namespace Logging {
 
         // GetModuleName() returns 3 character acronyms that are not very readable, define a
         // separate array containing the full module names (replacing "NotSpecified" with "Default").
-        static char const * gLoggerNames[kLogModule_Max] = {
+        constexpr char const * gLoggerNames[kLogModule_Max] = {
 #define _CHIP_LOGMODULE_FULLNAME(MOD, ...) (kLogModule_##MOD == kLogModule_NotSpecified ? "Default" : #MOD),
             CHIP_LOGMODULES_ENUMERATE(_CHIP_LOGMODULE_FULLNAME)
         };
 
         struct CachedLogger {
-            dispatch_once_t once;
-            os_log_t handle;
+            dispatch_once_t once = 0;
+            void * /* os_log_t */ handle = nullptr; // void * to avoid a destructor that requires a static initializer
         };
         CachedLogger gLoggers[kLogModule_Max] {};
 
@@ -46,7 +46,7 @@ namespace Logging {
         {
             auto entry = static_cast<CachedLogger *>(context);
             auto moduleId = entry - gLoggers;
-            entry->handle = os_log_create("com.csa.matter", gLoggerNames[moduleId]);
+            entry->handle = (__bridge_retained void *) os_log_create("com.csa.matter", gLoggerNames[moduleId]);
         }
 
         void * LoggerForModule(LogModule moduleID)
@@ -56,7 +56,7 @@ namespace Logging {
             }
             auto entry = &gLoggers[moduleID];
             dispatch_once_f(&entry->once, entry, CreateLogger);
-            return (__bridge void *) entry->handle;
+            return entry->handle;
         }
 
         void LogByteSpan(LogModule moduleId, os_log_type_t type, const chip::ByteSpan & span)
