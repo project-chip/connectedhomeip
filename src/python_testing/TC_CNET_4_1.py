@@ -18,6 +18,7 @@
 import logging
 
 import chip.clusters as Clusters
+import test_plan_support
 from chip.clusters.Types import NullValue
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
@@ -43,6 +44,7 @@ class TC_CNET_4_1(MatterBaseTest):
 
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
         steps = [
+            TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(1, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
             TestStep(2, "TH reads the Networks attribute list from the DUT on all available endpoints",
@@ -51,7 +53,8 @@ class TC_CNET_4_1(MatterBaseTest):
                       The connected field is of type bool \n\
                       Verify that only one entry has connected status as TRUE \n\
                       Verify that the number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'"),
-            TestStep(3, "TH reads ScanMaxTimeSeconds attribute from the DUT",
+            TestStep(3, "Skip remaining steps if the connected network is not on the cluster currently being verified. "
+                     "TH reads ScanMaxTimeSeconds attribute from the DUT",
                      "Verify that ScanMaxTimeSeconds attribute value is within the range of 1 to 255 seconds"),
             TestStep(4, "TH reads ConnectMaxTimeSeconds attribute from the DUT",
                      "Verify that ConnectMaxTimeSeconds attribute value is within the range of 1 to 255 seconds"),
@@ -71,23 +74,33 @@ class TC_CNET_4_1(MatterBaseTest):
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_1(self):
+
+        self.step(0)
         # Commissioning already done
         self.step(1)
         max_networks_count = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.MaxNetworks)
-
         matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="MaxNetworks")
 
         self.step(2)
-        network = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
-        logger.info(f"network single {network}")
         networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
         logger.info("List of network obj")
         logger.info(list(networks_dict.values()))
 
+        network_count = {}
+        network_ids = {}
+        network_ids_list = []
+        # Search for connected networks and ids in all endpoints. Gather by endpoints. Join all the networks in a single list.
+        for ep in networks_dict:
+            network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            network_ids[ep] = list(map(lambda x: x.networkID, networks_dict[ep]))
+            network_ids_list.extend(network_ids[ep])
+        logger.info(f"All networkd ids: {network_ids_list}")
+        network = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        logger.info(f"Network single {network}")
         asserts.assert_true(network, "NetworkInfoStruct list should not be empty")
         matter_asserts.assert_list_element_type(network, Clusters.NetworkCommissioning.Structs.NetworkInfoStruct,
                                                 "All elements in list are of type NetworkInfoStruct")
@@ -95,23 +108,18 @@ class TC_CNET_4_1(MatterBaseTest):
                                   "connected field is an instance of bool")
         matter_asserts.assert_all(network, lambda x: isinstance(x.connected, bool),
                                   "NetworkID field is an octet string within a length range 1 to 32")
-        network_count = {}
-        network_ids = {}
-        network_ids_list = []
-        # Search for connected networks and ids in all endpoints. Gather by endpoints. List all the networks in a single list.
-        for ep in networks_dict:
-            network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
-            network_ids[ep] = list(map(lambda x: x.networkID, networks_dict[ep]))
-            network_ids_list.extend(network_ids[ep])
-
-        logger.info(f"All networkd ids: {network_ids_list}")
-
         connected_networks = sum(network_count.values())
         asserts.assert_equal(connected_networks, 1, "Verify that only one entry has connected status as TRUE")
         asserts.assert_less_equal(connected_networks, max_networks_count,
                                   "Number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'")
+        # Verify if there is one network connected in the current cluster.
+        current_cluster_connected = network_count[self.get_endpoint()] == 1
 
         self.step(3)
+        if not current_cluster_connected:
+            logger.info(f"Current cluster is not connected in the endpoint: {self.get_endpoint()}, skipping.")
+            self.skip_all_remaining_steps()
+            return
         scan_max_time_seconds = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds)
