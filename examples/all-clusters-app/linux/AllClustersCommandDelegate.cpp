@@ -24,7 +24,7 @@
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -678,7 +678,7 @@ void AllClustersAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
         softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
     }
 
-    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
 
 void AllClustersAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)

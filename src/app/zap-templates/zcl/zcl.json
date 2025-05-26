@@ -3,7 +3,7 @@
     "category": "matter",
     "version": 1,
     "requiredFeatureLevel": 102,
-    "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
+    "xmlRoot": [".", "./data-model/chip"],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -71,6 +71,8 @@
         "icd-management-cluster.xml",
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",
+        "joint-fabric-datastore-cluster.xml",
+        "joint-fabric-administrator-cluster.xml",
         "keypad-input-cluster.xml",
         "laundry-washer-mode-cluster.xml",
         "laundry-dryer-controls-cluster.xml",
@@ -105,9 +107,8 @@
         "refrigerator-and-temperature-controlled-cabinet-mode-cluster.xml",
         "refrigerator-alarm.xml",
         "relative-humidity-measurement-cluster.xml",
-        "rvc-clean-mode-cluster.xml ",
+        "rvc-clean-mode-cluster.xml",
         "rvc-run-mode-cluster.xml",
-        "replacable-monitoring-cluster.xml",
         "resource-monitoring-cluster.xml",
         "scene.xml",
         "service-area-cluster.xml",
@@ -144,12 +145,9 @@
         "window-covering.xml",
         "matter-devices.xml",
         "sample-mei-cluster.xml",
-        "types/door-lock.xml",
-        "types/occupancy-sensing.xml",
-        "types/thermostat-user-interface-configuration.xml",
         "zone-management-cluster.xml"
     ],
-    "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
+    "manufacturersXml": "./data-model/manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]
@@ -171,7 +169,8 @@
             "ClusterRevision",
             "SubjectsPerAccessControlEntry",
             "TargetsPerAccessControlEntry",
-            "AccessControlEntriesPerFabric"
+            "AccessControlEntriesPerFabric",
+            "FeatureMap"
         ],
         "Administrator Commissioning": [
             "WindowStatus",
@@ -322,6 +321,7 @@
             "OperatingMode",
             "FeatureMap"
         ],
+        "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
             "PointOfDelivery",
@@ -344,6 +344,7 @@
             "CurrentFabricIndex"
         ],
         "Software Diagnostics": [
+            "ClusterRevision",
             "CurrentHeapFree",
             "CurrentHeapHighWatermark",
             "CurrentHeapUsed",

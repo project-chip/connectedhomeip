@@ -63,7 +63,7 @@ constexpr size_t kNumOfStreamUsageTypes = 4;
 
 // StreamUsageEnum + Anonymous tag (1 byte).
 // Assumes min-size encoding (1 byte) for the integer.
-constexpr size_t kStreamUsageTlvSize = sizeof(StreamUsageEnum) + 1;
+constexpr size_t kStreamUsageTlvSize = sizeof(Globals::StreamUsageEnum) + 1;
 
 // 1 control byte + end-of-array marker
 constexpr size_t kArrayTlvOverhead = 2;
@@ -331,8 +331,8 @@ public:
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
                              const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
-                             const std::vector<StreamUsageEnum> & aSupportedStreamUsages,
-                             const std::vector<StreamUsageEnum> & aRankedStreamPriorities);
+                             const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
+                             const std::vector<Globals::StreamUsageEnum> & aRankedStreamPriorities);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -434,7 +434,7 @@ public:
 
     bool GetHDRModeEnabled() const { return mHDRModeEnabled; }
 
-    const std::vector<StreamUsageEnum> & GetSupportedStreamUsages() const { return mSupportedStreamUsages; }
+    const std::vector<Globals::StreamUsageEnum> & GetSupportedStreamUsages() const { return mSupportedStreamUsages; }
 
     const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const { return mAllocatedVideoStreams; }
 
@@ -442,7 +442,7 @@ public:
 
     const std::vector<SnapshotStreamStruct> & GetAllocatedSnapshotStreams() const { return mAllocatedSnapshotStreams; }
 
-    const std::vector<StreamUsageEnum> & GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
+    const std::vector<Globals::StreamUsageEnum> & GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
 
     bool GetSoftRecordingPrivacyModeEnabled() const { return mSoftRecordingPrivacyModeEnabled; }
 
@@ -492,7 +492,7 @@ public:
 
     // Add/Remove Management functions for streams
 
-    CHIP_ERROR SetRankedVideoStreamPriorities(const std::vector<StreamUsageEnum> & newPriorities);
+    CHIP_ERROR SetRankedVideoStreamPriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
@@ -553,9 +553,9 @@ private:
     Globals::ThreeLevelAutoEnum mStatusLightBrightness = Globals::ThreeLevelAutoEnum::kMedium;
 
     // Managed lists
-    std::vector<StreamUsageEnum> mSupportedStreamUsages;
+    std::vector<Globals::StreamUsageEnum> mSupportedStreamUsages;
 
-    std::vector<StreamUsageEnum> mRankedVideoStreamPriorities;
+    std::vector<Globals::StreamUsageEnum> mRankedVideoStreamPriorities;
     std::vector<VideoStreamStruct> mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> mAllocatedAudioStreams;
     std::vector<SnapshotStreamStruct> mAllocatedSnapshotStreams;
@@ -614,6 +614,11 @@ private:
 
     CHIP_ERROR StoreRankedVideoStreamPriorities();
     CHIP_ERROR LoadRankedVideoStreamPriorities();
+
+    void ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
+
+    void ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
+
     /**
      * @brief Inherited from CommandHandlerInterface
      */
