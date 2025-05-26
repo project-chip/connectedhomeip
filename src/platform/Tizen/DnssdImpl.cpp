@@ -338,7 +338,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
         ChipLogError(DeviceLayer, "chip::Inet::InterfaceId::InterfaceNameToId() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
     ret = dnssd_service_get_all_txt_record(service, &rCtx->mResultTxtRecordLen,
-                                           reinterpret_cast<void **>(rCtx->mResultTxtRecord.out()));
+                                           reinterpret_cast<void **>(&rCtx->mResultTxtRecord.GetReceiver()));
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed: %s", get_error_message(ret)));
 
@@ -407,8 +407,7 @@ namespace Dnssd {
 DnssdTizen DnssdTizen::sInstance;
 
 RegisterContext::RegisterContext(DnssdTizen * instance, const char * type, const DnssdService & service,
-                                 DnssdPublishCallback callback, void * context) :
-    GenericContext(ContextType::Register, instance)
+                                 DnssdPublishCallback callback, void * context) : GenericContext(ContextType::Register, instance)
 {
     Platform::CopyString(mName, service.mName);
     Platform::CopyString(mType, type);
@@ -432,8 +431,7 @@ RegisterContext::~RegisterContext()
 }
 
 BrowseContext::BrowseContext(DnssdTizen * instance, const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
-                             DnssdBrowseCallback callback, void * context) :
-    GenericContext(ContextType::Browse, instance)
+                             DnssdBrowseCallback callback, void * context) : GenericContext(ContextType::Browse, instance)
 {
     Platform::CopyString(mType, type);
     mProtocol    = protocol;
@@ -453,8 +451,7 @@ BrowseContext::~BrowseContext()
 }
 
 ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId,
-                               DnssdResolveCallback callback, void * context) :
-    GenericContext(ContextType::Resolve, instance)
+                               DnssdResolveCallback callback, void * context) : GenericContext(ContextType::Resolve, instance)
 {
     Platform::CopyString(mName, name);
     Platform::CopyString(mType, type);
