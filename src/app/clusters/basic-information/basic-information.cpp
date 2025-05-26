@@ -111,10 +111,10 @@ CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & enco
 CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR status         = CHIP_NO_ERROR;
-    auto * dataModelProvider  = InteractionModelEngine::GetInstance()->GetDataModelProvider();
     auto * deviceInfoProvider = GetDeviceInstanceInfoProvider();
     auto & configManager      = ConfigurationMgr();
     DataModel::NodeDataModelConfiguration nodeConfig;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfiguration(nodeConfig);
 
     switch (aPath.mAttributeId)
     {
@@ -123,7 +123,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         break;
 
     case DataModelRevision::Id:
-        dataModelProvider->GetNodeDataModelConfiguration(nodeConfig);
         status = aEncoder.Encode(nodeConfig.dataModelVersion);
         break;
 
@@ -299,19 +298,16 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     }
 
     case SpecificationVersion::Id: {
-        dataModelProvider->GetNodeDataModelConfiguration(nodeConfig);
         status = aEncoder.Encode(nodeConfig.specVersion);
         break;
     }
 
     case MaxPathsPerInvoke::Id: {
-        dataModelProvider->GetNodeDataModelConfiguration(nodeConfig);
         status = aEncoder.Encode(nodeConfig.maxPathPerInvoke);
         break;
     }
 
     case ConfigurationVersion::Id: {
-        dataModelProvider->GetNodeDataModelConfiguration(nodeConfig);
         status = aEncoder.Encode(nodeConfig.configurationVersion);
         break;
     }
