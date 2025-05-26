@@ -31,10 +31,10 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-TIMEOUT = 900
-REQUEST_TIMEOUT_MS = 5000
-WIFI_WAIT_SECONDS = 10
 MAX_RETRIES = 4
+TIMEOUT = 900
+TIMED_REQUEST_TIMEOUT_MS = 5000
+WIFI_WAIT_SECONDS = 10
 
 
 async def connect_wifi_linux(ssid, password):
@@ -73,7 +73,8 @@ async def connect_wifi_linux(ssid, password):
             ["nmcli", "d", "wifi", "connect", ssid, "password", password],
             capture_output=True, text=True
         )
-        await asyncio.sleep(WIFI_WAIT_SECONDS)  # wait the connection to be ready
+        # wait the connection to be ready
+        await asyncio.sleep(WIFI_WAIT_SECONDS)
 
         # Let's verify it is connected
         check = subprocess.run(
@@ -105,7 +106,7 @@ async def connect_wifi_mac(ssid, password):
             ["/usr/sbin/networksetup", "-listallhardwareports"],
             capture_output=True, text=True
         )
-        interface = "en0"   # 'en0' is by default in many cases
+        interface = "en0"   # 'en0' is by default
         for block in interface_result.stdout.split("\n\n"):
             if "Wi-Fi" in block:
                 for line in block.splitlines():
@@ -132,7 +133,7 @@ async def connect_host_wifi(ssid, password):
     os_name = platform.system()
     logger.info(f" --- connect_host_wifi: OS detected: {os_name}")
 
-    # We try to connect the TH to the second network a few times, to avoid network instability
+    # Let's try to connect the TH to the second network a few times, to avoid network instability
     retry = 1
     while retry <= MAX_RETRIES:
         logger.info(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{MAX_RETRIES}")
@@ -173,14 +174,13 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
     retry = 1
     while retry <= MAX_RETRIES:
         try:
-            # Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.value = 60
             err = await test.send_single_cmd(
                 cmd=cluster.Commands.ConnectNetwork(
                     networkID=ssid,
                     breadcrumb=breadcrumb
                 )
             )
-            logger.info(f" --- err type: {type(err)}, value: {err}")
+            logger.info(f" --- change_networks: err type: {type(err)}, value: {err}")
             success = is_network_switch_successful(err)
             if success:
                 logger.info(" --- change_networks: Network switch successful.")
@@ -322,7 +322,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
-            timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
         # Successful command execution is implied if no exception is raised.
 
@@ -359,7 +359,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 networkID=wifi_1st_ap_ssid.encode(),
                 breadcrumb=1
             ),
-            timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
         # Verify that DUT sends NetworkConfigResponse to command with the following fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
@@ -379,7 +379,7 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info(" --- Step 5: Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
-        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=REQUEST_TIMEOUT_MS)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
 
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
@@ -487,7 +487,7 @@ class TC_CNET_4_11(MatterBaseTest):
         response = await asyncio.wait_for(
             self.send_single_cmd(
                 cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
-                timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
+                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
             ),
             timeout=TIMEOUT
         )
@@ -554,7 +554,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
-            timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
         # Successful command execution is implied if no exception is raised.
 
@@ -566,7 +566,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 networkID=wifi_1st_ap_ssid.encode(),
                 breadcrumb=1
             ),
-            timedRequestTimeoutMs=REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
 
         # Verify that DUT sends NetworkConfigResponse to command with the following response fields:
@@ -584,7 +584,7 @@ class TC_CNET_4_11(MatterBaseTest):
         logger.info("--- Step 16: Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
-        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=REQUEST_TIMEOUT_MS)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
 
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         # 1. NetworkingStatus is success which is "0"
@@ -663,7 +663,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # Disarm the failsafe
         logger.info(" --- Step 21: Disarming the failsafe")
         cmd = cgen.Commands.CommissioningComplete()
-        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=REQUEST_TIMEOUT_MS)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
 
         # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
         asserts.assert_true(isinstance(response, cgen.Commands.CommissioningCompleteResponse), "Got wrong response type")
