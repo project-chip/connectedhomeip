@@ -200,24 +200,17 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     while (true)
     {
         std::string command = GetCommand();
-<<<<<<< HEAD
-        if (!command.empty() && !ParseCommand(command, &status))
-=======
         if (command.empty())
->>>>>>> upstream/master
         {
             break;
         }
 
-<<<<<<< HEAD
-=======
         if (!ParseCommand(command, &status))
         {
             break;
         }
     }
 
->>>>>>> upstream/master
         SetCommandExitStatus(CHIP_NO_ERROR);
         CloseLogFile();
 
@@ -528,4 +521,7 @@ void StopInteractiveEventLoop()
         command->StopCommand();
     }
 }
+<<<<<<< HEAD
 >>>>>>> de4e5a2785 (Automate python test WEBRTCR_2_3 in CI (#38810))
+=======
+>>>>>>> upstream/master
