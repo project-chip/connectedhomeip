@@ -22,7 +22,8 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
-if (chip_system_config_use_openthread_inet_endpoints && current_os != "zephyr") {
+if (chip_system_config_use_openthread_inet_endpoints &&
+    current_os != "zephyr") {
   import("//build_overrides/openthread.gni")
 }
 
@@ -128,7 +129,8 @@ static_library("inet") {
     public_deps += [ "${lwip_root}:lwip" ]
   }
 
-  if (chip_system_config_use_openthread_inet_endpoints && current_os != "zephyr") {
+  if (chip_system_config_use_openthread_inet_endpoints &&
+      current_os != "zephyr") {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
   }
 
