@@ -77,6 +77,8 @@ except ImportError:
         os.path.join(DEFAULT_CHIP_ROOT, 'credentials')))
     import fetch_paa_certs_from_dcl
 
+sys.path.append(os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing')))
+
 
 @dataclass
 class Failure:
