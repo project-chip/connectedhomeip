@@ -302,7 +302,7 @@ public:
     {
         VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
 
-        return builder.AppendElements(mGenerated);
+        return builder.AppendElements({ mGenerated.data(), mGenerated.size() });
     }
 
     void SetOverrideAccepted(bool o) { mOverrideAccepted = o; }
