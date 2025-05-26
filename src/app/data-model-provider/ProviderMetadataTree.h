@@ -50,6 +50,7 @@ public:
 
     virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & outConfig) = 0;
     virtual CHIP_ERROR BumpNodeDataModelConfigurationVersion()                               = 0;
+    virtual CHIP_ERROR ResetNodeDataModelConfigurationVersion()                              = 0;
 
     virtual CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> & builder) = 0;
 

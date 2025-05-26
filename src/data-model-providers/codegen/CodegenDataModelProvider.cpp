@@ -237,6 +237,17 @@ CHIP_ERROR CodegenDataModelProvider::BumpNodeDataModelConfigurationVersion()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CodegenDataModelProvider::ResetNodeDataModelConfigurationVersion()
+{
+    uint32_t configurationVersion    = 1;
+    uint16_t size                    = sizeof(configurationVersion);
+    chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
+    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
+
+    NodeConfigurationListener::NotifyNodeConfigurationListener();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CodegenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & builder)
 {
     const uint16_t endpointCount = emberAfEndpointCount();

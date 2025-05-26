@@ -71,6 +71,7 @@ public:
 
     CHIP_ERROR GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & outConfig) override;
     CHIP_ERROR BumpNodeDataModelConfigurationVersion() override;
+    CHIP_ERROR ResetNodeDataModelConfigurationVersion() override;
 
     /// attribute tree iteration
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out) override;
