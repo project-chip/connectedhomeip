@@ -72,23 +72,20 @@ The resulting executable is placed in:
 out/linux-x64-camera/chip-camera-app.
 ```
 
-4. Start the camera accessory
-Open a new terminal and run:
+4. Start the camera accessory Open a new terminal and run:
 
 ```
 ./out/linux-x64-camera-app/chip-camera-app --camera-deferred-offer
 ```
 
-5. Launch the camera controller
-In a second terminal:
+5. Launch the camera controller In a second terminal:
 
 ```
 ./out/linux-x64-camera-controller/chip-camera-controller
 ```
 
-5. Commission the camera device
-At the controller prompt, pair over the local network using the default setup PIN 20202021 and an arbitrary
-nodeID 1:
+5. Commission the camera device At the controller prompt, pair over the local
+   network using the default setup PIN 20202021 and an arbitrary nodeID 1:
 
 ```
 pairing onnetwork 1 20202021
@@ -96,11 +93,12 @@ pairing onnetwork 1 20202021
 
 Wait until commissioning succeeds.
 
-6. Start a live‑view stream
-Still in the controller shell, request a live view from the camera you just paired:
+6. Start a live‑view stream Still in the controller shell, request a live view
+   from the camera you just paired:
 
 ```
 liveview start 1
 ```
 
-You should see the GStreamer pipeline start and a video window appear, confirming that the camera stream is active.
+You should see the GStreamer pipeline start and a video window appear,
+confirming that the camera stream is active.
