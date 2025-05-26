@@ -11,5 +11,45 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("constants") {
+  sources = [ "constants.h" ]
+}
+
+source_set("wifi-response-encoding") {
+  sources = [
+    "wifi-scan-response.cpp",
+    "wifi-scan-response.h",
+  ]
+
+  public_deps = [
+    ":constants",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/platform",
+    "${chip_root}/zzz_generated/app-common/clusters/NetworkCommissioning",
+  ]
+}
+
+source_set("thread-response-encoding") {
+  sources = [
+    "thread-scan-response.cpp",
+    "thread-scan-response.h",
+  ]
+
+  public_deps = [
+    ":constants",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/zzz_generated/app-common/clusters/NetworkCommissioning",
+  ]
+}
+
 group("network-commissioning") {
+  public_deps = [
+    ":thread-response-encoding",
+    ":wifi-response-encoding",
+  ]
 }

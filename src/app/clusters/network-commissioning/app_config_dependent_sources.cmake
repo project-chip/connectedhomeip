@@ -18,3 +18,14 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/network-commissioning.cpp"
 )
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/constants.h"
+    "${CLUSTER_DIR}/thread-scan-response.cpp"
+    "${CLUSTER_DIR}/thread-scan-response.h"
+    "${CLUSTER_DIR}/wifi-scan-response.cpp"
+    "${CLUSTER_DIR}/wifi-scan-response.h"
+)
