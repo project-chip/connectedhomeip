@@ -27,7 +27,28 @@ using namespace chip::app::Clusters::ClosureControl;
 using Protocols::InteractionModel::Status;
 
 namespace {
+
 constexpr ElapsedS kDefaultCountdownTime = 30;
+
+enum class ClosureControlTestEventTrigger : uint64_t
+{
+    // MainState is SetupRequired(7) Test Event | Simulate that the device is in SetupRequired state
+    kMainStateIsSetupReuired = 0x0104000000000000,
+
+    // MainState is Protected(5) Test Event | Simulate that the device is in protected state
+    kMainStateIsProtected = 0x0104000000000001,
+
+    // MainState is Disengaged(6) Test Event | Simulate that the device is in disengaged state
+    kMainStateIsDisengaged = 0x0104000000000002,
+
+    // MainState Test clear Event | Returns the device to pre-test status for that test event.
+    kClearEvent = 0x0104000000000003,
+
+    // MainState is Error(3) Test Event | Simulate that the device is in error state, add at least one element to the
+    // CurrentErrorList attribute
+    kMainStateIsError = 0x0104000000000004,
+};
+
 } // namespace
 
 Status PrintOnlyDelegate::HandleCalibrateCommand()
@@ -92,6 +113,38 @@ ElapsedS PrintOnlyDelegate::GetWaitingForMotionCountdownTime()
     // This function should return the waiting for motion countdown time.
     // For now, we will return kDefaultCountdownTime.
     return kDefaultCountdownTime;
+}
+
+CHIP_ERROR PrintOnlyDelegate::HandleEventTrigger(uint64_t eventTrigger)
+{
+    eventTrigger                           = clearEndpointInEventTrigger(eventTrigger);
+    ClosureControlTestEventTrigger trigger = static_cast<ClosureControlTestEventTrigger>(eventTrigger);
+    ClusterLogic * logic                   = GetLogic();
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+
+    switch (trigger)
+    {
+    case ClosureControlTestEventTrigger::kMainStateIsSetupReuired:
+        logic->SetMainState(MainStateEnum::kSetupRequired);
+        break;
+    case ClosureControlTestEventTrigger::kMainStateIsProtected:
+        logic->SetMainState(MainStateEnum::kProtected);
+        break;
+    case ClosureControlTestEventTrigger::kMainStateIsError:
+        logic->SetMainState(MainStateEnum::kError);
+        break;
+    case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
+        logic->SetMainState(MainStateEnum::kDisengaged);
+        break;
+    case ClosureControlTestEventTrigger::kClearEvent:
+        // TODO
+        break;
+    default:
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
+
+    return err;
 }
 
 CHIP_ERROR ClosureControlEndpoint::Init()
