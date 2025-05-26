@@ -30,11 +30,14 @@ from mobly import asserts
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-
 MAX_RETRIES = 5
 TIMEOUT = 900
 TIMED_REQUEST_TIMEOUT_MS = 5000
-WIFI_WAIT_SECONDS = 10
+WIFI_WAIT_SECONDS = 5
+
+cgen = Clusters.GeneralCommissioning
+cnet = Clusters.NetworkCommissioning
+attr = cnet.Attributes
 
 
 async def connect_wifi_linux(ssid, password):
@@ -164,7 +167,7 @@ def is_network_switch_successful(err):
     return (
         err is None or
         (hasattr(err, "networkingStatus") and
-         err.networkingStatus == Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess)
+         err.networkingStatus == cnet.Enums.NetworkCommissioningStatusEnum.kSuccess)
     )
 
 
@@ -216,6 +219,38 @@ class TC_CNET_4_11(MatterBaseTest):
     def default_timeout(self) -> int:
         return TIMEOUT
 
+    async def verify_operational_network(self, ssid):
+        networks = None
+        retry = 1
+        while retry <= MAX_RETRIES:
+            try:
+                networks = await asyncio.wait_for(
+                    self.read_single_attribute_check_success(
+                        cluster=cnet,
+                        attribute=cnet.Attributes.Networks
+                    ),
+                    timeout=TIMEOUT
+                )
+            except Exception as e:
+                logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
+                # Let's wait a couple of seconds to change networks
+                await asyncio.sleep(WIFI_WAIT_SECONDS)
+            finally:
+                if networks and networks[0].connected:
+                    logger.info(f" --- verify_operational_network: networks: {networks}")
+                    break
+                else:
+                    retry += 1
+        else:
+            asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
+
+        asserts.assert_is_not_none(networks, "Could not read networks.")
+        for idx, network in enumerate(networks):
+            if network.networkID == ssid.encode():
+                asserts.assert_true(network.connected, f"Wifi network {ssid} is not connected.")
+                logger.info(f" --- verify_operational_network: Connected to SSID: {ssid}")
+                break
+
     def steps_TC_CNET_4_11(self):
         return [
             TestStep("precondition", "TH is commissioned", is_commissioning=True),
@@ -261,10 +296,6 @@ class TC_CNET_4_11(MatterBaseTest):
         wifi_2nd_ap_ssid = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"]
         wifi_2nd_ap_credentials = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"]
 
-        cgen = Clusters.GeneralCommissioning
-        cnet = Clusters.NetworkCommissioning
-        attr = cnet.Attributes
-
         # Commissioning is already done
         self.step("precondition")
 
@@ -297,7 +328,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         if not current_cluster_connected:
             logger.info("Current cluster is not connected, skipping all remaining test steps")
-            self.skip_all_remaining_steps(4)
+            self.skip_all_remaining_steps(1)
             return
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
@@ -414,41 +445,9 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(9)
 
         # Verify that the TH successfully connects to the DUT
-        retry = 1
-        while retry <= MAX_RETRIES:
-            try:
-                networks = await asyncio.wait_for(
-                    self.read_single_attribute_check_success(
-                        cluster=cnet,
-                        attribute=cnet.Attributes.Networks
-                    ),
-                    timeout=TIMEOUT
-                )
-
-            except Exception as e:
-                logger.error(f" --- Step 9: Exception reading networks: {e}")
-                # Let's wait a couple of seconds to change networks
-                await asyncio.sleep(WIFI_WAIT_SECONDS)
-                networks = await asyncio.wait_for(
-                    self.read_single_attribute_check_success(
-                        cluster=cnet,
-                        attribute=cnet.Attributes.Networks
-                    ),
-                    timeout=TIMEOUT
-                )
-
-            finally:
-                logger.info(f" --- Step 9: networks: {networks}")
-                if networks and networks[0].connected:
-                    break
-                else:
-                    retry += 1
-
-        for idx, network in enumerate(networks):
-            if network.networkID == wifi_2nd_ap_ssid.encode():
-                asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid} is not connected.")
-                logger.info(f" --- Step 9: Connected to 2nd SSID: {wifi_2nd_ap_ssid}")
-                break
+        logger.info(f" --- Step 9: Verifiying that TH successfully connects to the DUT on {wifi_2nd_ap_ssid}")
+        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await self.verify_operational_network(wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(10)
@@ -476,7 +475,7 @@ class TC_CNET_4_11(MatterBaseTest):
         )
         asserts.assert_equal(
             response.errorCode,
-            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+            cgen.Enums.CommissioningErrorEnum.kOk,
             "ArmFailSafeResponse error code is not OK.",
         )
 
@@ -495,42 +494,9 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
         self.step(13)
 
-        retry = 1
-        while retry <= MAX_RETRIES:
-            try:
-                networks = await asyncio.wait_for(
-                    self.read_single_attribute_check_success(
-                        cluster=cnet,
-                        attribute=cnet.Attributes.Networks
-                    ),
-                    timeout=TIMEOUT
-                )
-
-            except Exception as e:
-                logger.error(f" --- Step 13: Exception reading networks: {e}")
-                # Let's wait a couple of seconds to change networks
-                await asyncio.sleep(WIFI_WAIT_SECONDS)
-                networks = await asyncio.wait_for(
-                    self.read_single_attribute_check_success(
-                        cluster=cnet,
-                        attribute=cnet.Attributes.Networks
-                    ),
-                    timeout=TIMEOUT
-                )
-
-            finally:
-                logger.info(f" --- Step 13: networks: {networks}")
-                if networks and networks[0].connected:
-                    break
-                else:
-                    retry += 1
-
-        # Verify that the TH successfully connects to the DUT
-        for idx, network in enumerate(networks):
-            if network.networkID == wifi_1st_ap_ssid.encode():
-                asserts.assert_true(network.connected, f"Wifi network {wifi_1st_ap_ssid} is not connected.")
-                logger.info(f" --- Step 13: Connected to 1st SSID: {wifi_1st_ap_ssid}")
-                break
+        logger.info(f" --- Step 13: Verifiying that TH successfully connects to the DUT on {wifi_1st_ap_ssid}")
+        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await self.verify_operational_network(wifi_1st_ap_ssid)
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(14)
@@ -600,32 +566,9 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(19)
 
         # Verify that the TH successfully connects to the DUT
-        try:
-            networks = await asyncio.wait_for(
-                self.read_single_attribute_check_success(
-                    cluster=cnet,
-                    attribute=cnet.Attributes.Networks
-                ),
-                timeout=TIMEOUT
-            )
-
-        except Exception as e:
-            logger.error(f" --- Step 19: Exception reading networks: {e}")
-            # Let's wait a couple of seconds to change networks
-            await asyncio.sleep(WIFI_WAIT_SECONDS)
-            networks = await asyncio.wait_for(
-                self.read_single_attribute_check_success(
-                    cluster=cnet,
-                    attribute=cnet.Attributes.Networks
-                ),
-                timeout=TIMEOUT
-            )
-
-        for idx, network in enumerate(networks):
-            if network.networkID == wifi_2nd_ap_ssid.encode():
-                asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid} is not connected.")
-                logger.info(f" --- Step 19: Connected to 2nd SSID: {wifi_2nd_ap_ssid}")
-                break
+        logger.info(f" --- Step 19: Verifiying that TH successfully connects to the DUT at {wifi_2nd_ap_ssid}")
+        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await self.verify_operational_network(wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(20)
