@@ -38,7 +38,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-ble-no-shell-tsan-clang]
+                build_variant: [no-ble-no-wifipaf-no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
