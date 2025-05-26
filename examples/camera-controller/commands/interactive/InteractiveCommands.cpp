@@ -35,7 +35,7 @@ using namespace chip;
 // Global flag to signal shutdown
 std::atomic<bool> gShutdownRequested{ false };
 
-// Global handle for ReadCommandThread 
+// Global handle for ReadCommandThread
 pthread_t gReadThreadId;
 
 namespace {

@@ -81,8 +81,17 @@ CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorD
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideAnswer(sessionId, mLocalDescription); });
+    // Store sessionId for the delayed callback
+    mPendingSessionId = sessionId;
+
+    // Schedule the ProvideAnswer() call to run with a small delay to ensure the response is sent first
+    DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(300),
+        [](chip::System::Layer * systemLayer, void * appState) {
+            auto * self = static_cast<WebRTCManager *>(appState);
+            self->ProvideAnswer(self->mPendingSessionId, self->mLocalDescription);
+        },
+        this);
 
     return CHIP_NO_ERROR;
 }
@@ -102,8 +111,17 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
     rtc::Description answerDesc(sdp, rtc::Description::Type::Answer);
     mPeerConnection->setRemoteDescription(answerDesc);
 
-    // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
+    // Store sessionId for the delayed callback
+    mPendingSessionId = sessionId;
+
+    // Schedule the ProvideICECandidates() call to run with a small delay to ensure the response is sent first
+    DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(300),
+        [](chip::System::Layer * systemLayer, void * appState) {
+            auto * self = static_cast<WebRTCManager *>(appState);
+            self->ProvideICECandidates(self->mPendingSessionId);
+        },
+        this);
 
     return CHIP_NO_ERROR;
 }
