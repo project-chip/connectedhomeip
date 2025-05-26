@@ -17,8 +17,8 @@
 #pragma once
 
 #include <app/data-model/EncodableToTLV.h>
-#include <clusters/NetworkCommissioning/Enums.h>
 #include <clusters/NetworkCommissioning/Commands.h>
+#include <clusters/NetworkCommissioning/Enums.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
@@ -30,10 +30,7 @@ namespace NetworkCommissioning {
 class ScanResponseEncoder : public chip::app::DataModel::EncodableToTLV
 {
 public:
-    ScanResponseEncoder(NetworkCommissioningStatusEnum status, CharSpan debugText) :
-        mStatus(status),
-        mDebugText(debugText)
-    {}
+    ScanResponseEncoder(NetworkCommissioningStatusEnum status, CharSpan debugText) : mStatus(status), mDebugText(debugText) {}
 
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
     {
@@ -43,7 +40,7 @@ public:
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override;
 
 protected:
-    virtual CHIP_ERROR EncodeList(TLV::TLVWriter &writer) const = 0;
+    virtual CHIP_ERROR EncodeList(TLV::TLVWriter & writer) const          = 0;
     virtual Commands::ScanNetworksResponse::Fields GetResultField() const = 0;
 
     NetworkCommissioningStatusEnum GetStatus() const { return mStatus; }

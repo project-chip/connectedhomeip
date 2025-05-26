@@ -37,8 +37,7 @@ CHIP_ERROR ScanResponseEncoder::EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) 
 
     {
         TLV::TLVType listContainerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(GetResultField()),
-                                                   TLV::kTLVType_Array, listContainerType));
+        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(GetResultField()), TLV::kTLVType_Array, listContainerType));
 
         ReturnErrorOnFailure(EncodeList(writer));
         ReturnErrorOnFailure(writer.EndContainer(listContainerType));
