@@ -56,13 +56,12 @@ class NodeConfigurationListenerImpl : public NodeConfigurationListener
 public:
     void OnConfigurationVersionChanged() override
     {
-        MatterReportingAttributeChangeCallback(0, BasicInformation::Id, BasicInformation::Attributes::ConfigurationVersion::Id);
-    }
-
-    static NodeConfigurationListenerImpl & Instance()
-    {
-        static NodeConfigurationListenerImpl instance;
-        return instance;
+        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
+        {
+            // If Basic cluster is implemented on this endpoint
+            MatterReportingAttributeChangeCallback(endpoint, BasicInformation::Id,
+                                                   BasicInformation::Attributes::ConfigurationVersion::Id);
+        }
     }
 };
 
@@ -86,6 +85,8 @@ class BasicAttrAccess : public AttributeAccessInterface
 public:
     // Register for the Basic cluster on all endpoints.
     BasicAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BasicInformation::Id) {}
+
+    NodeConfigurationListenerImpl mNodeConfigurationListener;
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
@@ -470,10 +471,7 @@ void MatterBasicInformationPluginServerInitCallback()
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
 
     // Register the NodeConfigurationListener
-    if (NodeConfigurationListener::GetNodeConfigurationListener() == nullptr)
-    {
-        NodeConfigurationListener::SetNodeConfigurationListener(&NodeConfigurationListenerImpl::Instance());
-    }
+    NodeConfigurationListener::SetNodeConfigurationListener(&gAttrAccess.mNodeConfigurationListener);
 }
 
 void MatterBasicInformationPluginServerShutdownCallback()
@@ -482,8 +480,5 @@ void MatterBasicInformationPluginServerShutdownCallback()
     AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 
     // Unregister the NodeConfigurationListener
-    if (NodeConfigurationListener::GetNodeConfigurationListener() == &NodeConfigurationListenerImpl::Instance())
-    {
-        NodeConfigurationListener::SetNodeConfigurationListener(nullptr);
-    }
+    NodeConfigurationListener::SetNodeConfigurationListener(nullptr);
 }
