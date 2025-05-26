@@ -28,14 +28,22 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
-CHIP_ERROR ThreadScanResponseToTLV::LoadResponses(Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
-                                                  Span<ThreadScanResponse> & validResponses) const
+namespace {
+
+/// Fills up scanResponseArray with valid and de-duplicated thread responses from mNetworks.
+/// Handles sorting and keeping only larger rssi
+///
+/// Returns the valid list of scan responses into `validResponses`, which is only valid
+/// as long as scanResponseArray is valid.
+CHIP_ERROR LoadResponses(DeviceLayer::NetworkCommissioning::ThreadScanResponseIterator * networks,
+                         Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
+                         Span<ThreadScanResponse> & validResponses)
 {
-    VerifyOrReturnError(scanResponseArray.Alloc(std::min(mNetworks->Count(), kMaxNetworksInScanResponse)), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(scanResponseArray.Alloc(std::min(networks->Count(), kMaxNetworksInScanResponse)), CHIP_ERROR_NO_MEMORY);
 
     ThreadScanResponse scanResponse;
     size_t scanResponseArrayLength = 0;
-    for (; mNetworks != nullptr && mNetworks->Next(scanResponse);)
+    for (; networks != nullptr && networks->Next(scanResponse);)
     {
         if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
             (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
@@ -83,13 +91,14 @@ CHIP_ERROR ThreadScanResponseToTLV::LoadResponses(Platform::ScopedMemoryBuffer<T
 
     return CHIP_NO_ERROR;
 }
+} // namespace
 
 CHIP_ERROR ThreadScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     Platform::ScopedMemoryBuffer<ThreadScanResponse> responseArray;
     Span<ThreadScanResponse> responseSpan;
 
-    ReturnErrorOnFailure(LoadResponses(responseArray, responseSpan));
+    ReturnErrorOnFailure(LoadResponses(mNetworks, responseArray, responseSpan));
 
     TLV::TLVType outerType;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outerType));

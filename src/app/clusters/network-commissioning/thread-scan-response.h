@@ -48,14 +48,6 @@ private:
     NetworkCommissioningStatusEnum mStatus;
     CharSpan mDebugText;
     DeviceLayer::NetworkCommissioning::ThreadScanResponseIterator * mNetworks;
-
-    /// Fills up scanResponseArray with valid and de-duplicated thread responses from mNetworks.
-    /// Handles sorting and keeping only larger rssi
-    ///
-    /// Returns the valid list of scan responses into `validResponses`, which is only valid
-    /// as long as scanResponseArray is valid.
-    CHIP_ERROR LoadResponses(Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
-                             Span<ThreadScanResponse> & validResponses) const;
 };
 
 } // namespace NetworkCommissioning
