@@ -40,7 +40,8 @@ from typing import Any
 
 import chip.clusters as Clusters
 import test_plan_support
-from chip.testing.matter_testing import ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest,
+                                         TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
 
