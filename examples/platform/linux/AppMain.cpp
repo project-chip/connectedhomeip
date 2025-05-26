@@ -37,6 +37,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -146,6 +147,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
 using namespace chip::Access;
+using namespace chip::Platform;
 
 // Network comissioning implementation
 namespace {
@@ -439,7 +441,7 @@ public:
         if (mVendorName.HasValue())
         {
             VerifyOrReturnError(CanFitInNullTerminatedString(mVendorName.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            strcpy(buf, mVendorName.Value().c_str());
+            CopyString(buf, bufSize, mVendorName.Value().c_str());
             return CHIP_NO_ERROR;
         }
 
@@ -454,7 +456,7 @@ public:
         if (mProductName.HasValue())
         {
             VerifyOrReturnError(CanFitInNullTerminatedString(mProductName.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            strcpy(buf, mProductName.Value().c_str());
+            CopyString(buf, bufSize, mProductName.Value().c_str());
             return CHIP_NO_ERROR;
         }
 
@@ -472,7 +474,7 @@ public:
         if (mSerialNumber.HasValue())
         {
             VerifyOrReturnError(CanFitInNullTerminatedString(mSerialNumber.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            strcpy(buf, mSerialNumber.Value().c_str());
+            CopyString(buf, bufSize, mSerialNumber.Value().c_str());
             return CHIP_NO_ERROR;
         }
 
@@ -493,7 +495,7 @@ public:
         if (mHardwareVersionString.HasValue())
         {
             VerifyOrReturnError(CanFitInNullTerminatedString(mHardwareVersionString.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            strcpy(buf, mHardwareVersionString.Value().c_str());
+            CopyString(buf, bufSize, mHardwareVersionString.Value().c_str());
             return CHIP_NO_ERROR;
         }
 
@@ -506,7 +508,7 @@ public:
         if (mSoftwareVersionString.HasValue())
         {
             VerifyOrReturnError(CanFitInNullTerminatedString(mSoftwareVersionString.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            strcpy(buf, mSoftwareVersionString.Value().c_str());
+            CopyString(buf, bufSize, mSoftwareVersionString.Value().c_str());
             return CHIP_NO_ERROR;
         }
 
