@@ -164,7 +164,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 
     InitDataModelForTesting();
 
-    // If no ConfigutationVersion is set, we will set it to 1
+    // If no ConfigurationVersion was ever set, initialize it to 1.
     chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
     if (!mPersistentStorageDelegate->SyncDoesKeyExist(kStorageKey.KeyName()))
     {
