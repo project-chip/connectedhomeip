@@ -253,7 +253,7 @@ def async_test_body(body):
     """
 
     def async_runner(self: "MatterBaseTest", *args, **kwargs):
-        if self.user_params.get('test_case_list', False) and self.current_test_info.name.startswith('test'):
+        if self.user_params.get('dry_run', False) and self.current_test_info.name.startswith('test'):
             test_pics = self._get_defined_pics(self.current_test_info.name)
             if not test_pics:
                 logging.error("No pics provided for test without runner decorator")
@@ -362,7 +362,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
     """
     def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(test_instance: "MatterBaseTest", *args, **kwargs):
-            if test_instance.user_params.get('test_case_list', False):
+            if test_instance.user_params.get('dry_run', False):
                 matching_coroutine = asyncio.wait_for(_get_all_matching_endpoints(test_instance, accept_function), timeout=60)
                 matching = test_instance.event_loop.run_until_complete(matching_coroutine)
                 test_instance.applicable_endpoints = matching
@@ -395,7 +395,7 @@ def run_on_every_server_node(body):
        These tests run once for the whole node, and check all the endpoints within in the test body.
     """
     def run_on_every_server_node_internal(test_instance: "MatterBaseTest", *args, **kwargs):
-        if test_instance.user_params.get('test_case_list', False):
+        if test_instance.user_params.get('dry_run', False):
             if test_instance.get_endpoint(default=None) is None:
                 logging.info(f"Run test {inspect.stack()[-1].filename} {body}")
                 test_instance.applicable_endpoints = [None]
@@ -411,7 +411,7 @@ def run_on_every_server_node_async(body):
        These tests run once for the whole node, and check all the endpoints within in the test body.
     """
     def run_on_every_server_node_async_internal(test_instance: "MatterBaseTest", *args, **kwargs):
-        if test_instance.user_params.get('test_case_list', False):
+        if test_instance.user_params.get('dry_run', False):
             if test_instance.get_endpoint(default=None) is None:
                 logging.info(f"Run test {inspect.stack()[-1].filename} {body}")
                 test_instance.applicable_endpoints = [None]

@@ -93,7 +93,7 @@ def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
     return supersets
 
 
-class TC_DeviceConformance(BasicCompositionTests):
+class DeviceConformanceTests(BasicCompositionTests):
     async def setup_class_helper(self):
         await super().setup_class_helper()
         self.build_spec_xmls()
