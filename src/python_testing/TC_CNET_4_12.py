@@ -414,7 +414,7 @@ class TC_CNET_4_12(MatterBaseTest):
         # Step 11: When the failsafe is disarmed, the device should automatically return to THREAD_1ST.
         # This means the THREAD_2ND network will be removed,
         # and the device will reconnect to Thread 1 without further intervention.
-        logger.info(f'Step #11: DUT automatically return to THREAD_1ST')
+        logger.info('Step #11: DUT automatically return to THREAD_1ST')
 
         self.step(12)
         networks = await self.read_single_attribute_check_success(
