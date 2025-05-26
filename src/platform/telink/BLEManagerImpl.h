@@ -170,6 +170,7 @@ public:
 #endif
 
     bool NeedToResetFailSafeTimer(void);
+    void ClearResetFailSafeTimerFlag(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     // Switch context from BLE to Thread
@@ -218,6 +219,11 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline bool BLEManagerImpl::NeedToResetFailSafeTimer(void)
 {
     return mNeedToResetFailSafeTimer;
+}
+
+inline void BLEManagerImpl::ClearResetFailSafeTimerFlag(void)
+{
+    mNeedToResetFailSafeTimer = false;
 }
 
 inline BleLayer * BLEManagerImpl::_GetBleLayer()

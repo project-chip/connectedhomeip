@@ -751,6 +751,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         if (Internal::BLEMgrImpl().NeedToResetFailSafeTimer())
         {
             LOG_INF("BLE disconnected during commissioning.");
+            Internal::BLEMgrImpl().ClearResetFailSafeTimerFlag();
             Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
         }
         break;
