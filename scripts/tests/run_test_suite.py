@@ -273,6 +273,9 @@ def cmd_list(context):
     '--chip-tool-with-python',
     help='what python script to use for running yaml tests using chip-tool as controller')
 @click.option(
+    '--closure-app',
+    help='what closure app to use')
+@click.option(
     '--pics-file',
     type=click.Path(exists=True),
     default="src/app/tests/suites/certification/ci-pics-values",
@@ -297,8 +300,8 @@ def cmd_list(context):
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
-            fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, chip_repl_yaml_tester,
-            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
+            fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, closure_app,
+            chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
         sys.exit(2)
@@ -340,6 +343,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if network_manager_app is None:
         network_manager_app = paths_finder.get('matter-network-manager-app')
 
+    if closure_app is None:
+        closure_app = paths_finder.get('closure-app')
+
     if chip_repl_yaml_tester is None:
         chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
 
@@ -363,6 +369,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         microwave_oven_app=[microwave_oven_app],
         rvc_app=[rvc_app],
         network_manager_app=[network_manager_app],
+        closure_app=[closure_app],
         chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester],
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
