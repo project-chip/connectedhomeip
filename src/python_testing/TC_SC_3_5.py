@@ -27,16 +27,16 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import tempfile
-from mobly import asserts
 import os
+import tempfile
 from time import sleep
 
-from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
 from chip.fault_injection import CHIPFaultId
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
 
 
 class TC_SC_3_5(MatterBaseTest):

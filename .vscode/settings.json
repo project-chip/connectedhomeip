@@ -198,10 +198,5 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
-    "autopep8.args": ["--max-line-length", "132"],
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#213308",
-        "titleBar.activeBackground": "#2E470C",
-        "titleBar.activeForeground": "#F7FCEF"
-    }
+    "autopep8.args": ["--max-line-length", "132"]
 }
