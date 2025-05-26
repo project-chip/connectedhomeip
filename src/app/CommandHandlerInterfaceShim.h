@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include <CommandHandlerInterface.h>
+#include "CommandHandlerInterface.h"
+
 #include <clusters/AllMetadataBridge.h>
 
 template <ClusterId... TClusterIds>
