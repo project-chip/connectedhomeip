@@ -535,3 +535,8 @@ jobs:
 
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh --yaml
+
+            - name: Upload coverage reports to Codecov with GitHub Action
+              uses: codecov/codecov-action@v5
+              env:
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
