@@ -33,12 +33,12 @@ source_set("data-model-provider") {
     "EventsGenerator.h",
     "MetadataLookup.cpp",
     "MetadataLookup.h",
+    "NodeConfigurationListener.h",
     "OperationTypes.h",
     "Provider.h",
     "ProviderChangeListener.h",
     "ProviderMetadataTree.cpp",
     "ProviderMetadataTree.h",
-    "NodeConfigurationListener.h",
   ]
 
   public_deps = [
