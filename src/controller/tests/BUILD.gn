@@ -35,6 +35,7 @@ chip_test_suite("tests") {
       "TestEventNumberCaching.cpp",
       "TestReadChunking.cpp",
       "TestServerCommandDispatch.cpp",
+      "TestSetUpCodePairer.cpp",
     ]
 
     # At some instances, this Test end ups allocating more than 32 Timers, and since the fake platform doesn`t use the heap, the maximum number of allowed timers is 32.
