@@ -85,23 +85,6 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-static void StopSignalHandler(int signum)
-{
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
-        switch (role)
-        {
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
-            break;
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
-            break;
-        }
-    });
-}
-#endif
-
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -148,14 +131,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    pmWiFiPAF = &WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-    pmWiFiPAF->Init(&DeviceLayer::SystemLayer());
-
-    struct sigaction sa = {};
-    sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = SA_RESETHAND;
-    sigaction(SIGINT, &sa, nullptr);
-    sigaction(SIGTERM, &sa, nullptr);
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
 #endif
 
     return CHIP_NO_ERROR;
@@ -1129,6 +1105,9 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
 
         SuccessOrExit(ret);
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    mPafChannelAvailable = false;
+#endif
 
     result = wpa_supplicant_1_interface_call_add_network_sync(
         mWpaSupplicant.iface.get(), args, &mWpaSupplicant.networkPath.GetReceiver(), nullptr, &err.GetReceiver());
@@ -1155,6 +1134,9 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     {
         ChipLogError(DeviceLayer, "wpa_supplicant: failed to add network: %s", err ? err->message : "unknown error");
         mWpaSupplicant.networkPath.reset();
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        mPafChannelAvailable = true;
+#endif
         ret = CHIP_ERROR_INTERNAL;
     }
 
@@ -2386,6 +2368,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     });
 
     g_strfreev(oldBsss);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    mPafChannelAvailable = true;
+#endif
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()
