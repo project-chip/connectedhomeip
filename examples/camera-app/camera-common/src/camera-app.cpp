@@ -43,17 +43,15 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<CameraAvStreamManagement::Feature> features;
+    BitFlags<OptionalAttribute> optionalAttrs;
     features.Set(CameraAvStreamManagement::Feature::kSnapshot);
     features.Set(CameraAvStreamManagement::Feature::kVideo);
+    features.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
 
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
         features.Set(CameraAvStreamManagement::Feature::kAudio);
     }
-
-    features.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
-
-    BitFlags<OptionalAttribute> optionalAttrs;
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
     {
