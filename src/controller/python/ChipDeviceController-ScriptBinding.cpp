@@ -163,6 +163,7 @@ PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, c
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
 PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_DeleteAllSessionResumption(chip::Controller::DeviceCommissioner * devCtrl);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                            uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port);
 PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
@@ -708,6 +709,16 @@ PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::Dev
                                                                          session->MarkForEviction();
                                                                      }
                                                                  });
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_DeleteAllSessionResumption(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    FabricIndex fabricIndex = devCtrl->GetFabricIndex();
+
+    PyReturnErrorOnFailure(ToPyChipError(
+        DeviceControllerFactory::GetInstance().GetSystemState()->GetSessionResumptionStorage()->DeleteAll(fabricIndex)));
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
