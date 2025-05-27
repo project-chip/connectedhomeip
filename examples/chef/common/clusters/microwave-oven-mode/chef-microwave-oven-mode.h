@@ -15,13 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <utility>
-
-#pragma once
 
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
 
@@ -30,16 +29,18 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenMode {
 
+using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
+
 const uint8_t ModeNormal  = 0;
 const uint8_t ModeDefrost = 1;
 
 class ChefDelegate : public ModeBase::Delegate
 {
 private:
-    using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType ModeTagsNormal[1]  = { { .value = to_underlying(ModeTag::kNormal) } };
     ModeTagStructType ModeTagsDefrost[1] = { { .value = to_underlying(ModeTag::kDefrost) } };
 
+public:
     const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
                                                  .mode     = ModeNormal,
@@ -49,7 +50,6 @@ private:
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsDefrost) },
     };
 
-public:
     CHIP_ERROR Init() override;
 
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
@@ -63,6 +63,9 @@ public:
     ~ChefDelegate() = default;
     ChefDelegate()  = default;
 };
+
+ModeBase::Instance * GetInstance();
+ChefDelegate * GetDelegate();
 
 } // namespace MicrowaveOvenMode
 } // namespace Clusters

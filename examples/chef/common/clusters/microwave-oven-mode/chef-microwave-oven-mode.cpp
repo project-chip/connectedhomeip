@@ -26,6 +26,7 @@
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeBase;
 using chip::Protocols::InteractionModel::Status;
@@ -41,9 +42,28 @@ static_assert(kMicrowaveOvenModeTableSize <= kEmberInvalidEndpointIndex, "Microw
 std::unique_ptr<MicrowaveOvenMode::ChefDelegate> gDelegateTable[kMicrowaveOvenModeTableSize];
 std::unique_ptr<ModeBase::Instance> gInstanceTable[kMicrowaveOvenModeTableSize];
 
-/**
- * Initializes MicrowaveOvenMode cluster for the app (all endpoints).
- */
+static constexpr EndpointId kDemoEndpointId = 1;
+
+ModeBase::Instance * GetInstance()
+{
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(kDemoEndpointId, MicrowaveOvenMode::Id, kMicrowaveOvenModeTableSize);
+    if (epIndex < kMicrowaveOvenModeTableSize && gInstanceTable[epIndex])
+    {
+        return gInstanceTable[epIndex].get();
+    }
+    return nullptr;
+}
+
+MicrowaveOvenMode::ChefDelegate * GetDelegate()
+{
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(kDemoEndpointId, MicrowaveOvenMode::Id, kMicrowaveOvenModeTableSize);
+    if (epIndex < kMicrowaveOvenModeTableSize && gDelegateTable[epIndex])
+    {
+        return gDelegateTable[epIndex].get();
+    }
+    return nullptr;
+}
+
 void InitChefMicrowaveOvenModeCluster()
 {
     const uint16_t endpointCount = emberAfEndpointCount();
@@ -56,7 +76,6 @@ void InitChefMicrowaveOvenModeCluster()
             continue;
         }
 
-        // Check if endpoint has MicrowaveOvenMode cluster enabled
         uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, MicrowaveOvenMode::Id,
                                                                 MATTER_DM_MICROWAVE_OVEN_MODE_CLUSTER_SERVER_ENDPOINT_COUNT);
         if (epIndex >= kMicrowaveOvenModeTableSize)
@@ -75,6 +94,22 @@ void InitChefMicrowaveOvenModeCluster()
 }
 } // namespace ChefMicrowaveOvenMode
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace MicrowaveOvenMode {
+ModeBase::Instance * GetInstance() {
+    return ChefMicrowaveOvenMode::GetInstance();
+}
+ChefDelegate * GetDelegate() {
+    return ChefMicrowaveOvenMode::GetDelegate();
+}
+} // namespace MicrowaveOvenMode
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::Init()
 {
     return CHIP_NO_ERROR;
@@ -82,15 +117,11 @@ CHIP_ERROR MicrowaveOvenMode::ChefDelegate::Init()
 
 void MicrowaveOvenMode::ChefDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
-    ChipLogDetail(DeviceLayer, "HandleChangeToMode: Endpoint %d", endpointId);
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
-    ChipLogDetail(DeviceLayer, "GetModeLabelByIndex: Endpoint %d", endpointId);
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -100,8 +131,6 @@ CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeLabelByIndex(uint8_t modeInde
 
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
-    ChipLogDetail(DeviceLayer, "GetModeValueByIndex: Endpoint %d", endpointId);
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -112,8 +141,6 @@ CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeValueByIndex(uint8_t modeInde
 
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
-    ChipLogDetail(DeviceLayer, "GetModeTagsByIndex: Endpoint %d", endpointId);
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -130,4 +157,4 @@ CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeTagsByIndex(uint8_t modeIndex
     return CHIP_NO_ERROR;
 }
 
-#endif // MATTER_DM_PLUGIN_Microwave_OVEN_MODE_SERVER
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
