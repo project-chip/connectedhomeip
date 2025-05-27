@@ -52,17 +52,17 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     {
         features.Set(CameraAvStreamManagement::Feature::kWatermark);
     }
-    
+
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsOSD())
     {
         features.Set(CameraAvStreamManagement::Feature::kOnScreenDisplay);
     }
-    
+
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
     {
         features.Set(CameraAvStreamManagement::Feature::kPrivacy);
     }
-    
+
     // Check microphone support to set Audio feature
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
@@ -187,7 +187,7 @@ void CameraApp::InitializeCameraAVStreamMgmt()
     {
         mAVStreamMgmtServerPtr->SetNightVision(mCameraDevice->GetCameraHALInterface().GetNightVision());
     }
-    
+
     mAVStreamMgmtServerPtr->SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
 
     if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
@@ -218,7 +218,7 @@ void CameraApp::InitializeCameraAVStreamMgmt()
     if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
     {
         mAVStreamMgmtServerPtr->SetStatusLightEnabled(mCameraDevice->GetCameraHALInterface().GetStatusLightEnabled());
-    }   
+    }
 
     mAVStreamMgmtServerPtr->Init();
 }

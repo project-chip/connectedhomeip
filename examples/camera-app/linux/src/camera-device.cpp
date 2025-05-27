@@ -724,7 +724,7 @@ AudioCapabilitiesStruct & CameraDevice::GetSpeakerCapabilities()
     static std::array<uint32_t, 2> sampleRates         = { 48000, 32000 }; // Sample rates in Hz
     static std::array<uint8_t, 2> bitDepths            = { 24, 32 };
     static AudioCapabilitiesStruct speakerCapabilities = { kSpeakerMaxChannelCount, chip::Span<AudioCodecEnum>(audioCodecs),
-                                                           chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths) };    
+                                                           chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths) };
     return speakerCapabilities;
 }
 

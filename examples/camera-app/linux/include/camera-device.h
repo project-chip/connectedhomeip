@@ -216,7 +216,7 @@ public:
     // Get the microphone max and min levels.
     uint8_t GetMicrophoneMaxLevel() override { return mMicrophoneMaxLevel; }
     uint8_t GetMicrophoneMinLevel() override { return mMicrophoneMinLevel; }
-    
+
     // Does camera have local storage
     bool HasLocalStorage() override { return false; }
 
@@ -290,7 +290,7 @@ private:
     chip::app::Clusters::Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 1920, 1080 };
     uint16_t mCurrentVideoFrameRate                                       = kMinVideoFrameRate;
     bool mHDREnabled                                                      = false;
-    bool mSpeakerMuted                                                    = false;   
+    bool mSpeakerMuted                                                    = false;
     bool mMicrophoneMuted                                                 = false;
     bool mHardPrivacyModeOn                                                 = false;
     chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum mNightVision = chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum::kOff;
