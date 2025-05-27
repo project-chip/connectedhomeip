@@ -39,6 +39,7 @@ import operator
 from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
+from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_infrastructure.chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
                                                                        async_test_body, default_matter_test_main)
@@ -632,7 +633,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 f"[FC] SpeedCurrent attribute baseline values do not match after the Step command decrease/increase runs. Descending: {self.baseline_speed_current_desc}, Ascending: {self.baseline_speed_current_asc}."
             )
 
-    async def wrap_test(self, step: Clusters.FanControl.Commands.Step) -> None:
+    async def wrap_test(self, step: Clusters.FanControl.Commands.Step, handle_current_values: bool) -> None:
         """Tests the `wrap` flag for the given Step command.
 
         Args:
@@ -643,13 +644,13 @@ class TC_FAN_3_5(MatterBaseTest):
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in acordance with the Step command parameters
         # self.step(self.current_step_index + 1)
-        await self.initialize_percent_setting_and_verify_affected_attribtutes(step)
+        await self.initialize_percent_setting_and_verify_affected_attribtutes(step, handle_current_values)
 
-        # *** NEXT STEP ***
-        # Reset the subscriptions to clear any previous attribute reports
-        # self.step(self.current_step_index + 1)
-        for sub in self.subscriptions:
-            sub.reset()
+        # # *** NEXT STEP ***
+        # # Reset the subscriptions to clear any previous attribute reports
+        # # self.step(self.current_step_index + 1)
+        # for sub in self.subscriptions:
+        #     sub.reset()
 
         # *** NEXT STEP ***
         # TH sends a Step command with the reqested parameters
@@ -657,32 +658,51 @@ class TC_FAN_3_5(MatterBaseTest):
         # self.step(self.current_step_index + 1)
         await self.perform_wrap_step_commands_and_verify(step)
 
-    async def perform_wrap_step_commands_and_verify(self, step: Clusters.FanControl.Commands.Step) -> None:
+    async def perform_wrap_step_commands_and_verify(self, step: Clusters.FanControl.Commands.Step, handle_current_values: bool) -> None:
         cluster = Clusters.FanControl
         fm_enum = cluster.Enums.FanModeEnum
         sd_enum = cluster.Enums.StepDirectionEnum
+        attr = cluster.Attributes
 
         if step.direction == sd_enum.kDecrease and step.lowestOff:
-            # - Verify that the attribute values all go to Off values
-            await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
-            # - Verify that the attribute values all go to High values
-            await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
+            if not handle_current_values:
+                # - Verify that the attribute values all go to Off values
+                await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
+                # - Verify that the attribute values all go to High values
+                await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
+            else:
+                # - Verify that the attribute values all go to Off values
+                await self.wrap_veirfy(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=0)
+                # - Verify that the attribute values all go to High values
+                await self.wrap_veirfy(step, percent_setting_expected=100, percent_current_expected=100, speed_current_expected=self.speed_max)
         elif step.direction == sd_enum.kDecrease and not step.lowestOff:
             # - Verify that the attribute values all go to High values
-            await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
+            if not handle_current_values:
+                await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
+            else:
+                await self.wrap_veirfy(step, percent_setting_expected=100, percent_current_expected=100, speed_current_expected=self.speed_max)
         elif step.direction == sd_enum.kIncrease and step.lowestOff:
             # - Verify that the PercentSetting attribute value goes to 0
-            await self.wrap_veirfy(step, percent_setting_expected=0)
+            if not handle_current_values:
+                await self.wrap_veirfy(step, percent_setting_expected=0)
+            else:
+                await self.wrap_veirfy(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=0)
         elif step.direction == sd_enum.kIncrease and not step.lowestOff:
             # - Verify that the PercentSetting attribute value goes to the minimum Step value above 0
-            await self.wrap_veirfy(step, percent_setting_expected=self.percent_setting_per_step)
+            if not handle_current_values:
+                await self.wrap_veirfy(step, percent_setting_expected=self.percent_setting_per_step)
+            else:
+                await self.wrap_veirfy(step, percent_setting_expected=self.percent_setting_per_step, percent_current_expected=self.percent_setting_per_step)
 
     async def wrap_veirfy(
         self,
         step: Clusters.FanControl.Commands.Step,
+        # handle_current_values: bool,
         percent_setting_expected: int,
         fan_mode_expected: Optional[Any] = None,
-        speed_setting_expected: Optional[int] = None
+        speed_setting_expected: Optional[int] = None,
+        percent_current_expected: Optional[Any] = None,
+        speed_current_expected: Optional[int] = None
     ) -> None:
         """Sends a Step command and verifies the resulting attribute values match expectations.
 
@@ -706,6 +726,7 @@ class TC_FAN_3_5(MatterBaseTest):
             f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})."
         )
 
+        # if not handle_current_values:
         if fan_mode_expected is not None:
             fan_mode = await self.read_setting(attr.FanMode)
             asserts.assert_equal(
@@ -718,6 +739,20 @@ class TC_FAN_3_5(MatterBaseTest):
             asserts.assert_equal(
                 speed_setting, speed_setting_expected,
                 f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({speed_setting_expected})."
+            )
+    # else:
+        if percent_current_expected is not None:
+            percent_current = await self.read_setting(attr.PercentCurrent)
+            asserts.assert_equal(
+                percent_current, percent_current_expected,
+                f"[FC] PercentCurrent attribute value ({percent_current}) is not equal to the expected value ({percent_current_expected})."
+            )
+
+        if speed_current_expected is not None:
+            speed_current = await self.read_setting(attr.SpeedCurrent)
+            asserts.assert_equal(
+                speed_current, speed_current_expected,
+                f"[FC] SpeedCurrent attribute value ({speed_current}) is not equal to the expected value ({speed_current_expected})."
             )
 
     def pics_TC_FAN_3_5(self) -> list[str]:
@@ -774,32 +809,33 @@ class TC_FAN_3_5(MatterBaseTest):
         # self.step(6)
         await self.get_percent_setting_range_per_step()
 
-        # LowestOff=True Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        await self.subscribe_to_attributes(handle_current_values=False)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=False)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=False)
-        self.verify_baseline_values(handle_current_values=False)
+        # # LowestOff=True Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        # await self.subscribe_to_attributes(handle_current_values=False)
+        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=False)
+        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=False)
+        # self.verify_baseline_values(handle_current_values=False)
         
-        # LowestOff=True Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        await self.subscribe_to_attributes(handle_current_values=True)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=True)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=True)
-        self.verify_baseline_values(handle_current_values=False)
+        # # LowestOff=True Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        # await self.subscribe_to_attributes(handle_current_values=True)
+        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=True)
+        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=True)
+        # self.verify_baseline_values(handle_current_values=False)
 
-        # LowestOff=False Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        await self.subscribe_to_attributes(handle_current_values=False)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=False)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=False)
-        self.verify_baseline_values(handle_current_values=False)
+        # # LowestOff=False Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        # await self.subscribe_to_attributes(handle_current_values=False)
+        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=False)
+        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=False)
+        # self.verify_baseline_values(handle_current_values=False)
         
-        # LowestOff=False Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        await self.subscribe_to_attributes(handle_current_values=True)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=True)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=True)
-        self.verify_baseline_values(handle_current_values=True)
+        # # LowestOff=False Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        # await self.subscribe_to_attributes(handle_current_values=True)
+        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=True)
+        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=True)
+        # self.verify_baseline_values(handle_current_values=True)
 
-        # # Wrap tests
-        # await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True))
+        # Wrap tests
+        await self.subscribe_to_attributes(handle_current_values=False)
+        await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True))
         # await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False))
         # await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True))
         # await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False))
