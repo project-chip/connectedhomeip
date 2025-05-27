@@ -554,7 +554,8 @@ CHIP_ERROR BluezEndpoint::Init(BluezAdapter1 * apAdapter, bool aIsCentral)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to subscribe for notifications: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization: %" CHIP_ERROR_FORMAT, err.Format()));
 
