@@ -18,7 +18,6 @@ following items are met (and see below for details)
 -   [ ] Good Pull request summary/description
     -   Summary contains sufficient context for reviewers including links to
         relevant test plan and / or specification changes
-    -   Summary contains sufficient context for reviewers
     -   Summary contains flash/ram overhead if changing core/common parts
 -   [ ] CI should pass (i.e. green or yellow/waiting for review)
 -   [ ] Avoid force-pushes and squashing commits. By keeping your PR commit
