@@ -41,7 +41,6 @@
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/EmberMetadata.h>
-#include <data-model-providers/codegen/NodeConfigurationListener.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
@@ -209,16 +208,29 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
     return std::nullopt;
 }
 
-CHIP_ERROR CodegenDataModelProvider::GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & outConfig)
+void CodegenDataModelProvider::SetNodeConfigurationListener(NodeConfigurationListener * nodeConfigurationListener)
+{
+    mNodeConfigurationListener = nodeConfigurationListener;
+};
+void CodegenDataModelProvider::NotifyNodeConfigurationListener()
+{
+    if (mNodeConfigurationListener != nullptr)
+    {
+        mNodeConfigurationListener->OnConfigurationVersionChanged();
+    }
+};
+
+CHIP_ERROR
+CodegenDataModelProvider::GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration)
 {
     uint32_t configurationVersion    = 0;
     uint16_t size                    = sizeof(configurationVersion);
     chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
     ReturnErrorOnFailure(mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
 
-    outConfig.configurationVersion = configurationVersion;
-    outConfig.dataModelVersion     = Revision::kDataModelRevision;
-    outConfig.specVersion          = Revision::kSpecificationVersion;
+    nodeDataModelConfiguration.configurationVersion = configurationVersion;
+    nodeDataModelConfiguration.dataModelVersion     = Revision::kDataModelRevision;
+    nodeDataModelConfiguration.specVersion          = Revision::kSpecificationVersion;
 
     return CHIP_NO_ERROR;
 }
@@ -233,7 +245,7 @@ CHIP_ERROR CodegenDataModelProvider::BumpNodeDataModelConfigurationVersion()
     configurationVersion++;
     ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
 
-    NodeConfigurationListener::NotifyNodeConfigurationListener();
+    NotifyNodeConfigurationListener();
     return CHIP_NO_ERROR;
 }
 
@@ -244,7 +256,7 @@ CHIP_ERROR CodegenDataModelProvider::ResetNodeDataModelConfigurationVersion()
     chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
     ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
 
-    NodeConfigurationListener::NotifyNodeConfigurationListener();
+    NotifyNodeConfigurationListener();
     return CHIP_NO_ERROR;
 }
 

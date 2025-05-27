@@ -22,6 +22,7 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/NodeConfigurationListener.h>
 #include <app/data-model/List.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
@@ -48,9 +49,11 @@ public:
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
-    virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & outConfig) = 0;
-    virtual CHIP_ERROR BumpNodeDataModelConfigurationVersion()                               = 0;
-    virtual CHIP_ERROR ResetNodeDataModelConfigurationVersion()                              = 0;
+    virtual void SetNodeConfigurationListener(NodeConfigurationListener * listener)                           = 0;
+    virtual void NotifyNodeConfigurationListener()                                                            = 0;
+    virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & nodeDataModelConfiguration) = 0;
+    virtual CHIP_ERROR BumpNodeDataModelConfigurationVersion()                                                = 0;
+    virtual CHIP_ERROR ResetNodeDataModelConfigurationVersion()                                               = 0;
 
     virtual CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> & builder) = 0;
 

@@ -23,13 +23,13 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SpecificationDefinedRevisions.h>
+#include <app/data-model-provider/NodeConfigurationListener.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/Events.h>
 #include <clusters/BasicInformation/Metadata.h>
 #include <clusters/BasicInformation/Structs.h>
-#include <data-model-providers/codegen/NodeConfigurationListener.h>
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
@@ -471,7 +471,8 @@ void MatterBasicInformationPluginServerInitCallback()
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
 
     // Register the NodeConfigurationListener
-    NodeConfigurationListener::SetNodeConfigurationListener(&gAttrAccess.mNodeConfigurationListener);
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->SetNodeConfigurationListener(
+        &gAttrAccess.mNodeConfigurationListener);
 }
 
 void MatterBasicInformationPluginServerShutdownCallback()
@@ -480,5 +481,5 @@ void MatterBasicInformationPluginServerShutdownCallback()
     AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 
     // Unregister the NodeConfigurationListener
-    NodeConfigurationListener::SetNodeConfigurationListener(nullptr);
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->SetNodeConfigurationListener(nullptr);
 }

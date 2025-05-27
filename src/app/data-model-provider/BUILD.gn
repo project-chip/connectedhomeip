@@ -38,6 +38,7 @@ source_set("data-model-provider") {
     "ProviderChangeListener.h",
     "ProviderMetadataTree.cpp",
     "ProviderMetadataTree.h",
+    "NodeConfigurationListener.h",
   ]
 
   public_deps = [

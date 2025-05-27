@@ -21,6 +21,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/NodeConfigurationListener.h>
 #include <app/util/af-types.h>
 #include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -69,7 +70,9 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-    CHIP_ERROR GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & outConfig) override;
+    void SetNodeConfigurationListener(NodeConfigurationListener * nodeConfigurationListener) override;
+    void NotifyNodeConfigurationListener() override;
+    CHIP_ERROR GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
     CHIP_ERROR BumpNodeDataModelConfigurationVersion() override;
     CHIP_ERROR ResetNodeDataModelConfigurationVersion() override;
 
@@ -96,6 +99,8 @@ protected:
     virtual void InitDataModelForTesting();
 
 private:
+    NodeConfigurationListener * mNodeConfigurationListener;
+
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
     uint16_t mEndpointIterationHint = 0;

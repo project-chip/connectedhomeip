@@ -25,22 +25,9 @@ namespace app {
 class NodeConfigurationListener
 {
 public:
-    NodeConfigurationListener()          = default;
     virtual ~NodeConfigurationListener() = default;
 
     virtual void OnConfigurationVersionChanged() = 0;
-
-    static NodeConfigurationListener * GetNodeConfigurationListener();
-
-    static void SetNodeConfigurationListener(NodeConfigurationListener * newNodeConfigurationListener);
-
-    static void NotifyNodeConfigurationListener()
-    {
-        if (NodeConfigurationListener * listener = GetNodeConfigurationListener(); listener != nullptr)
-        {
-            listener->OnConfigurationVersionChanged();
-        }
-    }
 };
 
 } // namespace app
