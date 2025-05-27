@@ -246,7 +246,7 @@ gcovr --exclude=zzz_generated/ \
     --exclude=third_party/ \
     --include=src/ \
     --gcov-ignore-parse-errors \
-    --xml=$COVERAGE_ROOT/coverage.xml
+    --xml="$COVERAGE_ROOT"/coverage.xml
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
