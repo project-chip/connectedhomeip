@@ -527,6 +527,7 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+            - run: pip install gcovr
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
