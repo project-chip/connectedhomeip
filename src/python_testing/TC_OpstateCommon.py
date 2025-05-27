@@ -86,7 +86,7 @@ class EventSpecificChangeCallback:
 
 
 class TC_OPSTATE_BASE():
-    def setup_base(self, test_info=None, ):
+    def setup_base(self, test_info=None):
         asserts.assert_true(test_info is not None,
                             "You shall define the test info!")
 
