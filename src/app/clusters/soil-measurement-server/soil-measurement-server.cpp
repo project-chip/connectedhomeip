@@ -62,9 +62,12 @@ void Instance::Shutdown()
 CHIP_ERROR
 Instance::SetSoilMeasuredValue(const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
 {
-    mSoilMeasurementData.soilMoistureMeasuredValue = soilMoistureMeasuredValue;
+    if (mSoilMeasurementData.soilMoistureMeasuredValue != soilMoistureMeasuredValue)
+    {
+        mSoilMeasurementData.soilMoistureMeasuredValue = soilMoistureMeasuredValue;
 
-    MatterReportingAttributeChangeCallback(mEndpointId, SoilMeasurement::Id, SoilMoistureMeasuredValue::Id);
+        MatterReportingAttributeChangeCallback(mEndpointId, SoilMeasurement::Id, SoilMoistureMeasuredValue::Id);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -84,9 +87,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case ClusterRevision::Id: {
         return aEncoder.Encode(kRevision);
     }
-    default: {
+    default:
         break;
-    }
     }
     return CHIP_NO_ERROR;
 }
