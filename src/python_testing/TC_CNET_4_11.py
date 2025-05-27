@@ -466,12 +466,9 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(11)
 
         logger.info(" --- Step 11: Setting ArmFailSafe to 0.")
-        response = await asyncio.wait_for(
-            self.send_single_cmd(
-                cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
-                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
-            ),
-            timeout=TIMEOUT
+        response = await self.send_single_cmd(
+            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
         asserts.assert_equal(
             response.errorCode,
