@@ -133,8 +133,8 @@ void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & en
     }
     if (eventType == ReliableMessageAnalyticsDelegate::EventType::kAcknowledged)
     {
-        auto now         = System::SystemClock().GetMonotonicTimestamp();
-        auto latency     = now - entry.initialSentTime;
+        auto now           = System::SystemClock().GetMonotonicTimestamp();
+        auto latency       = now - entry.initialSentTime;
         event.ackLatencyMs = latency.count();
     }
 
