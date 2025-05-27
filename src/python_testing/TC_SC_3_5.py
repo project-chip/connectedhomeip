@@ -34,6 +34,7 @@ from time import sleep
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.fault_injection import CHIPFaultId
+from chip.interaction_model import InteractionModelError, Status
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -52,20 +53,10 @@ class TC_SC_3_5(MatterBaseTest):
         self.th_server_passcode = 20202021
 
         self.th_server_app = self.user_params.get("th_server_app_path", None)
-        if self.is_pics_sdk_ci_only:
-            ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-            DEFAULT_APP_PATH = os.path.join(
-                ROOT_DIR, "out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app")
-        else:
-            ROOT_DIR = "/root"
-            DEFAULT_APP_PATH = os.path.join(ROOT_DIR, "apps/chip-all-clusters-app")
-
-        if self.th_server_app is None:
-            self.th_server_app = DEFAULT_APP_PATH
-
-        if self.th_server_app is None or not os.path.exists(self.th_server_app):
-            asserts.fail(
-                "--string-arg th_server_app_path:<th_server_app_path> is required for this test, please provide the path to the app (eg: all-clusters-app)")
+        if not self.th_server_app:
+            asserts.fail("This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>")
+        if not os.path.exists(self.th_server_app):
+            asserts.fail(f"The path {self.th_server_app} does not exist")
 
         # Start TH Server
         self.start_th_server()
@@ -80,6 +71,12 @@ class TC_SC_3_5(MatterBaseTest):
 
     def desc_TC_SC_3_5(self) -> str:
         return "[TC-SC-3.5] CASE Error Handling [DUT_Initiator] "
+
+    def pics_TC_SC_3_5(self) -> list[str]:
+        pics = [
+            "MCORE.ROLE.COMMISSIONER",
+        ]
+        return pics
 
     def steps_TC_SC_3_5(self) -> list[TestStep]:
         steps = [
@@ -172,6 +169,26 @@ class TC_SC_3_5(MatterBaseTest):
 
         return await self.open_commissioning_window()
 
+    async def send_fault_injection_command(self, faultID: CHIPFaultId):
+        '''Inject Fault in TH_SERVER, by sending fault injection Cluster Command from TH_CLIENT'''
+
+        command = Clusters.FaultInjection.Commands.FailAtFault(
+            type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
+            id=faultID,
+            numCallsToFail=1,
+            takeMutex=False,
+        )
+
+        try:
+            await self.th_client.SendCommand(
+                nodeid=self.th_server_local_nodeid,
+                endpoint=0,  # Fault‑Injection cluster lives on EP0
+                payload=command,
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, "Fault Injection Command Failed, is the TH_SERVER app built with the FaultInjection Cluster ?")
+
     @async_test_body
     async def test_TC_SC_3_5(self):
 
@@ -183,18 +200,7 @@ class TC_SC_3_5(MatterBaseTest):
         th_server_passcode = await self.open_commissioning_window()
 
         self.step("1b")
-        # Inject Fault in TH_SERVER, by sending fault injection Cluster Command from TH_CLIENT
-        command = Clusters.FaultInjection.Commands.FailAtFault(
-            type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
-            id=CHIPFaultId.CASECorruptTBEData2Encrypted,
-            numCallsToFail=1,
-            takeMutex=False,
-        )
-        await self.th_client.SendCommand(
-            nodeid=self.th_server_local_nodeid,
-            endpoint=0,  # Fault‑Injection cluster lives on EP0
-            payload=command,
-        )
+        await self.send_fault_injection_command(CHIPFaultId.CASECorruptTBEData2Encrypted)
 
         self.step("1c")
         prompt_msg = (
@@ -225,17 +231,7 @@ class TC_SC_3_5(MatterBaseTest):
         th_server_passcode = await self.reopen_commissioning_window()
 
         self.step("2b")
-        command = Clusters.FaultInjection.Commands.FailAtFault(
-            type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
-            id=CHIPFaultId.CASECorruptSigma2NOC,
-            numCallsToFail=1,
-            takeMutex=False,
-        )
-        await self.th_client.SendCommand(
-            nodeid=self.th_server_local_nodeid,
-            endpoint=0,  # Fault‑Injection cluster lives on EP0
-            payload=command,
-        )
+        await self.send_fault_injection_command(CHIPFaultId.CASECorruptSigma2NOC)
 
         self.step("2c")
         prompt_msg = (
@@ -267,17 +263,7 @@ class TC_SC_3_5(MatterBaseTest):
         th_server_passcode = await self.reopen_commissioning_window()
 
         self.step("3b")
-        command = Clusters.FaultInjection.Commands.FailAtFault(
-            type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
-            id=CHIPFaultId.CASECorruptSigma2ICAC,
-            numCallsToFail=1,
-            takeMutex=False,
-        )
-        await self.th_client.SendCommand(
-            nodeid=self.th_server_local_nodeid,
-            endpoint=0,  # Fault‑Injection cluster lives on EP0
-            payload=command,
-        )
+        await self.send_fault_injection_command(CHIPFaultId.CASECorruptSigma2ICAC)
 
         self.step("3c")
         prompt_msg = (
@@ -309,17 +295,7 @@ class TC_SC_3_5(MatterBaseTest):
         th_server_passcode = await self.reopen_commissioning_window()
 
         self.step("4b")
-        command = Clusters.FaultInjection.Commands.FailAtFault(
-            type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
-            id=CHIPFaultId.CASECorruptSigma2Signature,
-            numCallsToFail=1,
-            takeMutex=False,
-        )
-        await self.th_client.SendCommand(
-            nodeid=self.th_server_local_nodeid,
-            endpoint=0,  # Fault‑Injection cluster lives on EP0
-            payload=command,
-        )
+        await self.send_fault_injection_command(CHIPFaultId.CASECorruptSigma2Signature)
 
         self.step("4c")
         prompt_msg = (
