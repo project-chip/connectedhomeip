@@ -78,7 +78,7 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     epIndex = getIndexTemperatureMeasurement(endpointId);
     if (epIndex < kTemperatureMeasurementCount)
     {
-        auto updatedTemperature = onOff ? TemperatureRangeMax[epIndex] : DataModel::NullNullable;
+        auto updatedTemperature = onOff ? TemperatureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
         TemperatureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedTemperature);
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
@@ -87,7 +87,7 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     epIndex = getIndexPressureMeasurement(endpointId);
     if (epIndex < kPressureMeasurementCount)
     {
-        auto updatedPressure = onOff ? PressureRangeMax[epIndex] : DataModel::NullNullable;
+        auto updatedPressure = onOff ? PressureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
         PressureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedPressure);
         MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
                                                PressureMeasurement::Attributes::MeasuredValue::Id);
@@ -96,7 +96,7 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     epIndex = getIndexFlowMeasurement(endpointId);
     if (epIndex < kFlowMeasurementCount)
     {
-        auto updatedFlow = onOff ? FlowRangeMax[epIndex] : DataModel::NullNullable;
+        auto updatedFlow = onOff ? FlowRangeMax[epIndex] : chip::app::DataModel::Nullable<uint16_t>(0);
         FlowMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedFlow);
         MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
     }
@@ -119,8 +119,13 @@ template <typename T>
 DataModel::Nullable<T> LevelToSetpoint(DataModel::Nullable<uint8_t> level, DataModel::Nullable<T> RangeMin,
                                        DataModel::Nullable<T> RangeMax)
 {
-    if (level.IsNull() || !level.Value() || level.Value() == kNullLevel || RangeMin.IsNull() || RangeMax.IsNull())
+    if (level.IsNull() || level.Value() == kNullLevel || RangeMin.IsNull() || RangeMax.IsNull())
         return DataModel::NullNullable;
+
+    if (!level.Value())
+    {
+        return DataModel::Nullable<T>(0);
+    }
 
     return RangeMin.Value() + (RangeMax.Value() - RangeMin.Value()) * std::min(level.ValueOr(0), (uint8_t) 200) / 200;
 }
@@ -197,7 +202,7 @@ void postMoveToLevel(EndpointId endpoint, uint8_t level)
     if (level && level != kNullLevel)
         updateSetPointsLevel(endpoint, DataModel::Nullable<uint8_t>(level));
     else
-        updateSetPointsLevel(endpoint, DataModel::NullNullable);
+        updateSetPointsLevel(endpoint, DataModel::Nullable<uint8_t>(0));
 }
 
 /**
@@ -218,20 +223,32 @@ void postOnOff(EndpointId endpoint, bool value)
         }
         else // On to Off
         {
-            updateSetPointsLevel(endpoint, DataModel::NullNullable);
+            updateSetPointsLevel(endpoint, DataModel::Nullable<uint8_t>(0));
         }
     }
     else
     {
         updateSetPointsOnOff(endpoint, value);
     }
+
+    BitMask<PumpConfigurationAndControl::PumpStatusBitmap> currentStatus;
+    Status res = PumpConfigurationAndControl::Attributes::PumpStatus::Get(endpoint, &currentStatus);
+    VerifyOrReturn(res == Status::Success, ChipLogError(DeviceLayer, "Failed to read pump status."));
     if (value)
     {
-        setPumpStatus(endpoint, to_underlying(PumpConfigurationAndControl::PumpStatusBitmap::kRunning));
+        if (!currentStatus.GetField(PumpConfigurationAndControl::PumpStatusBitmap::kRunning))
+        {
+            currentStatus.SetField(PumpConfigurationAndControl::PumpStatusBitmap::kRunning, 1);
+            setPumpStatus(endpoint, currentStatus.Raw());
+        }
     }
     else
     {
-        setPumpStatus(endpoint, 0);
+        if (currentStatus.GetField(PumpConfigurationAndControl::PumpStatusBitmap::kRunning))
+        {
+            currentStatus.SetField(PumpConfigurationAndControl::PumpStatusBitmap::kRunning, 0);
+            setPumpStatus(endpoint, currentStatus.Raw());
+        }
     }
 }
 
@@ -311,12 +328,13 @@ void init()
         epIndex = getIndexLevelControl(endpointId);
         if (epIndex < kLevelControlCount)
         {
-            VerifyOrDieWithMsg(LevelControl::Attributes::CurrentLevel::Set(endpointId, kMinLevel) == Status::Success, DeviceLayer,
-                               "Failed to initialize Current Level to 1 for Endpoint: %d", endpointId);
+            VerifyOrDieWithMsg(LevelControl::Attributes::CurrentLevel::Set(endpointId, 0) == Status::Success, DeviceLayer,
+                               "Failed to initialize Current Level to 0 for Endpoint: %d", endpointId);
         }
 
         VerifyOrDieWithMsg(OnOff::Attributes::OnOff::Set(endpointId, false) == Status::Success, DeviceLayer,
                            "Failed to initialize OnOff to false for Endpoint: %d", endpointId);
+        updateSetPointsOnOff(endpointId, false);
 
         setPumpStatus(endpointId, 0);
     }
