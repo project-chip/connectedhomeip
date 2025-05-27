@@ -165,8 +165,10 @@ void CameraApp::InitializeCameraAVStreamMgmt()
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
     {
-        mAVStreamMgmtServerPtr->SetSoftRecordingPrivacyModeEnabled(mCameraDevice->GetCameraHALInterface().GetSoftRecordingPrivacyModeEnabled());
-        mAVStreamMgmtServerPtr->SetSoftLivestreamPrivacyModeEnabled(mCameraDevice->GetCameraHALInterface().GetSoftLivestreamPrivacyModeEnabled());
+        mAVStreamMgmtServerPtr->SetSoftRecordingPrivacyModeEnabled(
+            mCameraDevice->GetCameraHALInterface().GetSoftRecordingPrivacyModeEnabled());
+        mAVStreamMgmtServerPtr->SetSoftLivestreamPrivacyModeEnabled(
+            mCameraDevice->GetCameraHALInterface().GetSoftLivestreamPrivacyModeEnabled());
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
@@ -200,8 +202,10 @@ void CameraApp::InitializeCameraAVStreamMgmt()
     // Video and Snapshot features are already enabled.
     if (mCameraDevice->GetCameraHALInterface().HasLocalStorage())
     {
-        mAVStreamMgmtServerPtr->SetLocalVideoRecordingEnabled(mCameraDevice->GetCameraHALInterface().GetLocalVideoRecordingEnabled());
-        mAVStreamMgmtServerPtr->SetLocalSnapshotRecordingEnabled(mCameraDevice->GetCameraHALInterface().GetLocalSnapshotRecordingEnabled());
+        mAVStreamMgmtServerPtr->SetLocalVideoRecordingEnabled(
+            mCameraDevice->GetCameraHALInterface().GetLocalVideoRecordingEnabled());
+        mAVStreamMgmtServerPtr->SetLocalSnapshotRecordingEnabled(
+            mCameraDevice->GetCameraHALInterface().GetLocalSnapshotRecordingEnabled());
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasStatusLight())

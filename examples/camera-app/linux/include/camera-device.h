@@ -42,8 +42,8 @@ static constexpr uint32_t kMaxNetworkBandwidthMbps   = 128;
 static constexpr uint8_t kMaxConcurrentEncoders      = 1;
 static constexpr uint32_t kMaxEncodedPixelRate       = 27648000; // 720p at 30fps
 static constexpr uint8_t kSpeakerMinLevel            = 1;
-static constexpr uint8_t kSpeakerMaxLevel            = 254;  // Spec constraint
-static constexpr uint8_t kSpeakerMaxChannelCount     = 8;    // Same as Microphone
+static constexpr uint8_t kSpeakerMaxLevel            = 254; // Spec constraint
+static constexpr uint8_t kSpeakerMaxChannelCount     = 8;   // Same as Microphone
 static constexpr uint8_t kMicrophoneMinLevel         = 1;
 static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
 static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
@@ -290,18 +290,19 @@ private:
     bool mSpeakerMuted                                                      = false;
     bool mMicrophoneMuted                                                   = false;
     bool mHardPrivacyModeOn                                                 = false;
-    chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum mNightVision                                           = chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum::kOff;
-    bool mSoftRecordingPrivacyModeEnabled                                   = false;
-    bool mSoftLivestreamPrivacyModeEnabled                                  = false;
-    uint8_t mSpeakerVol                                                     = kSpeakerMinLevel;
-    uint8_t mSpeakerMinLevel                                                = kSpeakerMinLevel;
-    uint8_t mSpeakerMaxLevel                                                = kSpeakerMaxLevel;
-    uint8_t mMicrophoneVol                                                  = kMicrophoneMinLevel;
-    uint8_t mMicrophoneMinLevel                                             = kMicrophoneMinLevel;
-    uint8_t mMicrophoneMaxLevel                                             = kMicrophoneMaxLevel;
-    bool mLocalVideoRecordingEnabled                                        = false;
-    bool mLocalSnapshotRecordingEnabled                                     = false;
-    bool mStatusLightEnabled                                                = false;
+    chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum mNightVision =
+        chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum::kOff;
+    bool mSoftRecordingPrivacyModeEnabled  = false;
+    bool mSoftLivestreamPrivacyModeEnabled = false;
+    uint8_t mSpeakerVol                    = kSpeakerMinLevel;
+    uint8_t mSpeakerMinLevel               = kSpeakerMinLevel;
+    uint8_t mSpeakerMaxLevel               = kSpeakerMaxLevel;
+    uint8_t mMicrophoneVol                 = kMicrophoneMinLevel;
+    uint8_t mMicrophoneMinLevel            = kMicrophoneMinLevel;
+    uint8_t mMicrophoneMaxLevel            = kMicrophoneMaxLevel;
+    bool mLocalVideoRecordingEnabled       = false;
+    bool mLocalSnapshotRecordingEnabled    = false;
+    bool mStatusLightEnabled               = false;
 
     std::vector<StreamUsageEnum> mRankedStreamPriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 };

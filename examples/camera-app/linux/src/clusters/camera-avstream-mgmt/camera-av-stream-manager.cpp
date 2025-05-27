@@ -290,11 +290,13 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         break;
     }
     case SoftRecordingPrivacyModeEnabled::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetSoftRecordingPrivacyModeEnabled(GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetSoftRecordingPrivacyModeEnabled(
+            GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled());
         break;
     }
     case SoftLivestreamPrivacyModeEnabled::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetSoftLivestreamPrivacyModeEnabled(GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetSoftLivestreamPrivacyModeEnabled(
+            GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled());
         break;
     }
     case NightVision::Id: {
@@ -336,11 +338,13 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         break;
     }
     case LocalVideoRecordingEnabled::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetLocalVideoRecordingEnabled(GetCameraAVStreamMgmtServer()->GetLocalVideoRecordingEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetLocalVideoRecordingEnabled(
+            GetCameraAVStreamMgmtServer()->GetLocalVideoRecordingEnabled());
         break;
     }
     case LocalSnapshotRecordingEnabled::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetLocalSnapshotRecordingEnabled(GetCameraAVStreamMgmtServer()->GetLocalSnapshotRecordingEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetLocalSnapshotRecordingEnabled(
+            GetCameraAVStreamMgmtServer()->GetLocalSnapshotRecordingEnabled());
         break;
     }
     case StatusLightEnabled::Id: {
