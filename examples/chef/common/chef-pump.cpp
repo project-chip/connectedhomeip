@@ -100,6 +100,11 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
         FlowMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedFlow);
         MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
     }
+
+    DataModel::Nullable<int16_t> capacity = onOff ? DataModel::Nullable<int16_t>(kMaxCapacity) : DataModel::Nullable<int16_t>(0);
+    PumpConfigurationAndControl::Attributes::Capacity::Set(endpointId, capacity);
+    MatterReportingAttributeChangeCallback(endpointId, PumpConfigurationAndControl::Id,
+                                           PumpConfigurationAndControl::Attributes::Capacity::Id);
 }
 
 constexpr size_t kLevelControlCount = MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
