@@ -23,8 +23,8 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 
-#include "../microwave-oven-mode/chef-microwave-oven-mode.h"
 #include "../../chef-operational-state-delegate-impl.h"
+#include "../microwave-oven-mode/chef-microwave-oven-mode.h"
 
 #include <app/util/config.h>
 #include <cstring>
@@ -37,14 +37,14 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+using MicrowaveOvenMode::ModeTagStructType;
 using ModeBase::Commands::ChangeToModeResponse::Type;
 using OperationalState::GenericOperationalError;
 using OperationalState::GenericOperationalState;
-using MicrowaveOvenMode::ModeTagStructType;
 
 class ChefMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate,
-                                   public ModeBase::Delegate,
-                                   public OperationalState::OperationalStateDelegate
+                                public ModeBase::Delegate,
+                                public OperationalState::OperationalStateDelegate
 {
 
 public:
@@ -52,8 +52,7 @@ public:
         mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
                                       BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
                                                                              MicrowaveOvenControl::Feature::kPowerNumberLimits),
-                                      *OperationalState::GetOperationalStateInstance(),
-                                      *MicrowaveOvenMode::GetInstance())
+                                      *OperationalState::GetOperationalStateInstance(), *MicrowaveOvenMode::GetInstance())
     {}
 
     void MicrowaveOvenInit();
@@ -98,15 +97,15 @@ public:
 private:
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
 
-    static constexpr uint8_t kMinPowerNum        = 20u;
-    static constexpr uint8_t kMaxPowerNum        = 90u;
-    static constexpr uint8_t kPowerStepNum       = 10u;
-    static constexpr uint32_t kMaxCookTimeSec     = 86400u;
+    static constexpr uint8_t kMinPowerNum            = 20u;
+    static constexpr uint8_t kMaxPowerNum            = 90u;
+    static constexpr uint8_t kPowerStepNum           = 10u;
+    static constexpr uint32_t kMaxCookTimeSec        = 86400u;
     static constexpr uint8_t kDefaultPowerSettingNum = kMaxPowerNum;
 
-    uint8_t mPowerSettingNum  = kDefaultPowerSettingNum;
+    uint8_t mPowerSettingNum   = kDefaultPowerSettingNum;
     uint8_t mSelectedWattIndex = 0;
-    uint16_t mWattRating      = 0;
+    uint16_t mWattRating       = 0;
 };
 
 } // namespace Clusters
