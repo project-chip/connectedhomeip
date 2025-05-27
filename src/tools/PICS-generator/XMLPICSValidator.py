@@ -18,8 +18,8 @@
 import argparse
 import os
 import sys
-from pathlib import Path
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
 
