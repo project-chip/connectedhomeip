@@ -79,6 +79,9 @@ buildconfig_header("crypto_buildconfig") {
     defines += [ "CHIP_CRYPTO_TRUSTY_OS=1" ]
     defines += [ "CHIP_OP_KEYSTORE_TRUSTY_OS=1" ]
   }
+  if (chip_with_imx_ele) {
+    defines += [ "CHIP_OP_KEYSTORE_ELE=1" ]
+  }
 }
 
 source_set("public_headers") {
@@ -100,6 +103,11 @@ source_set("public_headers") {
 
   if (chip_with_trusty_os) {
     public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
+
+  if (chip_with_imx_ele) {
+    public_deps +=
+        [ "${chip_root}/third_party/imx-secure-enclave:libelematter" ]
   }
 }
 
@@ -216,6 +224,8 @@ static_library("crypto") {
 
   if (chip_with_trusty_os) {
     sources += [ "PersistentStorageOperationalKeystoreTrusty.cpp" ]
+  } else if (chip_with_imx_ele) {
+    sources += [ "PersistentStorageOperationalKeystoreEle.cpp" ]
   } else {
     sources += [ "PersistentStorageOperationalKeystore.cpp" ]
   }

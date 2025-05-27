@@ -29,6 +29,10 @@
 #include <trusty_matter.h>
 #endif
 
+#if defined(CHIP_OP_KEYSTORE_ELE)
+#include "hsm_api.h"
+#endif
+
 namespace chip {
 
 /**
@@ -113,6 +117,17 @@ protected:
 #if defined(CHIP_OP_KEYSTORE_TRUSTY_OS)
 private:
     mutable matter::TrustyMatter trusty_matter;
+#endif
+#if defined(CHIP_OP_KEYSTORE_ELE)
+private:
+    void ResetPendingKey(bool delete_key);
+    hsm_err_t EleDeleteKey(uint32_t keyId);
+    CHIP_ERROR EleGenerateCSR(uint32_t keyId, uint8_t * csr, size_t & csrLength);
+    hsm_err_t EleSignMessage(uint32_t keyId, const uint8_t * msg, size_t msgSize, uint8_t * sig, size_t sigSize) const;
+
+    hsm_hdl_t hsm_session_hdl = 0;
+    hsm_hdl_t key_store_hdl   = 0;
+    hsm_hdl_t key_mgmt_hdl    = 0;
 #endif
 };
 

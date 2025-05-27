@@ -32,6 +32,13 @@ declare_args() {
   # Trusty TEE, please refer the website listed below:
   # https://source.android.com/docs/security/features/trusty
   chip_with_trusty_os = false
+
+  # Controls enabling of ELE(EdgeLock Enclave) for i.MX 9 platforms, this
+  # feature enables hardware acceleration for cryptographic algorithms.
+  # And provides a full suite of drivers for secure hardware on i.MX 9.
+  # see https://www.nxp.com/products/nxp-product-information/nxp-product-programs/edgelock-secure-enclave:EDGELOCK-SECURE-ENCLAVE
+  # to get more information.
+  chip_with_imx_ele = false
 }
 
 assert(
