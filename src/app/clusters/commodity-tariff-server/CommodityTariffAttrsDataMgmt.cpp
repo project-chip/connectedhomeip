@@ -61,9 +61,9 @@ namespace CommonUtilities {
         }
     }
 
-    static bool HasDuplicateIDs(const DataModel::List<const uint32_t>& IDs)
+    static bool HasDuplicateIDs(const DataModel::List<const uint32_t>& IDs,
+        std::unordered_set<uint32_t>& seen)
     {
-        std::unordered_set<uint32_t> seen;
         for (auto id : IDs)
         {
             if (!seen.insert(id).second)
@@ -169,7 +169,18 @@ void TariffInfoDataClass::CleanupStructValue(PayloadType& aValue)
 
 // DayPatternsDataClass
 namespace DayPatternsDataClass_Utils {
-    static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type& newValue) {
+    static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type& newValue,
+                                        std::unordered_set<uint32_t>& seenDeIDs) {
+
+        VerifyOrReturnError(newValue.daysOfWeek.HasAny(),
+            CHIP_ERROR_INVALID_ARGUMENT);
+
+        // Check that the current day pattern item has no duplicated dayEntryIDs
+        if (CommonUtilities::HasDuplicateIDs(newValue.dayEntryIDs, seenDeIDs))
+        {
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
+
         return CHIP_NO_ERROR;
     }
 }
@@ -177,12 +188,20 @@ namespace DayPatternsDataClass_Utils {
 CHIP_ERROR DayPatternsDataClass::Validate(const ValueType & aValue) const {
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto & newList = aValue;
+    std::unordered_set<uint32_t> KeyIDs;
+    std::unordered_set<uint32_t> seenDeIDs;
 
     VerifyOrReturnError( (newList.size() > 0 && newList.size() <= kDayPatternsAttrMaxLength), 
         CHIP_ERROR_INVALID_LIST_LENGTH);
 
     for (const auto& item : newList) {
-        err = DayPatternsDataClass_Utils::ValidateListEntry(item);
+        if (!KeyIDs.insert(item.dayPatternID).second)
+        {
+            err = CHIP_ERROR_DUPLICATE_KEY_ID;
+            break; // Duplicate found
+        }
+        
+        err = DayPatternsDataClass_Utils::ValidateListEntry(item, seenDeIDs);
         if (err != CHIP_NO_ERROR)
         {
             break;
@@ -210,11 +229,18 @@ namespace DayEntriesDataClass_Utils {
 CHIP_ERROR DayEntriesDataClass::Validate(const ValueType & aValue) const {
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto & newList = aValue;
+    std::unordered_set<uint32_t> KeyIDs;
 
     VerifyOrReturnError( (newList.size() > 0 && newList.size() <= kDayEntriesAttrMaxLength), 
         CHIP_ERROR_INVALID_LIST_LENGTH);
 
     for (const auto& item : newList) {
+        if (!KeyIDs.insert(item.dayEntryID).second)
+        {
+            err = CHIP_ERROR_DUPLICATE_KEY_ID;
+            break; // Duplicate found
+        }
+
         err = DayEntriesDataClass_Utils::ValidateListEntry(item);
         if (err != CHIP_NO_ERROR)
         {
@@ -239,7 +265,9 @@ void DayEntriesDataClass::CleanupStructValue(PayloadType& aValue) {
 //TariffPeriodsDataClass
 
 namespace TariffPeriodsDataClass_Utils {
-    static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type& newValue) {
+    static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type& newValue,
+                                        std::unordered_set<uint32_t>& seenDeIDs,
+                                        std::unordered_set<uint32_t>& seenTcIDs) {
         if (!newValue.label.IsNull() && newValue.label.Value().size() > kDefaultStringValuesMaxBufLength)
             return CHIP_ERROR_INVALID_ARGUMENT;
         else if (newValue.label.Value().empty())
@@ -255,15 +283,15 @@ namespace TariffPeriodsDataClass_Utils {
             return CHIP_ERROR_INVALID_ARGUMENT;
     
         // Check that the current period item has no duplicated dayEntryIDs
-        if (CommonUtilities::HasDuplicateIDs(newValue.dayEntryIDs))
+        if (CommonUtilities::HasDuplicateIDs(newValue.dayEntryIDs, seenDeIDs))
         {
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
     
         // Check that the current period item has no duplicated dayEntryIDs
-        if (CommonUtilities::HasDuplicateIDs(newValue.tariffComponentIDs))
+        if (CommonUtilities::HasDuplicateIDs(newValue.tariffComponentIDs, seenTcIDs))
         {
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
     
         return CHIP_NO_ERROR;
@@ -273,12 +301,14 @@ namespace TariffPeriodsDataClass_Utils {
 CHIP_ERROR TariffPeriodsDataClass::Validate(const ValueType & aValue)  const {
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto & newList = aValue;
+    std::unordered_set<uint32_t> seenDeIDs;
+    std::unordered_set<uint32_t> seenTcIDs;
 
     VerifyOrReturnError( (newList.size() > 0 && newList.size() <= kTariffPeriodsAttrMaxLength), 
         CHIP_ERROR_INVALID_LIST_LENGTH);
 
     for (const auto& item : newList) {
-        err = TariffPeriodsDataClass_Utils::ValidateListEntry(item);
+        err = TariffPeriodsDataClass_Utils::ValidateListEntry(item, seenDeIDs, seenTcIDs);
         if (err != CHIP_NO_ERROR)
         {
             break;
@@ -411,10 +441,18 @@ namespace TariffComponentsDataClass_Utils {
 CHIP_ERROR TariffComponentsDataClass::Validate(const ValueType & aValue) const {
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto & newList = aValue;
+    std::unordered_set<uint32_t> KeyIDs;
+
     VerifyOrReturnError( (newList.size() > 0 && newList.size() <= kTariffComponentsAttrMaxLength), 
         CHIP_ERROR_INVALID_LIST_LENGTH);
 
     for (const auto& item : newList) {
+        if (!KeyIDs.insert(item.tariffComponentID).second)
+        {
+            err = CHIP_ERROR_DUPLICATE_KEY_ID;
+            break; // Duplicate found
+        }
+
         err = TariffComponentsDataClass_Utils::ValidateListEntry(item, mFeatureMap);
         if (err != CHIP_NO_ERROR)
         {

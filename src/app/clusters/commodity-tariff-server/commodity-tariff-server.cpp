@@ -102,12 +102,14 @@ bool CommodityTariffDataProvider::TariffDataUpd_Validator()
         return false;
     }
 
-    //CheckDayPatterns
     //CheckDayEntries
-    //CheckTariffPeriods    
+    //CheckDayPatterns
+    //CheckIndividualDays
+
     //CheckTariffComponents
 
-    //CheckIndividualDays
+    //CheckTariffPeriods
+
     //CalendarPeriods
 
     return true;
