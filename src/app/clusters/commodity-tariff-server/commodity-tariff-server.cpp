@@ -68,8 +68,6 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 
 void CommodityTariffDataProvider::TariffDataUpd_Commit()
 {
-    std::vector<uint16_t> changedAttributes;
-
 #define X(attrName, attrType) \
     attrName##_MgmtObj.UpdateCommit();
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
@@ -78,18 +76,10 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #define X(attrName, attrType) \
     if (attrName##_MgmtObj.HasChanged()) { \
         ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) updated", Attributes::attrName::Id); \
-        changedAttributes.push_back(Attributes::attrName::Id); \
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, Attributes::attrName::Id); \
     }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
-
-    if (!changedAttributes.empty())
-    {
-        for (auto attrId : changedAttributes)
-        {
-            MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, attrId);
-        }
-    }
 }
 
 void CommodityTariffDataProvider::TariffDataUpd_Abort()
@@ -102,6 +92,14 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 
 bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator()
 {
+    //CheckDayPatterns
+    //CheckDayEntries
+    //CheckTariffPeriods    
+    //CheckTariffComponents
+
+    //CheckIndividualDays
+    //CalendarPeriods
+
     return true;
 }
 
@@ -150,51 +148,51 @@ CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, 
     switch (aPath.mAttributeId)
     {
     case TariffInfo::Id:
-        return aEncoder.Encode(mDelegate.GetTariffInfo());
+        return aEncoder.Encode(mProvider.GetTariffInfo());
     case TariffUnit::Id:
-        return aEncoder.Encode(mDelegate.GetTariffUnit());
+        return aEncoder.Encode(mProvider.GetTariffUnit());
     case StartDate::Id:
-        return aEncoder.Encode(mDelegate.GetStartDate());
+        return aEncoder.Encode(mProvider.GetStartDate());
     case DayEntries::Id:
-        return aEncoder.Encode(mDelegate.GetDayEntries());
+        return aEncoder.Encode(mProvider.GetDayEntries());
     case DayPatterns::Id:
-        return aEncoder.Encode(mDelegate.GetDayPatterns());
+        return aEncoder.Encode(mProvider.GetDayPatterns());
     case CalendarPeriods::Id:
-        return aEncoder.Encode(mDelegate.GetCalendarPeriods());
+        return aEncoder.Encode(mProvider.GetCalendarPeriods());
     case IndividualDays::Id:
-        return aEncoder.Encode(mDelegate.GetIndividualDays());
+        return aEncoder.Encode(mProvider.GetIndividualDays());
     case CurrentDay::Id:
-        return aEncoder.Encode(mDelegate.GetCurrentDay());
+        return aEncoder.Encode(mProvider.GetCurrentDay());
     case NextDay::Id:
-        return aEncoder.Encode(mDelegate.GetNextDay());
+        return aEncoder.Encode(mProvider.GetNextDay());
     case CurrentDayEntry::Id:
-        return aEncoder.Encode(mDelegate.GetCurrentDayEntry());
+        return aEncoder.Encode(mProvider.GetCurrentDayEntry());
     case CurrentDayEntryDate::Id:
-        return aEncoder.Encode(mDelegate.GetCurrentDayEntryDate());
+        return aEncoder.Encode(mProvider.GetCurrentDayEntryDate());
     case NextDayEntry::Id:
-        return aEncoder.Encode(mDelegate.GetNextDayEntry());
+        return aEncoder.Encode(mProvider.GetNextDayEntry());
     case NextDayEntryDate::Id:
-        return aEncoder.Encode(mDelegate.GetNextDayEntryDate());
+        return aEncoder.Encode(mProvider.GetNextDayEntryDate());
     case TariffComponents::Id:
-        return aEncoder.Encode(mDelegate.GetTariffComponents());
+        return aEncoder.Encode(mProvider.GetTariffComponents());
     case TariffPeriods::Id:
-        return aEncoder.Encode(mDelegate.GetTariffPeriods());
+        return aEncoder.Encode(mProvider.GetTariffPeriods());
     case CurrentTariffComponents::Id:
-        return aEncoder.Encode(mDelegate.GetCurrentTariffComponents());
+        return aEncoder.Encode(mProvider.GetCurrentTariffComponents());
     case NextTariffComponents::Id:
-        return aEncoder.Encode(mDelegate.GetNextTariffComponents());
+        return aEncoder.Encode(mProvider.GetNextTariffComponents());
     case DefaultRandomizationOffset::Id:
         if (!HasFeature(Feature::kRandomization))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mDelegate.GetDefaultRandomizationOffset());
+        return aEncoder.Encode(mProvider.GetDefaultRandomizationOffset());
     case DefaultRandomizationType::Id:
         if (!HasFeature(Feature::kRandomization))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mDelegate.GetDefaultRandomizationType());
+        return aEncoder.Encode(mProvider.GetDefaultRandomizationType());
 
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
@@ -226,7 +224,7 @@ void CommodityTariffServer::HandleGetTariffComponent(HandlerContext & ctx, const
 {
     Commands::GetTariffComponentResponse::Type response;
 
-    Status status = mDelegate.GetTariffComponentInfoById(commandData.tariffComponentID, 
+    Status status = mProvider.GetTariffComponentInfoById(commandData.tariffComponentID, 
                                                          response.label,
                                                          response.dayEntryIDs,
                                                          response.tariffComponent);
@@ -243,7 +241,7 @@ void CommodityTariffServer::HandleGetDayEntry(HandlerContext & ctx, const Comman
 {
     Commands::GetDayEntryResponse::Type response;
 
-    Status status = mDelegate.GetDayEntryById(commandData.dayEntryID, response.dayEntry);
+    Status status = mProvider.GetDayEntryById(commandData.dayEntryID, response.dayEntry);
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);

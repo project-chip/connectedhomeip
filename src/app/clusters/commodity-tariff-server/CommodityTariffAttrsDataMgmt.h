@@ -37,6 +37,19 @@ constexpr bool operator!=(const Span<const char>& lhs, const Span<const char>& r
     // Compare byte-by-byte (safe for non-null-terminated data)
     return !std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
+
+constexpr bool operator!=(const Span<const uint32_t>& lhs, const Span<const uint32_t>& rhs)
+{
+    if (lhs.size() != rhs.size()) 
+        return true; // Different lengths → not equal
+    
+    if (lhs.data() == rhs.data()) 
+        return false; // Same pointer (or both null) → equal
+    
+    // Compare byte-by-byte (safe for non-null-terminated data)
+    return !std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
 namespace app {
 namespace Clusters {
 
@@ -253,7 +266,7 @@ public:
 
         mFeatureMap = aFeatureMap;
 
-        err = ValidateValue(aValue);
+        err = Validate(aValue);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -338,7 +351,7 @@ protected:
      * 
      * @note Derived classes should override for custom validation
      */
-    CHIP_ERROR ValidateValue(const T & aValue) {
+    CHIP_ERROR Validate(const T & aValue) {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         if constexpr (IsValueNullable())
@@ -347,12 +360,9 @@ protected:
             {
                 err = ValidateList(aValue.Value());
             }
-            else if constexpr (IsStruct<WrappedType>::value) {
-                err = ValidateStructValue(aValue.Value(), false, nullptr);
-            }
-            else if constexpr (IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value)
+            else if constexpr (IsStruct<WrappedType>::value || IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value)
             {
-                err = ValidateScalarValue(aValue.Value());
+                err = ValidateValue(aValue.Value());
             }
             else {
                 static_assert(false, "Unexpected Nullable wrapped type");
@@ -438,28 +448,25 @@ protected:
         }
     }
 
-    virtual CHIP_ERROR ValidateScalarValue(const PayloadType & newValue) const {
+    virtual CHIP_ERROR ValidateValue(const PayloadType & newValue) const {
         return CHIP_NO_ERROR;
     }
 
-    virtual CHIP_ERROR ValidateStructValue(const PayloadType & newValue, bool is_first_item, const WrappedType * owner) const {
+    virtual CHIP_ERROR ValidateListEntry(const PayloadType & newValue) const {
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ValidateList(const DataModel::List<PayloadType>& newList)
-    {
-        CHIP_ERROR err = CHIP_ERROR_INVALID_LIST_LENGTH;
-        bool is_first_item = true;
-        
+    virtual CHIP_ERROR ValidateList(const WrappedType& newList) const {
+        /*CHIP_ERROR err = CHIP_ERROR_INVALID_LIST_LENGTH;
         for (const auto& item : newList) {
-            err = ValidateStructValue(item, is_first_item, &newList);
-            is_first_item = false;
+            err = ValidateListEntry(item);
             if (err != CHIP_NO_ERROR)
             {
                 break;
             }
         }
-        return err;
+        return err;*/
+        return CHIP_NO_ERROR;
    }
 
     /**

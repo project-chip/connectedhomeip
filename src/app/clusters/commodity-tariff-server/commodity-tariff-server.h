@@ -63,8 +63,10 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
     X(DefaultRandomizationOffset,   DataModel::Nullable<int16_t>) \
     X(DefaultRandomizationType,     DataModel::Nullable<DayEntryRandomizationTypeEnum>)
 
-#define COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES \
-    X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>) \
+#define COMMODITY_TARIFF_PRIMARY_SINGLE_STRUCT_ATTRS \
+    X(TariffInfo,                   DataModel::Nullable<Structs::TariffInformationStruct::Type>)
+
+#define COMMODITY_TARIFF_PRIMARY_LIST_ATTRIBUTES \
     X(DayEntries,                   DataModel::List<Structs::DayEntryStruct::Type>)  \
     X(DayPatterns,                  DataModel::List<Structs::DayPatternStruct::Type>) \
     X(TariffComponents,             DataModel::List<Structs::TariffComponentStruct::Type>) \
@@ -74,7 +76,8 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
 
 #define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES \
     COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS \
-    COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
+    COMMODITY_TARIFF_PRIMARY_SINGLE_STRUCT_ATTRS \
+    COMMODITY_TARIFF_PRIMARY_LIST_ATTRIBUTES
 
 /**
  * @def COMMODITY_TARIFF_CURRENT_ATTRIBUTES
@@ -132,7 +135,7 @@ public: \
         : CTC_BaseDataClass<attrType>(aValueStorage) {} \
     ~attrName##DataClass() override = default; \
 protected: \
-    CHIP_ERROR ValidateScalarValue(const PayloadType& newValue) const override; \
+    CHIP_ERROR ValidateValue(const PayloadType& newValue) const override; \
 };
 COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
 #undef X
@@ -144,11 +147,26 @@ public: \
         : CTC_BaseDataClass<attrType>(aValueStorage) {} \
     ~attrName##DataClass() override = default; \
 protected: \
-    CHIP_ERROR ValidateStructValue(const PayloadType& newValue, bool is_first_item, const WrappedType * owner) const override; \
+    CHIP_ERROR ValidateValue(const PayloadType& newValue) const override; \
     bool CompareStructValue(const PayloadType& source, const PayloadType& destination) const override; \
     void CleanupStructValue(PayloadType& aValue) override; \
 };
-COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
+COMMODITY_TARIFF_PRIMARY_SINGLE_STRUCT_ATTRS
+#undef X
+
+#define X(attrName, attrType) \
+class attrName##DataClass : public CTC_BaseDataClass<attrType> { \
+public: \
+    attrName##DataClass(attrType& aValueStorage) \
+        : CTC_BaseDataClass<attrType>(aValueStorage) {} \
+    ~attrName##DataClass() override = default; \
+protected: \
+    CHIP_ERROR ValidateList(const WrappedType & newList) const override; \
+    CHIP_ERROR ValidateListEntry(const PayloadType& newValue) const override; \
+    bool CompareStructValue(const PayloadType& source, const PayloadType& destination) const override; \
+    void CleanupStructValue(PayloadType& aValue) override; \
+};
+COMMODITY_TARIFF_PRIMARY_LIST_ATTRIBUTES
 #undef X
 
 /** @} */ // end of attribute_management
@@ -276,11 +294,11 @@ public:
     /**
      * @brief Construct a new Commodity Tariff Server instance
      * @param aEndpointId The Matter endpoint ID
-     * @param aDelegate The data provider delegate
+     * @param aProvider The data provider delegate
      * @param aFeature Bitmask of supported features
      */
     CommodityTariffServer(EndpointId aEndpointId, 
-                         CommodityTariffDataProvider & aDelegate, 
+                         CommodityTariffDataProvider & aProvider, 
                          BitMask<Feature> aFeature);
 
     ~CommodityTariffServer() { Shutdown(); }
@@ -296,7 +314,7 @@ public:
     bool HasFeature(Feature aFeature) const;
 
 private:
-    CommodityTariffDataProvider & mDelegate;
+    CommodityTariffDataProvider & mProvider;
     BitMask<Feature> mFeature;
 
     // AttributeAccessInterface implementation
