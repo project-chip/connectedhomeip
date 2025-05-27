@@ -37,23 +37,25 @@ class UnitLocalizationServer : public AttributeAccessInterface
 {
 public:
     // Register for the UnitLocalization cluster on all endpoints.
+    CHIP_ERROR Init();
     static UnitLocalizationServer & Instance();
 
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units);
-    DataModel::List<TempUnitEnum> & GetSupportedTemperatureUnits(void) { return mSupportedTemperatureUnits; }
+    const DataModel::List<TempUnitEnum> & GetSupportedTemperatureUnits(void) { return mSupportedTemperatureUnits; }
+    TempUnitEnum GetTemperatureUnit(void) { return mTemperatureUnit; }
+    CHIP_ERROR SetTemperatureUnit(TempUnitEnum unit);
 
 private:
     UnitLocalizationServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UnitLocalization::Id) {}
-
-    CHIP_ERROR ReadSupportedTemperatureUnits(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadClusterRevision(AttributeValueEncoder & aEncoder);
 
     static UnitLocalizationServer mInstance;
     DataModel::List<TempUnitEnum> mSupportedTemperatureUnits{ DataModel::List<TempUnitEnum>(mUnitsBuffer) };
     TempUnitEnum mUnitsBuffer[kMaxSupportedLocalizationUnits] = { TempUnitEnum::kFahrenheit, TempUnitEnum::kCelsius,
                                                                   TempUnitEnum::kKelvin };
+    TempUnitEnum mTemperatureUnit                             = TempUnitEnum::kCelsius;
 };
 
 } // namespace UnitLocalization

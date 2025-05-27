@@ -66,6 +66,7 @@ public:
     CHIP_ERROR WiFiPAFMessageReceived(WiFiPAF::WiFiPAFSession & RxInfo, System::PacketBufferHandle && buffer) override;
     CHIP_ERROR WiFiPAFMessageSend(WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg) override;
     CHIP_ERROR WiFiPAFCloseSession(WiFiPAF::WiFiPAFSession & SessionInfo) override;
+    bool WiFiPAFResourceAvailable(void) override;
 
 private:
     /**
