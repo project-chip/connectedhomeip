@@ -116,6 +116,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
                 asserts.assert_less_equal(len(supported_temperature_units), 3,
                                           "SupportedTemperatureUnits may have a maximum of three entries in the list")
             else:
+                # Per CCB 4201, support Kelvin is not enforced for devices that predate SupportedTemperatureUnits
                 supported_temperature_units = [Clusters.UnitLocalization.Enums.TempUnitEnum.kCelsius,
                                                Clusters.UnitLocalization.Enums.TempUnitEnum.kFahrenheit]
             for unit in supported_temperature_units:
