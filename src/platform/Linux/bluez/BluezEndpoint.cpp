@@ -287,7 +287,7 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
     GVariant * options = g_variant_builder_end(&optionsBuilder);
 
     bluez_gatt_manager1_call_register_application(
-        gattMgr.get(), mpRootPath.get(), options, nullptr,
+        gattMgr.get(), mRootPath.get(), options, nullptr,
         +[](GObject * aObj, GAsyncResult * aResult, void * self) {
             reinterpret_cast<BluezEndpoint *>(self)->RegisterGattApplicationDone(aObj, aResult);
         },
@@ -335,8 +335,8 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
     VerifyOrExit(conn != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = conn->Init(*this));
 
-    mpPeerDevicePath.reset(g_strdup(objectPath));
-    mConnMap[mpPeerDevicePath.get()] = conn;
+    mPeerDevicePath.reset(g_strdup(objectPath));
+    mConnMap[mPeerDevicePath.get()] = conn;
 
     ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
@@ -369,9 +369,9 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
     BluezObjectSkeleton * object;
     BluezGattService1 * service;
 
-    mpServicePath.reset(g_strdup_printf("%s/service", mpRootPath.get()));
-    ChipLogDetail(DeviceLayer, "CREATE service object at %s", mpServicePath.get());
-    object = bluez_object_skeleton_new(mpServicePath.get());
+    mServicePath.reset(g_strdup_printf("%s/service", mRootPath.get()));
+    ChipLogDetail(DeviceLayer, "CREATE service object at %s", mServicePath.get());
+    object = bluez_object_skeleton_new(mServicePath.get());
 
     service = bluez_gatt_service1_skeleton_new();
     bluez_gatt_service1_set_uuid(service, aUUID);
@@ -394,7 +394,7 @@ BluezConnection * BluezEndpoint::GetBluezConnection(const char * aPath)
 
 BluezConnection * BluezEndpoint::GetBluezConnectionViaDevice()
 {
-    return GetBluezConnection(mpPeerDevicePath.get());
+    return GetBluezConnection(mPeerDevicePath.get());
 }
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -520,8 +520,8 @@ void BluezEndpoint::SetupGattServer(GDBusConnection * aConn)
 {
     VerifyOrReturn(!mIsCentral);
 
-    mpRootPath.reset(g_strdup_printf("/chipoble/%04x", getpid() & 0xffff));
-    mRoot.reset(g_dbus_object_manager_server_new(mpRootPath.get()));
+    mRootPath.reset(g_strdup_printf("/chipoble/%04x", getpid() & 0xffff));
+    mRoot.reset(g_dbus_object_manager_server_new(mRootPath.get()));
 
     SetupGattService();
 
@@ -554,8 +554,7 @@ CHIP_ERROR BluezEndpoint::Init(BluezAdapter1 * apAdapter, bool aIsCentral)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to subscribe for notifications: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization: %" CHIP_ERROR_FORMAT, err.Format()));
 

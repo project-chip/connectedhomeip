@@ -25,7 +25,6 @@
 #include <vector>
 
 #include <dns-sd.h>
-#include <glib-object.h>
 #include <glib.h>
 
 #include <inet/IPAddress.h>
