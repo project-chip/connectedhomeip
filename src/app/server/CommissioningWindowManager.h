@@ -100,6 +100,8 @@ public:
 
     void OnFabricRemoved(FabricIndex removedIndex);
 
+    void OnNfcBasedCommissioningStarting();
+
     // CommissioningModeProvider implementation.
     Dnssd::CommissioningMode GetCommissioningMode() const override;
 
