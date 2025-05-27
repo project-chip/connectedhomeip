@@ -360,6 +360,7 @@ namespace DeviceLayer {
 {
     _onConnectionComplete = nullptr;
     _onConnectionError = nullptr;
+    _onConnectionCompleteWithDiscriminator = nullptr;
     _appState = nullptr;
 }
 
