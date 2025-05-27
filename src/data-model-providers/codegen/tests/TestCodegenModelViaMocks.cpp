@@ -293,22 +293,19 @@ public:
                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
         VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
-        VerifyOrReturnError(builder.ReferenceExisting(mAccepted));
-
-        return CHIP_NO_ERROR;
+        return builder.AppendElements(Span<const AcceptedCommandEntry>(mAccepted.data(), mAccepted.size()));
     }
 
     CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
     {
         VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        return builder.AppendElements({ mGenerated.data(), mGenerated.size() });
+        return builder.AppendElements(Span<const CommandId>(mGenerated.data(), mGenerated.size()));
     }
 
     void SetOverrideAccepted(bool o) { mOverrideAccepted = o; }
     void SetOverrideGenerated(bool o) { mOverrideGenerated = o; }
 
-    std::vector<CommandId> & AcceptedVec() { return mAccepted; }
+    std::vector<DataModel::AcceptedCommandEntry> & AcceptedVec() { return mAccepted; }
     std::vector<CommandId> & GeneratedVec() { return mGenerated; }
 
 private:
@@ -316,7 +313,7 @@ private:
     bool mOverrideGenerated = false;
     bool mHandleCommand     = false;
 
-    std::vector<CommandId> mAccepted;
+    std::vector<DataModel::AcceptedCommandEntry> mAccepted;
     std::vector<CommandId> mGenerated;
 };
 
@@ -1348,8 +1345,8 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     // set some overrides
-    handler.AcceptedVec().push_back(1234);
-    handler.AcceptedVec().push_back(999);
+    handler.AcceptedVec().push_back({ 1234 });
+    handler.AcceptedVec().push_back({ 999 });
 
     handler.GeneratedVec().push_back(33);
 
@@ -1361,7 +1358,8 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     ASSERT_EQ(acceptedCommands[1].commandId, 999u);
 
     ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
-    auto generatedCommands                      = generatedBuilder.TakeBuffer();
+    auto generatedCommands = generatedBuilder.TakeBuffer();
+    ASSERT_EQ(generatedCommands.size(), std::size_t{ 1 });
     const CommandId expectedGeneratedCommands[] = { 33 };
     ASSERT_TRUE(generatedCommands.data_equal(Span<const CommandId>(expectedGeneratedCommands)));
 }

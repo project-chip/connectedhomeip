@@ -117,12 +117,12 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    builder.EnsureAppendCapacity(2);
-    builder.Append(GetDetailedPriceRequest::kMetadataEntry);
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(2));
+    ReturnErrorOnFailure(builder.Append(GetDetailedPriceRequest::kMetadataEntry));
 
     if (HasFeature(Feature::kForecasting))
     {
-        builder.Append(GetDetailedForecastRequest::kMetadataEntry);
+        ReturnErrorOnFailure(builder.Append(GetDetailedForecastRequest::kMetadataEntry));
     }
     return CHIP_NO_ERROR;
 }
