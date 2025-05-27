@@ -243,8 +243,8 @@ genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --header-title "Matter SDK Coverage Report"
 
 gcovr --exclude=zzz_generated/ \
-    --exclude=third_party/  \
-    --include=src/  \
+    --exclude=third_party/ \
+    --include=src/ \
     --gcov-ignore-parse-errors \
     --xml=$COVERAGE_ROOT/coverage.xml
 
