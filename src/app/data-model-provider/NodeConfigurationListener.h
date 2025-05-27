@@ -18,6 +18,7 @@
 
 namespace chip {
 namespace app {
+namespace DataModel {
 
 /// A global class that listens for node configuration changes detection.
 ///
@@ -30,5 +31,6 @@ public:
     virtual void OnConfigurationVersionChanged() = 0;
 };
 
+} // namespace DataModel
 } // namespace app
 } // namespace chip

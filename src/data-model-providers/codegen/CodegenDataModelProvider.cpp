@@ -208,10 +208,11 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
     return std::nullopt;
 }
 
-void CodegenDataModelProvider::SetNodeConfigurationListener(NodeConfigurationListener * nodeConfigurationListener)
+void CodegenDataModelProvider::SetNodeConfigurationListener(DataModel::NodeConfigurationListener * nodeConfigurationListener)
 {
     mNodeConfigurationListener = nodeConfigurationListener;
 };
+
 void CodegenDataModelProvider::NotifyNodeConfigurationListener()
 {
     if (mNodeConfigurationListener != nullptr)

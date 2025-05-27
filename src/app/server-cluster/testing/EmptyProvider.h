@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/data-model-provider/NodeConfigurationListener.h>
 #include <app/data-model-provider/Provider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -34,6 +35,13 @@ public:
     using ActionReturnStatus = app::DataModel::ActionReturnStatus;
 
     CHIP_ERROR Shutdown() override;
+
+    void SetNodeConfigurationListener(app::DataModel::NodeConfigurationListener * nodeConfigurationListener) override;
+    void NotifyNodeConfigurationListener() override;
+    CHIP_ERROR GetNodeDataModelConfiguration(app::DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
+    CHIP_ERROR BumpNodeDataModelConfigurationVersion() override;
+    CHIP_ERROR ResetNodeDataModelConfigurationVersion() override;
+
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder) override;
 
     CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;

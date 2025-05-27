@@ -28,6 +28,31 @@ CHIP_ERROR EmptyProvider::Shutdown()
     return CHIP_NO_ERROR;
 }
 
+void EmptyProvider::SetNodeConfigurationListener(app::DataModel::NodeConfigurationListener * nodeConfigurationListener)
+{
+    return;
+}
+
+void EmptyProvider::NotifyNodeConfigurationListener()
+{
+    return;
+}
+
+CHIP_ERROR EmptyProvider::GetNodeDataModelConfiguration(app::DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EmptyProvider::BumpNodeDataModelConfigurationVersion()
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EmptyProvider::ResetNodeDataModelConfigurationVersion()
+{
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR EmptyProvider::Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder)
 {
     return CHIP_NO_ERROR;

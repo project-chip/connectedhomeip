@@ -51,7 +51,7 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-class NodeConfigurationListenerImpl : public NodeConfigurationListener
+class NodeConfigurationListenerImpl : public DataModel::NodeConfigurationListener
 {
 public:
     void OnConfigurationVersionChanged() override

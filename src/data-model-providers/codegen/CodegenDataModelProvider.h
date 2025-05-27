@@ -70,7 +70,7 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-    void SetNodeConfigurationListener(NodeConfigurationListener * nodeConfigurationListener) override;
+    void SetNodeConfigurationListener(DataModel::NodeConfigurationListener * nodeConfigurationListener) override;
     void NotifyNodeConfigurationListener() override;
     CHIP_ERROR GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
     CHIP_ERROR BumpNodeDataModelConfigurationVersion() override;
@@ -99,7 +99,7 @@ protected:
     virtual void InitDataModelForTesting();
 
 private:
-    NodeConfigurationListener * mNodeConfigurationListener;
+    DataModel::NodeConfigurationListener * mNodeConfigurationListener;
 
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
