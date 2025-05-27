@@ -656,7 +656,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH sends a Step command with the reqested parameters
         #  - Verify the expected attribute values are produced
         # self.step(self.current_step_index + 1)
-        await self.perform_wrap_step_commands_and_verify(step)
+        await self.perform_wrap_step_commands_and_verify(step, handle_current_values)
 
     async def perform_wrap_step_commands_and_verify(self, step: Clusters.FanControl.Commands.Step, handle_current_values: bool) -> None:
         cluster = Clusters.FanControl
@@ -697,7 +697,6 @@ class TC_FAN_3_5(MatterBaseTest):
     async def wrap_veirfy(
         self,
         step: Clusters.FanControl.Commands.Step,
-        # handle_current_values: bool,
         percent_setting_expected: int,
         fan_mode_expected: Optional[Any] = None,
         speed_setting_expected: Optional[int] = None,
@@ -726,30 +725,28 @@ class TC_FAN_3_5(MatterBaseTest):
             f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})."
         )
 
-        # if not handle_current_values:
         if fan_mode_expected is not None:
             fan_mode = await self.read_setting(attr.FanMode)
             asserts.assert_equal(
                 fan_mode, fan_mode_expected,
                 f"[FC] FanMode attribute value ({fan_mode}) is not equal to the expected value ({fan_mode_expected})."
             )
-
         if speed_setting_expected is not None:
             speed_setting = await self.read_setting(attr.SpeedSetting)
             asserts.assert_equal(
                 speed_setting, speed_setting_expected,
                 f"[FC] SpeedSetting attribute value ({speed_setting}) is not equal to the expected value ({speed_setting_expected})."
             )
-    # else:
         if percent_current_expected is not None:
-            percent_current = await self.read_setting(attr.PercentCurrent)
+            percent_current_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentCurrent), None)
+            percent_current = percent_current_sub.get_last_attribute_report_value(self.endpoint, attr.PercentCurrent, self.timeout_sec)
             asserts.assert_equal(
                 percent_current, percent_current_expected,
                 f"[FC] PercentCurrent attribute value ({percent_current}) is not equal to the expected value ({percent_current_expected})."
             )
-
         if speed_current_expected is not None:
-            speed_current = await self.read_setting(attr.SpeedCurrent)
+            speed_current_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.SpeedCurrent), None)
+            speed_current = speed_current_sub.get_last_attribute_report_value(self.endpoint, attr.SpeedCurrent, self.timeout_sec)
             asserts.assert_equal(
                 speed_current, speed_current_expected,
                 f"[FC] SpeedCurrent attribute value ({speed_current}) is not equal to the expected value ({speed_current_expected})."
@@ -766,7 +763,7 @@ class TC_FAN_3_5(MatterBaseTest):
         attr = cluster.Attributes
         cmd = cluster.Commands
         sd_enum = cluster.Enums.StepDirectionEnum
-        self.timeout_sec: float = 0.5
+        self.timeout_sec: float = 3
         self.percent_setting_per_step: Optional[int] = None
 
         # *** STEP 1 ***
@@ -809,36 +806,42 @@ class TC_FAN_3_5(MatterBaseTest):
         # self.step(6)
         await self.get_percent_setting_range_per_step()
 
-        # # LowestOff=True Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        # await self.subscribe_to_attributes(handle_current_values=False)
-        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=False)
-        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=False)
-        # self.verify_baseline_values(handle_current_values=False)
+        # LowestOff=True Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        await self.subscribe_to_attributes(handle_current_values=False)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=False)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=False)
+        self.verify_baseline_values(handle_current_values=False)
         
-        # # LowestOff=True Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        # await self.subscribe_to_attributes(handle_current_values=True)
-        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=True)
-        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=True)
-        # self.verify_baseline_values(handle_current_values=False)
+        # LowestOff=True Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        await self.subscribe_to_attributes(handle_current_values=True)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=True)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=True)
+        self.verify_baseline_values(handle_current_values=False)
 
-        # # LowestOff=False Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        # await self.subscribe_to_attributes(handle_current_values=False)
-        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=False)
-        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=False)
-        # self.verify_baseline_values(handle_current_values=False)
+        # LowestOff=False Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        await self.subscribe_to_attributes(handle_current_values=False)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=False)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=False)
+        self.verify_baseline_values(handle_current_values=False)
         
-        # # LowestOff=False Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        # await self.subscribe_to_attributes(handle_current_values=True)
-        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=True)
-        # await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=True)
-        # self.verify_baseline_values(handle_current_values=True)
+        # LowestOff=False Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        await self.subscribe_to_attributes(handle_current_values=True)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=True)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=True)
+        self.verify_baseline_values(handle_current_values=True)
 
         # Wrap tests
         await self.subscribe_to_attributes(handle_current_values=False)
-        await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True))
-        # await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False))
-        # await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True))
-        # await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False))
+        await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True), handle_current_values=False)
+        await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False), handle_current_values=False)
+        await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True), handle_current_values=False)
+        await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False), handle_current_values=False)
+        # Wrap tests
+        await self.subscribe_to_attributes(handle_current_values=True)
+        await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True), handle_current_values=True)
+        await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False), handle_current_values=True)
+        await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True), handle_current_values=True)
+        await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False), handle_current_values=True)
 
         # *** STEP 35 ***
         # Read both the descending and ascending baseline attribute report values
