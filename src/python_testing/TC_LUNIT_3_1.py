@@ -32,8 +32,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
