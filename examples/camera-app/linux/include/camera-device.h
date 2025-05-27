@@ -119,6 +119,8 @@ public:
 
     bool GetNightVisionUsesInfrared() override;
 
+    bool GetCameraSupportsImageControl() override;
+
     VideoResolutionStruct & GetMinViewport() override;
 
     std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() override;

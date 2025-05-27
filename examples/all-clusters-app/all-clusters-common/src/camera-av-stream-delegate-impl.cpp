@@ -335,10 +335,14 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     BitFlags<Feature> features;
     features.Set(Feature::kSnapshot);
     features.Set(Feature::kNightVision);
+    features.Set(Feature::kImageControl);
 
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(OptionalAttribute::kNightVision);
     optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+    optionalAttrs.Set(OptionalAttribute::kImageRotation);
+    optionalAttrs.Set(OptionalAttribute::kImageFlipVertical);
+    optionalAttrs.Set(OptionalAttribute::kImageFlipHorizontal);
     uint32_t maxConcurrentVideoEncoders  = 1;
     uint32_t maxEncodedPixelRate         = 10000;
     VideoSensorParamsStruct sensorParams = { 4608, 2592, 120, Optional<uint16_t>(30) }; // Typical numbers for Pi camera.

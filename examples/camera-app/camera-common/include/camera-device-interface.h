@@ -185,6 +185,9 @@ public:
         // Get indication whether camera night vision using infrared
         virtual bool GetNightVisionUsesInfrared() = 0;
 
+        // Get indication whether camera supports image control
+        virtual bool GetCameraSupportsImageControl() = 0;
+
         // Get indication of the min resolution(pixels) that camera allows for
         // its viewport.
         virtual VideoResolutionStruct & GetMinViewport() = 0;

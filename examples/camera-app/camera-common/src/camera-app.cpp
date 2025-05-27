@@ -62,6 +62,14 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
     }
 
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kImageControl);
+        optionalAttrs.Set(OptionalAttribute::kImageRotation);
+        optionalAttrs.Set(OptionalAttribute::kImageFlipHorizontal);
+        optionalAttrs.Set(OptionalAttribute::kImageFlipVertical);
+    }
+
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
     uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
     VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();

@@ -664,6 +664,11 @@ bool CameraDevice::GetNightVisionUsesInfrared()
     return false;
 }
 
+bool CameraDevice::GetCameraSupportsImageControl()
+{
+    return true;
+}
+
 VideoResolutionStruct & CameraDevice::GetMinViewport()
 {
     static VideoResolutionStruct minViewport = { kMinResolutionWidth, kMinResolutionHeight };
