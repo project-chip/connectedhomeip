@@ -27,6 +27,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeString.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace Dnssd {
@@ -47,6 +48,16 @@ enum class CommissioningMode
     kEnabledBasic,   // Basic Commissioning Mode, CM=1 in DNS-SD key/value pairs
     kEnabledEnhanced // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
 };
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+enum class JointFabricMode : uint8_t
+{
+    kAvailable     = 1 << 0, // This device is capable of acting as a Joint Fabric Administrator.
+    kAdministrator = 1 << 1, // This device is acting as a Joint Fabric Administrator.
+    kAnchor        = 1 << 2, // This device is acting as a Joint Fabric Anchor Administrator.
+    kDatastore     = 1 << 3  // This device is acting as a Joint Fabric Datastore.
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 enum class ICDModeAdvertise : uint8_t
 {
@@ -204,6 +215,15 @@ public:
     }
     CommissioningMode GetCommissioningMode() const { return mCommissioningMode; }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    CommissionAdvertisingParameters & SetJointFabricMode(BitFlags<JointFabricMode> mode)
+    {
+        mJointFabricMode = mode;
+        return *this;
+    }
+    BitFlags<JointFabricMode> GetJointFabricMode() const { return mJointFabricMode; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     CommissionAdvertisingParameters & SetDeviceType(std::optional<uint32_t> deviceType)
     {
         mDeviceType = deviceType;
@@ -291,6 +311,9 @@ private:
     uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
     CommssionAdvertiseMode mMode         = CommssionAdvertiseMode::kCommissionableNode;
     CommissioningMode mCommissioningMode = CommissioningMode::kEnabledBasic;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    BitFlags<JointFabricMode> mJointFabricMode;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     std::optional<uint16_t> mVendorId;
     std::optional<uint16_t> mProductId;
     std::optional<uint32_t> mDeviceType;
