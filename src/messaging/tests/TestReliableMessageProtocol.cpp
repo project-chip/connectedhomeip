@@ -2076,7 +2076,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     TestReliablityAnalyticDelegate testAnalyticsDelegate;
     rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
 
-    constexpr auto kTestRetryInterval = 30_ms32;
+    constexpr auto kTestRetryInterval = System::Clock::Milliseconds32(30_ms32);
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
@@ -2194,8 +2194,8 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(sixthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kAcknowledged);
     EXPECT_EQ(sixthTransmitEvent.retransmissionCount, std::nullopt);
     EXPECT_TRUE(sixthTransmitEvent.ackLatencyMs.has_value());
-    auto expectedMinimumAckLatencyTime = kTestRetryInterval * 5;
-    EXPECT_GT(sixthTransmitEvent.ackLatencyMs, expectedMinimumAckLatencyTime.count());
+    auto expectedMinimumAckLatencyTime = System::Clock::Milliseconds64(kTestRetryInterval * 5);
+    EXPECT_GT(sixthTransmitEvent.ackLatencyMs, expectedMinimumAckLatencyTime);
     EXPECT_EQ(messageCounter, sixthTransmitEvent.messageCounter);
 }
 
