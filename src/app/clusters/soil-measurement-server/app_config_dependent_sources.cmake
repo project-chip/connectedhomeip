@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
-declare_args() {
-  # Pass the directory to the BUILD.gn that pulls in the generated data-model files, e.g. ///examples/lighting-app/lighting-common
-  chip_data_model = ""
-}
+# This is the equivalent to app_config_dependent_sources.gni
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/soil-measurement-server.cpp"
+    "${CLUSTER_DIR}/soil-measurement-server.h"
+)
