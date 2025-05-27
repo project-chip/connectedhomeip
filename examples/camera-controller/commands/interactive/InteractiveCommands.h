@@ -43,7 +43,7 @@ public:
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
     bool NeedsOperationalAdvertising() override;
 
-    bool ParseCommand(char * command, int * status);
+    bool ParseCommand(const std::string & command, int * status);
 
 private:
     Commands * mHandler = nullptr;
@@ -62,7 +62,7 @@ public:
     CHIP_ERROR RunCommand() override;
 
 private:
-    char * GetCommand(char * command);
+    std::string GetCommand() const;
     std::string GetHistoryFilePath() const;
 };
 
@@ -87,7 +87,11 @@ public:
     /////////// RemoteDataModelLoggerDelegate interface /////////
     CHIP_ERROR LogJSON(const char * json) override;
 
+    void StopCommand();
+
 private:
     WebSocketServer mWebSocketServer;
     chip::Optional<uint16_t> mPort;
 };
+
+void StopInteractiveEventLoop();
