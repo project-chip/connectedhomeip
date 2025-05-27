@@ -34,7 +34,7 @@ from time import sleep
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.fault_injection import CHIPFaultId
-from chip.interaction_model import InteractionModelError, Status
+from chip.interaction_model import InteractionModelError
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -185,9 +185,8 @@ class TC_SC_3_5(MatterBaseTest):
                 endpoint=0,  # Fault‑Injection cluster lives on EP0
                 payload=command,
             )
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Fault Injection Command Failed, is the TH_SERVER app built with the FaultInjection Cluster ?")
+        except InteractionModelError:
+            asserts.fail("Fault Injection Command Failed, is the TH_SERVER app built with the FaultInjection Cluster?")
 
     @async_test_body
     async def test_TC_SC_3_5(self):
