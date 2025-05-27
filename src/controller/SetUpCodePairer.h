@@ -225,5 +225,9 @@ private:
     CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
 };
 
+namespace PayloadUtils {
+CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload);
+}
+
 } // namespace Controller
 } // namespace chip

@@ -40,7 +40,7 @@ using namespace chip::Tracing;
 namespace chip {
 namespace Controller {
 
-namespace {
+namespace PayloadUtils {
 
 CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
 {
@@ -58,7 +58,7 @@ CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
 
     return CHIP_NO_ERROR;
 }
-} // namespace
+} // namespace PayloadUtils
 
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
                                        DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
@@ -67,7 +67,7 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
     VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, remoteId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
 
     SetupPayload payload;
-    ReturnErrorOnFailure(GetPayload(setUpCode, payload));
+    ReturnErrorOnFailure(PayloadUtils::GetPayload(setUpCode, payload));
 
     if (resolutionData.HasValue())
     {
