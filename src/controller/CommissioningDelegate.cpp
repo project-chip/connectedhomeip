@@ -73,6 +73,14 @@ const char * StageToString(CommissioningStage stage)
     case kAttestationRevocationCheck:
         return "AttestationRevocationCheck";
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    case kJFValidateNOC:
+        return "JFValidateNOC";
+
+    case kSendVIDVerificationRequest:
+        return "SendVIDVerificationRequest";
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     case kSendOpCertSigningRequest:
         return "SendOpCertSigningRequest";
 
