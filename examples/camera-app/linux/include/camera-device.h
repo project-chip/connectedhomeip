@@ -292,8 +292,9 @@ private:
     bool mHDREnabled                                                      = false;
     bool mSpeakerMuted                                                    = false;
     bool mMicrophoneMuted                                                 = false;
-    bool mHardPrivacyModeOn                                                 = false;
-    chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum mNightVision = chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum::kOff;
+    bool mHardPrivacyModeOn                                               = false;
+    chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum mNightVision =
+        chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum::kOff;
     bool mSoftRecordingPrivacyModeEnabled  = false;
     bool mSoftLivestreamPrivacyModeEnabled = false;
     uint8_t mSpeakerVol                    = kSpeakerMinLevel;

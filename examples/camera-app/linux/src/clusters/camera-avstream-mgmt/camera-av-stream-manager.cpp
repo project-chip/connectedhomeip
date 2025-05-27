@@ -65,7 +65,6 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
                 // Inform DPTZ that there's an allocated stream
                 mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
-
                 // Set the current frame rate attribute from HAL once stream has started
                 GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 
@@ -291,11 +290,13 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         break;
     }
     case SoftRecordingPrivacyModeEnabled::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetSoftRecordingPrivacyModeEnabled(GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetSoftRecordingPrivacyModeEnabled(
+            GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled());
         break;
     }
     case SoftLivestreamPrivacyModeEnabled::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetSoftLivestreamPrivacyModeEnabled(GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetSoftLivestreamPrivacyModeEnabled(
+            GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled());
         break;
     }
     case NightVision::Id: {

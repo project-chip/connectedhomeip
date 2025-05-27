@@ -244,11 +244,11 @@ public:
 
         // Get/Set soft recording privacy mode
         virtual CameraError SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode) = 0;
-        virtual bool GetSoftRecordingPrivacyModeEnabled() = 0;
+        virtual bool GetSoftRecordingPrivacyModeEnabled()                                     = 0;
 
         // Get/Set soft livestream privacy mode
         virtual CameraError SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode) = 0;
-        virtual bool GetSoftLivestreamPrivacyModeEnabled() = 0;
+        virtual bool GetSoftLivestreamPrivacyModeEnabled()                                      = 0;
 
         // Does camera have a hard privacy switch
         virtual bool HasHardPrivacySwitch() = 0;
@@ -258,7 +258,7 @@ public:
 
         // Get/Set night vision
         virtual CameraError SetNightVision(TriStateAutoEnum nightVision) = 0;
-        virtual TriStateAutoEnum GetNightVision() = 0;
+        virtual TriStateAutoEnum GetNightVision()                        = 0;
 
         // Set the viewport for all streams
         virtual CameraError SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) = 0;
@@ -278,7 +278,7 @@ public:
         virtual CameraError SetSpeakerMuted(bool muteSpeaker) = 0;
 
         // Get/Set speaker volume level.
-        virtual uint8_t GetSpeakerVolume() = 0;
+        virtual uint8_t GetSpeakerVolume()                       = 0;
         virtual CameraError SetSpeakerVolume(uint8_t speakerVol) = 0;
 
         // Get the speaker max and min levels.
