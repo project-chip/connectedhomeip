@@ -570,21 +570,26 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SetSimulatedSoilMoisture")
     {
-        uint8_t soilMoisture = static_cast<uint8_t>(self->mJsonValue["SoilMoistureValue"].asUInt());
-        EndpointId endpoint  = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        EndpointId endpoint          = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        Json::Value jsonSoilMoisture = self->mJsonValue["SoilMoistureValue"];
+        DataModel::Nullable<Percent> soilMoistureMeasuredValue;
 
         if (endpoint != 1)
         {
             ChipLogError(NotSpecified, "Invalid EndpointId to set Soil Moisture value.");
+            return;
         }
-        else if (soilMoisture > 100)
+
+        if (jsonSoilMoisture.isNull())
         {
-            ChipLogError(NotSpecified, "Invalid Soil Moisture value to set.");
+            soilMoistureMeasuredValue.SetNull();
         }
         else
         {
-            self->OnSoilMoistureChange(endpoint, soilMoisture);
+            soilMoistureMeasuredValue.SetNonNull(static_cast<uint8_t>(self->mJsonValue["SoilMoistureValue"].asUInt()));
         }
+
+        self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
     }
     else
     {
@@ -948,17 +953,25 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
     }
 }
 
-void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, uint8_t soilMoisture)
+void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, DataModel::Nullable<Percent> soilMoisture)
 {
-    if (soilMoisture > 100)
+    SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
+
+    if (soilMoisture.IsNull())
     {
-        ChipLogDetail(NotSpecified, "Invalid value/endpoint to set.");
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
+    }
+    else if (soilMoisture.Value() > 100)
+    {
+        ChipLogDetail(NotSpecified, "Invalid SoilMoisture value");
         return;
     }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
+    }
 
-    SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
     soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture);
-    ChipLogDetail(NotSpecified, "Set Soil Moisture value to %u", soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
