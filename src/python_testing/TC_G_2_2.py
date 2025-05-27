@@ -216,7 +216,7 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
         self.step("7b")
-        kGroupNameInUnused = "Gp13"
+        kGroupNameInUnused = "GpUnused"
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupIdUnused, kGroupNameInUnused))
         asserts.assert_equal(result.status, Status.ResourceExhausted,
                              "Returned status is different from expected ResourceExhausted")
