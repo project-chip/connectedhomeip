@@ -36,12 +36,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:133
+            image: ghcr.io/project-chip/chip-build:134
 
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-
+s
             # Bootstrap and checkout for internal scripts (like idl_lint)
             # to run
             - name: Checkout submodules & Bootstrap
