@@ -66,9 +66,10 @@ class TC_LUNIT_3_1(MatterBaseTest):
 
     def steps_TC_LUNIT_3_1(self) -> list[TestStep]:
         steps = [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commission DUT if required", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the TemperatureUnit attribute"),
-            TestStep(2, "If supported, TH reads from the DUT the SupportedTemperatureUnits attribute", "Verify the "),
+            TestStep(2, "If supported, TH reads from the DUT the SupportedTemperatureUnits attribute",
+                     "Verify the list length is between 2 and 3 inclusive.\nVerify that each entry in the list is a valid\nTempUnitEnum value and is unique."),
             TestStep(3, "If the SupportedTemperatureUnits is supported, TH creates a `supported` list With each entry in SupportedUnitsList. If SupportedTemperatureUnits is not supported, TH creates a `supported` list with Celsius and Fahrenheit. TH writes each entry in the `supported` list to the DUT the TemperatureUnit attribute", "Write is successful"),
             TestStep(4, "If the SupportedTemperatureUnits is supported, TH construct a list with valid TempUnitEnum values that are not contained in SupportedUnitsList"),
             TestStep(5, "if the SupportedTemperatureUnits is supported, With each entry in UnsupportedUnitsList, TH writes to the DUT the TemperatureUnit attribute",
