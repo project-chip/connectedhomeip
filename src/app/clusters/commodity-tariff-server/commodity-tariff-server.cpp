@@ -48,13 +48,13 @@ void UnlockThreadTask(void)
 
 bool CommodityTariffDataProvider::TariffDataUpd_Init(const CommodityTariffPrimaryData& aNewData)
 {
-        bool allValid = true;
+        CHIP_ERROR err = CHIP_NO_ERROR;
 
 #define X(attrName, attrType) \
-        attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, mFeature);
+        err = attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, mFeature);
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
-
+/*
 #define X(attrName, attrType) \
         if (!attrName##_MgmtObj.IsValid()) { \
             ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) is invalid", Attributes::attrName::Id); \
@@ -62,8 +62,13 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
         }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
+*/
+        if (err != CHIP_NO_ERROR)
+        {
+            return false;
+        }
 
-        return allValid;
+        return true;
 }
 
 void CommodityTariffDataProvider::TariffDataUpd_Commit()
@@ -90,8 +95,13 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 }
 
-bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator()
+bool CommodityTariffDataProvider::TariffDataUpd_Validator()
 {
+    if (!TariffInfo_MgmtObj.GetValue().IsNull())
+    {
+        return false;
+    }
+
     //CheckDayPatterns
     //CheckDayEntries
     //CheckTariffPeriods    
@@ -109,7 +119,7 @@ void CommodityTariffDataProvider::TariffDataUpdate(const CommodityTariffPrimaryD
     {
         ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
     }
-    else if (!TariffDataUpd_CrossValidator())
+    else if (!TariffDataUpd_Validator())
     {
         ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
     }

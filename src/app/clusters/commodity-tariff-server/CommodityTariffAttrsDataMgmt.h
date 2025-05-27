@@ -261,21 +261,19 @@ public:
      * @brief Performs a pre-validation of arguments value before assigning it as newValue
      * @param aValue New value for future update mValue
      */
-     void UpdateBegin(const T & aValue, BitMask<Feature> aFeatureMap) {
+     CHIP_ERROR UpdateBegin(const T & aValue, BitMask<Feature> aFeatureMap) {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         mFeatureMap = aFeatureMap;
 
         err = Validate(aValue);
 
-        if (err != CHIP_NO_ERROR)
+        if (CHIP_NO_ERROR == err)
         {
-            return;
+            mNewValue = aValue;
         };
 
-        is_valid = true;
-
-        mNewValue = aValue;
+        return err;
     };
 
     void UpdateCommit()
@@ -351,36 +349,9 @@ protected:
      * 
      * @note Derived classes should override for custom validation
      */
-    CHIP_ERROR Validate(const T & aValue) {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if constexpr (IsValueNullable())
-        {
-            if constexpr (IsList<WrappedType>::value)
-            {
-                err = ValidateList(aValue.Value());
-            }
-            else if constexpr (IsStruct<WrappedType>::value || IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value)
-            {
-                err = ValidateValue(aValue.Value());
-            }
-            else {
-                static_assert(false, "Unexpected Nullable wrapped type");
-            }
-        }
-        else if constexpr (IsValueList())
-        {
-            ValidateList(mValue);
-        }
-        else
-        {
-            InspectTypes();
-            static_assert(false, "Unexpected type");
-        }
-
-        return err;
+    virtual CHIP_ERROR Validate(const ValueType & aValue) const {
+        return CHIP_NO_ERROR;
     }
-
 
     virtual bool CompareStructValue(const PayloadType& source, const PayloadType& destination) const 
     {
@@ -447,27 +418,6 @@ protected:
             return ListsNotEqual(mNewValue, mValue);
         }
     }
-
-    virtual CHIP_ERROR ValidateValue(const PayloadType & newValue) const {
-        return CHIP_NO_ERROR;
-    }
-
-    virtual CHIP_ERROR ValidateListEntry(const PayloadType & newValue) const {
-        return CHIP_NO_ERROR;
-    }
-
-    virtual CHIP_ERROR ValidateList(const WrappedType& newList) const {
-        /*CHIP_ERROR err = CHIP_ERROR_INVALID_LIST_LENGTH;
-        for (const auto& item : newList) {
-            err = ValidateListEntry(item);
-            if (err != CHIP_NO_ERROR)
-            {
-                break;
-            }
-        }
-        return err;*/
-        return CHIP_NO_ERROR;
-   }
 
     /**
      * @brief Clean up list memory
