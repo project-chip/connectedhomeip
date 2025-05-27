@@ -218,7 +218,6 @@ fi
 mkdir -p "$COVERAGE_ROOT"
 
 lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors inconsistent \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
@@ -226,15 +225,13 @@ lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
     --output-file "$COVERAGE_ROOT/lcov_base.info"
 
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors inconsistent \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
     --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_test.info"
 
-lcov --ignore-errors inconsistent \
-    --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
+lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
     --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_final.info"
@@ -244,6 +241,12 @@ genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
     --header-title "Matter SDK Coverage Report"
+
+gcovr --exclude=zzz_generated/ \
+    --exclude=third_party/  \
+    --include=src/  \
+    --gcov-ignore-parse-errors \
+    --xml=$COVERAGE_ROOT/coverage.xml
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
