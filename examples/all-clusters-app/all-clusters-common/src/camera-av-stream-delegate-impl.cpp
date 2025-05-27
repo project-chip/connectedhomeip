@@ -341,6 +341,9 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     features.Set(Feature::kPrivacy);
     features.Set(Feature::kSpeaker);
     features.Set(Feature::kLocalStorage);
+    features.Set(Feature::kWatermark);
+    features.Set(Feature::kOnScreenDisplay);
+    features.Set(Feature::kHighDynamicRange);
 
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(OptionalAttribute::kNightVision);

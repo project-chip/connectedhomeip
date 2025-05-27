@@ -654,6 +654,11 @@ VideoSensorParamsStruct & CameraDevice::GetVideoSensorParams()
     return videoSensorParams;
 }
 
+bool CameraDevice::GetCameraSupportsHDR()
+{
+    return true;
+}
+
 bool CameraDevice::GetCameraSupportsNightVision()
 {
     return true;
@@ -662,6 +667,21 @@ bool CameraDevice::GetCameraSupportsNightVision()
 bool CameraDevice::GetNightVisionUsesInfrared()
 {
     return false;
+}
+
+bool CameraDevice::GetCameraSupportsWatermark()
+{
+    return true;
+}
+
+bool CameraDevice::GetCameraSupportsOSD()
+{
+    return true;
+}
+
+bool CameraDevice::GetCameraSupportsSoftPrivacy()
+{
+    return true;
 }
 
 bool CameraDevice::GetCameraSupportsImageControl()
@@ -700,7 +720,11 @@ AudioCapabilitiesStruct & CameraDevice::GetMicrophoneCapabilities()
 
 AudioCapabilitiesStruct & CameraDevice::GetSpeakerCapabilities()
 {
-    static AudioCapabilitiesStruct speakerCapabilities = {};
+    static std::array<AudioCodecEnum, 2> audioCodecs   = { AudioCodecEnum::kOpus, AudioCodecEnum::kAacLc };
+    static std::array<uint32_t, 2> sampleRates         = { 48000, 32000 }; // Sample rates in Hz
+    static std::array<uint8_t, 2> bitDepths            = { 24, 32 };
+    static AudioCapabilitiesStruct speakerCapabilities = { kSpeakerMaxChannelCount, chip::Span<AudioCodecEnum>(audioCodecs),
+                                                           chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths) };    
     return speakerCapabilities;
 }
 
@@ -712,6 +736,13 @@ std::vector<SnapshotCapabilitiesStruct> & CameraDevice::GetSnapshotCapabilities(
                                                                               false,
                                                                               chip::MakeOptional(static_cast<bool>(false)) } };
     return snapshotCapabilities;
+}
+
+CameraError CameraDevice::SetNightVision(TriStateAutoEnum nightVision)
+{
+    mNightVision = nightVision;
+
+    return CameraError::SUCCESS;
 }
 
 uint32_t CameraDevice::GetMaxNetworkBandwidth()
@@ -753,6 +784,36 @@ CameraError CameraDevice::SetViewport(VideoStream & stream,
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode)
+{
+    mSoftRecordingPrivacyModeEnabled = softRecordingPrivacyMode;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode)
+{
+    mSoftLivestreamPrivacyModeEnabled = softLivestreamPrivacyMode;
+
+    return CameraError::SUCCESS;
+}
+
+// Mute/Unmute speaker.
+CameraError CameraDevice::SetSpeakerMuted(bool muteSpeaker)
+{
+    mSpeakerMuted = muteSpeaker;
+
+    return CameraError::SUCCESS;
+}
+
+// Set speaker volume level.
+CameraError CameraDevice::SetSpeakerVolume(uint8_t speakerVol)
+{
+    mSpeakerVol = speakerVol;
+
+    return CameraError::SUCCESS;
+}
+
 // Mute/Unmute microphone.
 CameraError CameraDevice::SetMicrophoneMuted(bool muteMicrophone)
 {
@@ -765,6 +826,27 @@ CameraError CameraDevice::SetMicrophoneMuted(bool muteMicrophone)
 CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
 {
     mMicrophoneVol = microphoneVol;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetLocalVideoRecordingEnabled(bool localVideoRecordingEnabled)
+{
+    mLocalVideoRecordingEnabled = localVideoRecordingEnabled;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetLocalSnapshotRecordingEnabled(bool localSnapshotRecordingEnabled)
+{
+    mLocalSnapshotRecordingEnabled = localSnapshotRecordingEnabled;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetStatusLightEnabled(bool statusLightEnabled)
+{
+    mStatusLightEnabled = statusLightEnabled;
 
     return CameraError::SUCCESS;
 }

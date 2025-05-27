@@ -65,6 +65,10 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
                 // Inform DPTZ that there's an allocated stream
                 mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
+
+                // Set the current frame rate attribute from HAL once stream has started
+                GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());                
+
                 return Status::Success;
             }
             else
@@ -287,12 +291,15 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         break;
     }
     case SoftRecordingPrivacyModeEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetSoftRecordingPrivacyModeEnabled(GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled());        
         break;
     }
     case SoftLivestreamPrivacyModeEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetSoftLivestreamPrivacyModeEnabled(GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled());
         break;
     }
     case NightVision::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetNightVision(GetCameraAVStreamMgmtServer()->GetNightVision());
         break;
     }
     case NightVisionIllum::Id: {
@@ -327,6 +334,20 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     }
     case MicrophoneVolumeLevel::Id: {
         mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneVolume(GetCameraAVStreamMgmtServer()->GetMicrophoneVolumeLevel());
+        break;
+    }
+    case LocalVideoRecordingEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetLocalVideoRecordingEnabled(
+            GetCameraAVStreamMgmtServer()->GetLocalVideoRecordingEnabled());
+        break;
+    }
+    case LocalSnapshotRecordingEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetLocalSnapshotRecordingEnabled(
+            GetCameraAVStreamMgmtServer()->GetLocalSnapshotRecordingEnabled());
+        break;
+    }
+    case StatusLightEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetStatusLightEnabled(GetCameraAVStreamMgmtServer()->GetStatusLightEnabled());
         break;
     }
     default:
