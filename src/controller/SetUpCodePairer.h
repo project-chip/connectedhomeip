@@ -50,6 +50,12 @@ namespace Controller {
 
 class DeviceCommissioner;
 
+/**
+ * A class that represents a discovered device.  This includes both the inputs to discovery (via the
+ * RendezvousParameters super-class), and the outputs from discovery (the PeerAddress in
+ * RendezvousParameters but also some of our members like mHostName, mInterfaceId,
+ * mLongDiscriminator).
+ */
 class SetUpCodePairerParameters : public RendezvousParameters
 {
 public:
@@ -60,6 +66,12 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
     char mHostName[Dnssd::kHostNameMaxLength + 1] = {};
     Inet::InterfaceId mInterfaceId;
+
+    // The long discriminator of the device that was actually discovered, if this is known.  This
+    // differs from the mSetupDiscriminator member of RendezvousParameters in that the latter may be
+    // a short discriminator from a numeric setup code (which may match multiple devices), while
+    // this member, if set, is always a long discriminator that was actually advertised by the
+    // device represented by our PeerAddress.
     std::optional<uint16_t> mLongDiscriminator = std::nullopt;
 };
 

@@ -50,6 +50,15 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
     std::vector<SetupPayload> payloads;
     ReturnErrorOnFailure(SetupPayload::FromStringRepresentation(setUpCode, payloads));
 
+    // If the caller has provided a specific single resolution data, and we were
+    // only looking for one commissionee, and the caller says that the provided
+    // data matches that one commissionee, just go ahead and use the provided data.
+    //
+    // If we were looking for more than one device (i.e. if either of the
+    // payload arrays involved does not have length 1), we can't make use of the
+    // incoming resolution data, since it does not contain the long
+    // discriminator of the thing that was discovered, and therefore we can't
+    // tell which setup passcode to use for it.
     if (resolutionData.HasValue() && payloads.size() == 1 && mSetupPayloads.size() == 1)
     {
         VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, discoveryType != DiscoveryType::kAll,
@@ -58,7 +67,7 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
             mDiscoveryType == discoveryType)
         {
             // Not passing a discriminator is ok, since we have only one payload.
-            NotifyCommissionableDeviceDiscovered(resolutionData.Value(), std::nullopt);
+            NotifyCommissionableDeviceDiscovered(resolutionData.Value(), /* matchedLongDiscriminator = */ std::nullopt);
             return CHIP_NO_ERROR;
         }
     }
@@ -74,7 +83,7 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
     {
         // No need to pass in a discriminator if we have only one payload, which
         // is good because we don't have a full discriminator here anyway.
-        NotifyCommissionableDeviceDiscovered(resolutionData.Value(), std::nullopt);
+        NotifyCommissionableDeviceDiscovered(resolutionData.Value(), /* matchedLongDiscriminator = */ std::nullopt);
         return CHIP_NO_ERROR;
     }
 
@@ -145,6 +154,9 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverBLE()
     // Handle possibly-sync callbacks.
     mWaitingForDiscovery[kBLETransport] = true;
     CHIP_ERROR err;
+    // Not all BLE backends support the new NewBleConnectionByDiscriminators
+    // API, so use the old one when we can (i.e. when we only have one setup
+    // payload), to avoid breaking existing API consumers.
     if (mSetupPayloads.size() == 1)
     {
         err = mBleLayer->NewBleConnectionByDiscriminator(mSetupPayloads[0].discriminator, this, OnDiscoveredDeviceOverBleSuccess,
