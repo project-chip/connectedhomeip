@@ -151,6 +151,9 @@ public:
 
     bool GetHardPrivacyMode() override { return mHardPrivacyModeOn; }
 
+    CameraError SetNightVision(chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum nightVision) override;
+    chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum GetNightVision() override { return mNightVision; }
+
     std::vector<StreamUsageEnum> & GetSupportedStreamUsages() override;
 
     std::vector<StreamUsageEnum> & GetRankedStreamPriorities() override { return mRankedStreamPriorities; }
@@ -211,6 +214,24 @@ public:
     uint8_t GetMicrophoneMaxLevel() override { return mMicrophoneMaxLevel; }
     uint8_t GetMicrophoneMinLevel() override { return mMicrophoneMinLevel; }
 
+    // Does camera have local storage
+    bool HasLocalStorage() override { return false; }
+
+    // Set/Get LocalVideoRecordingEnabled
+    CameraError SetLocalVideoRecordingEnabled(bool localVideoRecordingEnabled) override;
+    bool GetLocalVideoRecordingEnabled() override { return mLocalVideoRecordingEnabled; }
+
+    // Set/Get LocalSnapshotRecordingEnabled
+    CameraError SetLocalSnapshotRecordingEnabled(bool localSnapshotRecordingEnabled) override;
+    bool GetLocalSnapshotRecordingEnabled() override { return mLocalSnapshotRecordingEnabled; }
+
+    // Does camera have a status light
+    bool HasStatusLight() override { return true; }
+
+    // Set/Get StatusLightEnabled
+    CameraError SetStatusLightEnabled(bool statusLightEnabled) override;
+    bool GetStatusLightEnabled() override { return mStatusLightEnabled; }
+
     int16_t GetPanMin() override;
 
     int16_t GetPanMax() override;
@@ -269,6 +290,7 @@ private:
     bool mSpeakerMuted                                                      = false;
     bool mMicrophoneMuted                                                   = false;
     bool mHardPrivacyModeOn                                                 = false;
+    chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum mNightVision                                           = chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum::kOff;
     bool mSoftRecordingPrivacyModeEnabled                                   = false;
     bool mSoftLivestreamPrivacyModeEnabled                                  = false;
     uint8_t mSpeakerVol                                                     = kSpeakerMinLevel;
@@ -277,6 +299,9 @@ private:
     uint8_t mMicrophoneVol                                                  = kMicrophoneMinLevel;
     uint8_t mMicrophoneMinLevel                                             = kMicrophoneMinLevel;
     uint8_t mMicrophoneMaxLevel                                             = kMicrophoneMaxLevel;
+    bool mLocalVideoRecordingEnabled                                        = false;
+    bool mLocalSnapshotRecordingEnabled                                     = false;
+    bool mStatusLightEnabled                                                = false;
 
     std::vector<StreamUsageEnum> mRankedStreamPriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 };

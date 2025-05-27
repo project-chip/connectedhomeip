@@ -33,6 +33,7 @@ using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
+using chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum;
 using chip::app::Clusters::Globals::StreamUsageEnum;
 
 struct VideoStream
@@ -255,6 +256,9 @@ public:
         // Get whether hard privacy mode is On
         virtual bool GetHardPrivacyMode() = 0;
 
+        virtual CameraError SetNightVision(TriStateAutoEnum nightVision) = 0;
+        virtual TriStateAutoEnum GetNightVision()                        = 0;
+
         // Set the viewport for all streams
         virtual CameraError SetViewport(const ViewportStruct & viewPort) = 0;
 
@@ -293,6 +297,21 @@ public:
         // Get the microphone max and min levels.
         virtual uint8_t GetMicrophoneMaxLevel() = 0;
         virtual uint8_t GetMicrophoneMinLevel() = 0;
+
+        // Does camera have local storage
+        virtual bool HasLocalStorage() = 0;
+
+        virtual CameraError SetLocalVideoRecordingEnabled(bool localVideoRecordingEnabled) = 0;
+        virtual bool GetLocalVideoRecordingEnabled()                                       = 0;
+
+        virtual CameraError SetLocalSnapshotRecordingEnabled(bool localSnapshotRecordingEnabled) = 0;
+        virtual bool GetLocalSnapshotRecordingEnabled()                                          = 0;
+
+        // Does camera have a status light
+        virtual bool HasStatusLight() = 0;
+
+        virtual CameraError SetStatusLightEnabled(bool statusLightEnabled) = 0;
+        virtual bool GetStatusLightEnabled()                               = 0;
 
         // Set Pan, Tilt, and Zoom
         virtual CameraError SetPan(int16_t aPan)   = 0;

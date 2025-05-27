@@ -46,7 +46,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     features.Set(CameraAvStreamManagement::Feature::kSnapshot);
     features.Set(CameraAvStreamManagement::Feature::kVideo);
 
-    // Enable the Watermark and OSD fealtures if camera supports
+    // Enable the Watermark and OSD features if camera supports
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsWatermark())
     {
         features.Set(CameraAvStreamManagement::Feature::kWatermark);
@@ -68,6 +68,11 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         features.Set(CameraAvStreamManagement::Feature::kAudio);
     }
 
+    if (mCameraDevice->GetCameraHALInterface().HasLocalStorage())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kLocalStorage);
+    }
+
     // Check if camera has speaker
     if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
     {
@@ -84,13 +89,17 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
     {
         features.Set(CameraAvStreamManagement::Feature::kNightVision);
-        optionalAttrs.Set(OptionalAttribute::kNightVision);
-        optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
     {
         optionalAttrs.Set(OptionalAttribute::kHardPrivacyModeOn);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
+    {
+        optionalAttrs.Set(OptionalAttribute::kStatusLightEnabled);
+        optionalAttrs.Set(OptionalAttribute::kStatusLightBrightness);
     }
 
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
@@ -154,12 +163,51 @@ void CameraApp::InitializeCameraAVStreamMgmt()
         mAVStreamMgmtServerPtr->SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode());
     }
 
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
+    {
+        mAVStreamMgmtServerPtr->SetSoftRecordingPrivacyModeEnabled(mCameraDevice->GetCameraHALInterface().GetSoftRecordingPrivacyModeEnabled());
+        mAVStreamMgmtServerPtr->SetSoftLivestreamPrivacyModeEnabled(mCameraDevice->GetCameraHALInterface().GetSoftLivestreamPrivacyModeEnabled());
+    }
+
     if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
     {
         mAVStreamMgmtServerPtr->SetHardPrivacyModeOn(mCameraDevice->GetCameraHALInterface().GetHardPrivacyMode());
     }
 
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
+    {
+        mAVStreamMgmtServerPtr->SetNightVision(mCameraDevice->GetCameraHALInterface().GetNightVision());
+    }
+
     mAVStreamMgmtServerPtr->SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
+
+    if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
+    {
+        mAVStreamMgmtServerPtr->SetSpeakerMuted(mCameraDevice->GetCameraHALInterface().GetSpeakerMuted());
+        mAVStreamMgmtServerPtr->SetSpeakerVolumeLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerVolume());
+        mAVStreamMgmtServerPtr->SetSpeakerMaxLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerMaxLevel());
+        mAVStreamMgmtServerPtr->SetSpeakerMinLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerMinLevel());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
+    {
+        mAVStreamMgmtServerPtr->SetMicrophoneMuted(mCameraDevice->GetCameraHALInterface().GetMicrophoneMuted());
+        mAVStreamMgmtServerPtr->SetMicrophoneVolumeLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneVolume());
+        mAVStreamMgmtServerPtr->SetMicrophoneMaxLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneMaxLevel());
+        mAVStreamMgmtServerPtr->SetMicrophoneMinLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneMinLevel());
+    }
+
+    // Video and Snapshot features are already enabled.
+    if (mCameraDevice->GetCameraHALInterface().HasLocalStorage())
+    {
+        mAVStreamMgmtServerPtr->SetLocalVideoRecordingEnabled(mCameraDevice->GetCameraHALInterface().GetLocalVideoRecordingEnabled());
+        mAVStreamMgmtServerPtr->SetLocalSnapshotRecordingEnabled(mCameraDevice->GetCameraHALInterface().GetLocalSnapshotRecordingEnabled());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
+    {
+        mAVStreamMgmtServerPtr->SetStatusLightEnabled(mCameraDevice->GetCameraHALInterface().GetStatusLightEnabled());
+    }
 
     mAVStreamMgmtServerPtr->Init();
 }
