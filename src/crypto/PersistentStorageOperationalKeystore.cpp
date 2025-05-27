@@ -169,6 +169,19 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
 
 } // namespace
 
+PersistentStorageOperationalKeystore::PersistentStorageOperationalKeystore() = default;
+
+/**
+ * @brief Finalize the keystore, so that subsequent operations fail
+ */
+void PersistentStorageOperationalKeystore::Finish()
+{
+    VerifyOrReturn(mStorage != nullptr);
+
+    ResetPendingKey();
+    mStorage = nullptr;
+}
+
 bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) const
 {
     VerifyOrReturnError(mStorage != nullptr, false);

@@ -39,7 +39,7 @@ namespace chip {
 class PersistentStorageOperationalKeystore : public Crypto::OperationalKeystore
 {
 public:
-    PersistentStorageOperationalKeystore() = default;
+    PersistentStorageOperationalKeystore();
     virtual ~PersistentStorageOperationalKeystore() { Finish(); }
 
     // Non-copyable
@@ -64,16 +64,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    /**
-     * @brief Finalize the keystore, so that subsequent operations fail
-     */
-    void Finish()
-    {
-        VerifyOrReturn(mStorage != nullptr);
-
-        ResetPendingKey();
-        mStorage = nullptr;
-    }
+    void Finish();
 
     bool HasPendingOpKeypair() const override { return (mPendingKeypair != nullptr); }
 
