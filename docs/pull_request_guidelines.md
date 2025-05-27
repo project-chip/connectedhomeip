@@ -41,7 +41,7 @@ following items are met (and see below for details)
 
 Describe the change as a one-line in some descriptive manner. Add sufficient
 context for a reader to understand what is improved. If platform-specific
-consider adding the platform as a prefix, like `[Android]` or any other tags may
+consider adding the platform as a prefix, like `[Android]` or any other tags that may
 be useful for quick filtering like `[TC-ABC-1.2]` to tag test changes.
 
 Examples of descriptive titles:
@@ -73,7 +73,7 @@ to be possible to begin with). The downside is that a full CI run is required
 before merging (typically 2+ hours for a full run). At this time we prioritize
 reviewer time and prefer small patches.
 
-Patch size generally consider "updated" code, however we do not consider test
+Patch size generally considers "updated" code, however we do not consider test
 file changes (it is common for test files to be larger than the implementation)
 nor generated files (generally files in `zzz_generated`, `*.matter` files or
 files under a `/generated/` folder like for darwin/kotlin/java/python)
@@ -122,7 +122,7 @@ details:
 
 #### Coverage
 
-We are working on automated coverage, however in the mean time we would
+We are working on automated coverage, however in the meantime we would
 appreciate some automated test coverage information in the PR summary: are only
 happy paths covered? Any corner cases that are not/could not be covered?
 
@@ -137,9 +137,9 @@ Reviewers are likely to have less context than someone actively working on a PR.
 Provide sufficient information for a reviewer to understand the change. Include:
 
 -   a `TLDR` of the change content. This is a judgment call on details,
-    generally you should include a what was changed and why. The change is
+    generally you should include what was changed and why. If the change is
     trivial/short, this can be very short (i.e. "fixed typos" is perfectly
-    acceptable, however if changing 100-1000s of line, the areas of changes
+    acceptable, however if changing 100-1000s of lines, the areas of changes
     should be explained)
 -   If a crash/error is fixed, explain the root cause and if the fix is not
     obvious (again, judgment call), explain why the given approach was taken.
@@ -170,7 +170,7 @@ Provide sufficient information for a reviewer to understand the change. Include:
 
 ### PR updates post review
 
-Try to make changes based on reviewer comment in one or few commits without any
+Try to make changes based on reviewer comments in one or few commits without any
 "squash" or "merge with master". This makes it easier for reviewers to validate
 that their comments were addressed.
 
