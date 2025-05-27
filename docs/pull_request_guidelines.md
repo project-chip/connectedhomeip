@@ -41,8 +41,8 @@ following items are met (and see below for details)
 
 Describe the change as a one-line in some descriptive manner. Add sufficient
 context for a reader to understand what is improved. If platform-specific
-consider adding the platform as a prefix, like `[Android]` or any other tags that may
-be useful for quick filtering like `[TC-ABC-1.2]` to tag test changes.
+consider adding the platform as a prefix, like `[Android]` or any other tags
+that may be useful for quick filtering like `[TC-ABC-1.2]` to tag test changes.
 
 Examples of descriptive titles:
 
