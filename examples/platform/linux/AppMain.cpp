@@ -805,30 +805,23 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationInit();
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    auto & platformMgr = chip::DeviceLayer::PlatformMgrImpl();
+    platformMgr.RegisterSignalHandler(SIGINT, ^{
+        platformMgr.UnregisterAllSignalHandlers();
+        StopSignalHandler(SIGINT);
+    });
+
+    platformMgr.RegisterSignalHandler(SIGTERM, ^{
+        platformMgr.UnregisterAllSignalHandlers();
+        StopSignalHandler(SIGTERM);
+    });
+#else
     // NOTE: For some reason, on Darwin, the signal handler is not called if the signal is
     //       registered with sigaction() call and TSAN is enabled. The problem seems to be
     //       related with the dispatch_semaphore_wait() function in the RunEventLoop() method.
     //       If this call is commented out, the signal handler is called as expected...
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
-
-    dispatch_source_t sourceSigInt = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGINT, 0, workQueue);
-    dispatch_source_set_event_handler(sourceSigInt, ^{
-        StopSignalHandler(SIGINT);
-        dispatch_release(sourceSigInt);
-    });
-    dispatch_resume(sourceSigInt);
-    signal(SIGINT, SIG_IGN);
-
-    dispatch_source_t sourceSigTerm = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGTERM, 0, workQueue);
-    dispatch_source_set_event_handler(sourceSigTerm, ^{
-        StopSignalHandler(SIGTERM);
-        dispatch_release(sourceSigTerm);
-    });
-    dispatch_resume(sourceSigTerm);
-    signal(SIGTERM, SIG_IGN);
-#else
     // NOLINTBEGIN(bugprone-signal-handler)
     signal(SIGINT, StopSignalHandler);
     signal(SIGTERM, StopSignalHandler);

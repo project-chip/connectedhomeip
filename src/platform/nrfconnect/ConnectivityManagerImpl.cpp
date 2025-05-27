@@ -44,10 +44,7 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-// Temporary workaround for lack of the public Zephyr's API for MLDv2.
-// Should be removed after https://github.com/zephyrproject-rtos/zephyr/pull/79274 is merged.
-extern "C" int net_ipv6_mld_join(struct net_if * iface, const struct in6_addr * addr);
-extern "C" int net_ipv6_mld_leave(struct net_if * iface, const struct in6_addr * addr);
+#include <zephyr/net/mld.h>
 #endif
 
 using namespace ::chip::Inet;

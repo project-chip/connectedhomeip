@@ -939,9 +939,12 @@ bool InterfaceAddressIterator::Next()
             mIpv6 = config->ip.ipv6;
         }
 
-        while (++mCurAddrIndex < NET_IF_MAX_IPV6_ADDR)
-            if (mIpv6->unicast[mCurAddrIndex].is_used)
-                return true;
+        if (mIpv6)
+        {
+            while (++mCurAddrIndex < NET_IF_MAX_IPV6_ADDR)
+                if (mIpv6->unicast[mCurAddrIndex].is_used)
+                    return true;
+        }
 
         mCurAddrIndex = -1;
         mIntfIter.Next();

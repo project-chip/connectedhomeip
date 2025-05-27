@@ -196,6 +196,75 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeICECandidateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _candidate = @"";
+
+        _sdpMid = nil;
+
+        _sdpmLineIndex = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeICECandidateStruct alloc] init];
+
+    other.candidate = self.candidate;
+    other.sdpMid = self.sdpMid;
+    other.sdpmLineIndex = self.sdpmLineIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: candidate:%@; sdpMid:%@; sdpmLineIndex:%@; >", NSStringFromClass([self class]), _candidate, _sdpMid, _sdpmLineIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeICEServerStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _urls = [NSArray array];
+
+        _username = nil;
+
+        _credential = nil;
+
+        _caid = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeICEServerStruct alloc] init];
+
+    other.urls = self.urls;
+    other.username = self.username;
+    other.credential = self.credential;
+    other.caid = self.caid;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: urls:%@; username:%@; credential:%@; caid:%@; >", NSStringFromClass([self class]), _urls, _username, _credential, _caid];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeLocationDescriptorStruct
 - (instancetype)init
 {
@@ -290,6 +359,54 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeWebRTCSessionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _id = @(0);
+
+        _peerNodeID = @(0);
+
+        _peerEndpointID = @(0);
+
+        _streamUsage = @(0);
+
+        _videoStreamID = nil;
+
+        _audioStreamID = nil;
+
+        _metadataEnabled = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeWebRTCSessionStruct alloc] init];
+
+    other.id = self.id;
+    other.peerNodeID = self.peerNodeID;
+    other.peerEndpointID = self.peerEndpointID;
+    other.streamUsage = self.streamUsage;
+    other.videoStreamID = self.videoStreamID;
+    other.audioStreamID = self.audioStreamID;
+    other.metadataEnabled = self.metadataEnabled;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataEnabled:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataEnabled, _fabricIndex];
     return descriptionString;
 }
 
@@ -5103,6 +5220,10 @@ NS_ASSUME_NONNULL_BEGIN
         _startSystime = nil;
 
         _endSystime = nil;
+
+        _apparentEnergy = nil;
+
+        _reactiveEnergy = nil;
     }
     return self;
 }
@@ -5116,13 +5237,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.endTimestamp = self.endTimestamp;
     other.startSystime = self.startSystime;
     other.endSystime = self.endSystime;
+    other.apparentEnergy = self.apparentEnergy;
+    other.reactiveEnergy = self.reactiveEnergy;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energy:%@; startTimestamp:%@; endTimestamp:%@; startSystime:%@; endSystime:%@; >", NSStringFromClass([self class]), _energy, _startTimestamp, _endTimestamp, _startSystime, _endSystime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energy:%@; startTimestamp:%@; endTimestamp:%@; startSystime:%@; endSystime:%@; apparentEnergy:%@; reactiveEnergy:%@; >", NSStringFromClass([self class]), _energy, _startTimestamp, _endTimestamp, _startSystime, _endSystime, _apparentEnergy, _reactiveEnergy];
     return descriptionString;
 }
 
@@ -9781,169 +9904,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRWebRTCTransportProviderClusterICEServerStruct
+@implementation MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _urls = [NSArray array];
+        _videoStreamID = @(0);
 
-        _username = nil;
-
-        _credential = nil;
-
-        _caid = nil;
+        _viewport = [MTRCameraAVSettingsUserLevelManagementClusterViewportStruct new];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRWebRTCTransportProviderClusterICEServerStruct alloc] init];
+    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct alloc] init];
 
-    other.urls = self.urls;
-    other.username = self.username;
-    other.credential = self.credential;
-    other.caid = self.caid;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: urls:%@; username:%@; credential:%@; caid:%@; >", NSStringFromClass([self class]), _urls, _username, _credential, _caid];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRWebRTCTransportProviderClusterWebRTCSessionStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _id = @(0);
-
-        _peerNodeID = @(0);
-
-        _peerEndpointID = @(0);
-
-        _streamUsage = @(0);
-
-        _videoStreamID = nil;
-
-        _audioStreamID = nil;
-
-        _metadataOptions = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRWebRTCTransportProviderClusterWebRTCSessionStruct alloc] init];
-
-    other.id = self.id;
-    other.peerNodeID = self.peerNodeID;
-    other.peerEndpointID = self.peerEndpointID;
-    other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
-    other.audioStreamID = self.audioStreamID;
-    other.metadataOptions = self.metadataOptions;
-    other.fabricIndex = self.fabricIndex;
+    other.viewport = self.viewport;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions, _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRWebRTCTransportRequestorClusterICEServerStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _urls = [NSArray array];
-
-        _username = nil;
-
-        _credential = nil;
-
-        _caid = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRWebRTCTransportRequestorClusterICEServerStruct alloc] init];
-
-    other.urls = self.urls;
-    other.username = self.username;
-    other.credential = self.credential;
-    other.caid = self.caid;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: urls:%@; username:%@; credential:%@; caid:%@; >", NSStringFromClass([self class]), _urls, _username, _credential, _caid];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRWebRTCTransportRequestorClusterWebRTCSessionStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _id = @(0);
-
-        _peerNodeID = @(0);
-
-        _peerEndpointID = @(0);
-
-        _streamUsage = @(0);
-
-        _videoStreamID = nil;
-
-        _audioStreamID = nil;
-
-        _metadataOptions = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRWebRTCTransportRequestorClusterWebRTCSessionStruct alloc] init];
-
-    other.id = self.id;
-    other.peerNodeID = self.peerNodeID;
-    other.peerEndpointID = self.peerEndpointID;
-    other.streamUsage = self.streamUsage;
-    other.videoStreamID = self.videoStreamID;
-    other.audioStreamID = self.audioStreamID;
-    other.metadataOptions = self.metadataOptions;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; viewport:%@; >", NSStringFromClass([self class]), _videoStreamID, _viewport];
     return descriptionString;
 }
 
@@ -11316,6 +11301,8 @@ NS_ASSUME_NONNULL_BEGIN
         _caid = @(0);
 
         _certificate = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -11326,13 +11313,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.caid = self.caid;
     other.certificate = self.certificate;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caid:%@; certificate:%@; >", NSStringFromClass([self class]), _caid, [_certificate base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caid:%@; certificate:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _caid, [_certificate base64EncodedStringWithOptions:0], _fabricIndex];
     return descriptionString;
 }
 
@@ -11348,6 +11336,8 @@ NS_ASSUME_NONNULL_BEGIN
         _clientCertificate = nil;
 
         _intermediateCertificates = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -11359,13 +11349,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.ccdid = self.ccdid;
     other.clientCertificate = self.clientCertificate;
     other.intermediateCertificates = self.intermediateCertificates;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; clientCertificate:%@; intermediateCertificates:%@; >", NSStringFromClass([self class]), _ccdid, [_clientCertificate base64EncodedStringWithOptions:0], _intermediateCertificates];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; clientCertificate:%@; intermediateCertificates:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _ccdid, [_clientCertificate base64EncodedStringWithOptions:0], _intermediateCertificates, _fabricIndex];
     return descriptionString;
 }
 

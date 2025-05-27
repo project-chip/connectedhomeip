@@ -39,11 +39,11 @@ public:
 
 private:
     template <typename T>
-    void RegisterInterfaces(std::vector<std::pair<uint32_t, T>> interfaces, uint16_t type)
+    void RegisterInterfaces(std::vector<std::pair<nw_interface_t, T>> interfaces, uint16_t type)
     {
         for (auto & interface : interfaces)
         {
-            auto interfaceId = interface.first;
+            auto interfaceId = nw_interface_get_index(interface.first);
 
             LogErrorOnFailure(RegisterInterface(interfaceId, interface.second, type));
         }
