@@ -55,6 +55,7 @@ from enum import Enum, auto
 from typing import Optional
 
 import chip.clusters as Clusters
+from chip.clusters.Attribute import ValueDecodeFailure
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
@@ -175,8 +176,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         for cluster_id in all_clusters:
             location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
             if cluster_id not in self.xml_clusters:
-                # TODO: Upgrade from warning when the spec XML stabilizes
-                self.record_warning(test_name="Access Checker", location=location, problem="Cluster not present in spec data")
+                self.record_error(test_name="Access Checker", location=location, problem="Cluster not present in spec data")
+                self.success = False
                 continue
             if cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
                 self.record_error(test_name="Access Checker", location=location, problem="Unknown cluster")
@@ -188,8 +189,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             for attribute_id in attrs[cluster_id]:
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 if attribute_id not in xml_cluster.attributes.keys():
-                    self.record_warning(test_name="Access Checker", location=location,
-                                        problem="Cluster attribute not found in spec XML")
+                    self.record_error(test_name="Access Checker", location=location,
+                                      problem="Cluster attribute not found in spec XML")
+                    self.success = False
                     continue
                 if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
                     self.record_error(test_name="Access Checker", location=location,
@@ -200,8 +202,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             for command_id in cmds[cluster_id]:
                 location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
                 if command_id not in xml_cluster.accepted_commands.keys():
-                    self.record_warning(test_name="Access Checker", location=location,
-                                        problem="Cluster command not found in spec XML")
+                    self.record_error(test_name="Access Checker", location=location,
+                                      problem="Cluster command not found in spec XML")
+                    self.success = False
                     continue
                 if command_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]:
                     self._record_error(test_name="Access Checker", location=location,
@@ -286,6 +289,11 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             # Because we read everything with admin, we should have this in the wildcard read
             # This will only not work if we end up with write-only attributes. We do not currently have any of these.
             val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
+            if isinstance(val, ValueDecodeFailure):
+                self.record_error(test_name=test_name, location=location,
+                                  problem=f"Attribute {attribute} returned a read error {val} - unable to write current value")
+                self.success = False
+                continue
             if isinstance(val, list):
                 # Use an empty list for writes in case the list is large and does not fit
                 val = []
