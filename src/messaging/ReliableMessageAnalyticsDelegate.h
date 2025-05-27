@@ -74,7 +74,7 @@ public:
         // When eventType is kAcknowledged, this will be populated with the number of milliseconds
         // that have elapsed between when the initial message was sent and when we received
         // acknowledgment for the message.
-        std::optional<uint64_t> ackLatency;
+        std::optional<uint64_t> ackLatencyMs;
     };
 
     virtual void OnTransmitEvent(const TransmitEvent & event) = 0;

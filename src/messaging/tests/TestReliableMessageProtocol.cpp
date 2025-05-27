@@ -2146,7 +2146,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(firstTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(firstTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
     EXPECT_EQ(firstTransmitEvent.retransmissionCount, std::nullopt);
-    EXPECT_EQ(firstTransmitEvent.ackLatency, std::nullopt);
+    EXPECT_EQ(firstTransmitEvent.ackLatencyMs, std::nullopt);
     // We have no way of validating the first messageCounter since this is a randomly generated value, but it should
     // remain constant for all subsequent transmit events in this test.
     const uint32_t messageCounter = firstTransmitEvent.messageCounter;
@@ -2157,7 +2157,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(secondTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(secondTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(secondTransmitEvent.retransmissionCount, 1);
-    EXPECT_EQ(secondTransmitEvent.ackLatency, std::nullopt);
+    EXPECT_EQ(secondTransmitEvent.ackLatencyMs, std::nullopt);
     EXPECT_EQ(messageCounter, secondTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2166,7 +2166,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(thirdTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(thirdTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(thirdTransmitEvent.retransmissionCount, 2);
-    EXPECT_EQ(thirdTransmitEvent.ackLatency, std::nullopt);
+    EXPECT_EQ(thirdTransmitEvent.ackLatencyMs, std::nullopt);
     EXPECT_EQ(messageCounter, thirdTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2175,7 +2175,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(fourthTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(fourthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(fourthTransmitEvent.retransmissionCount, 3);
-    EXPECT_EQ(fourthTransmitEvent.ackLatency, std::nullopt);
+    EXPECT_EQ(fourthTransmitEvent.ackLatencyMs, std::nullopt);
     EXPECT_EQ(messageCounter, fourthTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2184,7 +2184,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(fifthTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(fifthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(fifthTransmitEvent.retransmissionCount, 4);
-    EXPECT_EQ(fifthTransmitEvent.ackLatency, std::nullopt);
+    EXPECT_EQ(fifthTransmitEvent.ackLatencyMs, std::nullopt);
     EXPECT_EQ(messageCounter, fifthTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2193,9 +2193,9 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(sixthTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(sixthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kAcknowledged);
     EXPECT_EQ(sixthTransmitEvent.retransmissionCount, std::nullopt);
-    EXPECT_TRUE(sixthTransmitEvent.ackLatency.has_value());
+    EXPECT_TRUE(sixthTransmitEvent.ackLatencyMs.has_value());
     auto expectedMinimumAckLatencyTime = kTestRetryInterval * 5;
-    EXPECT_GT(sixthTransmitEvent.ackLatency, expectedMinimumAckLatencyTime.count());
+    EXPECT_GT(sixthTransmitEvent.ackLatencyMs, expectedMinimumAckLatencyTime.count());
     EXPECT_EQ(messageCounter, sixthTransmitEvent.messageCounter);
 }
 
