@@ -191,8 +191,7 @@ private:
     Variant<DeviceLayer::NetworkCommissioning::WiFiDriver *, DeviceLayer::NetworkCommissioning::ThreadDriver *> mpDriver;
 
     app::CommandHandler::Handle mAsyncCommandHandle;
-
-    ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
+    ConcreteCommandPath mAsyncCommandPath;
 
     // Last* attributes
     // Setting these values don't have to care about parallel requests, since we will reject other requests when there is

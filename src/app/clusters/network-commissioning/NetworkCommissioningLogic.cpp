@@ -197,7 +197,7 @@ void NetworkCommissioningLogic::SendNonConcurrentConnectNetworkResponse()
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
     Commands::ConnectNetworkResponse::Type response;
     response.networkingStatus = NetworkCommissioning::Status::kSuccess;
-    commandHandle->AddResponse(mPath, response);
+    commandHandle->AddResponse(mAsyncCommandPath, response);
 }
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
@@ -264,11 +264,10 @@ void NetworkCommissioningLogic::OnNetworkingStatusChange(Status aCommissioningEr
 }
 
 std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleScanNetworks(CommandHandler & handler,
-                                                                                const ConcreteCommandPath &commandPath,
+                                                                                const ConcreteCommandPath & commandPath,
                                                                                 const Commands::ScanNetworks::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleScanNetwork", "NetworkCommissioning");
-    mPath = commandPath;
 
     mScanningWasDirected = false;
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
@@ -297,6 +296,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleScanNetworks(
 
         mScanningWasDirected        = !ssid.empty();
         mCurrentOperationBreadcrumb = req.breadcrumb;
+        mAsyncCommandPath           = commandPath;
         mAsyncCommandHandle         = CommandHandler::Handle(&handler);
         handler.FlushAcksRightAwayOnSlowCommand();
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(ssid, this);
@@ -317,6 +317,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleScanNetworks(
         // }
 
         mCurrentOperationBreadcrumb = req.breadcrumb;
+        mAsyncCommandPath           = commandPath;
         mAsyncCommandHandle         = CommandHandler::Handle(&handler);
         handler.FlushAcksRightAwayOnSlowCommand();
         mpDriver.Get<ThreadDriver *>()->ScanNetworks(this);
@@ -364,7 +365,6 @@ std::optional<ActionReturnStatus>
 NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                         const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
-    mPath = commandPath;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
 
@@ -552,7 +552,6 @@ std::optional<ActionReturnStatus>
 NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                           const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
-    mPath = commandPath;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
@@ -597,7 +596,6 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleRemoveNetwork
                                                                                  const Commands::RemoveNetwork::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
-    mPath = commandPath;
 
     CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
 
@@ -633,12 +631,12 @@ NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const 
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
-    mPath = commandPath;
 
     CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
+    mAsyncCommandPath           = commandPath;
     mAsyncCommandHandle         = CommandHandler::Handle(&handler);
     mCurrentOperationBreadcrumb = req.breadcrumb;
 
@@ -646,7 +644,7 @@ NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const 
     // Per spec, lingering connections on any other interfaces need to be disconnected at this point.
     for (auto & node : sInstances)
     {
-        NetworkCommissioningLogic * instance = static_cast<NetworkCommissioningLogic *>(&node);
+        auto instance = static_cast<NetworkCommissioningLogic *>(&node);
         if (instance != this)
         {
             instance->DisconnectLingeringConnection();
@@ -678,7 +676,6 @@ NetworkCommissioningLogic::HandleReorderNetwork(CommandHandler & handler, const 
                                                 const Commands::ReorderNetwork::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
-    mPath = commandPath;
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
     MutableCharSpan debugText(debugTextBuffer);
@@ -844,7 +841,7 @@ void NetworkCommissioningLogic::OnResult(Status commissioningError, CharSpan deb
     // TODO(#30576) raised to modify CommandHandler to notify it if no response required
     // -----> Is this required here: commandHandle->FinishCommand();
 #else
-    commandHandle->AddResponse(mPath, response);
+    commandHandle->AddResponse(mAsyncCommandPath, response);
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
     if (commissioningError == Status::kSuccess)
@@ -870,7 +867,7 @@ void NetworkCommissioningLogic::OnFinished(Status status, CharSpan debugText, Th
     SetLastNetworkingStatusValue(MakeNullable(status));
 
     ThreadScanResponseToTLV responseBuilder(status, debugText, networks);
-    commandHandle->AddResponse(mPath, Commands::ScanNetworksResponse::Id, responseBuilder);
+    commandHandle->AddResponse(mAsyncCommandPath, Commands::ScanNetworksResponse::Id, responseBuilder);
 
     if (status == Status::kSuccess)
     {
@@ -903,7 +900,7 @@ void NetworkCommissioningLogic::OnFinished(Status status, CharSpan debugText, Wi
     SetLastNetworkingStatusValue(MakeNullable(status));
 
     WifiScanResponseToTLV responseBuilder(status, debugText, networks);
-    commandHandle->AddResponse(mPath, Commands::ScanNetworksResponse::Id, responseBuilder);
+    commandHandle->AddResponse(mAsyncCommandPath, Commands::ScanNetworksResponse::Id, responseBuilder);
 
     if (status == Status::kSuccess)
     {
@@ -914,7 +911,7 @@ void NetworkCommissioningLogic::OnFinished(Status status, CharSpan debugText, Wi
 
 void NetworkCommissioningLogic::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    NetworkCommissioningLogic * this_ = reinterpret_cast<NetworkCommissioningLogic *>(arg);
+    auto this_ = reinterpret_cast<NetworkCommissioningLogic *>(arg);
 
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
