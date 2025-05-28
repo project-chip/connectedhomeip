@@ -52,43 +52,112 @@ class TC_FAN_3_5(MatterBaseTest):
     def desc_TC_FAN_3_5(self) -> str:
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
 
-    # def steps_TC_FAN_3_5(self):
-    #     return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
-    #             TestStep(2, "[FC] Action_2.", "Check."),
-    #             TestStep(3, "[FC] Action_3.", "Check."),
-    #             TestStep(4, "[FC] Action_4.", "Check."),
-    #             TestStep(5, "[FC] Action_5.", "Check."),
-    #             TestStep(6, "[FC] Action_6.", "Check."),
-    #             TestStep(7, "[FC] Action_7.", "Check."),
-    #             TestStep(8, "[FC] Action_8.", "Check."),
-    #             TestStep(9, "[FC] Action_9.", "Check."),
-    #             TestStep(10, "[FC] Action_10.", "Check."),
-    #             TestStep(11, "[FC] Action_11.", "Check."),
-    #             TestStep(12, "[FC] Action_12.", "Check."),
-    #             TestStep(13, "[FC] Action_13.", "Check."),
-    #             TestStep(14, "[FC] Action_14.", "Check."),
-    #             TestStep(15, "[FC] Action_15.", "Check."),
-    #             TestStep(16, "[FC] Action_16.", "Check."),
-    #             TestStep(17, "[FC] Action_17.", "Check."),
-    #             TestStep(18, "[FC] Action_18.", "Check."),
-    #             TestStep(19, "[FC] Action_19.", "Check."),
-    #             TestStep(20, "[FC] Action_20.", "Check."),
-    #             TestStep(21, "[FC] Action_21.", "Check."),
-    #             TestStep(22, "[FC] Action_22.", "Check."),
-    #             TestStep(23, "[FC] Action_23.", "Check."),
-    #             TestStep(24, "[FC] Action_24.", "Check."),
-    #             TestStep(25, "[FC] Action_25.", "Check."),
-    #             TestStep(26, "[FC] Action_26.", "Check."),
-    #             TestStep(27, "[FC] Action_27.", "Check."),
-    #             TestStep(28, "[FC] Action_28.", "Check."),
-    #             TestStep(29, "[FC] Action_29.", "Check."),
-    #             TestStep(30, "[FC] Action_30.", "Check."),
-    #             TestStep(31, "[FC] Action_31.", "Check."),
-    #             TestStep(32, "[FC] Action_32.", "Check."),
-    #             TestStep(33, "[FC] Action_33.", "Check."),
-    #             TestStep(34, "[FC] Action_34.", "Check."),
-    #             TestStep(35, "[FC] Action_35.", "Check."),
-    #             ]
+    def steps_TC_FAN_3_5(self):
+        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+                TestStep(2, "[FC] TH checks the DUT for the prescence of the OnOff cluster.", "If the cluster is present, set it to On."),
+                TestStep(3, "[FC] TH checks the DUT for support of the Step and MultiSpeed features.", "If the DUT does not support both features, the test is skipped."),
+                TestStep(4, "[FC] TH reads from the DUT the SpeedMax attribute.", "Store value for future reference."),
+                TestStep(5, "[FC] TH reads from the DUT the FanModeSequence attribute.", "Store value for future reference."),
+                TestStep(6, "[FC] TH determines the PercentSetting range per Step command.", "- Set PercentSetting to 0. - Send Step command with direction=Increase, lowestOff=True, and wrap=False. - Read the resulting PercentSetting attribute report value. - Calculate the PercentSetting range per Step command. - Store value for future reference."),
+
+                # LowestOff tests
+                TestStep(7, "[FC] TH tests Step command behavior of the LowestOff field.", "- Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=True."),
+                TestStep(8, "[FC] Initialize the PercentSetting attribute to 100.", "- Verify that the SpeedSetting attribute value is set to SpeedMax. - Verify that the FanMode attribute value is set to High."),
+                TestStep(9, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.", "Listen for attribute report updates."),
+                TestStep(10, "[FC] TH sends Step commands iteratively.", "- Verify that the PercentSetting attribute value reaches 0. - When the PercentSetting attribute value reaches 0, send an additional Step command to veiryf that the PercentSetting attribute value stays at 0."),
+                TestStep(11, "[FC] Read the resulting attribute reports from each subscription after the Step commands.", "- Verify that the attribute report values from each subscription are in descending order. - If the number of PercentSetting reports is greater than the number of FanMode reports: -- Verify that all the expected FanMode values are present in the reports in acordance with the FanModeSequence attribute value. - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports: -- Verify that all the expected SpeedSetting values are present in the reports in acordance with the SpeedMax attribute value. - Save the resulting descending attribute report values from each subscription as a baseline for comparison with the ascending values from the next steps."),
+
+                TestStep(12, "[FC] TH tests Step command behavior of the LowestOff field.", "- Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=True."),
+                TestStep(13, "[FC] Initialize the PercentSetting attribute to 0.", "- Verify that the SpeedSetting attribute value is set to 0. - Verify that the FanMode attribute value is set to Off."),
+                TestStep(14, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.", "Listen for attribute report updates."),
+                TestStep(15, "[FC] TH sends Step commands iteratively.", "- Verify that the PercentSetting attribute value reaches 100. - When the PercentSetting attribute value reaches 100, send an additional Step command to veiryf that the PercentSetting attribute value stays at 100."),
+                TestStep(16, "[FC] Read the resulting attribute reports from each subscription after the Step commands.", "- Verify that the attribute report values from each subscription are in ascending order. - If the number of PercentSetting reports is greater than the number of FanMode reports: -- Verify that all the expected FanMode values are present in the reports in acordance with the FanModeSequence attribute value. - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports: -- Verify that all the expected SpeedSetting values are present in the reports in acordance with the SpeedMax attribute value. - Save the resulting ascending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps."),
+
+                TestStep(17, "[FC] Compare the descending baseline values with the ascending baseline values.", "Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute."),
+
+                TestStep(18, "[FC] TH tests Step command behavior of the LowestOff field.", "- Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=True."),
+                TestStep(19, "[FC] Initialize the PercentSetting attribute to 100.", "- Verify that the PercentCurrent attribute value is set to 100. - Verify that the SpeedCurrent attribute value is set to SpeedMax."),
+                TestStep(20, "[FC] Subscribe to PercentSetting, PercentCurrent, and SpeedCurrent attributes.", "Listen for attribute report updates."),
+                TestStep(21, "[FC] TH sends Step commands iteratively.", "- Verify that the PercentSetting attribute value reaches 0. - When the PercentSetting attribute value reaches 0, send an additional Step command to veiryf that the PercentSetting attribute value stays at 0."),
+                TestStep(22, "[FC] Read the resulting attribute reports from each subscription after the Step commands.", "- Verify that the attribute report values from each subscription are in descending order. - If the number of PercentSetting reports is equal to the number of PercentCurrent reports: -- Verify that all the expected PercentCurrent values are present in the reports. - If the number of PercentSetting reports is greater or equal than the number of SpeedCurrent reports: -- Verify that all the expected SpeedCurrent values are present in the reports in acordance with the SpeedMax attribute value. - Save the resulting descending attribute report values from each subscription as a baseline for comparison with the ascending values from the next steps."),
+
+                TestStep(23, "[FC] TH tests Step command behavior of the LowestOff field.", "- Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=True."),
+                TestStep(24, "[FC] Initialize the PercentSetting attribute to 0.", "- Verify that the PercentCurrent attribute value is set to 0. - Verify that the SpeedCurrent attribute value is set to 0."),
+                TestStep(25, "[FC] Subscribe to PercentSetting, PercentCurrent, and SpeedCurrent attributes.", "Listen for attribute report updates."),
+                TestStep(26, "[FC] TH sends Step commands iteratively.", "- Verify that the PercentSetting attribute value reaches 100. - When the PercentSetting attribute value reaches 100, send an additional Step command to veiryf that the PercentSetting attribute value stays at 100."),
+                TestStep(27, "[FC] Read the resulting attribute reports from each subscription after the Step commands.", "- Verify that the attribute report values from each subscription are in ascending order. - If the number of PercentSetting reports is equal to the number of PercentCurrent reports: -- Verify that all the expected PercentCurrent values are present in the reports. - If the number of PercentSetting reports is greater or equal than the number of SpeedCurrent reports: -- Verify that all the expected SpeedCurrent values are present in the reports in acordance with the SpeedMax attribute value. - Save the resulting descending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps."),
+
+                TestStep(28, "[FC] Compare the descending baseline values with the ascending baseline values.", "Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute."),
+
+                TestStep(29, "[FC] TH tests Step command behavior of the LowestOff field.", "- Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=False."),
+                TestStep(30, "[FC] Initialize the PercentSetting attribute to 100.", "- Verify that the SpeedSetting attribute value is set to SpeedMax. - Verify that the FanMode attribute value is set to High."),
+                TestStep(31, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.", "Listen for attribute report updates."),
+                TestStep(32, "[FC] TH sends Step commands iteratively.", "- Verify that the PercentSetting attribute value reaches the value of percent setting range per step. - When the PercentSetting attribute value reaches the value of percent setting range per step, send an additional Step command to veiryf that the PercentSetting attribute value stays at percent setting range per step."),
+                TestStep(33, "[FC] Read the resulting attribute reports from each subscription after the Step commands.", "- Verify that the attribute report values from each subscription are in descending order. - If the number of PercentSetting reports is greater than the number of FanMode reports: -- Verify that all the expected FanMode values are present in the reports in acordance with the FanModeSequence attribute value. - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports: -- Verify that all the expected SpeedSetting values are present in the reports in acordance with the SpeedMax attribute value. - Save the resulting descending attribute report values from each subscription as a baseline for comparison with the ascending values from the next steps."),
+
+                TestStep(34, "[FC] TH tests Step command behavior of the LowestOff field.", "- Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=False."),
+                TestStep(35, "[FC] Initialize the PercentSetting attribute to 0.", "- Verify that the SpeedSetting attribute value is set to 0. - Verify that the FanMode attribute value is set to Off."),
+                TestStep(36, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.", "Listen for attribute report updates."),
+                TestStep(37, "[FC] TH sends Step commands iteratively.", "- Verify that the PercentSetting attribute value reaches 100. - When the PercentSetting attribute value reaches 100, send an additional Step command to veiryf that the PercentSetting attribute value stays at 100."),
+                TestStep(38, "[FC] Read the resulting attribute reports from each subscription after the Step commands.", "- Verify that the attribute report values from each subscription are in ascending order. - If the number of PercentSetting reports is greater than the number of FanMode reports: -- Verify that all the expected FanMode values are present in the reports in acordance with the FanModeSequence attribute value. - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports: -- Verify that all the expected SpeedSetting values are present in the reports in acordance with the SpeedMax attribute value. - Save the resulting ascending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps."),
+
+                TestStep(39, "[FC] Compare the descending baseline values with the ascending baseline values.", "Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute."),
+
+                TestStep(40, "[FC] TH tests Step command behavior of the LowestOff field.", "- Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=False."),
+                TestStep(41, "[FC] Initialize the PercentSetting attribute to 100.", "- Verify that the PercentCurrent attribute value is set to 100. - Verify that the SpeedCurrent attribute value is set to SpeedMax."),
+                TestStep(42, "[FC] Subscribe to PercentSetting, PercentCurrent, and SpeedCurrent attributes.", "Listen for attribute report updates."),
+                TestStep(43, "[FC] TH sends Step commands iteratively.", "- Verify that the PercentSetting attribute value reaches 0. - When the PercentSetting attribute value reaches 0, send an additional Step command to veiryf that the PercentSetting attribute value stays at 0."),
+                TestStep(44, "[FC] Read the resulting attribute reports from each subscription after the Step commands.", "- Verify that the attribute report values from each subscription are in descending order. - If the number of PercentSetting reports is equal to the number of PercentCurrent reports: -- Verify that all the expected PercentCurrent values are present in the reports. - If the number of PercentSetting reports is greater or equal than the number of SpeedCurrent reports: -- Verify that all the expected SpeedCurrent values are present in the reports in acordance with the SpeedMax attribute value. - Save the resulting descending attribute report values from each subscription as a baseline for comparison with the ascending values from the next steps."),
+
+                TestStep(45, "[FC] TH tests Step command behavior of the LowestOff field.", "- Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=False."),
+                TestStep(46, "[FC] Initialize the PercentSetting attribute to 0.", "- Verify that the PercentCurrent attribute value is set to 0. - Verify that the SpeedCurrent attribute value is set to 0."),
+                TestStep(47, "[FC] Subscribe to PercentSetting, PercentCurrent, and SpeedCurrent attributes.", "Listen for attribute report updates."),
+                TestStep(48, "[FC] TH sends Step commands iteratively.", "- Verify that the PercentSetting attribute value reaches the value of percent setting range per step. - When the PercentSetting attribute value reaches the value of percent setting range per step, send an additional Step command to veiryf that the PercentSetting attribute value stays at the value of percent setting range per step."),
+                TestStep(49, "[FC] Read the resulting attribute reports from each subscription after the Step commands.", "- Verify that the attribute report values from each subscription are in ascending order. - If the number of PercentSetting reports is equal to the number of PercentCurrent reports: -- Verify that all the expected PercentCurrent values are present in the reports. - If the number of PercentSetting reports is greater or equal than the number of SpeedCurrent reports: -- Verify that all the expected SpeedCurrent values are present in the reports in acordance with the SpeedMax attribute value. - Save the resulting descending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps."),
+
+                TestStep(50, "[FC] Compare the descending baseline values with the ascending baseline values.", "Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute."),
+
+                # Wrap tests
+                TestStep(51, "[FC] TH tests Step command behavior of the Wrap field.", "- Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=True."),
+                TestStep(52, "[FC] Initialize the PercentSetting attribute to the value of percent setting range per step.", "- Verify that the PercentSetting attribute value is set to the written value."),
+                TestStep(53, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.", "Listen for attribute report updates."),
+                TestStep(54, "[FC] TH sends the Step command.", "- Verify that the attribute values all go to Off values. - Send another the Step command and verify that the attribute values all go to High values."),
+
+                TestStep(55, "[FC] TH tests Step command behavior of the Wrap field.", "- Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=False."),
+                TestStep(56, "[FC] Initialize the PercentSetting attribute to the value of percent setting range per step.", "- Verify that the PercentSetting attribute value is set to the written value."),
+                TestStep(57, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.", "Listen for attribute report updates."),
+                TestStep(58, "[FC] TH sends the Step command.", "- Verify that the attribute values all go to High values."),
+
+                TestStep(59, "[FC] TH tests Step command behavior of the Wrap field.", "- Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=True."),
+                TestStep(60, "[FC] Initialize the PercentSetting attribute to 100.", "- Verify that the PercentSetting attribute value is set to the written value."),
+                TestStep(61, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.", "Listen for attribute report updates."),
+                TestStep(62, "[FC] TH sends the Step command.", "- Verify that the attribute values all go to Off values."),
+
+                TestStep(63, "[FC] TH tests Step command behavior of the Wrap field.", "- Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=False."),
+                TestStep(64, "[FC] Initialize the PercentSetting attribute to 100.", "- Verify that the PercentSetting attribute value is set to the written value."),
+                TestStep(65, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.", "Listen for attribute report updates."),
+                TestStep(66, "[FC] TH sends the Step command.", "- Verify that the PercentSetting attribute value goes to the value of percent setting range per step."),
+
+                TestStep(67, "[FC] TH tests Step command behavior of the Wrap field.", "- Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=True."),
+                TestStep(68, "[FC] Initialize the PercentSetting attribute to the value of percent setting range per step.", "- Verify that the PercentSetting attribute value is set to the written value."),
+                TestStep(69, "[FC] Subscribe to PercentSetting, PercentCurrent, and SpeedCurrent attributes.", "Listen for attribute report updates."),
+                TestStep(70, "[FC] TH sends the Step command.", "- Verify that the attribute values all go to Off values. - Send another the Step command and verify that the attribute values all go to High values."),
+
+                TestStep(71, "[FC] TH tests Step command behavior of the Wrap field.", "- Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=False."),
+                TestStep(72, "[FC] Initialize the PercentSetting attribute to the value of percent setting range per step.", "- Verify that the PercentSetting attribute value is set to the written value."),
+                TestStep(73, "[FC] Subscribe to PercentSetting, PercentCurrent, and SpeedCurrent attributes.", "Listen for attribute report updates."),
+                TestStep(74, "[FC] TH sends the Step command.", "- Verify that the attribute values all go to High values."),
+
+                TestStep(75, "[FC] TH tests Step command behavior of the Wrap field.", "- Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=True."),
+                TestStep(76, "[FC] Initialize the PercentSetting attribute to 100.", "- Verify that the PercentSetting attribute value is set to the written value."),
+                TestStep(77, "[FC] Subscribe to PercentSetting, PercentCurrent, and SpeedCurrent attributes.", "Listen for attribute report updates."),
+                TestStep(78, "[FC] TH sends the Step command.", "- Verify that the attribute values all go to Off values."),
+
+                TestStep(79, "[FC] TH tests Step command behavior of the Wrap field.", "- Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=False."),
+                TestStep(80, "[FC] Initialize the PercentSetting attribute to 100.", "- Verify that the PercentSetting attribute value is set to the written value."),
+                TestStep(81, "[FC] Subscribe to PercentSetting, PercentCurrent, and SpeedCurrent attributes.", "Listen for attribute report updates."),
+                TestStep(82, "[FC] TH sends the Step command.", "- Verify that the PercentSetting and PercentCurrent attribute values all go to the value of percent setting range per step."),
+                ]
 
     async def read_setting(self, attribute: Any) -> Any:
         """Read a specified attribute from the FanControl cluster.
@@ -236,11 +305,11 @@ class TC_FAN_3_5(MatterBaseTest):
         # Verify PercentSetting initialization value
         await self.verify_expected_attribute_value(attr.PercentSetting, percent_setting_init)
 
-        # - Since there is no direct relationship between the Step command and the speed-related attributes
-        #   (PercentSetting, FanMode, and SpeedSetting), as this is implementation-specific, when testing the
+        # - Since there is no direct relationship between the Step command and the speed-oriented attributes
+        #   (PercentSetting, FanMode, and SpeedSetting), and that this is implementation-specific, when testing the
         #   Step command with Wrap=True, Direction=Decrease, and initializing PercentSetting at 100, the expected
-        #   values for FanMode and SpeedSetting are unknown. In this case, their verification is skipped.
-        # - In all other scenarios, verify that FanMode and SpeedSetting are set to their expected values.
+        #   values for FanMode and SpeedSetting are unknown. In this case, their verification is skipped. In all
+        #   other scenarios, verify that FanMode and SpeedSetting are set to their expected values.
         if not step.wrap:
             if not step.direction == sd_enum.kDecrease:
                 if not handle_current_values:
@@ -325,7 +394,7 @@ class TC_FAN_3_5(MatterBaseTest):
             if percent_setting == percent_setting_expected:
                 # Send additional Step command
                 await self.send_step_command(step)
-                
+
                 # Read the resulting PercentSetting attribute value
                 # and verify it's still equal to the expected value
                 percent_setting = await self.read_setting(attr.PercentSetting)
@@ -358,14 +427,15 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** NEXT STEP ***
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in acordance with the Step command parameters
-        # self.step(self.current_step_index + 1)
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         percent_setting_init = await self.initialize_percent_setting_and_verify_affected_attribtutes(step, handle_current_values)
 
         # *** NEXT STEP ***
-        # Reset the subscriptions to clear any previous attribute reports
-        # self.step(self.current_step_index + 1)
-        for sub in self.subscriptions:
-            sub.reset()
+        # Subscribe to the requested attributes
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
+        await self.subscribe_to_attributes(handle_current_values=handle_current_values)
 
         # *** NEXT STEP ***
         # TH sends Step commands iteratively
@@ -374,7 +444,8 @@ class TC_FAN_3_5(MatterBaseTest):
         #    - If the expected PercentSetting attribute report value is reached, send
         #      an additional Step command to veiryf that the PercentSetting attribute
         #      report value stays at the expected value, otherwise, the test is failed.
-        # self.step(self.current_step_index + 1)
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.perform_lowest_off_step_commands_and_verify(step)
 
         # *** NEXT STEP ***
@@ -389,7 +460,8 @@ class TC_FAN_3_5(MatterBaseTest):
         #        in acordance with the SpeedMax attribute value.
         #   - Save the resulting attribute report values from each subscription as a baseline
         #     for future comparisons.
-        # self.step(self.current_step_index + 1)
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         self.verify_all_expected_reports_and_value_progression(step, percent_setting_init, handle_current_values)
 
     def verify_attribute_progression(self, step: Clusters.FanControl.Commands.Step, expected_attribute: Clusters.FanControl.Attributes, values: list) -> None:
@@ -515,7 +587,6 @@ class TC_FAN_3_5(MatterBaseTest):
             logging.info(f"[FC] percent_current_expected: {percent_current_expected}")
             logging.info(f"[FC] speed_current_expected: {speed_current_expected}")
 
-        logging.info(f"[FC] about to checks per no of ps reports.")
         if not handle_current_values:
             # If the number of PercentSetting reports is greater than the number of FanMode reports,
             # - Verify that all the expected FanMode values are present in the reports
@@ -545,15 +616,17 @@ class TC_FAN_3_5(MatterBaseTest):
             else:
                 missing_percent_current = [percent for percent in percent_current_expected if percent not in percent_current_values_produced]
                 asserts.fail(f"[FC] Some of the expected PercentCurrent values are not present in the reports. Expected: {percent_current_expected}, missing: {missing_percent_current}.")
-            # If the number of PercentCurrent reports is greater than the number of SpeedCurrent reports,
+
+            # If the number of PercentCurrent reports is greater or equal than the number of SpeedCurrent reports,
             # - Verify that all the expected SpeedCurrent values are present in the reports
-            if percent_setting_report_qty > speed_current_report_qty:
+            if percent_setting_report_qty >= speed_current_report_qty:
                 missing_speed_current = [speed for speed in speed_current_expected if speed not in speed_current_values_produced]
                 asserts.assert_equal(
                     speed_current_expected, speed_current_values_produced,
                     f"[FC] Some of the expected SpeedCurrent values are not present in the reports. Expected: {speed_current_expected}, missing: {missing_speed_current}."
                 )
-        logging.info(f"[FC] about to save_baseline_values")
+
+        # Save the resulting attribute report values from each subscription as a baseline for future comparisons.
         self.save_baseline_values(step, percent_setting_values_produced, dependent_values1, dependent_values2, handle_current_values)
 
     def save_baseline_values(self, step: Clusters.FanControl.Commands.Step, percent_setting_values_produced: list, dependent_values_produced1: list, dependent_values_produced2: list, handle_current_values: bool) -> None:
@@ -571,24 +644,19 @@ class TC_FAN_3_5(MatterBaseTest):
         """
         sd_enum = Clusters.FanControl.Enums.StepDirectionEnum
 
-        logging.info(f"[FC] I'm in save_baseline_values, Step: {step}")
-
         # if step.direction == sd_enum.kDecrease and step.lowestOff:
         if step.direction == sd_enum.kDecrease:
-            logging.info(f"[FC] handle_current_values: {handle_current_values} DECREASE")
             trim = slice(None) if not step.lowestOff else slice(None, -1)
             self.baseline_percent_setting_desc = percent_setting_values_produced[trim]
             if not handle_current_values:
                 self.baseline_fan_mode_desc = dependent_values_produced1[trim]
                 self.baseline_speed_setting_desc = dependent_values_produced2[trim]
             else:
-                logging.info(f"[FC] i SHOULD BE HEA")
                 self.baseline_percent_current_desc = dependent_values_produced1[trim]
                 self.baseline_speed_current_desc = dependent_values_produced2[trim]
 
         # if step.direction == sd_enum.kIncrease and step.lowestOff:
         if step.direction == sd_enum.kIncrease:
-            logging.info(f"[FC] handle_current_values: {handle_current_values} INCREASE")
             self.baseline_percent_setting_asc = percent_setting_values_produced[:-1]
             if not handle_current_values:
                 self.baseline_fan_mode_asc = dependent_values_produced1[:-1]
@@ -639,30 +707,30 @@ class TC_FAN_3_5(MatterBaseTest):
         Args:
             step (Clusters.FanControl.Commands.Step): Step command parameters.
         """
-
         # *** NEXT STEP ***
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in acordance with the Step command parameters
-        # self.step(self.current_step_index + 1)
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.initialize_percent_setting_and_verify_affected_attribtutes(step, handle_current_values)
 
-        # # *** NEXT STEP ***
-        # # Reset the subscriptions to clear any previous attribute reports
-        # # self.step(self.current_step_index + 1)
-        # for sub in self.subscriptions:
-        #     sub.reset()
+        # *** NEXT STEP ***
+        # Subscribe to the requested attributes
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
+        await self.subscribe_to_attributes(handle_current_values=handle_current_values)
 
         # *** NEXT STEP ***
         # TH sends a Step command with the reqested parameters
         #  - Verify the expected attribute values are produced
-        # self.step(self.current_step_index + 1)
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.perform_wrap_step_commands_and_verify(step, handle_current_values)
 
     async def perform_wrap_step_commands_and_verify(self, step: Clusters.FanControl.Commands.Step, handle_current_values: bool) -> None:
         cluster = Clusters.FanControl
         fm_enum = cluster.Enums.FanModeEnum
         sd_enum = cluster.Enums.StepDirectionEnum
-        attr = cluster.Attributes
 
         if step.direction == sd_enum.kDecrease and step.lowestOff:
             if not handle_current_values:
@@ -684,7 +752,7 @@ class TC_FAN_3_5(MatterBaseTest):
         elif step.direction == sd_enum.kIncrease and step.lowestOff:
             # - Verify that the PercentSetting attribute value goes to 0
             if not handle_current_values:
-                await self.wrap_veirfy(step, percent_setting_expected=0)
+                await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
             else:
                 await self.wrap_veirfy(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=0)
         elif step.direction == sd_enum.kIncrease and not step.lowestOff:
@@ -763,17 +831,17 @@ class TC_FAN_3_5(MatterBaseTest):
         attr = cluster.Attributes
         cmd = cluster.Commands
         sd_enum = cluster.Enums.StepDirectionEnum
-        self.timeout_sec: float = 3
+        self.timeout_sec: float = 1
         self.percent_setting_per_step: Optional[int] = None
 
         # *** STEP 1 ***
         # Commissioning already done
-        # self.step(1)
+        self.step(1)
 
         # *** STEP 2 ***
         # TH checks the DUT for the prescence of the OnOff cluster
         # - If the cluster is present, set it to On
-        # self.step(2)
+        self.step(2)
         has_on_off_cluster = await self.cluster_guard(endpoint=self.endpoint, cluster=Clusters.OnOff, skip_step=False)
         if has_on_off_cluster:
             await self.send_on_off_command(Clusters.OnOff.Commands.On())
@@ -781,7 +849,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** STEP 3 ***
         # TH checks the DUT for support of the Step and MultiSpeed features
         #  - If the DUT does not support both features, the test is skipped
-        # self.step(3)
+        self.step(3)
         feature_map = await self.read_setting(attr.FeatureMap)
         self.supports_step = bool(feature_map & cluster.Bitmaps.Feature.kStep)
         self.supports_multi_speed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
@@ -792,72 +860,185 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** STEP 4 ***
         # TH reads from the DUT the SpeedMax attribute
         #  - Store value for future reference
-        # self.step(4)
+        self.step(4)
         self.speed_max = await self.read_setting(attr.SpeedMax)
 
         # *** STEP 5 ***
         # TH reads from the DUT the FanModeSequence attribute
-        #  - Store result for future reference
-        # self.step(5)
+        #  - Store value for future reference
+        self.step(5)
         await self.get_fan_modes(remove_auto=True)
 
         # *** STEP 6 ***
-        # TH subscribes to the PercentSetting, FanMode, and SpeedSetting attributes individually
-        # self.step(6)
+        # TH determines the PercentSetting range per Step command
+        #  - Set PercentSetting to 0
+        #  - Send Step command with direction=Increase, lowestOff=True, and wrap=False
+        #  - Read the resulting PercentSetting attribute report value
+        #  - Calculate the PercentSetting range per Step command
+        #  - Store value for future reference
+        self.step(6)
         await self.get_percent_setting_range_per_step()
 
-        # LowestOff=True Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        await self.subscribe_to_attributes(handle_current_values=False)
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the LowestOff field
+        #  - Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=True
+        #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=False)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the LowestOff field
+        #  - Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=True
+        #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=False)
-        self.verify_baseline_values(handle_current_values=False)
-        
-        # LowestOff=True Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        await self.subscribe_to_attributes(handle_current_values=True)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=True)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=True)
+
+        # ** NEXT STEP ***
+        # Compare the descending baseline values with the ascending baseline values
+        #  - Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         self.verify_baseline_values(handle_current_values=False)
 
-        # LowestOff=False Test - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        await self.subscribe_to_attributes(handle_current_values=False)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=False)
-        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=False)
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the LowestOff field
+        #  - Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=True
+        #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=True)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the LowestOff field
+        #  - Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=True
+        #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=True)
+
+        # ** NEXT STEP ***
+        # Compare the descending baseline values with the ascending baseline values
+        #  - Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         self.verify_baseline_values(handle_current_values=False)
-        
-        # LowestOff=False Test - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        await self.subscribe_to_attributes(handle_current_values=True)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the LowestOff field
+        #  - Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=False
+        #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=False)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the LowestOff field
+        #  - Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=False
+        #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
+        await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=False)
+
+        # ** NEXT STEP ***
+        # Compare the descending baseline values with the ascending baseline values
+        #  - Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
+        self.verify_baseline_values(handle_current_values=False)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the LowestOff field
+        #  - Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=False
+        #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=True)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the LowestOff field
+        #  - Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=False
+        #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=True)
+        
+        # ** NEXT STEP ***
+        # Compare the descending baseline values with the ascending baseline values
+        #  - Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         self.verify_baseline_values(handle_current_values=True)
 
-        # Wrap tests
-        await self.subscribe_to_attributes(handle_current_values=False)
+
+
+
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the Wrap field
+        #  - Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=True
+        #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True), handle_current_values=False)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the Wrap field
+        #  - Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=False
+        #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False), handle_current_values=False)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the Wrap field
+        #  - Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=True
+        #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True), handle_current_values=False)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the Wrap field
+        #  - Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=False
+        #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False), handle_current_values=False)
-        # Wrap tests
-        await self.subscribe_to_attributes(handle_current_values=True)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the Wrap field
+        #  - Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=True
+        #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True), handle_current_values=True)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the Wrap field
+        #  - Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=False
+        #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False), handle_current_values=True)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the Wrap field
+        #  - Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=True
+        #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True), handle_current_values=True)
+
+        # *** NEXT STEP ***
+        # TH tests Step command behavior of the LowestOff field
+        #  - Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=False
+        #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
+        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False), handle_current_values=True)
 
-        # *** STEP 35 ***
-        # Read both the descending and ascending baseline attribute report values
-        #  - Verify that the descending baseline values are the exact reverse of the
-        #    ascending baseline values for each of the attributes
-        # self.step(self.current_step_index + 1)
-
-        # # *** STEP 36 ***
-        # # TH subscribes to the PercentCurrent and SpeedCurrent attributes individually
-        # self.step(36)
-        # subscriptions = [
-        #     ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
-        #     ClusterAttributeChangeAccumulator(cluster, attr.PercentCurrent),
-        #     ClusterAttributeChangeAccumulator(cluster, attr.SpeedCurrent)
-        # ]
-        # await self.subscribe_to_attributes(subscriptions)
 
 
 if __name__ == "__main__":
