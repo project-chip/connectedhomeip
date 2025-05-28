@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 #include "NetworkCommissioningLogic.h"
+#include "app/CommandHandler.h"
+#include "app/ConcreteCommandPath.h"
+#include "protocols/interaction_model/StatusCode.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -32,6 +35,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/SortUtils.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <optional>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DeviceControlServer.h>
@@ -52,8 +56,6 @@ using namespace DeviceLayer::NetworkCommissioning;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
 namespace {
-
-constexpr uint16_t kCurrentClusterRevision = 2;
 
 // Note: CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE can be 0, this disables debug text
 using DebugTextStorage = std::array<char, CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE>;
@@ -133,14 +135,12 @@ NetworkCommissioningLogic::NetworkInstanceList NetworkCommissioningLogic::sInsta
 #endif
 
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, WiFiDriver * apDelegate) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
     mEndpointId(aEndpointId), mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
 {
     mpDriver.Set<WiFiDriver *>(apDelegate);
 }
 
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, ThreadDriver * apDelegate) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
     mEndpointId(aEndpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate),
     mpBaseDriver(apDelegate)
 {
@@ -148,7 +148,6 @@ NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, Thr
 }
 
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, EthernetDriver * apDelegate) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
     mEndpointId(aEndpointId), mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
 {}
 
@@ -548,7 +547,8 @@ void NetworkCommissioningLogic::OnNetworkingStatusChange(Status aCommissioningEr
     }
 }
 
-void NetworkCommissioningLogic::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
+std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleScanNetworks(CommandHandler & handler,
+                                                                                const Commands::ScanNetworks::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleScanNetwork", "NetworkCommissioning");
 
@@ -573,18 +573,19 @@ void NetworkCommissioningLogic::HandleScanNetworks(HandlerContext & ctx, const C
         if (ssid.size() > DeviceLayer::Internal::kMaxWiFiSSIDLength)
         {
             // Clients should never use too large a SSID.
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
             SetLastNetworkingStatusValue(MakeNullable(Status::kUnknownError));
-            return;
+            return Protocols::InteractionModel::Status::ConstraintError;
         }
 
         mScanningWasDirected        = !ssid.empty();
         mCurrentOperationBreadcrumb = req.breadcrumb;
-        mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
-        ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
+        mAsyncCommandHandle         = CommandHandler::Handle(&handler);
+        handler.FlushAcksRightAwayOnSlowCommand();
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(ssid, this);
+        return std::nullopt;
     }
-    else if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
+
+    if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
         // NOTE: the following lines were commented out due to issue #32875. In short, a popular
         // commissioner is passing a null SSID argument and this logic breaks interoperability as a result.
@@ -594,19 +595,17 @@ void NetworkCommissioningLogic::HandleScanNetworks(HandlerContext & ctx, const C
         // SSID present on Thread violates the `[WI]` conformance.
         // if (req.ssid.HasValue())
         // {
-        //     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-        //     return;
+        //     return Protocols::InteractionModel::Status::InvalidCommand;
         // }
 
         mCurrentOperationBreadcrumb = req.breadcrumb;
-        mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
-        ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
+        mAsyncCommandHandle         = CommandHandler::Handle(&handler);
+        handler.FlushAcksRightAwayOnSlowCommand();
         mpDriver.Get<ThreadDriver *>()->ScanNetworks(this);
+        return std::nullopt;
     }
-    else
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
+
+    return Protocols::InteractionModel::Status::UnsupportedCommand;
 }
 
 namespace {
@@ -622,34 +621,40 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
     }
 }
 
-bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
+std::optional<ActionReturnStatus> CheckFailSafeArmed(FabricIndex fabricIndex)
 {
-    // FIXME: this coupling is ROUGH!
     auto & failSafeContext = chip::Server::GetInstance().GetFailSafeContext();
 
-    if (failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()))
+    if (!failSafeContext.IsFailSafeArmed(fabricIndex))
     {
-        return true;
+        return Protocols::InteractionModel::Status::FailsafeRequired;
     }
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::FailsafeRequired);
-    return false;
+    return std::nullopt;
 }
+
+#define CHECK_FAILSFE_ARMED(fabricIndex)                                                                                           \
+    if (std::optional<ActionReturnStatus> status = CheckFailSafeArmed(fabricIndex); status.has_value())                            \
+    {                                                                                                                              \
+        return status;                                                                                                             \
+    }                                                                                                                              \
+    (void) 0
 
 } // namespace
 
-void NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx,
-                                                             const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
+std::optional<ActionReturnStatus>
+NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                                        const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
 
-    VerifyOrReturn(CheckFailSafeArmed(ctx));
+    CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
 
     if (req.ssid.empty() || req.ssid.size() > DeviceLayer::Internal::kMaxWiFiSSIDLength)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError, "ssid");
-        return;
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "ssid");
+        return std::nullopt;
     }
 
     // Presence of a Network Identity indicates we're configuring for Per-Device Credentials
@@ -658,12 +663,11 @@ void NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(HandlerContext & ct
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
         if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
         {
-            HandleAddOrUpdateWiFiNetworkWithPDC(ctx, req);
+            HandleAddOrUpdateWiFiNetworkWithPDC(handler, req);
             return;
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-        return;
+        return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
     // Spec 11.8.8.4
@@ -689,16 +693,14 @@ void NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(HandlerContext & ct
         {
             if (!isxdigit(req.credentials.data()[d]))
             {
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
-                return;
+                return Protocols::InteractionModel::Status::ConstraintError;
             }
         }
     }
     else
     {
         // Invalid length
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
-        return;
+        return Protocols::InteractionModel::Status::ConstraintError;
     }
 
     Commands::NetworkConfigResponse::Type response;
@@ -708,23 +710,27 @@ void NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(HandlerContext & ct
     response.networkingStatus =
         mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    handler.AddResponse(commandPath, response);
     if (response.networkingStatus == Status::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
         ReportNetworksListChanged();
     }
+    return std::nullopt;
+#else
+    return Protocols::InteractionModel::Status::InvalidCommand;
 #endif
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-void NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & ctx,
-                                                                    const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
+std::optional<ActionReturnStatus>
+NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & handler,
+                                                               const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
     // Credentials must be empty when configuring for PDC, it's only present to keep the command shape compatible.
     if (!req.credentials.empty())
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError, "credentials");
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "credentials");
         return;
     }
 
@@ -732,20 +738,20 @@ void NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerConte
     if (networkIdentity.size() > kMaxCHIPCompactNetworkIdentityLength ||
         Credentials::ValidateChipNetworkIdentity(networkIdentity) != CHIP_NO_ERROR)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError, "networkIdentity");
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "networkIdentity");
         return;
     }
 
     if (req.clientIdentifier.HasValue() && req.clientIdentifier.Value().size() != CertificateKeyId::size())
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError, "clientIdentifier");
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "clientIdentifier");
         return;
     }
 
     bool provePossession = req.possessionNonce.HasValue();
     if (provePossession && req.possessionNonce.Value().size() != kPossessionNonceSize)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError, "possessionNonce");
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "possessionNonce");
         return;
     }
 
@@ -770,7 +776,7 @@ void NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerConte
             });
             if (!clientIdentityNetworkIndex.HasValue())
             {
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound, "clientIdentifier");
+                handler.AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound, "clientIdentifier");
                 return;
             }
         }
@@ -811,26 +817,27 @@ void NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerConte
             UpdateBreadcrumb(req.breadcrumb);
         }
 
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        handler.AddResponse(commandPath, response);
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AddOrUpdateWiFiNetwork with PDC failed: %" CHIP_ERROR_FORMAT, err.Format());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Failure);
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
-void NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx,
-                                                               const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
+std::optional<ActionReturnStatus>
+NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                                          const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
 
-    VerifyOrReturn(CheckFailSafeArmed(ctx));
+    CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
 
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
@@ -839,12 +846,15 @@ void NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(HandlerContext & 
     response.networkingStatus =
         mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    handler.AddResponse(commandPath, response);
     if (response.networkingStatus == Status::kSuccess)
     {
         ReportNetworksListChanged();
         UpdateBreadcrumb(req.breadcrumb);
     }
+    return std::nullopt;
+#else
+    return Protocols::InteractionModel::Status::InvalidCommand;
 #endif
 }
 
@@ -862,11 +872,13 @@ void NetworkCommissioningLogic::CommitSavedBreadcrumb()
     mCurrentOperationBreadcrumb.ClearValue();
 }
 
-void NetworkCommissioningLogic::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
+std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleRemoveNetwork(CommandHandler & handler,
+                                                                                 const ConcreteCommandPath & commandPath,
+                                                                                 const Commands::RemoveNetwork::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
 
-    VerifyOrReturn(CheckFailSafeArmed(ctx));
+    CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
 
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
@@ -874,7 +886,7 @@ void NetworkCommissioningLogic::HandleRemoveNetwork(HandlerContext & ctx, const 
     uint8_t outNetworkIndex   = 0;
     response.networkingStatus = mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    handler.AddResponse(commandPath, response);
     if (response.networkingStatus == Status::kSuccess)
     {
         ReportNetworksListChanged();
@@ -888,22 +900,24 @@ void NetworkCommissioningLogic::HandleRemoveNetwork(HandlerContext & ctx, const 
             SetLastNetworkingStatusValue(NullNullable);
         }
     }
+    return std::nullopt;
 }
 
-void NetworkCommissioningLogic::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
+std::optional<ActionReturnStatus>
+NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                                const Commands::ConnectNetwork::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
     if (req.networkID.size() > kMaxNetworkIDLen)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
-        return;
+        return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    VerifyOrReturn(CheckFailSafeArmed(ctx));
+    CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
-    mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
+    mAsyncCommandHandle         = CommandHandler::Handle(&handler);
     mCurrentOperationBreadcrumb = req.breadcrumb;
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -925,17 +939,21 @@ void NetworkCommissioningLogic::HandleConnectNetwork(HandlerContext & ctx, const
     // As per spec, send the ConnectNetworkResponse(Success) prior to releasing the commissioning channel
     SendNonConcurrentConnectNetworkResponse();
 #endif
+    return std::nullopt;
 }
 
-void NetworkCommissioningLogic::HandleNonConcurrentConnectNetwork()
+std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%.*s", mConnectingNetworkIDLen,
                     mConnectingNetworkID);
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
+    return std::nullopt;
 }
 
-void NetworkCommissioningLogic::HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req)
+std::optional<ActionReturnStatus>
+NetworkCommissioningLogic::HandleReorderNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                                const Commands::ReorderNetwork::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
@@ -943,31 +961,33 @@ void NetworkCommissioningLogic::HandleReorderNetwork(HandlerContext & ctx, const
     MutableCharSpan debugText(debugTextBuffer);
     response.networkingStatus = mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText);
     FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    handler.AddResponse(commandPath, response);
     if (response.networkingStatus == Status::kSuccess)
     {
         ReportNetworksListChanged();
         UpdateBreadcrumb(req.breadcrumb);
     }
+    return std::nullopt;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-void NetworkCommissioningLogic::HandleQueryIdentity(HandlerContext & ctx, const Commands::QueryIdentity::DecodableType & req)
+std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleQueryIdentity(CommandHandler & ctx,
+                                                                                 const Commands::QueryIdentity::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleQueryIdentity", "NetworkCommissioning");
 
     if (req.keyIdentifier.size() != CertificateKeyId::size())
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError, "keyIdentifier");
-        return;
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "keyIdentifier");
+        returns std::nullopt;
     }
     CertificateKeyId keyIdentifier(req.keyIdentifier.data());
 
     bool provePossession = req.possessionNonce.HasValue();
     if (provePossession && req.possessionNonce.Value().size() != kPossessionNonceSize)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError, "possessionNonce");
-        return;
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "possessionNonce");
+        return std::nullopt;
     }
 
     auto err      = CHIP_NO_ERROR;
@@ -1016,7 +1036,7 @@ void NetworkCommissioningLogic::HandleQueryIdentity(HandlerContext & ctx, const 
         {
             response.possessionSignature.SetValue(possessionSignature.Value().Span());
         }
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        handler.AddResponse(commandPath, response);
     }
 
 exit:
@@ -1027,12 +1047,10 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "QueryIdentity failed: %" CHIP_ERROR_FORMAT, err.Format());
-        status = Protocols::InteractionModel::Status::Failure;
+        return Protocols::InteractionModel::Status::Failure;
     }
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-    }
+    // response was sent if error is CHIP_NO_ERROR
+    return std::nullopt;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 

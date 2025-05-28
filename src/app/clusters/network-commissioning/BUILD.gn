@@ -47,7 +47,7 @@ source_set("thread-response-encoding") {
   ]
 }
 
-group("network-commissioning") {
+source_set("network-commissioning") {
   sources = [
     "NetworkCommissioningCluster.cpp",
     "NetworkCommissioningCluster.h",
@@ -58,6 +58,11 @@ group("network-commissioning") {
   public_deps = [
     ":thread-response-encoding",
     ":wifi-response-encoding",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/credentials",
   ]
 
 }

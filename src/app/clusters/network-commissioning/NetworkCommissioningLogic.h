@@ -16,16 +16,20 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
+#include "app/ConcreteCommandPath.h"
+#include <app/CommandHandler.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
+#include <clusters/NetworkCommissioning/Attributes.h>
+#include <clusters/NetworkCommissioning/Commands.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/Variant.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -37,7 +41,7 @@ class NetworkCommissioningLogicListNode : public IntrusiveListNodeBase<>
 {
 };
 #else
-class NetworNetworkCommissioningLogicListNode
+class NetworkCommissioningLogicListNode
 {
 };
 #endif
@@ -47,15 +51,17 @@ class NetworNetworkCommissioningLogicListNode
 // TODO: this originates as a copy of the AttributeAccessInterface / CommandHandlerInterface
 //       based implementation, so the integrations are significantly separated out
 class NetworkCommissioningLogic : private NetworkCommissioningLogicListNode,
-                 public DeviceLayer::NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback,
-                 public DeviceLayer::NetworkCommissioning::Internal::WirelessDriver::ConnectCallback,
-                 public DeviceLayer::NetworkCommissioning::WiFiDriver::ScanCallback,
-                 public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
+                                  public DeviceLayer::NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback,
+                                  public DeviceLayer::NetworkCommissioning::Internal::WirelessDriver::ConnectCallback,
+                                  public DeviceLayer::NetworkCommissioning::WiFiDriver::ScanCallback,
+                                  public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
 {
 public:
     /**
      * Register will register the network commissioning instance to the attribute and command dispatching route.
      */
+    // TODO: init should be removed. It is not the cluste responsibility to register
+    //       so that we avoid globals
     CHIP_ERROR Init();
     void Shutdown();
 
@@ -98,7 +104,7 @@ private:
 
 // TODO: This could be guarded by a separate multi-interface condition instead
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    class NetworkInstanceList : public IntrusiveList<InstanceListNode>
+    class NetworkInstanceList : public IntrusiveList<NetworkCommissioningLogicListNode>
     {
     public:
         ~NetworkInstanceList() { this->Clear(); }
@@ -108,7 +114,7 @@ private:
 #endif
 
     EndpointId mEndpointId = kInvalidEndpointId;
-    const BitFlags<Feature> mFeatureFlags;
+    const BitFlags<NetworkCommissioning::Feature> mFeatureFlags;
 
     DeviceLayer::NetworkCommissioning::Internal::WirelessDriver * const mpWirelessDriver;
     DeviceLayer::NetworkCommissioning::Internal::BaseDriver * const mpBaseDriver;
@@ -123,8 +129,8 @@ private:
     // Setting these values don't have to care about parallel requests, since we will reject other requests when there is another
     // request ongoing.
     // These values can be updated via OnNetworkingStatusChange callback, ScanCallback::OnFinished and ConnectCallback::OnResult.
-    Attributes::LastNetworkingStatus::TypeInfo::Type mLastNetworkingStatusValue;
-    Attributes::LastConnectErrorValue::TypeInfo::Type mLastConnectErrorValue;
+    NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type mLastNetworkingStatusValue;
+    NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type mLastConnectErrorValue;
     uint8_t mConnectingNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
     uint8_t mConnectingNetworkIDLen = 0;
     uint8_t mLastNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
@@ -132,8 +138,8 @@ private:
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
 
-    void SetLastNetworkingStatusValue(Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);
-    void SetLastConnectErrorValue(Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue);
+    void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);
+    void SetLastConnectErrorValue(NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue);
     void SetLastNetworkId(ByteSpan lastNetworkId);
     void ReportNetworksListChanged() const;
 
@@ -150,15 +156,31 @@ private:
     void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
 
     // Actual handlers of the commands
-    void HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req);
-    void HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
-    void HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
-    void HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req);
-    void HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req);
-    void HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req);
-    void HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req);
-    void HandleNonConcurrentConnectNetwork(void);
-    void HandleQueryIdentity(HandlerContext & ctx, const Commands::QueryIdentity::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleScanNetworks(CommandHandler & handler,
+                       const NetworkCommissioning::Commands::ScanNetworks::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAddOrUpdateWiFiNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                 const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAddOrUpdateWiFiNetworkWithPDC(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                        const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAddOrUpdateThreadNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                   const NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleRemoveNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                        const NetworkCommissioning::Commands::RemoveNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleConnectNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                         const NetworkCommissioning::Commands::ConnectNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleReorderNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                         const NetworkCommissioning::Commands::ReorderNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandleNonConcurrentConnectNetwork();
+    std::optional<DataModel::ActionReturnStatus>
+    HandleQueryIdentity(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                        const NetworkCommissioning::Commands::QueryIdentity::DecodableType & req);
 
 public:
     NetworkCommissioningLogic(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * apDelegate);
