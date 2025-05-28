@@ -25,7 +25,7 @@ declare_args() {
   chip_fake_platform = false
 
   # Include wifi-paf to commission the device or not
-  chip_device_config_enable_wifipaf = false
+  chip_device_config_enable_wifipaf = current_os == "linux"
 }
 
 if (chip_device_platform == "auto") {
