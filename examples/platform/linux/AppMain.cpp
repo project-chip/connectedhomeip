@@ -438,10 +438,10 @@ public:
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override
     {
         // Check if it was set from the command line or fall back to default provider.
-        if (mVendorName.HasValue())
+        if (mVendorName.has_value())
         {
-            VerifyOrReturnError(CanFitInNullTerminatedString(mVendorName.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            CopyString(buf, bufSize, mVendorName.Value().c_str());
+            VerifyOrReturnError(CanFitInNullTerminatedString(mVendorName.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+            CopyString(buf, bufSize, mVendorName.value().c_str());
             return CHIP_NO_ERROR;
         }
 
@@ -453,10 +453,10 @@ public:
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override
     {
         // Check if it was set from the command line or fall back to default provider.
-        if (mProductName.HasValue())
+        if (mProductName.has_value())
         {
-            VerifyOrReturnError(CanFitInNullTerminatedString(mProductName.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            CopyString(buf, bufSize, mProductName.Value().c_str());
+            VerifyOrReturnError(CanFitInNullTerminatedString(mProductName.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+            CopyString(buf, bufSize, mProductName.value().c_str());
             return CHIP_NO_ERROR;
         }
 
@@ -471,10 +471,10 @@ public:
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override
     {
         // Check if it was set from the command line or fall back to default provider.
-        if (mSerialNumber.HasValue())
+        if (mSerialNumber.has_value())
         {
-            VerifyOrReturnError(CanFitInNullTerminatedString(mSerialNumber.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            CopyString(buf, bufSize, mSerialNumber.Value().c_str());
+            VerifyOrReturnError(CanFitInNullTerminatedString(mSerialNumber.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+            CopyString(buf, bufSize, mSerialNumber.value().c_str());
             return CHIP_NO_ERROR;
         }
 
@@ -492,10 +492,10 @@ public:
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override
     {
         // Check if it was set from the command line or fall back to default provider.
-        if (mHardwareVersionString.HasValue())
+        if (mHardwareVersionString.has_value())
         {
-            VerifyOrReturnError(CanFitInNullTerminatedString(mHardwareVersionString.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            CopyString(buf, bufSize, mHardwareVersionString.Value().c_str());
+            VerifyOrReturnError(CanFitInNullTerminatedString(mHardwareVersionString.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+            CopyString(buf, bufSize, mHardwareVersionString.value().c_str());
             return CHIP_NO_ERROR;
         }
 
@@ -505,10 +505,10 @@ public:
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override
     {
         // Check if it was set from the command line or fall back to default provider.
-        if (mSoftwareVersionString.HasValue())
+        if (mSoftwareVersionString.has_value())
         {
-            VerifyOrReturnError(CanFitInNullTerminatedString(mSoftwareVersionString.Value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            CopyString(buf, bufSize, mSoftwareVersionString.Value().c_str());
+            VerifyOrReturnError(CanFitInNullTerminatedString(mSoftwareVersionString.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+            CopyString(buf, bufSize, mSoftwareVersionString.value().c_str());
             return CHIP_NO_ERROR;
         }
 
@@ -539,11 +539,11 @@ public:
     // Once an attribute has been set with one of these Set methods, the
     // corresponding Get method will return the stored value instead of getting
     // the value from the default provider.
-    void SetVendorName(const std::string & buf) { mVendorName.SetValue(buf); }
-    void SetProductName(const std::string & buf) { mProductName.SetValue(buf); }
-    void SetSerialNumber(const std::string & buf) { mSerialNumber.SetValue(buf); }
-    void SetHardwareVersionString(const std::string & buf) { mHardwareVersionString.SetValue(buf); }
-    void SetSoftwareVersionString(const std::string & buf) { mSoftwareVersionString.SetValue(buf); }
+    void SetVendorName(const std::string & buf) { mVendorName = buf; }
+    void SetProductName(const std::string & buf) { mProductName = buf; }
+    void SetSerialNumber(const std::string & buf) { mSerialNumber = buf; }
+    void SetHardwareVersionString(const std::string & buf) { mHardwareVersionString = buf; }
+    void SetSoftwareVersionString(const std::string & buf) { mSoftwareVersionString = buf; }
 
 private:
     DeviceInstanceInfoProvider * mDefaultProvider;
@@ -551,11 +551,11 @@ private:
     // Values of basic information cluster attributes that may be set from the command-line.
     // When GetX is called, if this has a value it will be returned instead of getting the
     // value from the default provider.
-    Optional<std::string> mVendorName;
-    Optional<std::string> mProductName;
-    Optional<std::string> mSerialNumber;
-    Optional<std::string> mHardwareVersionString;
-    Optional<std::string> mSoftwareVersionString;
+    std::optional<std::string> mVendorName;
+    std::optional<std::string> mProductName;
+    std::optional<std::string> mSerialNumber;
+    std::optional<std::string> mHardwareVersionString;
+    std::optional<std::string> mSoftwareVersionString;
 
     static inline bool CanFitInNullTerminatedString(const std::string & candidate, size_t bufSizeIncludingNull)
     {
