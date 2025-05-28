@@ -22,10 +22,28 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
+from chip.testing.pics import accepted_cmd_pics_str, attribute_pics_str, client_pics_str, event_pics_str, feature_pics_str, generated_cmd_pics_str, server_pics_str
 
 # Add the path to python_testing folder, in order to be able to import from matter_testing_support
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
 from chip.testing.spec_parsing import build_xml_clusters  # noqa: E402
+
+
+def pics_validation(dm_pics, xml_pics):
+    """
+    Validate the PICS codes from DM and XML.
+    """
+    matched_pics_code = list(set(dm_pics) & set(xml_pics))
+    pics_xml_only_pics_code = list(set(xml_pics) - set(dm_pics))
+    dm_scrape_only_pics_code = list(set(dm_pics) - set(xml_pics))
+
+    if args.verbose and matched_pics_code:
+        print(f"Matched PICS: {matched_pics_code} ✅")
+    if pics_xml_only_pics_code:
+        print(f"PICS XML Only PICS: {pics_xml_only_pics_code} ❌")
+    if dm_scrape_only_pics_code:
+        print(f"DM Scrape Only PICS: {dm_scrape_only_pics_code} ❌")
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--pics-template', required=True)
@@ -43,7 +61,6 @@ pics_xml_file_list = pics_xml_file_list_loader(xml_template_path_str, True)
 print("Build list of spec XML")
 xml_clusters, problems = build_xml_clusters(Path(f"{args.dm_xml}/clusters"))
 
-
 for cluster in xml_clusters:
     pics_xml_file_name = map_cluster_name_to_pics_xml(xml_clusters[cluster].name, pics_xml_file_list)
 
@@ -59,15 +76,16 @@ for cluster in xml_clusters:
             tree = ET.parse(f"{xml_template_path_str}{pics_xml_file_name}", parser)
             root = tree.getroot()
         except ET.ParseError:
-            print(f"[red]Could not find \"{pics_xml_file_name}\" ❌")
+            print(f"Could not parse \"{pics_xml_file_name}\" ❌")
             continue
 
         print(f"PICS Code: {xml_clusters[cluster].pics}")
         pics_code = xml_clusters[cluster].pics
-        pics_code_server = f"{pics_code}.S"
-        pics_code_client = f"{pics_code}.C"
+        if not pics_code:
+            print(f"No PICS code found for {xml_clusters[cluster].name} ❌")
+            continue
 
-        pics_code_dm_list = [pics_code_server, pics_code_client]
+        pics_code_dm_list = [server_pics_str(pics_code), client_pics_str(pics_code)]
 
         pics_code_xml_list = []
         usage_node = root.find('usage')
@@ -82,17 +100,7 @@ for cluster in xml_clusters:
             else:
                 pics_code_xml_list.append(item_number_element.text)
 
-        matched_pics_code = list(set(pics_code_dm_list) & set(pics_code_xml_list))
-        pics_xml_only_pics_code = list(set(pics_code_xml_list) - set(pics_code_dm_list))
-        dm_scrape_only_pics_code = list(set(pics_code_dm_list) - set(pics_code_xml_list))
-
-        if args.verbose and matched_pics_code:
-            print(f"Matched PICS Code: {matched_pics_code} ✅")
-
-        if pics_xml_only_pics_code:
-            print(f"PICS XML Only PICS Code: {pics_xml_only_pics_code} ❌")
-        if dm_scrape_only_pics_code:
-            print(f"DM Scrape Only PICS Code: {dm_scrape_only_pics_code} ❌")
+        pics_validation(pics_code_dm_list, pics_code_xml_list)
 
         # print(f"FeatureMap: {xml_clusters[cluster].feature_map}")
         if xml_clusters[cluster].feature_map:
@@ -113,19 +121,10 @@ for cluster in xml_clusters:
                 # print(f"Feature: {xml_clusters[cluster].feature_map[feature]} - {feature}")
                 for bit_index in range(0, 32):
                     if xml_clusters[cluster].feature_map[feature] >> bit_index == 1:
-                        # print(f"DM Scrape - {pics_code_server}.F{bit_index:02x}")
-                        dmScrapeFeatureList.append(f"{pics_code_server}.F{bit_index:02x}")
+                        # print(f"DM Scrape - {feature_pics_str(pics_code, bit_index)}")
+                        dmScrapeFeatureList.append(feature_pics_str(pics_code, bit_index))
 
-            matchedFeatures = list(set(picsXmlFeatureList) & set(dmScrapeFeatureList))
-            picsXmlOnlyFeatures = list(set(picsXmlFeatureList) - set(dmScrapeFeatureList))
-            dmScrapeOnlyFeatures = list(set(dmScrapeFeatureList) - set(picsXmlFeatureList))
-
-            if args.verbose and matchedFeatures:
-                print(f"Matched Feature PICS: {matchedFeatures} ✅")
-            if picsXmlOnlyFeatures:
-                print(f"PICS XML Only Feature PICS: {picsXmlOnlyFeatures} ❌")
-            if dmScrapeOnlyFeatures:
-                print(f"DM Scrape Only Feature PICS: {dmScrapeOnlyFeatures} ❌")
+            pics_validation(dmScrapeFeatureList, picsXmlFeatureList)
 
         # print(f"Attributes: {xml_clusters[cluster].attribute_map}")
         if xml_clusters[cluster].attribute_map:
@@ -142,19 +141,10 @@ for cluster in xml_clusters:
 
             dmScrapeAttributeList = []
             for attribute in xml_clusters[cluster].attribute_map:
-                # print(f"DM Scrape - {pics_code_server}.A{xml_clusters[cluster].attribute_map[attribute]:04x}")
-                dmScrapeAttributeList.append(f"{pics_code_server}.A{xml_clusters[cluster].attribute_map[attribute]:04x}")
+                # print(f"DM Scrape - {attribute_pics_str(pics_code, xml_clusters[cluster].attribute_map[attribute])}")
+                dmScrapeAttributeList.append(attribute_pics_str(pics_code, xml_clusters[cluster].attribute_map[attribute]))
 
-            matchedAttributes = list(set(picsXmlAttributeList) & set(dmScrapeAttributeList))
-            picsXmlOnlyAttributes = list(set(picsXmlAttributeList) - set(dmScrapeAttributeList))
-            dmScrapeOnlyAttributes = list(set(dmScrapeAttributeList) - set(picsXmlAttributeList))
-
-            if args.verbose and matchedAttributes:
-                print(f"Matched Attribute PICS: {matchedAttributes} ✅")
-            if picsXmlOnlyAttributes:
-                print(f"PICS XML Only Attribute PICS: {picsXmlOnlyAttributes} ❌")
-            if dmScrapeOnlyAttributes:
-                print(f"DM Scrape Only Attribute PICS: {dmScrapeOnlyAttributes} ❌")
+            pics_validation(dmScrapeAttributeList, picsXmlAttributeList)
 
         # print(f"Accepted Commands: {xml_clusters[cluster].accepted_commands}")
         if xml_clusters[cluster].accepted_commands:
@@ -171,19 +161,10 @@ for cluster in xml_clusters:
 
             dmScrapeCommandReceivedList = []
             for command in xml_clusters[cluster].accepted_commands:
-                # print(f"DM Scrape - {pics_code_server}.C{command:02x}.Rsp")
-                dmScrapeCommandReceivedList.append(f"{pics_code_server}.C{command:02x}.Rsp")
+                # print(f"DM Scrape - {accepted_cmd_pics_str(pics_code, command)}")
+                dmScrapeCommandReceivedList.append(accepted_cmd_pics_str(pics_code, command))
 
-            matchedRspCommands = list(set(picsXmlCommandReceivedList) & set(dmScrapeCommandReceivedList))
-            picsXmlOnlyRspCommands = list(set(picsXmlCommandReceivedList) - set(dmScrapeCommandReceivedList))
-            dmScrapeOnlyRspCommands = list(set(dmScrapeCommandReceivedList) - set(picsXmlCommandReceivedList))
-
-            if args.verbose and matchedRspCommands:
-                print(f"Matched Command PICS: {matchedRspCommands} ✅")
-            if picsXmlOnlyRspCommands:
-                print(f"PICS XML Only Command PICS: {picsXmlOnlyRspCommands} ❌")
-            if dmScrapeOnlyRspCommands:
-                print(f"DM Scrape Only Command PICS: {dmScrapeOnlyRspCommands} ❌")
+            pics_validation(dmScrapeCommandReceivedList, picsXmlCommandReceivedList)
 
         if xml_clusters[cluster].generated_commands:
             picsXmlCommandGeneratedList = []
@@ -199,19 +180,10 @@ for cluster in xml_clusters:
 
             dmScrapeCommandGeneratedList = []
             for command in xml_clusters[cluster].generated_commands:
-                # print(f"DM Scrape - {pics_code_server}.C{command:02x}.Tx")
-                dmScrapeCommandGeneratedList.append(f"{pics_code_server}.C{command:02x}.Tx")
+                # print(f"DM Scrape - {generated_cmd_pics_str(pics_code, command)}")
+                dmScrapeCommandGeneratedList.append(generated_cmd_pics_str(pics_code, command))
 
-            matchedTxCommands = list(set(picsXmlCommandGeneratedList) & set(dmScrapeCommandGeneratedList))
-            picsXmlOnlyTxCommands = list(set(picsXmlCommandGeneratedList) - set(dmScrapeCommandGeneratedList))
-            dmScrapeOnlyTxCommands = list(set(dmScrapeCommandGeneratedList) - set(picsXmlCommandGeneratedList))
-
-            if args.verbose and matchedTxCommands:
-                print(f"Matched Command PICS: {matchedTxCommands} ✅")
-            if picsXmlOnlyTxCommands:
-                print(f"PICS XML Only Command PICS: {picsXmlOnlyTxCommands} ❌")
-            if dmScrapeOnlyTxCommands:
-                print(f"DM Scrape Only Command PICS: {dmScrapeOnlyTxCommands} ❌")
+            pics_validation(dmScrapeCommandGeneratedList, picsXmlCommandGeneratedList)
 
         if xml_clusters[cluster].events:
             picsXmlEventList = []
@@ -227,19 +199,10 @@ for cluster in xml_clusters:
 
             dmScrapeEventList = []
             for event in xml_clusters[cluster].events:
-                # print(f"DM Scrape - {pics_code_server}.E{event:02x}")
-                dmScrapeEventList.append(f"{pics_code_server}.E{event:02x}")
+                # print(f"DM Scrape - {event_pics_str(pics_code, event)}")
+                dmScrapeEventList.append(event_pics_str(pics_code, event))
 
-            matchedEvents = list(set(picsXmlEventList) & set(dmScrapeEventList))
-            picsXmlOnlyEvents = list(set(picsXmlEventList) - set(dmScrapeEventList))
-            dmScrapeOnlyEvents = list(set(dmScrapeEventList) - set(picsXmlEventList))
-
-            if args.verbose and matchedEvents:
-                print(f"Matched Event PICS: {matchedEvents} ✅")
-            if picsXmlOnlyEvents:
-                print(f"PICS XML Only Event PICS: {picsXmlOnlyEvents} ❌")
-            if dmScrapeOnlyEvents:
-                print(f"DM Scrape Only Event PICS: {dmScrapeOnlyEvents} ❌")
+            pics_validation(dmScrapeEventList, picsXmlEventList)
 
     else:
         print(
