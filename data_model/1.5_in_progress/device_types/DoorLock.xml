@@ -82,7 +82,7 @@ Davis, CA 95616, USA
             <orTerm>
               <feature name="PIN"/>
               <feature name="RID"/>
-              <feature name="FPG"/>
+              <condition name="FPG"/>
               <feature name="FACE"/>
               <feature name="ALIRO"/>
             </orTerm>

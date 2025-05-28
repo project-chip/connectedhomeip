@@ -272,6 +272,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+ *
+ * A monothonic number identifying the configuration version running on the device.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION 1
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *
  * Enables the use of a hard-coded default serial number if none
@@ -445,6 +454,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+ *
+ * Enable support for Joint Fabric in core SDK.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#define CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC 0
 #endif
 
 /**

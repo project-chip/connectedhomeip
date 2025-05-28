@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import logging
-import sys
 
 import click
 
@@ -24,16 +23,8 @@ try:
 except ImportError:
     _has_coloredlogs = False
 
-try:
-    from matter.idl.matter_idl_parser import CreateParser
-except ImportError:
-    import os
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
-    from matter.idl.matter_idl_parser import CreateParser
-
-# isort: off
 from matter.idl.generators.path_resolution import expand_path_for_idl
-
+from matter.idl.matter_idl_parser import CreateParser
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants

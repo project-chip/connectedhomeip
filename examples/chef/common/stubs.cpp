@@ -102,6 +102,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { 
 #include "oven-mode/chef-oven-mode.h"
 #endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
 
+#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+#include "oven-cavity-operational-state/chef-oven-cavity-operational-state.h"
+#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -307,12 +311,17 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
 
 #ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include "channel/ChannelManager.h"
-static ChannelManager channelManager;
+static ChannelManager channelManager[MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
-    Channel::SetDefaultDelegate(endpoint, &channelManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        channelManager[ep].SetEndpoint(endpoint);
+        Channel::SetDefaultDelegate(endpoint, &channelManager[ep]);
+    }
 }
 #endif
 
@@ -459,6 +468,9 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
         SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
         SetTagList(kTemperatureControlledCabinetEpId,
                    Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
+#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+        Clusters::OvenCavityOperationalState::InitChefOvenCavityOperationalStateCluster();
+#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
     }
     CooktopCookSurfaceInit(kCooktopEpId);
 }

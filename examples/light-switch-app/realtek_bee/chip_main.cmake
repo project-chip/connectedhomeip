@@ -17,6 +17,19 @@ list(
 )
 endif (matter_enable_shell)
 
+if (matter_enable_ota_requestor)
+list(
+    APPEND ${list_chip_main_sources}
+    #OTARequestor
+    ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+    ${chip_dir}/examples/platform/realtek_bee/ota/OTAInitializer.cpp
+)
+endif (matter_enable_ota_requestor)
+
 list(
     APPEND ${list_chip_main_sources}
 
@@ -75,7 +88,11 @@ list(
 )
 
 if (matter_dac_key_encryption)
-list(APPEND chip_main_flags -DCONFIG_DAC_KEY_ENC=1)
+list(
+    APPEND chip_main_flags 
+
+    -DCONFIG_DAC_KEY_ENC=1
+)
 endif (matter_dac_key_encryption)
 
 if (matter_enable_persistentstorage_audit)

@@ -33,9 +33,10 @@ CLUSTER_ID = 0x0BEE
 CLUSTER_NAME = "TestCluster"
 ATTRIBUTE_NAME = "TestAttribute"
 ATTRIBUTE_ID = 0x0000
+COMMAND_ID = 0x0F
 
 
-def single_attribute_cluster_xml(read_access: str, write_access: str, write_supported: str):
+def single_attribute_cluster_xml(read_access: str, write_access: str, write_supported: str, invoke_access: str):
     xml_cluster = f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="3">'
     revision_table = ('<revisionHistory>'
                       '<revision revision="1" summary="Initial Release"/>'
@@ -55,12 +56,20 @@ def single_attribute_cluster_xml(read_access: str, write_access: str, write_supp
                  '<mandatoryConform/>'
                  '</attribute>'
                  '</attributes>')
+    invoke_access_str = f'invokePrivilege="{invoke_access}"' if invoke_access is not None else ""
+    command = ('<commands>'
+               f'<command id="{COMMAND_ID}" name="Cmd" direction="commandToServer" response="Y">'
+               f'<access {invoke_access_str}/>'
+               '<mandatoryConform/>'
+               '</command>'
+               '</commands>')
 
     return (f'{xml_cluster}'
             f'{revision_table}'
             f'{id_table}'
             f'{classification}'
             f'{attribute}'
+            f'{command}'
             '</cluster>')
 
 
@@ -260,11 +269,12 @@ class TestSpecParsingSupport(MatterBaseTest):
     def test_build_xml_override(self):
         # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
         one_five_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
-        one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
+        one_three_clusters, one_three_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
         one_four_clusters, one_four_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         one_four_one_clusters, one_four_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
 
-        # We know 1.4 and 1.4.1 are clear of errors, ensure it stays that way.
+        # We know 1.3, 1.4 and 1.4.1 are clear of errors, ensure it stays that way.
+        asserts.assert_equal(len(one_three_problems), 0, "Unexpected problems found on 1.3 cluster parsing")
         asserts.assert_equal(len(one_four_problems), 0, "Unexpected problems found on 1.4 cluster parsing")
         asserts.assert_equal(len(one_four_one_problems), 0, "Unexpected problems found on 1.4.1 cluster parsing")
 
@@ -297,7 +307,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         strs = [None, 'view', 'operate', 'manage', 'admin']
         for read in strs:
             for write in strs:
-                xml = single_attribute_cluster_xml(read, write, "true")
+                xml = single_attribute_cluster_xml(read, write, "true", None)
                 xml_cluster = parse_cluster(xml)
                 asserts.assert_is_not_none(xml_cluster.attributes, "No attributes found in cluster")
                 asserts.assert_is_not_none(xml_cluster.attribute_map, "No attribute map found in cluster")
@@ -308,10 +318,19 @@ class TestSpecParsingSupport(MatterBaseTest):
                                      get_access_enum_from_string(read), "Unexpected read access")
                 asserts.assert_equal(xml_cluster.attributes[ATTRIBUTE_ID].write_access,
                                      get_access_enum_from_string(write), "Unexpected write access")
+        for invoke in strs:
+            xml = single_attribute_cluster_xml(None, None, "true", invoke)
+            xml_cluster = parse_cluster(xml)
+            asserts.assert_is_not_none(xml_cluster.accepted_commands, "No commands found in cluster")
+            asserts.assert_is_not_none(xml_cluster.command_map, "No command map found in cluster")
+            asserts.assert_true(COMMAND_ID in xml_cluster.accepted_commands.keys(),
+                                "Did not find test command in XmlCluster.accepted_commands")
+            asserts.assert_equal(xml_cluster.accepted_commands[COMMAND_ID].privilege,
+                                 get_access_enum_from_string(invoke), "Unexpected invoke privilege")
 
     def test_write_optional(self):
         for write_support in ['true', 'optional']:
-            xml = single_attribute_cluster_xml('view', 'view', write_support)
+            xml = single_attribute_cluster_xml('view', 'view', write_support, None)
             xml_cluster = parse_cluster(xml)
             asserts.assert_is_not_none(xml_cluster.attributes, "No attributes found in cluster")
             asserts.assert_is_not_none(xml_cluster.attribute_map, "No attribute map found in cluster")

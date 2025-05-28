@@ -15,9 +15,6 @@
  *    limitations under the License.
  */
 
-#include "descriptor.h"
-
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
@@ -27,8 +24,12 @@
 #include <app/data-model/List.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <clusters/Descriptor/Attributes.h>
+#include <clusters/Descriptor/Metadata.h>
+#include <clusters/Descriptor/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -49,7 +50,6 @@ bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint,
     //       however endpoint depth should not be as large.
     while (true)
     {
-
         VerifyOrReturnValue(childEndpoint != nullptr, false);
         VerifyOrReturnValue(childEndpoint->parentId != parentId, true);
 
@@ -87,8 +87,10 @@ private:
     CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClientClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    CHIP_ERROR ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+#endif
 };
 
 CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -159,7 +161,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
     switch (endpointInfo.compositionPattern)
     {
     case DataModel::EndpointCompositionPattern::kFullFamily:
-        // encodes ALL endpoints that have the specified endpoint as a descendant
+        // encodes ALL endpoints that have the specified endpoint as a descendant.
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
             for (const auto & ep : endpoints)
             {
@@ -211,6 +213,17 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
     return err;
 }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+    MutableCharSpan epUniqueId(buffer);
+
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointUniqueID(endpoint, epUniqueId));
+    return aEncoder.Encode(epUniqueId);
+}
+#endif
+
 CHIP_ERROR DescriptorAttrAccess::ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
@@ -237,17 +250,12 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientClusters(EndpointId endpoint, Attribu
     });
 }
 
-CHIP_ERROR DescriptorAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.Encode(kClusterRevision);
+namespace {
+Global<DescriptorAttrAccess> gAttrAccess;
 }
-
-DescriptorAttrAccess gAttrAccess;
 
 CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aPath.mClusterId == Descriptor::Id);
-
     switch (aPath.mAttributeId)
     {
     case DeviceTypeList::Id: {
@@ -266,11 +274,16 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         return ReadTagListAttribute(aPath.mEndpointId, aEncoder);
     }
     case ClusterRevision::Id: {
-        return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+        return aEncoder.Encode(kRevision);
     }
     case FeatureMap::Id: {
         return ReadFeatureMap(aPath.mEndpointId, aEncoder);
     }
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    case EndpointUniqueID::Id: {
+        return ReadEndpointUniqueId(aPath.mEndpointId, aEncoder);
+    }
+#endif
     default: {
         break;
     }
@@ -282,10 +295,10 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
 void MatterDescriptorPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess.get());
 }
 
 void MatterDescriptorPluginServerShutdownCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess.get());
 }

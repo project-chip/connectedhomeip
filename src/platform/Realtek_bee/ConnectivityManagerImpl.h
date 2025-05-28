@@ -46,7 +46,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for Qorvo QPG platforms.
+ * Concrete implementation of the ConnectivityManager singleton object for Realtek Bee platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,

@@ -34,8 +34,11 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 
-using ICEServerDecodableTypeStruct = Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionTypeStruct      = Structs::WebRTCSessionStruct::Type;
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
 /** @brief
  *  Defines methods for implementing application-specific logic for the WebRTCTransportRequestor Cluster.
@@ -49,9 +52,8 @@ public:
 
     struct OfferArgs
     {
-        uint16_t sessionId;
         std::string sdp;
-        Optional<std::vector<ICEServerDecodableTypeStruct>> iceServers;
+        Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
         NodeId peerNodeId;
     };
@@ -63,12 +65,10 @@ public:
      * @param[in] args
      *   Structure containing all input arguments for the command.
      *
-     * @param[out] outSession New session struct is created with the new session details received.
-     *
      * @return CHIP_ERROR
      *   - Returns error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleOffer(uint16_t sessionId, const OfferArgs & args, WebRTCSessionTypeStruct & outSession) = 0;
+    virtual CHIP_ERROR HandleOffer(uint16_t sessionId, const OfferArgs & args) = 0;
     /**
      * @brief
      *   Handles the Answer command received by the server.
@@ -85,12 +85,14 @@ public:
      *   Called when the server receives the ICECandidates command.
      *
      * @param[in] sessionId  Current session ID.
-     * @param[in] candidates List of ICE candidate strings.
+     * @param[in] candidates List of ICE candidate structs.
+     * Note: The callee cannot reference the `candidates` vector after this call
+     * returns, and must copy the contents over for later use, if required.
      *
      * @return CHIP_ERROR
      *   - Returns error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) = 0;
+    virtual CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) = 0;
     /**
      * @brief
      *   Called when the server receives the End command.
@@ -148,7 +150,7 @@ public:
      * @brief
      *   Gets the current sessions from the Requestor server.
      */
-    std::vector<WebRTCSessionTypeStruct> GetCurrentSessions() const { return mCurrentSessions; }
+    std::vector<WebRTCSessionStruct> GetCurrentSessions() const { return mCurrentSessions; }
 
     /**
      * @brief
@@ -157,7 +159,7 @@ public:
      * @param session The session data to insert or update.
      * @return kInserted if a new session was added, kUpdated if an existing one was modified.
      */
-    UpsertResultEnum UpsertSession(const WebRTCSessionTypeStruct & session); // Now public
+    UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session); // Now public
 
     /**
      * @brief
@@ -170,7 +172,7 @@ public:
 
 private:
     WebRTCTransportRequestorDelegate & mDelegate;
-    std::vector<WebRTCSessionTypeStruct> mCurrentSessions;
+    std::vector<WebRTCSessionStruct> mCurrentSessions;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -179,7 +181,7 @@ private:
     void InvokeCommand(HandlerContext & ctx) override;
 
     // Helper functions
-    WebRTCSessionTypeStruct * FindSession(uint16_t sessionId);
+    WebRTCSessionStruct * FindSession(uint16_t sessionId);
     uint16_t GenerateSessionId();
     bool IsPeerNodeSessionValid(uint16_t sessionId, HandlerContext & ctx);
 

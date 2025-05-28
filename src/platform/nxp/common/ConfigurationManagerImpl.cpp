@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2022, 2025 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -46,6 +46,10 @@ extern "C" {
 #include "wlan.h"
 }
 #endif
+#if CONFIG_CHIP_ETHERNET
+#include "fsl_enet.h"
+#include "fsl_silicon_id.h"
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -58,9 +62,9 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
 CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
 {
+#if CONFIG_BOOT_REASON_SDK_SUPPORT
     /*
     With current implementation kBrownOutReset couldn't be catched
     */
@@ -93,8 +97,10 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
     }
 
     return StoreBootReason(to_underlying(bootReason));
-}
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
+}
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
 {
@@ -168,6 +174,15 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }
+
+#if CONFIG_CHIP_ETHERNET
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
+{
+    ENET_GetMacAddr(ENET, buf.data());
+
+    return CHIP_NO_ERROR;
+}
+#endif
 
 CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 {
