@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
@@ -32,6 +33,8 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
   val referenceCount: UByte,
   val encodedPixels: Boolean,
   val hardwareEncoder: Boolean,
+  val watermarkEnabled: Optional<Boolean>,
+  val OSDEnabled: Optional<Boolean>,
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterSnapshotStreamStruct {\n")
@@ -44,6 +47,8 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
     append("\treferenceCount : $referenceCount\n")
     append("\tencodedPixels : $encodedPixels\n")
     append("\thardwareEncoder : $hardwareEncoder\n")
+    append("\twatermarkEnabled : $watermarkEnabled\n")
+    append("\tOSDEnabled : $OSDEnabled\n")
     append("}\n")
   }
 
@@ -59,6 +64,14 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
       put(ContextSpecificTag(TAG_REFERENCE_COUNT), referenceCount)
       put(ContextSpecificTag(TAG_ENCODED_PIXELS), encodedPixels)
       put(ContextSpecificTag(TAG_HARDWARE_ENCODER), hardwareEncoder)
+      if (watermarkEnabled.isPresent) {
+        val optwatermarkEnabled = watermarkEnabled.get()
+        put(ContextSpecificTag(TAG_WATERMARK_ENABLED), optwatermarkEnabled)
+      }
+      if (OSDEnabled.isPresent) {
+        val optOSDEnabled = OSDEnabled.get()
+        put(ContextSpecificTag(TAG_OSD_ENABLED), optOSDEnabled)
+      }
       endStructure()
     }
   }
@@ -73,6 +86,8 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
     private const val TAG_REFERENCE_COUNT = 6
     private const val TAG_ENCODED_PIXELS = 7
     private const val TAG_HARDWARE_ENCODER = 8
+    private const val TAG_WATERMARK_ENABLED = 9
+    private const val TAG_OSD_ENABLED = 10
 
     fun fromTlv(
       tlvTag: Tag,
@@ -96,6 +111,18 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
       val referenceCount = tlvReader.getUByte(ContextSpecificTag(TAG_REFERENCE_COUNT))
       val encodedPixels = tlvReader.getBoolean(ContextSpecificTag(TAG_ENCODED_PIXELS))
       val hardwareEncoder = tlvReader.getBoolean(ContextSpecificTag(TAG_HARDWARE_ENCODER))
+      val watermarkEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATERMARK_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_WATERMARK_ENABLED)))
+        } else {
+          Optional.empty()
+        }
+      val OSDEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OSD_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OSD_ENABLED)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -109,6 +136,8 @@ class CameraAvStreamManagementClusterSnapshotStreamStruct(
         referenceCount,
         encodedPixels,
         hardwareEncoder,
+        watermarkEnabled,
+        OSDEnabled,
       )
     }
   }

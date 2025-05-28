@@ -57,7 +57,7 @@
         "Test_TC_EEVSEM_3_3"
     ],
     "FlowMeasurement": ["Test_TC_FLW_2_1"],
-    "FanControl": ["Test_TC_FAN_2_1", "Test_TC_FAN_2_3", "Test_TC_FAN_3_6"],
+    "FanControl": ["Test_TC_FAN_3_6"],
     "GeneralCommissioning": ["Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": [],
     "GroupKeyManagement": ["Test_TC_GRPKEY_2_2"],
@@ -80,8 +80,7 @@
         "Test_TC_LVL_9_1"
     ],
     "LocalizationConfiguration": [],
-    "TimeFormatLocalization": ["Test_TC_LTIME_1_2", "Test_TC_LTIME_3_1"],
-    "UnitLocalization": ["Test_TC_LUNIT_3_1"],
+    "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
     "UserLabel": [
         "Test_TC_ULABEL_2_1",
         "Test_TC_ULABEL_2_2",
