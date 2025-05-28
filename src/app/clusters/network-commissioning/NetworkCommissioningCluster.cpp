@@ -223,8 +223,39 @@ CHIP_ERROR NetworkCommissioningCluster::GeneratedCommands(const ConcreteClusterP
 CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    // FIXME: implement: this is where existing code IS LACKING!!!!
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    using namespace NetworkCommissioning::Attributes;
+    using NetworkCommissioning::Feature;
+
+    // mandatory attributes
+    ReturnErrorOnFailure(builder.AppendElements({
+        MaxNetworks::kMetadataEntry,
+        Networks::kMetadataEntry,
+        InterfaceEnabled::kMetadataEntry,
+        LastNetworkingStatus::kMetadataEntry,
+        LastNetworkID::kMetadataEntry,
+        LastConnectErrorValue::kMetadataEntry,
+    }));
+
+    // NOTE: thread and wifi are mutually exclusive features
+    if (mLogic.Features().Has(Feature::kThreadNetworkInterface))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({
+            ScanMaxTimeSeconds::kMetadataEntry,
+            ConnectMaxTimeSeconds::kMetadataEntry,
+            SupportedThreadFeatures::kMetadataEntry,
+            ThreadVersion::kMetadataEntry,
+        }));
+    }
+    else if (mLogic.Features().Has(Feature::kThreadNetworkInterface))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({
+            ScanMaxTimeSeconds::kMetadataEntry,
+            ConnectMaxTimeSeconds::kMetadataEntry,
+            SupportedWiFiBands::kMetadataEntry,
+        }));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Clusters
