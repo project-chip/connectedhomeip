@@ -345,12 +345,15 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     features.Set(Feature::kOnScreenDisplay);
     features.Set(Feature::kHighDynamicRange);
 
-    //Pure optional attributes that aren't covered by a feature flag
+    //Pure optional attributes that aren't covered by a feature flag, or are attested by the server given feature flag settings
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(OptionalAttribute::kHardPrivacyModeOn);
     optionalAttrs.Set(OptionalAttribute::kMicrophoneAGCEnabled);
     optionalAttrs.Set(OptionalAttribute::kStatusLightEnabled);
     optionalAttrs.Set(OptionalAttribute::kStatusLightBrightness);
+    optionalAttrs.Set(OptionalAttribute::kImageFlipVertical);
+    optionalAttrs.Set(OptionalAttribute::kImageFlipHorizontal);
+    optionalAttrs.Set(OptionalAttribute::kImageRotation);
 
     uint32_t maxConcurrentVideoEncoders  = 1;
     uint32_t maxEncodedPixelRate         = 10000;

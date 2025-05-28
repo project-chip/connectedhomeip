@@ -146,18 +146,6 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                          mEndpointId));
     }
 
-    if (HasFeature(Feature::kImageControl))
-    {
-        VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal) || SupportsOptAttr(OptionalAttribute::kImageFlipVertical) ||
-                SupportsOptAttr(OptionalAttribute::kImageRotation),
-            CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(Zcl,
-                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl feature supported, then "
-                         "at least one of ImageFlip or Rotation should be supported",
-                         mEndpointId));
-    }
-
     LoadPersistentAttributes();
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);

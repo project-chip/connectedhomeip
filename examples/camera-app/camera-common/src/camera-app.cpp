@@ -105,6 +105,9 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
     {
         features.Set(CameraAvStreamManagement::Feature::kImageControl);
+        optionalAttrs.Set(OptionalAttribute::kImageFlipVertical);
+        optionalAttrs.Set(OptionalAttribute::kImageFlipHorizontal);
+        optionalAttrs.Set(OptionalAttribute::kImageRotation);
     }
 
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
