@@ -96,17 +96,18 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace MicrowaveOvenMode {
-ModeBase::Instance * GetInstance() {
+ModeBase::Instance * GetInstance()
+{
     return ChefMicrowaveOvenMode::GetInstance();
 }
-ChefDelegate * GetDelegate() {
+ChefDelegate * GetDelegate()
+{
     return ChefMicrowaveOvenMode::GetDelegate();
 }
 } // namespace MicrowaveOvenMode
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
 
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::Init()
 {
