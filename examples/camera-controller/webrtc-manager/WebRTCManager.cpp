@@ -81,7 +81,7 @@ CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorD
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Schedule the ProvideICECandidates() call to run asynchronously.
+    // Schedule the ProvideAnswer() call to run asynchronously.
     DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideAnswer(sessionId, mLocalDescription); });
 
     return CHIP_NO_ERROR;
