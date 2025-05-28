@@ -261,7 +261,6 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
-    WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
     uint16_t mApFreq;
