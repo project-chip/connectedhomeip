@@ -374,6 +374,48 @@ void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
     }
 }
 
+/**
+ * Named pipe handler for simulating a configuration version bump
+ * by changing the LevelStep value in the ValveConfigurationAndControl cluster
+ *
+ * Usage example:
+ *   echo '{"Name":"SimulateConfigurationVersionChange"}' > /tmp/chip_all_clusters_fifo_53713
+ */
+
+void HandleSimulateConfigurationVersionBump(void)
+{
+    EndpointId endpoint = 1;
+
+    // Change a F attribute to simulate a change in configuration of the device
+    uint8_t valveLevelStep = 0;
+    Protocols::InteractionModel::Status status =
+        ValveConfigurationAndControl::Attributes::LevelStep::Get(endpoint, &valveLevelStep);
+    VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
+
+    if (valveLevelStep == 1)
+    {
+        // Change fixed LevelStep value to 10
+        valveLevelStep = 10;
+    }
+    else
+    {
+        // Change fixed LevelStep value back to 1
+        valveLevelStep = 1;
+    }
+
+    status = ValveConfigurationAndControl::Attributes::LevelStep::Set(endpoint, valveLevelStep);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(NotSpecified, "Failed to set LevelStep value");
+    }
+    else
+    {
+        // LevelStep in ValveConfigurationAndControl has been modified, so bump ConfigurationVersion
+        DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction(
+            InteractionModelEngine::GetInstance()->GetDataModelProvider());
+    }
+}
+
 } // namespace
 
 AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char * json)
@@ -559,40 +601,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SimulateConfigurationVersionChange")
     {
-        EndpointId endpoint = 1;
-
-        // Change a F attribute to simulate a change in construction
-        uint8_t valveLevelStep = 0;
-        Protocols::InteractionModel::Status status =
-            ValveConfigurationAndControl::Attributes::LevelStep::Get(endpoint, &valveLevelStep);
-        VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
-
-        ChipLogProgress(NotSpecified, "Current LevelStep value: %d", valveLevelStep);
-
-        if (valveLevelStep == 1)
-        {
-            // Change fixed LevelStep value to 10
-            valveLevelStep = 10;
-        }
-        else
-        {
-            // Change fixed LevelStep value back to 1
-            valveLevelStep = 1;
-        }
-
-        status = ValveConfigurationAndControl::Attributes::LevelStep::Set(endpoint, valveLevelStep);
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogProgress(NotSpecified, "Failed to set LevelStep value");
-        }
-        else
-        {
-            ChipLogDetail(NotSpecified,
-                          "LevelStep in ValveConfigurationAndControl has been modified, so bump ConfigurationVersion");
-
-            DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction(
-                InteractionModelEngine::GetInstance()->GetDataModelProvider());
-        }
+        HandleSimulateConfigurationVersionBump();
     }
     else
     {
