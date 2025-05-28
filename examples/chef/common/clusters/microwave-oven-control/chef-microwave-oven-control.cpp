@@ -17,24 +17,25 @@
  */
 
 #include "chef-microwave-oven-control.h"
-#include "../../chef-operational-state-delegate-impl.h"
 #include "../microwave-oven-mode/chef-microwave-oven-mode.h"
+#include "../../chef-operational-state-delegate-impl.h"
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-using ModeBase::StatusCode;
-using OperationalState::ErrorStateEnum;
 using OperationalState::OperationalStateEnum;
+using OperationalState::ErrorStateEnum;
+using ModeBase::StatusCode;
 
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 template <typename T>
-using List = chip::app::DataModel::List<T>;
+using List          = chip::app::DataModel::List<T>;
 using MicrowaveOvenMode::ModeTagStructType;
-using Status = Protocols::InteractionModel::Status;
+using Status          = Protocols::InteractionModel::Status;
 
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+
 
 void ChefMicrowaveOvenDevice::MicrowaveOvenInit()
 {
@@ -42,14 +43,12 @@ void ChefMicrowaveOvenDevice::MicrowaveOvenInit()
     OperationalState::GetOperationalStateInstance()->Init();
     MicrowaveOvenMode::GetInstance()->Init();
     mMicrowaveOvenControlInstance.Init();
-
-    mSelectedWattIndex = 0;
-    mWattRating        = 0;
 }
 
 Protocols::InteractionModel::Status
 ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec, bool startAfterSetting,
-                                                            Optional<uint8_t> powerSettingNum, Optional<uint8_t> wattSettingIndex)
+                                                               Optional<uint8_t> powerSettingNum,
+                                                               Optional<uint8_t> wattSettingIndex)
 {
     Status status;
     if ((status = MicrowaveOvenMode::GetInstance()->UpdateCurrentMode(cookMode)) != Status::Success)
@@ -84,57 +83,48 @@ CHIP_ERROR ChefMicrowaveOvenDevice::GetWattSettingByIndex(uint8_t index, uint16_
 
 app::DataModel::Nullable<uint32_t> ChefMicrowaveOvenDevice::GetCountdownTime()
 {
-    return mCountDownTime;
+    return OperationalState::GetOperationalStateDelegate()->GetCountdownTime();
 }
 
-CHIP_ERROR ChefMicrowaveOvenDevice::GetOperationalStateAtIndex(
-    size_t index, chip::app::Clusters::OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR ChefMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index,
+                                                                    chip::app::Clusters::OperationalState::GenericOperationalState & operationalState)
 {
-    if (index > mOperationalStateList.size() - 1)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-    operationalState = mOperationalStateList[index];
-    return CHIP_NO_ERROR;
+    return OperationalState::GetOperationalStateDelegate()->GetOperationalStateAtIndex(index, operationalState);
 }
 
 CHIP_ERROR ChefMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
-    if (index >= mOperationalPhaseList.size())
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-    return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
+    return OperationalState::GetOperationalStateDelegate()->GetOperationalPhaseAtIndex(index, operationalPhase);
 }
 
 void ChefMicrowaveOvenDevice::HandlePauseStateCallback(chip::app::Clusters::OperationalState::GenericOperationalError & err)
 {
-    OperationalStateDelegate::HandlePauseStateCallback(err);
+    OperationalState::GetOperationalStateDelegate()->HandlePauseStateCallback(err);
 }
 
 void ChefMicrowaveOvenDevice::HandleResumeStateCallback(chip::app::Clusters::OperationalState::GenericOperationalError & err)
 {
-    OperationalStateDelegate::HandleResumeStateCallback(err);
+    OperationalState::GetOperationalStateDelegate()->HandleResumeStateCallback(err);
 }
 
 void ChefMicrowaveOvenDevice::HandleStartStateCallback(chip::app::Clusters::OperationalState::GenericOperationalError & err)
 {
-    OperationalStateDelegate::HandleStartStateCallback(err);
+    OperationalState::GetOperationalStateDelegate()->HandleStartStateCallback(err);
 }
 
 void ChefMicrowaveOvenDevice::HandleStopStateCallback(chip::app::Clusters::OperationalState::GenericOperationalError & err)
 {
-    OperationalStateDelegate::HandleStopStateCallback(err);
+    OperationalState::GetOperationalStateDelegate()->HandleStopStateCallback(err);
 }
 
 CHIP_ERROR ChefMicrowaveOvenDevice::Init()
 {
-    return CHIP_NO_ERROR;
+    return MicrowaveOvenMode::GetDelegate()->Init();
 }
 
 void ChefMicrowaveOvenDevice::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    response.status = to_underlying(StatusCode::kSuccess);
+    MicrowaveOvenMode::GetDelegate()->HandleChangeToMode(NewMode, response);
 }
 
 CHIP_ERROR ChefMicrowaveOvenDevice::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
@@ -168,8 +158,7 @@ CHIP_ERROR ChefMicrowaveOvenDevice::GetModeTagsByIndex(uint8_t modeIndex, List<M
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    std::copy(MicrowaveOvenMode::GetDelegate()->kModeOptions[modeIndex].modeTags.begin(),
-              MicrowaveOvenMode::GetDelegate()->kModeOptions[modeIndex].modeTags.end(), tags.begin());
+    std::copy(MicrowaveOvenMode::GetDelegate()->kModeOptions[modeIndex].modeTags.begin(), MicrowaveOvenMode::GetDelegate()->kModeOptions[modeIndex].modeTags.end(), tags.begin());
     tags.reduce_size(MicrowaveOvenMode::GetDelegate()->kModeOptions[modeIndex].modeTags.size());
 
     return CHIP_NO_ERROR;

@@ -88,8 +88,6 @@ void InitChefMicrowaveOvenModeCluster()
         gInstanceTable[epIndex] =
             std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId, MicrowaveOvenMode::Id, featureMap);
         gInstanceTable[epIndex]->Init();
-
-        ChipLogProgress(DeviceLayer, "Endpoint %d MicrowaveOvenMode Initialized.", endpointId);
     }
 }
 } // namespace ChefMicrowaveOvenMode
@@ -98,18 +96,17 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace MicrowaveOvenMode {
-ModeBase::Instance * GetInstance()
-{
+ModeBase::Instance * GetInstance() {
     return ChefMicrowaveOvenMode::GetInstance();
 }
-ChefDelegate * GetDelegate()
-{
+ChefDelegate * GetDelegate() {
     return ChefMicrowaveOvenMode::GetDelegate();
 }
 } // namespace MicrowaveOvenMode
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
 
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::Init()
 {

@@ -23,8 +23,8 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 
-#include "../../chef-operational-state-delegate-impl.h"
 #include "../microwave-oven-mode/chef-microwave-oven-mode.h"
+#include "../../chef-operational-state-delegate-impl.h"
 
 #include <app/util/config.h>
 #include <cstring>
@@ -37,14 +37,12 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-using MicrowaveOvenMode::ModeTagStructType;
 using ModeBase::Commands::ChangeToModeResponse::Type;
 using OperationalState::GenericOperationalError;
 using OperationalState::GenericOperationalState;
+using MicrowaveOvenMode::ModeTagStructType;
 
-class ChefMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate,
-                                public ModeBase::Delegate,
-                                public OperationalState::OperationalStateDelegate
+class ChefMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate
 {
 
 public:
@@ -52,7 +50,8 @@ public:
         mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
                                       BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
                                                                              MicrowaveOvenControl::Feature::kPowerNumberLimits),
-                                      *OperationalState::GetOperationalStateInstance(), *MicrowaveOvenMode::GetInstance())
+                                      *OperationalState::GetOperationalStateInstance(),
+                                      *MicrowaveOvenMode::GetInstance())
     {}
 
     void MicrowaveOvenInit();
@@ -80,19 +79,19 @@ public:
 
     uint16_t GetWattRating() const override { return mWattRating; };
 
-    app::DataModel::Nullable<uint32_t> GetCountdownTime() override;
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
-    void HandlePauseStateCallback(GenericOperationalError & err) override;
-    void HandleResumeStateCallback(GenericOperationalError & err) override;
-    void HandleStartStateCallback(GenericOperationalError & err) override;
-    void HandleStopStateCallback(GenericOperationalError & err) override;
+    app::DataModel::Nullable<uint32_t> GetCountdownTime();
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState);
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase);
+    void HandlePauseStateCallback(GenericOperationalError & err);
+    void HandleResumeStateCallback(GenericOperationalError & err);
+    void HandleStartStateCallback(GenericOperationalError & err);
+    void HandleStopStateCallback(GenericOperationalError & err);
 
-    CHIP_ERROR Init() override;
-    void HandleChangeToMode(uint8_t mode, Type & response) override;
-    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
-    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
+    CHIP_ERROR Init();
+    void HandleChangeToMode(uint8_t mode, Type & response);
+    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label);
+    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value);
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags);
 
 private:
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
