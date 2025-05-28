@@ -20,6 +20,7 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/python_wheel.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/controller/flags.gni")
 import("${chip_root}/src/platform/python.gni")
 import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
@@ -33,7 +34,7 @@ config("controller_wno_deprecate") {
 }
 
 shared_library("ChipDeviceCtrl") {
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     output_name = "_ChipDeviceCtrl"
   } else {
     output_name = "_ChipServer"
@@ -50,7 +51,7 @@ shared_library("ChipDeviceCtrl") {
 
   defines = []
 
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
       "ChipDeviceController-Discovery.cpp",
@@ -138,7 +139,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/transport",
   ]
 
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     public_deps += [
       "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
@@ -223,7 +224,7 @@ chip_python_wheel_action("chip-core") {
         "chip/yaml/runner.py",
       ]
 
-      if (chip_controller) {
+      if (chip_support_commissioning_in_controller) {
         sources += [ "chip/ChipDeviceCtrl.py" ]
       } else {
         sources += [ "chip/server/__init__.py" ]
@@ -231,7 +232,7 @@ chip_python_wheel_action("chip-core") {
     },
     {
       src_dir = target_out_dir
-      if (chip_controller) {
+      if (chip_support_commissioning_in_controller) {
         sources = [ "${target_out_dir}/chip/_ChipDeviceCtrl.so" ]
       } else {
         sources = [ "${target_out_dir}/chip/_ChipServer.so" ]
@@ -270,7 +271,7 @@ chip_python_wheel_action("chip-core") {
     "chip.fault_injection",
   ]
 
-  if (!chip_controller) {
+  if (!chip_support_commissioning_in_controller) {
     py_packages += [ "chip.server" ]
   }
 
@@ -309,7 +310,7 @@ chip_python_wheel_action("chip-core") {
 
   tags = "cp37-abi3-" + py_platform_tag
 
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     lib_name = "_ChipDeviceCtrl.so"
   } else {
     lib_name = "_ChipServer.so"
