@@ -2806,8 +2806,7 @@ TEST_F(TestCodegenModelViaMocks, ConfigurationVersionBump)
 
     {
         // Start the ConfigurationVersionTransaction
-        chip::app::CodegenDataModelProvider::ScopedConfigurationVersionUpdater configurationVersionTransaction =
-            model.GetConfigurationVersionUpdater();
+        chip::app::DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction(model);
 
         // Assert the ConfigurationVersion is still 1, since the ScopedConfigurationVersionUpdater has not been descructed
         configurationVersion = 0;
