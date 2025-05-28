@@ -375,14 +375,15 @@ void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
 }
 
 /**
- * Named pipe handler for simulating a configuration version bump
+ * Named pipe handler for simulating a configuration change
  * by changing the LevelStep value in the ValveConfigurationAndControl cluster
+ * and incrementing the ConfigurationVersion
  *
  * Usage example:
- *   echo '{"Name":"SimulateConfigurationVersionChange"}' > /tmp/chip_all_clusters_fifo_53713
+ *   echo '{"Name":"SimulateConfigurationChange"}' > /tmp/chip_all_clusters_fifo_53713
  */
 
-void HandleSimulateConfigurationVersionBump(void)
+void HandleSimulateConfigurationChange(void)
 {
     EndpointId endpoint = 1;
 
@@ -599,9 +600,9 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         SetRefrigeratorDoorStatusHandler(self->mJsonValue);
     }
-    else if (name == "SimulateConfigurationVersionChange")
+    else if (name == "SimulateConfigurationChange")
     {
-        HandleSimulateConfigurationVersionBump();
+        HandleSimulateConfigurationChange();
     }
     else
     {
