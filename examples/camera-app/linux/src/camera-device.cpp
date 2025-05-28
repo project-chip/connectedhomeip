@@ -19,10 +19,12 @@
 #include "camera-device.h"
 #include <AppMain.h>
 #include <fcntl.h> // For file descriptor operations
+#include <filesystem>
 #include <fstream>
 #include <gst/gst.h>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
+#include <limits.h>          // For PATH_MAX
 #include <linux/videodev2.h> // For V4L2 definitions
 #include <sys/ioctl.h>
 
@@ -47,6 +49,221 @@ const int kBallAnimationPattern = 18;
 #endif
 
 } // namespace
+
+namespace GstreamerPipepline {
+
+enum class CameraType
+{
+    kCsi,
+    kUsb,
+    kFailure,
+};
+
+CameraType detectCameraType(const std::string & fullDevicePath)
+{
+    if (!std::filesystem::exists(fullDevicePath))
+    {
+        return CameraType::kFailure;
+    }
+
+    std::string videoDeviceName = std::filesystem::path(fullDevicePath).filename(); // ex: video0
+    std::string sysPath         = "/sys/class/video4linux/" + videoDeviceName + "/device/driver/module";
+
+    char resolvedPath[PATH_MAX];
+    ssize_t len = readlink(sysPath.c_str(), resolvedPath, sizeof(resolvedPath) - 1);
+
+    // Define driver name constants to avoid magic strings
+    constexpr const char * kCsiDriver1 = "bm2835";
+    constexpr const char * kCsiDriver2 = "unicam";
+    constexpr const char * kUsbDriver  = "uvc";
+
+    VerifyOrReturnError(len != -1, CameraType::kFailure);
+
+    const std::string driverPath(resolvedPath, static_cast<size_t>(len));
+
+    if (driverPath.find(kCsiDriver1) != std::string::npos || driverPath.find(kCsiDriver2) != std::string::npos)
+    {
+        return CameraType::kCsi;
+    }
+    if (driverPath.find(kUsbDriver) != std::string::npos)
+    {
+        return CameraType::kUsb;
+    }
+
+    return CameraType::kFailure;
+}
+
+// Function to unreference GStreamer elements and the pipeline
+template <typename... Args>
+void unrefGstElements(GstElement * pipeline, Args... elements)
+{
+    if (pipeline)
+    {
+        gst_object_unref(pipeline);
+    }
+
+    // Unreference each element in the variadic template argument pack
+    ((elements ? gst_object_unref(elements) : void()), ...);
+}
+
+bool isGstElementsNull(const std::vector<std::pair<GstElement *, const char *>> & elements)
+{
+    bool isNull = false;
+
+    // Check if any of the elements in the vector is nullptr
+    for (const auto & element : elements)
+    {
+        if (!element.first)
+        {
+            ChipLogError(Camera, "Element '%s' could not be created.", element.second);
+            isNull = true;
+        }
+    }
+
+    return isNull;
+}
+
+namespace Snapshot {
+struct SnapshotPipelineConfig
+{
+    std::string device;
+    int width;
+    int height;
+    int quality;
+    int framerate;
+    std::string filename;
+};
+
+GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, CameraError & error)
+{
+    // Create the GStreamer elements for the snapshot pipeline
+    GstElement * pipeline = gst_pipeline_new("snapshot-pipeline");
+    // TODO: Have the video source passed in.
+    GstElement * source         = gst_element_factory_make("v4l2src", "source");
+    GstElement * jpeg_caps      = gst_element_factory_make("capsfilter", "jpeg_caps");
+    GstElement * videorate      = gst_element_factory_make("videorate", "videorate");
+    GstElement * videorate_caps = gst_element_factory_make("capsfilter", "timelapse_framerate");
+    GstElement * queue          = gst_element_factory_make("queue", "queue");
+    GstElement * filesink       = gst_element_factory_make("multifilesink", "sink");
+
+    // Check for any nullptr among the created elements
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { pipeline, "pipeline" },             //
+        { source, "source" },                 //
+        { jpeg_caps, "jpeg_caps" },           //
+        { videorate, "videorate" },           //
+        { videorate_caps, "videorate_caps" }, //
+        { queue, "queue" },                   //
+        { filesink, "filesink" }              //
+    };
+    bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
+
+    // If any element creation failed, log the error and unreference the elements
+    if (isElementFactoryMakeFailed)
+    {
+        // Unreference the elements that were created
+        GstreamerPipepline::unrefGstElements(pipeline, source, jpeg_caps, videorate, videorate_caps, queue, filesink);
+
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    // Set the source device and caps
+    g_object_set(source, "device", config.device.c_str(), "do-timestamp", TRUE, nullptr);
+
+    GstCaps * caps = gst_caps_new_simple(                    //
+        "image/jpeg",                                        //
+        "width", G_TYPE_INT, config.width,                   //
+        "height", G_TYPE_INT, config.height,                 //
+        "framerate", GST_TYPE_FRACTION, config.framerate, 1, //
+        "quality", G_TYPE_INT, config.quality,               //
+        nullptr                                              //
+    );
+    g_object_set(jpeg_caps, "caps", caps, nullptr);
+    gst_caps_unref(caps);
+
+    // Set the output file location
+    g_object_set(filesink, "location", config.filename.c_str(), nullptr);
+
+    // Add elements to the pipeline
+    gst_bin_add_many(GST_BIN(pipeline), source, jpeg_caps, videorate, videorate_caps, queue, filesink, nullptr);
+
+    // Link the elements
+    if (gst_element_link_many(source, jpeg_caps, videorate, videorate_caps, queue, filesink, nullptr) != TRUE)
+    {
+        ChipLogError(Camera, "Elements could not be linked.");
+
+        // The pipeline will unref all added elements automatically when you unref the pipeline.
+        gst_object_unref(pipeline);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    return pipeline;
+}
+
+GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & config, CameraError & error)
+{
+    // Create the GStreamer elements for the snapshot pipeline
+    GstElement * pipeline   = gst_pipeline_new("snapshot-pipeline");
+    GstElement * source     = gst_element_factory_make("libcamerasrc", "source");
+    GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+    GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
+    GstElement * queue      = gst_element_factory_make("queue", "queue");
+    GstElement * filesink   = gst_element_factory_make("multifilesink", "sink");
+
+    // Check for any nullptr among the created elements
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { pipeline, "pipeline" },     //
+        { source, "source" },         //
+        { capsfilter, "capsfilter" }, //
+        { jpegenc, "jpegenc" },       //
+        { queue, "queue" },           //
+        { filesink, "filesink" }      //
+    };
+    const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
+
+    // If any element creation failed, log the error and unreference the elements
+    if (isElementFactoryMakeFailed)
+    {
+        // Unreference the elements that were created
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegenc, filesink);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    // Set resolution and framerate caps
+    GstCaps * caps = gst_caps_new_simple(                    //
+        "video/x-raw",                                       //
+        "width", G_TYPE_INT, config.width,                   //
+        "height", G_TYPE_INT, config.height,                 //
+        "framerate", GST_TYPE_FRACTION, config.framerate, 1, //
+        nullptr                                              //
+    );
+    g_object_set(capsfilter, "caps", caps, nullptr);
+    gst_caps_unref(caps);
+
+    // Set JPEG quality
+    g_object_set(jpegenc, "quality", config.quality, nullptr);
+
+    // Set multifilesink to write only one file
+    g_object_set(filesink, "location", config.filename.c_str(), nullptr);
+
+    // Add and link elements
+    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, filesink, nullptr);
+    if (!gst_element_link_many(source, capsfilter, jpegenc, queue, filesink, nullptr))
+    {
+        ChipLogError(Camera, "Elements could not be linked.");
+        gst_object_unref(pipeline);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    return pipeline;
+}
+} // namespace Snapshot
+
+} // namespace GstreamerPipepline
 
 CameraDevice::CameraDevice()
 {
@@ -114,67 +331,37 @@ CameraError CameraDevice::InitializeStreams()
 GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int framerate,
                                                   const std::string & filename, CameraError & error)
 {
-    GstElement *pipeline, *source, *jpeg_caps, *videorate, *videorate_caps, *queue, *filesink;
+    const auto cameraType = GstreamerPipepline::detectCameraType(device);
 
-    // Create the pipeline elements
-    pipeline = gst_pipeline_new("snapshot-pipeline");
-    // TODO: Have the video source passed in.
-    source         = gst_element_factory_make("v4l2src", "source");
-    jpeg_caps      = gst_element_factory_make("capsfilter", "jpeg_caps");
-    videorate      = gst_element_factory_make("videorate", "videorate");
-    videorate_caps = gst_element_factory_make("capsfilter", "timelapse_framerate");
-    queue          = gst_element_factory_make("queue", "queue");
-    filesink       = gst_element_factory_make("multifilesink", "sink");
+    const GstreamerPipepline::Snapshot::SnapshotPipelineConfig config = {
+        .device    = device,
+        .width     = width,
+        .height    = height,
+        .quality   = quality,
+        .framerate = framerate,
+        .filename  = filename,
+    };
 
-    if (!pipeline || !source || !jpeg_caps || !videorate || !videorate_caps || !queue || !filesink)
+    switch (cameraType)
     {
-        ChipLogError(Camera, "Not all elements could be created.");
-
-        if (pipeline)
-            gst_object_unref(pipeline);
-        if (source)
-            gst_object_unref(source);
-        if (jpeg_caps)
-            gst_object_unref(jpeg_caps);
-        if (videorate)
-            gst_object_unref(videorate);
-        if (videorate_caps)
-            gst_object_unref(videorate_caps);
-        if (queue)
-            gst_object_unref(queue);
-        if (filesink)
-            gst_object_unref(filesink);
-
+    case GstreamerPipepline::CameraType::kCsi: {
+        ChipLogDetail(Camera, "Detected CSI camera: %s", device.c_str());
+        return GstreamerPipepline::Snapshot::CreateSnapshotPipelineLibcamerasrc(config, error);
+    }
+    break;
+    case GstreamerPipepline::CameraType::kUsb: {
+        ChipLogDetail(Camera, "Detected USB camera: %s", device.c_str());
+        return GstreamerPipepline::Snapshot::CreateSnapshotPipelineV4l2(config, error);
+    }
+    break;
+    case GstreamerPipepline::CameraType::kFailure: {
+        ChipLogError(Camera, "Unsupported camera type or device not found: %s", device.c_str());
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
-
-    // Set the source device and caps
-    g_object_set(source, "device", device.c_str(), "do-timestamp", TRUE, nullptr);
-
-    GstCaps * caps = gst_caps_new_simple("image/jpeg", "width", G_TYPE_INT, width, "height", G_TYPE_INT, height, "framerate",
-                                         GST_TYPE_FRACTION, framerate, 1, "quality", G_TYPE_INT, quality, nullptr);
-    g_object_set(jpeg_caps, "caps", caps, nullptr);
-    gst_caps_unref(caps);
-
-    // Set the output file location
-    g_object_set(filesink, "location", filename.c_str(), nullptr);
-
-    // Add elements to the pipeline
-    gst_bin_add_many(GST_BIN(pipeline), source, jpeg_caps, videorate, videorate_caps, queue, filesink, nullptr);
-
-    // Link the elements
-    if (gst_element_link_many(source, jpeg_caps, videorate, videorate_caps, queue, filesink, nullptr) != TRUE)
-    {
-        ChipLogError(Camera, "Elements could not be linked.");
-
-        // The pipeline will unref all added elements automatically when you unref the pipeline.
-        gst_object_unref(pipeline);
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
     }
 
-    return pipeline;
+    return nullptr; // Here to avoid compiler warnings, should never reach this point.
 }
 
 // Helper function to create a GStreamer pipeline that ingests MJPEG frames coming
