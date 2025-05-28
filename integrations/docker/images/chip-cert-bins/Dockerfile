@@ -100,7 +100,7 @@ RUN set -x \
 
 RUN set -x \
     && pip3 install --break-system-packages \
-    attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate \
+    attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate gcovr \
     && : # last line
 
 # build and install gn
