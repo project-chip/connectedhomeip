@@ -57,7 +57,8 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
 }
 
 Protocols::InteractionModel::Status
-PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, const TransportOptionsStruct & transportOptions)
+PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID,
+                                                  const Structs::TransportOptionsStruct::DecodableType transportOptions)
 {
     for (PushAvStream & stream : pushavStreams)
     {

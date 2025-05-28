@@ -29,7 +29,9 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
-static constexpr size_t kMaxUrlLength = 2000u;
+static constexpr size_t kMaxUrlLength       = 2000u;
+static constexpr size_t kMaxCENCKeyLength   = 16u;
+static constexpr size_t kMaxCENCKeyIDLength = 16u;
 
 using SupportedFormatStruct                   = Structs::SupportedFormatStruct::Type;
 using CMAFContainerOptionsStruct              = Structs::CMAFContainerOptionsStruct::Type;
@@ -51,8 +53,36 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 {
     TransportTriggerOptionsStorage() {};
 
-    TransportTriggerOptionsStorage(Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions,
-                                   const BitFlags<Feature> features)
+    TransportTriggerOptionsStorage(const TransportTriggerOptionsStorage & aTransportTriggerOptionsStorage)
+    {
+        *this = aTransportTriggerOptionsStorage;
+    }
+
+    TransportTriggerOptionsStorage & operator=(const TransportTriggerOptionsStorage & aTransportTriggerOptionsStorage)
+    {
+        triggerType = aTransportTriggerOptionsStorage.triggerType;
+
+        mTransportZoneOptions = aTransportTriggerOptionsStorage.mTransportZoneOptions;
+
+        // Rebind motionZones to point to the copied vector if it was set
+        if (aTransportTriggerOptionsStorage.motionZones.HasValue() && !aTransportTriggerOptionsStorage.motionZones.Value().IsNull())
+        {
+            motionZones.SetValue(DataModel::Nullable<DataModel::List<const TransportZoneOptionsStruct>>(
+                Span<TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
+        }
+        else
+        {
+            motionZones.Missing();
+        }
+
+        motionSensitivity = aTransportTriggerOptionsStorage.motionSensitivity;
+        motionTimeControl = aTransportTriggerOptionsStorage.motionTimeControl;
+        maxPreRollLen     = aTransportTriggerOptionsStorage.maxPreRollLen;
+
+        return *this;
+    }
+
+    TransportTriggerOptionsStorage(Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions)
     {
         triggerType = triggerOptions.triggerType;
 
@@ -91,8 +121,43 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 {
     CMAFContainerOptionsStorage() {};
 
-    CMAFContainerOptionsStorage(Optional<Structs::CMAFContainerOptionsStruct::Type> CMAFContainerOptions,
-                                const BitFlags<Feature> features)
+    CMAFContainerOptionsStorage(const CMAFContainerOptionsStorage & aCMAFContainerOptionsStorage)
+    {
+        *this = aCMAFContainerOptionsStorage;
+    }
+
+    CMAFContainerOptionsStorage & operator=(const CMAFContainerOptionsStorage & aCMAFContainerOptionsStorage)
+    {
+        chunkDuration = aCMAFContainerOptionsStorage.chunkDuration;
+
+        std::memcpy(mCENCKeyBuffer, aCMAFContainerOptionsStorage.mCENCKeyBuffer, sizeof(mCENCKeyBuffer));
+
+        std::memcpy(mCENCKeyIDBuffer, aCMAFContainerOptionsStorage.mCENCKeyIDBuffer, sizeof(mCENCKeyIDBuffer));
+
+        if (aCMAFContainerOptionsStorage.CENCKey.HasValue())
+        {
+            CENCKey.SetValue(ByteSpan(mCENCKeyBuffer, aCMAFContainerOptionsStorage.CENCKey.Value().size()));
+        }
+        else
+        {
+            CENCKey.Missing();
+        }
+
+        metadataEnabled = aCMAFContainerOptionsStorage.metadataEnabled;
+
+        if (aCMAFContainerOptionsStorage.CENCKeyID.HasValue())
+        {
+            CENCKeyID.SetValue(ByteSpan(mCENCKeyIDBuffer, aCMAFContainerOptionsStorage.CENCKeyID.Value().size()));
+        }
+        else
+        {
+            CENCKeyID.Missing();
+        }
+
+        return *this;
+    }
+
+    CMAFContainerOptionsStorage(Optional<Structs::CMAFContainerOptionsStruct::Type> CMAFContainerOptions)
     {
         if (CMAFContainerOptions.HasValue() == true)
         {
@@ -104,15 +169,12 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
                 CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKey.Value(), CENCKeyBuffer);
                 CENCKey.SetValue(CENCKeyBuffer);
             }
-
-            if (features.Has(Feature::kMetadata) && CMAFContainerOptions.HasValue())
-            {
-                metadataEnabled = CMAFContainerOptions.Value().metadataEnabled;
-            }
             else
             {
-                metadataEnabled.Missing();
+                CENCKey.Missing();
             }
+
+            metadataEnabled = CMAFContainerOptions.Value().metadataEnabled;
 
             if (CMAFContainerOptions.Value().CENCKey.HasValue())
             {
@@ -120,25 +182,42 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
                 CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKeyID.Value(), CENCKeyIDBuffer);
                 CENCKeyID.SetValue(CENCKeyIDBuffer);
             }
+            else
+            {
+                CENCKeyID.Missing();
+            }
         }
     }
 
 private:
-    uint8_t mCENCKeyBuffer[16];
-    uint8_t mCENCKeyIDBuffer[16];
+    uint8_t mCENCKeyBuffer[kMaxCENCKeyLength];
+    uint8_t mCENCKeyIDBuffer[kMaxCENCKeyIDLength];
 };
 
 struct ContainerOptionsStorage : public ContainerOptionsStruct
 {
     ContainerOptionsStorage() {};
 
-    ContainerOptionsStorage(Structs::ContainerOptionsStruct::DecodableType containerOptions, const BitFlags<Feature> features)
+    ContainerOptionsStorage(const ContainerOptionsStorage & aContainerOptionsStorage) { *this = aContainerOptionsStorage; }
+
+    ContainerOptionsStorage & operator=(const ContainerOptionsStorage & aContainerOptionsStorage)
+    {
+        containerType = aContainerOptionsStorage.containerType;
+
+        mCMAFContainerStorage = aContainerOptionsStorage.mCMAFContainerStorage;
+
+        CMAFContainerOptions.SetValue(mCMAFContainerStorage);
+
+        return *this;
+    }
+
+    ContainerOptionsStorage(Structs::ContainerOptionsStruct::DecodableType containerOptions)
     {
         containerType = containerOptions.containerType;
 
         if (containerType == ContainerFormatEnum::kCmaf)
         {
-            mCMAFContainerStorage = CMAFContainerOptionsStorage(containerOptions.CMAFContainerOptions, features);
+            mCMAFContainerStorage = CMAFContainerOptionsStorage(containerOptions.CMAFContainerOptions);
             CMAFContainerOptions.SetValue(mCMAFContainerStorage);
         }
         else
@@ -155,7 +234,34 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 {
     TransportOptionsStorage() {};
 
-    TransportOptionsStorage(Structs::TransportOptionsStruct::DecodableType transportOptions, const BitFlags<Feature> features)
+    TransportOptionsStorage(const TransportOptionsStorage & aTransportOptionsStorage) { *this = aTransportOptionsStorage; }
+
+    TransportOptionsStorage & operator=(const TransportOptionsStorage & aTransportOptionsStorage)
+    {
+        streamUsage   = aTransportOptionsStorage.streamUsage;
+        videoStreamID = aTransportOptionsStorage.videoStreamID;
+        audioStreamID = aTransportOptionsStorage.audioStreamID;
+        endpointID    = aTransportOptionsStorage.endpointID;
+
+        // Deep copy the URL buffer
+        std::memcpy(mUrlBuffer, aTransportOptionsStorage.mUrlBuffer, kMaxUrlLength);
+        url = MutableCharSpan(mUrlBuffer, aTransportOptionsStorage.url.size());
+
+        // Copy internal storage objects
+        mTriggerOptionsStorage = aTransportOptionsStorage.mTriggerOptionsStorage;
+        triggerOptions         = mTriggerOptionsStorage;
+
+        ingestMethod = aTransportOptionsStorage.ingestMethod;
+
+        mContainerOptionsStorage = aTransportOptionsStorage.mContainerOptionsStorage;
+        containerOptions         = mContainerOptionsStorage;
+
+        expiryTime = aTransportOptionsStorage.expiryTime;
+
+        return *this;
+    }
+
+    TransportOptionsStorage(Structs::TransportOptionsStruct::DecodableType transportOptions)
     {
         streamUsage   = transportOptions.streamUsage;
         videoStreamID = transportOptions.videoStreamID;
@@ -166,12 +272,12 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         CopyCharSpanToMutableCharSpanWithTruncation(transportOptions.url, urlBuffer);
         url = urlBuffer;
 
-        mTriggerOptionsStorage = TransportTriggerOptionsStorage(transportOptions.triggerOptions, features);
+        mTriggerOptionsStorage = TransportTriggerOptionsStorage(transportOptions.triggerOptions);
         triggerOptions         = mTriggerOptionsStorage;
 
         ingestMethod = transportOptions.ingestMethod;
 
-        mContainerOptionsStorage = ContainerOptionsStorage(transportOptions.containerOptions, features);
+        mContainerOptionsStorage = ContainerOptionsStorage(transportOptions.containerOptions);
         containerOptions         = mContainerOptionsStorage;
 
         expiryTime = transportOptions.expiryTime;
@@ -187,6 +293,30 @@ struct TransportConfigurationStorage : public TransportConfigurationStruct
 {
     TransportConfigurationStorage() {}
 
+    TransportConfigurationStorage(const TransportConfigurationStorage & aTransportConfigurationStorage)
+    {
+        *this = aTransportConfigurationStorage;
+    }
+
+    TransportConfigurationStorage & operator=(const TransportConfigurationStorage & aTransportConfigurationStorage)
+    {
+        connectionID    = aTransportConfigurationStorage.connectionID;
+        transportStatus = aTransportConfigurationStorage.transportStatus;
+
+        mTransportOptionsPtr = aTransportConfigurationStorage.mTransportOptionsPtr;
+
+        if (mTransportOptionsPtr)
+        {
+            transportOptions.SetValue(*mTransportOptionsPtr);
+        }
+        else
+        {
+            transportOptions.Missing();
+        }
+
+        return *this;
+    }
+
     TransportConfigurationStorage(const uint16_t aConnectionID, std::shared_ptr<TransportOptionsStorage> aTransportOptionsPtr)
     {
         connectionID    = aConnectionID;
@@ -194,9 +324,28 @@ struct TransportConfigurationStorage : public TransportConfigurationStruct
         /*Store the pointer to keep buffer alive*/
         mTransportOptionsPtr = aTransportOptionsPtr;
         /*Convert Storage type to base type*/
-        transportOptions.SetValue(*aTransportOptionsPtr);
+        if (mTransportOptionsPtr)
+        {
+            transportOptions.SetValue(*mTransportOptionsPtr);
+        }
+        else
+        {
+            transportOptions.Missing();
+        }
     }
     std::shared_ptr<TransportOptionsStorage> GetTransportOptionsPtr() const { return mTransportOptionsPtr; }
+    void SetTransportOptionsPtr(std::shared_ptr<TransportOptionsStorage> aTransportOptionsPtr)
+    {
+        mTransportOptionsPtr = aTransportOptionsPtr;
+        if (mTransportOptionsPtr)
+        {
+            transportOptions.SetValue(*mTransportOptionsPtr);
+        }
+        else
+        {
+            transportOptions.Missing();
+        }
+    }
 
 private:
     std::shared_ptr<TransportOptionsStorage> mTransportOptionsPtr;
@@ -219,6 +368,8 @@ public:
 
     virtual ~PushAvStreamTransportDelegate() = default;
 
+    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
+
     /**
      *   @brief Handle Command Delegate for stream transport allocation with the provided transport configuration option.
      *
@@ -227,8 +378,14 @@ public:
      *   @param connectionID[in]            Indicates the connectionID to allocate.
      *
      *   @return Success if the allocation is successful and a PushTransportConnectionID was produced; otherwise, the command SHALL
-     *   be rejected with an appropriate error. The delegate is expected to process the transport options, allocate the transport
-     * and map it to the connectionID. On Success TransportConfigurationStruct is sent as response by the server.
+     * be rejected with Failure.
+     *
+     *   The buffers storing URL, Trigger Options, Motion Zones, Container Options is owned by the PushAVStreamTransport Server.
+     *   The buffers are allocated on success of AllocatePushTransport and deallocated on success of DeallocatePushTransport
+     * command. The delegate is expected to process the transport following transport options: URL :  Validate the URL
+     *   StreamUsage,VideoStreamID,AudioStreamID for selection of Stream.
+     *   Allocate the transport and map it to the connectionID.
+     *   On Success TransportConfigurationStruct is sent as response by the server.
      */
     virtual Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
                                                                       const uint16_t connectionID) = 0;
@@ -238,8 +395,8 @@ public:
      *
      *   @param connectionID[in]        Indicates the connectionID to deallocate.
      *
-     *   @return Success if the transport deallocation is successful; otherwise, the command SHALL be rejected with an appropriate
-     *   error.
+     *   @return Success if the transport deallocation is successful; otherwise, the delegate is expected to return status code BUSY
+     *   if the transport is currently uploading.
      *
      */
     virtual Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) = 0;
@@ -248,13 +405,16 @@ public:
      *
      *   @param connectionID [in]           Indicates the connectionID of the stream transport to modify.
      *
-     *   @param transportOptions [out]      represents the Trigger Options to modify.
+     *   @param transportOptions [out]      represents the Transport Options to modify.
      *
-     *   @return Success if the stream transport modification is successful; otherwise, the command SHALL be rejected with an
-     * appropriate error.
+     *   The buffers storing URL, Trigger Options, Motion Zones, Container Options is owned by the PushAVStreamTransport Server.
+     *   The allocated buffers are cleared and reassigned on success of ModifyPushTransport and deallocated on success of
+     * DeallocatePushTransport.
+     *
+     *   @return Success if the stream transport modification is successful; otherwise, the command SHALL be rejected with Failure.
      */
-    virtual Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                                    const TransportOptionsStruct & transportOptions) = 0;
+    virtual Protocols::InteractionModel::Status
+    ModifyPushTransport(const uint16_t connectionID, const Structs::TransportOptionsStruct::DecodableType transportOptions) = 0;
 
     /**
      *   @brief Handle Command Delegate for Stream transport modification.
@@ -262,8 +422,7 @@ public:
      *   @param connectionIDList [in]       represent the list of connectionIDs for which new transport status to apply.
      *   @param transportStatus  [in]       represents the updated status of the connection(s).
      *
-     *   @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with an
-     * appropriate error.
+     *   @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with Failure.
      */
     virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
                                                                    TransportStatusEnum transportStatus) = 0;
@@ -276,9 +435,13 @@ public:
      *
      *   @param timeControl   [in]          Configuration to control the life cycle of a triggered transport.
      *
-     *   @return Success if the stream transport trigger is successful; otherwise, the command SHALL be rejected with an
-appropriate
-     *   error.
+     *   The delegate is expected to begin transmission using the timeControl values.
+     *
+     *   Emitting of PushTransportBegin event is handled by the server when delegate returns success.
+     *
+     *   The delegate should emit PushTransportEnd Event using GeneratePushTransportEndEvent() API when timeControl values when
+transmission ends.
+     *   @return Success if the stream transport trigger is successful; otherwise, the command SHALL be rejected with Failure.
      */
     virtual Protocols::InteractionModel::Status
     ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
@@ -333,7 +496,7 @@ appropriate
      *
      * @param[in] connectionID Indicates the connectionID of the stream transport to check status
      *
-     * @return busy if transport is active else idle
+     * @return busy if transport is uploading else idle
      */
     virtual PushAvStreamTransportStatusEnum GetTransportStatus(const uint16_t connectionID) = 0;
 
@@ -363,6 +526,17 @@ appropriate
      *  the Cluster have been loaded from Storage.
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
+
+    // Send Push AV Stream Transport events
+    Protocols::InteractionModel::Status
+    GeneratePushTransportBeginEvent(const uint16_t connectionID, const TransportTriggerTypeEnum triggerType,
+                                    const Optional<TriggerActivationReasonEnum> activationReason);
+    Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID,
+                                                                      const TransportTriggerTypeEnum triggerType,
+                                                                      const Optional<TriggerActivationReasonEnum> activationReason);
+
+protected:
+    EndpointId mEndpointId = 0;
 };
 
 class PushAvStreamTransportServer : public AttributeAccessInterface, public CommandHandlerInterface
@@ -397,13 +571,19 @@ public:
 
     bool HasFeature(Feature feature) const;
 
-    // Attribute Getters
+    static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
 
 private:
     enum class UpsertResultEnum : uint8_t
     {
         kInserted = 0x00,
         kUpdated  = 0x01,
+    };
+
+    struct PushAVStreamTransportDeallocateCallbackContext
+    {
+        PushAvStreamTransportServer * instance;
+        uint16_t connectionID;
     };
 
     PushAvStreamTransportDelegate & mDelegate;
@@ -434,11 +614,21 @@ private:
 
     // Helper functions
     uint16_t GenerateConnectionID();
+
     TransportConfigurationStorageWithFabricIndex * FindStreamTransportConnection(const uint16_t connectionID);
+
     // Add/Remove Management functions for transport
     UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStorageWithFabricIndex & transportConfiguration);
 
     void RemoveStreamTransportConnection(const uint16_t connectionID);
+
+    /**
+     * @brief Schedule deallocate with a given timeout
+     *
+     * @param endpointId    endpoint where DoorLockServer is running
+     * @param timeoutSec    timeout in seconds
+     */
+    void ScheduleTransportDeallocate(chip::EndpointId endpointId, uint32_t timeoutSec);
 
     /**
      * @brief Inherited from CommandHandlerInterface
