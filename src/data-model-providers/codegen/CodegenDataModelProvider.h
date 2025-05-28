@@ -100,6 +100,7 @@ protected:
 
 private:
     DataModel::NodeConfigurationListener * mNodeConfigurationListener;
+    uint32_t mConfigurationVersion = 1;
 
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned

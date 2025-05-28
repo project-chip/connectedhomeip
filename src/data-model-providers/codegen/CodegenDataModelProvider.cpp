@@ -167,9 +167,14 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
     if (!mPersistentStorageDelegate->SyncDoesKeyExist(kStorageKey.KeyName()))
     {
-        uint32_t configurationVersion = 1;
-        uint16_t size                 = sizeof(configurationVersion);
-        mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size);
+        mConfigurationVersion = 1;
+        uint16_t size         = sizeof(mConfigurationVersion);
+        mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size);
+    }
+    else
+    {
+        uint16_t size = sizeof(mConfigurationVersion);
+        mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size);
     }
 
     return mRegistry.SetContext(ServerClusterContext{
@@ -224,12 +229,7 @@ void CodegenDataModelProvider::NotifyNodeConfigurationListener()
 CHIP_ERROR
 CodegenDataModelProvider::GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration)
 {
-    uint32_t configurationVersion    = 0;
-    uint16_t size                    = sizeof(configurationVersion);
-    chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
-    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
-
-    nodeDataModelConfiguration.configurationVersion = configurationVersion;
+    nodeDataModelConfiguration.configurationVersion = mConfigurationVersion;
     nodeDataModelConfiguration.dataModelVersion     = Revision::kDataModelRevision;
     nodeDataModelConfiguration.specVersion          = Revision::kSpecificationVersion;
 
@@ -238,13 +238,13 @@ CodegenDataModelProvider::GetNodeDataModelConfiguration(DataModel::NodeDataModel
 
 CHIP_ERROR CodegenDataModelProvider::BumpNodeDataModelConfigurationVersion()
 {
-    uint32_t configurationVersion    = 0;
-    uint16_t size                    = sizeof(configurationVersion);
-    chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
-    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
+    uint32_t tempConfigurationVersion = mConfigurationVersion;
+    uint16_t size                     = sizeof(tempConfigurationVersion);
+    chip::StorageKeyName kStorageKey  = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
 
-    configurationVersion++;
-    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
+    tempConfigurationVersion++;
+    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &tempConfigurationVersion, size));
+    mConfigurationVersion = tempConfigurationVersion;
 
     NotifyNodeConfigurationListener();
     return CHIP_NO_ERROR;
@@ -252,10 +252,11 @@ CHIP_ERROR CodegenDataModelProvider::BumpNodeDataModelConfigurationVersion()
 
 CHIP_ERROR CodegenDataModelProvider::ResetNodeDataModelConfigurationVersion()
 {
-    uint32_t configurationVersion    = 1;
-    uint16_t size                    = sizeof(configurationVersion);
-    chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
-    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &configurationVersion, size));
+    uint32_t tempConfigurationVersion = 1;
+    uint16_t size                     = sizeof(tempConfigurationVersion);
+    chip::StorageKeyName kStorageKey  = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
+    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size));
+    mConfigurationVersion = tempConfigurationVersion;
 
     NotifyNodeConfigurationListener();
     return CHIP_NO_ERROR;
