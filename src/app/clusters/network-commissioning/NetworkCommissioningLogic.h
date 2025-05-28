@@ -157,8 +157,7 @@ private:
 
     // Actual handlers of the commands
     std::optional<DataModel::ActionReturnStatus>
-    HandleScanNetworks(CommandHandler & handler,
-                       const NetworkCommissioning::Commands::ScanNetworks::DecodableType & req);
+    HandleScanNetworks(CommandHandler & handler, const NetworkCommissioning::Commands::ScanNetworks::DecodableType & req);
     std::optional<DataModel::ActionReturnStatus>
     HandleAddOrUpdateWiFiNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                  const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);

@@ -16,14 +16,45 @@
  */
 #pragma once
 
+#include <app/clusters/network-commissioning/NetworkCommissioningLogic.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace NetworkCommissioning {
 
-// FIXME: implement
+/// Integration of Network Commissioning logic within the Matter data model
+///
+/// Translates between matter calls and Network commissioning logic
+class NetworkCommissioningCluster : public DefaultServerCluster
+{
+public:
+    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * driver) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
+    {}
+    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * driver) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
+    {}
+    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * driver) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
+    {}
 
-} // namespace NetworkCommissioning
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+private:
+    NetworkCommissioningLogic mLogic;
+};
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
