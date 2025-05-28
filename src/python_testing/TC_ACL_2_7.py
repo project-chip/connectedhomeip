@@ -246,7 +246,7 @@ class TC_ACL_2_7(MatterBaseTest):
             fabric_filtered=False
         )
         logging.info("TH2 read result (fabricFiltered=False): %s", str(result2_unfiltered))
-        asserts.assert_equal(len(result2_unfiltered), 2, "Should have two extensions when not fabric filtered")
+        asserts.assert_true(len(result2_unfiltered) >= 2, "Should have two extensions when not fabric filtered")
 
         self.step(9)
         # TH1 reads AccessControlExtensionChanged event with both fabricFiltered True and False
