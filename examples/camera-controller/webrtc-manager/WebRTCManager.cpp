@@ -86,7 +86,7 @@ CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorD
 
     // Schedule the ProvideAnswer() call to run with a small delay to ensure the response is sent first
     DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(300), // 100ms delay
+        chip::System::Clock::Milliseconds32(300),
         [](chip::System::Layer * systemLayer, void * appState) {
             auto * self = static_cast<WebRTCManager *>(appState);
             self->ProvideAnswer(self->mPendingSessionId, self->mLocalDescription);
@@ -116,7 +116,7 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
 
     // Schedule the ProvideICECandidates() call to run with a small delay to ensure the response is sent first
     DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(300), // 100ms delay
+        chip::System::Clock::Milliseconds32(300),
         [](chip::System::Layer * systemLayer, void * appState) {
             auto * self = static_cast<WebRTCManager *>(appState);
             self->ProvideICECandidates(self->mPendingSessionId);
