@@ -16,15 +16,12 @@ runs:
     - name: filter-sarif
       uses: advanced-security/filter-sarif@v1
       with:
+        # We also disable checks that are not too important and that result in many hundreds of alerts with generated code, such as the check "Empty branch of conditional"
         patterns: |
           -**/third_party/**
           -**/scripts/**
           -**/tests/**
-
-        # Disabling checks that are not too important, and that result in many hundreds of alerts due to generated code
-        # Disable checks: No trivial switch statements
           -**/*.cpp:cpp/trivial-switch
-        # Disable check: Empty branch of conditional
           -**/*.cpp:cpp/empty-block
         input: "sarif-results/${{ inputs.language }}.sarif"
         output: "sarif-results/${{ inputs.language }}.sarif"

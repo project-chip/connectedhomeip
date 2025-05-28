@@ -26,11 +26,13 @@ import matter.tlv.TlvWriter
 class TlsCertificateManagementClusterTLSCertStruct(
   val caid: UInt,
   val certificate: Optional<ByteArray>,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSCertStruct {\n")
     append("\tcaid : $caid\n")
     append("\tcertificate : $certificate\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -42,6 +44,7 @@ class TlsCertificateManagementClusterTLSCertStruct(
         val optcertificate = certificate.get()
         put(ContextSpecificTag(TAG_CERTIFICATE), optcertificate)
       }
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -49,6 +52,7 @@ class TlsCertificateManagementClusterTLSCertStruct(
   companion object {
     private const val TAG_CAID = 0
     private const val TAG_CERTIFICATE = 1
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TlsCertificateManagementClusterTLSCertStruct {
       tlvReader.enterStructure(tlvTag)
@@ -59,10 +63,11 @@ class TlsCertificateManagementClusterTLSCertStruct(
         } else {
           Optional.empty()
         }
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
-      return TlsCertificateManagementClusterTLSCertStruct(caid, certificate)
+      return TlsCertificateManagementClusterTLSCertStruct(caid, certificate, fabricIndex)
     }
   }
 }

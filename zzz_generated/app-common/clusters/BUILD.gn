@@ -69,6 +69,8 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/IcdManagement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/Identify" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/IlluminanceMeasurement" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/JointFabricAdministrator" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/JointFabricDatastore" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/KeypadInput" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/LaundryDryerControls" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/LaundryWasherControls" + invoker.target,
