@@ -39,7 +39,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -99,7 +99,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -156,7 +156,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -212,7 +212,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -240,7 +240,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -307,7 +307,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -326,7 +326,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
             err = DataModel::Decode(reader, clientCertificateDetails);
             if (err == CHIP_NO_ERROR)
             {
-                clientCertificateDetails.SetFabricIndex(aAccessingFabricIndex);
+                clientCertificateDetails.SetFabricIndex(reader.mAccessingFabricIndex);
             }
         }
 
@@ -343,7 +343,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -400,7 +400,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -456,7 +456,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)

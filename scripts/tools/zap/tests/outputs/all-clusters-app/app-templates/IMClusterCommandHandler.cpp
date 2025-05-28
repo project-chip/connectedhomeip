@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model/Decode.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
@@ -48,8 +49,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::SuppressAlarm::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SuppressAlarm::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(apCommandObj, aCommandPath, commandData);
@@ -57,8 +59,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::EnableDisableAlarm::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::EnableDisableAlarm::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -99,8 +102,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::MoveToHue::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveToHueCallback(apCommandObj, aCommandPath, commandData);
@@ -108,8 +112,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveHue::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveHueCallback(apCommandObj, aCommandPath, commandData);
@@ -117,8 +122,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepHue::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterStepHueCallback(apCommandObj, aCommandPath, commandData);
@@ -126,8 +132,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToSaturation::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToSaturation::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveToSaturationCallback(apCommandObj, aCommandPath, commandData);
@@ -135,8 +142,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveSaturation::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveSaturation::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveSaturationCallback(apCommandObj, aCommandPath, commandData);
@@ -144,8 +152,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepSaturation::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepSaturation::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterStepSaturationCallback(apCommandObj, aCommandPath, commandData);
@@ -153,8 +162,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToHueAndSaturation::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToHueAndSaturation::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveToHueAndSaturationCallback(apCommandObj, aCommandPath, commandData);
@@ -162,8 +172,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToColor::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToColor::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveToColorCallback(apCommandObj, aCommandPath, commandData);
@@ -171,8 +182,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveColor::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveColor::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveColorCallback(apCommandObj, aCommandPath, commandData);
@@ -180,8 +192,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepColor::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepColor::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterStepColorCallback(apCommandObj, aCommandPath, commandData);
@@ -189,8 +202,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToColorTemperature::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToColorTemperature::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveToColorTemperatureCallback(apCommandObj, aCommandPath, commandData);
@@ -198,8 +212,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::EnhancedMoveToHue::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::EnhancedMoveToHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterEnhancedMoveToHueCallback(apCommandObj, aCommandPath, commandData);
@@ -207,8 +222,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::EnhancedMoveHue::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::EnhancedMoveHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterEnhancedMoveHueCallback(apCommandObj, aCommandPath, commandData);
@@ -216,8 +232,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::EnhancedStepHue::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::EnhancedStepHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterEnhancedStepHueCallback(apCommandObj, aCommandPath, commandData);
@@ -225,8 +242,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::EnhancedMoveToHueAndSaturation::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::EnhancedMoveToHueAndSaturation::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -235,8 +253,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::ColorLoopSet::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ColorLoopSet::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterColorLoopSetCallback(apCommandObj, aCommandPath, commandData);
@@ -244,8 +263,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StopMoveStep::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StopMoveStep::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterStopMoveStepCallback(apCommandObj, aCommandPath, commandData);
@@ -253,8 +273,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveColorTemperature::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveColorTemperature::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveColorTemperatureCallback(apCommandObj, aCommandPath, commandData);
@@ -262,8 +283,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepColorTemperature::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepColorTemperature::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterStepColorTemperatureCallback(apCommandObj, aCommandPath, commandData);
@@ -303,8 +325,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::RetrieveLogsRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::RetrieveLogsRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -344,8 +367,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::Reset::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Reset::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfDishwasherAlarmClusterResetCallback(apCommandObj, aCommandPath, commandData);
@@ -353,8 +377,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::ModifyEnabledAlarms::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ModifyEnabledAlarms::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(apCommandObj, aCommandPath, commandData);
@@ -394,8 +419,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::ResetCounts::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ResetCounts::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(apCommandObj, aCommandPath, commandData);
@@ -435,8 +461,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::Step::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Step::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfFanControlClusterStepCallback(apCommandObj, aCommandPath, commandData);
@@ -476,8 +503,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::FailAtFault::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::FailAtFault::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfFaultInjectionClusterFailAtFaultCallback(apCommandObj, aCommandPath, commandData);
@@ -485,8 +513,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::FailRandomlyAtFault::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::FailRandomlyAtFault::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(apCommandObj, aCommandPath, commandData);
@@ -526,8 +555,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::KeySetWrite::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::KeySetWrite::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupKeyManagementClusterKeySetWriteCallback(apCommandObj, aCommandPath, commandData);
@@ -535,8 +565,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::KeySetRead::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::KeySetRead::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupKeyManagementClusterKeySetReadCallback(apCommandObj, aCommandPath, commandData);
@@ -544,8 +575,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::KeySetRemove::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::KeySetRemove::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupKeyManagementClusterKeySetRemoveCallback(apCommandObj, aCommandPath, commandData);
@@ -553,8 +585,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::KeySetReadAllIndices::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::KeySetReadAllIndices::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(apCommandObj, aCommandPath, commandData);
@@ -594,8 +627,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::AddGroup::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AddGroup::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupsClusterAddGroupCallback(apCommandObj, aCommandPath, commandData);
@@ -603,8 +637,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::ViewGroup::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ViewGroup::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupsClusterViewGroupCallback(apCommandObj, aCommandPath, commandData);
@@ -612,8 +647,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::GetGroupMembership::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::GetGroupMembership::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupsClusterGetGroupMembershipCallback(apCommandObj, aCommandPath, commandData);
@@ -621,8 +657,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::RemoveGroup::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::RemoveGroup::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupsClusterRemoveGroupCallback(apCommandObj, aCommandPath, commandData);
@@ -630,8 +667,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::RemoveAllGroups::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::RemoveAllGroups::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupsClusterRemoveAllGroupsCallback(apCommandObj, aCommandPath, commandData);
@@ -639,8 +677,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::AddGroupIfIdentifying::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AddGroupIfIdentifying::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGroupsClusterAddGroupIfIdentifyingCallback(apCommandObj, aCommandPath, commandData);
@@ -680,8 +719,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::Identify::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Identify::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfIdentifyClusterIdentifyCallback(apCommandObj, aCommandPath, commandData);
@@ -689,8 +729,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TriggerEffect::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TriggerEffect::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfIdentifyClusterTriggerEffectCallback(apCommandObj, aCommandPath, commandData);
@@ -730,8 +771,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::MoveToLevel::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToLevel::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLevelControlClusterMoveToLevelCallback(apCommandObj, aCommandPath, commandData);
@@ -739,8 +781,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::Move::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Move::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLevelControlClusterMoveCallback(apCommandObj, aCommandPath, commandData);
@@ -748,8 +791,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::Step::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Step::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLevelControlClusterStepCallback(apCommandObj, aCommandPath, commandData);
@@ -757,8 +801,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::Stop::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Stop::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLevelControlClusterStopCallback(apCommandObj, aCommandPath, commandData);
@@ -766,8 +811,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToLevelWithOnOff::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToLevelWithOnOff::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLevelControlClusterMoveToLevelWithOnOffCallback(apCommandObj, aCommandPath, commandData);
@@ -775,8 +821,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveWithOnOff::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveWithOnOff::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(apCommandObj, aCommandPath, commandData);
@@ -784,8 +831,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepWithOnOff::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepWithOnOff::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLevelControlClusterStepWithOnOffCallback(apCommandObj, aCommandPath, commandData);
@@ -793,8 +841,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StopWithOnOff::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StopWithOnOff::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj, aCommandPath, commandData);
@@ -834,8 +883,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::Sleep::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Sleep::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLowPowerClusterSleepCallback(apCommandObj, aCommandPath, commandData);
@@ -875,8 +925,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::ChangeToMode::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ChangeToMode::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfModeSelectClusterChangeToModeCallback(apCommandObj, aCommandPath, commandData);
@@ -916,8 +967,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::AnnounceOTAProvider::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AnnounceOTAProvider::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -958,8 +1010,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::Off::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Off::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOnOffClusterOffCallback(apCommandObj, aCommandPath, commandData);
@@ -967,8 +1020,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::On::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::On::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOnOffClusterOnCallback(apCommandObj, aCommandPath, commandData);
@@ -976,8 +1030,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::Toggle::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Toggle::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOnOffClusterToggleCallback(apCommandObj, aCommandPath, commandData);
@@ -985,8 +1040,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::OffWithEffect::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::OffWithEffect::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOnOffClusterOffWithEffectCallback(apCommandObj, aCommandPath, commandData);
@@ -994,8 +1050,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::OnWithRecallGlobalScene::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::OnWithRecallGlobalScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOnOffClusterOnWithRecallGlobalSceneCallback(apCommandObj, aCommandPath, commandData);
@@ -1003,8 +1060,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::OnWithTimedOff::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::OnWithTimedOff::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOnOffClusterOnWithTimedOffCallback(apCommandObj, aCommandPath, commandData);
@@ -1044,8 +1102,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::AttestationRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AttestationRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -1054,8 +1113,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::CertificateChainRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::CertificateChainRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -1064,8 +1124,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::CSRRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::CSRRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOperationalCredentialsClusterCSRRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1073,8 +1134,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::AddNOC::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AddNOC::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(apCommandObj, aCommandPath, commandData);
@@ -1082,8 +1144,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::UpdateNOC::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::UpdateNOC::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(apCommandObj, aCommandPath, commandData);
@@ -1091,8 +1154,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::UpdateFabricLabel::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::UpdateFabricLabel::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(apCommandObj, aCommandPath, commandData);
@@ -1100,8 +1164,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::RemoveFabric::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::RemoveFabric::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(apCommandObj, aCommandPath, commandData);
@@ -1109,8 +1174,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::AddTrustedRootCertificate::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AddTrustedRootCertificate::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -1151,8 +1217,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::SelfTestRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SelfTestRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfSmokeCoAlarmClusterSelfTestRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1192,8 +1259,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::SetTemperature::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SetTemperature::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfTemperatureControlClusterSetTemperatureCallback(apCommandObj, aCommandPath, commandData);
@@ -1233,8 +1301,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::SetpointRaiseLower::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SetpointRaiseLower::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfThermostatClusterSetpointRaiseLowerCallback(apCommandObj, aCommandPath, commandData);
@@ -1242,8 +1311,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::SetActiveScheduleRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SetActiveScheduleRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfThermostatClusterSetActiveScheduleRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1251,8 +1321,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::SetActivePresetRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SetActivePresetRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfThermostatClusterSetActivePresetRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1260,8 +1331,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::AtomicRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AtomicRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfThermostatClusterAtomicRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1301,8 +1373,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::ResetCounts::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ResetCounts::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(apCommandObj, aCommandPath, commandData);
@@ -1342,8 +1415,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::SetUTCTime::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SetUTCTime::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfTimeSynchronizationClusterSetUTCTimeCallback(apCommandObj, aCommandPath, commandData);
@@ -1351,8 +1425,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::SetTrustedTimeSource::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SetTrustedTimeSource::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfTimeSynchronizationClusterSetTrustedTimeSourceCallback(apCommandObj, aCommandPath, commandData);
@@ -1360,8 +1435,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::SetTimeZone::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SetTimeZone::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfTimeSynchronizationClusterSetTimeZoneCallback(apCommandObj, aCommandPath, commandData);
@@ -1369,8 +1445,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::SetDSTOffset::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SetDSTOffset::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfTimeSynchronizationClusterSetDSTOffsetCallback(apCommandObj, aCommandPath, commandData);
@@ -1378,8 +1455,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::SetDefaultNTP::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SetDefaultNTP::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfTimeSynchronizationClusterSetDefaultNTPCallback(apCommandObj, aCommandPath, commandData);
@@ -1419,8 +1497,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::Test::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Test::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestCallback(apCommandObj, aCommandPath, commandData);
@@ -1428,8 +1507,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestNotHandled::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestNotHandled::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestNotHandledCallback(apCommandObj, aCommandPath, commandData);
@@ -1437,8 +1517,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestSpecific::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestSpecific::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestSpecificCallback(apCommandObj, aCommandPath, commandData);
@@ -1446,8 +1527,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestAddArguments::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestAddArguments::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestAddArgumentsCallback(apCommandObj, aCommandPath, commandData);
@@ -1455,8 +1537,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestStructArgumentRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestStructArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1464,8 +1547,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestNestedStructArgumentRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestNestedStructArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -1474,8 +1558,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestListStructArgumentRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestListStructArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -1484,8 +1569,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestListInt8UArgumentRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestListInt8UArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestListInt8UArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1493,8 +1579,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestNestedStructListArgumentRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestNestedStructListArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -1503,8 +1590,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestListNestedStructListArgumentRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestListNestedStructListArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestListNestedStructListArgumentRequestCallback(apCommandObj, aCommandPath,
@@ -1513,8 +1601,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestListInt8UReverseRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestListInt8UReverseRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1522,8 +1611,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestEnumsRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestEnumsRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestEnumsRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1531,8 +1621,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestNullableOptionalRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestNullableOptionalRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestNullableOptionalRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1540,8 +1631,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::SimpleStructEchoRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::SimpleStructEchoRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterSimpleStructEchoRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1549,8 +1641,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TimedInvokeRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TimedInvokeRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTimedInvokeRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1558,8 +1651,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestSimpleOptionalArgumentRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestSimpleOptionalArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -1568,8 +1662,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestEmitTestEventRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestEmitTestEventRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestEmitTestEventRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1577,8 +1672,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestEmitTestFabricScopedEventRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestEmitTestFabricScopedEventRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -1587,8 +1683,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestBatchHelperRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestBatchHelperRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestBatchHelperRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1596,8 +1693,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestSecondBatchHelperRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestSecondBatchHelperRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(apCommandObj, aCommandPath, commandData);
@@ -1605,8 +1703,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TestDifferentVendorMeiRequest::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TestDifferentVendorMeiRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
@@ -1647,8 +1746,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::Open::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Open::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfValveConfigurationAndControlClusterOpenCallback(apCommandObj, aCommandPath, commandData);
@@ -1656,8 +1756,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::Close::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Close::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfValveConfigurationAndControlClusterCloseCallback(apCommandObj, aCommandPath, commandData);
@@ -1697,8 +1798,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         switch (aCommandPath.mCommandId)
         {
         case Commands::UpOrOpen::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::UpOrOpen::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfWindowCoveringClusterUpOrOpenCallback(apCommandObj, aCommandPath, commandData);
@@ -1706,8 +1808,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::DownOrClose::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::DownOrClose::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfWindowCoveringClusterDownOrCloseCallback(apCommandObj, aCommandPath, commandData);
@@ -1715,8 +1818,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StopMotion::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StopMotion::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfWindowCoveringClusterStopMotionCallback(apCommandObj, aCommandPath, commandData);
@@ -1724,8 +1828,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::GoToLiftValue::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::GoToLiftValue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfWindowCoveringClusterGoToLiftValueCallback(apCommandObj, aCommandPath, commandData);
@@ -1733,8 +1838,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::GoToLiftPercentage::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::GoToLiftPercentage::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfWindowCoveringClusterGoToLiftPercentageCallback(apCommandObj, aCommandPath, commandData);
@@ -1742,8 +1848,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::GoToTiltValue::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::GoToTiltValue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfWindowCoveringClusterGoToTiltValueCallback(apCommandObj, aCommandPath, commandData);
@@ -1751,8 +1858,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::GoToTiltPercentage::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::GoToTiltPercentage::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfWindowCoveringClusterGoToTiltPercentageCallback(apCommandObj, aCommandPath, commandData);

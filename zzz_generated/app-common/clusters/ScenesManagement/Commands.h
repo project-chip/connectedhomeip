@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -168,7 +169,7 @@ public:
     chip::CharSpan sceneName;
     DataModel::DecodableList<Structs::ExtensionFieldSetStruct::DecodableType> extensionFieldSetStructs;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace AddScene
 namespace AddSceneResponse {
@@ -244,7 +245,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ViewScene
 namespace ViewSceneResponse {
@@ -329,7 +330,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace RemoveScene
 namespace RemoveSceneResponse {
@@ -402,7 +403,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace RemoveAllScenes
 namespace RemoveAllScenesResponse {
@@ -475,7 +476,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace StoreScene
 namespace StoreSceneResponse {
@@ -554,7 +555,7 @@ public:
     uint8_t sceneID       = static_cast<uint8_t>(0);
     Optional<DataModel::Nullable<uint32_t>> transitionTime;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace RecallScene
 namespace GetSceneMembership {
@@ -588,7 +589,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace GetSceneMembership
 namespace GetSceneMembershipResponse {
@@ -676,7 +677,7 @@ public:
     chip::GroupId groupIdentifierTo    = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierTo          = static_cast<uint8_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace CopyScene
 namespace CopySceneResponse {

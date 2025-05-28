@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -134,7 +135,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace AddGroup
 namespace AddGroupResponse {
@@ -204,7 +205,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ViewGroup
 namespace ViewGroupResponse {
@@ -277,7 +278,7 @@ public:
 
     DataModel::DecodableList<chip::GroupId> groupList;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace GetGroupMembership
 namespace GetGroupMembershipResponse {
@@ -347,7 +348,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace RemoveGroup
 namespace RemoveGroupResponse {
@@ -412,7 +413,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace RemoveAllGroups
 namespace AddGroupIfIdentifying {
@@ -449,7 +450,7 @@ public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace AddGroupIfIdentifying
 } // namespace Commands
