@@ -7425,13 +7425,6 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidTransportStatus = 8;
   }
 
-  shared enum StreamUsageEnum : enum8 {
-    kInternal = 0;
-    kRecording = 1;
-    kAnalysis = 2;
-    kLiveView = 3;
-  }
-
   enum TransportStatusEnum : enum8 {
     kActive = 0;
     kInactive = 1;
@@ -7599,13 +7592,6 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidCombination = 6;
     kInvalidTriggerType = 7;
     kInvalidTransportStatus = 8;
-  }
-
-  shared enum StreamUsageEnum : enum8 {
-    kInternal = 0;
-    kRecording = 1;
-    kAnalysis = 2;
-    kLiveView = 3;
   }
 
   enum TransportStatusEnum : enum8 {

@@ -41,6 +41,7 @@ using TransportTriggerOptionsStruct           = Structs::TransportTriggerOptions
 using TransportMotionTriggerTimeControlStruct = Structs::TransportMotionTriggerTimeControlStruct::Type;
 using TransportOptionsStruct                  = Structs::TransportOptionsStruct::Type;
 using TransportConfigurationStruct            = Structs::TransportConfigurationStruct::Type;
+using StreamUsageEnum                         = chip::app::Clusters::Globals::StreamUsageEnum;
 
 enum class PushAvStreamTransportStatusEnum : uint8_t
 {

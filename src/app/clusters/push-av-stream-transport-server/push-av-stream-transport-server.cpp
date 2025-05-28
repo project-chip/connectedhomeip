@@ -1028,7 +1028,7 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
 
     if (transportConfigurations.size() == 0)
     {
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, Status::NotFound);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
     }
 
     response.transportConfigurations =
