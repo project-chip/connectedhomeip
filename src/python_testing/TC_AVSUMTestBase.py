@@ -211,24 +211,26 @@ class AVSUMTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):        
-        cluster = Clusters.CameraAvSettingsUserLevelManagement
-        attrs = Clusters.CameraAvSettingsUserLevelManagement.Attributes
+        cluster = Clusters.Objects.CameraAvStreamManagement
+        attrs = cluster.Attributes
 
         # Check for watermark and OSD features
         feature_map = await self.read_avstr_attribute_expect_success(endpoint, attrs.FeatureMap)
-        has_feature_watermark = (feature_map & cluster.Bitmaps.Feature.kWatermark) != 0
-        has_feature_osd = (feature_map & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0
+        watermark = True if (feature_map & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (feature_map & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+        #has_feature_watermark = (feature_map & cluster.Bitmaps.Feature.kWatermark) != 0
+        #has_feature_osd = (feature_map & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0
         
         # Get the parms from the device (those which are available)
         aStreamUsagePriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.StreamUsagePriorities)
         aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
         aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
         aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
-        watermark = osd = None
-        if has_feature_watermark:
-            watermark = True
-        if has_feature_osd:
-            osd = True
+        #watermark = osd = None
+        #if has_feature_watermark:
+        #    watermark = True
+        #if has_feature_osd:
+        #    osd = True
 
         try:
             response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(

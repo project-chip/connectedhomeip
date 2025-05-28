@@ -160,6 +160,10 @@ class AVSMTestBase:
         )
         logger.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
 
+        # Check for watermark and OSD features
+        watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
         try:
             asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
             asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
@@ -176,6 +180,8 @@ class AVSMTestBase:
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=4000,
                 maxKeyFrameInterval=4000,
+                watermarkEnabled = watermark,
+                OSDEnabled = osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")

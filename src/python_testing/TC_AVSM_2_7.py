@@ -149,6 +149,10 @@ class TC_AVSM_2_7(MatterBaseTest):
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
+        # Check for watermark and OSD features
+        watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
         self.step(2)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
@@ -203,6 +207,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=4000,
                 maxKeyFrameInterval=4000,
+                watermarkEnabled = watermark,
+                OSDEnabled = osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
@@ -239,6 +245,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=4000,
                 maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
@@ -268,6 +276,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=4000,
                 maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
@@ -296,6 +306,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=4000,
                 maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinFrameRate > MaxFrameRate")
@@ -322,6 +334,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=4000,
                 maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
@@ -350,6 +364,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=4000,
                 maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinBitRate > MaxBitRate")
@@ -376,6 +392,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=4000 + 1,
                 maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
