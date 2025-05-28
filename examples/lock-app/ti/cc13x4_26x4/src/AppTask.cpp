@@ -127,7 +127,6 @@ void InitializeOTARequestor(void)
 }
 
 TimerHandle_t sOTAInitTimer = 0;
-
 #endif
 
 // The OTA Init Timer is only started upon the first Thread State Change
