@@ -51,7 +51,7 @@ enum class PushAvStreamTransportStatusEnum : uint8_t
 
 struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 {
-    TransportTriggerOptionsStorage() {};
+    TransportTriggerOptionsStorage(){};
 
     TransportTriggerOptionsStorage(const TransportTriggerOptionsStorage & aTransportTriggerOptionsStorage)
     {
@@ -119,7 +119,7 @@ private:
 
 struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 {
-    CMAFContainerOptionsStorage() {};
+    CMAFContainerOptionsStorage(){};
 
     CMAFContainerOptionsStorage(const CMAFContainerOptionsStorage & aCMAFContainerOptionsStorage)
     {
@@ -196,7 +196,7 @@ private:
 
 struct ContainerOptionsStorage : public ContainerOptionsStruct
 {
-    ContainerOptionsStorage() {};
+    ContainerOptionsStorage(){};
 
     ContainerOptionsStorage(const ContainerOptionsStorage & aContainerOptionsStorage) { *this = aContainerOptionsStorage; }
 
@@ -232,7 +232,7 @@ private:
 
 struct TransportOptionsStorage : public TransportOptionsStruct
 {
-    TransportOptionsStorage() {};
+    TransportOptionsStorage(){};
 
     TransportOptionsStorage(const TransportOptionsStorage & aTransportOptionsStorage) { *this = aTransportOptionsStorage; }
 
