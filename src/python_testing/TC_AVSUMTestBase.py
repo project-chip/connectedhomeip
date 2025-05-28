@@ -71,7 +71,7 @@ class AVSUMTestBase:
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def read_avstr_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.CameraAvStreamManagement
+        cluster = Clusters.CameraAvStreamManagement
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def check_avsum_attribute(self, attribute, expected_value, endpoint):
@@ -210,14 +210,25 @@ class AVSUMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
-        attrs = Clusters.Objects.CameraAvStreamManagement.Attributes
+    async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):        
+        cluster = Clusters.CameraAvSettingsUserLevelManagement
+        attrs = Clusters.CameraAvSettingsUserLevelManagement.Attributes
 
+        # Check for watermark and OSD features
+        feature_map = await self.read_avstr_attribute_expect_success(endpoint, attrs.FeatureMap)
+        has_feature_watermark = (feature_map & cluster.Bitmaps.Feature.kWatermark) != 0
+        has_feature_osd = (feature_map & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0
+        
         # Get the parms from the device (those which are available)
         aStreamUsagePriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.StreamUsagePriorities)
         aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
         aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
         aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
+        watermark = osd = None
+        if has_feature_watermark:
+            watermark = True
+        if has_feature_osd:
+            osd = True
 
         try:
             response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
@@ -231,7 +242,9 @@ class AVSUMTestBase:
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=2000,
-                maxKeyFrameInterval=8000
+                maxKeyFrameInterval=8000,
+                watermarkEnabled = watermark,
+                OSDEnabled = osd
             ),
                 endpoint=endpoint)
 
