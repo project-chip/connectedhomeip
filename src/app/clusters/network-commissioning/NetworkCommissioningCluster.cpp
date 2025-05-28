@@ -17,8 +17,13 @@
 #include "NetworkCommissioningCluster.h"
 
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/NetworkCommissioning/AttributeIds.h>
+#include <clusters/NetworkCommissioning/CommandIds.h>
+#include <clusters/NetworkCommissioning/Enums.h>
+#include <clusters/NetworkCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <optional>
@@ -181,18 +186,15 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::ReadAttribute(const D
 DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                           AttributeValueDecoder & decoder)
 {
-#if 0
-    switch (aPath.mAttributeId)
+    using namespace NetworkCommissioning::Attributes;
+
+    if (request.path.mAttributeId == InterfaceEnabled::Id)
     {
-    case Attributes::InterfaceEnabled::Id:
         bool value;
-        ReturnErrorOnFailure(aDecoder.Decode(value));
-        return mpBaseDriver->SetEnabled(value);
-    default:
-        return CHIP_IM_GLOBAL_STATUS(InvalidAction);
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return mLogic.SetInterfaceEnabled(value);
     }
-#endif
-    // FIXME: implement
+
     return Protocols::InteractionModel::Status::InvalidAction;
 }
 
@@ -269,46 +271,60 @@ std::optional<DataModel::ActionReturnStatus> NetworkCommissioningCluster::Invoke
 CHIP_ERROR NetworkCommissioningCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    // FIXME: implement
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#if 0
-    using namespace Clusters::NetworkCommissioning::Commands;
+    using namespace NetworkCommissioning::Commands;
+    using NetworkCommissioning::Feature;
 
-    if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
+    if (mLogic.Features().Has(Feature::kThreadNetworkInterface))
     {
-        for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateThreadNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        ReturnErrorOnFailure(builder.AppendElements({
+            ScanNetworks::kMetadataEntry,
+            AddOrUpdateThreadNetwork::kMetadataEntry,
+            RemoveNetwork::kMetadataEntry,
+            ConnectNetwork::kMetadataEntry,
+            ReorderNetwork::kMetadataEntry,
+        }));
     }
-    else if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+    else if (mLogic.Features().Has(Feature::kWiFiNetworkInterface))
     {
-        for (auto && cmd : {
-                 ScanNetworks::Id,
-                 AddOrUpdateWiFiNetwork::Id,
-                 RemoveNetwork::Id,
-                 ConnectNetwork::Id,
-                 ReorderNetwork::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        ReturnErrorOnFailure(builder.AppendElements({
+            ScanNetworks::kMetadataEntry,
+            AddOrUpdateWiFiNetwork::kMetadataEntry,
+            RemoveNetwork::kMetadataEntry,
+            ConnectNetwork::kMetadataEntry,
+            ReorderNetwork::kMetadataEntry,
+        }));
     }
 
-    if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
+    if (mLogic.Features().Has(Feature::kPerDeviceCredentials))
     {
-        VerifyOrExit(callback(QueryIdentity::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.AppendElements({ QueryIdentity::kMetadataEntry }));
     }
 
-exit:
     return CHIP_NO_ERROR;
-#endif
+}
+
+CHIP_ERROR NetworkCommissioningCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                          ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    using namespace NetworkCommissioning::Commands;
+    using NetworkCommissioning::Feature;
+
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(4));
+
+    if (mLogic.Features().HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({
+            ScanNetworksResponse::Id,
+            NetworkConfigResponse::Id,
+            ConnectNetworkResponse::Id,
+        }));
+    }
+
+    if (mLogic.Features().Has(Feature::kPerDeviceCredentials))
+    {
+        ReturnErrorOnFailure(builder.Append(QueryIdentityResponse::Id));
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & path,
@@ -316,32 +332,6 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
 {
     // FIXME: implement: this is where existing code IS LACKING!!!!
     return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR NetworkCommissioningCluster::GeneratedCommands(const ConcreteClusterPath & path,
-                                                          ReadOnlyBufferBuilder<CommandId> & builder)
-{
-    // FIXME: implement
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#if 0
-    using namespace Clusters::NetworkCommissioning::Commands;
-
-    if (mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
-    {
-        for (auto && cmd : { ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
-    }
-
-    if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
-    {
-        VerifyOrExit(callback(QueryIdentityResponse::Id, context) == Loop::Continue, /**/);
-    }
-
-exit:
-    return CHIP_NO_ERROR;
-#endif
 }
 
 } // namespace Clusters
