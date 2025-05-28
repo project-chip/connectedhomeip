@@ -795,6 +795,20 @@ class ChipDeviceControllerBase():
                 self.devCtrl, nodeid)
         ).raise_on_error()
 
+    def DeleteAllSessionResumptionStorage(self):
+        '''
+        Remove all session resumption information associated with the fabric index of the controller.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            PyChipError: If the operation fails.
+        '''
+
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DeleteAllSessionResumption(
+                self.devCtrl)).raise_on_error()
+
     async def _establishPASESession(self, callFunct):
         self.CheckIsActive()
 
@@ -2148,6 +2162,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_MarkSessionForEviction.argtypes = [
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_MarkSessionForEviction.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_DeleteAllSessionResumption.argtypes = [
+                c_void_p]
+            self._dmLib.pychip_DeviceController_DeleteAllSessionResumption.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
