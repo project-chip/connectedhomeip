@@ -17,7 +17,7 @@
 #include "platform/NetworkCommissioning.h"
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/network-commissioning/thread-scan-response.h>
+#include <app/clusters/network-commissioning/ThreadScanResponse.h>
 
 namespace {
 

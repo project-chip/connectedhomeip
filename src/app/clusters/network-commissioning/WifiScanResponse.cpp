@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "wifi-scan-response.h"
+#include "WifiScanResponse.h"
 
 #include "constants.h"
 #include <clusters/NetworkCommissioning/Commands.h>

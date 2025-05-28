@@ -20,8 +20,8 @@ source_set("constants") {
 
 source_set("wifi-response-encoding") {
   sources = [
-    "wifi-scan-response.cpp",
-    "wifi-scan-response.h",
+    "WifiScanResponse.cpp",
+    "WifiScanResponse.h",
   ]
 
   public_deps = [
@@ -34,8 +34,8 @@ source_set("wifi-response-encoding") {
 
 source_set("thread-response-encoding") {
   sources = [
-    "thread-scan-response.cpp",
-    "thread-scan-response.h",
+    "ThreadScanResponse.cpp",
+    "ThreadScanResponse.h",
   ]
 
   public_deps = [

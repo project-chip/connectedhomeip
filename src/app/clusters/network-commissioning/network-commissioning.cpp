@@ -42,8 +42,8 @@
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <tracing/macros.h>
 
-#include "thread-scan-response.h"
-#include "wifi-scan-response.h"
+#include "ThreadScanResponse.h"
+#include "WifiScanResponse.h"
 
 #include <array>
 #include <utility>
@@ -1217,24 +1217,6 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
 
 exit:
     return CHIP_NO_ERROR;
-}
-
-bool NullNetworkDriver::GetEnabled()
-{
-    // Disable the interface and it cannot be enabled since there are no physical interfaces.
-    return false;
-}
-
-uint8_t NullNetworkDriver::GetMaxNetworks()
-{
-    // The minimal value of MaxNetworks should be 1 per spec.
-    return 1;
-}
-
-NetworkIterator * NullNetworkDriver::GetNetworks()
-{
-    // Instance::Read accepts nullptr as an empty NetworkIterator.
-    return nullptr;
 }
 
 } // namespace NetworkCommissioning

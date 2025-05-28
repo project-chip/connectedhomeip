@@ -18,7 +18,7 @@
 #include "platform/NetworkCommissioning.h"
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/network-commissioning/wifi-scan-response.h>
+#include <app/clusters/network-commissioning/WifiScanResponse.h>
 #include <lib/core/TLV.h>
 
 #include <array>
