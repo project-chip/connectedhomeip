@@ -1188,7 +1188,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(System::PacketBufferHandle && msgR2Resu
 
     mState = State::kSentSigma2Resume;
 
-    ChipLogDetail(SecureChannel, "Sent Sigma2Resume msg");
+    ChipLogProgress(SecureChannel, "Sent Sigma2Resume msg");
 
     return CHIP_NO_ERROR;
 }

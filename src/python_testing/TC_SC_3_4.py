@@ -50,6 +50,9 @@ class TC_SC_3_4(MatterBaseTest):
 
     def steps_TC_SC_3_4(self) -> list[TestStep]:
         steps = [
+
+            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT"),
+
             TestStep(1, "TH constructs and sends a Sigma1 message with a resumptionID and NO initiatorResumeMIC to DUT",
                      "DUT sends a status report to the TH with a FAILURE general code , Protocol ID of SECURE_CHANNEL (0x0000), and Protocol Code of INVALID_PARAMETER (0X0002). DUT MUST perform no further processing after sending the status report."),
 
@@ -109,8 +112,17 @@ class TC_SC_3_4(MatterBaseTest):
     @async_test_body
     async def test_TC_SC_3_4(self):
 
-        self.step(1)
         self.th = self.default_controller
+
+        self.step("precondition")
+        # DUT Should be Commissioned Already, Now we try to Establish a CASE Session with it
+        try:
+            await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
+        except ChipStackError as e:
+            asserts.fail(
+                f"Unexpected Failure, TH Should be able to establish a CASE Session with DUT \nError = {e}")
+
+        self.step(1)
         # using FaultInjection to skip InitiatorResumeMIC from Sigma1 with Resumption
         FailAtFault(faultID=CHIPFaultId.CASESkipInitiatorResumeMIC,
                     numCallsToSkip=0,
