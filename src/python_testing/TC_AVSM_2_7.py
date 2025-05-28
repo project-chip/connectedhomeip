@@ -207,8 +207,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=4000,
                 maxKeyFrameInterval=4000,
-                watermarkEnabled = watermark,
-                OSDEnabled = osd
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")

@@ -210,7 +210,7 @@ class AVSUMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):        
+    async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
         cluster = Clusters.Objects.CameraAvStreamManagement
         attrs = cluster.Attributes
 
@@ -220,16 +220,16 @@ class AVSUMTestBase:
         osd = True if (feature_map & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
         #has_feature_watermark = (feature_map & cluster.Bitmaps.Feature.kWatermark) != 0
         #has_feature_osd = (feature_map & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0
-        
+
         # Get the parms from the device (those which are available)
         aStreamUsagePriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.StreamUsagePriorities)
         aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
         aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
         aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
         #watermark = osd = None
-        #if has_feature_watermark:
+        # if has_feature_watermark:
         #    watermark = True
-        #if has_feature_osd:
+        # if has_feature_osd:
         #    osd = True
 
         try:
@@ -245,8 +245,8 @@ class AVSUMTestBase:
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minKeyFrameInterval=2000,
                 maxKeyFrameInterval=8000,
-                watermarkEnabled = watermark,
-                OSDEnabled = osd
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             ),
                 endpoint=endpoint)
 
