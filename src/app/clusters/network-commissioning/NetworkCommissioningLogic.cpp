@@ -954,6 +954,67 @@ void NetworkCommissioningLogic::OnFailSafeTimerExpired()
     }
 }
 
+CHIP_ERROR NetworkCommissioningLogic::EncodeNetworks(AttributeValueEncoder & encoder) const
+{
+    return encoder.EncodeList([this](const auto & encoder) {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        Structs::NetworkInfoStruct::Type networkForEncode;
+        EnumerateAndRelease(mpBaseDriver->GetNetworks(), [&](const Network & network) {
+            networkForEncode.networkID = ByteSpan(network.networkID, network.networkIDLen);
+            networkForEncode.connected = network.connected;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+            // These fields are both optional and nullable in NetworkInfoStruct.
+            // If PDC is supported, the fields are always present but may be null.
+            if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
+            {
+                networkForEncode.networkIdentifier = MakeOptional(Nullable<ByteSpan>(network.networkIdentifier));
+                networkForEncode.clientIdentifier  = MakeOptional(Nullable<ByteSpan>(network.clientIdentifier));
+            }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+            err = encoder.Encode(networkForEncode);
+            return (err == CHIP_NO_ERROR) ? Loop::Continue : Loop::Break;
+        });
+        return err;
+    });
+}
+
+CHIP_ERROR NetworkCommissioningLogic::EncodeSupportedWiFiBands(AttributeValueEncoder & encoder) const
+{
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+    // TODO https://github.com/project-chip/connectedhomeip/issues/31431
+    // This is a case of shared zap config where mandatory wifi attributes are enabled for a thread platform (e.g
+    // all-cluster-app). Real world product must only enable the attributes tied to the network technology supported by their
+    // product. Temporarily return an list of 1 element of value 0 when wifi is not supported or WiFiNetworkInterface is not
+    // enabled until a solution is implemented with the attribute list.
+    // Final implementation will return UnsupportedAttribute if we get here without the needed WiFi support .
+    // VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+    {
+        return encoder.EncodeList([this](const auto & encoder) {
+            uint32_t bands = mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBandsMask();
+
+            // Extract every band from the bitmap of supported bands, starting positionally on the right.
+            for (uint32_t band_bit_pos = 0; band_bit_pos < std::numeric_limits<uint32_t>::digits; ++band_bit_pos)
+            {
+                auto band_mask = static_cast<uint32_t>(1UL << band_bit_pos);
+                if ((bands & band_mask) != 0)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(static_cast<WiFiBandEnum>(band_bit_pos)));
+                }
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+#endif
+    return encoder.EncodeList([](const auto & encoder) {
+        WiFiBandEnum bands = WiFiBandEnum::k2g4;
+        ReturnErrorOnFailure(encoder.Encode(bands));
+        return CHIP_NO_ERROR;
+    });
+}
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

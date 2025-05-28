@@ -43,148 +43,37 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::ReadAttribute(const D
         return encoder.Encode(mLogic.Features());
     case ClusterRevision::Id:
         return encoder.Encode(NetworkCommissioning::kRevision);
-        // FIXME: implement the rest
+    case MaxNetworks::Id:
+        return encoder.Encode(mLogic.GetMaxNetworks());
+    case ScanMaxTimeSeconds::Id:
+        return encoder.Encode(mLogic.GetScanNetworkTimeoutSeconds());
+    case ConnectMaxTimeSeconds::Id:
+        return encoder.Encode(mLogic.GetConnectNetworkTimeoutSeconds());
+    case InterfaceEnabled::Id:
+        return encoder.Encode(mLogic.GetInterfaceEnabled());
+    case LastNetworkingStatus::Id:
+        return encoder.Encode(mLogic.GetLastNetworkingStatus());
+    case LastNetworkID::Id:
+        if (mLogic.GetLastNetworkID().empty())
+        {
+            return encoder.EncodeNull();
+        }
+        return encoder.Encode(mLogic.GetLastNetworkID());
+    case LastConnectErrorValue::Id:
+        return encoder.Encode(mLogic.GetLastConnectErrorValue());
+    case SupportedThreadFeatures::Id:
+        return encoder.Encode(mLogic.GetThreadCapabilities());
+    case Networks::Id:
+        return mLogic.EncodeNetworks(encoder);
+    case SupportedWiFiBands::Id:
+        return mLogic.EncodeSupportedWiFiBands(encoder);
+    case ThreadVersion::Id:
+        VerifyOrReturnError(mLogic.Features().Has(NetworkCommissioning::Feature::kThreadNetworkInterface),
+                            Protocols::InteractionModel::Status::UnsupportedAttribute);
+        return encoder.Encode(mLogic.GetThreadVersion());
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-
-#if 0
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::MaxNetworks::Id:
-        return aEncoder.Encode(mpBaseDriver->GetMaxNetworks());
-
-    case Attributes::Networks::Id:
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            CHIP_ERROR err = CHIP_NO_ERROR;
-            Structs::NetworkInfoStruct::Type networkForEncode;
-            EnumerateAndRelease(mpBaseDriver->GetNetworks(), [&](const Network & network) {
-                networkForEncode.networkID = ByteSpan(network.networkID, network.networkIDLen);
-                networkForEncode.connected = network.connected;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-                // These fields are both optional and nullable in NetworkInfoStruct.
-                // If PDC is supported, the fields are always present but may be null.
-                if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
-                {
-                    networkForEncode.networkIdentifier = MakeOptional(Nullable<ByteSpan>(network.networkIdentifier));
-                    networkForEncode.clientIdentifier  = MakeOptional(Nullable<ByteSpan>(network.clientIdentifier));
-                }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-
-                err = encoder.Encode(networkForEncode);
-                return (err == CHIP_NO_ERROR) ? Loop::Continue : Loop::Break;
-            });
-            return err;
-        });
-
-    case Attributes::ScanMaxTimeSeconds::Id:
-        if (mpWirelessDriver != nullptr)
-        {
-            return aEncoder.Encode(mpWirelessDriver->GetScanNetworkTimeoutSeconds());
-        }
-        return CHIP_NO_ERROR;
-
-    case Attributes::ConnectMaxTimeSeconds::Id:
-        if (mpWirelessDriver != nullptr)
-        {
-            return aEncoder.Encode(mpWirelessDriver->GetConnectNetworkTimeoutSeconds());
-        }
-        return CHIP_NO_ERROR;
-
-    case Attributes::InterfaceEnabled::Id:
-        return aEncoder.Encode(mpBaseDriver->GetEnabled());
-
-    case Attributes::LastNetworkingStatus::Id:
-        return aEncoder.Encode(mLastNetworkingStatusValue);
-
-    case Attributes::LastNetworkID::Id:
-        if (mLastNetworkIDLen == 0)
-        {
-            return aEncoder.EncodeNull();
-        }
-        else
-        {
-            return aEncoder.Encode(ByteSpan(mLastNetworkID, mLastNetworkIDLen));
-        }
-
-    case Attributes::LastConnectErrorValue::Id:
-        return aEncoder.Encode(mLastConnectErrorValue);
-
-    case Attributes::SupportedWiFiBands::Id: {
-#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-        // TODO https://github.com/project-chip/connectedhomeip/issues/31431
-        // This is a case of shared zap config where mandatory wifi attributes are enabled for a thread platform (e.g
-        // all-cluster-app). Real world product must only enable the attributes tied to the network technology supported by their
-        // product. Temporarily return an list of 1 element of value 0 when wifi is not supported or WiFiNetworkInterface is not
-        // enabled until a solution is implemented with the attribute list.
-        // Final implementation will return UnsupportedAttribute if we get here without the needed WiFi support .
-        // VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
-        {
-            return aEncoder.EncodeList([this](const auto & encoder) {
-                uint32_t bands = mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBandsMask();
-
-                // Extract every band from the bitmap of supported bands, starting positionally on the right.
-                for (uint32_t band_bit_pos = 0; band_bit_pos < std::numeric_limits<uint32_t>::digits; ++band_bit_pos)
-                {
-                    uint32_t band_mask = static_cast<uint32_t>(1UL << band_bit_pos);
-                    if ((bands & band_mask) != 0)
-                    {
-                        ReturnErrorOnFailure(encoder.Encode(static_cast<WiFiBandEnum>(band_bit_pos)));
-                    }
-                }
-                return CHIP_NO_ERROR;
-            });
-        }
-#endif
-        return aEncoder.EncodeList([](const auto & encoder) {
-            WiFiBandEnum bands = WiFiBandEnum::k2g4;
-            ReturnErrorOnFailure(encoder.Encode(bands));
-            return CHIP_NO_ERROR;
-        });
-    }
-    break;
-    case Attributes::SupportedThreadFeatures::Id: {
-        // TODO https://github.com/project-chip/connectedhomeip/issues/31431
-        BitMask<ThreadCapabilities> ThreadCapabilities = 0;
-#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
-        // This is a case of shared zap config where mandatory thread attributes are enabled for a wifi platform (e.g
-        // all-cluster-app). Real world product must only enable the attributes tied to the network technology supported by their
-        // product. Temporarily encode a value of 0 reflecting no thread capabilities hen CHIP_DEVICE_CONFIG_ENABLE_THREAD or
-        // ThreadNetworkInterface are not enabled until a solution is implemented with the attribute list.
-        // Final implementation will return UnsupportedAttribute if we get here without the needed thread support
-        // VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
-        {
-            ThreadCapabilities = mpDriver.Get<ThreadDriver *>()->GetSupportedThreadFeatures();
-        }
-#endif
-        return aEncoder.Encode(ThreadCapabilities);
-    }
-    break;
-    case Attributes::ThreadVersion::Id: {
-        // TODO https://github.com/project-chip/connectedhomeip/issues/31431ß
-        uint16_t threadVersion = 0;
-#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
-        // This is a case of shared zap config where mandatory thread attributes are enabled for a wifi platform (e.g
-        // all-cluster-app) Real world product must only enable the attributes tied to the network technology supported by their
-        // product. Temporarily encode a value of 0 reflecting no thread version when CHIP_DEVICE_CONFIG_ENABLE_THREAD or
-        // ThreadNetworkInterface are not enabled until a solution is implemented with the attribute list.
-        // Final implementation will return UnsupportedAttribute if we get here without the needed thread support
-        // VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
-        {
-            threadVersion = mpDriver.Get<ThreadDriver *>()->GetThreadVersion();
-        }
-#endif
-        return aEncoder.Encode(threadVersion);
-    }
-    break;
-    default:
-        return CHIP_NO_ERROR;
-    }
-#endif
 }
 
 DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,

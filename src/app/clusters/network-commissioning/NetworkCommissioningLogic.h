@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/AttributeValueEncoder.h"
 #include "app/ConcreteCommandPath.h"
 #include "lib/core/CHIPError.h"
 #include <app/CommandHandler.h>
@@ -66,19 +67,6 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    // TODO:
-    //    CHI and AAI equivalent
-#if 0
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-#endif
-
     // BaseDriver::NetworkStatusChangeCallback
     void OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Status aCommissioningError, Optional<ByteSpan> aNetworkId,
                                   Optional<int32_t> aConnectStatus) override;
@@ -123,6 +111,51 @@ public:
 
     // Attribute handling
     CHIP_ERROR SetInterfaceEnabled(bool enabled) { return mpBaseDriver->SetEnabled(enabled); }
+    uint8_t GetMaxNetworks() const { return mpBaseDriver->GetMaxNetworks(); }
+    uint8_t GetScanNetworkTimeoutSeconds() const
+    {
+        return mpWirelessDriver != nullptr ? mpWirelessDriver->GetScanNetworkTimeoutSeconds() : 0;
+    }
+    uint8_t GetConnectNetworkTimeoutSeconds() const
+    {
+        return mpWirelessDriver != nullptr ? mpWirelessDriver->GetConnectNetworkTimeoutSeconds() : 0;
+    }
+    bool GetInterfaceEnabled() const { return mpBaseDriver->GetEnabled(); }
+    NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type GetLastNetworkingStatus() const
+    {
+        return mLastNetworkingStatusValue;
+    }
+    NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type GetLastConnectErrorValue() const
+    {
+        return mLastConnectErrorValue;
+    }
+    ByteSpan GetLastNetworkID() const { return { mLastNetworkID, mLastNetworkIDLen }; }
+
+    uint16_t GetThreadVersion() const
+    {
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+        if (mFeatureFlags.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
+        {
+            return mpDriver.Get<DeviceLayer::NetworkCommissioning::ThreadDriver *>()->GetThreadVersion();
+        }
+#endif
+        return 0;
+    }
+
+    BitMask<chip::DeviceLayer::NetworkCommissioning::ThreadCapabilities> GetThreadCapabilities() const
+    {
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+        if (mFeatureFlags.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
+        {
+            return mpDriver.Get<chip::DeviceLayer::NetworkCommissioning::ThreadDriver *>()->GetSupportedThreadFeatures();
+        }
+#endif
+        return {};
+    }
+
+    CHIP_ERROR EncodeSupportedThreadFeatures(AttributeValueEncoder & encoder) const;
+    CHIP_ERROR EncodeNetworks(AttributeValueEncoder & encoder) const;
+    CHIP_ERROR EncodeSupportedWiFiBands(AttributeValueEncoder & encoder) const;
 
     const BitFlags<NetworkCommissioning::Feature> & Features() const { return mFeatureFlags; }
 
@@ -158,9 +191,9 @@ private:
     ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
 
     // Last* attributes
-    // Setting these values don't have to care about parallel requests, since we will reject other requests when there is another
-    // request ongoing.
-    // These values can be updated via OnNetworkingStatusChange callback, ScanCallback::OnFinished and ConnectCallback::OnResult.
+    // Setting these values don't have to care about parallel requests, since we will reject other requests when there is
+    // another request ongoing. These values can be updated via OnNetworkingStatusChange callback, ScanCallback::OnFinished and
+    // ConnectCallback::OnResult.
     NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type mLastNetworkingStatusValue;
     NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type mLastConnectErrorValue;
     uint8_t mConnectingNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
