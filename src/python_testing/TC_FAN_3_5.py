@@ -222,7 +222,6 @@ class TC_FAN_3_5(MatterBaseTest):
             pass
 
     async def subscribe_to_attributes(self, handle_current_values: bool) -> None:
-        """Subscribe to PercentSetting, SpeedSetting, and FanMode attributes on the DUT."""
         cluster = Clusters.FanControl
         attr = cluster.Attributes
 
@@ -305,11 +304,11 @@ class TC_FAN_3_5(MatterBaseTest):
         # Verify PercentSetting initialization value
         await self.verify_expected_attribute_value(attr.PercentSetting, percent_setting_init)
 
-        # - Since there is no direct relationship between the Step command and the speed-oriented attributes
-        #   (PercentSetting, FanMode, and SpeedSetting), and that this is implementation-specific, when testing the
-        #   Step command with Wrap=True, Direction=Decrease, and initializing PercentSetting at 100, the expected
-        #   values for FanMode and SpeedSetting are unknown. In this case, their verification is skipped. In all
-        #   other scenarios, verify that FanMode and SpeedSetting are set to their expected values.
+        # - Since there is no direct relationship between the Step command and the speed-oriented attributes due to
+        #   it being implementation-specific, when testing the Step command with Wrap=True, Direction=Decrease, and
+        #   initializing PercentSetting at 100, the expected value of the speed-oriented attributes is unknown.
+        #   In this case, their verification is skipped. In all other scenarios, verify that the speed-oriented
+        #   attributes are set to their expected values.
         if not step.wrap:
             if not step.direction == sd_enum.kDecrease:
                 if not handle_current_values:
@@ -377,7 +376,7 @@ class TC_FAN_3_5(MatterBaseTest):
         attr = cluster.Attributes        
         percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
 
-        # Get the expected PercentSetting value based on the Step command parameters
+        # Get the expected final PercentSetting value based on the Step command parameters
         percent_setting_expected = self.get_expected_percent_setting(step)
 
         for i in range(101):
@@ -405,7 +404,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 break
             else:
                 # If we reach here, it means the expected PercentSetting
-                # attribute value was not reached, which fails the test
+                # attribute value was never reached
                 if i == 100:
                     asserts.fail(
                         f"[FC] The expected PercentSetting attribute value ({percent_setting_expected}) was never reached, the last reported value is ({percent_setting})."
@@ -427,13 +426,11 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** NEXT STEP ***
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in acordance with the Step command parameters
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         percent_setting_init = await self.initialize_percent_setting_and_verify_affected_attribtutes(step, handle_current_values)
 
         # *** NEXT STEP ***
         # Subscribe to the requested attributes
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.subscribe_to_attributes(handle_current_values=handle_current_values)
 
@@ -443,8 +440,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #    - Verify the expected PercentSetting attribute report value is reached.
         #    - If the expected PercentSetting attribute report value is reached, send
         #      an additional Step command to veiryf that the PercentSetting attribute
-        #      report value stays at the expected value, otherwise, the test is failed.
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
+        #      report value stays at the expected value.
         self.step(self.current_step_index + 1)
         await self.perform_lowest_off_step_commands_and_verify(step)
 
@@ -452,15 +448,9 @@ class TC_FAN_3_5(MatterBaseTest):
         #  Read the resulting attribute reports from each subscription after the Step commands
         #   - Verify that the attribute report values from each subscription are in the
         #     expected order in acordance with the Step command direction parameter.
-        #   - If the number of PercentSetting reports is greater than the number of FanMode reports:
-        #     -- Verify that all the expected FanMode values are present in the reports
-        #        in acordance with the FanModeSequence attribute value.
-        #   - If the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports:
-        #     -- Verify that all the expected SpeedSetting values are present in the reports
-        #        in acordance with the SpeedMax attribute value.
+        #   - Verify that all the expected attribute values are present in the reports.
         #   - Save the resulting attribute report values from each subscription as a baseline
         #     for future comparisons.
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         self.verify_all_expected_reports_and_value_progression(step, percent_setting_init, handle_current_values)
 
@@ -504,7 +494,7 @@ class TC_FAN_3_5(MatterBaseTest):
         fm_enum = cluster.Enums.FanModeEnum
 
         # - Count the number of each of the subscription attribute reports
-        # - Get the values of the PercentSetting, FanMode, and SpeedSetting attributes
+        # - Get the values of the speed oriented attributes
         for sub in self.subscriptions:
             if sub._expected_attribute == attr.PercentSetting:
                 percent_setting_report_qty = len(sub.attribute_queue.queue)
@@ -568,10 +558,10 @@ class TC_FAN_3_5(MatterBaseTest):
             speed_current_init_removed = [x for x in speed_max_range if x != speed_current_remove]
 
         # When the Step command has direction=decrease and lowestOff=False, the zero or Off state will never be reached,
-        # therefore we also prepare removal of that element from the full attribute value ranges
+        # therefore we also prepare removal of that element from the full attribute value ranges for that case
         trim = slice(None, -1) if (step.direction == sd_enum.kDecrease and not step.lowestOff) else slice(None)
 
-        # Determine final expected attribute values lists
+        # Determine the final expected attribute values lists for comparison with the produced values
         if not handle_current_values:
             fan_modes_expected = fan_modes_init_removed[trim] if step.direction == sd_enum.kIncrease else list(reversed(fan_modes_init_removed))[trim]
             speed_setting_expected = speed_setting_init_removed[trim] if step.direction == sd_enum.kIncrease else list(reversed(speed_setting_init_removed))[trim]
@@ -579,7 +569,6 @@ class TC_FAN_3_5(MatterBaseTest):
             percent_current_expected = list(reversed(percent_current_init_removed))[trim] if step.direction == sd_enum.kIncrease else list(reversed(percent_current_init_removed))
             speed_current_expected = speed_current_init_removed[trim] if step.direction == sd_enum.kIncrease else list(reversed(speed_current_init_removed))[trim]
 
-        # logging.info(f"[FC] percent_setting_values_produced: {percent_setting_values_produced}")
         if not handle_current_values:
             logging.info(f"[FC] fan_modes_expected: {fan_modes_expected}")
             logging.info(f"[FC] speed_setting_expected: {speed_setting_expected}")
@@ -710,20 +699,17 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** NEXT STEP ***
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in acordance with the Step command parameters
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.initialize_percent_setting_and_verify_affected_attribtutes(step, handle_current_values)
 
         # *** NEXT STEP ***
         # Subscribe to the requested attributes
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.subscribe_to_attributes(handle_current_values=handle_current_values)
 
         # *** NEXT STEP ***
         # TH sends a Step command with the reqested parameters
         #  - Verify the expected attribute values are produced
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.perform_wrap_step_commands_and_verify(step, handle_current_values)
 
@@ -750,7 +736,7 @@ class TC_FAN_3_5(MatterBaseTest):
             else:
                 await self.wrap_veirfy(step, percent_setting_expected=100, percent_current_expected=100, speed_current_expected=self.speed_max)
         elif step.direction == sd_enum.kIncrease and step.lowestOff:
-            # - Verify that the PercentSetting attribute value goes to 0
+                # - Verify that the attribute values all go to Off values
             if not handle_current_values:
                 await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
             else:
@@ -879,11 +865,12 @@ class TC_FAN_3_5(MatterBaseTest):
         self.step(6)
         await self.get_percent_setting_range_per_step()
 
+        # LowestOff Tests
+
         # *** NEXT STEP ***
         # TH tests Step command behavior of the LowestOff field
         #  - Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=True
         #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=False)
 
@@ -891,14 +878,12 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the LowestOff field
         #  - Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=True
         #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=False)
 
         # ** NEXT STEP ***
         # Compare the descending baseline values with the ascending baseline values
         #  - Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         self.verify_baseline_values(handle_current_values=False)
 
@@ -906,7 +891,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the LowestOff field
         #  - Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=True
         #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=True), handle_current_values=True)
 
@@ -914,14 +898,12 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the LowestOff field
         #  - Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=True
         #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=True)
 
         # ** NEXT STEP ***
         # Compare the descending baseline values with the ascending baseline values
         #  - Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         self.verify_baseline_values(handle_current_values=False)
 
@@ -929,7 +911,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the LowestOff field
         #  - Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=False
         #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=False)
 
@@ -937,14 +918,12 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the LowestOff field
         #  - Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=False
         #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=False)
 
         # ** NEXT STEP ***
         # Compare the descending baseline values with the ascending baseline values
         #  - Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         self.verify_baseline_values(handle_current_values=False)
 
@@ -952,7 +931,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the LowestOff field
         #  - Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowsetOff=False
         #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kDecrease, wrap=False, lowestOff=False), handle_current_values=True)
 
@@ -960,26 +938,21 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the LowestOff field
         #  - Setup a Step command with: -- Direction=Increase -- Wrap=False -- LowsetOff=False
         #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=False), handle_current_values=True)
         
         # ** NEXT STEP ***
         # Compare the descending baseline values with the ascending baseline values
         #  - Veirfy that the descending baseline values are the reverse of the ascending baseline values for each attribute
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         self.verify_baseline_values(handle_current_values=True)
 
-
-
-
+        # Wrap Tests
 
         # *** NEXT STEP ***
         # TH tests Step command behavior of the Wrap field
         #  - Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=True
         #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True), handle_current_values=False)
 
@@ -987,7 +960,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the Wrap field
         #  - Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=False
         #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False), handle_current_values=False)
 
@@ -995,7 +967,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the Wrap field
         #  - Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=True
         #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True), handle_current_values=False)
 
@@ -1003,7 +974,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the Wrap field
         #  - Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=False
         #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False), handle_current_values=False)
 
@@ -1011,7 +981,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the Wrap field
         #  - Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=True
         #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=True), handle_current_values=True)
 
@@ -1019,7 +988,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the Wrap field
         #  - Setup a Step command with: -- Direction=Decrease -- Wrap=True -- LowsetOff=False
         #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kDecrease, wrap=True, lowestOff=False), handle_current_values=True)
 
@@ -1027,7 +995,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the Wrap field
         #  - Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=True
         #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=True), handle_current_values=True)
 
@@ -1035,10 +1002,8 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the LowestOff field
         #  - Setup a Step command with: -- Direction=Increase -- Wrap=True -- LowsetOff=False
         #  - Verify Attributes PercentSetting, PercentCurrent, and SpeedCurrent
-        logging.info(f"[FC] STEPZZZZZZZZZZZZZZZZZZZ: {self.current_step_index + 1}")
         self.step(self.current_step_index + 1)
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False), handle_current_values=True)
-
 
 
 if __name__ == "__main__":
