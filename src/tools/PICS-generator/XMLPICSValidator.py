@@ -21,8 +21,9 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from chip.testing.pics import (accepted_cmd_pics_str, attribute_pics_str, client_pics_str, event_pics_str, feature_pics_str,
+                               generated_cmd_pics_str, server_pics_str)
 from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
-from chip.testing.pics import accepted_cmd_pics_str, attribute_pics_str, client_pics_str, event_pics_str, feature_pics_str, generated_cmd_pics_str, server_pics_str
 
 # Add the path to python_testing folder, in order to be able to import from matter_testing_support
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
