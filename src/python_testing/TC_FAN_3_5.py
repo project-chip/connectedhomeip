@@ -359,7 +359,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
         percent_setting_per_step = percent_setting - percent_setting_zero
         logging.info(f"[FC] PercentSetting range per Step: {percent_setting_per_step}")
-        
+
         self.percent_setting_per_step = percent_setting_per_step
 
     def get_expected_percent_setting(self, step: Clusters.FanControl.Commands.Step) -> int:
@@ -373,7 +373,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
     async def perform_lowest_off_step_commands_and_verify(self, step: Clusters.FanControl.Commands.Step) -> None:
         cluster = Clusters.FanControl
-        attr = cluster.Attributes        
+        attr = cluster.Attributes
         percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
 
         # Get the expected final PercentSetting value based on the Step command parameters
@@ -540,7 +540,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
         # Get SpeedMax range
         speed_max_range = range(0, self.speed_max + 1)
-        
+
         # Determine the initialization attribute values to remove
         if not handle_current_values:
             fan_mode_remove = fm_enum.kOff if percent_setting_init == 0 else fm_enum.kHigh
@@ -554,7 +554,8 @@ class TC_FAN_3_5(MatterBaseTest):
             fan_modes_init_removed = [x for x in self.fan_modes if x != fan_mode_remove]
             speed_setting_init_removed = [x for x in speed_max_range if x != speed_setting_remove]
         else:
-            percent_current_init_removed = [x for x in list(reversed(percent_current_values_produced)) if x != percent_current_remove]
+            percent_current_init_removed = [x for x in list(
+                reversed(percent_current_values_produced)) if x != percent_current_remove]
             speed_current_init_removed = [x for x in speed_max_range if x != speed_current_remove]
 
         # When the Step command has direction=decrease and lowestOff=False, the zero or Off state will never be reached,
@@ -563,11 +564,15 @@ class TC_FAN_3_5(MatterBaseTest):
 
         # Determine the final expected attribute values lists for comparison with the produced values
         if not handle_current_values:
-            fan_modes_expected = fan_modes_init_removed[trim] if step.direction == sd_enum.kIncrease else list(reversed(fan_modes_init_removed))[trim]
-            speed_setting_expected = speed_setting_init_removed[trim] if step.direction == sd_enum.kIncrease else list(reversed(speed_setting_init_removed))[trim]
+            fan_modes_expected = fan_modes_init_removed[trim] if step.direction == sd_enum.kIncrease else list(
+                reversed(fan_modes_init_removed))[trim]
+            speed_setting_expected = speed_setting_init_removed[trim] if step.direction == sd_enum.kIncrease else list(
+                reversed(speed_setting_init_removed))[trim]
         else:
-            percent_current_expected = list(reversed(percent_current_init_removed))[trim] if step.direction == sd_enum.kIncrease else list(reversed(percent_current_init_removed))
-            speed_current_expected = speed_current_init_removed[trim] if step.direction == sd_enum.kIncrease else list(reversed(speed_current_init_removed))[trim]
+            percent_current_expected = list(reversed(percent_current_init_removed))[
+                trim] if step.direction == sd_enum.kIncrease else list(reversed(percent_current_init_removed))
+            speed_current_expected = speed_current_init_removed[trim] if step.direction == sd_enum.kIncrease else list(
+                reversed(speed_current_init_removed))[trim]
 
         if not handle_current_values:
             logging.info(f"[FC] fan_modes_expected: {fan_modes_expected}")
@@ -593,7 +598,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 asserts.assert_equal(
                     speed_setting_expected, speed_setting_values_produced,
                     f"[FC] Some of the expected SpeedSetting values are not present in the reports. Expected: {speed_setting_expected}, missing: {missing_speed_setting}."
-            )
+                )
         else:
             # If the number of PercentCurrent reports is greater or equal than the number of SpeedCurrent reports,
             # - Verify that all the expected PercentCurrent values are present in the reports
@@ -603,8 +608,10 @@ class TC_FAN_3_5(MatterBaseTest):
                     f"[FC] PercentCurrent attribute values not equal to PercentSetting attribute values. PercentCurrent: {percent_current_values_produced}, PercentSetting: {percent_setting_values_produced}."
                 )
             else:
-                missing_percent_current = [percent for percent in percent_current_expected if percent not in percent_current_values_produced]
-                asserts.fail(f"[FC] Some of the expected PercentCurrent values are not present in the reports. Expected: {percent_current_expected}, missing: {missing_percent_current}.")
+                missing_percent_current = [
+                    percent for percent in percent_current_expected if percent not in percent_current_values_produced]
+                asserts.fail(
+                    f"[FC] Some of the expected PercentCurrent values are not present in the reports. Expected: {percent_current_expected}, missing: {missing_percent_current}.")
 
             # If the number of PercentCurrent reports is greater or equal than the number of SpeedCurrent reports,
             # - Verify that all the expected SpeedCurrent values are present in the reports
@@ -616,7 +623,8 @@ class TC_FAN_3_5(MatterBaseTest):
                 )
 
         # Save the resulting attribute report values from each subscription as a baseline for future comparisons.
-        self.save_baseline_values(step, percent_setting_values_produced, dependent_values1, dependent_values2, handle_current_values)
+        self.save_baseline_values(step, percent_setting_values_produced, dependent_values1,
+                                  dependent_values2, handle_current_values)
 
     def save_baseline_values(self, step: Clusters.FanControl.Commands.Step, percent_setting_values_produced: list, dependent_values_produced1: list, dependent_values_produced2: list, handle_current_values: bool) -> None:
         """This method saves the baseline PercentSetting, FanMode, and SpeedSetting values 
@@ -793,7 +801,8 @@ class TC_FAN_3_5(MatterBaseTest):
             )
         if percent_current_expected is not None:
             percent_current_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentCurrent), None)
-            percent_current = percent_current_sub.get_last_attribute_report_value(self.endpoint, attr.PercentCurrent, self.timeout_sec)
+            percent_current = percent_current_sub.get_last_attribute_report_value(
+                self.endpoint, attr.PercentCurrent, self.timeout_sec)
             asserts.assert_equal(
                 percent_current, percent_current_expected,
                 f"[FC] PercentCurrent attribute value ({percent_current}) is not equal to the expected value ({percent_current_expected})."
