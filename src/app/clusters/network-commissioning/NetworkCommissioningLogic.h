@@ -124,8 +124,8 @@ public:
     // Attribute handling
     CHIP_ERROR SetInterfaceEnabled(bool enabled) { return mpBaseDriver->SetEnabled(enabled); }
 
+    const BitFlags<NetworkCommissioning::Feature> & Features() const { return mFeatureFlags; }
 
-    const BitFlags<NetworkCommissioning::Feature>& Features() const { return mFeatureFlags; }
 private:
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void OnCommissioningComplete();
@@ -186,7 +186,6 @@ private:
 
     // Sets the breadcrumb attribute in GeneralCommissioning cluster, no-op when breadcrumbValue is NullOptional.
     void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
-
 
 public:
     NetworkCommissioningLogic(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * apDelegate);
