@@ -530,13 +530,13 @@ If you would like the name of the app_pipe to be dynamic you need to send the ap
 and send the full path which includes the app-id to the test script.
 
 
-Default without `app-id`
+Default without `--app-id`
 ```bash
 ./out/darwin-arm64-all-clusters/chip-all-clusters-app
 python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/chip_all_clusters_fifo_  --int-arg PIXIT.REFALM.AlarmThreshold:1
 ```
 
-Using custom `app-id`.
+Using custom `--app-id`.
 ```bash
 ./out/darwin-arm64-all-clusters/chip-all-clusters-app --app-id 9001
 python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/chip_all_clusters_fifo_9001  --int-arg PIXIT.REFALM.AlarmThreshold:1
