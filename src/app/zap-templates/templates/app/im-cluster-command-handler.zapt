@@ -9,6 +9,7 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/util/util.h>
 #include <app/CommandHandler.h>
+#include <app/data-model/Decode.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
@@ -36,12 +37,9 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
         {
     {{/first}}
         case Commands::{{asUpperCamelCase commandName}}::Id: {
+            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::{{asUpperCamelCase commandName}}::DecodableType commandData;
-            {{#if isFabricScoped}}
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
-            {{else}}
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            {{/if}}
+            TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAf{{asUpperCamelCase parent.clusterName}}Cluster{{asUpperCamelCase commandName}}Callback(apCommandObj, aCommandPath, commandData);

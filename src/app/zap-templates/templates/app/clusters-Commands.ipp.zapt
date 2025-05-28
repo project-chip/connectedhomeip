@@ -39,7 +39,7 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 {{#if (isClient source)}}
 {{#if isFabricScoped~}}
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader, FabricIndex aAccessingFabricIndex) {
+CHIP_ERROR DecodableType::Decode(DataModel::FabricAwareTLVReader & reader) {
 {{else}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 {{/if}}
@@ -66,7 +66,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
             {{#if (isClient parent.source)}}
             if (err == CHIP_NO_ERROR)
             {
-                {{asLowerCamelCase label}}.SetFabricIndex(aAccessingFabricIndex);
+                {{asLowerCamelCase label}}.SetFabricIndex(reader.mAccessingFabricIndex);
             }
             {{/if}}
             {{/if_is_fabric_scoped_struct~}}
