@@ -29,9 +29,10 @@ using OperationalState::ErrorStateEnum;
 using OperationalState::OperationalStateEnum;
 
 using namespace chip::app::Clusters::MicrowaveOvenControl;
+using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
+
 template <typename T>
 using List = chip::app::DataModel::List<T>;
-using MicrowaveOvenMode::ModeTagStructType;
 using Status = Protocols::InteractionModel::Status;
 
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
