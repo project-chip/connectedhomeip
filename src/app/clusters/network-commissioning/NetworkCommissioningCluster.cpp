@@ -35,9 +35,19 @@ namespace Clusters {
 DataModel::ActionReturnStatus NetworkCommissioningCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                          AttributeValueEncoder & encoder)
 {
+    using namespace NetworkCommissioning::Attributes;
 
-    // FIXME: implement
-    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    switch (request.path.mAttributeId)
+    {
+    case FeatureMap::Id:
+        return encoder.Encode(mLogic.Features());
+    case ClusterRevision::Id:
+        return encoder.Encode(NetworkCommissioning::kRevision);
+        // FIXME: implement the rest
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+
 #if 0
     switch (aPath.mAttributeId)
     {
@@ -100,12 +110,6 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::ReadAttribute(const D
 
     case Attributes::LastConnectErrorValue::Id:
         return aEncoder.Encode(mLastConnectErrorValue);
-
-    case Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mFeatureFlags);
-
-    case Attributes::ClusterRevision::Id:
-        return aEncoder.Encode(kCurrentClusterRevision);
 
     case Attributes::SupportedWiFiBands::Id: {
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
