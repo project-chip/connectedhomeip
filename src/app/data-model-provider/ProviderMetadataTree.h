@@ -51,11 +51,11 @@ public:
     class ScopedConfigurationVersionUpdater
     {
     public:
-        ScopedConfigurationVersionUpdater(ProviderMetadataTree & parentTree) : mParentTree(parentTree) {}
-        ~ScopedConfigurationVersionUpdater() { mParentTree.Internal_BumpNodeDataModelConfigurationVersion(); };
+        ScopedConfigurationVersionUpdater(ProviderMetadataTree * parentTree) { mParentTree = parentTree; }
+        ~ScopedConfigurationVersionUpdater() { mParentTree->Internal_BumpNodeDataModelConfigurationVersion(); };
 
     private:
-        ProviderMetadataTree & mParentTree;
+        ProviderMetadataTree * mParentTree;
     };
 
     virtual ~ProviderMetadataTree() = default;
@@ -107,8 +107,6 @@ public:
     virtual void NotifyNodeConfigurationListener()                                                            = 0;
     virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & nodeDataModelConfiguration) = 0;
     virtual CHIP_ERROR ResetNodeDataModelConfigurationVersion()                                               = 0;
-
-    ScopedConfigurationVersionUpdater GetConfigurationVersionUpdater() { return ScopedConfigurationVersionUpdater(*this); }
 
     // "convenience" functions that just return the data and ignore the error
     // This returns the `ReadOnlyBufferBuilder<..>::TakeBuffer` from their equivalent fuctions as-is,

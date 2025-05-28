@@ -559,10 +559,40 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SimulateConfigurationVersionChange")
     {
-        DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction =
-            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetConfigurationVersionUpdater();
+        EndpointId endpoint = 1;
 
-        // TDOD: Change a F attribute
+        // Change a F attribute to simulate a change in construction
+        uint8_t valveLevelStep = 0;
+        Protocols::InteractionModel::Status status =
+            ValveConfigurationAndControl::Attributes::LevelStep::Get(endpoint, &valveLevelStep);
+        VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
+
+        ChipLogProgress(NotSpecified, "Current LevelStep value: %d", valveLevelStep);
+
+        if (valveLevelStep == 1)
+        {
+            // Change fixed LevelStep value to 10
+            valveLevelStep = 10;
+        }
+        else
+        {
+            // Change fixed LevelStep value back to 1
+            valveLevelStep = 1;
+        }
+
+        status = ValveConfigurationAndControl::Attributes::LevelStep::Set(endpoint, valveLevelStep);
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            ChipLogProgress(NotSpecified, "Failed to set LevelStep value");
+        }
+        else
+        {
+            ChipLogDetail(NotSpecified,
+                          "LevelStep in ValveConfigurationAndControl has been modified, so bump ConfigurationVersion");
+
+            DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction(
+                InteractionModelEngine::GetInstance()->GetDataModelProvider());
+        }
     }
     else
     {
