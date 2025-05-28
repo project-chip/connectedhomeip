@@ -172,7 +172,13 @@ class TC_AVSM_2_13(MatterBaseTest):
         asserts.assert_greater_equal(aMaxEncodedPixelRate, streamPixelRate, "Stream Pixel rate exceeds camera maxEncodedPixelRate")
 
         self.step(8)
+        logger.info("Fetch feature map to check if WMark and OSD are supported")
+        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
+        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
         try:
+            watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+            osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aRankedStreamPriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
@@ -186,6 +192,8 @@ class TC_AVSM_2_13(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minFragmentLen=4000,
                 maxFragmentLen=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
@@ -219,6 +227,8 @@ class TC_AVSM_2_13(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minFragmentLen=4000,
                 maxFragmentLen=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")

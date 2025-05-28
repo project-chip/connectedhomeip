@@ -52,6 +52,11 @@ class AVSMTestBase:
         logger.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
 
         asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
+
+        # Check for Watermark and OSD features
+        watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=aSnapshotCapabilities[0].imageCodec,
@@ -59,6 +64,8 @@ class AVSMTestBase:
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
@@ -160,6 +167,10 @@ class AVSMTestBase:
         )
         logger.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
 
+        # Check for Watermark and OSD features
+        watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
         try:
             asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
             asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
@@ -176,6 +187,8 @@ class AVSMTestBase:
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 minFragmentLen=4000,
                 maxFragmentLen=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")

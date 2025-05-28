@@ -122,13 +122,21 @@ class TC_AVSM_2_15(MatterBaseTest):
 
         self.step(4)
         asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
+        logger.info("Fetch feature map to check if WMark and OSD are supported")
+        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
+        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
         try:
+            watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+            osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=aSnapshotCapabilities[0].imageCodec,
                 maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
@@ -155,6 +163,8 @@ class TC_AVSM_2_15(MatterBaseTest):
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
