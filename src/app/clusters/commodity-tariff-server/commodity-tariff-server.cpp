@@ -48,27 +48,30 @@ void UnlockThreadTask(void)
 
 bool CommodityTariffDataProvider::TariffDataUpd_Init(const CommodityTariffPrimaryData& aNewData)
 {
-        CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
 #define X(attrName, attrType) \
-        err = attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, mFeature);
+    err = attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, this);
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
+
+//TODO - Init the update cache
+
 /*
 #define X(attrName, attrType) \
-        if (!attrName##_MgmtObj.IsValid()) { \
+        if (!attrName##_MgmtObj.IsValid()) { \mServer
             ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) is invalid", Attributes::attrName::Id); \
             allValid = false; \
         }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 */
-        if (err != CHIP_NO_ERROR)
-        {
-            return false;
-        }
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
 
-        return true;
+    return true;
 }
 
 void CommodityTariffDataProvider::TariffDataUpd_Commit()
@@ -93,6 +96,8 @@ void CommodityTariffDataProvider::TariffDataUpd_Abort()
         attrName##_MgmtObj.UpdateAbort();
 COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
+
+//TODO - Deinit the update cache
 }
 
 bool CommodityTariffDataProvider::TariffDataUpd_Validator()
@@ -101,6 +106,8 @@ bool CommodityTariffDataProvider::TariffDataUpd_Validator()
     {
         return false;
     }
+
+    //TODO - Use the update cache
 
     //CheckDayEntries
     //CheckDayPatterns

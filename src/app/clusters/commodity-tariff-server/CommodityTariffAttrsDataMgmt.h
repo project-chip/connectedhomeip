@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <cassert>
 #include <cstring>
 #include <type_traits>
 
@@ -58,6 +59,27 @@ constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, co
     return ((lhs.currency != rhs.currency) || (lhs.decimalPoints != rhs.decimalPoints));
 }
 
+constexpr bool operator!=(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs, const CommodityTariff::Structs::TariffPriceStruct::Type & rhs)
+{
+    return ((lhs.priceType != rhs.priceType) || (lhs.price != rhs.price) || (lhs.priceLevel != rhs.priceLevel));
+}
+
+
+constexpr bool operator!=(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs, const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
+{
+    return ((lhs.number != rhs.number) || (lhs.requiredState != rhs.requiredState));
+}
+
+constexpr bool operator!=(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs, const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs)
+{
+    return ((lhs.severity != rhs.severity) || (lhs.peakPeriod != rhs.peakPeriod));
+}
+
+constexpr bool operator!=(const Globals::Structs::PowerThresholdStruct::Type & lhs, const Globals::Structs::PowerThresholdStruct::Type & rhs)
+{
+    if (lhs.powerThresholdSource != rhs.powerThresholdSource) return true;
+    return ((lhs.powerThreshold != rhs.powerThreshold) || (lhs.apparentPowerThreshold != rhs.apparentPowerThreshold));
+}
 namespace CommodityTariff {
 
 /**
@@ -261,10 +283,12 @@ public:
      * @brief Performs a pre-validation of arguments value before assigning it as newValue
      * @param aValue New value for future update mValue
      */
-     CHIP_ERROR UpdateBegin(const T & aValue, BitMask<Feature> aFeatureMap) {
+     CHIP_ERROR UpdateBegin(const T & aValue, void * aSrvInstance ) {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        mFeatureMap = aFeatureMap;
+        assert(aSrvInstance != nullptr);
+
+        mOwnerInstance = aSrvInstance;
 
         err = Validate(aValue);
 
@@ -338,7 +362,7 @@ public:
 protected:
     T & mValue; // Reference to the applied value storage
     T & mNewValue = mValue;  // Reference to a value for updating
-    BitMask<Feature> mFeatureMap;
+    void * mOwnerInstance;
     bool is_valid = false;
     bool is_changed = false;
 

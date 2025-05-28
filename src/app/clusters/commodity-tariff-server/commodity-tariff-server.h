@@ -198,6 +198,8 @@ public:
      */
     void SetFeatures(BitMask<Feature> aFeature) { mFeature = aFeature; }
 
+    bool HasFeature(Feature aFeature) { return mFeature.Has(aFeature); }
+
     // Pure virtual interface methods
     virtual Protocols::InteractionModel::Status 
     GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId,
