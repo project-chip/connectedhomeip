@@ -15,17 +15,13 @@
  *    limitations under the License.
  */
 
-#include "general-diagnostics-server.h"
+#include "general-fault-listener.h"
 
 #include <stdint.h>
 #include <string.h>
 
 #include <app/util/config.h>
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
@@ -35,7 +31,9 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/GeneralDiagnostics/Events.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <zap-generated/gen_config.h>
@@ -516,6 +514,10 @@ void MatterGeneralDiagnosticsPluginServerInitCallback()
     {
         GeneralDiagnosticsServer::Instance().OnDeviceReboot(bootReason);
     }
+
+    if (GeneralFaultListener::GetGlobalListener() == nullptr) {
+        GeneralFaultListener::SetGlobalListener(&GeneralFaultListenerImpl::Instance());
+    }
 }
 
 void MatterGeneralDiagnosticsPluginServerShutdownCallback()
@@ -524,4 +526,8 @@ void MatterGeneralDiagnosticsPluginServerShutdownCallback()
 
     AttributeAccessInterfaceRegistry::Instance().Unregister(&gGeneralDiagnosticsInstance);
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gGeneralDiagnosticsInstance);
+
+    if (GeneralFaultListener::GetGlobalListener() == &GeneralFaultListenerImpl::Instance()) {
+        GeneralFaultListener::SetGlobalListener(nullptr);
+    }
 }
