@@ -128,9 +128,9 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/bridged-actions-stub.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/smco-stub.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/static-supported-modes-manager.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/DeviceCallbacks.cpp
