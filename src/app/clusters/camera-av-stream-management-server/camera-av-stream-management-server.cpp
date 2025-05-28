@@ -488,13 +488,13 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         break;
     case NightVision::Id:
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVision, attribute is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVision));
         break;
     case NightVisionIllum::Id:
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kNightVisionIllum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVisionIllumination, attribute is not supported",
                          mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionIllum));
@@ -563,19 +563,19 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         break;
     case ImageRotation::Id:
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kImageRotation), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kImageControl), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageRotation, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageRotation));
         break;
     case ImageFlipHorizontal::Id:
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kImageControl), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipHorizontal));
         break;
     case ImageFlipVertical::Id:
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kImageFlipVertical), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kImageControl), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipVertical));
         break;
