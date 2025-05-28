@@ -264,9 +264,11 @@ void NetworkCommissioningLogic::OnNetworkingStatusChange(Status aCommissioningEr
 }
 
 std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleScanNetworks(CommandHandler & handler,
+                                                                                const ConcreteCommandPath &commandPath,
                                                                                 const Commands::ScanNetworks::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleScanNetwork", "NetworkCommissioning");
+    mPath = commandPath;
 
     mScanningWasDirected = false;
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
@@ -362,6 +364,7 @@ std::optional<ActionReturnStatus>
 NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                         const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
+    mPath = commandPath;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
 
@@ -549,6 +552,7 @@ std::optional<ActionReturnStatus>
 NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                           const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
+    mPath = commandPath;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
@@ -593,6 +597,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleRemoveNetwork
                                                                                  const Commands::RemoveNetwork::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
+    mPath = commandPath;
 
     CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
 
@@ -628,6 +633,7 @@ NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const 
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
+    mPath = commandPath;
 
     CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
 
@@ -672,6 +678,7 @@ NetworkCommissioningLogic::HandleReorderNetwork(CommandHandler & handler, const 
                                                 const Commands::ReorderNetwork::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
+    mPath = commandPath;
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
     MutableCharSpan debugText(debugTextBuffer);
@@ -687,7 +694,7 @@ NetworkCommissioningLogic::HandleReorderNetwork(CommandHandler & handler, const 
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleQueryIdentity(CommandHandler & ctx,
+std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleQueryIdentity(CommandHandler & handler,
                                                                                  const Commands::QueryIdentity::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleQueryIdentity", "NetworkCommissioning");

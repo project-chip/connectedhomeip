@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "NetworkCommissioningCluster.h"
+#include "clusters/NetworkCommissioning/Commands.h"
 
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
@@ -95,70 +96,56 @@ std::optional<DataModel::ActionReturnStatus> NetworkCommissioningCluster::Invoke
                                                                                         TLV::TLVReader & input_arguments,
                                                                                         CommandHandler * handler)
 {
+    using namespace NetworkCommissioning::Commands;
 
-    // FIXME: implement
-    return Protocols::InteractionModel::Status::UnsupportedCommand;
-#if 0
-    if (mAsyncCommandHandle.Get() != nullptr)
+    VerifyOrReturnError(!mLogic.IsProcessingAsyncCommand(), Protocols::InteractionModel::Status::Busy);
+
+    // // Since mPath is used for building the response command, and we have checked that we are not pending the response of another
+    // // command above. So it is safe to set the mPath here and not clear it when return.
+    // mPath = ctxt.mRequestPath;
+
+    switch (request.path.mCommandId)
     {
-        // We have a command processing in the backend, reject all incoming commands.
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Busy);
-        ctxt.SetCommandHandled();
-        return;
+    case ScanNetworks::Id: {
+        ScanNetworks::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return mLogic.HandleScanNetworks(*handler, request.path, request_data);
     }
-
-    // Since mPath is used for building the response command, and we have checked that we are not pending the response of another
-    // command above. So it is safe to set the mPath here and not clear it when return.
-    mPath = ctxt.mRequestPath;
-
-    switch (ctxt.mRequestPath.mCommandId)
-    {
-    case Commands::ScanNetworks::Id:
-        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
-        HandleCommand<Commands::ScanNetworks::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleScanNetworks(ctx, req); });
-        return;
-
-    case Commands::AddOrUpdateWiFiNetwork::Id:
-        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface));
-        HandleCommand<Commands::AddOrUpdateWiFiNetwork::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleAddOrUpdateWiFiNetwork(ctx, req); });
-        return;
-
-    case Commands::AddOrUpdateThreadNetwork::Id:
-        VerifyOrReturn(mFeatureFlags.Has(Feature::kThreadNetworkInterface));
-        HandleCommand<Commands::AddOrUpdateThreadNetwork::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleAddOrUpdateThreadNetwork(ctx, req); });
-        return;
-
-    case Commands::RemoveNetwork::Id:
-        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
-        HandleCommand<Commands::RemoveNetwork::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleRemoveNetwork(ctx, req); });
-        return;
-
-    case Commands::ConnectNetwork::Id: {
-        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
-
-        HandleCommand<Commands::ConnectNetwork::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleConnectNetwork(ctx, req); });
-        return;
+    case AddOrUpdateWiFiNetwork::Id: {
+        AddOrUpdateWiFiNetwork::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return mLogic.HandleAddOrUpdateWiFiNetwork(*handler, request.path, request_data);
     }
-
-    case Commands::ReorderNetwork::Id:
-        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
-        HandleCommand<Commands::ReorderNetwork::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleReorderNetwork(ctx, req); });
-        return;
+    case AddOrUpdateThreadNetwork::Id: {
+        AddOrUpdateThreadNetwork::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return mLogic.HandleAddOrUpdateThreadNetwork(*handler, request.path, request_data);
+    }
+    case RemoveNetwork::Id: {
+        RemoveNetwork::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return mLogic.HandleRemoveNetwork(*handler, request.path, request_data);
+    }
+    case ConnectNetwork::Id: {
+        ConnectNetwork::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return mLogic.HandleConnectNetwork(*handler, request.path, request_data);
+    }
+    case ReorderNetwork::Id: {
+        ReorderNetwork::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return mLogic.HandleReorderNetwork(*handler, request.path, request_data);
+    }
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-    case Commands::QueryIdentity::Id:
-        VerifyOrReturn(mFeatureFlags.Has(Feature::kPerDeviceCredentials));
-        HandleCommand<Commands::QueryIdentity::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleQueryIdentity(ctx, req); });
-        return;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    case QueryIdentity::Id: {
+        QueryIdentity::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return mLogic.HandleQueryIdentity(*handler, request_data);
     }
 #endif
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
 }
 
 CHIP_ERROR NetworkCommissioningCluster::AcceptedCommands(const ConcreteClusterPath & path,

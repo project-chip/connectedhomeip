@@ -85,7 +85,8 @@ public:
 
     // Actual handlers of the commands
     std::optional<DataModel::ActionReturnStatus>
-    HandleScanNetworks(CommandHandler & handler, const NetworkCommissioning::Commands::ScanNetworks::DecodableType & req);
+    HandleScanNetworks(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                       const NetworkCommissioning::Commands::ScanNetworks::DecodableType & req);
     std::optional<DataModel::ActionReturnStatus>
     HandleAddOrUpdateWiFiNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                  const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
@@ -158,6 +159,9 @@ public:
     CHIP_ERROR EncodeSupportedWiFiBands(AttributeValueEncoder & encoder) const;
 
     const BitFlags<NetworkCommissioning::Feature> & Features() const { return mFeatureFlags; }
+
+    // Command handling
+    bool IsProcessingAsyncCommand() const { return mAsyncCommandHandle.IsValid(); }
 
 private:
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
