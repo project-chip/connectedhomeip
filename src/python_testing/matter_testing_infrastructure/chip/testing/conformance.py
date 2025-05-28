@@ -270,7 +270,8 @@ class optional_wrapper(Conformance):
     def __init__(self, op: Conformance, choice: Optional[Choice] = None):
         self.op = op
         if op.choice and choice:
-            raise ChoiceConformanceException('OPTIONAL wrapper with internal choice conformance')
+            raise ChoiceConformanceException(
+                "Conflicting 'choice' definition: OPTIONAL wrapper and its wrapped operation both have choice markers")
         self.choice = choice
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
@@ -300,13 +301,14 @@ class mandatory_wrapper(Conformance):
 
 class not_operation(Conformance):
     def __init__(self, op: Conformance):
-        # not operations can't be used with anything that returns DISALLOWED
-        # not operations also can't be used with things that are optional
         if op.choice:
             raise ChoiceConformanceException('NOT operation called on choice conformance')
         self.op = op
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+        # not operations can't be used with anything that returns DISALLOWED
+        # not operations also can't be used with things that are optional
+        # ie, ![AB] doesn't make sense, nor does !O
         decision_with_choice = self.op(feature_map, attribute_list, all_command_list)
         if decision_with_choice.decision in [ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
             raise ConformanceException('NOT operation on optional or disallowed item')
