@@ -58,19 +58,8 @@ cluster {{asUpperCamelCase name}} = {{!}}
 
   {{/zcl_events}}
   {{#zcl_attributes_server}}
-    {{#if clusterRef}}
   {{! ensure indent }}{{>idl_attribute_definition}}
-    {{/if}}
   {{/zcl_attributes_server}}
-
-  {{~!--Global attributes: spec 7.13 describes these as mandatory --}}
-  {{~!TODO(26053): global attributes are marked as optional,
-                   hence the exclusion above and re-add here.}}
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
   {{#zcl_commands}}
     {{#if (isStrEqual source "client")}}
     {{~>idl_command_request_struct}}
