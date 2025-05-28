@@ -92,7 +92,7 @@ class XmlAttribute:
 class XmlCommand:
     id: int
     name: str
-    conformance: Callable[[uint], ConformanceDecision]
+    conformance: ConformanceCallable
     privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
     def __str__(self):
@@ -252,8 +252,8 @@ class ClusterParser:
         except (KeyError, StopIteration):
             self._pics = None
 
-        if self._cluster_id in ALIAS_PICS.keys():
-            self._pics = ALIAS_PICS[cluster_id]
+        if self._cluster_id is not None and self._cluster_id in ALIAS_PICS.keys():
+            self._pics = ALIAS_PICS[int(self._cluster_id)]
 
         self.feature_elements = self.get_all_feature_elements()
         self.attribute_elements = self.get_all_attribute_elements()
@@ -339,7 +339,7 @@ class ClusterParser:
             return False
         return access_xml.attrib['write'] == 'optional'
 
-    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: Callable) -> tuple[Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]]:
+    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: ConformanceCallable) -> tuple[Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]]:
         ''' Returns a tuple of access types for read / write / invoke'''
         def str_to_access_type(privilege_str: str) -> Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum:
             if privilege_str == 'view':
@@ -407,16 +407,22 @@ class ClusterParser:
             conformance = self.parse_conformance(conformance_xml)
             if conformance is None:
                 continue
+            assert conformance is not None  # Tell mypy conformance is not None here
+            current_conformance = conformance  # Keep original for or_operation
             if code in attributes:
                 # This is one of those fun ones where two different rows have the same id and name, but differ in conformance and ranges
                 # I don't have a good way to relate the ranges to the conformance, but they're both acceptable, so let's just or them.
-                conformance = or_operation([conformance, attributes[code].conformance])
-            read_access, write_access, _ = self.parse_access(element, access_xml, conformance)
+                # Ensure that current_conformance used in or_operation is known to be non-None.
+                conformance = or_operation([current_conformance, attributes[code].conformance])
+
+            # Cast to ConformanceCallable as mypy seems to lose the narrowed type after potential reassignment
+            casted_conformance = typing.cast(ConformanceCallable, conformance)
+            read_access, write_access, _ = self.parse_access(element, access_xml, casted_conformance)
             write_optional = False
             if write_access not in [None, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue]:
                 write_optional = self.parse_write_optional(element, access_xml)
             attributes[code] = XmlAttribute(name=element.attrib['name'], datatype=datatype,
-                                            conformance=conformance, read_access=read_access, write_access=write_access, write_optional=write_optional)
+                                            conformance=casted_conformance, read_access=read_access, write_access=write_access, write_optional=write_optional)
         # Add in the global attributes for the base class
         for id in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
@@ -447,8 +453,11 @@ class ClusterParser:
             conformance = self.parse_conformance(conformance_xml)
 
             if conformance is not None:
-                _, _, privilege = self.parse_access(element, access_xml, conformance)
-                commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance, privilege=privilege))
+                assert conformance is not None  # Tell mypy conformance is not None here
+                casted_conformance = typing.cast(ConformanceCallable, conformance)
+                _, _, privilege = self.parse_access(element, access_xml, casted_conformance)
+                commands.append(XmlCommand(id=code, name=element.attrib['name'],
+                                conformance=casted_conformance, privilege=privilege))
         return commands
 
     def parse_commands(self, command_type: CommandType) -> dict[uint, XmlCommand]:
@@ -460,11 +469,16 @@ class ClusterParser:
             conformance = self.parse_conformance(conformance_xml)
             if conformance is None:
                 continue
+            assert conformance is not None  # Tell mypy conformance is not None here
+            current_conformance = conformance  # Keep original for or_operation
             if code in commands:
-                conformance = or_operation([conformance, commands[code].conformance])
+                # Ensure that current_conformance used in or_operation is known to be non-None.
+                conformance = or_operation([current_conformance, commands[code].conformance])
 
-            _, _, privilege = self.parse_access(element, access_xml, conformance)
-            commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance, privilege=privilege)
+            casted_conformance = typing.cast(ConformanceCallable, conformance)
+            _, _, privilege = self.parse_access(element, access_xml, casted_conformance)
+            commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'],
+                                              conformance=casted_conformance, privilege=privilege)
         return commands
 
     def parse_events(self) -> dict[uint, XmlEvent]:
@@ -474,9 +488,14 @@ class ClusterParser:
             conformance = self.parse_conformance(conformance_xml)
             if conformance is None:
                 continue
+            assert conformance is not None  # Tell mypy conformance is not None here
+            current_conformance = conformance  # Keep original for or_operation
             if code in events:
-                conformance = or_operation([conformance, events[code].conformance])
-            events[code] = XmlEvent(name=element.attrib['name'], conformance=conformance)
+                # Ensure that current_conformance used in or_operation is known to be non-None.
+                conformance = or_operation([current_conformance, events[code].conformance])
+
+            casted_conformance = typing.cast(ConformanceCallable, conformance)
+            events[code] = XmlEvent(name=element.attrib['name'], conformance=casted_conformance)
         return events
 
     def create_cluster(self) -> XmlCluster:
@@ -492,7 +511,7 @@ class ClusterParser:
                           accepted_commands=self.parse_commands(CommandType.ACCEPTED),
                           generated_commands=self.parse_commands(CommandType.GENERATED),
                           unknown_commands=self.parse_unknown_commands(),
-                          events=self.parse_events(), pics=self._pics, is_provisional=self._is_provisional)
+                          events=self.parse_events(), pics=self._pics if self._pics is not None else "", is_provisional=self._is_provisional)
 
     def get_problems(self) -> list[ProblemNotice]:
         return self._problems
@@ -590,9 +609,10 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
         return data_model_directory
 
     # If it's a prebuilt directory, build the path based on the version and data model level
-    zip_path = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+    zip_resource_path = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
         'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
-    path = zipfile.Path(zip_path)
+    # Ensure zip_resource_path is treated as a string path for zipfile.Path
+    path = zipfile.Path(str(zip_resource_path))
 
     return path.joinpath(data_model_level.dirname)
 
@@ -737,8 +757,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
         overrides = {k: v for k, v in derived.items() if k in base.keys()}
         ret.update(extras)
         for id, override in overrides.items():
-            if override.conformance:
-                ret[id].conformance = override.conformance
+            ret[id].conformance = override.conformance
             if override.read_access:
                 ret[id].read_access = override.read_access
             if override.write_access:

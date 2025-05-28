@@ -143,6 +143,14 @@ class MetadataReader:
 
         for run, attr in runs_args.items():
             self.__resolve_env_vals__(attr)
+
+            raw_factory_reset = attr.get("factory-reset", False)
+            factory_reset_bool = raw_factory_reset if isinstance(
+                raw_factory_reset, bool) else str(raw_factory_reset).lower() == 'true'
+
+            raw_quiet = attr.get("quiet", True)  # Default is True for quiet
+            quiet_bool = raw_quiet if isinstance(raw_quiet, bool) else str(raw_quiet).lower() == 'true'
+
             runs_metadata.append(Metadata(
                 py_script_path=py_script_path,
                 run=run,
@@ -151,8 +159,8 @@ class MetadataReader:
                 app_ready_pattern=attr.get("app-ready-pattern"),
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
-                factory_reset=attr.get("factory-reset", False),
-                quiet=attr.get("quiet", True),
+                factory_reset=factory_reset_bool,
+                quiet=quiet_bool,
             ))
 
         return runs_metadata
