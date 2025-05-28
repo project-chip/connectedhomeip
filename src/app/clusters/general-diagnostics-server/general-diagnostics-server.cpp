@@ -391,127 +391,117 @@ void GeneralDiagnosticsGlobalInstance::HandlePayloadTestRequest(HandlerContext &
 
 GeneralDiagnosticsGlobalInstance gGeneralDiagnosticsInstance;
 
+class GeneralFaultListenerImpl : public GeneralDiagnostics::GeneralFaultListener{
+public:
+
+    // Gets called when the device has been rebooted.
+    void OnDeviceReboot(BootReasonEnum bootReason) override
+    {
+        ChipLogDetail(Zcl, "GeneralDiagnostics: OnDeviceReboot");
+
+        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReason::Id);
+
+        // GeneralDiagnostics cluster should exist only for endpoint 0.
+        if (emberAfContainsServer(0, GeneralDiagnostics::Id))
+        {
+            Events::BootReason::Type event{ bootReason };
+            EventNumber eventNumber;
+
+            CHIP_ERROR err = LogEvent(event, 0, eventNumber);
+            if (CHIP_NO_ERROR != err)
+            {
+                ChipLogError(Zcl, "GeneralDiagnostics: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        }
+    }
+
+    // Get called when the Node detects a hardware fault has been raised.
+    void OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
+                                                        const GeneralFaults<kMaxHardwareFaults> & current) override
+    {
+        ChipLogDetail(Zcl, "GeneralDiagnostics: OnHardwareFaultsDetect");
+
+        for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+        {
+            // If General Diagnostics cluster is implemented on this endpoint
+            MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
+
+            // Record HardwareFault event
+            EventNumber eventNumber;
+            DataModel::List<const HardwareFaultEnum> currentList(reinterpret_cast<const HardwareFaultEnum *>(current.data()),
+                                                                current.size());
+            DataModel::List<const HardwareFaultEnum> previousList(reinterpret_cast<const HardwareFaultEnum *>(previous.data()),
+                                                                previous.size());
+            Events::HardwareFaultChange::Type event{ currentList, previousList };
+
+            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
+            {
+                ChipLogError(Zcl, "GeneralDiagnostics: Failed to record HardwareFault event");
+            }
+        }
+    }
+
+    // Get called when the Node detects a radio fault has been raised.
+    void OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
+                                                    const GeneralFaults<kMaxRadioFaults> & current) override
+    {
+        ChipLogDetail(Zcl, "GeneralDiagnostics: OnRadioFaultsDetect");
+
+        for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+        {
+            // If General Diagnostics cluster is implemented on this endpoint
+            MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
+
+            // Record RadioFault event
+            EventNumber eventNumber;
+            DataModel::List<const RadioFaultEnum> currentList(reinterpret_cast<const RadioFaultEnum *>(current.data()), current.size());
+            DataModel::List<const RadioFaultEnum> previousList(reinterpret_cast<const RadioFaultEnum *>(previous.data()),
+                                                            previous.size());
+            Events::RadioFaultChange::Type event{ currentList, previousList };
+
+            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
+            {
+                ChipLogError(Zcl, "GeneralDiagnostics: Failed to record RadioFault event");
+            }
+        }
+    }
+
+    // Get called when the Node detects a network fault has been raised.
+    void OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
+                                                        const GeneralFaults<kMaxNetworkFaults> & current) override
+    {
+        ChipLogDetail(Zcl, "GeneralDiagnostics: OnNetworkFaultsDetect");
+
+        for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+        {
+            // If General Diagnostics cluster is implemented on this endpoint
+            MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
+
+            // Record NetworkFault event
+            EventNumber eventNumber;
+            DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()),
+                                                                current.size());
+            DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
+                                                                previous.size());
+            Events::NetworkFaultChange::Type event{ currentList, previousList };
+
+            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
+            {
+                ChipLogError(Zcl, "GeneralDiagnostics: Failed to record NetworkFault event");
+            }
+        }
+    }
+
+    static GeneralFaultListener & Instance()
+    {
+        static GeneralFaultListenerImpl instance;
+        return instance;
+    }
+};
 } // anonymous namespace
-
-namespace chip {
-namespace app {
-namespace Clusters {
-
-GeneralDiagnosticsServer GeneralDiagnosticsServer::instance;
-
-/**********************************************************
- * GeneralDiagnosticsServer Implementation
- *********************************************************/
-
-GeneralDiagnosticsServer & GeneralDiagnosticsServer::Instance()
-{
-    return instance;
-}
-
-// Gets called when the device has been rebooted.
-void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonEnum bootReason)
-{
-    ChipLogDetail(Zcl, "GeneralDiagnostics: OnDeviceReboot");
-
-    ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReason::Id);
-
-    // GeneralDiagnostics cluster should exist only for endpoint 0.
-    if (emberAfContainsServer(0, GeneralDiagnostics::Id))
-    {
-        Events::BootReason::Type event{ bootReason };
-        EventNumber eventNumber;
-
-        CHIP_ERROR err = LogEvent(event, 0, eventNumber);
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(Zcl, "GeneralDiagnostics: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-    }
-}
-
-// Get called when the Node detects a hardware fault has been raised.
-void GeneralDiagnosticsServer::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
-                                                      const GeneralFaults<kMaxHardwareFaults> & current)
-{
-    ChipLogDetail(Zcl, "GeneralDiagnostics: OnHardwareFaultsDetect");
-
-    for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
-    {
-        // If General Diagnostics cluster is implemented on this endpoint
-        MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                               GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
-
-        // Record HardwareFault event
-        EventNumber eventNumber;
-        DataModel::List<const HardwareFaultEnum> currentList(reinterpret_cast<const HardwareFaultEnum *>(current.data()),
-                                                             current.size());
-        DataModel::List<const HardwareFaultEnum> previousList(reinterpret_cast<const HardwareFaultEnum *>(previous.data()),
-                                                              previous.size());
-        Events::HardwareFaultChange::Type event{ currentList, previousList };
-
-        if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
-        {
-            ChipLogError(Zcl, "GeneralDiagnostics: Failed to record HardwareFault event");
-        }
-    }
-}
-
-// Get called when the Node detects a radio fault has been raised.
-void GeneralDiagnosticsServer::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
-                                                   const GeneralFaults<kMaxRadioFaults> & current)
-{
-    ChipLogDetail(Zcl, "GeneralDiagnostics: OnRadioFaultsDetect");
-
-    for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
-    {
-        // If General Diagnostics cluster is implemented on this endpoint
-        MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                               GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
-
-        // Record RadioFault event
-        EventNumber eventNumber;
-        DataModel::List<const RadioFaultEnum> currentList(reinterpret_cast<const RadioFaultEnum *>(current.data()), current.size());
-        DataModel::List<const RadioFaultEnum> previousList(reinterpret_cast<const RadioFaultEnum *>(previous.data()),
-                                                           previous.size());
-        Events::RadioFaultChange::Type event{ currentList, previousList };
-
-        if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
-        {
-            ChipLogError(Zcl, "GeneralDiagnostics: Failed to record RadioFault event");
-        }
-    }
-}
-
-// Get called when the Node detects a network fault has been raised.
-void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
-                                                     const GeneralFaults<kMaxNetworkFaults> & current)
-{
-    ChipLogDetail(Zcl, "GeneralDiagnostics: OnNetworkFaultsDetect");
-
-    for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
-    {
-        // If General Diagnostics cluster is implemented on this endpoint
-        MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                               GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
-
-        // Record NetworkFault event
-        EventNumber eventNumber;
-        DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()),
-                                                            current.size());
-        DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
-                                                             previous.size());
-        Events::NetworkFaultChange::Type event{ currentList, previousList };
-
-        if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
-        {
-            ChipLogError(Zcl, "GeneralDiagnostics: Failed to record NetworkFault event");
-        }
-    }
-}
-
-} // namespace Clusters
-} // namespace app
-} // namespace chip
 
 void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
