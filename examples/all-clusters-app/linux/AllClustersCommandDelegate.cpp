@@ -559,7 +559,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SimulateConfigurationVersionChange")
     {
-        InteractionModelEngine::GetInstance()->GetDataModelProvider()->BumpNodeDataModelConfigurationVersion();
+        DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction =
+            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetConfigurationVersionUpdater();
+
+        // TDOD: Change a F attribute
     }
     else
     {

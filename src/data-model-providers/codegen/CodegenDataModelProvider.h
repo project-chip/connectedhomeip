@@ -73,7 +73,6 @@ public:
     void SetNodeConfigurationListener(DataModel::NodeConfigurationListener * nodeConfigurationListener) override;
     void NotifyNodeConfigurationListener() override;
     CHIP_ERROR GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
-    CHIP_ERROR BumpNodeDataModelConfigurationVersion() override;
     CHIP_ERROR ResetNodeDataModelConfigurationVersion() override;
 
     /// attribute tree iteration
@@ -137,6 +136,9 @@ private:
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
+
+protected:
+    CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() override;
 };
 
 } // namespace app

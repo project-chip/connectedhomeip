@@ -236,7 +236,7 @@ CodegenDataModelProvider::GetNodeDataModelConfiguration(DataModel::NodeDataModel
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CodegenDataModelProvider::BumpNodeDataModelConfigurationVersion()
+CHIP_ERROR CodegenDataModelProvider::Internal_BumpNodeDataModelConfigurationVersion()
 {
     uint32_t tempConfigurationVersion = mConfigurationVersion;
     uint16_t size                     = sizeof(tempConfigurationVersion);

@@ -45,15 +45,22 @@ struct NodeDataModelConfiguration
 class ProviderMetadataTree
 {
 public:
+    // This sub-class provides the scoped where the configuration version get bumped.
+    // It is used to provide RAII for the ConfigurationVersion where the value is bumped when deconstructed
+    // and provides a stable interface for clients to perform the bump.
+    class ScopedConfigurationVersionUpdater
+    {
+    public:
+        ScopedConfigurationVersionUpdater(ProviderMetadataTree & parentTree) : mParentTree(parentTree) {}
+        ~ScopedConfigurationVersionUpdater() { mParentTree.Internal_BumpNodeDataModelConfigurationVersion(); };
+
+    private:
+        ProviderMetadataTree & mParentTree;
+    };
+
     virtual ~ProviderMetadataTree() = default;
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
-
-    virtual void SetNodeConfigurationListener(NodeConfigurationListener * listener)                           = 0;
-    virtual void NotifyNodeConfigurationListener()                                                            = 0;
-    virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & nodeDataModelConfiguration) = 0;
-    virtual CHIP_ERROR BumpNodeDataModelConfigurationVersion()                                                = 0;
-    virtual CHIP_ERROR ResetNodeDataModelConfigurationVersion()                                               = 0;
 
     virtual CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> & builder) = 0;
 
@@ -96,6 +103,13 @@ public:
     /// the attribute changes.
     virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 
+    virtual void SetNodeConfigurationListener(NodeConfigurationListener * listener)                           = 0;
+    virtual void NotifyNodeConfigurationListener()                                                            = 0;
+    virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & nodeDataModelConfiguration) = 0;
+    virtual CHIP_ERROR ResetNodeDataModelConfigurationVersion()                                               = 0;
+
+    ScopedConfigurationVersionUpdater GetConfigurationVersionUpdater() { return ScopedConfigurationVersionUpdater(*this); }
+
     // "convenience" functions that just return the data and ignore the error
     // This returns the `ReadOnlyBufferBuilder<..>::TakeBuffer` from their equivalent fuctions as-is,
     // even after an error (e.g. not found would return empty data).
@@ -105,6 +119,9 @@ public:
     ReadOnlyBuffer<EndpointEntry> EndpointsIgnoreError();
     ReadOnlyBuffer<ServerClusterEntry> ServerClustersIgnoreError(EndpointId endpointId);
     ReadOnlyBuffer<AttributeEntry> AttributesIgnoreError(const ConcreteClusterPath & path);
+
+protected:
+    virtual CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() = 0;
 };
 
 } // namespace DataModel

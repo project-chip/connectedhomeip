@@ -39,7 +39,6 @@ public:
     void SetNodeConfigurationListener(app::DataModel::NodeConfigurationListener * nodeConfigurationListener) override;
     void NotifyNodeConfigurationListener() override;
     CHIP_ERROR GetNodeDataModelConfiguration(app::DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
-    CHIP_ERROR BumpNodeDataModelConfigurationVersion() override;
     CHIP_ERROR ResetNodeDataModelConfigurationVersion() override;
 
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder) override;
@@ -68,6 +67,9 @@ public:
                                       app::AttributeValueDecoder & decoder) override;
     std::optional<ActionReturnStatus> InvokeCommand(const app::DataModel::InvokeRequest & request,
                                                     chip::TLV::TLVReader & input_arguments, app::CommandHandler * handler) override;
+
+protected:
+    CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() override;
 };
 
 } // namespace Test

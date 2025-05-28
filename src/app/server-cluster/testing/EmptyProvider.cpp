@@ -43,7 +43,7 @@ CHIP_ERROR EmptyProvider::GetNodeDataModelConfiguration(app::DataModel::NodeData
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmptyProvider::BumpNodeDataModelConfigurationVersion()
+CHIP_ERROR EmptyProvider::Internal_BumpNodeDataModelConfigurationVersion()
 {
     return CHIP_NO_ERROR;
 }
