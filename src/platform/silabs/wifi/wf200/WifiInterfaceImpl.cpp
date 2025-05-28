@@ -30,7 +30,6 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/silabs/wifi/WifiInterface.h>
 #include <platform/silabs/wifi/lwip-support/dhcp_client.h>
 #include <platform/silabs/wifi/lwip-support/ethernetif.h>
 #include <platform/silabs/wifi/lwip-support/lwip_netif.h>
@@ -956,8 +955,6 @@ void WifiInterfaceImpl::ProcessEvents(void * arg)
 
                 if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !WifiInterfaceImpl::GetInstance().HasNotifiedIPv4())
                 {
-                    WifiInterfaceImpl::GetInstance().NotifyIPv4Change(false);
-
                     WifiInterfaceImpl::GetInstance().GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     if (!hasNotifiedWifiConnectivity)
                     {
