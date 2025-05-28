@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -91,7 +92,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::TwoDCartesianZoneStruct::Type zone;
 
@@ -126,11 +126,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -142,7 +141,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
 
@@ -162,7 +160,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
     Structs::TwoDCartesianZoneStruct::Type zone;
@@ -199,7 +196,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<DataModel::Nullable<uint16_t>> zoneID;
 
@@ -234,11 +230,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::TwoDCartesianZoneStruct::Type> zones;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -250,7 +245,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<Structs::TwoDCartesianZoneStruct::DecodableType> zones;
 
@@ -269,7 +263,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
 

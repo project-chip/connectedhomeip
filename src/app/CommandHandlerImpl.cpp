@@ -156,7 +156,9 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
         accessingFabricIndex = kUndefinedFabricIndex;
     }
 
-    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), accessingFabricIndex));
+    DataModel::FabricAwareTLVWriter responseWriter(*writer, accessingFabricIndex);
+
+    ReturnErrorOnFailure(aEncodable.EncodeTo(responseWriter, TLV::ContextTag(CommandDataIB::Tag::kFields)));
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 
