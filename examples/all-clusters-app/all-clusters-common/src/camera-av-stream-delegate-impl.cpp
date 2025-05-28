@@ -345,7 +345,7 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     features.Set(Feature::kOnScreenDisplay);
     features.Set(Feature::kHighDynamicRange);
 
-    //Pure optional attributes that aren't covered by a feature flag
+    // Pure optional attributes that aren't covered by a feature flag
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(OptionalAttribute::kHardPrivacyModeOn);
     optionalAttrs.Set(OptionalAttribute::kMicrophoneAGCEnabled);
