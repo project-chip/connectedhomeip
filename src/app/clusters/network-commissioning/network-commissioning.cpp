@@ -42,8 +42,13 @@
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <tracing/macros.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include "ThreadScanResponse.h"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 #include "WifiScanResponse.h"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
 #include <array>
 #include <utility>
