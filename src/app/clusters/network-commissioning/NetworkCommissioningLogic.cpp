@@ -15,15 +15,14 @@
  *    limitations under the License.
  */
 #include "NetworkCommissioningLogic.h"
-#include "app/CommandHandler.h"
-#include "app/ConcreteCommandPath.h"
-#include "protocols/interaction_model/StatusCode.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandler.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
 #include <app/clusters/network-commissioning/ThreadScanResponse.h>
 #include <app/clusters/network-commissioning/WifiScanResponse.h>
@@ -41,6 +40,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
 
 #include <array>
@@ -987,13 +987,6 @@ CHIP_ERROR NetworkCommissioningLogic::EncodeNetworks(AttributeValueEncoder & enc
 CHIP_ERROR NetworkCommissioningLogic::EncodeSupportedWiFiBands(AttributeValueEncoder & encoder) const
 {
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-    // TODO https://github.com/project-chip/connectedhomeip/issues/31431
-    // This is a case of shared zap config where mandatory wifi attributes are enabled for a thread platform (e.g
-    // all-cluster-app). Real world product must only enable the attributes tied to the network technology supported by their
-    // product. Temporarily return an list of 1 element of value 0 when wifi is not supported or WiFiNetworkInterface is not
-    // enabled until a solution is implemented with the attribute list.
-    // Final implementation will return UnsupportedAttribute if we get here without the needed WiFi support .
-    // VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         return encoder.EncodeList([this](const auto & encoder) {
@@ -1012,11 +1005,8 @@ CHIP_ERROR NetworkCommissioningLogic::EncodeSupportedWiFiBands(AttributeValueEnc
         });
     }
 #endif
-    return encoder.EncodeList([](const auto & encoder) {
-        WiFiBandEnum bands = WiFiBandEnum::k2g4;
-        ReturnErrorOnFailure(encoder.Encode(bands));
-        return CHIP_NO_ERROR;
-    });
+    // attribute available IFF wifi supported (see above)
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 } // namespace Clusters

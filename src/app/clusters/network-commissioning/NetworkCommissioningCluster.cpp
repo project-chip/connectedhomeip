@@ -106,20 +106,11 @@ std::optional<DataModel::ActionReturnStatus> NetworkCommissioningCluster::Invoke
 
     switch (request.path.mCommandId)
     {
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP || CHIP_DEVICE_CONFIG_ENABLE_THREAD)
     case ScanNetworks::Id: {
         ScanNetworks::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
         return mLogic.HandleScanNetworks(*handler, request.path, request_data);
-    }
-    case AddOrUpdateWiFiNetwork::Id: {
-        AddOrUpdateWiFiNetwork::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return mLogic.HandleAddOrUpdateWiFiNetwork(*handler, request.path, request_data);
-    }
-    case AddOrUpdateThreadNetwork::Id: {
-        AddOrUpdateThreadNetwork::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return mLogic.HandleAddOrUpdateThreadNetwork(*handler, request.path, request_data);
     }
     case RemoveNetwork::Id: {
         RemoveNetwork::DecodableType request_data;
@@ -136,6 +127,21 @@ std::optional<DataModel::ActionReturnStatus> NetworkCommissioningCluster::Invoke
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
         return mLogic.HandleReorderNetwork(*handler, request.path, request_data);
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP || CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+    case AddOrUpdateWiFiNetwork::Id: {
+        AddOrUpdateWiFiNetwork::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return mLogic.HandleAddOrUpdateWiFiNetwork(*handler, request.path, request_data);
+    }
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    case AddOrUpdateThreadNetwork::Id: {
+        AddOrUpdateThreadNetwork::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return mLogic.HandleAddOrUpdateThreadNetwork(*handler, request.path, request_data);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     case QueryIdentity::Id: {
         QueryIdentity::DecodableType request_data;
@@ -154,6 +160,7 @@ CHIP_ERROR NetworkCommissioningCluster::AcceptedCommands(const ConcreteClusterPa
     using namespace NetworkCommissioning::Commands;
     using NetworkCommissioning::Feature;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (mLogic.Features().Has(Feature::kThreadNetworkInterface))
     {
         ReturnErrorOnFailure(builder.AppendElements({
@@ -164,7 +171,10 @@ CHIP_ERROR NetworkCommissioningCluster::AcceptedCommands(const ConcreteClusterPa
             ReorderNetwork::kMetadataEntry,
         }));
     }
-    else if (mLogic.Features().Has(Feature::kWiFiNetworkInterface))
+    else
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+        if (mLogic.Features().Has(Feature::kWiFiNetworkInterface))
     {
         ReturnErrorOnFailure(builder.AppendElements({
             ScanNetworks::kMetadataEntry,
@@ -174,6 +184,9 @@ CHIP_ERROR NetworkCommissioningCluster::AcceptedCommands(const ConcreteClusterPa
             ReorderNetwork::kMetadataEntry,
         }));
     }
+    else
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+    {}
 
     if (mLogic.Features().Has(Feature::kPerDeviceCredentials))
     {
@@ -224,6 +237,7 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
     }));
 
     // NOTE: thread and wifi are mutually exclusive features
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (mLogic.Features().Has(Feature::kThreadNetworkInterface))
     {
         ReturnErrorOnFailure(builder.AppendElements({
@@ -233,7 +247,10 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
             ThreadVersion::kMetadataEntry,
         }));
     }
-    else if (mLogic.Features().Has(Feature::kThreadNetworkInterface))
+    else
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+        if (mLogic.Features().Has(Feature::kWiFiNetworkInterface))
     {
         ReturnErrorOnFailure(builder.AppendElements({
             ScanMaxTimeSeconds::kMetadataEntry,
@@ -241,6 +258,9 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
             SupportedWiFiBands::kMetadataEntry,
         }));
     }
+    else
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+    {}
 
     return CHIP_NO_ERROR;
 }
