@@ -17,11 +17,15 @@
  */
 
 #include <ClosureControlEndpoint.h>
+#include <ClosureManager.h>
+#include "cmsis_os2.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ClosureControl;
 
 using Protocols::InteractionModel::Status;
@@ -51,25 +55,31 @@ enum class ClosureControlTestEventTrigger : uint64_t
 
 } // namespace
 
-Status PrintOnlyDelegate::HandleCalibrateCommand()
+Status PrintOnlyDelegate::HandleCalibrateCommand(DataModel::Nullable<ElapsedS> & countdownTime)
 {
-    ChipLogProgress(AppServer, "HandleCalibrateCommand");
+    ChipLogError(AppServer, "###########HandleCalibrateCommand###############");
+    osDelay(1000);
+    ClosureManager::GetInstance().OnCalibrateCommand(countdownTime);
     // Add the calibration logic here
     return Status::Success;
 }
 
 Status PrintOnlyDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
-                                              const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
+                                              DataModel::Nullable<ElapsedS> & countdownTime)
 {
-    ChipLogProgress(AppServer, "HandleMoveToCommand");
+    ChipLogProgress(AppServer, "###########HandleMoveToCommand###############");
+    osDelay(1000);
+    ClosureManager::GetInstance().OnMoveToCommand(countdownTime);
     // Add the move to logic here
     return Status::Success;
 }
 
 Status PrintOnlyDelegate::HandleStopCommand()
 {
-    ChipLogProgress(AppServer, "HandleStopCommand");
-    // Add the stop logic here
+    ChipLogProgress(AppServer, "###########HandleStopCommand###############");
+    osDelay(1000);
+    ClosureManager::GetInstance().OnStopCommand();
     return Status::Success;
 }
 
@@ -167,4 +177,85 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     ReturnErrorOnFailure(mInterface.Init());
 
     return CHIP_NO_ERROR;
+}
+
+void ClosureControlEndpoint::OnActionComplete(uint8_t action) 
+{
+    ChipLogError(AppServer, "#######OnActionComplete 0############");
+    osDelay(1000);
+    ClosureManager::Action_t closureAction = static_cast<ClosureManager::Action_t>(action);
+    switch (closureAction)
+    {
+    case ClosureManager::Action_t::STOP_ACTION:
+        mLogic.SetCountdownTimeFromDelegate(0);
+            ChipLogError(AppServer, "#######OnActionComplete 3############");
+            osDelay(1000);
+        mLogic.GenerateMovementCompletedEvent();
+            ChipLogError(AppServer, "#######OnActionComplete 4############");
+            osDelay(1000);
+        break;
+    case ClosureManager::Action_t::CALIBRATE_ACTION:
+    {
+        DataModel::Nullable<GenericOverallState> overallState = DataModel::NullNullable;
+        mLogic.SetMainState(MainStateEnum::kStopped);
+        ChipLogError(AppServer, "#######OnActionComplete 5-1############");
+            osDelay(1000);
+        mLogic.SetOverallState(overallState);
+            ChipLogError(AppServer, "#######OnActionComplete 5############");
+            osDelay(1000);
+        mLogic.SetCountdownTimeFromDelegate(0);
+            ChipLogError(AppServer, "#######OnActionComplete 6############");
+            osDelay(1000);
+        mLogic.GenerateMovementCompletedEvent();
+            ChipLogError(AppServer, "#######OnActionComplete 7############");
+            osDelay(1000);
+        break;
+    }
+    case ClosureManager::Action_t::MOVE_TO_ACTION:
+    {
+        ClusterState state;
+        state = mLogic.GetState();
+        ChipLogError(AppServer, "#######OnActionComplete 8############");
+        osDelay(1000);
+        
+        if (!state.mOverallTarget.IsNull())
+        {
+            const auto & target = state.mOverallTarget.Value();
+            state.mOverallState.Value().Set(
+                target.position.HasValue()
+                    ? MakeOptional(MakeNullable(static_cast<PositioningEnum>(target.position.Value())))
+                    : NullOptional,
+                target.latch.HasValue()
+                    ? MakeOptional(MakeNullable(target.latch.Value()))
+                    : NullOptional,
+                target.speed.HasValue()
+                    ? MakeOptional(MakeNullable(target.speed.Value()))
+                    : NullOptional,
+                NullOptional // secureState not present in target
+            );
+        }
+        else
+        {
+            state.mOverallState.SetNull();
+        }
+
+        mLogic.SetOverallState(state.mOverallState);
+        ChipLogError(AppServer, "#######OnActionComplete 5############");
+        osDelay(1000);
+        mLogic.SetMainState(MainStateEnum::kStopped);
+        ChipLogError(AppServer, "#######OnActionComplete 9############");
+            osDelay(1000);
+        mLogic.SetCountdownTimeFromDelegate(0);
+            ChipLogError(AppServer, "#######OnActionComplete 6############");
+            osDelay(1000);
+        mLogic.GenerateMovementCompletedEvent();
+            ChipLogError(AppServer, "#######OnActionComplete 7############");
+            osDelay(1000);
+        break;
+    }
+    default:
+        ChipLogError(AppServer, "Invalid action received in OnActionComplete");
+        osDelay(1000);
+        return;
+    }
 }

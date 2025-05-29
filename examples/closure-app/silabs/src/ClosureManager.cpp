@@ -16,9 +16,11 @@
  *    limitations under the License.
  */
 
+#include <AppTask.h>
 #include "ClosureManager.h"
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
+#include "cmsis_os2.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
@@ -85,4 +87,86 @@ void ClosureManager::Init()
     SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEp3TagList));
 
     DeviceLayer::PlatformMgr().UnlockChipStack();
+}
+
+void ClosureManager::OnCalibrateCommand(DataModel::Nullable<ElapsedS> & countdownTime)
+{
+  ChipLogError(AppServer, "###########OnCalibrateCommand###################");
+  osDelay(1000);
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = Action_t::CALIBRATE_ACTION;
+    event.Handler = HandleClosureAction;
+    AppTask::GetAppTask().PostEvent(&event);
+}
+
+void ClosureManager::OnStopCommand()
+{
+  ChipLogError(AppServer, "###########OnStopCommand###################");
+  osDelay(1000);
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = Action_t::STOP_ACTION;
+    event.Handler = HandleClosureAction;
+    AppTask::GetAppTask().PostEvent(&event);
+}
+
+void ClosureManager::OnMoveToCommand(chip::app::DataModel::Nullable<chip::ElapsedS> & countdownTime)
+{
+    ChipLogError(AppServer, "###########OnMoveToCommand###################");
+    osDelay(1000);
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = Action_t::MOVE_TO_ACTION;
+    event.Handler = HandleClosureAction;
+    AppTask::GetAppTask().PostEvent(&event);
+}
+
+void ClosureManager::HandleClosureAction(AppEvent * aEvent)
+{
+  ChipLogError(AppServer, "############HandleClosureAction 1###############"); 
+  osDelay(1000);
+    if (aEvent->Type == AppEvent::kEventType_Closure)
+    {
+      ChipLogError(AppServer, "############HandleClosureAction 2###############"); 
+      osDelay(1000);
+        switch (aEvent->ClosureEvent.Action)
+        {
+        case Action_t::CALIBRATE_ACTION:
+        {
+            // Perform hardware calibration
+            ChipLogError(AppServer, "############HandleClosureAction 3###############"); 
+            osDelay(1000);
+            chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { GetInstance().ep1.OnActionComplete(Action_t::CALIBRATE_ACTION); });
+            ChipLogError(AppServer, "############HandleClosureAction 4###############"); 
+            osDelay(1000);
+            break;
+        }
+        case Action_t::STOP_ACTION:
+        {
+            // Perform hardware stop action
+            ChipLogError(AppServer, "############HandleClosureAction 5###############"); 
+            osDelay(1000);
+            chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { GetInstance().ep1.OnActionComplete(Action_t::STOP_ACTION); });
+            ChipLogError(AppServer, "############HandleClosureAction 6###############"); 
+            osDelay(1000);
+            break;
+        }
+        case Action_t::MOVE_TO_ACTION:
+        {
+            // Perform hardware move to action
+            ChipLogError(AppServer, "############HandleClosureAction 7###############"); 
+            osDelay(1000);
+            chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { GetInstance().ep1.OnActionComplete(Action_t::MOVE_TO_ACTION); });
+            ChipLogError(AppServer, "############HandleClosureAction 8###############"); 
+            osDelay(1000);
+            break;
+        }
+        case Action_t::INVALID_ACTION:
+            ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
+            break;
+        default:
+            break;
+        }
+    }
 }

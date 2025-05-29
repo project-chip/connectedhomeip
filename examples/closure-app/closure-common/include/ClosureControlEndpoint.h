@@ -53,8 +53,9 @@ public:
     Protocols::InteractionModel::Status HandleStopCommand() override;
     Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & position,
                                                             const Optional<bool> & latch,
-                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
-    Protocols::InteractionModel::Status HandleCalibrateCommand() override;
+                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed,
+                                                            chip::app::DataModel::Nullable<ElapsedS> & countdownTime) override;
+    Protocols::InteractionModel::Status HandleCalibrateCommand(chip::app::DataModel::Nullable<ElapsedS> & countdownTime) override;
 
     CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
     bool IsReadyToMove() override;
@@ -118,6 +119,9 @@ public:
      * @return Reference to the PrintOnlyDelegate instance.
      */
     PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+    ClusterLogic GetLogic() const { return mLogic; }
+
+    void OnActionComplete(uint8_t action);
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;

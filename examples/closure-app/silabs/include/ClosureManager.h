@@ -29,10 +29,19 @@
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
 #include <lib/core/DataModelTypes.h>
+#include <AppEvent.h>
 
 class ClosureManager
 {
 public:
+    enum Action_t
+    {
+        STOP_ACTION = 0,
+        CALIBRATE_ACTION,
+        MOVE_TO_ACTION,
+        
+        INVALID_ACTION
+    } Action;
     /**
      * @brief Initializes the ClosureManager.
      *
@@ -42,6 +51,9 @@ public:
     void Init();
 
     static ClosureManager & GetInstance() { return sClosureMgr; }
+    void OnCalibrateCommand(chip::app::DataModel::Nullable<chip::ElapsedS> & countdownTime);
+    void OnMoveToCommand(chip::app::DataModel::Nullable<chip::ElapsedS> & countdownTime);
+    void OnStopCommand();
 
 private:
     static ClosureManager sClosureMgr;
@@ -53,4 +65,6 @@ private:
     chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
+    
+    static void HandleClosureAction(AppEvent * aEvent);
 };

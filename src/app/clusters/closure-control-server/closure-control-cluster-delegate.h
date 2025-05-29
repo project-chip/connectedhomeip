@@ -19,6 +19,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
@@ -53,7 +54,8 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & position,
                                                                     const Optional<bool> & latch,
-                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed,
+                                                                    DataModel::Nullable<chip::ElapsedS> & countdownTime) = 0;
 
     /**
      * @brief This function handles Calibrate command implementaion.
@@ -61,7 +63,7 @@ public:
      * @return Success when closure succesfully handles calibration.
      *         Error when calibration fails.
      */
-    virtual Protocols::InteractionModel::Status HandleCalibrateCommand() = 0;
+    virtual Protocols::InteractionModel::Status HandleCalibrateCommand(DataModel::Nullable<chip::ElapsedS> & countdownTime) = 0;
 
     /**
      * @brief This function returns the current error at the specified index of CurrentErrorList.
