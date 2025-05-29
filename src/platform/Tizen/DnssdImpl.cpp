@@ -406,8 +406,7 @@ namespace Dnssd {
 DnssdTizen DnssdTizen::sInstance;
 
 RegisterContext::RegisterContext(DnssdTizen * instance, const char * type, const DnssdService & service,
-                                 DnssdPublishCallback callback, void * context) :
-    GenericContext(ContextType::Register, instance)
+                                 DnssdPublishCallback callback, void * context) : GenericContext(ContextType::Register, instance)
 {
     Platform::CopyString(mName, service.mName);
     Platform::CopyString(mType, type);
@@ -431,8 +430,7 @@ RegisterContext::~RegisterContext()
 }
 
 BrowseContext::BrowseContext(DnssdTizen * instance, const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
-                             DnssdBrowseCallback callback, void * context) :
-    GenericContext(ContextType::Browse, instance)
+                             DnssdBrowseCallback callback, void * context) : GenericContext(ContextType::Browse, instance)
 {
     Platform::CopyString(mType, type);
     mProtocol    = protocol;
@@ -452,8 +450,7 @@ BrowseContext::~BrowseContext()
 }
 
 ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId,
-                               DnssdResolveCallback callback, void * context) :
-    GenericContext(ContextType::Resolve, instance)
+                               DnssdResolveCallback callback, void * context) : GenericContext(ContextType::Resolve, instance)
 {
     Platform::CopyString(mName, name);
     Platform::CopyString(mType, type);
@@ -462,8 +459,6 @@ ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const c
     mCallback  = callback;
     mCbContext = context;
 }
-
-ResolveContext::~ResolveContext() = default;
 
 void ResolveContext::Finalize(CHIP_ERROR error)
 {
