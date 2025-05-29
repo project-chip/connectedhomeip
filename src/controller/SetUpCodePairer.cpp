@@ -170,9 +170,9 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverBLE()
         {
             discriminators.emplace_back(payload.discriminator);
         }
-        err = mBleLayer->NewBleConnectionByDiscriminators(
-            Span<const SetupDiscriminator>(discriminators.data(), discriminators.size()), this,
-            OnDiscoveredDeviceWithDiscriminatorOverBleSuccess, OnDiscoveredDeviceOverBleError);
+        err = mBleLayer->NewBleConnectionByDiscriminators(Span(discriminators.data(), discriminators.size()), this,
+                                                          OnDiscoveredDeviceWithDiscriminatorOverBleSuccess,
+                                                          OnDiscoveredDeviceOverBleError);
     }
     if (err != CHIP_NO_ERROR)
     {
