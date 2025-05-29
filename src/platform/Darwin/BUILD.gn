@@ -60,7 +60,7 @@ static_library("Darwin") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdContexts.cpp",
-    "DnssdHostNameRegistrar.cpp",
+    "DnssdHostNameRegistrar.mm",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "DnssdType.cpp",
@@ -68,8 +68,8 @@ static_library("Darwin") {
     "MdnsError.cpp",
     "MdnsError.h",
     "NetworkCommissioningDriver.h",
-    "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "PlatformManagerImpl.mm",
     "PlatformMetricKeys.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
@@ -77,6 +77,8 @@ static_library("Darwin") {
     "SystemTimeSupport.cpp",
     "UserDefaults.h",
     "UserDefaults.mm",
+    "inet/NetworkMonitor.h",
+    "inet/NetworkMonitor.mm",
   ]
 
   if (chip_enable_wifi) {

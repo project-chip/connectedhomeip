@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/reporting/reporting.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -44,7 +45,7 @@ CHIP_ERROR UnitLocalizationServer::Init()
     uint8_t storedTempUnit = 0;
 
     err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(0, UnitLocalization::Id, TemperatureUnit::Id), storedTempUnit);
+        ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), storedTempUnit);
     if (err == CHIP_NO_ERROR)
     {
         mTemperatureUnit = static_cast<TempUnitEnum>(storedTempUnit);
@@ -84,20 +85,8 @@ CHIP_ERROR UnitLocalizationServer::Write(const ConcreteDataAttributePath & aPath
     {
     case TemperatureUnit::Id: {
         TempUnitEnum newTempUnit = TempUnitEnum::kCelsius;
-        bool isValid             = false;
         ReturnErrorOnFailure(aDecoder.Decode(newTempUnit));
-        const auto & units = GetSupportedTemperatureUnits();
-        for (auto const & unit : units)
-        {
-            if (unit == newTempUnit)
-            {
-                isValid = true;
-                break;
-            }
-        }
-        VerifyOrReturnError(isValid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        mTemperatureUnit = newTempUnit;
-        ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(aPath, to_underlying(mTemperatureUnit)));
+        ReturnErrorOnFailure(SetTemperatureUnit(newTempUnit));
         return CHIP_NO_ERROR;
     }
     default:
@@ -128,6 +117,27 @@ CHIP_ERROR UnitLocalizationServer::Read(const ConcreteReadAttributePath & aPath,
     default:
         break;
     }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR UnitLocalizationServer::SetTemperatureUnit(TempUnitEnum newTempUnit)
+{
+    bool isValid       = false;
+    const auto & units = GetSupportedTemperatureUnits();
+    for (auto const & unit : units)
+    {
+        if (unit == newTempUnit)
+        {
+            isValid = true;
+            break;
+        }
+    }
+    VerifyOrReturnError(isValid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnValue(mTemperatureUnit != newTempUnit, CHIP_NO_ERROR);
+    mTemperatureUnit = newTempUnit;
+    MatterReportingAttributeChangeCallback(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id);
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), to_underlying(mTemperatureUnit)));
     return CHIP_NO_ERROR;
 }
 
