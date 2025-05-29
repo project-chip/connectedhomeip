@@ -958,9 +958,9 @@ void NetworkCommissioningLogic::OnFailSafeTimerExpired()
     }
 }
 
-CHIP_ERROR NetworkCommissioningLogic::EncodeNetworks(AttributeValueEncoder & encoder) const
+CHIP_ERROR NetworkCommissioningLogic::EncodeNetworks(AttributeValueEncoder & listEncoder) const
 {
-    return encoder.EncodeList([this](const auto & encoder) {
+    return listEncoder.EncodeList([this](const auto & encoder) {
         CHIP_ERROR err = CHIP_NO_ERROR;
         Structs::NetworkInfoStruct::Type networkForEncode;
         EnumerateAndRelease(mpBaseDriver->GetNetworks(), [&](const Network & network) {
@@ -984,12 +984,12 @@ CHIP_ERROR NetworkCommissioningLogic::EncodeNetworks(AttributeValueEncoder & enc
     });
 }
 
-CHIP_ERROR NetworkCommissioningLogic::EncodeSupportedWiFiBands(AttributeValueEncoder & encoder) const
+CHIP_ERROR NetworkCommissioningLogic::EncodeSupportedWiFiBands(AttributeValueEncoder & listEncoder) const
 {
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
-        return encoder.EncodeList([this](const auto & encoder) {
+        return listEncoder.EncodeList([this](const auto & encoder) {
             uint32_t bands = mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBandsMask();
 
             // Extract every band from the bitmap of supported bands, starting positionally on the right.
