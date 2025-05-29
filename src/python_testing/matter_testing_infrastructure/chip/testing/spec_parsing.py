@@ -757,7 +757,8 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
         overrides = {k: v for k, v in derived.items() if k in base.keys()}
         ret.update(extras)
         for id, override in overrides.items():
-            ret[id].conformance = override.conformance
+            if override.conformance:
+                ret[id].conformance = override.conformance
             if override.read_access:
                 ret[id].read_access = override.read_access
             if override.write_access:
