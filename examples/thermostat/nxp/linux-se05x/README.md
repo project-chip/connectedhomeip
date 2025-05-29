@@ -48,11 +48,13 @@ Use the config file `src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config
 
 /*
  * Enable se05x for PBKDF SHA256
+ * Not supported for SE052F
  */
 #define ENABLE_SE05X_PBKDF2_SHA256 0
 
 /*
  * Enable se05x for HKDF SHA256
+ * Not supported for SE052F
  */
 #define ENABLE_SE05X_HKDF_SHA256 1
 

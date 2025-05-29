@@ -54,11 +54,13 @@
 
 /*
  * Enable se05x for PBKDF SHA256
+ * Note: Not supported for SE052F.
  */
 #define ENABLE_SE05X_PBKDF2_SHA256 0
 
 /*
  * Enable se05x for HKDF SHA256
+ * Note: Not supported for SE052F.
  */
 #define ENABLE_SE05X_HKDF_SHA256 1
 
