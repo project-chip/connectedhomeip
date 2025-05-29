@@ -76,9 +76,9 @@ def generate_vid_verification_statement(fabric_index: int) -> bytes:
 
 class TC_RR_1_1(MatterBaseTest):
     def setup_class(self):
+        super().setup_class()
         self._pseudo_random_generator = random.Random(1234)
         self._subscriptions = []
-        super().setup_class()
 
     def teardown_class(self):
         logging.info("Teardown: shutting down all subscription to avoid racy callbacks")
@@ -206,10 +206,12 @@ class TC_RR_1_1(MatterBaseTest):
         # Step 1c - Set VIDVerificationStatement for initial fabric.
         current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
         vid_verification_statement = b''
-        if await self.command_guard(0, Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement):
+        if supports_vid_verification:
             logging.info("Step 1c, Set VIDVerificationStatmeent for initial fabric")
             vid_verification_statement = generate_vid_verification_statement(current_fabric_index)
             await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
+        else:
+            logging.info("Skipping VID verification as this is not supported on the device")
 
         fabric_table_entries_to_check[current_fabric_index] = FabricTableEntryToCheck(
             fabric_id=dev_ctrl.fabricId, node_id=self.dut_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=dev_ctrl.rootPublicKeyBytes)
