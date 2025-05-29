@@ -245,8 +245,8 @@ public:
     Ble::BleLayer * BleLayer() const { return mBleLayer; };
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAF::WiFiPAFLayer * WiFiPayLayer() const { return mWiFiPafLayer; };
- #endif
+    WiFiPAF::WiFiPAFLayer * WiFiPafLayer() const { return mWiFiPafLayer; };
+#endif
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
     chip::app::reporting::ReportScheduler * GetReportScheduler() const { return mReportScheduler; }
@@ -271,7 +271,7 @@ private:
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     WiFiPAF::WiFiPAFLayer * mWiFiPafLayer = nullptr;
- #endif
+#endif
     DeviceTransportMgr * mTransportMgr                                             = nullptr;
     SessionManager * mSessionMgr                                                   = nullptr;
     Protocols::SecureChannel::UnsolicitedStatusHandler * mUnsolicitedStatusHandler = nullptr;

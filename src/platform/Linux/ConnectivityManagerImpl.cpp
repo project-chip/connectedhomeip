@@ -1337,7 +1337,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     dataValue.reset(value);
     auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
-    GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
+    GetWiFiPafLayer()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
     /*
         Error Checking
