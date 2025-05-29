@@ -40,7 +40,7 @@ public:
     {
         kEstablishedCase,
         // Initially, we are starting with only one session type, but we are considering the future when we expand to allow
-        // other session types, such as establishing a CASE session
+        // other session types, such as establishing a CASE session.
     };
 
     enum class EventType
