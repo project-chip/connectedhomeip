@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 
 mbedtls_target = "//config/realtek/bee/mbedtls:mbedtls"
 
-chip_device_platform = "bee"
+chip_device_platform = "realtek_bee"
 chip_mdns = "platform"
 
 lwip_platform = "external"

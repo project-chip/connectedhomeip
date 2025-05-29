@@ -18,7 +18,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
-chip_device_platform = "bee"
+chip_device_platform = "realtek_bee"
 
 # ARM architecture flags will be set for Bee
 arm_platform_config = "//config/realtek/bee/bee_arm.gni"
