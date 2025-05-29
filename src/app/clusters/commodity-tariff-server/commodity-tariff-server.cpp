@@ -36,36 +36,30 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
-void LockThreadTask(void)
-{
+void LockThreadTask(void) {}
 
-}
+void UnlockThreadTask(void) {}
 
-void UnlockThreadTask(void)
-{
-
-}
-
-bool CommodityTariffDataProvider::TariffDataUpd_Init(const CommodityTariffPrimaryData& aNewData)
+bool CommodityTariffDataProvider::TariffDataUpd_Init(const CommodityTariffPrimaryData & aNewData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#define X(attrName, attrType) \
-    err = attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, this);
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-//TODO - Init the update cache
-
-/*
-#define X(attrName, attrType) \
-        if (!attrName##_MgmtObj.IsValid()) { \mServer
-            ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) is invalid", Attributes::attrName::Id); \
-            allValid = false; \
-        }
+#define X(attrName, attrType) err = attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, this);
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
-*/
+
+    // TODO - Init the update cache
+
+    /*
+    #define X(attrName, attrType) \
+            if (!attrName##_MgmtObj.IsValid()) { \mServer
+                ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) is invalid",
+    Attributes::attrName::Id); \
+                allValid = false; \
+            }
+        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+    #undef X
+    */
     if (err != CHIP_NO_ERROR)
     {
         return false;
@@ -76,15 +70,15 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 
 void CommodityTariffDataProvider::TariffDataUpd_Commit()
 {
-#define X(attrName, attrType) \
-    attrName##_MgmtObj.UpdateCommit();
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#define X(attrName, attrType) attrName##_MgmtObj.UpdateCommit();
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
-#define X(attrName, attrType) \
-    if (attrName##_MgmtObj.HasChanged()) { \
+#define X(attrName, attrType)                                                                                                      \
+    if (attrName##_MgmtObj.HasChanged())                                                                                           \
+    {                                                                                                                              \
         ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) updated", Attributes::attrName::Id); \
-        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, Attributes::attrName::Id); \
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, Attributes::attrName::Id);                        \
     }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
@@ -92,12 +86,11 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 
 void CommodityTariffDataProvider::TariffDataUpd_Abort()
 {
-#define X(attrName, attrType) \
-        attrName##_MgmtObj.UpdateAbort();
-COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#define X(attrName, attrType) attrName##_MgmtObj.UpdateAbort();
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
-//TODO - Deinit the update cache
+    // TODO - Deinit the update cache
 }
 
 bool CommodityTariffDataProvider::TariffDataUpd_Validator()
@@ -107,22 +100,22 @@ bool CommodityTariffDataProvider::TariffDataUpd_Validator()
         return false;
     }
 
-    //TODO - Use the update cache
+    // TODO - Use the update cache
 
-    //CheckDayEntries
-    //CheckDayPatterns
-    //CheckIndividualDays
+    // CheckDayEntries
+    // CheckDayPatterns
+    // CheckIndividualDays
 
-    //CheckTariffComponents
+    // CheckTariffComponents
 
-    //CheckTariffPeriods
+    // CheckTariffPeriods
 
-    //CalendarPeriods
+    // CalendarPeriods
 
     return true;
 }
 
-void CommodityTariffDataProvider::TariffDataUpdate(const CommodityTariffPrimaryData& newData)
+void CommodityTariffDataProvider::TariffDataUpdate(const CommodityTariffPrimaryData & newData)
 {
     if (!TariffDataUpd_Init(newData))
     {
@@ -140,7 +133,6 @@ void CommodityTariffDataProvider::TariffDataUpdate(const CommodityTariffPrimaryD
     }
     TariffDataUpd_Abort();
 }
-
 
 CHIP_ERROR CommodityTariffServer::Init()
 {
@@ -231,7 +223,7 @@ void CommodityTariffServer::InvokeCommand(HandlerContext & handlerContext)
     case GetTariffComponent::Id:
         HandleCommand<GetTariffComponent::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetTariffComponent(ctx, commandData); });
-        return;        
+        return;
     case GetDayEntry::Id:
         HandleCommand<GetDayEntry::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetDayEntry(ctx, commandData); });
@@ -239,13 +231,12 @@ void CommodityTariffServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-void CommodityTariffServer::HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData)
+void CommodityTariffServer::HandleGetTariffComponent(HandlerContext & ctx,
+                                                     const Commands::GetTariffComponent::DecodableType & commandData)
 {
     Commands::GetTariffComponentResponse::Type response;
 
-    Status status = mProvider.GetTariffComponentInfoById(commandData.tariffComponentID, 
-                                                         response.label,
-                                                         response.dayEntryIDs,
+    Status status = mProvider.GetTariffComponentInfoById(commandData.tariffComponentID, response.label, response.dayEntryIDs,
                                                          response.tariffComponent);
     if (status != Status::Success)
     {
