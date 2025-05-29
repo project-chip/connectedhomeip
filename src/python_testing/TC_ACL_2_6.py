@@ -275,5 +275,6 @@ class TC_ACL_2_6(MatterBaseTest):
 
         logging.info("No events found for invalid entry, as expected")
 
+
 if __name__ == "__main__":
     default_matter_test_main()

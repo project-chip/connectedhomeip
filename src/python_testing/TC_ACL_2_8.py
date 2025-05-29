@@ -150,7 +150,7 @@ class TC_ACL_2_8(MatterBaseTest):
         # Read CurrentFabricIndex for TH2
         f2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
         logging.info(f"CurrentFabricIndex F2 {str(f2)}")
-        
+
         self.step(5)
         # Get latest event number before writing events
         acec_event = Clusters.AccessControl.Events.AccessControlEntryChanged
@@ -252,14 +252,14 @@ class TC_ACL_2_8(MatterBaseTest):
         # Below event filtering and parsing is currently required in the event that the DUT is not reset before running this test.
         # First find the most recent "added" event
         added_events = [e for e in events if (
-            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and 
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
             e.Data.latestValue.subjects == [self.th1.nodeId]
         )]
         added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
 
         # Then find the most recent "changed" event that occurred after the "added" event
         changed_events = [e for e in events if (
-            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and 
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
             e.Data.latestValue.subjects == [self.th1.nodeId, 1111] and
             e.Header.EventNumber > added_event.Header.EventNumber
         )]
@@ -300,14 +300,14 @@ class TC_ACL_2_8(MatterBaseTest):
 
         # First find the most recent "added" event
         added_events = [e for e in events if (
-            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and 
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
             e.Data.latestValue.subjects == [self.th2.nodeId]
         )]
         added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
 
         # Then find the most recent "changed" event that occurred after the "added" event
         changed_events = [e for e in events if (
-            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and 
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
             e.Data.latestValue.subjects == [self.th2.nodeId, 2222] and
             e.Header.EventNumber > added_event.Header.EventNumber
         )]
