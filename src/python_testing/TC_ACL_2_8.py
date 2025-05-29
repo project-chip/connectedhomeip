@@ -138,9 +138,6 @@ class TC_ACL_2_8(MatterBaseTest):
         logging.info(f"CurrentFabricIndex F2 {str(f2)}")
 
         self.step(5)
-        # Get latest event number before writing events
-        acec_event = Clusters.AccessControl.Events.AccessControlEntryChanged
-
         # TH1 writes ACL attribute
         acl_struct = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=5,
