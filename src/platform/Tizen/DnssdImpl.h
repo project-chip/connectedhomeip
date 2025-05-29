@@ -113,7 +113,7 @@ struct ResolveContext : public GenericContext
 
     ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
                    void * context);
-    ~ResolveContext() = default;
+    ~ResolveContext() override;
 
     void Finalize(CHIP_ERROR error);
 };
