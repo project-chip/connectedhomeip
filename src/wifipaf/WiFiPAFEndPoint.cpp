@@ -70,6 +70,10 @@
 #define WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD 1
 
 #define WIFIPAF_ACK_SEND_TIMEOUT_MS 2500
+#define WIFIPAF_WAIT_RES_TIMEOUT_MS 1000
+// Drop the connection if network resources remain unavailable for the period.
+// Known condition: If the remote side is awaiting an ACK packet, the wait time must not exceed PAFTP_ACK_TIMEOUT_MS.
+#define WIFIPAF_MAX_RESOURCE_BLOCK_COUNT (PAFTP_ACK_TIMEOUT_MS / WIFIPAF_WAIT_RES_TIMEOUT_MS)
 
 /**
  *  @def WIFIPAF_WINDOW_NO_ACK_SEND_THRESHOLD
@@ -245,6 +249,7 @@ void WiFiPAFEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR 
             // Cancel send and receive-ack timers, if running.
             StopAckReceivedTimer();
             StopSendAckTimer();
+            StopWaitResourceTimer();
             mConnStateFlags.Set(ConnectionStateFlag::kOperationInFlight);
         }
         else
@@ -275,6 +280,7 @@ void WiFiPAFEndPoint::Free()
     StopConnectTimer();
     StopAckReceivedTimer();
     StopSendAckTimer();
+    StopWaitResourceTimer();
 
     // Clear callbacks.
     mOnPafSubscribeComplete = nullptr;
@@ -596,6 +602,14 @@ CHIP_ERROR WiFiPAFEndPoint::DriveSending()
         // Can't send anything.
         return CHIP_NO_ERROR;
     }
+
+    if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable())
+    {
+        // Resource is currently unavailable, send packets later
+        StartWaitResourceTimer();
+        return CHIP_NO_ERROR;
+    }
+    mResourceWaitCount = 0;
 
     // Otherwise, let's see what we can send.
     if ((!mAckToSend.IsNull()) && !mConnStateFlags.Has(ConnectionStateFlag::kStandAloneAckInFlight))
@@ -1175,6 +1189,27 @@ CHIP_ERROR WiFiPAFEndPoint::StartSendAckTimer()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WiFiPAFEndPoint::StartWaitResourceTimer()
+{
+    mResourceWaitCount++;
+    if (mResourceWaitCount >= WIFIPAF_MAX_RESOURCE_BLOCK_COUNT)
+    {
+        ChipLogError(WiFiPAF, "Network resource has been unavailable for a long time");
+        mResourceWaitCount = 0;
+        DoClose(kWiFiPAFCloseFlag_AbortTransmission, CHIP_ERROR_NOT_CONNECTED);
+        return CHIP_NO_ERROR;
+    }
+    if (!mTimerStateFlags.Has(TimerStateFlag::kWaitResTimerRunning))
+    {
+        ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "starting new SendAckTimer");
+        const CHIP_ERROR timerErr = mWiFiPafLayer->mSystemLayer->StartTimer(
+            System::Clock::Milliseconds32(WIFIPAF_WAIT_RES_TIMEOUT_MS), HandleWaitResourceTimeout, this);
+        ReturnErrorOnFailure(timerErr);
+        mTimerStateFlags.Set(TimerStateFlag::kWaitResTimerRunning);
+    }
+    return CHIP_NO_ERROR;
+}
+
 void WiFiPAFEndPoint::StopConnectTimer()
 {
     // Cancel any existing connect timer.
@@ -1194,6 +1229,13 @@ void WiFiPAFEndPoint::StopSendAckTimer()
     // Cancel any existing send-ack timer.
     mWiFiPafLayer->mSystemLayer->CancelTimer(HandleSendAckTimeout, this);
     mTimerStateFlags.Clear(TimerStateFlag::kSendAckTimerRunning);
+}
+
+void WiFiPAFEndPoint::StopWaitResourceTimer()
+{
+    // Cancel any existing wait-resource timer.
+    mWiFiPafLayer->mSystemLayer->CancelTimer(HandleWaitResourceTimeout, this);
+    mTimerStateFlags.Clear(TimerStateFlag::kWaitResTimerRunning);
 }
 
 void WiFiPAFEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState)
@@ -1241,6 +1283,22 @@ void WiFiPAFEndPoint::HandleSendAckTimeout(chip::System::Layer * systemLayer, vo
             {
                 ep->DoClose(kWiFiPAFCloseFlag_AbortTransmission, sendErr);
             }
+        }
+    }
+}
+
+void WiFiPAFEndPoint::HandleWaitResourceTimeout(chip::System::Layer * systemLayer, void * appState)
+{
+    WiFiPAFEndPoint * ep = static_cast<WiFiPAFEndPoint *>(appState);
+
+    // Check for event-based timer race condition.
+    if (ep->mTimerStateFlags.Has(TimerStateFlag::kWaitResTimerRunning))
+    {
+        ep->mTimerStateFlags.Clear(TimerStateFlag::kWaitResTimerRunning);
+        CHIP_ERROR sendErr = ep->DriveSending();
+        if (sendErr != CHIP_NO_ERROR)
+        {
+            ep->DoClose(kWiFiPAFCloseFlag_AbortTransmission, sendErr);
         }
     }
 }

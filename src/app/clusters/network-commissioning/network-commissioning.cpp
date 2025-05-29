@@ -148,11 +148,6 @@ public:
         mStatus(status), mDebugText(debugText), mNetworks(networks)
     {}
 
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
-    {
-        return EncodeTo(writer, tag);
-    }
-
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override;
 
 private:
@@ -218,11 +213,6 @@ public:
     ThreadScanResponseToTLV(Status status, CharSpan debugText, ThreadScanResponseIterator * networks) :
         mStatus(status), mDebugText(debugText), mNetworks(networks)
     {}
-
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
-    {
-        return EncodeTo(writer, tag);
-    }
 
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override;
 
