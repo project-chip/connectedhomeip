@@ -46,6 +46,8 @@ class TC_ACL_2_8(MatterBaseTest):
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        if not events:
+            raise AssertionError(f"No events found for {acec_event} to determine the latest event number.")
         return max([e.Header.EventNumber for e in events])
 
     def _verify_acl_event(
@@ -108,22 +110,6 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(1)
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
-        '''
-        # Reset ACL to only include admin entry
-        acl_attr = Clusters.AccessControl.Attributes.Acl
-        admin_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=5,  # Administer privilege
-            authMode=2,   # CASE
-            subjects=[self.th1.nodeId],
-            targets=NullValue
-        )
-        result = await self.th1.WriteAttribute(
-            self.dut_node_id,
-            [(0, acl_attr(value=[admin_entry]))]
-        )
-        asserts.assert_equal(result[0].Status, Status.Success, "Failed to reset ACL entries")
-        logging.info("Reset ACL entries to admin-only")
-        '''
 
         self.step(2)
         # Read CurrentFabricIndex for TH1
@@ -154,7 +140,6 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(5)
         # Get latest event number before writing events
         acec_event = Clusters.AccessControl.Events.AccessControlEntryChanged
-        start_event_number = await self.get_latest_event_number(acec_event)
 
         # TH1 writes ACL attribute
         acl_struct = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -255,6 +240,7 @@ class TC_ACL_2_8(MatterBaseTest):
             e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
             e.Data.latestValue.subjects == [self.th1.nodeId]
         )]
+        asserts.assert_true(len(added_events) > 0, "Expected 'added' event for TH1 not found")
         added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
 
         # Then find the most recent "changed" event that occurred after the "added" event
@@ -263,6 +249,7 @@ class TC_ACL_2_8(MatterBaseTest):
             e.Data.latestValue.subjects == [self.th1.nodeId, 1111] and
             e.Header.EventNumber > added_event.Header.EventNumber
         )]
+        asserts.assert_true(len(changed_events) > 0, "Expected 'changed' event for TH1 not found after the 'added' event")
         changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
 
         relevant_events = [added_event, changed_event]
@@ -303,6 +290,7 @@ class TC_ACL_2_8(MatterBaseTest):
             e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
             e.Data.latestValue.subjects == [self.th2.nodeId]
         )]
+        asserts.assert_true(len(added_events) > 0, "Expected 'added' event for TH2 not found")
         added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
 
         # Then find the most recent "changed" event that occurred after the "added" event
@@ -311,6 +299,7 @@ class TC_ACL_2_8(MatterBaseTest):
             e.Data.latestValue.subjects == [self.th2.nodeId, 2222] and
             e.Header.EventNumber > added_event.Header.EventNumber
         )]
+        asserts.assert_true(len(changed_events) > 0, "Expected 'changed' event for TH2 not found after the 'added' event")
         changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
 
         relevant_events = [added_event, changed_event]

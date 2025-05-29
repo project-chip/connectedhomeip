@@ -42,16 +42,20 @@ from mobly import asserts
 
 
 class TC_ACL_2_6(MatterBaseTest):
-    async def get_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged, altitude: str) -> int:
-        if altitude == "min":
-            event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-            events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
-            return events[0].Header.EventNumber  # fallback to first event if no match found
+    async def get_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged, altitude: str) -> int:
+        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
 
-        if altitude == "max":
-            event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-            events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
-            return max([e.Header.EventNumber for e in events])
+        if not events:
+            raise AssertionError(f"No events found for {acec_event} to determine {altitude} event number.")
+
+        if altitude == "min":
+            return min(e.Header.EventNumber for e in events)
+        elif altitude == "max":
+            return max(e.Header.EventNumber for e in events)
+        else:
+            # It might be good to raise an error for an unexpected altitude value.
+            raise ValueError(f"Invalid altitude specified: {altitude}")
 
     # Compare events by their relevant fields instead of string representation
     def event_key(self, event):
