@@ -86,8 +86,7 @@ __attribute__((const)) void * LoggerForModule(LogModule moduleId);
     do                                                                                                                             \
     {                                                                                                                              \
         _Pragma("clang diagnostic push");                                                                                          \
-        _Pragma("clang diagnostic ignored \"-Wshadow\"");                                                                          \
-        using os_log_t = ::os_log_t __unsafe_unretained;                                                                           \
+        _Pragma("clang diagnostic ignored \"-Wshadow\"") /* issue #39135 */ using os_log_t = ::os_log_t __unsafe_unretained;       \
         os_log_with_type((__bridge os_log_t) log, type, fmt, ##__VA_ARGS__);                                                       \
         _Pragma("clang diagnostic pop");                                                                                           \
     } while (0)
