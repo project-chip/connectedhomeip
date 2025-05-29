@@ -218,19 +218,12 @@ class AVSUMTestBase:
         feature_map = await self.read_avstr_attribute_expect_success(endpoint, attrs.FeatureMap)
         watermark = True if (feature_map & cluster.Bitmaps.Feature.kWatermark) != 0 else None
         osd = True if (feature_map & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
-        #has_feature_watermark = (feature_map & cluster.Bitmaps.Feature.kWatermark) != 0
-        #has_feature_osd = (feature_map & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0
 
         # Get the parms from the device (those which are available)
         aStreamUsagePriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.StreamUsagePriorities)
         aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
         aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
         aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
-        #watermark = osd = None
-        # if has_feature_watermark:
-        #    watermark = True
-        # if has_feature_osd:
-        #    osd = True
 
         try:
             response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
