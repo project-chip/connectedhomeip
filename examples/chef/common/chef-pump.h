@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -14,27 +15,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <platform/NetworkCommissioning.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/attribute-metadata.h>
+#include <app/util/config.h>
+#include <protocols/interaction_model/StatusCode.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace NetworkCommissioning {
+namespace chef {
+namespace pump {
 
-// NetworkDriver for the devices that don't have / don't need a real network driver.
-class NullNetworkDriver : public DeviceLayer::NetworkCommissioning::EthernetDriver
-{
-public:
-    ~NullNetworkDriver() override = default;
+void postMoveToLevel(chip::EndpointId endpoint, uint8_t level);
 
-    uint8_t GetMaxNetworks() override { return 1; }
-    DeviceLayer::NetworkCommissioning::NetworkIterator * GetNetworks() override { return nullptr; }
-    bool GetEnabled() override { return false; }
-};
+void postOnOff(chip::EndpointId endpoint, bool value);
 
-} // namespace NetworkCommissioning
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void init();
+
+} // namespace pump
+} // namespace chef

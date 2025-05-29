@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -122,7 +123,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::InstantAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -161,7 +161,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::InstantActionWithTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -201,7 +200,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -240,7 +238,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -280,7 +277,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StopAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -318,7 +314,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PauseAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -357,7 +352,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PauseActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -397,7 +391,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResumeAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -435,7 +428,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -474,7 +466,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -514,7 +505,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DisableAction::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -553,7 +543,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DisableActionWithDuration::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;

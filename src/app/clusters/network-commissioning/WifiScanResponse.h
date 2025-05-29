@@ -35,11 +35,6 @@ public:
         mDebugText(debugText), mNetworks(networks)
     {}
 
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
-    {
-        return EncodeTo(writer, tag);
-    }
-
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override;
 
 private:
