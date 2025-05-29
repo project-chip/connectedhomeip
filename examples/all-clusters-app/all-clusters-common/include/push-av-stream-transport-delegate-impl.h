@@ -55,11 +55,18 @@ public:
 
     bool ValidateUrl(std::string url);
 
-    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
-    CHIP_ERROR ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                      const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
-    PushAvStreamTransportStatusEnum GetTransportStatus(const uint16_t connectionID);
+    Protocols::InteractionModel::Status ValidateBandwidthLimit(StreamUsageEnum streamUsage,
+                                                               const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                               const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
+    Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId);
+
+    Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId);
+
+    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId);
+
+    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId);
+
+    PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID);
 
     void OnAttributeChanged(AttributeId attributeId);
     CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorageWithFabricIndex> & currentConnections);

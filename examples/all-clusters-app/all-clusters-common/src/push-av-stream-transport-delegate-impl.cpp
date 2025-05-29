@@ -105,13 +105,14 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     return Status::Success;
 }
 
-CHIP_ERROR PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage,
-                                                                const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+Protocols::InteractionModel::Status
+PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage,
+                                                     const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                     const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
     // TODO: Validates the requested stream usage against the camera's resource management.
-    // Returning CHIP_NO_ERROR to pass through checks in the Server Implementation.
-    return CHIP_NO_ERROR;
+    // Returning Status::Success to pass through checks in the Server Implementation.
+    return Status::Success;
 }
 
 bool PushAvStreamTransportManager::ValidateUrl(std::string url)
@@ -119,17 +120,37 @@ bool PushAvStreamTransportManager::ValidateUrl(std::string url)
     return true;
 }
 
-CHIP_ERROR
-PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                                  const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                  const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectVideoStream(StreamUsageEnum streamUsage,
+                                                                                    uint16_t & videoStreamId)
 {
-    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
-    // Returning CHIP_NO_ERROR to pass through checks in the Server Implementation.
-    return CHIP_NO_ERROR;
+    // TODO: Select and Assign videoStreamID from the allocated videoStreams
+    // Returning Status::Success to pass through checks in the Server Implementation.
+    return Status::Success;
 }
 
-PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportStatus(const uint16_t connectionID)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectAudioStream(StreamUsageEnum streamUsage,
+                                                                                    uint16_t & audioStreamId)
+{
+    // TODO: Select and Assign audioStreamID from the allocated audioStreams
+    // Returning Status::Success to pass through checks in the Server Implementation.
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateVideoStream(uint16_t videoStreamId)
+{
+    // TODO: Validate videoStreamID from the allocated videoStreams
+    // Returning Status::Success to pass through checks in the Server Implementation.
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateAudioStream(uint16_t audioStreamId)
+{
+    // TODO: Validate audioStreamID from the allocated audioStreams
+    // Returning Status::Success to pass through checks in the Server Implementation.
+    return Status::Success;
+}
+
+PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportBusyStatus(const uint16_t connectionID)
 {
     for (PushAvStream & stream : pushavStreams)
     {

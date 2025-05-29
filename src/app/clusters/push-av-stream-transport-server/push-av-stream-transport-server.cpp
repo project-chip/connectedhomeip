@@ -261,6 +261,18 @@ PushAvStreamTransportServer::FindStreamTransportConnection(const uint16_t connec
     return nullptr;
 }
 
+TransportConfigurationStorageWithFabricIndex *
+PushAvStreamTransportServer::FindStreamTransportConnectionWithinFabric(const uint16_t connectionID, FabricIndex fabricIndex)
+{
+    for (auto & transportConnection : mCurrentConnections)
+    {
+        if (transportConnection.transportConfiguration.connectionID == connectionID &&
+            transportConnection.fabricIndex == fabricIndex)
+            return &transportConnection;
+    }
+    return nullptr;
+}
+
 uint16_t PushAvStreamTransportServer::GenerateConnectionID()
 {
     static uint16_t lastID = 0;
@@ -548,35 +560,14 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         return;
     }
 
-    // Validate ZoneId
+    // Todo:Validate ZoneId
 
     // Validate Bandwidth Requirement
-    CHIP_ERROR err = mDelegate.ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,
-                                                      transportOptions.audioStreamID);
-    if (err != CHIP_NO_ERROR)
+    Status status = mDelegate.ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,
+                                                     transportOptions.audioStreamID);
+    if (status != Status::Success)
     {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Resource Exhausted",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
-        return;
-    }
-
-    // Validate the StreamUsageEnum as per resource management and stream priorities.
-    err =
-        mDelegate.ValidateStreamUsage(transportOptions.streamUsage, transportOptions.videoStreamID, transportOptions.audioStreamID);
-    if (err != CHIP_NO_ERROR)
-    {
-        auto status = to_underlying(StatusCodeEnum::kInvalidStream);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Stream", AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
-        return;
-    }
-
-    uint16_t connectionID = GenerateConnectionID();
-
-    if (connectionID == kMaxConnectionId)
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Max Connections Exhausted",
                      AttributeAccessInterface::GetEndpointId().Value());
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
         return;
@@ -592,9 +583,73 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         return;
     }
 
+    if (transportOptions.videoStreamID.HasValue())
+    {
+        if (transportOptions.videoStreamID.Value().IsNull() == true)
+        {
+            uint16_t videoStreamID;
+
+            auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                mDelegate.SelectVideoStream(transportOptions.streamUsage, videoStreamID));
+
+            if (delegateStatus.IsSuccess() == false)
+            {
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
+                return;
+            }
+
+            transportOptionsPtr->videoStreamID.SetValue(videoStreamID);
+        }
+        else
+        {
+            auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                mDelegate.ValidateVideoStream(transportOptions.videoStreamID.Value().Value()));
+
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
+            return;
+        }
+    }
+
+    if (transportOptions.audioStreamID.HasValue() && transportOptions.audioStreamID.Value().IsNull())
+    {
+        if (transportOptions.audioStreamID.Value().IsNull() == true)
+        {
+            uint16_t audioStreamID;
+
+            auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                mDelegate.SelectAudioStream(transportOptions.streamUsage, audioStreamID));
+
+            if (delegateStatus.IsSuccess() == false)
+            {
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
+                return;
+            }
+
+            transportOptionsPtr->audioStreamID.SetValue(audioStreamID);
+        }
+        else
+        {
+            auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                mDelegate.ValidateAudioStream(transportOptions.videoStreamID.Value().Value()));
+
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
+            return;
+        }
+    }
+
+    uint16_t connectionID = GenerateConnectionID();
+
+    if (connectionID == kMaxConnectionId)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Max Connections Exhausted",
+                     AttributeAccessInterface::GetEndpointId().Value());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+        return;
+    }
+
     TransportConfigurationStorage outTransportConfiguration(connectionID, transportOptionsPtr);
 
-    Status status = mDelegate.AllocatePushTransport(*transportOptionsPtr, connectionID);
+    status = mDelegate.AllocatePushTransport(*transportOptionsPtr, connectionID);
 
     if (status == Status::Success)
     {
@@ -623,17 +678,11 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 void PushAvStreamTransportServer::HandleDeallocatePushTransport(
     HandlerContext & ctx, const Commands::DeallocatePushTransport::DecodableType & commandData)
 {
-    uint16_t connectionID                                                 = commandData.connectionID;
-    TransportConfigurationStorageWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID);
+    uint16_t connectionID   = commandData.connectionID;
+    FabricIndex FabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    TransportConfigurationStorageWithFabricIndex * transportConfiguration =
+        FindStreamTransportConnectionWithinFabric(connectionID, FabricIndex);
     if (transportConfiguration == nullptr)
-    {
-        ChipLogError(Zcl, "HandleDeallocatePushTransport[ep=%d]: ConnectionID Not Found.",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-        return;
-    }
-
-    if (transportConfiguration->fabricIndex != ctx.mCommandHandler.GetAccessingFabricIndex())
     {
         ChipLogError(Zcl, "HandleDeallocatePushTransport[ep=%d]: ConnectionID Not Found.",
                      AttributeAccessInterface::GetEndpointId().Value());
@@ -772,7 +821,10 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    TransportConfigurationStorageWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID);
+    FabricIndex fabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+
+    TransportConfigurationStorageWithFabricIndex * transportConfiguration =
+        FindStreamTransportConnectionWithinFabric(connectionID, fabricIndex);
 
     if (transportConfiguration == nullptr)
     {
@@ -782,15 +834,7 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
         return;
     }
 
-    if (transportConfiguration->fabricIndex != ctx.mCommandHandler.GetAccessingFabricIndex())
-    {
-        ChipLogError(Zcl, "HandleModifyPushTransport[ep=%d]: ConnectionID Not Found.",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-        return;
-    }
-
-    if (mDelegate.GetTransportStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
+    if (mDelegate.GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
     {
         ChipLogError(Zcl, "HandleModifyPushTransport[ep=%d]: Connection is Busy",
                      AttributeAccessInterface::GetEndpointId().Value());
@@ -838,15 +882,10 @@ void PushAvStreamTransportServer::HandleSetTransportStatus(HandlerContext & ctx,
     }
     else
     {
-        TransportConfigurationStorageWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID.Value());
+        FabricIndex fabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+        TransportConfigurationStorageWithFabricIndex * transportConfiguration =
+            FindStreamTransportConnectionWithinFabric(connectionID.Value(), fabricIndex);
         if (transportConfiguration == nullptr)
-        {
-            ChipLogError(Zcl, "HandleSetTransportStatus[ep=%d]: ConnectionID Not Found.",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-            return;
-        }
-        if (transportConfiguration->fabricIndex != ctx.mCommandHandler.GetAccessingFabricIndex())
         {
             ChipLogError(Zcl, "HandleSetTransportStatus[ep=%d]: ConnectionID Not Found.",
                          AttributeAccessInterface::GetEndpointId().Value());
@@ -903,7 +942,9 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
         });
     }
 
-    TransportConfigurationStorageWithFabricIndex * transportConfiguration = FindStreamTransportConnection(connectionID);
+    FabricIndex fabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    TransportConfigurationStorageWithFabricIndex * transportConfiguration =
+        FindStreamTransportConnectionWithinFabric(connectionID, fabricIndex);
 
     if (transportConfiguration == nullptr)
     {
@@ -913,15 +954,7 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
         return;
     }
 
-    if (transportConfiguration->fabricIndex != ctx.mCommandHandler.GetAccessingFabricIndex())
-    {
-        ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: ConnectionID Not Found.",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-        return;
-    }
-
-    if (mDelegate.GetTransportStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
+    if (mDelegate.GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
     {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Connection is Busy",
                      AttributeAccessInterface::GetEndpointId().Value());
@@ -1007,8 +1040,9 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
     }
     else
     {
+        FabricIndex fabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
         TransportConfigurationStorageWithFabricIndex * transportConfiguration =
-            FindStreamTransportConnection(connectionID.Value().Value());
+            FindStreamTransportConnectionWithinFabric(connectionID.Value().Value(), fabricIndex);
         if (transportConfiguration == nullptr)
         {
             ChipLogError(Zcl, "HandleFindTransport[ep=%d]: ConnectionID not found",
@@ -1016,13 +1050,7 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
             return;
         }
-        if (transportConfiguration->fabricIndex != ctx.mCommandHandler.GetAccessingFabricIndex())
-        {
-            ChipLogError(Zcl, "HandleFindTransport[ep=%d]: ConnectionID Not Found.",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-            return;
-        }
+
         transportConfigurations.push_back(transportConfiguration->transportConfiguration);
     }
 

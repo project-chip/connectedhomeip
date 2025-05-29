@@ -52,7 +52,7 @@ enum class PushAvStreamTransportStatusEnum : uint8_t
 
 struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 {
-    TransportTriggerOptionsStorage(){};
+    TransportTriggerOptionsStorage() {};
 
     TransportTriggerOptionsStorage(const TransportTriggerOptionsStorage & aTransportTriggerOptionsStorage)
     {
@@ -120,7 +120,7 @@ private:
 
 struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 {
-    CMAFContainerOptionsStorage(){};
+    CMAFContainerOptionsStorage() {};
 
     CMAFContainerOptionsStorage(const CMAFContainerOptionsStorage & aCMAFContainerOptionsStorage)
     {
@@ -197,7 +197,7 @@ private:
 
 struct ContainerOptionsStorage : public ContainerOptionsStruct
 {
-    ContainerOptionsStorage(){};
+    ContainerOptionsStorage() {};
 
     ContainerOptionsStorage(const ContainerOptionsStorage & aContainerOptionsStorage) { *this = aContainerOptionsStorage; }
 
@@ -233,7 +233,7 @@ private:
 
 struct TransportOptionsStorage : public TransportOptionsStruct
 {
-    TransportOptionsStorage(){};
+    TransportOptionsStorage() {};
 
     TransportOptionsStorage(const TransportOptionsStorage & aTransportOptionsStorage) { *this = aTransportOptionsStorage; }
 
@@ -467,30 +467,57 @@ transmission ends.
      * @param[in] videoStreamId  Optional identifier for the requested video stream.
      * @param[in] audioStreamId  Optional identifier for the requested audio stream.
      *
-     * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
+     * @return Status::Success if the stream usage is valid; and Status::ResourceExhausted otherwise.
      */
 
-    virtual CHIP_ERROR ValidateBandwidthLimit(StreamUsageEnum streamUsage,
-                                              const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                              const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+    virtual Protocols::InteractionModel::Status
+    ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
 
     /**
-     * @brief Validates the requested stream usage against the camera's resource management
-     *        and stream priority policies.
-     *
-     * The implementation SHALL ensure:
-     *  - The requested stream usage (streamUsage) is allowed given the current allocation of
-     *    camera resources (e.g. CPU, memory, network bandwidth) and the prioritized stream list.
+     * @brief Assign an existing Video Stream as per the camera's resource management and stream priority policies using requested
+     * stream usage.
      *
      * @param[in] streamUsage    The desired usage type for the stream (e.g. live view, recording, etc.).
-     * @param[in] videoStreamId  Optional identifier for the requested video stream.
-     * @param[in] audioStreamId  Optional identifier for the requested audio stream.
+     * @param[in] videoStreamId  Identifier for the requested video stream.
      *
-     * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
+     * @return Assign the selected videoStreamID and return Status::Success. Return Status::InvalidStream if there are no allocated
+     * VideoStream.
      */
-    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+    virtual Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) = 0;
+    /**
+     * @brief Assign an existing Audio Stream as per the camera's resource management and stream priority policies using requested
+     * stream usage.
+     *
+     * @param[in] streamUsage    The desired usage type for the stream (e.g. live view, recording, etc.).
+     * @param[in] audioStreamId  Identifier for the requested audio stream.
+     *
+     * @return Assign the selected audioStreamID and return Status::Success. Return Status::InvalidStream if there are no allocated
+     * audioStream.
+     */
+
+    virtual Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) = 0;
+    /**
+     * @brief Validate that the videoStream corresponding to the videoStreamID is allocated.
+     *
+     * @param[in] videoStreamId  Identifier for the requested video stream.
+     *
+     * @return Status::Success if there is an allocated video stream. Return Status::InvalidStream if there are no allocated
+     * video stream with videoStreamID.
+     */
+
+    virtual Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) = 0;
+
+    /**
+     * @brief Validate that the audioStream corresponding to the audioStreamID is allocated.
+     *
+     * @param[in] audioStreamId  Identifier for the requested audio stream.
+     *
+     * @return Status::Success if there is an allocated audio stream. Return Status::InvalidStream if there are no allocated
+     * audio stream with audioStreamID.
+     */
+
+    virtual Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) = 0;
 
     /**
      * @brief Gets the status of the transport
@@ -499,7 +526,7 @@ transmission ends.
      *
      * @return busy if transport is uploading else idle
      */
-    virtual PushAvStreamTransportStatusEnum GetTransportStatus(const uint16_t connectionID) = 0;
+    virtual PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) = 0;
 
     /**
      *   @brief Delegate callback for notifying change in an attribute.
@@ -617,6 +644,9 @@ private:
     uint16_t GenerateConnectionID();
 
     TransportConfigurationStorageWithFabricIndex * FindStreamTransportConnection(const uint16_t connectionID);
+
+    TransportConfigurationStorageWithFabricIndex * FindStreamTransportConnectionWithinFabric(const uint16_t connectionID,
+                                                                                             FabricIndex fabricIndex);
 
     // Add/Remove Management functions for transport
     UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStorageWithFabricIndex & transportConfiguration);
