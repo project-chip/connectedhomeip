@@ -188,6 +188,16 @@ tests:
               minValue: MinLevelFeatureMapNotSupportedValue
               maxValue: MaxLevelFeatureMapNotSupportedValue
 
+    - label: "Step 9c: TH reads the OnLevel attribute from the DUT"
+      PICS: LVL.S.A0011 && !LVL.S.F01 && !LVL.S.A0002 && !LVL.S.A0003
+      command: "readAttribute"
+      attribute: "OnLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
     - label: "Step 10: TH reads the OnTransitionTime attribute from the DUT"
       PICS: LVL.S.A0012
       command: "readAttribute"

@@ -97,7 +97,8 @@ async def main():
 
     # TODO: Start at stage 2 once handling for arming failsafe on pase is done.
     if options.report:
-        for testFailureStage in range(3, 21):
+        # [kArmFailsafe, kConfigureTrustedTimeSource] (inclusive). TODO: https://github.com/project-chip/connectedhomeip/issues/36629
+        for testFailureStage in range(3, 20):
             FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
                                               setuppin=20202021,
                                               nodeid=1),
@@ -106,7 +107,8 @@ async def main():
                       "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
 
     else:
-        for testFailureStage in range(3, 21):
+        # [kArmFailsafe, kConfigureTrustedTimeSource] (inclusive). TODO: https://github.com/project-chip/connectedhomeip/issues/36629
+        for testFailureStage in range(3, 20):
             FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
                                               setuppin=20202021,
                                               nodeid=1),

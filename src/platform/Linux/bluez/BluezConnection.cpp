@@ -29,7 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
 #include <system/SystemPacketBuffer.h>

@@ -66,6 +66,11 @@
 
 #define MAX_PWM_CHANNEL 1
 
+#elif defined(BL704LDK)
+#define LED_PIN_PORT 1
+#define LED_PIN 18
+
+#define MAX_PWM_CHANNEL 1
 #else
 
 #define LED_PIN_PORT 2

@@ -61,7 +61,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
-#define MEMP_NUM_UDP_PCB 8
+#define MEMP_NUM_UDP_PCB 12
 
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
    connections. */
@@ -77,10 +77,6 @@ a lot of data that needs to be copied, this should be set high. */
 #define MEMP_NUM_SYS_TIMEOUT (LWIP_NUM_SYS_TIMEOUT_INTERNAL + 8 + 3)
 
 #define MEMP_NUM_NETCONN (MEMP_NUM_TCP_PCB + MEMP_NUM_UDP_PCB + MEMP_NUM_TCP_PCB_LISTEN)
-
-/* ---------- Pbuf options ---------- */
-/* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
-#define PBUF_POOL_SIZE 20
 
 /* ---------- TCP options ---------- */
 #define LWIP_TCP 1
@@ -269,16 +265,36 @@ a lot of data that needs to be copied, this should be set high. */
 
 #define LWIP_NETIF_EXT_STATUS_CALLBACK 1
 
-/* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
 #define PBUF_POOL_BUFSIZE LWIP_MEM_ALIGN_SIZE(TCP_MSS + 40 + PBUF_LINK_ENCAPSULATION_HLEN + PBUF_LINK_HLEN)
-
-#define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
 
 /*
    ---------------------------------
    ---------- MISC. options ----------
    ---------------------------------
 */
+
+#if defined(CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM) && CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
+#define PBUF_POOL_SIZE 0
+#define MEM_LIBC_MALLOC 0
+#define MEM_USE_POOLS 0
+#define MEMP_USE_CUSTOM_POOLS 0
+
+#include <lwip/arch.h>
+#include <lwip/mem.h>
+#define LWIP_PBUF_CUSTOM_DATA mem_size_t pool;
+
+#if defined(__cplusplus)
+extern "C" const mem_size_t * memp_sizes;
+extern "C" struct pbuf * pbuf_rightsize(struct pbuf * p, s16_t offset);
+#else
+extern const mem_size_t * memp_sizes;
+extern struct pbuf * pbuf_rightsize(struct pbuf * p, s16_t offset);
+#endif
+#else
+
+#define PBUF_POOL_SIZE 20
+#define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
+#endif
 
 #if defined(__cplusplus)
 extern "C" int bl_rand(void);

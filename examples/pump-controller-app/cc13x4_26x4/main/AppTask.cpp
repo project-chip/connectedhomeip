@@ -38,11 +38,12 @@
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
@@ -52,7 +53,7 @@
 #include <ti/drivers/apps/LED.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_UAT
-#include "app/icd/server/ICDNotifier.h"
+#include "app/icd/server/ICDNotifier.h" // nogncheck
 #endif
 
 /* syscfg */
@@ -130,6 +131,10 @@ static const uint32_t sIdentifyBlinkRateMs        = 500;
 
 ::Identify stIdentify = { sIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                           Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::TriggerIdentifyEffectHandler };
+
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+static bool sitModeRequested;
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS
 
 int AppTask::StartAppTask()
 {
@@ -301,6 +306,7 @@ int AppTask::Init()
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     chip::Server::GetInstance().Init(initParams);
 
     ret = PlatformMgr().StartEventLoopTask();
@@ -464,9 +470,29 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
 #if CHIP_CONFIG_ENABLE_ICD_UAT
+            PLAT_LOG("Enabled UAT");
             PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 #endif
         }
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+        else if (AppEvent::kAppEventButtonType_DoubleClicked == aEvent->ButtonEvent.Type)
+        {
+            if (!sitModeRequested)
+            {
+                chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                    [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
+                sitModeRequested = true;
+                PLAT_LOG("Enabled SIT in DSLS");
+            }
+            else
+            {
+                chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                    [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+                sitModeRequested = false;
+                PLAT_LOG("Enabled LIT in DSLS");
+            }
+        }
+#endif
         break;
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
@@ -609,6 +635,12 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
     {
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
     }
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+    else if (events & Button_EV_DOUBLECLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_DoubleClicked;
+    }
+#endif
     // button callbacks are in ISR context
     if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
     {
@@ -650,7 +682,7 @@ void AppTask::uiInit(void)
     Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
 
     Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED | Button_EV_DOUBLECLICKED;
     buttonParams.longPressDuration = 1000U; // ms
     sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(sAppRightHandle, ButtonRightEventHandler);

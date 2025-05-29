@@ -72,6 +72,7 @@ external_content_contents = [
     (MATTER_BASE, "examples/**/*.JPG"),
     (MATTER_BASE, "src/tools/**/*.md"),
     (MATTER_BASE, "scripts/tools/**/*.md"),
+    (MATTER_BASE, "scripts/tools/**/*.png"),
 ]
 external_content_link_prefixes = [
     "src/",

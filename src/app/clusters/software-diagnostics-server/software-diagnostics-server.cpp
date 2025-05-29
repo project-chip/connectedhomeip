@@ -15,11 +15,8 @@
  *    limitations under the License.
  */
 
-#include "software-diagnostics-server.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
+#include "software-fault-listener.h"
+
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
@@ -28,7 +25,9 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/SoftwareDiagnostics/Events.h>
 #include <lib/core/Optional.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
@@ -41,11 +40,11 @@ using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
-class SoftwareDiagosticsAttrAccess : public AttributeAccessInterface
+class SoftwareDiagnosticsAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
-    SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
+    SoftwareDiagnosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -65,11 +64,11 @@ public:
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 };
 
-SoftwareDiagosticsAttrAccess gAttrAccess;
+SoftwareDiagnosticsAttrAccess gAttrAccess;
 
 SoftwareDiagnosticsCommandHandler gCommandHandler;
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != SoftwareDiagnostics::Id)
     {
@@ -103,8 +102,8 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(uint64_t &),
-                                                         AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagnosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(uint64_t &),
+                                                          AttributeValueEncoder & aEncoder)
 {
     uint64_t data;
     CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);
@@ -120,7 +119,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticD
     return aEncoder.Encode(data);
 }
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagnosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::ThreadMetrics * threadMetrics;
@@ -182,54 +181,50 @@ CHIP_ERROR SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const Co
     return CHIP_NO_ERROR;
 }
 
-} // anonymous namespace
-
-namespace chip {
-namespace app {
-namespace Clusters {
-
-SoftwareDiagnosticsServer SoftwareDiagnosticsServer::instance;
-
-/**********************************************************
- * SoftwareDiagnosticsServer Implementation
- *********************************************************/
-
-SoftwareDiagnosticsServer & SoftwareDiagnosticsServer::Instance()
+class SoftwareFaultListenerImpl : public SoftwareDiagnostics::SoftwareFaultListener
 {
-    return instance;
-}
-
-// Gets called when a software fault that has taken place on the Node.
-void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
-{
-    ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
-
-    for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
+public:
+    void OnSoftwareFaultDetect(const Events::SoftwareFault::Type & softwareFault) override
     {
-        // If Software Diagnostics cluster is implemented on this endpoint
-        EventNumber eventNumber;
+        ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
-        if (CHIP_NO_ERROR != LogEvent(softwareFault, endpoint, eventNumber))
+        for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
         {
-            ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
+            // If Software Diagnostics cluster is implemented on this endpoint
+            EventNumber eventNumber;
+
+            if (CHIP_NO_ERROR != LogEvent(softwareFault, endpoint, eventNumber))
+            {
+                ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
+            }
         }
     }
-}
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+    static SoftwareFaultListener & Instance()
+    {
+        static SoftwareFaultListenerImpl instance;
+        return instance;
+    }
+};
 
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
-                                                              const app::ConcreteCommandPath & commandPath,
-                                                              const Commands::ResetWatermarks::DecodableType & commandData)
-{
-    // Shouldn't be called at all.
-    return false;
-}
+} // anonymous namespace
 
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gCommandHandler);
+    if (SoftwareFaultListener::GetGlobalListener() == nullptr)
+    {
+        SoftwareFaultListener::SetGlobalListener(&SoftwareFaultListenerImpl::Instance());
+    }
+}
+
+void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gCommandHandler);
+    if (SoftwareFaultListener::GetGlobalListener() == &SoftwareFaultListenerImpl::Instance())
+    {
+        SoftwareFaultListener::SetGlobalListener(nullptr);
+    }
 }

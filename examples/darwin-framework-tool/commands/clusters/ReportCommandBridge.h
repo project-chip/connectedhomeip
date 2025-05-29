@@ -28,7 +28,7 @@ public:
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        ModelCommand::AddArguments();
+        AddCommonByIdArguments();
     }
 
     ReadAttribute(chip::ClusterId clusterId)
@@ -37,7 +37,7 @@ public:
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        ModelCommand::AddArguments();
+        AddCommonByIdArguments();
     }
 
     ReadAttribute(const char * _Nonnull attributeName)
@@ -83,7 +83,44 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
+    {
+        MTRReadParams * params = [[MTRReadParams alloc] init];
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+
+        __auto_type * endpoint = @(endpointId);
+        __auto_type * cluster = @(mClusterId);
+        __auto_type * attribute = @(mAttributeId);
+        __auto_type values = [device readAttributeWithEndpointID:endpoint
+                                                       clusterID:cluster
+                                                     attributeID:attribute
+                                                          params:params];
+
+        NSError * error = nil;
+        if (nil == values) {
+            __auto_type * userInfo = @ { @"reason" : @"No value available." };
+            error = [NSError errorWithDomain:@"Error" code:0 userInfo:userInfo];
+            LogNSError("Error reading attribute", error);
+            RemoteDataModelLogger::LogAttributeErrorAsJSON(endpoint, cluster, attribute, error);
+        } else {
+            NSLog(@"cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u: %@", mClusterId, mAttributeId, endpointId, values);
+            RemoteDataModelLogger::LogAttributeAsJSON(endpoint, cluster, attribute, values);
+        }
+
+        SetCommandExitStatus(error);
+        return CHIP_NO_ERROR;
+    }
+
 protected:
+    void AddCommonByIdArguments()
+    {
+        AddArgument("use-mtr-device", 0, 1, &mUseMTRDevice,
+            "Use MTRDevice instead of MTRBaseDevice to send this command. Default is false.");
+        ModelCommand::AddArguments();
+    }
+
     chip::Optional<bool> mFabricFiltered;
 
 private:

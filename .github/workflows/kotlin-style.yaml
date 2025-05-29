@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: "detekt"
-        uses: natiginfo/action-detekt-all@1.23.6
+        uses: natiginfo/action-detekt-all@1.23.7
         # Detekt seems not to like circular symlinks, so we set up
         # explicit paths below
         #

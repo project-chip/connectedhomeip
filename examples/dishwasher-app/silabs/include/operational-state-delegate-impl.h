@@ -67,7 +67,7 @@ public:
     void SetEndpointId(EndpointId endpointId);
 
 private:
-    const GenericOperationalState rvcOpStateList[4] = {
+    const GenericOperationalState dishwasherOpStateList[4] = {
         GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
@@ -76,7 +76,8 @@ private:
 
     EndpointId mEndpointId;
 
-    DataModel::List<const GenericOperationalState> mOperationalStateList = Span<const GenericOperationalState>(rvcOpStateList);
+    DataModel::List<const GenericOperationalState> mOperationalStateList =
+        Span<const GenericOperationalState>(dishwasherOpStateList);
     const Span<const CharSpan> mOperationalPhaseList;
 };
 

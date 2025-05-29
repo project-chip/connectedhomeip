@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,17 +54,31 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0016" name="Root Node" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0016" name="Root Node" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added Power Source to device type; Deprecated Power Source Configuration"/>
+    <revision revision="3" summary="Added restriction on Managed Device feature of Access Control cluster"/>
   </revisionHistory>
   <classification class="node" scope="node"/>
+  <conditions>
+    <condition name="CustomNetworkConfig" summary="The node only supports out-of-band-configured networking (e.g. rich user interface, manufacturer-specific means, custom commissioning flows, or future IP-compliant network technology not yet directly supported by `NetworkCommissioning` cluster)."/>
+    <condition name="ManagedAclAllowed" summary="The node has at least one endpoint where some Device Type present on the endpoint has a Device Library element requirement table entry that sets this condition to true."/>
+  </conditions>
   <clusters>
     <cluster id="0x001F" name="Access Control" side="server">
       <quality singleton="true"/>
       <mandatoryConform/>
+      <features>
+        <feature code="MNGD" name="MNGD">
+          <optionalConform>
+            <condition name="ManagedAclAllowed"/>
+          </optionalConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x0028" name="Basic Information" side="server">
       <quality singleton="true"/>
@@ -102,7 +116,7 @@ Davis, CA 95616, USA
     <cluster id="0x0031" name="Network Commissioning" side="server">
       <mandatoryConform>
         <notTerm>
-          <attribute name="CustomNetworkConfig"/>
+          <condition name="CustomNetworkConfig"/>
         </notTerm>
       </mandatoryConform>
     </cluster>
@@ -152,16 +166,16 @@ Davis, CA 95616, USA
     <cluster id="0x0046" name="ICD Management" side="server">
       <quality singleton="true"/>
       <mandatoryConform>
-        <feature name="SIT"/>
+        <orTerm>
+          <feature name="SIT"/>
+          <feature name="LIT"/>
+        </orTerm>
       </mandatoryConform>
       <features>
         <feature code="" name="LongIdleTimeSupport">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform>
-              <feature name="LIT"/>
-            </mandatoryConform>
-          </otherwiseConform>
+          <mandatoryConform>
+            <feature name="LIT"/>
+          </mandatoryConform>
         </feature>
       </features>
     </cluster>

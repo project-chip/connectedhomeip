@@ -72,15 +72,15 @@ class ZoneManagementCluster(
     object SubscriptionEstablished : ZonesAttributeSubscriptionState()
   }
 
-  class TimeControlAttribute(val value: List<ZoneManagementClusterZoneTriggeringTimeControlStruct>)
+  class TriggersAttribute(val value: List<ZoneManagementClusterZoneTriggerControlStruct>)
 
-  sealed class TimeControlAttributeSubscriptionState {
-    data class Success(val value: List<ZoneManagementClusterZoneTriggeringTimeControlStruct>) :
-      TimeControlAttributeSubscriptionState()
+  sealed class TriggersAttributeSubscriptionState {
+    data class Success(val value: List<ZoneManagementClusterZoneTriggerControlStruct>) :
+      TriggersAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : TimeControlAttributeSubscriptionState()
+    data class Error(val exception: Exception) : TriggersAttributeSubscriptionState()
 
-    object SubscriptionEstablished : TimeControlAttributeSubscriptionState()
+    object SubscriptionEstablished : TriggersAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -101,16 +101,6 @@ class ZoneManagementCluster(
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }
-
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
   }
 
   class AttributeListAttribute(val value: List<UInt>)
@@ -473,7 +463,7 @@ class ZoneManagementCluster(
     }
   }
 
-  suspend fun readTimeControlAttribute(): TimeControlAttribute {
+  suspend fun readTriggersAttribute(): TriggersAttribute {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -495,24 +485,24 @@ class ZoneManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Timecontrol attribute not found in response" }
+    requireNotNull(attributeData) { "Triggers attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<ZoneManagementClusterZoneTriggeringTimeControlStruct> =
-      buildList<ZoneManagementClusterZoneTriggeringTimeControlStruct> {
+    val decodedValue: List<ZoneManagementClusterZoneTriggerControlStruct> =
+      buildList<ZoneManagementClusterZoneTriggerControlStruct> {
         tlvReader.enterArray(AnonymousTag)
         while (!tlvReader.isEndOfContainer()) {
-          add(ZoneManagementClusterZoneTriggeringTimeControlStruct.fromTlv(AnonymousTag, tlvReader))
+          add(ZoneManagementClusterZoneTriggerControlStruct.fromTlv(AnonymousTag, tlvReader))
         }
         tlvReader.exitContainer()
       }
 
-    return TimeControlAttribute(decodedValue)
+    return TriggersAttribute(decodedValue)
   }
 
-  suspend fun writeTimeControlAttribute(
-    value: List<ZoneManagementClusterZoneTriggeringTimeControlStruct>,
+  suspend fun writeTriggersAttribute(
+    value: List<ZoneManagementClusterZoneTriggerControlStruct>,
     timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 2u
@@ -558,10 +548,10 @@ class ZoneManagementCluster(
     }
   }
 
-  suspend fun subscribeTimeControlAttribute(
+  suspend fun subscribeTriggersAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<TimeControlAttributeSubscriptionState> {
+  ): Flow<TriggersAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
@@ -580,7 +570,7 @@ class ZoneManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            TimeControlAttributeSubscriptionState.Error(
+            TriggersAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -593,34 +583,29 @@ class ZoneManagementCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Timecontrol attribute not found in Node State update" }
+          requireNotNull(attributeData) { "Triggers attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<ZoneManagementClusterZoneTriggeringTimeControlStruct> =
-            buildList<ZoneManagementClusterZoneTriggeringTimeControlStruct> {
+          val decodedValue: List<ZoneManagementClusterZoneTriggerControlStruct> =
+            buildList<ZoneManagementClusterZoneTriggerControlStruct> {
               tlvReader.enterArray(AnonymousTag)
               while (!tlvReader.isEndOfContainer()) {
-                add(
-                  ZoneManagementClusterZoneTriggeringTimeControlStruct.fromTlv(
-                    AnonymousTag,
-                    tlvReader,
-                  )
-                )
+                add(ZoneManagementClusterZoneTriggerControlStruct.fromTlv(AnonymousTag, tlvReader))
               }
               tlvReader.exitContainer()
             }
 
-          emit(TimeControlAttributeSubscriptionState.Success(decodedValue))
+          emit(TriggersAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(TimeControlAttributeSubscriptionState.SubscriptionEstablished)
+          emit(TriggersAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readSensitivityAttribute(): UByte {
+  suspend fun readSensitivityAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -646,7 +631,12 @@ class ZoneManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -730,9 +720,14 @@ class ZoneManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+          val decodedValue: UByte? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(UByteSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
@@ -930,101 +925,6 @@ class ZoneManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

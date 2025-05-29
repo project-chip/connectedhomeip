@@ -65,8 +65,6 @@ int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) == 0);
 
-    LinuxDeviceOptions::GetInstance().dacProvider = AppOptions::GetDACProvider();
-
     auto & server = InteractiveServer::GetInstance();
     if (AppOptions::GetInteractiveMode())
     {

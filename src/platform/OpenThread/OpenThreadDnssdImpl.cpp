@@ -47,7 +47,7 @@ const char * GetProtocolString(DnssdServiceProtocol protocol)
 CHIP_ERROR OpenThreadDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (strcmp(service->mHostName, "") != 0)
     {
         ReturnErrorOnFailure(ThreadStackMgr().SetupSrpHost(service->mHostName));

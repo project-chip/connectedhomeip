@@ -14,15 +14,4 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/config/standalone/args.gni")
-
-chip_crypto = "boringssl"
-
-chip_device_project_config_include =
-    "${chip_root}/examples/darwin-framework-tool/include/CHIPProjectAppConfig.h"
-chip_project_config_include =
-    "${chip_root}/examples/darwin-framework-tool/include/CHIPProjectAppConfig.h"
-
-chip_project_config_include_dirs =
-    [ "${chip_root}/examples/darwin-framework-tool/include" ]
-chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+import("${chip_root}/config/darwin/args.gni")

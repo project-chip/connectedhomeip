@@ -35,6 +35,8 @@
 
 using namespace chip;
 
+namespace bridge {
+
 namespace {
 
 // Constants
@@ -205,3 +207,5 @@ CHIP_ERROR KeepActive(chip::ScopedNodeId scopedNodeId, uint32_t stayActiveDurati
 
     return WaitForResponse(call);
 }
+
+} // namespace bridge

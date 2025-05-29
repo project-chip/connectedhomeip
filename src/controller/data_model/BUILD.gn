@@ -42,5 +42,4 @@ chip_codegen("cluster-tlv-metadata") {
 
 chip_data_model("data_model") {
   zap_file = "controller-clusters.zap"
-  allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }

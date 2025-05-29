@@ -86,6 +86,15 @@ If a device has already been commissioned, the tool can be executed like this:
 python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath>
 ```
 
+The tool can be used to validate against the available spec versions, this can
+be done by providing the following tag in the command, if no path is provided it
+will use the current scrape of Master. An example path is
+"connectedhomeip/data_model/master".
+
+```
+python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --dm <pathToDmScrapeFolder>
+```
+
 # Updates for future releases
 
 Given each new release adds PICS files, to ensure the tool is able to map the
@@ -101,4 +110,13 @@ To run the XMLPICSValidator, the following command can be used:
 
 ```
 python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder>
+```
+
+The tool can be used to validate against the available spec versions, this can
+be done by providing the following tag in the command, if no path is provided it
+will use the current scrape of Master. An example path is
+"connectedhomeip/data_model/master".
+
+```
+python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder> --dm <pathToDmScrapeFolder>
 ```

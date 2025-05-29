@@ -18,7 +18,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/silabs_executable.gni")
+import("${silabs_sdk_build_root}/silabs_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -38,7 +38,7 @@ if (wifi_soc) {
   import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
   examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 } else {
-  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
   examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 }
 
@@ -87,6 +87,9 @@ if (wifi_soc) {
         "PW_RPC_ENABLED",
       ]
     }
+    if (sl_enable_rgb_led) {
+      include_dirs += [ "${examples_common_plat_dir}/rgb_led" ]
+    }
   }
 } else {
   efr32_sdk("sdk") {
@@ -101,6 +104,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/rgb_led",
     ]
 
     if (use_wf200) {
@@ -122,6 +126,9 @@ if (wifi_soc) {
         "HAL_VCOM_ENABLE=1",
         "PW_RPC_ENABLED",
       ]
+    }
+    if (sl_enable_rgb_led) {
+      include_dirs += [ "${examples_common_plat_dir}/rgb_led" ]
     }
   }
 }

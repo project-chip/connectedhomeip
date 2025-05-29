@@ -453,7 +453,7 @@ static CHIP_ERROR DecodeConvertECDSASignature(TLVReader & reader, ASN1Writer & w
     ReturnErrorOnFailure(DecodeECDSASignature(reader, certData));
 
     // Converting the signature is a bit of work, so explicitly check if we have a null writer
-    ReturnErrorCodeIf(writer.IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!writer.IsNullWriter(), CHIP_NO_ERROR);
 
     // signatureValue BIT STRING
     // Per RFC3279, the ECDSA signature value is encoded in DER encapsulated in the signatureValue BIT STRING.

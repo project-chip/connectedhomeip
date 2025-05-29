@@ -42,8 +42,6 @@
 #endif
 #include <bl_timer.h>
 
-#include <hosal_uart.h>
-
 extern "C" {
 #include <bl_irq.h>
 #include <bl_rtc.h>
@@ -57,6 +55,8 @@ extern "C" {
 #include <bl_flash.h>
 #endif
 }
+
+#include <hosal_uart.h>
 
 #include <uart.h>
 
@@ -103,6 +103,21 @@ extern "C" void vApplicationIdleHook(void)
     __asm volatile("   wfi     ");
 }
 
+#if (configUSE_TICK_HOOK != 0)
+extern "C" void vApplicationTickHook(void)
+{
+#if defined(CFG_USB_CDC_ENABLE)
+    extern void usb_cdc_monitor(void);
+    usb_cdc_monitor();
+#endif
+}
+#endif
+
+#if (configUSE_TICKLESS_IDLE != 0)
+extern "C" __WEAK void vApplicationSleep(TickType_t xExpectedIdleTime) {}
+#endif
+
+static StaticTask_t xIdleTaskTCB;
 extern "C" void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackType_t ** ppxIdleTaskStackBuffer,
                                               uint32_t * pulIdleTaskStackSize)
 {
@@ -145,18 +160,6 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     configTIMER_TASK_STACK_DEPTH is specified in words, not bytes. */
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
-
-#if (configUSE_TICK_HOOK != 0)
-extern "C" void vApplicationTickHook(void)
-{
-#if defined(CFG_USB_CDC_ENABLE)
-    extern void usb_cdc_monitor(void);
-    usb_cdc_monitor();
-#endif
-}
-#endif
-
-extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime) {}
 
 extern "C" void vAssertCalled(void)
 {
@@ -280,15 +283,9 @@ extern "C" void setup_heap()
     bl_sys_em_config();
 #endif
 
-#if CHIP_DEVICE_LAYER_TARGET_BL702
-    extern uint8_t __ocram_bss_start[], __ocram_bss_end[];
-    if (NULL != __ocram_bss_start && NULL != __ocram_bss_end && __ocram_bss_end > __ocram_bss_start)
-    {
-        memset(__ocram_bss_start, 0, __ocram_bss_end - __ocram_bss_start);
-    }
-#endif
-
     vPortDefineHeapRegions(xHeapRegions);
+
+    bl_sys_early_init();
 
 #ifdef CFG_USE_PSRAM
     bl_psram_init();
@@ -302,10 +299,24 @@ extern "C" size_t get_heap_size(void)
     return (size_t) &_heap_size;
 }
 
+static void bl_show_component_version(void)
+{
+    extern uint8_t _version_info_section_start;
+    extern uint8_t _version_info_section_end;
+    char ** version_str_p = NULL;
+
+    puts("Version of used components:\r\n");
+    for (version_str_p = (char **) &_version_info_section_start; version_str_p < (char **) &_version_info_section_end;
+         version_str_p++)
+    {
+        puts("\tVersion: ");
+        puts(*version_str_p);
+        puts("\r\n");
+    }
+}
+
 extern "C" void app_init(void)
 {
-    bl_sys_early_init();
-
 #if CHIP_DEVICE_LAYER_TARGET_BL702L
     bl_flash_init();
 #endif
@@ -327,12 +338,14 @@ extern "C" void app_init(void)
     /* board config is set after system is init*/
     hal_board_cfg(0);
 
-#if CHIP_DEVICE_LAYER_TARGET_BL702L || CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#if CHIP_DEVICE_LAYER_TARGET_BL702 && (CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET)
     hosal_dma_init();
 #endif
 #if CHIP_DEVICE_LAYER_TARGET_BL602
     wifi_td_diagnosis_init();
 #endif
+
+    bl_show_component_version();
 }
 
 extern "C" void platform_port_init(void)

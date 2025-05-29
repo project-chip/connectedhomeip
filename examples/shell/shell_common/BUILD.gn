@@ -92,6 +92,8 @@ static_library("shell_common") {
 
     public_deps +=
         [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
+
+    deps = [ "${chip_root}/src/app:attribute-persistence" ]
   }
 
   public_configs = [ ":shell_common_config" ]

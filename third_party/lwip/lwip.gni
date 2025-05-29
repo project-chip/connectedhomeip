@@ -19,7 +19,7 @@ import("//build_overrides/lwip.gni")
 # lwIP depends on external header files to compile. This template defines
 # a combined build of the lwIP sources plus target configuration.
 template("lwip_target") {
-  _lwip_root = "${lwip_root}/repo/lwip"
+  _lwip_root = "${lwip_root}/repo"
 
   lwip_target_name = target_name
 
@@ -29,9 +29,12 @@ template("lwip_target") {
                            "lwip_ipv4",
                            "lwip_ipv6",
                            "lwip_api",
+                           "lwip_bridge",
                            "lwip_ethernet",
                            "lwip_slip",
                            "lwip_6lowpan",
+                           "lwip_6lowpan_ble",
+                           "lwip_zep",
                          ])
 
   if (!defined(lwip_ipv4)) {
@@ -43,6 +46,9 @@ template("lwip_target") {
   if (!defined(lwip_api)) {
     lwip_api = true
   }
+  if (!defined(lwip_bridge)) {
+    lwip_bridge = false
+  }
   if (!defined(lwip_ethernet)) {
     lwip_ethernet = true
   }
@@ -52,9 +58,18 @@ template("lwip_target") {
   if (!defined(lwip_6lowpan)) {
     lwip_6lowpan = false
   }
+  if (!defined(lwip_6lowpan_ble)) {
+    lwip_6lowpan_ble = false
+  }
+  if (!defined(lwip_zep)) {
+    lwip_zep = false
+  }
 
   config("${lwip_target_name}_base_config") {
-    include_dirs = [ "${lwip_root}/repo/lwip/src/include" ]
+    include_dirs = [
+      "${lwip_root}/repo/src/include",
+      "${lwip_root}/repo/contrib/addons/ipv6_static_routing/",
+    ]
   }
 
   source_set(lwip_target_name) {
@@ -69,6 +84,11 @@ template("lwip_target") {
     # lwIP headers become empty if the relevant feature is disabled, so the
     # whole interface can be public regardless of build options.
     public += [
+      "${_lwip_root}/contrib/addons/ipv6_static_routing/ip6_route_table.h",
+      "${_lwip_root}/src/include/lwip/acd.h",
+      "${_lwip_root}/src/include/lwip/altcp.h",
+      "${_lwip_root}/src/include/lwip/altcp_tcp.h",
+      "${_lwip_root}/src/include/lwip/altcp_tls.h",
       "${_lwip_root}/src/include/lwip/api.h",
       "${_lwip_root}/src/include/lwip/autoip.h",
       "${_lwip_root}/src/include/lwip/debug.h",
@@ -77,21 +97,23 @@ template("lwip_target") {
       "${_lwip_root}/src/include/lwip/dhcp6.h",
       "${_lwip_root}/src/include/lwip/dns.h",
       "${_lwip_root}/src/include/lwip/err.h",
+      "${_lwip_root}/src/include/lwip/errno.h",
       "${_lwip_root}/src/include/lwip/etharp.h",
       "${_lwip_root}/src/include/lwip/ethip6.h",
       "${_lwip_root}/src/include/lwip/icmp.h",
       "${_lwip_root}/src/include/lwip/icmp6.h",
-      "${_lwip_root}/src/include/lwip/if.h",
+      "${_lwip_root}/src/include/lwip/if_api.h",
       "${_lwip_root}/src/include/lwip/igmp.h",
       "${_lwip_root}/src/include/lwip/inet.h",
       "${_lwip_root}/src/include/lwip/inet_chksum.h",
       "${_lwip_root}/src/include/lwip/init.h",
       "${_lwip_root}/src/include/lwip/ip.h",
+      "${_lwip_root}/src/include/lwip/ip4_addr.h",
       "${_lwip_root}/src/include/lwip/ip4_frag.h",
       "${_lwip_root}/src/include/lwip/ip6.h",
       "${_lwip_root}/src/include/lwip/ip6_addr.h",
       "${_lwip_root}/src/include/lwip/ip6_frag.h",
-      "${_lwip_root}/src/include/lwip/ip6_route_table.h",
+      "${_lwip_root}/src/include/lwip/ip6_zone.h",
       "${_lwip_root}/src/include/lwip/ip_addr.h",
       "${_lwip_root}/src/include/lwip/mem.h",
       "${_lwip_root}/src/include/lwip/memp.h",
@@ -103,28 +125,62 @@ template("lwip_target") {
       "${_lwip_root}/src/include/lwip/netifapi.h",
       "${_lwip_root}/src/include/lwip/opt.h",
       "${_lwip_root}/src/include/lwip/pbuf.h",
+      "${_lwip_root}/src/include/lwip/priv/altcp_priv.h",
+      "${_lwip_root}/src/include/lwip/priv/api_msg.h",
+      "${_lwip_root}/src/include/lwip/priv/mem_priv.h",
+      "${_lwip_root}/src/include/lwip/priv/memp_priv.h",
+      "${_lwip_root}/src/include/lwip/priv/memp_std.h",
+      "${_lwip_root}/src/include/lwip/priv/nd6_priv.h",
+      "${_lwip_root}/src/include/lwip/priv/raw_priv.h",
+      "${_lwip_root}/src/include/lwip/priv/sockets_priv.h",
       "${_lwip_root}/src/include/lwip/priv/tcp_priv.h",
       "${_lwip_root}/src/include/lwip/priv/tcpip_priv.h",
+      "${_lwip_root}/src/include/lwip/prot/acd.h",
       "${_lwip_root}/src/include/lwip/prot/autoip.h",
       "${_lwip_root}/src/include/lwip/prot/dhcp.h",
+      "${_lwip_root}/src/include/lwip/prot/dhcp6.h",
       "${_lwip_root}/src/include/lwip/prot/dns.h",
+      "${_lwip_root}/src/include/lwip/prot/etharp.h",
       "${_lwip_root}/src/include/lwip/prot/ethernet.h",
+      "${_lwip_root}/src/include/lwip/prot/iana.h",
       "${_lwip_root}/src/include/lwip/prot/icmp6.h",
+      "${_lwip_root}/src/include/lwip/prot/ieee.h",
       "${_lwip_root}/src/include/lwip/prot/igmp.h",
+      "${_lwip_root}/src/include/lwip/prot/ip.h",
+      "${_lwip_root}/src/include/lwip/prot/ip4.h",
+      "${_lwip_root}/src/include/lwip/prot/ip6.h",
       "${_lwip_root}/src/include/lwip/prot/mld6.h",
       "${_lwip_root}/src/include/lwip/prot/nd6.h",
+      "${_lwip_root}/src/include/lwip/prot/tcp.h",
+      "${_lwip_root}/src/include/lwip/prot/udp.h",
       "${_lwip_root}/src/include/lwip/raw.h",
+      "${_lwip_root}/src/include/lwip/sio.h",
       "${_lwip_root}/src/include/lwip/snmp.h",
       "${_lwip_root}/src/include/lwip/sockets.h",
       "${_lwip_root}/src/include/lwip/stats.h",
       "${_lwip_root}/src/include/lwip/sys.h",
       "${_lwip_root}/src/include/lwip/tcp.h",
+      "${_lwip_root}/src/include/lwip/tcpbase.h",
       "${_lwip_root}/src/include/lwip/tcpip.h",
       "${_lwip_root}/src/include/lwip/timeouts.h",
       "${_lwip_root}/src/include/lwip/udp.h",
+      "${_lwip_root}/src/include/netif/bridgeif.h",
+      "${_lwip_root}/src/include/netif/bridgeif_opts.h",
+      "${_lwip_root}/src/include/netif/etharp.h",
+      "${_lwip_root}/src/include/netif/ethernet.h",
+      "${_lwip_root}/src/include/netif/ieee802154.h",
+      "${_lwip_root}/src/include/netif/lowpan6.h",
+      "${_lwip_root}/src/include/netif/lowpan6_ble.h",
+      "${_lwip_root}/src/include/netif/lowpan6_common.h",
+      "${_lwip_root}/src/include/netif/lowpan6_opts.h",
+      "${_lwip_root}/src/include/netif/slipif.h",
+      "${_lwip_root}/src/include/netif/zepif.h",
     ]
 
     sources += [
+      "${_lwip_root}/src/core/altcp.c",
+      "${_lwip_root}/src/core/altcp_alloc.c",
+      "${_lwip_root}/src/core/altcp_tcp.c",
       "${_lwip_root}/src/core/def.c",
       "${_lwip_root}/src/core/dns.c",
       "${_lwip_root}/src/core/inet_chksum.c",
@@ -142,13 +198,11 @@ template("lwip_target") {
       "${_lwip_root}/src/core/tcp_out.c",
       "${_lwip_root}/src/core/timeouts.c",
       "${_lwip_root}/src/core/udp.c",
-      "${_lwip_root}/src/include/lwip/priv/api_msg.h",
-      "${_lwip_root}/src/include/lwip/priv/memp_std.h",
-      "${_lwip_root}/src/include/lwip/priv/nd6_priv.h",
     ]
 
     if (lwip_ipv4) {
       sources += [
+        "${_lwip_root}/src/core/ipv4/acd.c",
         "${_lwip_root}/src/core/ipv4/autoip.c",
         "${_lwip_root}/src/core/ipv4/dhcp.c",
         "${_lwip_root}/src/core/ipv4/etharp.c",
@@ -162,6 +216,7 @@ template("lwip_target") {
 
     if (lwip_ipv6) {
       sources += [
+        "${_lwip_root}/contrib/addons/ipv6_static_routing/ip6_route_table.c",
         "${_lwip_root}/src/core/ipv6/dhcp6.c",
         "${_lwip_root}/src/core/ipv6/ethip6.c",
         "${_lwip_root}/src/core/ipv6/icmp6.c",
@@ -169,7 +224,6 @@ template("lwip_target") {
         "${_lwip_root}/src/core/ipv6/ip6.c",
         "${_lwip_root}/src/core/ipv6/ip6_addr.c",
         "${_lwip_root}/src/core/ipv6/ip6_frag.c",
-        "${_lwip_root}/src/core/ipv6/ip6_route_table.c",
         "${_lwip_root}/src/core/ipv6/mld6.c",
         "${_lwip_root}/src/core/ipv6/nd6.c",
       ]
@@ -180,12 +234,19 @@ template("lwip_target") {
         "${_lwip_root}/src/api/api_lib.c",
         "${_lwip_root}/src/api/api_msg.c",
         "${_lwip_root}/src/api/err.c",
-        "${_lwip_root}/src/api/if.c",
+        "${_lwip_root}/src/api/if_api.c",
         "${_lwip_root}/src/api/netbuf.c",
         "${_lwip_root}/src/api/netdb.c",
         "${_lwip_root}/src/api/netifapi.c",
         "${_lwip_root}/src/api/sockets.c",
         "${_lwip_root}/src/api/tcpip.c",
+      ]
+    }
+
+    if (lwip_bridge) {
+      sources += [
+        "${_lwip_root}/src/netif/bridgeif.c",
+        "${_lwip_root}/src/netif/bridgeif_fdb.c",
       ]
     }
 
@@ -198,7 +259,21 @@ template("lwip_target") {
     }
 
     if (lwip_6lowpan) {
-      sources += [ "${_lwip_root}/src/netif/lowpan6.c" ]
+      sources += [
+        "${_lwip_root}/src/netif/lowpan6.c",
+        "${_lwip_root}/src/netif/lowpan6_common.c",
+      ]
+    }
+
+    if (lwip_6lowpan_ble) {
+      sources += [
+        "${_lwip_root}/src/netif/lowpan6_ble.c",
+        "${_lwip_root}/src/netif/lowpan6_common.c",
+      ]
+    }
+
+    if (lwip_zep) {
+      sources += [ "${_lwip_root}/src/netif/zepif.c" ]
     }
 
     if (defined(lwip_remove_configs)) {

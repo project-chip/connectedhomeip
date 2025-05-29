@@ -72,9 +72,11 @@ class SelectActionFragment : Fragment() {
     binding.provisionCustomFlowBtn.setOnClickListener { handleProvisionCustomFlowClicked() }
     binding.wildcardBtn.setOnClickListener { handleWildcardClicked() }
     binding.unpairDeviceBtn.setOnClickListener { handleUnpairDeviceClicked() }
+    binding.diagnosticLogBtn.setOnClickListener { handleDiagnosticLogClicked() }
     binding.groupSettingBtn.setOnClickListener { handleGroupSettingClicked() }
     binding.otaProviderBtn.setOnClickListener { handleOTAProviderClicked() }
     binding.icdBtn.setOnClickListener { handleICDClicked() }
+    binding.modeSelectBtn.setOnClickListener { handleModeSelectClicked() }
 
     return binding.root
   }
@@ -225,6 +227,10 @@ class SelectActionFragment : Fragment() {
     showFragment(OtaProviderClientFragment.newInstance())
   }
 
+  private fun handleDiagnosticLogClicked() {
+    showFragment(DiagnosticLogFragment.newInstance())
+  }
+
   /** Notifies listener of provision-WiFi-credentials button click. */
   private fun handleProvisionWiFiCredentialsClicked() {
     getCallback()?.setNetworkType(ProvisionNetworkType.WIFI)
@@ -248,6 +254,10 @@ class SelectActionFragment : Fragment() {
 
   private fun handleICDClicked() {
     showFragment(ICDFragment.newInstance())
+  }
+
+  private fun handleModeSelectClicked() {
+    showFragment(ModeSelectClientFragment.newInstance())
   }
 
   companion object {

@@ -7,7 +7,7 @@ for Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
-[README document](../../../docs/guides/nxp/nxp_imx8m_linux_examples.md) for
+[README document](../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md) for
 details.
 
 <hr>
@@ -24,6 +24,7 @@ details.
         -   [Activating python virtual env](#activating-python-virtual-env)
         -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
         -   [Using chip-repl to Fake a charging session](#using-chip-repl-to-fake-a-charging-session)
+    -   [Water Heater App: Interaction using the chip-tool and TestEventTriggers](#water-heater-app-interaction-using-the-chip-tool-and-testeventtriggers)
 
 <hr>
 
@@ -65,13 +66,11 @@ details.
     Enables Thread management feature, requires ot-br-posix dbus daemon running.
     Required for Thread commissioning.
 
--   `--ble-device <interface id>`
+-   `--ble-controller <selector>`
 
-    Use specific bluetooth interface for BLE advertisement and connections.
-
-    `interface id`: the number after `hci` when listing BLE interfaces by
-    `hciconfig` command, for example, `--ble-device 1` means using `hci1`
-    interface. Default: `0`.
+    Use the specific Bluetooth controller for BLE advertisement and connections.
+    For details on controller selection refer to
+    [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
 -   `--application <evse | water-heater>`
 
@@ -109,32 +108,19 @@ details.
 
     -   [Optional] Plug USB Bluetooth dongle
 
-        -   Plug USB Bluetooth dongle and find its bluetooth device number. The
-            number after `hci` is the bluetooth device number, `1` in this
-            example.
+        -   Plug USB Bluetooth dongle and find its bluetooth controller selector
+            as described in
+            [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
-                  $ hciconfig
-                  hci1:	Type: Primary  Bus: USB
-                      BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
-                      TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
+    -   Run Linux Energy Management Example App
 
-                  hci0:	Type: Primary  Bus: UART
-                      BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
-                      TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
+              $ cd ~/connectedhomeip/examples/energy-management-app/linux
+              $ sudo out/debug/chip-energy-management-app --ble-controller [bluetooth controller number]
+              # In this example, the device we want to use is hci1
+              $ sudo out/debug/chip-energy-management-app --ble-controller 1
 
-        -   Run Linux Energy Management Example App
-
-                  $ cd ~/connectedhomeip/examples/energy-management-app/linux
-                  $ sudo out/debug/chip-energy-management-app --ble-device [bluetooth device number]
-                  # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-energy-management-app --ble-device 1
-
-        -   Test the device using ChipDeviceController on your laptop /
-            workstation etc.
+    -   Test the device using ChipDeviceController on your laptop / workstation
+        etc.
 
 ## Device Tracing
 
@@ -155,7 +141,7 @@ CHIP-REPL is slightly easier to interact with when dealing with some of the
 complex structures.
 
 There are several test scripts provided for EVSE (in
-[src/python_testing](src/python_testing)):
+[src/python_testing](/src/python_testing)):
 
 -   `TC_EEVSE_2_2`: This validates the primary functionality
 -   `TC_EEVSE_2_3`: This validates Get/Set/Clear target commands
@@ -238,8 +224,9 @@ data (e.g. fabric info).
 
 ## CHIP-REPL Interaction
 
--   See chip-repl documentation in
-    [Matter_REPL_Intro](../../../docs/guides/repl/Matter_REPL_Intro.ipynb)
+-   See chip-repl documentation in:
+    -   [Working with Python CHIP Controller](../../../docs/development_controllers/chip-repl/python_chip_controller_building.md)
+    -   [Matter_REPL_Intro](https://github.com/project-chip/connectedhomeip/blob/master/docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
 
 ### Building chip-repl:
 
@@ -272,7 +259,7 @@ data (e.g. fabric info).
 -   Step 3: (In chip-repl) Commissioning OnNetwork
 
 ```python
-    devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
+    await devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
 Established secure session with Device
 Commissioning complete
 Out[2]: <chip.native.PyChipError object at 0x7f2432b16140>
@@ -552,3 +539,79 @@ When we re-read the events:
     state was `kPluggedInCharging` prior to the EV being not detected (normally
     in a graceful shutdown this would be `kPluggedInNoDemand` or
     `kPluggedInDemand`).
+
+## Water Heater App: Interaction using the chip-tool and TestEventTriggers
+
+This section demonstrates how to run the Water Heater application and interact
+with it using the `chip-tool` and `TestEventTriggers`. By default (at the time
+of writing), the WaterHeater app does not configure some of its attributes with
+simulated values (most default to 0). The steps below set the
+[default](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h#L47)
+`TestEventTrigger` which
+`Simulate installation in a 100L tank full of water at 20C, with a target temperature of 60C, in OFF mode`.
+
+Step-by-step:
+
+1. Build the `energy-management-app` for linux:
+
+    ```
+    ./scripts/build/build_examples.py --target linux-x64-energy-management-no-ble build
+    ```
+
+1. Run the Water Heater application:
+
+    ```
+    rm /tmp/chip_* && ./out/linux-x64-energy-management-no-ble/chip-energy-management-app --application water-heater --trace-to json:log --enable-key 000102030405060708090a0b0c0d0e0f
+    ```
+
+1. Commission with chip-tool as node `0x12344321`:
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool pairing code 0x12344321 MT:-24J0AFN00KA0648G00
+    ```
+
+1. Read the `TankVolume` attribute (expect 0 by default):
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement read tank-volume 0x12344321 2 | grep TOO
+
+    [1730306361.511] [2089549:2089552] [TOO]   TankVolume: 0
+    ```
+
+1. Set the default TestEventTrigger (`0x0094000000000000`):
+
+-   `0x0094000000000000` corresponds to
+    [`kBasicInstallationTestEvent`](https://github.com/project-chip/connectedhomeip/blob/5e3127f5ac61e13c572a968199280d90a9c19dce/src/app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h#L47)
+    from `WaterHeadermanagementTestEventTriggerHandler.h`
+-   `hex:00010203...0e0f` is the `--enable-key` passed to the startup of
+    chip-energy-management-app
+-   `0x12344321` is the node-id that the app was commissioned on
+-   final `0` is the endpoint on which the `GeneralDiagnostics` cluster exists
+    to call the `TestEventTrigger` command
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool generaldiagnostics test-event-trigger hex:000102030405060708090a0b0c0d0e0f 0x0094000000000000 0x12344321 0
+    ```
+
+1. Read TankVolume attribute again (now expect 100):
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement read tank-volume 0x12344321 2 | grep TOO
+
+    [1730312762.703] [2153606:2153609] [TOO]   TankVolume: 100
+    ```
+
+1. Set boost state:
+
+    - `durationIndicates` the time period in seconds for which the BOOST state
+      is activated before it automatically reverts to the previous mode (e.g.
+      OFF, MANUAL or TIMED).
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement boost '{ "duration": 1800 }' 0x12344321 2
+    ```
+
+1. Cancel boost state:
+
+    ```
+    ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement cancel-boost 0x12344321 2
+    ```

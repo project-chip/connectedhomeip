@@ -599,4 +599,4 @@ Usage:
 To learn more about the tool, how to build it, use its commands and advanced
 features, read the following guide:
 
--   [Working with the CHIP Tool](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/chip_tool_guide.md)
+-   [Working with the CHIP Tool](https://github.com/project-chip/connectedhomeip/tree/master/docs/development_controllers/chip-tool/chip_tool_guide.md)

@@ -168,7 +168,7 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     // formatted string, as long as we account for the possible string formats.
     constexpr size_t statusNameMaxLength =
 #define CHIP_IM_STATUS_CODE(name, spec_name, value)                                                                                \
-        max(sizeof(#spec_name),
+        std::max(sizeof(#spec_name),
 #include <protocols/interaction_model/StatusCodeList.h>
 #undef CHIP_IM_STATUS_CODE
         static_cast<size_t>(0)
@@ -177,7 +177,7 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 #include <protocols/interaction_model/StatusCodeList.h>
 #undef CHIP_IM_STATUS_CODE
         ;
-    constexpr size_t formattedSize = max(sizeof(generalFormat) + statusNameMaxLength, sizeof(clusterFormat));
+    constexpr size_t formattedSize = std::max(sizeof(generalFormat) + statusNameMaxLength, sizeof(clusterFormat));
     char formattedString[formattedSize];
 
     StatusIB status(err);

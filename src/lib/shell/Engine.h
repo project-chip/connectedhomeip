@@ -120,6 +120,13 @@ public:
     void RunMainLoop();
 
     /**
+     * Stop the shell mainloop on the next iteration.
+     *
+     * @note This method can be called from a signal handler to stop the main loop.
+     */
+    void StopMainLoop() { mRunning = false; }
+
+    /**
      * Initialize the Shell::Engine.
      *
      * Activates the linked streamer, registers default commands, and sets up exit handlers.
@@ -130,6 +137,7 @@ public:
 
 private:
     static void ProcessShellLineTask(intptr_t context);
+    bool mRunning = true;
 };
 
 } // namespace Shell

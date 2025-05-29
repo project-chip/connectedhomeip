@@ -11,12 +11,8 @@
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#ifdef ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER
 #define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS                                                                                         \
     (MATTER_DM_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-#else
-#define SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
-#endif /* ZCL_USING_SAMPLE_MEI_CLUSTER_SERVER */
 static constexpr size_t kNumSupportedEndpoints = SAMPLE_MEI_NUM_SUPPORTED_ENDPOINTS;
 
 namespace chip {

@@ -19,7 +19,6 @@
 #include "app/util/af-types.h"
 #include <app/util/mock/MockNodeConfig.h>
 
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <initializer_list>
 #include <lib/support/CodeUtils.h>
@@ -115,7 +114,7 @@ const T * findById(const std::vector<T> & vector, decltype(std::declval<T>().id)
 MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes,
                                      std::initializer_list<MockEventConfig> aEvents,
                                      std::initializer_list<CommandId> aAcceptedCommands,
-                                     std::initializer_list<CommandId> aGeneratedCommands) :
+                                     std::initializer_list<CommandId> aGeneratedCommands, BitMask<MockClusterSide> side) :
     id(aId),
     attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
     mGeneratedCommands(aGeneratedCommands)
@@ -127,9 +126,17 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
     {
         mEmberEventList.push_back(event.id);
     }
+
+    if (side.Has(MockClusterSide::kServer))
+    {
+        mEmberCluster.mask |= MATTER_CLUSTER_FLAG_SERVER;
+    }
+    if (side.Has(MockClusterSide::kClient))
+    {
+        mEmberCluster.mask |= MATTER_CLUSTER_FLAG_CLIENT;
+    }
     mEmberCluster.clusterId      = id;
     mEmberCluster.attributeCount = static_cast<uint16_t>(attributes.size());
-    mEmberCluster.mask           = CLUSTER_MASK_SERVER;
     mEmberCluster.eventCount     = static_cast<uint16_t>(mEmberEventList.size());
     mEmberCluster.eventList      = mEmberEventList.data();
 
@@ -177,10 +184,16 @@ const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attribu
 }
 
 MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters,
-                                       std::initializer_list<EmberAfDeviceType> aDeviceTypes) :
+                                       std::initializer_list<EmberAfDeviceType> aDeviceTypes,
+                                       std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags,
+                                       app::EndpointComposition aComposition, CharSpan aEndpointUniqueId) :
     id(aId),
-    clusters(aClusters), mDeviceTypes(aDeviceTypes), mEmberEndpoint{}
+    composition(aComposition), clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
+
 {
+
+    memcpy(endpointUniqueIdBuffer, aEndpointUniqueId.data(), aEndpointUniqueId.size());
+    endpointUniqueIdSize = static_cast<uint8_t>(aEndpointUniqueId.size());
     VerifyOrDie(aClusters.size() < UINT8_MAX);
 
     // Note: We're copying all the EmberAfClusters because they need to be contiguous in memory
@@ -193,11 +206,14 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
 }
 
 MockEndpointConfig::MockEndpointConfig(const MockEndpointConfig & other) :
-    id(other.id), clusters(other.clusters), mEmberClusters(other.mEmberClusters), mDeviceTypes(other.mDeviceTypes),
-    mEmberEndpoint(other.mEmberEndpoint)
+    id(other.id), composition(other.composition), clusters(other.clusters), mEmberClusters(other.mEmberClusters),
+    mDeviceTypes(other.mDeviceTypes), mSemanticTags(other.mSemanticTags), mEmberEndpoint(other.mEmberEndpoint)
 {
     // fix self-referencing pointers
     mEmberEndpoint.cluster = mEmberClusters.data();
+
+    memcpy(endpointUniqueIdBuffer, other.endpointUniqueIdBuffer, other.endpointUniqueIdSize);
+    endpointUniqueIdSize = other.endpointUniqueIdSize;
 }
 
 const MockClusterConfig * MockEndpointConfig::clusterById(ClusterId clusterId, ptrdiff_t * outIndex) const

@@ -16,13 +16,13 @@
 #    limitations under the License.
 #
 
-import os
 import sys
+from pathlib import Path
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.testing.pics import parse_pics_xml
-from MockTestRunner import MockTestRunner
+from chip.testing.runner import MockTestRunner
 
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file
@@ -49,6 +49,7 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
                 bi.ProductLabel: 'myProduct',
                 bi.SerialNumber: 'ABCD1234',
                 bi.LocalConfigDisabled: False,
+                bi.SpecificationVersion: 0x01040000,
                 bi.UniqueID: 'Hashy-McHashface'}
     if include_reachable:
         attrs_bi[bi.Reachable] = True
@@ -80,10 +81,12 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
 
 def main():
     # TODO: add the same test for commands and features
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    with open(f'{script_dir}/example_pics_xml_basic_info.xml') as f:
+
+    script_dir = Path(__file__).resolve().parent
+    with open(script_dir / 'example_pics_xml_basic_info.xml') as f:
         pics = parse_pics_xml(f.read())
-    test_runner = MockTestRunner('TC_pics_checker.py', 'TC_PICS_Checker', 'test_TC_IDM_10_4', 0, pics)
+    test_runner = MockTestRunner(script_dir / '../TC_pics_checker.py',
+                                 'TC_PICS_Checker', 'test_TC_IDM_10_4', 0, pics)
     failures = []
 
     # Success, include vendor ID, which IS in the pics file, and neither of the incorrect ones

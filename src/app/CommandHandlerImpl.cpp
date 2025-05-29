@@ -18,6 +18,7 @@
 #include <app/CommandHandlerImpl.h>
 
 #include <access/AccessControl.h>
+#include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/RequiredPrivilege.h>
@@ -134,7 +135,28 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
 
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+
+    auto context = GetExchangeContext();
+    // If we have no exchange or it has no session, we won't be able to send a
+    // response anyway, so it doesn't matter how we encode it, but we have unit
+    // tests that have a kinda-broken CommandHandler with no session... just use
+    // kUndefinedFabricIndex in those cases.
+    //
+    // Note that just calling GetAccessingFabricIndex() here is not OK, because
+    // we may have gone async already and our exchange/session may be gone, so
+    // that would crash.  Which is one of the reasons GetAccessingFabricIndex()
+    // is not allowed to be called once we have gone async.
+    FabricIndex accessingFabricIndex;
+    if (context && context->HasSessionHandle())
+    {
+        accessingFabricIndex = context->GetSessionHandle()->GetFabricIndex();
+    }
+    else
+    {
+        accessingFabricIndex = kUndefinedFabricIndex;
+    }
+
+    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), accessingFabricIndex));
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 
@@ -391,10 +413,11 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     {
+        Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         DataModel::InvokeRequest request;
 
         request.path              = concretePath;
-        request.subjectDescriptor = GetSubjectDescriptor();
+        request.subjectDescriptor = &subjectDescriptor;
         request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
         Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
@@ -473,25 +496,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     }
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
 
-    // Per spec, we do the "is this a timed command?" check for every path, but
-    // since all paths that fail it just get silently discarded we can do it
-    // once up front and discard all the paths at once.  Ordering with respect
-    // to ACL and command presence checks does not matter, because the behavior
-    // is the same for all of them: ignore the path.
-#if !CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-
-    // Without data model interface, we can query individual commands.
-    // Data model interface queries commands by a full path so we need endpointID as well.
-    //
-    // Since this is a performance update and group commands are never timed,
-    // missing this should not be that noticeable.
-    if (CommandNeedsTimedInvoke(clusterId, commandId))
-    {
-        // Group commands are never timed.
-        return Status::Success;
-    }
-#endif
-
     // No check for `CommandIsFabricScoped` unlike in `ProcessCommandDataIB()` since group commands
     // always have an accessing fabric, by definition.
 
@@ -513,10 +517,11 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
         {
+            Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
             DataModel::InvokeRequest request;
 
             request.path              = concretePath;
-            request.subjectDescriptor = GetSubjectDescriptor();
+            request.subjectDescriptor = &subjectDescriptor;
             request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
             Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);

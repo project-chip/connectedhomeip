@@ -22,6 +22,7 @@
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
 #include "app-common/zap-generated/ids/Clusters.h"
+#include "camera-av-settings-user-level-management-instance.h"
 #include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
 #include "energy-evse-modes.h"
@@ -30,6 +31,7 @@
 #include "laundry-dryer-controls-delegate-impl.h"
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
+#include "meter-identification-instance.h"
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
@@ -51,9 +53,9 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
+#include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -124,6 +126,7 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = { {
                                                                                  .tag         = kTagSwitchesUp } };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp4TagList[] = { { .namespaceID = kNamespaceSwitches,
                                                                                  .tag         = kTagSwitchesDown } };
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -256,7 +259,15 @@ void ApplicationInit()
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
-    Clusters::WaterHeaterManagement::WhmApplicationInit();
+    Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
+                                                                   Clusters::UnitLocalization::TempUnitEnum::kCelsius };
+    DataModel::List<Clusters::UnitLocalization::TempUnitEnum> unitsList(supportedUnits);
+    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetSupportedTemperatureUnits(unitsList) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetTemperatureUnit(
+                    Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
+
+    Clusters::WaterHeaterManagement::WhmApplicationInit(chip::EndpointId(1));
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
@@ -283,6 +294,7 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
+    Clusters::MeterIdentification::Shutdown();
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
     Clusters::WaterHeaterMode::Shutdown();

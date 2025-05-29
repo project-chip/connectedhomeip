@@ -31,41 +31,17 @@
 
 namespace chip {
 namespace Encoding {
-namespace LittleEndian {
 
-/**
- *  @class Reader
- *
- *  Simple reader for reading little-endian things out of buffers.
- */
-class Reader
+class BufferReader
 {
 public:
-    /**
-     * Create a buffer reader from a given buffer and length.
-     *
-     * @param buffer The octet buffer from which to read.  The caller must ensure
-     *               (most simply by allocating the reader on the stack) that
-     *               the buffer outlives the reader. If `buffer` is nullptr,
-     *               length is automatically overridden to zero, to avoid accesses.
-     * @param buf_len The number of octets in the buffer.
-     */
-    Reader(const uint8_t * buffer, size_t buf_len) : mBufStart(buffer), mReadPtr(buffer), mAvailable(buf_len)
+    BufferReader(const uint8_t * buffer, size_t buf_len) : mBufStart(buffer), mReadPtr(buffer), mAvailable(buf_len)
     {
         if (mBufStart == nullptr)
         {
             mAvailable = 0;
         }
     }
-
-    /**
-     * Create a buffer reader from a given byte span.
-     *
-     * @param buffer The octet buffer byte span from which to read.  The caller must ensure
-     *               that the buffer outlives the reader.  The buffer's ByteSpan .data() pointer
-     *               is is nullptr, length is automatically overridden to zero, to avoid accesses.
-     */
-    Reader(const ByteSpan & buffer) : Reader(buffer.data(), buffer.size()) {}
 
     /**
      * Number of octets we have read so far.
@@ -94,6 +70,121 @@ public:
      * @return false if the reader is in error, true if the reader is OK.
      */
     bool IsSuccess() const { return StatusCode() == CHIP_NO_ERROR; }
+
+    /**
+     * Read a byte string from the BufferReader
+     *
+     * @param [out] dest Where the bytes read
+     * @param [in] size How many bytes to read
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    BufferReader & ReadBytes(uint8_t * dest, size_t size);
+
+    /**
+     * Access bytes of size length, useful for in-place processing of strings
+     *
+     * data_ptr MUST NOT be null and will contain the data pointer with `len` bytes available
+     * if this call is successful
+     *
+     * If len is greater than the number of available bytes, the object enters in a failed status.
+     */
+    CHECK_RETURN_VALUE
+    BufferReader & ZeroCopyProcessBytes(size_t len, const uint8_t ** data_ptr)
+    {
+        if (len > mAvailable)
+        {
+            *data_ptr = nullptr;
+            mStatus   = CHIP_ERROR_BUFFER_TOO_SMALL;
+            // Ensure that future reads all fail.
+            mAvailable = 0;
+        }
+        else
+        {
+            *data_ptr = mReadPtr;
+            mReadPtr += len;
+            mAvailable -= len;
+        }
+        return *this;
+    }
+
+    /**
+     * Advance the Reader forward by the specified number of octets.
+     *
+     * @param len The number of octets to skip.
+     *
+     * @note If the len argument is greater than the number of available octets
+     *       remaining, the Reader will advance to the end of the buffer
+     *       without entering a failed-status state.
+     */
+    BufferReader & Skip(size_t len)
+    {
+        len = std::min(len, mAvailable);
+        mReadPtr += len;
+        mAvailable = static_cast<size_t>(mAvailable - len);
+        return *this;
+    }
+
+protected:
+    /// Our buffer start.
+    const uint8_t * const mBufStart;
+
+    /// Our current read point.
+    const uint8_t * mReadPtr;
+
+    /// The number of octets we can still read starting at mReadPtr.
+    size_t mAvailable;
+
+    /// Our current status.
+    CHIP_ERROR mStatus = CHIP_NO_ERROR;
+
+    /// Make sure we have at least the given number of bytes available (does not consume them)
+    bool EnsureAvailable(size_t size)
+    {
+        if (mAvailable < size)
+        {
+            mStatus = CHIP_ERROR_BUFFER_TOO_SMALL;
+            // Ensure that future reads all fail.
+            mAvailable = 0;
+            return false;
+        }
+        return true;
+    }
+};
+
+namespace LittleEndian {
+
+/**
+ *  @class Reader
+ *
+ *  Simple reader for reading little-endian things out of buffers.
+ */
+class Reader : public BufferReader
+{
+public:
+    /**
+     * Create a buffer reader from a given buffer and length.
+     *
+     * @param buffer The octet buffer from which to read.  The caller must ensure
+     *               (most simply by allocating the reader on the stack) that
+     *               the buffer outlives the reader. If `buffer` is nullptr,
+     *               length is automatically overridden to zero, to avoid accesses.
+     * @param buf_len The number of octets in the buffer.
+     */
+    Reader(const uint8_t * buffer, size_t buf_len) : BufferReader(buffer, buf_len) {}
+
+    /**
+     * Create a buffer reader from a given byte span.
+     *
+     * @param buffer The octet buffer byte span from which to read.  The caller must ensure
+     *               that the buffer outlives the reader.  The buffer's ByteSpan .data() pointer
+     *               is is nullptr, length is automatically overridden to zero, to avoid accesses.
+     */
+    Reader(const ByteSpan & buffer) : Reader(buffer.data(), buffer.size()) {}
 
     /**
      * Read a bool, assuming single byte storage.
@@ -268,20 +359,6 @@ public:
     }
 
     /**
-     * Read a byte string from the BufferReader
-     *
-     * @param [out] dest Where the bytes read
-     * @param [in] size How many bytes to read
-     *
-     * @note The read can put the reader in a failed-status state if there are
-     *       not enough octets available.  Callers must either continue to do
-     *       more reads on the return value or check its status to see whether
-     *       the sequence of reads that has been performed succeeded.
-     */
-    CHECK_RETURN_VALUE
-    Reader & ReadBytes(uint8_t * dest, size_t size);
-
-    /**
      * Helper for our various APIs so we don't have to write out various logic
      * multiple times.  This is public so that consumers that want to read into
      * whatever size a logical thing they are reading into has don't have to
@@ -290,46 +367,80 @@ public:
      */
     template <typename T>
     void RawReadLowLevelBeCareful(T * retval);
-
-    /**
-     * Advance the Reader forward by the specified number of octets.
-     *
-     * @param len The number of octets to skip.
-     *
-     * @note If the len argument is greater than the number of available octets
-     *       remaining, the Reader will advance to the end of the buffer
-     *       without entering a failed-status state.
-     */
-    Reader & Skip(size_t len)
-    {
-        len = ::chip::min(len, mAvailable);
-        mReadPtr += len;
-        mAvailable = static_cast<size_t>(mAvailable - len);
-        return *this;
-    }
-
-private:
-    /**
-     * Our buffer start.
-     */
-    const uint8_t * const mBufStart;
-
-    /**
-     * Our current read point.
-     */
-    const uint8_t * mReadPtr;
-
-    /**
-     * The number of octets we can still read starting at mReadPtr.
-     */
-    size_t mAvailable;
-
-    /**
-     * Our current status.
-     */
-    CHIP_ERROR mStatus = CHIP_NO_ERROR;
 };
 
 } // namespace LittleEndian
+
+namespace BigEndian {
+
+/**
+ *  @class Reader
+ *
+ *  Simple reader for reading big-endian things out of buffers.
+ */
+class Reader : public BufferReader
+{
+public:
+    /**
+     * Create a buffer reader from a given buffer and length.
+     *
+     * @param buffer The octet buffer from which to read.  The caller must ensure
+     *               (most simply by allocating the reader on the stack) that
+     *               the buffer outlives the reader. If `buffer` is nullptr,
+     *               length is automatically overridden to zero, to avoid accesses.
+     * @param buf_len The number of octets in the buffer.
+     */
+    Reader(const uint8_t * buffer, size_t buf_len) : BufferReader(buffer, buf_len) {}
+
+    /**
+     * Create a buffer reader from a given byte span.
+     *
+     * @param buffer The octet buffer byte span from which to read.  The caller must ensure
+     *               that the buffer outlives the reader.  If the buffer's ByteSpan .data() pointer
+     *               is nullptr, length is automatically overridden to zero, to avoid accesses.
+     */
+    Reader(const ByteSpan & buffer) : Reader(buffer.data(), buffer.size()) {}
+
+    /**
+     * Read a single 8-bit unsigned integer.
+     *
+     * @param [out] dest Where the 8-bit integer goes.
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & Read8(uint8_t * dest)
+    {
+        (void) ReadBytes(dest, 1);
+        return *this;
+    }
+
+    CHECK_RETURN_VALUE
+    Reader & ReadChar(char * dest)
+    {
+        (void) ReadBytes(reinterpret_cast<uint8_t *>(dest), 1);
+        return *this;
+    }
+
+    CHECK_RETURN_VALUE
+    Reader & ReadBool(char * dest)
+    {
+        (void) ReadBytes(reinterpret_cast<uint8_t *>(dest), 1);
+        return *this;
+    }
+
+    /// NOTE: only a subset of reads are supported here, more can be added if used/needed
+    CHECK_RETURN_VALUE
+    Reader & Read16(uint16_t * dest);
+
+    CHECK_RETURN_VALUE
+    Reader & Read32(uint32_t * dest);
+};
+
+} // namespace BigEndian
+
 } // namespace Encoding
 } // namespace chip

@@ -97,7 +97,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
 #if !CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
     saltB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
-    ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(saltB64Len <= sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT, saltB64Len);
 #else
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -109,7 +109,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     ReturnErrorOnFailure(err);
 
     size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
-    ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(saltLen <= saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(saltBuf.data(), saltB64, saltLen);
     saltBuf.reduce_size(saltLen);
@@ -128,7 +128,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifier
 #if !CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
     verifierB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
-    ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(verifierB64Len <= sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(verifierB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER, verifierB64Len);
 #else
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -140,7 +140,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifier
     ReturnErrorOnFailure(err);
 
     verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
-    ReturnErrorCodeIf(verifierLen > verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(verifierLen <= verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(verifierBuf.data(), verifierB64, verifierLen);
     verifierBuf.reduce_size(verifierLen);
@@ -352,13 +352,13 @@ CHIP_ERROR ASRFactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan &
 CHIP_ERROR ASRFactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
 #if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
 #else
     size_t buffer_len                                              = ConfigurationManager::kMaxVendorNameLength + 1;
     uint8_t buffer[ConfigurationManager::kMaxVendorNameLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_VENDOR_NAME_PARTITION, buffer, buffer_len, buffer_len));
-    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
     buf[buffer_len] = 0;
 #endif
@@ -380,13 +380,13 @@ CHIP_ERROR ASRFactoryDataProvider::GetVendorId(uint16_t & vendorId)
 CHIP_ERROR ASRFactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 {
 #if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
 #else
     size_t buffer_len                                               = ConfigurationManager::kMaxProductNameLength + 1;
     uint8_t buffer[ConfigurationManager::kMaxProductNameLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PRODUCT_NAME_PARTITION, buffer, buffer_len, buffer_len));
-    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
     buf[buffer_len] = 0;
 #endif
@@ -413,7 +413,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
     size_t buffer_len                                              = ConfigurationManager::kMaxPartNumberLength + 1;
     uint8_t buffer[ConfigurationManager::kMaxPartNumberLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PART_NUMBER_PARTITION, buffer, buffer_len, buffer_len));
-    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
     buf[buffer_len]                                                = 0;
 #endif
@@ -428,7 +428,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
     size_t buffer_len                                              = ConfigurationManager::kMaxProductURLLength + 1;
     uint8_t buffer[ConfigurationManager::kMaxProductURLLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PRODUCT_URL_PARTITION, buffer, buffer_len, buffer_len));
-    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
     buf[buffer_len]                                                  = 0;
 #endif
@@ -443,7 +443,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
     size_t buffer_len                                                = ConfigurationManager::kMaxProductLabelLength + 1;
     uint8_t buffer[ConfigurationManager::kMaxProductLabelLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PRODUCT_LABEL_PARTITION, buffer, buffer_len, buffer_len));
-    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
     buf[buffer_len]                                                  = 0;
 #endif
@@ -453,13 +453,13 @@ CHIP_ERROR ASRFactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 CHIP_ERROR ASRFactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
 #if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
 #else
     size_t buffer_len                                                = ConfigurationManager::kMaxSerialNumberLength + 1;
     uint8_t buffer[ConfigurationManager::kMaxSerialNumberLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_SERIAL_NUMBER_PARTITION, buffer, buffer_len, buffer_len));
-    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
     buf[buffer_len] = 0;
 #endif
@@ -522,13 +522,13 @@ CHIP_ERROR ASRFactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion
 CHIP_ERROR ASRFactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
 #if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
 #else
     size_t buffer_len = ConfigurationManager::kMaxHardwareVersionStringLength + 1;
     uint8_t buffer[ConfigurationManager::kMaxHardwareVersionStringLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_HARDWARE_VERSION_STR_PARTITION, buffer, buffer_len, buffer_len));
-    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
     buf[buffer_len] = 0;
 #endif
@@ -545,8 +545,8 @@ CHIP_ERROR ASRFactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan &
 #ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
     constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
-    ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sizeof(uniqueId) <= uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sizeof(uniqueId) == ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
     uniqueIdSpan.reduce_size(sizeof(uniqueId));
     return CHIP_NO_ERROR;
@@ -555,11 +555,11 @@ CHIP_ERROR ASRFactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan &
 #define ROTATING_UNIQUE_ID_STRING_LEN ConfigurationManager::kRotatingDeviceIDUniqueIDLength * 2
     uint8_t buffer[ROTATING_UNIQUE_ID_STRING_LEN] = { 0 };
     size_t buffer_len                             = ROTATING_UNIQUE_ID_STRING_LEN;
-    ReturnErrorCodeIf(ConfigurationManager::kRotatingDeviceIDUniqueIDLength > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(ConfigurationManager::kRotatingDeviceIDUniqueIDLength <= uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_ROTATING_UNIQUE_ID_PARTITION, buffer, buffer_len, buffer_len));
     size_t bytesLen =
         chip::Encoding::HexToBytes(Uint8::to_char(buffer), ROTATING_UNIQUE_ID_STRING_LEN, uniqueIdSpan.data(), uniqueIdSpan.size());
-    ReturnErrorCodeIf(bytesLen != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrReturnError(bytesLen == ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_STRING_LENGTH);
     uniqueIdSpan.reduce_size(bytesLen);
     return CHIP_NO_ERROR;
 #endif // CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER

@@ -29,7 +29,7 @@ struct AppEvent
         kTimer,
         kContact,
         kInstall,
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
         kEventType_Lp,
 #endif
         kOTAResume,
@@ -56,7 +56,7 @@ struct AppEvent
 
     EventHandler Handler;
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
     void * param;
 #endif
 };

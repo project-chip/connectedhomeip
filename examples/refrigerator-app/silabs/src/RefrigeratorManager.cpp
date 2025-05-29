@@ -102,7 +102,6 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
     case TempCtrlAttr::TemperatureSetpoint::Id: {
         int16_t temperatureSetpoint = ConvertToPrintableTemp(static_cast<int16_t>(*value));
         mTemperatureSetpoint        = temperatureSetpoint;
-        TempCtrlAttr::TemperatureSetpoint::Set(endpointId, temperatureSetpoint);
     }
     break;
     default: {

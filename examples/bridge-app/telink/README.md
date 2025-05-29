@@ -56,10 +56,10 @@ defined:
     definition.
 
 -   All attributes defined with these macros will be configured as
-    `ATTRIBUTE_MASK_EXTERNAL_STORAGE` in the ZCL database and therefore will
-    rely on the application to maintain storage for the attribute. Consequently,
-    reads or writes to these attributes must be handled within the application
-    by the `emberAfExternalAttributeWriteCallback` and
+    `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
+    will rely on the application to maintain storage for the attribute.
+    Consequently, reads or writes to these attributes must be handled within the
+    application by the `emberAfExternalAttributeWriteCallback` and
     `emberAfExternalAttributeReadCallback` functions. See the bridge
     application's `main.cpp` for an example of this implementation.
 
@@ -91,7 +91,6 @@ The example supports building and running on the following devices:
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | [B91](https://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide) [TLSR9518ADK80D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR951x-Series) | `tlsr9518adk80d`, `tlsr9518adk80d-mars`, `tlsr9518adk80d-usb` | [TLSR9518ADK80D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9518adk80d/doc/index.rst) |
 | [B92](https://wiki.telink-semi.cn/wiki/Hardware/B92_Generic_Starter_Kit_Hardware_Guide) [TLSR9528A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR952x-Series)      | `tlsr9528a`, `tlsr9528a_retention`                            | [TLSR9528A](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9528a/doc/index.rst)           |
-| [B95](https://wiki.telink-semi.cn/wiki/Hardware/B95_Generic_Starter_Kit_Hardware_Guide) [TLSR9258A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR925x-Series)      | `tlsr9258a`                                                   | [TLSR9258A](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9258a/doc/index.rst)           |
 | [W91](https://wiki.telink-semi.cn/wiki/Hardware/W91_Generic_Starter_Kit_Hardware_Guide) [TLSR9118BDK40D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR911x-Series) | `tlsr9118bdk40d`                                              | [TLSR9118BDK40D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9118bdk40d/doc/index.rst) |
 
 ## Build and flash
@@ -99,10 +98,23 @@ The example supports building and running on the following devices:
 1. Run the Docker container:
 
     ```bash
-    $ docker run -it --rm -v $PWD:/host -w /host ghcr.io/project-chip/chip-build-telink:$(wget -q -O - https://raw.githubusercontent.com/project-chip/connectedhomeip/master/.github/workflows/examples-telink.yaml 2> /dev/null | grep chip-build-telink | awk -F: '{print $NF}')
+    $ docker run -it --rm -v $PWD:/host -w /host ghcr.io/project-chip/chip-build-telink:$(wget -q -O - https://raw.githubusercontent.com/project-chip/connectedhomeip/master/.github/workflows/examples-telink.yaml 2> /dev/null | grep chip-build-telink | awk -F: '{print $NF}' | head -n1)
     ```
 
-    You can find the compatible Docker image version in the file:
+    The default Docker container includes the recommended Zephyr version, as
+    specified in:
+
+    ```bash
+    $ integrations/docker/images/stage-2/chip-build-telink/Dockerfile
+    ```
+
+    If you need to use Zephyr 3.3.0, use the following container instead:
+
+    ```bash
+    $ docker run -it --rm -v $PWD:/host -w /host ghcr.io/project-chip/chip-build-telink-zephyr_3_3:$(wget -q -O - https://raw.githubusercontent.com/project-chip/connectedhomeip/master/.github/workflows/examples-telink.yaml 2> /dev/null | grep chip-build-telink-zephyr_3_3 | awk -F: '{print $NF}')
+    ```
+
+    You can check the compatible Docker image version in:
 
     ```bash
     $ .github/workflows/examples-telink.yaml

@@ -24,6 +24,7 @@
 #include <time.h>
 
 #if defined(__APPLE__)
+#include <platform/Darwin/DispatchQueueNames.h>
 #include <pthread.h>
 #include <unistd.h>
 #elif defined(__gnu_linux__)
@@ -65,7 +66,8 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 #if defined(__APPLE__)
     uint64_t ktid;
     pthread_threadid_np(nullptr, &ktid);
-    printf("[%lld:%lld] ", static_cast<long long>(getpid()), static_cast<long long>(ktid));
+    const char * label = darwin::queues::CurrentLabel();
+    printf("[%lld:%lld:%s] ", static_cast<long long>(getpid()), static_cast<long long>(ktid), label);
 #elif defined(__gnu_linux__) && !defined(__NuttX__)
     // TODO: change to getpid() and gettid() after glib upgrade
     printf("[%lld:%lld] ", static_cast<long long>(syscall(SYS_getpid)), static_cast<long long>(syscall(SYS_gettid)));

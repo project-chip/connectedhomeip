@@ -163,7 +163,7 @@ Run -> Debug Configurations... -> C/C++ Application
 ## OTA
 
 Please see
-[k32w1 OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
+[k32w1 OTA guide](../../../../docs/platforms/nxp/nxp_mcxw71_ota_guide.md).
 
 ## Multiple BLE connections
 

@@ -16,15 +16,12 @@
  */
 #include <platform/KeyValueStoreManager.h>
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h>
-#include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include "fsl_adapter_flash.h"
 
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism();
 #endif
-
-using namespace chip::DeviceLayer::PersistedStorage;
 
 namespace chip {
 namespace DeviceLayer {
@@ -38,16 +35,6 @@ static constexpr size_t kPrivateKeyBlobLength  = Crypto::kP256_PrivateKey_Length
 uint32_t FactoryDataProvider::kFactoryDataMaxSize = 0x800;
 
 FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
-
-FactoryDataProvider & FactoryDataPrvd()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
-
-FactoryDataProviderImpl & FactoryDataPrvdImpl()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
 
 FactoryDataProviderImpl::FactoryDataProviderImpl()
 {
@@ -266,107 +253,6 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
     return CHIP_NO_ERROR;
 }
 
-#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
-
-extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
-{
-    CHIP_ERROR error           = CHIP_NO_ERROR;
-    FactoryDataDriver * driver = &FactoryDataDrv();
-
-    ReturnErrorCodeIf(driver == nullptr, CHIP_ERROR_INTERNAL);
-
-    // Check if key related to factory data backup exists.
-    // If it does, it means an external event (such as a power loss)
-    // interrupted the factory data update process and the section
-    // from internal flash is most likely erased and should be restored.
-    error = driver->ReadBackupInRam();
-
-    if (error == CHIP_NO_ERROR)
-    {
-        error = driver->UpdateFactoryData();
-        if (error == CHIP_NO_ERROR)
-        {
-            ChipLogProgress(DeviceLayer, "Factory data was restored successfully");
-        }
-    }
-
-    ReturnErrorOnFailure(driver->ClearRamBackup());
-
-    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-        return CHIP_NO_ERROR;
-
-    return error;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::PreResetCheck()
-{
-    OTARequestorInterface * requestor = nullptr;
-    uint32_t targetVersion;
-    /* Check integrity of freshly copied data. If validation fails, OTA will be aborted
-     * and factory data will be restored to the previous version. Use device instance info
-     * provider getter to access the factory data provider instance. The instance is created
-     * by the application, so it's easier to access it this way.*/
-    ReturnErrorOnFailure(Validate());
-
-    requestor = GetRequestorInstance();
-    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INVALID_ADDRESS);
-
-    targetVersion = requestor->GetTargetVersion();
-    ReturnErrorOnFailure(FactoryDataProviderImpl::SaveTargetVersion(targetVersion));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::PostResetCheck()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint32_t targetVersion, currentVersion;
-
-    err = FactoryDataProviderImpl::GetTargetVersion(targetVersion);
-    if (err != CHIP_NO_ERROR)
-        ChipLogProgress(DeviceLayer, "Could not get target version");
-
-    err = DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion);
-    if (err != CHIP_NO_ERROR)
-        ChipLogProgress(DeviceLayer, "Could not get current version");
-
-    if (targetVersion == currentVersion)
-    {
-        ChipLogProgress(DeviceLayer, "OTA successfully applied");
-        // If this point is reached, it means the new image successfully booted.
-        // Delete the factory data backup to stop doing a restore.
-        // This ensures that both the factory data and app were updated, otherwise
-        // revert to the backed up factory data.
-        mFactoryDataDriver->DeleteBackup();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::GetTargetVersion(uint32_t & version)
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    uint16_t len     = sizeof(uint32_t);
-    size_t bytesRead = 0;
-
-    error = KeyValueStoreMgr().Get(FactoryDataProviderImpl::GetTargetVersionKey().KeyName(), (uint8_t *) &version, len, &bytesRead);
-    ReturnErrorOnFailure(error);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SaveTargetVersion(uint32_t & version)
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    error =
-        KeyValueStoreMgr().Put(FactoryDataProviderImpl::GetTargetVersionKey().KeyName(), (uint8_t *) &version, sizeof(uint32_t));
-    ReturnErrorOnFailure(error);
-
-    return CHIP_NO_ERROR;
-}
-#endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
-
 #if CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
 
 #define _assert(condition)                                                                                                         \
@@ -467,6 +353,11 @@ void FactoryDataProviderImpl::SSS_RunApiTest()
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
 #endif // CHIP_USE_PLAIN_DAC_KEY
+
+FactoryDataProvider & FactoryDataPrvdImpl()
+{
+    return FactoryDataProviderImpl::sInstance;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

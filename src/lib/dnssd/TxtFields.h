@@ -121,7 +121,7 @@ uint8_t GetCommissionerPasscode(const ByteSpan & value);
 
 constexpr size_t MaxKeyLen(TxtKeyUse use)
 {
-    size_t max = 0;
+    size_t max = 1;
     for (auto & info : Internal::txtFieldInfo)
     {
         if (use == info.use)
@@ -147,7 +147,7 @@ constexpr size_t TotalKeyLen(TxtKeyUse use)
 
 constexpr size_t MaxValueLen(TxtKeyUse use)
 {
-    size_t max = 0;
+    size_t max = 1;
     for (auto & info : Internal::txtFieldInfo)
     {
         if (use == info.use)

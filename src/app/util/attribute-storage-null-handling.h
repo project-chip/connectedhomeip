@@ -60,22 +60,27 @@ struct NumericAttributeTraits
     static constexpr WorkingType StorageToWorking(StorageType storageValue) { return storageValue; }
 
 private:
+    // Ensure that this generic NumericAttributeTraits implementation is being used for some type for which it
+    // actually works.
+    static_assert(std::is_floating_point_v<T> || std::is_integral_v<T> || std::is_enum_v<T>,
+                  "NumericAttributeTraits specialization needed for this type");
+
     // We need to make sure we never look like we are assigning NaN to an
     // integer, even in a not-reached branch.  Without "if constexpr", the best
     // we can do is these functions using enable_if.
-    template <typename U = T, typename std::enable_if_t<std::is_floating_point<U>::value, int> = 0>
+    template <typename U = T, typename std::enable_if_t<std::is_floating_point_v<U>, int> = 0>
     static constexpr StorageType GetNullValue()
     {
         return std::numeric_limits<T>::quiet_NaN();
     }
 
-    template <typename U = T, typename std::enable_if_t<std::is_integral<U>::value, int> = 0>
+    template <typename U = T, typename std::enable_if_t<std::is_integral_v<U>, int> = 0>
     static constexpr StorageType GetNullValue()
     {
         return std::is_signed<T>::value ? std::numeric_limits<T>::min() : std::numeric_limits<T>::max();
     }
 
-    template <typename U = T, typename std::enable_if_t<std::is_enum<U>::value, int> = 0>
+    template <typename U = T, typename std::enable_if_t<std::is_enum_v<U>, int> = 0>
     static constexpr StorageType GetNullValue()
     {
         static_assert(!std::is_signed<std::underlying_type_t<T>>::value, "Enums must be unsigned");
@@ -246,7 +251,6 @@ struct NumericAttributeTraits<bool>
 
     static uint8_t MaxValue(bool isNullable) { return 1; }
 
-private:
     static constexpr StorageType kNullValue = 0xFF;
 };
 

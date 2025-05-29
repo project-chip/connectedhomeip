@@ -25,6 +25,8 @@
 #import "MTRError_Utils.h"
 #import <Matter/Matter.h>
 
+constexpr uint32_t kDefaultExpectedValueInterval = 60000;
+
 class WriteAttribute : public ModelCommand {
 public:
     WriteAttribute()
@@ -33,7 +35,7 @@ public:
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
-        AddArguments();
+        AddCommonByIdArguments();
     }
 
     WriteAttribute(chip::ClusterId clusterId)
@@ -42,30 +44,22 @@ public:
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
-        AddArguments();
+        AddCommonByIdArguments();
     }
 
     ~WriteAttribute() {}
 
     CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
-        chip::TLV::TLVWriter writer;
-        chip::TLV::TLVReader reader;
+        id value;
+        ReturnErrorOnFailure(GetValue(&value));
+        return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, value);
+    }
 
-        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), mDataMaxLen));
-        VerifyOrReturnError(mData != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        writer.Init(mData, mDataMaxLen);
-
-        ReturnErrorOnFailure(mAttributeValue.Encode(writer, chip::TLV::AnonymousTag()));
-        reader.Init(mData, writer.GetLengthWritten());
-        ReturnErrorOnFailure(reader.Next());
-
-        id value = NSObjectFromCHIPTLV(&reader);
-        if (value == nil) {
-            return CHIP_ERROR_INTERNAL;
-        }
-
+    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
+    {
+        id value;
+        ReturnErrorOnFailure(GetValue(&value));
         return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, value);
     }
 
@@ -102,12 +96,42 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+        chip::AttributeId attributeId, id _Nonnull value)
+    {
+        __auto_type * endpoint = @(endpointId);
+        __auto_type * cluster = @(mClusterId);
+        __auto_type * attribute = @(mAttributeId);
+        __auto_type * expectedValueInterval = @(mExpectedValueInterval.ValueOr(kDefaultExpectedValueInterval));
+        __auto_type * timedWriteTimeout = mTimedInteractionTimeoutMs.HasValue()
+            ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]
+            : nil;
+
+        [device writeAttributeWithEndpointID:endpoint
+                                   clusterID:cluster
+                                 attributeID:attribute
+                                       value:value
+                       expectedValueInterval:expectedValueInterval
+                           timedWriteTimeout:timedWriteTimeout];
+
+        SetCommandExitStatus(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
+    }
+
 protected:
     WriteAttribute(const char * _Nonnull attributeName)
         : ModelCommand("write")
     {
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         // Subclasses are responsible for calling AddArguments.
+    }
+
+    void AddCommonByIdArguments()
+    {
+        AddArgument("use-mtr-device", 0, 1, &mUseMTRDevice,
+            "Use MTRDevice instead of MTRBaseDevice to send this command. Default is false.");
+        AddArgument("expectedValueInterval", 0, UINT32_MAX, &mExpectedValueInterval, "When the write is issued using an MTRDevice (via –use-mtr-device), specify the maximum interval (in milliseconds) during which reads of the attribute will return the expected value. The default is 60000 milliseconds (60 seconds).");
+        AddArguments();
     }
 
     void AddArguments()
@@ -119,9 +143,39 @@ protected:
     }
 
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
+    chip::Optional<uint32_t> mExpectedValueInterval;
     chip::Optional<uint32_t> mDataVersion;
 
 private:
+    CHIP_ERROR GetValue(id _Nonnull * _Nonnull outValue)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVWriter writer;
+        chip::TLV::TLVReader reader;
+
+        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), mDataMaxLen));
+        VerifyOrExit(mData != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        writer.Init(mData, mDataMaxLen);
+
+        err = mAttributeValue.Encode(writer, chip::TLV::AnonymousTag());
+        SuccessOrExit(err);
+
+        reader.Init(mData, writer.GetLengthWritten());
+        err = reader.Next();
+        SuccessOrExit(err);
+
+        *outValue = NSObjectFromCHIPTLV(&reader);
+        VerifyOrDo(nil != *outValue, err = CHIP_ERROR_INTERNAL);
+
+    exit:
+        if (nullptr != mData) {
+            chip::Platform::MemoryFree(mData);
+            mData = nullptr;
+        }
+        return err;
+    }
+
     chip::ClusterId mClusterId;
     chip::AttributeId mAttributeId;
     CHIP_ERROR mError = CHIP_NO_ERROR;

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -62,16 +62,12 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0450" name="Network Identity Management"/>
+    <clusterId id="0x0450" name="Network Identity Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="NETIM" scope="Endpoint"/>
   <dataTypes>
-    <number name="Client Table" type=""/>
-    <enum name="NetworkIdentityStatus">
-      <item value="2" name="INVALID_SIGNATURE" summary="The provided signature is invalid">
-        <mandatoryConform/>
-      </item>
-    </enum>
     <struct name="ClientEndorsementStruct">
       <field id="0" name="NodeID" type="node-id" default="null">
         <access fabricSensitive="true"/>
@@ -83,44 +79,70 @@ Davis, CA 95616, USA
     <struct name="ClientStruct">
       <field id="0" name="ClientNumber" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="2047"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="2047"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="ClientIdentifier" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="20"/>
+        <constraint>
+          <allowed value="20"/>
+        </constraint>
       </field>
       <field id="2" name="Endorsements" type="list">
         <entry type="ClientEndorsementStruct"/>
+        <access fabricScoped="true"/>
         <mandatoryConform/>
-        <constraint type="countBetween" from="1" to="SupportedFabrics"/>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="SupportedFabrics"/>
+          </countBetween>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="NetworkIdentifier" type="octstr">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="20"/>
+      <constraint>
+        <allowed value="20"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="NetworkIdentity" type="octstr" default="desc">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="140"/>
+      <constraint>
+        <maxLength value="140"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="Clients" type="list">
       <entry type="ClientStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="ClientTableSize"/>
+      <constraint>
+        <maxCount>
+          <attribute name="ClientTableSize"/>
+        </maxCount>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="ClientTableSize" type="uint16" default="500">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="500" to="2047"/>
+      <constraint>
+        <between>
+          <from value="500"/>
+          <to value="2047"/>
+        </between>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -129,7 +151,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="ClientIdentity" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="140"/>
+        <constraint>
+          <maxLength value="140"/>
+        </constraint>
       </field>
       <field id="1" name="NodeID" type="node-id">
         <optionalConform/>
@@ -143,7 +167,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="ClientIdentifier" type="octstr">
         <optionalConform choice="a"/>
-        <constraint type="maxLength" value="20"/>
+        <constraint>
+          <allowed value="20"/>
+        </constraint>
       </field>
     </command>
     <command id="0x40" name="EndorseNetworkIdentityUpdate" direction="commandToServer" response="Y">
@@ -151,18 +177,29 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="NetworkIdentifier" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="20"/>
+        <constraint>
+          <allowed value="20"/>
+        </constraint>
       </field>
       <field id="1" name="PreviousNetworkIdentifiers" type="list">
         <entry type="octstr">
-          <constraint type="maxLength" value="20"/>
+          <constraint>
+            <allowed value="20"/>
+          </constraint>
         </entry>
         <mandatoryConform/>
-        <constraint type="countBetween" from="1" to="3"/>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="3"/>
+          </countBetween>
+        </constraint>
       </field>
       <field id="2" name="Signature" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <allowed value="64"/>
+        </constraint>
       </field>
     </command>
   </commands>

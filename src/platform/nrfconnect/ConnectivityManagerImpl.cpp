@@ -43,6 +43,13 @@
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+// Temporary workaround for lack of the public Zephyr's API for MLDv2.
+// Should be removed after https://github.com/zephyrproject-rtos/zephyr/pull/79274 is merged.
+extern "C" int net_ipv6_mld_join(struct net_if * iface, const struct in6_addr * addr);
+extern "C" int net_ipv6_mld_leave(struct net_if * iface, const struct in6_addr * addr);
+#endif
+
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -73,19 +80,17 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
     // The following code should also be valid for other interface types, such as Ethernet,
     // but they are not officially supported, so for now enable it for Wi-Fi only.
     const in6_addr in6Addr = InetUtils::ToZephyrAddr(address);
+    int status;
 
     if (operation == UDPEndPointImplSockets::MulticastOperation::kJoin)
     {
-        net_if_mcast_addr * maddr = net_if_ipv6_maddr_add(iface, &in6Addr);
-
-        if (maddr && !net_if_ipv6_maddr_is_joined(maddr))
-        {
-            net_if_ipv6_maddr_join(iface, maddr);
-        }
+        status = net_ipv6_mld_join(iface, &in6Addr);
+        VerifyOrReturnError((status == 0 || status == -EALREADY), System::MapErrorZephyr(status));
     }
     else if (operation == UDPEndPointImplSockets::MulticastOperation::kLeave)
     {
-        VerifyOrReturnError(net_if_ipv6_maddr_rm(iface, &in6Addr), CHIP_ERROR_INVALID_ADDRESS);
+        status = net_ipv6_mld_leave(iface, &in6Addr);
+        VerifyOrReturnError(status == 0, System::MapErrorZephyr(status));
     }
     else
     {

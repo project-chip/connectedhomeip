@@ -16,12 +16,20 @@
  ******************************************************************************/
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "rsi_ble_apis.h"
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "rsi_bt_common_apis.h"
 #include "rsi_user.h"
 #else
 #include <rsi_data_types.h>
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #if SL_MATTER_GN_BUILD == 0
@@ -232,7 +240,6 @@
 
 //! Scan types
 #define SCAN_TYPE_ACTIVE (0x01)
-#define SCAN_TYPE_PASSIVE (0x00)
 
 //! Scan filters
 #define SCAN_FILTER_TYPE_ALL (0x00)
@@ -267,15 +274,22 @@
     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT) //! TCP/IP feature select bitmap for selecting TCP/IP features
 #define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
 
+// Enable front-end internal switch control for ACX module boards
+#if (SL_SI91X_ACX_MODULE == 1)
+#define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_INTERNAL_SWITCH
+#else
+#define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0
+#endif
+
 #ifdef SLI_SI917
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION // Adding Support for WPA3 transition
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
     (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV |              \
-     SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 | SL_SI91X_EXT_FEAT_IEEE_80211W)
+     FRONT_END_SWITCH_CTRL | SL_SI91X_EXT_FEAT_IEEE_80211W)
 #else
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
     (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV |              \
-     SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0)
+     FRONT_END_SWITCH_CTRL)
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
 #else  // EXP_BOARD
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))

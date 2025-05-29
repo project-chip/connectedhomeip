@@ -43,10 +43,16 @@ limitations under the License.
         <optionalConform/>
       </feature>
     </features>
-    <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="CommissioningWindowStatusEnum" writable="false" optional="false">WindowStatus</attribute>
-    <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" isNullable="true" optional="false">AdminFabricIndex</attribute>
-    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="vendor_id" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
-
+    <attribute side="server" code="0x0000" name="WindowStatus" define="WINDOW_STATUS" type="CommissioningWindowStatusEnum">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="AdminFabricIndex" define="ADMIN_FABRIC_INDEX" type="fabric_idx" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="AdminVendorId" define="ADMIN_VENDOR_ID" type="vendor_id" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    
     <command source="client" code="0x00" name="OpenCommissioningWindow" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>
       <arg name="CommissioningTimeout" type="int16u"/>
@@ -55,17 +61,22 @@ limitations under the License.
       <arg name="Iterations" type="int32u"/>
       <arg name="Salt" type="octet_string" length="32"/>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="OpenBasicCommissioningWindow" mustUseTimedInvoke="true" optional="true">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it.</description>
       <arg name="CommissioningTimeout" type="int16u"/>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="BC"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x02" name="RevokeCommissioning" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command.</description>
       <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
     </command>
 
   </cluster>

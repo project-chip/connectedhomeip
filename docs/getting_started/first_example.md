@@ -1,4 +1,4 @@
-# An SDK example
+# Compiling, Running, and Controlling Matter examples
 
 The SDK provides a number of example devices and controllers that can be used to
 familiarize yourself with the SDK and the Matter ecosystem.
@@ -26,7 +26,7 @@ for testing.
 
 [chip-tool](../../examples/chip-tool/) is a C++ command line controller with an
 interactive shell. More information on chip-tool can be found in the
-[chip-tool guide](../guides/chip_tool_guide.md).
+[chip-tool guide](../development_controllers/chip-tool/chip_tool_guide.md).
 
 [chip-repl](../../src/controller/python/chip-repl.py) is a shell for the python
 controller. The chip-repl is part of the python controller framework, often used
@@ -37,7 +37,7 @@ for testing. More information about the python controller can be found in the
 
 The examples directory contains a set of apps using an example device
 composition \.zap file. For more information about device composition and zap,
-see [ZAP documentation](./zap.md).
+see [ZAP documentation](../zap_and_codegen/zap_intro.md).
 
 This quick start guide will walk you through
 

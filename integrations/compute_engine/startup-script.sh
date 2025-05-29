@@ -16,11 +16,23 @@
 # limitations under the License.
 #
 
+set -x
+
 cd /tmp
 rm -rf connectedhomeip
 git clone --recurse-submodules https://github.com/project-chip/connectedhomeip.git
 cd connectedhomeip
+
+# Generate Coverage Report
 ./scripts/build_coverage.sh 2>&1 | tee /tmp/matter_build.log
+
+# Generate Conformance Report
+source scripts/activate.sh
+./scripts/build_python.sh -i out/python_env
+python3 -u scripts/examples/conformance_report.py
+cp /tmp/conformance_report/conformance_report.html out/coverage/coverage/html
+
+# Upload
 cd out/coverage/coverage
 gcloud app deploy webapp_config.yaml 2>&1 | tee /tmp/matter_publish.log
 versions=$(gcloud app versions list \

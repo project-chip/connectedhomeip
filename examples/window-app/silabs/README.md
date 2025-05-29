@@ -81,6 +81,13 @@ Silicon Labs platform.
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
+*   Region code Setting (917 WiFi projects)
+
+    -   In Wifi configurations, the region code can be set in this
+        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+        The available region codes can be found
+        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
+
 *   Build the example application:
 
           cd ~/connectedhomeip
@@ -195,7 +202,7 @@ combination with JLinkRTTClient as follows:
 
 -   It is assumed here that you already have an OpenThread border router
     configured and running. If not see the following guide
-    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
     for more information on how to setup a border router on a raspberryPi.
 
     Take note that the RCP code is available directly through
@@ -324,7 +331,7 @@ combination with JLinkRTTClient as follows:
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../docs/platforms/silabs/silabs_efr32_software_update.md)
 
 ## Building options
 

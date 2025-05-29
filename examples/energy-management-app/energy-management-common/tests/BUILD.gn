@@ -23,7 +23,6 @@ config("tests_config") {
 
 chip_test_suite("tests") {
   output_name = "libEnergyTest"
-  output_dir = "${root_out_dir}/lib"
 
   public_configs = [ ":tests_config" ]
 

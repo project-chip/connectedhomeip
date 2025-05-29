@@ -26,8 +26,9 @@
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 
@@ -75,6 +76,7 @@
 
 #if CONFIG_LOW_POWER
 #include "LowPower.h"
+#include "PWR_Interface.h"
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -127,8 +129,7 @@ app::Clusters::NetworkCommissioning::Instance
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
-static constexpr EndpointId kThreadBRMgmtEndpoint = 2;
-static CharSpan sBrName("NXP-BR", strlen("NXP-BR"));
+extern char baseServiceInstanceName[];
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER || (CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
@@ -184,6 +185,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_NET_L2_OPENTHREAD
     // Init ZCL Data Model and start server
@@ -217,10 +219,6 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
     VerifyOrDie(WifiConnectAtboot(chip::NXP::App::GetAppTask().GetWifiDriverInstance()) == CHIP_NO_ERROR);
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_TBR
-    GetAppTask().EnableTbrManagementCluster();
 #endif
 }
 
@@ -431,6 +429,20 @@ void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
     chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
+void chip::NXP::App::AppTaskBase::AppMatter_DisallowDeviceToSleep(void)
+{
+#if CONFIG_LOW_POWER
+    PWR_DisallowDeviceToSleep();
+#endif
+}
+
+void chip::NXP::App::AppTaskBase::AppMatter_AllowDeviceToSleep(void)
+{
+#if CONFIG_LOW_POWER
+    PWR_AllowDeviceToSleep();
+#endif
+}
+
 void chip::NXP::App::AppTaskBase::PrintOnboardingInfo()
 {
 #if CONFIG_NETWORK_LAYER_BLE
@@ -468,15 +480,20 @@ void chip::NXP::App::AppTaskBase::PrintCurrentVersion()
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
 void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
 {
-    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
+    if (mTbrmClusterEnabled == false)
+    {
+        mTbrmClusterEnabled      = true;
+        auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
 
-    static ThreadBorderRouterManagement::GenericOpenThreadBorderRouterDelegate sThreadBRDelegate(persistentStorage);
-    static ThreadBorderRouterManagement::ServerInstance sThreadBRMgmtInstance(kThreadBRMgmtEndpoint, &sThreadBRDelegate,
-                                                                              Server::GetInstance().GetFailSafeContext());
+        static ThreadBorderRouterManagement::GenericOpenThreadBorderRouterDelegate sThreadBRDelegate(persistentStorage);
+        static ThreadBorderRouterManagement::ServerInstance sThreadBRMgmtInstance(kThreadBRMgmtEndpoint, &sThreadBRDelegate,
+                                                                                  Server::GetInstance().GetFailSafeContext());
 
-    // Initialize TBR name
-    sThreadBRDelegate.SetThreadBorderRouterName(sBrName);
-    // Initialize TBR cluster
-    sThreadBRMgmtInstance.Init();
+        // Initialize TBR name
+        CharSpan brName(baseServiceInstanceName, strlen(baseServiceInstanceName));
+        sThreadBRDelegate.SetThreadBorderRouterName(brName);
+        // Initialize TBR cluster
+        sThreadBRMgmtInstance.Init();
+    }
 }
 #endif

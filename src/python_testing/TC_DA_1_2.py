@@ -35,6 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import logging
 import os
 import random
 import re
@@ -42,8 +43,8 @@ import re
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, hex_from_bytes,
-                                         type_matches)
+from chip.testing.conversions import hex_from_bytes
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
@@ -391,7 +392,12 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
             if '.der' not in filename:
                 continue
             with open(os.path.join(cd_cert_dir, filename), 'rb') as f:
-                cert = x509.load_der_x509_certificate(f.read())
+                logging.info(f'Parsing CD signing certificate file: {filename}')
+                try:
+                    cert = x509.load_der_x509_certificate(f.read())
+                except ValueError:
+                    logging.info(f'File {filename} is not a valid certificate, skipping')
+                    pass
                 pub = cert.public_key()
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
                 certs[ski] = pub

@@ -221,6 +221,9 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
         if (bytesRead == 0)
         {
             readDone = true;
+            /* Return -1 to cancel the cli command, this command is empty as we are reading uart input until it
+            is empty but for matter shell empty command is meaning stop the shell loop */
+            return -1;
         }
     }
 

@@ -41,30 +41,54 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="CHANNEL_LIST"            type="array" entryType="ChannelInfoStruct" length="254"                    writable="false" optional="true">ChannelList</attribute>
-    <attribute side="server" code="0x0001" define="CHANNEL_LINEUP"          type="LineupInfoStruct"                    default="0x0" isNullable="true" writable="false" optional="true">Lineup</attribute>
-    <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfoStruct"                   default="0x0" isNullable="true" writable="false" optional="true">CurrentChannel</attribute>
-
+    <attribute side="server" code="0x0000" name="ChannelList" define="CHANNEL_LIST" type="array" entryType="ChannelInfoStruct" length="254" optional="true">
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="Lineup" define="CHANNEL_LINEUP" type="LineupInfoStruct" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="LI"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="CurrentChannel" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfoStruct" isNullable="true" optional="true">
+      <optionalConform/>
+    </attribute>
+    
     <command source="client" code="0x00" name="ChangeChannel" response="ChangeChannelResponse" optional="true">
       <description>Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. </description>
       <arg name="Match" type="char_string"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CL"/>
+          <feature name="LI"/>
+        </orTerm>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x02" name="ChangeChannelByNumber" optional="false">
       <description>Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute.</description>
       <arg name="MajorNumber" type="int16u"/>
       <arg name="MinorNumber" type="int16u"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x03" name="SkipChannel" optional="false">
       <description>This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count value of -1 is given, then the current channel should change to the last channel.</description>
       <arg name="Count" type="int16s"/>
+      <mandatoryConform/>
     </command>
 
     <command source="server" code="0x01" name="ChangeChannelResponse" optional="true">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
       <arg name="Status" type="StatusEnum"/>
       <arg name="Data"   type="char_string" optional="true"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CL"/>
+          <feature name="LI"/>
+        </orTerm>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x04" name="GetProgramGuide" response="ProgramGuideResponse" optional="true">
@@ -76,12 +100,18 @@ limitations under the License.
       <arg name="RecordingFlag" type="RecordingFlagBitmap" optional="true"/>
       <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
       <arg name="Data" type="octet_string" optional="true"/>
+      <mandatoryConform>
+        <feature name="EG"/>
+      </mandatoryConform>
     </command>
 
     <command source="server" code="0x05" name="ProgramGuideResponse" optional="true" apiMaturity="provisional">
       <description>This command is a response to the GetProgramGuide command.</description>
       <arg name="Paging" type="ChannelPagingStruct"/>
       <arg name="ProgramList" type="ProgramStruct" array="true"/>
+      <mandatoryConform>
+        <feature name="EG"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x06" name="RecordProgram" optional="true">
@@ -90,6 +120,12 @@ limitations under the License.
       <arg name="ShouldRecordSeries" type="boolean"/>
       <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true"/>
       <arg name="Data" type="octet_string"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="RP"/>
+          <feature name="EG"/>
+        </andTerm>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x07" name="CancelRecordProgram" optional="true">
@@ -98,6 +134,12 @@ limitations under the License.
       <arg name="ShouldRecordSeries" type="boolean"/>
       <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true"/>
       <arg name="Data" type="octet_string"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="RP"/>
+          <feature name="EG"/>
+        </andTerm>
+      </mandatoryConform>
     </command>
 
   </cluster>

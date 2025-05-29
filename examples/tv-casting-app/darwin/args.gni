@@ -14,17 +14,15 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/config/ios/args.gni")
+import("${chip_root}/config/darwin/args.gni")
 
 chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_system_project_config_include = "<SystemProjectConfig.h>"
 
-chip_project_config_include_dirs += [
+chip_project_config_include_dirs = [
   "${chip_root}/examples/tv-casting-app/tv-casting-common/include",
   "${chip_root}/examples/tv-casting-app/tv-casting-common",
 ]
-chip_project_config_include_dirs += [ "${chip_root}/config/ios" ]
 
 chip_build_libshell = true
 

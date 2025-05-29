@@ -32,7 +32,7 @@ extern "C" void pw_sys_io_Init()
 
 #ifdef CONFIG_USB
     err = usb_enable(nullptr);
-    assert(err == 0);
+    assert(err == 0 || err == (-EALREADY));
 #endif
 
     err = console_init();

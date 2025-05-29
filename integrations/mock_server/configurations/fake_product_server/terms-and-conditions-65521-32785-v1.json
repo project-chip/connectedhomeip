@@ -1,0 +1,105 @@
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/tc/65521/32785",
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "schemaVersion": 1,
+                    "esfRevision": 1,
+                    "defaultCountry": "US",
+                    "countryEntries": {
+                        "US": {
+                            "defaultLanguage": "en",
+                            "languageEntries": {
+                                "en": [
+                                    {
+                                        "ordinal": 0,
+                                        "required": true,
+                                        "title": "Terms and Conditions",
+                                        "text": "<p><b>Feature 1 Text</b><br><br>Please accept these.</p>"
+                                    },
+                                    {
+                                        "ordinal": 1,
+                                        "required": false,
+                                        "title": "Privacy Policy",
+                                        "text": "<p>Feature 2 Text</p>"
+                                    }
+                                ],
+                                "es": [
+                                    {
+                                        "ordinal": 0,
+                                        "required": true,
+                                        "title": "Términos y condiciones",
+                                        "text": "<p><b>Característica 1 Texto</b><br><br>Por favor acéptelos.</p>"
+                                    },
+                                    {
+                                        "ordinal": 1,
+                                        "required": false,
+                                        "title": "Política de privacidad",
+                                        "text": "<p>Característica 2 Texto</p>"
+                                    }
+                                ]
+                            }
+                        },
+                        "MX": {
+                            "defaultLanguage": "es",
+                            "languageEntries": {
+                                "es": [
+                                    {
+                                        "ordinal": 0,
+                                        "required": true,
+                                        "title": "Términos y condiciones",
+                                        "text": "<p><b>Característica 1 Texto</b><br><br>Por favor acéptelos.</p>"
+                                    }
+                                ]
+                            }
+                        },
+                        "CN": {
+                            "defaultLanguage": "zh",
+                            "languageEntries": {
+                                "zh": [
+                                    {
+                                        "ordinal": 0,
+                                        "required": true,
+                                        "title": "条款和条件",
+                                        "text": "<p><b>产品1文字</b></p>"
+                                    },
+                                    {
+                                        "ordinal": 1,
+                                        "required": false,
+                                        "title": "隐私条款",
+                                        "text": "<p><b>产品2文字</b></p>"
+                                    }
+                                ]
+                            }
+                        },
+                        "RU": {
+                            "defaultLanguage": "ru",
+                            "languageEntries": {
+                                "ru": [
+                                    {
+                                        "ordinal": 0,
+                                        "required": true,
+                                        "title": "Условия и положения",
+                                        "text": "<p><b>Текст функции 1</b><br><br>Пожалуйста, примите эти условия пользования.</p>"
+                                    },
+                                    {
+                                        "ordinal": 1,
+                                        "required": false,
+                                        "title": "оложение о конфиденциальности",
+                                        "text": "<p>Текст функции 2</p>"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

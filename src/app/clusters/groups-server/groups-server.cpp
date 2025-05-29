@@ -22,7 +22,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/reporting/reporting.h>
-#include <app/util/att-storage.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 #include <inttypes.h>
@@ -199,6 +198,7 @@ struct GroupMembershipResponse
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     GroupMembershipResponse(const Commands::GetGroupMembership::DecodableType & data, chip::EndpointId endpoint,
                             GroupDataProvider::EndpointIterator * iter) :
@@ -339,7 +339,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
         }
         iter->Release();
         ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId,
-                                                                      ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+                                                                      ScenesManagement::ScenesServer::kGlobalSceneGroupId);
     }
 #endif
 
@@ -388,3 +388,4 @@ bool emberAfGroupsClusterEndpointInGroupCallback(chip::FabricIndex fabricIndex, 
 void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, const CharSpan & groupName) {}
 
 void MatterGroupsPluginServerInitCallback() {}
+void MatterGroupsPluginServerShutdownCallback() {}

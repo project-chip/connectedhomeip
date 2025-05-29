@@ -20,6 +20,7 @@
 #include "commands/example/ExampleCredentialIssuerCommands.h"
 
 #include "commands/clusters/SubscriptionsCommands.h"
+#include "commands/dcl/Commands.h"
 #include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/group/Commands.h"
@@ -39,6 +40,7 @@ int main(int argc, char * argv[])
 {
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
+    registerCommandsDCL(commands);
     registerCommandsDelay(commands, &credIssuerCommands);
     registerCommandsDiscover(commands, &credIssuerCommands);
     registerCommandsICD(commands, &credIssuerCommands);

@@ -133,10 +133,10 @@ corresponding to data model target.
 
 ### Manufacturing data
 
-Use `chip_with_factory_data=1` in the gn build command to enable factory data.
+Use `nxp_use_factory_data=true` in the gn build command to enable factory data.
 
 For a full guide on manufacturing flow, please see
-[Guide for writing manufacturing data on NXP devices](../../../docs/guides/nxp/nxp_manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../docs/platforms/nxp/nxp_manufacturing_flow.md).
 
 ### Long Idle Time ICD Support
 
@@ -181,9 +181,9 @@ will be very low.
 In order to build with low power support, the following gn args must be used:
 
 ```
-chip_with_low_power = 1
+nxp_use_low_power = true
 chip_openthread_ftd = false
-chip_with_ot_cli = 0
+nxp_enable_ot_cli = false
 chip_logging = false
 ```
 

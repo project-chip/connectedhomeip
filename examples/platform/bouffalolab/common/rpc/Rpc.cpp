@@ -235,7 +235,7 @@ void RunRpcService(void *)
 void Init()
 {
     // Start App task.
-    sRpcTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TASK", ArraySize(sRpcTaskStack), nullptr, RPC_TASK_PRIORITY,
+    sRpcTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TASK", MATTER_ARRAY_SIZE(sRpcTaskStack), nullptr, RPC_TASK_PRIORITY,
                                        sRpcTaskStack, &sRpcTaskBuffer);
 }
 

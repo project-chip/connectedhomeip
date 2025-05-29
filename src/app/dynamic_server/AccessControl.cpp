@@ -18,6 +18,7 @@
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
+#include <access/ProviderDeviceTypeResolver.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -25,27 +26,19 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Global.h>
 
-// TODO: this include is unclear as dynamic server should NOT link those.
-//       we should probably have some separate includes here for dynamic
-//       server
-#include <app/util/ember-compatibility-functions.h>
-
 using namespace chip;
 using namespace chip::Access;
 using namespace chip::app::Clusters;
 
 namespace {
-// TODO: Maybe consider making this configurable?  See also
-// DynamicDispatch.cpp.
-constexpr EndpointId kSupportedEndpoint = 0;
 
-class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
+class DeviceTypeResolver : public chip::Access::DynamicProviderDeviceTypeResolver
 {
 public:
-    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
-    {
-        return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
-    }
+    DeviceTypeResolver() :
+        chip::Access::DynamicProviderDeviceTypeResolver(
+            [] { return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(); })
+    {}
 };
 
 // TODO: Make the policy more configurable by consumers.
@@ -54,9 +47,17 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        if (requestPath.endpoint != kSupportedEndpoint || requestPath.cluster != OtaSoftwareUpdateProvider::Id)
+        // Check for OTA Software Update Provider endpoint
+        bool isOtaEndpoint =
+            (requestPath.endpoint == kOtaProviderDynamicEndpointId && requestPath.cluster == OtaSoftwareUpdateProvider::Id);
+
+        // Check for WebRTC Transport Requestor endpoint
+        bool isWebRtcEndpoint =
+            (requestPath.endpoint == kWebRTCRequesterDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
+
+        // Only allow these specific endpoints
+        if (!isOtaEndpoint && !isWebRtcEndpoint)
         {
-            // We only allow access to OTA software update provider.
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
@@ -67,7 +68,8 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase)
+        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase &&
+            subjectDescriptor.authMode != AuthMode::kInternalDeviceAccess)
         {
             // No idea who is asking; deny for now.
             return CHIP_ERROR_ACCESS_DENIED;

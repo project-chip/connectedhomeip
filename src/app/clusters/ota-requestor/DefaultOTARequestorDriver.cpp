@@ -219,17 +219,17 @@ CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason
     case UpdateNotFoundReason::kUpToDate:
         break;
     case UpdateNotFoundReason::kBusy: {
-        status = ScheduleQueryRetry(true, chip::max(kDefaultDelayedActionTime, delay));
+        status = ScheduleQueryRetry(true, std::max(kDefaultDelayedActionTime, delay));
         if (status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
         {
             // If max retry exceeded with current provider, try a different provider
-            status = ScheduleQueryRetry(false, chip::max(kDefaultDelayedActionTime, delay));
+            status = ScheduleQueryRetry(false, std::max(kDefaultDelayedActionTime, delay));
         }
         break;
     }
     case UpdateNotFoundReason::kNotAvailable: {
         // Schedule a query only if a different provider is available
-        status = ScheduleQueryRetry(false, chip::max(kDefaultDelayedActionTime, delay));
+        status = ScheduleQueryRetry(false, std::max(kDefaultDelayedActionTime, delay));
         break;
     }
     }

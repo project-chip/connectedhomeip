@@ -104,6 +104,11 @@ else
     exit 1
 fi
 
+# Remove previous log files
+rm /tmp/fabric_admin.log
+rm /tmp/fabric_bridge_app.log
+echo "Removed fabric sync log files."
+
 # Start fabric-bridge-app if available and redirect its output to /dev/null
 if [ -f "$FABRIC_BRIDGE_APP_PATH" ]; then
     "$FABRIC_BRIDGE_APP_PATH" >"$FABRIC_BRIDGE_APP_LOG" 2>&1 &

@@ -26,6 +26,11 @@ static std::unique_ptr<EnergyEvseDelegate> gDelegate;
 static std::unique_ptr<EvseTargetsDelegate> gEvseTargetsDelegate;
 static std::unique_ptr<EnergyEvseManager> gInstance;
 
+EndpointId GetEnergyDeviceEndpointId()
+{
+    return chip::EndpointId(1);
+}
+
 void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
@@ -53,4 +58,15 @@ void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpointId)
 
         gInstance->Init(); /* Register Attribute & Command handlers */
     }
+}
+
+void emberAfEnergyEvseClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gInstance)
+    {
+        gInstance->Shutdown();
+    }
+    gInstance            = nullptr;
+    gDelegate            = nullptr;
+    gEvseTargetsDelegate = nullptr;
 }

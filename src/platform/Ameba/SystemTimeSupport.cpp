@@ -58,26 +58,32 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 
 CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
 {
-    // TODO(19081): This platform does not properly error out if wall clock has
-    //              not been set.  For now, short circuit this.
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#if 0
-    time_t seconds;
-    struct rtkTimeVal tv;
+#if CONFIG_ENABLE_AMEBA_SNTP
+    time_t seconds = 0, uSeconds = 0;
 
-    seconds = matter_rtc_read();
+    if (matter_sntp_rtc_is_sync()) // if RTC is already sync with SNTP, read directly from RTC
+    {
+        seconds = matter_rtc_read(); // ameba rtc precission is in seconds only
+    }
+    else // read from SNTP and sync RTC with SNTP
+    {
+        matter_sntp_get_current_time(&seconds, &uSeconds);
+    }
 
-    tv.tv_sec  = (uint32_t) seconds;
-    tv.tv_usec = 0;
-
-    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
+    if (seconds < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
-    curTime = Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
+    if (uSeconds < 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative uSeconds values!");
+    curTime = Microseconds64((static_cast<uint64_t>(seconds) * UINT64_C(1000000)) + static_cast<uint64_t>(uSeconds));
 
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }
 
@@ -105,9 +111,16 @@ CHIP_ERROR InitClock_RealTime()
         Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
     // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
     // Then the RealTime obtained from GetClock_RealTime will be always valid.
-    //
-    // TODO(19081): This is broken because it causes the platform to report
-    //              that it does have wall clock time when it actually doesn't.
+#if CONFIG_ENABLE_AMEBA_SNTP
+    time_t seconds = 0, uSeconds = 0;
+
+    matter_sntp_init();
+    matter_sntp_get_current_time(&seconds, &uSeconds); // try to read from SNTP and sync RTC with SNTP
+    if ((seconds > CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) && (uSeconds > 0))
+    {
+        curTime = Microseconds64((static_cast<uint64_t>(seconds) * UINT64_C(1000000)) + static_cast<uint64_t>(uSeconds));
+    }
+#endif
     return System::SystemClock().SetClock_RealTime(curTime);
 }
 

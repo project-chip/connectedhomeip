@@ -463,14 +463,16 @@ void RegisterAppShellCommands()
         &AppCmdCommandHandler, "switch", "Light switch commands. Usage: switch [local|onoff|groups|debug][identify]"
     };
 
-    AppCmdSubCommands.RegisterCommands(ifxAppCmdSubCommands, ArraySize(ifxAppCmdSubCommands));
-    AppCmdLocalSubCommands.RegisterCommands(ifxAppCmdLocalSubCommands, ArraySize(ifxAppCmdLocalSubCommands));
-    AppCmdOnOffSubCommands.RegisterCommands(ifxAppCmdOnOffSubCommands, ArraySize(ifxAppCmdOnOffSubCommands));
-    AppCmdGroupsSubCommands.RegisterCommands(ifxAppCmdGroupsSubCommands, ArraySize(ifxAppCmdGroupsSubCommands));
-    AppCmdGroupsOnOffSubCommands.RegisterCommands(ifxAppCmdGroupsOnOffSubCommands, ArraySize(ifxAppCmdGroupsOnOffSubCommands));
-    AppCmdDebugSubCommands.RegisterCommands(ifxAppCmdDebugSubCommands, ArraySize(ifxAppCmdDebugSubCommands));
-    AppCmdIdentifySubCommands.RegisterCommands(ifxAppCmdIdentifySubCommands, ArraySize(ifxAppCmdIdentifySubCommands));
-    AppCmdIdentifyReadSubCommands.RegisterCommands(ifxAppCmdIdentifyReadSubCommands, ArraySize(ifxAppCmdIdentifyReadSubCommands));
+    AppCmdSubCommands.RegisterCommands(ifxAppCmdSubCommands, MATTER_ARRAY_SIZE(ifxAppCmdSubCommands));
+    AppCmdLocalSubCommands.RegisterCommands(ifxAppCmdLocalSubCommands, MATTER_ARRAY_SIZE(ifxAppCmdLocalSubCommands));
+    AppCmdOnOffSubCommands.RegisterCommands(ifxAppCmdOnOffSubCommands, MATTER_ARRAY_SIZE(ifxAppCmdOnOffSubCommands));
+    AppCmdGroupsSubCommands.RegisterCommands(ifxAppCmdGroupsSubCommands, MATTER_ARRAY_SIZE(ifxAppCmdGroupsSubCommands));
+    AppCmdGroupsOnOffSubCommands.RegisterCommands(ifxAppCmdGroupsOnOffSubCommands,
+                                                  MATTER_ARRAY_SIZE(ifxAppCmdGroupsOnOffSubCommands));
+    AppCmdDebugSubCommands.RegisterCommands(ifxAppCmdDebugSubCommands, MATTER_ARRAY_SIZE(ifxAppCmdDebugSubCommands));
+    AppCmdIdentifySubCommands.RegisterCommands(ifxAppCmdIdentifySubCommands, MATTER_ARRAY_SIZE(ifxAppCmdIdentifySubCommands));
+    AppCmdIdentifyReadSubCommands.RegisterCommands(ifxAppCmdIdentifyReadSubCommands,
+                                                   MATTER_ARRAY_SIZE(ifxAppCmdIdentifyReadSubCommands));
 
     Engine::Root().RegisterCommands(&AppLightSwitchCommand, 1);
 }

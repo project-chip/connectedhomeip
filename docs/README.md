@@ -15,6 +15,11 @@
     [Visual Studio Code](https://code.visualstudio.com/) can be found in
     [the development guide](./VSCODE_DEVELOPMENT.md)
 
+## Issue triage
+
+Project issues are triaged and maintained according to the
+[issue triage](./issue_triage.md) guide.
+
 ## Platform Guides
 
 -   Various guides are available [here](./guides/README.md) that cover platform

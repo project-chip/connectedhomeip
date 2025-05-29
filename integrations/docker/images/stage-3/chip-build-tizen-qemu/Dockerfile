@@ -2,9 +2,9 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build-tizen:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
-ENV TIZEN_IOT_QEMU_KERNEL $TIZEN_SDK_ROOT/iot-qemu-virt-zImage
-ENV TIZEN_IOT_IMAGE_ROOT $TIZEN_SDK_ROOT/iot-rootfs.img
-ENV TIZEN_IOT_IMAGE_DATA $TIZEN_SDK_ROOT/iot-sysdata.img
+ENV TIZEN_IOT_QEMU_KERNEL=$TIZEN_SDK_ROOT/iot-qemu-virt-zImage
+ENV TIZEN_IOT_IMAGE_ROOT=$TIZEN_SDK_ROOT/iot-rootfs.img
+ENV TIZEN_IOT_IMAGE_DATA=$TIZEN_SDK_ROOT/iot-sysdata.img
 
 # ------------------------------------------------------------------------------
 # Switch to the root user so we could install things
@@ -39,7 +39,7 @@ RUN set -x \
     && wget --progress=dot:giga -r -nd --no-parent -e robots=off -A 'rpi4-linux-kernel-*.src.rpm' \
     http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/source/ \
     # Prepare kernel source (Linux kernel + Tizen patchset)
-    && unrpm rpi4-linux-kernel-*.src.rpm \
+    && 7z x -so rpi4-linux-kernel-*.src.rpm | cpio -idmv \
     && rm rpi4-linux-kernel-*.src.rpm \
     && tar -xJf linux-kernel-*.tar.xz \
     && rm linux-kernel-*.tar.xz \
@@ -165,6 +165,10 @@ RUN set -x \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_9P_MOUNT : \
     ln-sf $SYSTEMD_UNIT_9P_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
     mkdir /mnt/chip \
+    # Setup crash manager
+    && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda download /etc/crash-manager.conf crash-manager.conf \
+    && sed -i 's|# CrashRootPath=/usr/opt/share/crash/|CrashRootPath=/mnt/chip/|g' crash-manager.conf \
+    && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload crash-manager.conf /etc/crash-manager.conf \
     # Setup auto-login for root user
     && SYSTEMD_UNIT_SERIAL_GETTY=$SYSTEMD_SYSTEM/serial-getty@.service \
     && virt-edit $TIZEN_IOT_IMAGE_ROOT -e \
@@ -182,9 +186,13 @@ RUN set -x \
     && echo -n \
     "#!/bin/bash\n" \
     "grep -q 'rootshell' /proc/cmdline && exit\n" \
-    "if [[ -x /mnt/chip/runner.sh ]]; then\n" \
+    "runner=\$(grep -o 'runner=[^ ]*' /proc/cmdline | sed 's/runner=//')\n" \
+    "if [[ -z \"\$runner\" ]]; then\n" \
+    "  runner='/mnt/chip/runner.sh' \n" \
+    "fi\n" \
+    "if [[ -x \"\$runner\" ]]; then\n" \
     "  echo '### RUNNER START ###'\n" \
-    "  /mnt/chip/runner.sh\n" \
+    "  \"\$runner\"\n" \
     "  echo '### RUNNER STOP:' \$?\n" \
     "else\n" \
     "  read -r -t 5 -p 'Press ENTER to access root shell...' && exit || echo ' timeout.'\n" \

@@ -46,7 +46,7 @@ from mobly import asserts
 class TC_OCC_2_3(MatterBaseTest):
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         return await self.read_single_attribute_check_success(endpoint=endpoint_id, cluster=cluster, attribute=attribute)
 
     def desc_TC_OCC_2_3(self) -> str:

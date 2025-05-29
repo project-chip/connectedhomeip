@@ -31,7 +31,7 @@ gn \
     --root-target=//config/qpg/chip-gn \
     --dotfile="$GN_ROOT_TARGET/.gn" \
     --script-executable=python3 \
-    --export-compile-commands \
+    --add-export-compile-commands="*" \
     gen \
     --check \
     --args="$GN_ARGS" \

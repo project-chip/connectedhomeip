@@ -162,8 +162,9 @@ tests:
 
     - label: "Step 4: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x02, the TransitionTime field set
-          to 1000 (1s) and the ExtensionFieldSets set to: '[{ ClusterID: 0x0006,
-          AttributeValueList: [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }]}]'
+          to 1000 (1s) and the ExtensionFieldSetStructs set to: '[{ ClusterID:
+          0x0006, AttributeValueList: [{ AttributeID: 0x0000, ValueUnsigned8:
+          0x01 }]}]'
           "
       command: "AddScene"
       arguments:
@@ -176,7 +177,7 @@ tests:
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {

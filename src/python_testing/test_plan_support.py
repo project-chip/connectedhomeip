@@ -25,6 +25,14 @@ def read_attribute(attribute: str, cluster: typing.Optional[str] = None):
         return attr
 
 
+def send_command(command: str, cluster: typing.Optional[str] = None):
+    cmd = f"sends the {command} command"
+    if cluster:
+        return f'{cmd} from {cluster}'
+    else:
+        return cmd
+
+
 def save_as(val: str) -> str:
     return f' and saves the value as {val}'
 

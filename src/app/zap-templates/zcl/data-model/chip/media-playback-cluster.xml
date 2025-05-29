@@ -46,87 +46,156 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE"                     type="PlaybackStateEnum" min="0x00" max="0x03" default="0x00" writable="false"                    optional="false">CurrentState</attribute>
-    <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME"                type="epoch_us"          min="0x00"            default="0x00" writable="false" isNullable="true"  optional="true">StartTime</attribute>
-    <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION"                  type="int64u"            min="0x00"            default="0"    writable="false" isNullable="true"  optional="true">Duration</attribute>
-    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION"         type="PlaybackPositionStruct"                                 writable="false" isNullable="true"  optional="true">SampledPosition</attribute>
-    <attribute side="server" code="0x0004" define="MEDIA_PLAYBACK_PLAYBACK_SPEED"            type="single"            min="0x00"            default="0"    writable="false"                    optional="true">PlaybackSpeed</attribute>
-    <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END"   type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeEnd</attribute>
-    <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeStart</attribute>
-    <attribute side="server" code="0x0007" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_AUDIO_TRACK" optional="true"      type="TrackStruct"     writable="false" isNullable="true">ActiveAudioTrack</attribute>
-    <attribute side="server" code="0x0008" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_AUDIO_TRACKS" optional="true"  type="array" entryType="TrackStruct"     writable="false" isNullable="true">AvailableAudioTracks</attribute>
-    <attribute side="server" code="0x0009" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_TEXT_TRACK" optional="true"      type="TrackStruct"     writable="false" isNullable="true">ActiveTextTrack</attribute>
-    <attribute side="server" code="0x000A" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_TEXT_TRACKS" optional="true"  type="array" entryType="TrackStruct"     writable="false" isNullable="true">AvailableTextTracks</attribute>
+    <attribute side="server" code="0x0000" name="CurrentState" define="MEDIA_PLAYBACK_STATE" type="PlaybackStateEnum" min="0x00" max="0x03">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="StartTime" define="MEDIA_PLAYBACK_START_TIME" type="epoch_us" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0002" name="Duration" define="MEDIA_PLAYBACK_DURATION" type="int64u" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0003" name="SampledPosition" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="PlaybackPositionStruct" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="PlaybackSpeed" define="MEDIA_PLAYBACK_PLAYBACK_SPEED" type="single" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0005" name="SeekRangeEnd" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END" type="int64u" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0006" name="SeekRangeStart" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="int64u" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0007" name="ActiveAudioTrack" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_AUDIO_TRACK" optional="true" type="TrackStruct" isNullable="true">
+      <mandatoryConform>
+        <feature name="AT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0008" name="AvailableAudioTracks" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_AUDIO_TRACKS" optional="true" type="array" entryType="TrackStruct" isNullable="true">
+      <mandatoryConform>
+        <feature name="AT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0009" name="ActiveTextTrack" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_TEXT_TRACK" optional="true" type="TrackStruct" isNullable="true">
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x000A" name="AvailableTextTracks" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_TEXT_TRACKS" optional="true" type="array" entryType="TrackStruct" isNullable="true">
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
+    </attribute>
 
 
     <command source="client" code="0x00" name="Play" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL play media.</description>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="Pause" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL pause media.</description>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x02" name="Stop" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location where media was originally launched.</description>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x03" name="StartOver" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Start Over with the current media playback item.</description>
+      <optionalConform/>
     </command>
 
     <command source="client" code="0x04" name="Previous" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go back to the previous media playback item.</description>
+      <optionalConform/>
     </command>
 
     <command source="client" code="0x05" name="Next" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item.</description>
+      <optionalConform/>
     </command>
 
     <command source="client" code="0x06" name="Rewind" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).</description>
       <arg name="AudioAdvanceUnmuted" type="boolean" optional="true"/>
+      <mandatoryConform>
+        <feature name="VS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x07" name="FastForward" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).</description>
       <arg name="AudioAdvanceUnmuted" type="boolean" optional="true"/>
+      <mandatoryConform>
+        <feature name="VS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x08" name="SkipForward" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows:</description>
       <arg name="DeltaPositionMilliseconds" type="int64u"/>
+      <optionalConform/>
     </command>
 
     <command source="client" code="0x09" name="SkipBackward" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
       <arg name="DeltaPositionMilliseconds" type="int64u"/>
+      <optionalConform/>
     </command>
 
     <command source="client" code="0x0B" name="Seek" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
       <arg name="position" type="int64u"/>
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
     </command>
 
     <command source="server" code="0x0A" name="PlaybackResponse" optional="false">
       <description>This command SHALL be generated in response to various Playback Request commands.</description>
       <arg name="Status" type="StatusEnum"/>
       <arg name="Data"   type="char_string" optional="true"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x0C" name="ActivateAudioTrack" optional="true">
       <description>Upon receipt, the server SHALL set the active Audio Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server will return an error status of INVALID_ARGUMENT.</description>
       <arg name="TrackID" type="CHAR_STRING"/>
       <arg name="AudioOutputIndex"   type="INT8U"/>
+      <mandatoryConform>
+        <feature name="AT"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x0D" name="ActivateTextTrack" optional="true">
       <description>Upon receipt, the server SHALL set the active Text Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server SHALL return an error status of INVALID_ARGUMENT.</description>
       <arg name="TrackID" type="CHAR_STRING"/>
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x0E" name="DeactivateTextTrack" optional="true">
       <description>If a Text Track is active (i.e. being displayed), upon receipt of this command, the server SHALL stop displaying it.</description>
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
     </command>
 
     <event side="server" code="0x00" priority="info" name="StateChanged" optional="true">
@@ -140,6 +209,7 @@ limitations under the License.
       <field id="6" name="SeekRangeStart" type="INT64U"/>
       <field id="7" name="Data" type="OCTET_STRING" optional="true" length="900" />
       <field id="8" name="AudioAdvanceUnmuted" type="boolean" default="true"/>
+      <optionalConform/>
     </event>
   </cluster>
 

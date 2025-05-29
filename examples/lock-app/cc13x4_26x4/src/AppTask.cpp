@@ -43,9 +43,10 @@
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
@@ -55,7 +56,7 @@
 #include <ti/drivers/apps/LED.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_UAT
-#include "app/icd/server/ICDNotifier.h"
+#include "app/icd/server/ICDNotifier.h" // nogncheck
 #endif
 
 /* syscfg */
@@ -138,6 +139,10 @@ bool isAppStarting = true;
 
 ::Identify stIdentify = { 0, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                           Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::TriggerIdentifyEffectHandler };
+
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+static bool sitModeRequested;
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS
 
 int AppTask::StartAppTask()
 {
@@ -308,6 +313,7 @@ int AppTask::Init()
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     // Initialize info provider
     sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
@@ -532,6 +538,25 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         {
             chip::Server::GetInstance().ScheduleFactoryReset();
         }
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+        else if (AppEvent::kAppEventButtonType_DoubleClicked == aEvent->ButtonEvent.Type)
+        {
+            if (!sitModeRequested)
+            {
+                chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                    [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
+                sitModeRequested = true;
+                PLAT_LOG("Enabled SIT in DSLS");
+            }
+            else
+            {
+                chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                    [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+                sitModeRequested = false;
+                PLAT_LOG("Enabled LIT in DSLS");
+            }
+        }
+#endif
         break;
 
     case AppEvent::kEventType_ButtonRight:
@@ -699,6 +724,12 @@ void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask even
     {
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
     }
+#if (CHIP_CONFIG_ENABLE_ICD_LIT && CHIP_CONFIG_ENABLE_ICD_DSLS)
+    else if (events & Button_EV_DOUBLECLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_DoubleClicked;
+    }
+#endif
     // button callbacks are in ISR context
     if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
     {
@@ -754,7 +785,7 @@ void AppTask::uiInit(void)
     Button_init();
 
     Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED | Button_EV_DOUBLECLICKED;
     buttonParams.longPressDuration = 1000U; // ms
     sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
     Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);

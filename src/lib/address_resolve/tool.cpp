@@ -147,7 +147,7 @@ extern "C" void StopSignalHandler(int signal)
 
 } // namespace
 
-extern "C" int main(int argc, const char ** argv)
+int main(int argc, const char ** argv)
 {
     Platform::MemoryInit();
 

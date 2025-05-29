@@ -225,3 +225,15 @@ MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID {{availability (asUpperCamelC
 {{> eventIDs clusterName=label}}
 {{/zcl_clusters}}
 };
+
+#pragma mark - Device Type IDs
+
+typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
+  {{#zcl_device_types}}
+  {{! Only include standard device types for now.  The template syntax does not get hex numbers, apparently.
+      ZAP seems to have no is_number_less_than helper, so do is_number_greater_than with the arguments reversed. }}
+  {{#if (is_number_greater_than 65536 code)}}
+  MTRDeviceTypeIDType{{asUpperCamelCase caption preserveAcronyms=true}}ID {{availability "" deviceType=(asUpperCamelCase caption preserveAcronyms=true)}} = {{asHex code 8}},
+  {{/if}}
+  {{/zcl_device_types}}
+} MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));

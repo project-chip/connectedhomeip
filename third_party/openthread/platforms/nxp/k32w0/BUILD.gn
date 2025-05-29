@@ -86,7 +86,7 @@ source_set("libopenthread-k32w0") {
     ]
   }
 
-  if (chip_with_ot_cli == 1) {
+  if (nxp_enable_ot_cli) {
     sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]
   }
 

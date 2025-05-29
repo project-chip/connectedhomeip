@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050D" name="Device Energy Management" revision="2">
   <revisionHistory>
@@ -61,25 +63,44 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Updated description of when DEM Mode is to be included"/>
   </revisionHistory>
   <classification class="utility" scope="endpoint"/>
+  <conditions>
+    <condition name="ControllableESA" summary="The DEM cluster on this endpoint accepts commands to adjust its energy operation."/>
+  </conditions>
   <clusters>
     <cluster id="0x0098" name="Device Energy Management" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <features>
-        <feature code="" name="PowerAdjustment"/>
-        <feature code="" name="StartTimeAdjustment"/>
-        <feature code="" name="Pausable"/>
-        <feature code="" name="ForecastAdjustment"/>
-        <feature code="" name="ConstraintBasedAdjustment"/>
+        <feature code="" name="PowerAdjustment">
+          <optionalConform choice="a" more="true" min="1">
+            <condition name="ControllableESA"/>
+          </optionalConform>
+        </feature>
+        <feature code="" name="StartTimeAdjustment">
+          <optionalConform choice="a" more="true" min="1">
+            <condition name="ControllableESA"/>
+          </optionalConform>
+        </feature>
+        <feature code="" name="Pausable">
+          <optionalConform choice="a" more="true" min="1">
+            <condition name="ControllableESA"/>
+          </optionalConform>
+        </feature>
+        <feature code="" name="ForecastAdjustment">
+          <optionalConform choice="a" more="true" min="1">
+            <condition name="ControllableESA"/>
+          </optionalConform>
+        </feature>
+        <feature code="" name="ConstraintBasedAdjustment">
+          <optionalConform choice="a" more="true" min="1">
+            <condition name="ControllableESA"/>
+          </optionalConform>
+        </feature>
       </features>
     </cluster>
     <cluster id="0x009F" name="Device Energy Management Mode" side="server">
       <otherwiseConform>
-        <provisionalConform/>
         <mandatoryConform>
-          <attribute name="ControllableESA"/>
+          <condition name="ControllableESA"/>
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>

@@ -42,10 +42,11 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef USE_CHIP_DATA_MODEL
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #endif // USE_CHIP_DATA_MODEL
 
 #ifdef CHIP_OPEN_IOT_SDK_OTA_ENABLE
@@ -109,7 +110,7 @@ static void post_network_connect()
     // Iterate on the network interface to see if we already have beed assigned addresses.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        char ifName[chip::Inet::InterfaceId::kMaxIfNameLength];
+        char ifName[Inet::InterfaceId::kMaxIfNameLength];
         if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)))
         {
             chip::Inet::IPAddress addr;
@@ -274,6 +275,7 @@ int openiotsdk_chip_run(void)
         ChipLogError(NotSpecified, "Initialize static resources before server init failed: %s", err.AsString());
         return EXIT_FAILURE;
     }
+    initParams.dataModelProvider             = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 

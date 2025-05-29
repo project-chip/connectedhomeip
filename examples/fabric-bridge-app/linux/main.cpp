@@ -23,7 +23,7 @@
 #include "BridgedDeviceBasicInformationImpl.h"
 #include "BridgedDeviceManager.h"
 #include "CommissionableInit.h"
-#include "CommissionerControl.h"
+#include "CommissionerControlDelegate.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -35,6 +35,12 @@
 #include "RpcServer.h"
 #endif
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::AdministratorCommissioning;
+using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
+
 // This is declared here and not in a header because zap/embr assumes all clusters
 // are defined in a static endpoint in the .zap file. From there, the codegen will
 // automatically use PluginApplicationCallbacksHeader.jinja to declare and call
@@ -42,12 +48,6 @@
 // ever on a dynamic endpoint, this doesn't get declared and called for us, so we
 // need to declare and call it ourselves where the application is initialized.
 void MatterEcosystemInformationPluginServerInitCallback();
-
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::AdministratorCommissioning;
-using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
 namespace {
 
@@ -57,8 +57,6 @@ constexpr uint16_t kRetryIntervalS = 3;
 
 uint16_t gFabricAdminServerPort = 33001;
 uint16_t gLocalServerPort       = 33002;
-
-BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 
 constexpr uint16_t kOptionFabricAdminServerPortNumber = 0xFF01;
 constexpr uint16_t kOptionLocalServerPortNumber       = 0xFF02;
@@ -100,7 +98,7 @@ ArgParser::OptionSet sProgramCustomOptions = { HandleCustomOption, sProgramCusto
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
 {
-    if (StartRpcClient() == CHIP_NO_ERROR)
+    if (bridge::StartRpcClient() == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Connected to Fabric-Admin");
     }
@@ -112,6 +110,10 @@ void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
 }
 #endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 
+} // namespace
+
+namespace bridge {
+
 class AdministratorCommissioningCommandHandler : public CommandHandlerInterface
 {
 public:
@@ -120,8 +122,23 @@ public:
         CommandHandlerInterface(Optional<EndpointId>::Missing(), AdministratorCommissioning::Id)
     {}
 
+    CHIP_ERROR Init();
+
     void InvokeCommand(HandlerContext & handlerContext) override;
+
+private:
+    CommandHandlerInterface * mOriginalCommandHandlerInterface = nullptr;
 };
+
+CHIP_ERROR AdministratorCommissioningCommandHandler::Init()
+{
+    mOriginalCommandHandlerInterface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(kRootEndpointId, AdministratorCommissioning::Id);
+    VerifyOrReturnError(mOriginalCommandHandlerInterface, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(mOriginalCommandHandlerInterface));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    return CHIP_NO_ERROR;
+}
 
 void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & handlerContext)
 {
@@ -134,6 +151,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
         endpointId == kRootEndpointId)
     {
         // Proceed with default handling in Administrator Commissioning Server
+        mOriginalCommandHandlerInterface->InvokeCommand(handlerContext);
         return;
     }
 
@@ -149,7 +167,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     Status status = Status::Failure;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+    BridgedDevice * device = BridgedDeviceManager::Instance().GetDevice(endpointId);
 
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
     if (device != nullptr &&
@@ -212,7 +230,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
         return;
     }
 
-    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+    BridgedDevice * device = BridgedDeviceManager::Instance().GetDevice(endpointId);
     if (device == nullptr || !device->IsIcd())
     {
         handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
@@ -239,30 +257,35 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
 }
 
 BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
+BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 
-} // namespace
+} // namespace bridge
 
 void ApplicationInit()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
     MatterEcosystemInformationPluginServerInitCallback();
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
-    AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
+    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(
+                           &bridge::gBridgedDeviceInformationCommandHandler) == CHIP_NO_ERROR,
+                       NotSpecified, "Failed to register bridged device command handler");
+    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(&bridge::gBridgedDeviceBasicInformationAttributes),
+                       NotSpecified, "Failed to register bridged device attribute access");
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    SetRpcRemoteServerPort(gFabricAdminServerPort);
-    InitRpcServer(gLocalServerPort);
+    bridge::SetRpcRemoteServerPort(gFabricAdminServerPort);
+    bridge::InitRpcServer(gLocalServerPort);
     AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
 #endif
 
-    BridgeDeviceMgr().Init();
-    VerifyOrDie(gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
+    bridge::BridgedDeviceManager::Instance().Init();
+    VerifyOrDie(bridge::gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
+    VerifyOrDieWithMsg(bridge::gAdministratorCommissioningCommandHandler.Init() == CHIP_NO_ERROR, NotSpecified,
+                       "Failed to initialize Commissioner command handler");
 
-    VerifyOrDieWithMsg(CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
+    VerifyOrDieWithMsg(bridge::CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
                        "Failed to initialize Commissioner Control Server");
 }
 
@@ -270,7 +293,7 @@ void ApplicationShutdown()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationShutdown()");
 
-    if (CommissionerControlShutdown() != CHIP_NO_ERROR)
+    if (bridge::CommissionerControlShutdown() != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to shutdown Commissioner Control Server");
     }

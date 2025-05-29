@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include <zephyr/net/net_event.h>
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/net_stats.h>
+#include <zephyr/version.h>
 
 extern "C" {
 #include <common/defs.h>
@@ -70,9 +71,8 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
 
     if (result != nullptr)
     {
-        static_assert(sizeof(response.ssid) == sizeof(result->ssid), "SSID length mismatch");
         static_assert(sizeof(response.bssid) == sizeof(result->mac), "BSSID length mismatch");
-
+        assert(sizeof(response.ssid) >= result->ssid_length);
         // TODO: Distinguish WPA versions
         response.security.Set(result->security == WIFI_SECURITY_TYPE_PSK ? NetworkCommissioning::WiFiSecurity::kWpaPersonal
                                                                          : NetworkCommissioning::WiFiSecurity::kUnencrypted);
@@ -216,9 +216,11 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
         memcpy(mScanSsidBuffer, ssid.data(), ssid.size());
         mScanSsidBuffer[ssid.size()] = 0; // indicate the end of ssid string
         mScanParams.ssids[0]         = mScanSsidBuffer;
-        mScanParams.ssids[1]         = nullptr; // indicate the end of ssids list
-        scanParams                   = &mScanParams;
-        scanParamsSize               = sizeof(*scanParams);
+#if (CONFIG_WIFI_MGMT_SCAN_SSID_FILT_MAX > 1)
+        mScanParams.ssids[1] = nullptr; // indicate the end of ssids list
+#endif
+        scanParams     = &mScanParams;
+        scanParamsSize = sizeof(*scanParams);
     }
     if (0 != net_mgmt(NET_REQUEST_WIFI_SCAN, mNetIf, scanParams, scanParamsSize))
     {
@@ -300,6 +302,11 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
         info.mRssi         = static_cast<int8_t>(status.rssi);
         info.mChannel      = static_cast<uint16_t>(status.channel);
         info.mSsidLen      = status.ssid_len;
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
+        info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_tx_rate);
+#else
+        info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_rate);
+#endif
         memcpy(info.mSsid, status.ssid, status.ssid_len);
         memcpy(info.mBssId, status.bssid, sizeof(status.bssid));
 
@@ -318,6 +325,7 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
     stats.mPacketMulticastTxCount = data.multicast.tx;
     stats.mPacketUnicastRxCount   = data.unicast.rx;
     stats.mPacketUnicastTxCount   = data.unicast.tx;
+    stats.mOverRunCount           = data.overrun_count;
     stats.mBeaconsSuccessCount    = data.sta_mgmt.beacons_rx;
     stats.mBeaconsLostCount       = data.sta_mgmt.beacons_miss;
 

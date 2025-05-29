@@ -379,7 +379,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.maxrfidcodelength = None
         self.minrfidcodelength = None
 
-        self.endpoint = self.user_params.get("endpoint", 1)
+        self.endpoint = self.get_endpoint(default=1)
         print("endpoint", self.endpoint)
 
         # Aliro Keys for setting Aliro configuration and credential
@@ -591,8 +591,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             numberofcredentialsupportedperuser = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
                                                                                      cluster=drlkcluster,
                                                                                      attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
-        asserts.assert_in(numberofcredentialsupportedperuser, range(
-            0, 255), "NumberOfCredentialsSupportedPerUser value is out of range")
+            asserts.assert_in(numberofcredentialsupportedperuser, range(
+                0, 255), "NumberOfCredentialsSupportedPerUser value is out of range")
         self.step("15b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
             try:

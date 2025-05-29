@@ -22,7 +22,6 @@ config("config") {
 chip_data_model("fabric-bridge-common-zap") {
   zap_file = "fabric-bridge-app.zap"
   is_server = true
-  cflags = [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
 }
 
 # This includes all the clusters that only exist on the dynamic endpoint.

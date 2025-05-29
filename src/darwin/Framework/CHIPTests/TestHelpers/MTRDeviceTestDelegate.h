@@ -24,8 +24,10 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
 @property (nonatomic, nullable) dispatch_block_t onReachable;
 @property (nonatomic, nullable) dispatch_block_t onNotReachable;
+@property (nonatomic, nullable) dispatch_block_t onInternalStateChanged;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
+@property (nonatomic, nullable) dispatch_block_t onReportBegin;
 @property (nonatomic, nullable) dispatch_block_t onReportEnd;
 @property (nonatomic, nullable) dispatch_block_t onDeviceCachePrimed;
 @property (nonatomic) BOOL skipExpectedValuesForWrite;
@@ -35,6 +37,9 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @property (nonatomic, nullable) dispatch_block_t onSubscriptionPoolDequeue;
 @property (nonatomic, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
 @property (nonatomic, nullable) dispatch_block_t onClusterDataPersisted;
+@property (nonatomic, nullable) dispatch_block_t onSubscriptionCallbackDelete;
+@property (nonatomic, nullable) dispatch_block_t onSubscriptionReset;
+@property (nonatomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate

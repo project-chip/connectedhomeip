@@ -17,16 +17,8 @@
 
 #include "DeviceCallbacks.h"
 
-#include <DEMDelegate.h>
-#if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-#include <EnergyEvseMain.h>
-#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-
-#if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-#include <WhmMain.h>
-#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-
 #include "esp_log.h"
+#include <EnergyManagementAppCommonMain.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
@@ -44,11 +36,13 @@
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
 #include "shell_extension/openthread_cli_register.h"
+#include <EnergyManagementAppCmdLineOptions.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
+#include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
@@ -81,6 +75,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WaterHeaterManagement;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
@@ -93,6 +88,10 @@ static AppDeviceCallbacks EchoCallbacks;
 static DeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
 
 namespace {
+
+constexpr chip::EndpointId kEvseEndpoint        = 1;
+constexpr chip::EndpointId kWaterHeaterEndpoint = 2;
+
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -120,20 +119,66 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 } // namespace
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DeviceEnergyManagement {
+
+// Keep track of the parsed featureMap option
+#if defined(CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING) && defined(CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING)
+#error Cannot define CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING and CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
+#endif
+
+#ifdef CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
+                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
+                                          Feature::kConstraintBasedAdjustment);
+#elif CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kStateForecastReporting,
+                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
+                                          Feature::kConstraintBasedAdjustment);
+#else
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
+#endif
+
+chip::BitMask<Feature> GetFeatureMapFromCmdLine()
+{
+    return sFeatureMap;
+}
+
+} // namespace DeviceEnergyManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 // Check we are not trying to build in both app types simultaneously
 #if defined(CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE) && defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
 #error Cannot define CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE and CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 #endif
 
+EndpointId GetEnergyDeviceEndpointId()
+{
+#if defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
+    return kWaterHeaterEndpoint;
+#else
+    return kEvseEndpoint;
+#endif
+}
+
 void ApplicationInit()
 {
     ESP_LOGD(TAG, "Energy Management App: ApplicationInit()");
 #if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
+
     EvseApplicationInit();
+    // Disable Water Heater Endpoint
+    emberAfEndpointEnableDisable(kWaterHeaterEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    WhmApplicationInit();
+    WaterHeaterApplicationInit();
+    // Disable EVSE Endpoint
+    emberAfEndpointEnableDisable(kEvseEndpoint, false);
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 
@@ -146,7 +191,7 @@ void ApplicationShutdown()
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    WhmApplicationShutdown();
+    WaterHeaterApplicationShutdown();
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 
@@ -207,11 +252,13 @@ extern "C" void app_main()
 
     ESP_LOGI(TAG, "==================================================");
 #if defined(CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE)
-    ESP_LOGI(TAG, "chip-esp32-energy-management-example evse starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
+    ESP_LOGI(TAG, "chip-esp32-energy-management-example evse starting. featureMap 0x%08lx",
+             DeviceEnergyManagement::sFeatureMap.Raw());
 #elif defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
-    ESP_LOGI(TAG, "chip-esp32-energy-management-example water-heater starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
+    ESP_LOGI(TAG, "chip-esp32-energy-management-example water-heater starting. featureMap 0x%08lx",
+             DeviceEnergyManagement::sFeatureMap.Raw());
 #else
-    ESP_LOGI(TAG, "chip-esp32-energy-management-example starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
+    ESP_LOGI(TAG, "chip-esp32-energy-management-example starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
 #endif
     ESP_LOGI(TAG, "==================================================");
 
@@ -247,7 +294,6 @@ extern "C" void app_main()
 #endif
 
     SetDeviceAttestationCredentialsProvider(get_dac_provider());
-    ESPOpenThreadInit();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

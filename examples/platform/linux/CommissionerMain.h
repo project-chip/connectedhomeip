@@ -18,18 +18,15 @@
 
 #pragma once
 
-#include <controller/CHIPDeviceController.h>
-#include <controller/CommissionerDiscoveryController.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-#include <transport/TransportMgr.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-using chip::Controller::DeviceCommissioner;
-using chip::Transport::PeerAddress;
+#include <controller/CHIPDeviceController.h> // nogncheck
+#include <controller/CommissionerDiscoveryController.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, PeerAddress address);
 CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index);
@@ -37,7 +34,9 @@ CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index);
 CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, chip::FabricId fabricId = chip::kUndefinedFabricId);
 void ShutdownCommissioner();
 
-DeviceCommissioner * GetDeviceCommissioner();
+chip::Controller::DeviceCommissioner * GetDeviceCommissioner();
 CommissionerDiscoveryController * GetCommissionerDiscoveryController();
+chip::Crypto::SessionKeystore * GetSessionKeystore();
+chip::PersistentStorageDelegate * GetPersistentStorageDelegate();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

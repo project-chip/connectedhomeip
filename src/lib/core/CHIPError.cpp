@@ -22,14 +22,22 @@
 
 namespace chip {
 
+static ErrorFormatter sCHIPErrorFormatter = { FormatCHIPError, nullptr };
+
 /**
  * Register a text error formatter for CHIP core errors.
  */
 void RegisterCHIPLayerErrorFormatter()
 {
-    static ErrorFormatter sCHIPErrorFormatter = { FormatCHIPError, nullptr };
-
     RegisterErrorFormatter(&sCHIPErrorFormatter);
+}
+
+/**
+ * Deregister a text error formatter for CHIP core errors.
+ */
+void DeregisterCHIPLayerErrorFormatter()
+{
+    DeregisterErrorFormatter(&sCHIPErrorFormatter);
 }
 
 /**
@@ -170,11 +178,20 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_TLV_CONTAINER_OPEN.AsInteger():
         desc = "TLV container open";
         break;
+    case CHIP_ERROR_IN_USE.AsInteger():
+        desc = "In use";
+        break;
+    case CHIP_ERROR_HAD_FAILURES.AsInteger():
+        desc = "Operation had failures";
+        break;
     case CHIP_ERROR_INVALID_MESSAGE_TYPE.AsInteger():
         desc = "Invalid message type";
         break;
     case CHIP_ERROR_UNEXPECTED_TLV_ELEMENT.AsInteger():
         desc = "Unexpected TLV element";
+        break;
+    case CHIP_ERROR_ALREADY_INITIALIZED.AsInteger():
+        desc = "Already initialized";
         break;
     case CHIP_ERROR_NOT_IMPLEMENTED.AsInteger():
         desc = "Not Implemented";

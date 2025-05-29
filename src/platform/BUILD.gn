@@ -148,14 +148,15 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
         chip_device_platform == "webos" || chip_device_platform == "bl602" ||
-        chip_device_platform == "bl702" || chip_device_platform == "bl702l") {
+        chip_device_platform == "bl702" || chip_device_platform == "bl702l" ||
+        chip_device_platform == "bl616" || chip_device_platform == "esp32") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
-    if (chip_enable_nfc) {
+    if (chip_enable_nfc_onboarding_payload) {
       defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",
-        "CONFIG_CHIP_NFC_COMMISSIONING=1",
+        "CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD=1",
+        "CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=1",
       ]
     }
 
@@ -249,6 +250,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+    } else if (chip_device_platform == "bl616") {
+      device_layer_target_define = "BL616"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
     } else if (chip_device_platform == "bl702") {
       device_layer_target_define = "BL702"
       defines += [
@@ -275,6 +282,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET=Ameba",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "realtek_bee") {
+      device_layer_target_define = "REALTEK_BEE"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_REALTEK_BEE=1",
+        "CHIP_DEVICE_LAYER_TARGET=Realtek_bee",
       ]
     } else if (chip_device_platform == "cyw30739") {
       device_layer_target_define = "CYW30739"
@@ -346,11 +359,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "TELINK",
       "MBED",
       "BL602",
+      "BL616",
       "BL702",
       "BL702L",
       "FAKE",
       "ANDROID",
       "AMEBA",
+      "REALTEK_BEE",
       "CYW30739",
       "WEBOS",
       "MW320",
@@ -464,6 +479,7 @@ if (chip_device_platform != "none") {
       "../include/platform/ConnectivityManager.h",
       "../include/platform/DeviceControlServer.h",
       "../include/platform/DeviceInstanceInfoProvider.h",
+      "../include/platform/GeneralFaults.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/KvsPersistentStorageDelegate.h",
@@ -531,7 +547,8 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
-      "${chip_root}/src/app/common:cluster-objects",
+      "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/app/util:types",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]
@@ -572,10 +589,14 @@ if (chip_device_platform != "none") {
       _platform_target = "Infineon/PSOC6"
     } else if (chip_device_platform == "ameba") {
       _platform_target = "Ameba"
+    } else if (chip_device_platform == "realtek_bee") {
+      _platform_target = "Realtek_bee"
     } else if (chip_device_platform == "webos") {
       _platform_target = "webos"
     } else if (chip_device_platform == "bl602") {
       _platform_target = "bouffalolab/BL602"
+    } else if (chip_device_platform == "bl616") {
+      _platform_target = "bouffalolab/BL616"
     } else if (chip_device_platform == "bl702") {
       _platform_target = "bouffalolab/BL702"
     } else if (chip_device_platform == "bl702l") {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -199,6 +199,16 @@ public:
         if (mSystemState)
         {
             return mSystemState->SessionMgr();
+        }
+
+        return nullptr;
+    }
+
+    CASESessionManager * CASESessionMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->CASESessionMgr();
         }
 
         return nullptr;
@@ -468,7 +478,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() override;
+    ~DeviceCommissioner() override {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -720,6 +730,7 @@ public:
      */
     void CloseBleConnection();
 #endif
+
     /**
      * @brief
      *   Discover all devices advertising as commissionable.
@@ -806,6 +817,7 @@ public:
 
     Optional<CommissioningParameters> GetCommissioningParameters()
     {
+        // TODO: Return a non-optional const & to avoid a copy, mDefaultCommissioner is never null
         return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
     }
 
@@ -828,8 +840,11 @@ private:
     DeviceProxy * mDeviceBeingCommissioned               = nullptr;
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
+    Optional<System::Clock::Timeout> mCommissioningStepTimeout; // Note: For multi-interaction steps this is per interaction
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
-    bool mRunCommissioningAfterConnection  = false;
+    uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()
+
+    bool mRunCommissioningAfterConnection = false;
     Internal::InvokeCancelFn mInvokeCancelFn;
     Internal::WriteCancelFn mWriteCancelFn;
 
@@ -947,6 +962,9 @@ private:
     static void OnSetRegulatoryConfigResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+    static void OnSetTCAcknowledgementsResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType & data);
     static void OnSetUTCError(void * context, CHIP_ERROR error);
     static void
     OnSetTimeZoneResponse(void * context,
@@ -1040,16 +1058,14 @@ private:
     void CancelCASECallbacks();
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    void ParseCommissioningInfo();
-    // Parsing attributes read in kReadCommissioningInfo stage.
-    CHIP_ERROR ParseCommissioningInfo1(ReadCommissioningInfo & info);
-    // Parsing attributes read in kReadCommissioningInfo2 stage.
-    CHIP_ERROR ParseCommissioningInfo2(ReadCommissioningInfo & info);
-    // Called by ParseCommissioningInfo2
+    void ContinueReadingCommissioningInfo(const CommissioningParameters & params);
+    void FinishReadingCommissioningInfo();
+    CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
-    // Called by ParseCommissioningInfo
-    void ParseTimeSyncInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     static CHIP_ERROR

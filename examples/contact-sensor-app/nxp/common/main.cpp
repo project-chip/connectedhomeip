@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,10 +30,17 @@ extern "C" void main_task(void const * argument)
     chip::NXP::App::GetAppTask().Start();
 }
 #else
-extern "C" int main(int argc, char * argv[])
+int main(int argc, char * argv[])
 {
     chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
     chip::NXP::App::GetAppTask().Start();
     vTaskStartScheduler();
+}
+#endif
+
+#if (defined(configCHECK_FOR_STACK_OVERFLOW) && (configCHECK_FOR_STACK_OVERFLOW > 0))
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
+{
+    assert(0);
 }
 #endif

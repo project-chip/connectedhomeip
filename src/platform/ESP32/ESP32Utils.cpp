@@ -241,7 +241,7 @@ CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & net
     netInfo.NetworkId              = kWiFiStationNetworkId;
     netInfo.FieldPresent.NetworkId = true;
     memcpy(netInfo.WiFiSSID, stationConfig.sta.ssid,
-           min(strlen(reinterpret_cast<char *>(stationConfig.sta.ssid)) + 1, sizeof(netInfo.WiFiSSID)));
+           std::min(strlen(reinterpret_cast<char *>(stationConfig.sta.ssid)) + 1, sizeof(netInfo.WiFiSSID)));
 
     // Enforce that netInfo wifiSSID is null terminated
     netInfo.WiFiSSID[kMaxWiFiSSIDLength] = '\0';
@@ -249,7 +249,7 @@ CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & net
     if (includeCredentials)
     {
         static_assert(sizeof(netInfo.WiFiKey) < 255, "Our min might not fit in netInfo.WiFiKeyLen");
-        netInfo.WiFiKeyLen = static_cast<uint8_t>(min(strlen((char *) stationConfig.sta.password), sizeof(netInfo.WiFiKey)));
+        netInfo.WiFiKeyLen = static_cast<uint8_t>(std::min(strlen((char *) stationConfig.sta.password), sizeof(netInfo.WiFiKey)));
         memcpy(netInfo.WiFiKey, stationConfig.sta.password, netInfo.WiFiKeyLen);
     }
 
@@ -268,7 +268,7 @@ CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo
     ReturnErrorOnFailure(ESP32Utils::EnableStationMode());
 
     // Enforce that wifiSSID is null terminated before copying it
-    memcpy(wifiSSID, netInfo.WiFiSSID, min(netInfoSSIDLen + 1, sizeof(wifiSSID)));
+    memcpy(wifiSSID, netInfo.WiFiSSID, std::min(netInfoSSIDLen + 1, sizeof(wifiSSID)));
     if (netInfoSSIDLen + 1 < sizeof(wifiSSID))
     {
         wifiSSID[netInfoSSIDLen] = '\0';
@@ -280,8 +280,8 @@ CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo
 
     // Initialize an ESP wifi_config_t structure based on the new provision information.
     memset(&wifiConfig, 0, sizeof(wifiConfig));
-    memcpy(wifiConfig.sta.ssid, wifiSSID, min(strlen(wifiSSID) + 1, sizeof(wifiConfig.sta.ssid)));
-    memcpy(wifiConfig.sta.password, netInfo.WiFiKey, min((size_t) netInfo.WiFiKeyLen, sizeof(wifiConfig.sta.password)));
+    memcpy(wifiConfig.sta.ssid, wifiSSID, std::min(strlen(wifiSSID) + 1, sizeof(wifiConfig.sta.ssid)));
+    memcpy(wifiConfig.sta.password, netInfo.WiFiKey, std::min((size_t) netInfo.WiFiKeyLen, sizeof(wifiConfig.sta.password)));
     wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
     wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
 

@@ -61,6 +61,16 @@ public:
      *         false subject doesn't have any persisted subscription with the device
      */
     virtual bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) = 0;
+
+    /**
+     * @brief Check if a given fabric has at least 1 active subscription.
+     *
+     * @param aFabricIndex fabric index for which we want to validate is has at least one active subscription
+     *
+     * @return true fabric has at least one active subscription
+     *         false fabric doesn't have any active subscription or failed to validate
+     */
+    virtual bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) = 0;
 };
 
 } // namespace app

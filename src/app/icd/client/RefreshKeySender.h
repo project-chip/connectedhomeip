@@ -52,6 +52,14 @@ public:
      */
     CHIP_ERROR EstablishSessionToPeer();
 
+    /**
+     * @brief Used to retrieve ICDClientInfo from RefreshKeySender.
+     *
+     * @return ICDClientInfo - ICDClientInfo object representing the state associated with the
+                               node that requested a key refresh.
+     */
+    const ICDClientInfo & GetICDClientInfo();
+
 private:
     // CASE session callbacks
     /**

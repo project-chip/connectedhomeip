@@ -94,7 +94,7 @@ class TC_FAN_3_3(MatterBaseTest):
             self.skip_all_remaining_steps(1)
             return
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)
 

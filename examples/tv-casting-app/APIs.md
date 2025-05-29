@@ -71,13 +71,20 @@ In order to illustrate these steps, refer to the figure below
 The Casting Client is expected to consume the Matter TV Casting library built
 for its respective platform which implements the APIs described in this
 document. Refer to the tv-casting-app READMEs for [Linux](linux/README.md),
-Android and [iOS](darwin/TvCasting/README.md) to understand how to build and
-consume each platform's specific libraries. The libraries MUST be built with the
+[Android](https://github.com/project-chip/connectedhomeip/blob/master/examples/tv-casting-app/android/README.md)
+and [iOS](darwin/TvCasting/README.md) to understand how to build and consume
+each platform's specific libraries. The libraries MUST be built with the
 client's specific values for `CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and
 `CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID` updated in the
 [CHIPProjectAppConfig.h](tv-casting-common/include/CHIPProjectAppConfig.h) file.
 Other values like the `CHIP_DEVICE_CONFIG_DEVICE_NAME` may be updated as well to
 correspond to the client being built.
+
+`CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and `CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID`
+can be obtained during the CSA certification of your mobile app. The Matter SDK
+has pre-configured sample/test values for them in the
+[CHIPDeviceConfig.h](https://github.com/project-chip/connectedhomeip/blob/master/src/include/platform/CHIPDeviceConfig.h)
+file.
 
 ### Initialize the Casting Client
 

@@ -6,6 +6,10 @@ select one, sends the TV a User Directed Commissioning request, enters
 commissioning mode, advertises itself as a Commissionable Node and gets
 commissioned. Then it allows the user to send CHIP commands to the TV.
 
+Refer to the
+[Matter Casting APIs documentation](https://project-chip.github.io/connectedhomeip-doc/examples/tv-casting-app/APIs.html)
+to build the Matter “Casting Client” into your consumer-facing mobile app.
+
 <hr>
 
 -   [CHIP TV Casting App Example](#chip-tv-casting-app-example)
@@ -62,6 +66,10 @@ commissioned. Then it allows the user to send CHIP commands to the TV.
     below for details.
 
 ### Commissioning the tv-casting-app
+
+This example Matter TV Casting Android app can be tested with the
+[example Matter tv-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app)
+running on a Raspberry Pi.
 
 The tv-casting-app will automatically discover video players and print these out
 upon startup. The user-directed-commissioning (UDC) process can be initiated

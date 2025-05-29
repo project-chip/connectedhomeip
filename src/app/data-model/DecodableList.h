@@ -27,32 +27,15 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+namespace detail {
+
 /*
- * @brief
- *
- * This class provides an iteratable decoder of list items within TLV payloads
- * such that no memory has to be provided ahead of time to store the entirety of the decoded
- * list contents.
- *
- * Typical use of a DecodableList looks like this:
- *
- *    auto iter = list.begin();
- *    while (iter.Next()) {
- *        auto & entry = iter.GetValue();
- *        // Do whatever with entry
- *    }
- *    CHIP_ERROR err = iter.GetStatus();
- *    // If err is failure, decoding failed somewhere along the way.  Some valid
- *    // entries may have been processed already.
- *
+ * Base class of DecodableList to minimize template usage
  */
-template <typename T>
-class DecodableList
+class DecodableListBase
 {
 public:
-    DecodableList() { ClearReader(); }
-
-    static constexpr bool kIsFabricScoped = DataModel::IsFabricScoped<T>::value;
+    DecodableListBase() { ClearReader(); }
 
     /*
      * @brief
@@ -70,125 +53,6 @@ public:
      * This call clears the TLV reader managed by this class, so it can be reused.
      */
     void ClearReader() { mReader.Init(nullptr, 0); }
-
-    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
-    void SetFabricIndex(FabricIndex fabricIndex)
-    {
-        mFabricIndex.SetValue(fabricIndex);
-    }
-
-    class Iterator
-    {
-    public:
-        /*
-         * Initialize the iterator with a reference to a reader.
-         *
-         * This reader should be pointing into the list just after
-         * having called `OpenContainer` on the list element, or should
-         * have a `kTLVType_NotSpecified` container type if there is
-         * no list.
-         */
-        Iterator(const TLV::TLVReader & reader, Optional<FabricIndex> fabricIndex) : mFabricIndex(fabricIndex)
-        {
-            mStatus = CHIP_NO_ERROR;
-            mReader.Init(reader);
-        }
-
-        /*
-         * Increments the iterator to point to the next list element
-         * if a valid one exists, and decodes the list element into
-         * the internal value storage.
-         *
-         * If an element does exist and was successfully decoded, this
-         * shall return true.
-         *
-         * Otherwise, if the end of list is reached, or there was no list,
-         * this call shall return false.
-         *
-         * If an error was encountered at any point during the iteration or decode,
-         * this shall return false as well. The caller is expected to invoke GetStatus()
-         * to retrieve the status of the operation.
-         */
-        template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
-        bool Next()
-        {
-            return DoNext();
-        }
-
-        template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
-        bool Next()
-        {
-            bool hasNext = DoNext();
-
-            if (hasNext && mFabricIndex.HasValue())
-            {
-                mValue.SetFabricIndex(mFabricIndex.Value());
-            }
-
-            return hasNext;
-        }
-
-        /*
-         * Retrieves a reference to the decoded value, if one
-         * was decoded on a previous call to Next().
-         */
-        const T & GetValue() const { return mValue; }
-
-        /*
-         * Returns the result of all previous operations on this iterator.
-         *
-         * Notably, if the end-of-list was encountered in a previous call to Next,
-         * the status returned shall be CHIP_NO_ERROR.
-         */
-        CHIP_ERROR GetStatus() const
-        {
-            if (mStatus == CHIP_END_OF_TLV)
-            {
-                return CHIP_NO_ERROR;
-            }
-
-            return mStatus;
-        }
-
-    private:
-        bool DoNext()
-        {
-            if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
-            {
-                return false;
-            }
-
-            if (mStatus == CHIP_NO_ERROR)
-            {
-                mStatus = mReader.Next();
-            }
-
-            if (mStatus == CHIP_NO_ERROR)
-            {
-                //
-                // Re-construct mValue to reset its state back to cluster object defaults.
-                // This is especially important when decoding successive list elements
-                // that do not contain all of the fields for a given struct because
-                // they are marked optional/fabric-sensitive. Without this re-construction,
-                // data from previous decode attempts will continue to linger and give
-                // an incorrect view of the state as seen from a client.
-                //
-                mValue  = T();
-                mStatus = DataModel::Decode(mReader, mValue);
-            }
-
-            return (mStatus == CHIP_NO_ERROR);
-        }
-
-        T mValue;
-        CHIP_ERROR mStatus;
-        TLV::TLVReader mReader;
-        // TODO: Consider some setup where this field does not exist when T
-        // is not a fabric scoped struct.
-        const Optional<FabricIndex> mFabricIndex;
-    };
-
-    Iterator begin() const { return Iterator(mReader, mFabricIndex); }
 
     /*
      * Compute the size of the list. This can fail if the TLV is malformed. If
@@ -218,9 +82,230 @@ public:
         return CHIP_NO_ERROR;
     }
 
-private:
+protected:
+    class Iterator
+    {
+    public:
+        Iterator(const TLV::TLVReader & reader)
+        {
+            mStatus = CHIP_NO_ERROR;
+            mReader.Init(reader);
+        }
+
+        bool Next()
+        {
+            if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
+            {
+                return false;
+            }
+
+            if (mStatus == CHIP_NO_ERROR)
+            {
+                mStatus = mReader.Next();
+            }
+
+            return (mStatus == CHIP_NO_ERROR);
+        }
+
+        /*
+         * Returns the result of all previous operations on this iterator.
+         *
+         * Notably, if the end-of-list was encountered in a previous call to Next,
+         * the status returned shall be CHIP_NO_ERROR.
+         */
+        CHIP_ERROR GetStatus() const
+        {
+            if (mStatus == CHIP_END_OF_TLV)
+            {
+                return CHIP_NO_ERROR;
+            }
+
+            return mStatus;
+        }
+
+    protected:
+        CHIP_ERROR mStatus;
+        TLV::TLVReader mReader;
+    };
+
     TLV::TLVReader mReader;
-    chip::Optional<FabricIndex> mFabricIndex;
+};
+
+template <bool IsFabricScoped>
+class FabricIndexListMemberMixin
+{
+};
+
+template <>
+class FabricIndexListMemberMixin<true>
+{
+public:
+    void SetFabricIndex(FabricIndex fabricIndex) { mFabricIndex.SetValue(fabricIndex); }
+
+protected:
+    Optional<FabricIndex> mFabricIndex;
+};
+
+template <bool IsFabricScoped>
+class FabricIndexIteratorMemberMixin
+{
+};
+
+template <>
+class FabricIndexIteratorMemberMixin<true>
+{
+public:
+    FabricIndexIteratorMemberMixin(const Optional<FabricIndex> & fabricindex) : mFabricIndex(fabricindex) {}
+
+protected:
+    const Optional<FabricIndex> mFabricIndex;
+};
+
+template <bool IsFabricScoped>
+class DecodableMaybeFabricScopedList : public DecodableListBase, public FabricIndexListMemberMixin<IsFabricScoped>
+{
+public:
+    static constexpr bool kIsFabricScoped = IsFabricScoped;
+
+protected:
+    class Iterator : public DecodableListBase::Iterator, public FabricIndexIteratorMemberMixin<IsFabricScoped>
+    {
+    public:
+        template <bool IsActuallyFabricScoped = IsFabricScoped, std::enable_if_t<IsActuallyFabricScoped, bool> = true>
+        Iterator(const TLV::TLVReader & reader, const Optional<FabricIndex> & fabricIndex) :
+            DecodableListBase::Iterator(reader), FabricIndexIteratorMemberMixin<IsFabricScoped>(fabricIndex)
+        {}
+
+        template <bool IsActuallyFabricScoped = IsFabricScoped, std::enable_if_t<!IsActuallyFabricScoped, bool> = true>
+        Iterator(const TLV::TLVReader & reader) : DecodableListBase::Iterator(reader)
+        {}
+    };
+};
+
+} // namespace detail
+
+/*
+ * @brief
+ *
+ * This class provides an iteratable decoder of list items within TLV payloads
+ * such that no memory has to be provided ahead of time to store the entirety of the decoded
+ * list contents.
+ *
+ * Typical use of a DecodableList looks like this:
+ *
+ *    auto iter = list.begin();
+ *    while (iter.Next()) {
+ *        auto & entry = iter.GetValue();
+ *        // Do whatever with entry
+ *    }
+ *    CHIP_ERROR err = iter.GetStatus();
+ *    // If err is failure, decoding failed somewhere along the way.  Some valid
+ *    // entries may have been processed already.
+ *
+ */
+template <typename T>
+class DecodableList : public detail::DecodableMaybeFabricScopedList<DataModel::IsFabricScoped<T>::value>
+{
+public:
+    DecodableList() {}
+
+    class Iterator : public detail::DecodableMaybeFabricScopedList<DataModel::IsFabricScoped<T>::value>::Iterator
+    {
+        using IteratorBase = typename detail::DecodableMaybeFabricScopedList<DataModel::IsFabricScoped<T>::value>::Iterator;
+
+    public:
+        /*
+         * Initialize the iterator with a reference to a reader.
+         *
+         * This reader should be pointing into the list just after
+         * having called `OpenContainer` on the list element, or should
+         * have a `kTLVType_NotSpecified` container type if there is
+         * no list.
+         */
+        template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
+        Iterator(const TLV::TLVReader & reader, Optional<FabricIndex> fabricIndex) : IteratorBase(reader, fabricIndex)
+        {}
+
+        template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
+        Iterator(const TLV::TLVReader & reader) : IteratorBase(reader)
+        {}
+
+        /*
+         * Increments the iterator to point to the next list element
+         * if a valid one exists, and decodes the list element into
+         * the internal value storage.
+         *
+         * If an element does exist and was successfully decoded, this
+         * shall return true.
+         *
+         * Otherwise, if the end of list is reached, or there was no list,
+         * this call shall return false.
+         *
+         * If an error was encountered at any point during the iteration or decode,
+         * this shall return false as well. The caller is expected to invoke GetStatus()
+         * to retrieve the status of the operation.
+         */
+        template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
+        bool Next()
+        {
+            return IteratorBase::Next() && DecodeValue();
+        }
+
+        template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
+        bool Next()
+        {
+            bool hasNext = IteratorBase::Next() && DecodeValue();
+
+            if (hasNext && this->mFabricIndex.HasValue())
+            {
+                mValue.SetFabricIndex(this->mFabricIndex.Value());
+            }
+
+            return hasNext;
+        }
+
+        /*
+         * Retrieves a reference to the decoded value, if one
+         * was decoded on a previous call to Next().
+         */
+        const T & GetValue() const { return mValue; }
+
+    private:
+        bool DecodeValue()
+        {
+            if (this->mStatus == CHIP_NO_ERROR)
+            {
+                //
+                // Re-construct mValue to reset its state back to cluster object defaults.
+                // This is especially important when decoding successive list elements
+                // that do not contain all of the fields for a given struct because
+                // they are marked optional/fabric-sensitive. Without this re-construction,
+                // data from previous decode attempts will continue to linger and give
+                // an incorrect view of the state as seen from a client.
+                //
+                mValue        = T();
+                this->mStatus = DataModel::Decode(this->mReader, mValue);
+            }
+
+            return (this->mStatus == CHIP_NO_ERROR);
+        }
+
+        T mValue;
+    };
+
+    // Need this->mReader and this->mFabricIndex for the name lookup to realize
+    // those can be found in our superclasses.
+    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
+    Iterator begin() const
+    {
+        return Iterator(this->mReader, this->mFabricIndex);
+    }
+
+    template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
+    Iterator begin() const
+    {
+        return Iterator(this->mReader);
+    }
 };
 
 } // namespace DataModel

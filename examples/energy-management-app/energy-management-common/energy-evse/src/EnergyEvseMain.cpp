@@ -20,8 +20,9 @@
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
 #include <ElectricalPowerMeasurementDelegate.h>
+#include <ElectricalSensorInit.h>
 #include <EnergyEvseManager.h>
-#include <EnergyReportingMain.h>
+#include <EnergyManagementAppCommonMain.h>
 #include <PowerTopologyDelegate.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>
@@ -31,18 +32,14 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/clusters/power-topology-server/power-topology-server.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
-
-static constexpr int ENERGY_EVSE_ENDPOINT = 1;
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
@@ -51,7 +48,6 @@ using namespace chip::app::Clusters::PowerTopology;
 static std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
 static std::unique_ptr<EvseTargetsDelegate> gEvseTargetsDelegate;
 static std::unique_ptr<EnergyEvseManager> gEvseInstance;
-
 static std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
 
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
@@ -66,7 +62,7 @@ EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-CHIP_ERROR EnergyEvseInit()
+CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
 {
     CHIP_ERROR err;
 
@@ -93,7 +89,7 @@ CHIP_ERROR EnergyEvseInit()
 
     /* Manufacturer may optionally not support all features, commands & attributes */
     gEvseInstance = std::make_unique<EnergyEvseManager>(
-        EndpointId(ENERGY_EVSE_ENDPOINT), *gEvseDelegate,
+        EndpointId(endpointId), *gEvseDelegate,
         BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kRfid),
         BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                           EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
@@ -148,6 +144,11 @@ CHIP_ERROR EnergyEvseShutdown()
         gEvseDelegate.reset();
     }
 
+    if (gEvseTargetsDelegate)
+    {
+        gEvseTargetsDelegate.reset();
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -158,7 +159,9 @@ CHIP_ERROR EnergyEvseShutdown()
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-CHIP_ERROR EVSEManufacturerInit()
+CHIP_ERROR EVSEManufacturerInit(chip::EndpointId powerSourceEndpointId, ElectricalPowerMeasurementInstance & epmInstance,
+                                PowerTopologyInstance & ptInstance, DeviceEnergyManagementManager & demInstance,
+                                DeviceEnergyManagementDelegate & demDelegate)
 {
     CHIP_ERROR err;
 
@@ -169,18 +172,17 @@ CHIP_ERROR EVSEManufacturerInit()
     }
 
     /* Now create EVSEManufacturer */
-    gEvseManufacturer =
-        std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gEPMInstance.get(), gPTInstance.get(), gDEMInstance.get());
+    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get(), &epmInstance, &ptInstance, &demInstance);
     if (!gEvseManufacturer)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EvseManufacturer");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    gDEMDelegate.get()->SetDEMManufacturerDelegate(*gEvseManufacturer.get());
+    demDelegate.SetDEMManufacturerDelegate(*gEvseManufacturer.get());
 
     /* Call Manufacturer specific init */
-    err = gEvseManufacturer->Init();
+    err = gEvseManufacturer->Init(powerSourceEndpointId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Init failed on gEvseManufacturer");
@@ -201,58 +203,4 @@ CHIP_ERROR EVSEManufacturerShutdown()
     }
 
     return CHIP_NO_ERROR;
-}
-
-void EvseApplicationInit()
-{
-    if (DeviceEnergyManagementInit() != CHIP_NO_ERROR)
-    {
-        return;
-    }
-
-    if (EnergyEvseInit() != CHIP_NO_ERROR)
-    {
-        DeviceEnergyManagementShutdown();
-        return;
-    }
-
-    if (EnergyMeterInit() != CHIP_NO_ERROR)
-    {
-        DeviceEnergyManagementShutdown();
-        EnergyEvseShutdown();
-        return;
-    }
-
-    if (PowerTopologyInit() != CHIP_NO_ERROR)
-    {
-        DeviceEnergyManagementShutdown();
-        EnergyEvseShutdown();
-        EnergyMeterShutdown();
-        return;
-    }
-
-    /* Do this last so that the instances for other clusters can be wrapped inside */
-    if (EVSEManufacturerInit() != CHIP_NO_ERROR)
-    {
-        DeviceEnergyManagementShutdown();
-        EnergyEvseShutdown();
-        EnergyMeterShutdown();
-        PowerTopologyShutdown();
-        return;
-    }
-}
-
-void EvseApplicationShutdown()
-{
-    ChipLogDetail(AppServer, "Energy Management App (EVSE): ApplicationShutdown()");
-
-    /* Shutdown in reverse order that they were created */
-    EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */
-    PowerTopologyShutdown();          /* Free the PowerTopology */
-    EnergyMeterShutdown();            /* Free the Energy Meter */
-    EnergyEvseShutdown();             /* Free the EnergyEvse */
-    DeviceEnergyManagementShutdown(); /* Free the DEM */
-
-    Clusters::DeviceEnergyManagementMode::Shutdown();
-    Clusters::EnergyEvseMode::Shutdown();
 }

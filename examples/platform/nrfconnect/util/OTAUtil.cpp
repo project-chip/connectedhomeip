@@ -45,7 +45,7 @@ chip::DefaultOTARequestor sOTARequestor;
 OTAImageProcessorImpl & GetOTAImageProcessor()
 {
 #if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR
-    static OTAImageProcessorImpl sOTAImageProcessor(&GetFlashHandler());
+    static OTAImageProcessorImpl sOTAImageProcessor(ExternalFlashManager.GetInstance());
 #else
     static OTAImageProcessorImpl sOTAImageProcessor;
 #endif
@@ -93,9 +93,3 @@ void OtaConfirmNewImage()
 }
 
 #endif
-
-ExternalFlashManager & GetFlashHandler()
-{
-    static ExternalFlashManager sFlashHandler;
-    return sFlashHandler;
-}

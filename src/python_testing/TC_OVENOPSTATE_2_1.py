@@ -61,7 +61,7 @@ class TC_OVENOPSTATE_2_1(MatterBaseTest, TC_OPSTATE_BASE):
 
     @async_test_body
     async def test_TC_OVENOPSTATE_2_1(self):
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint(default=1)
         await self.TEST_TC_OPSTATE_BASE_2_1(endpoint)
 
 

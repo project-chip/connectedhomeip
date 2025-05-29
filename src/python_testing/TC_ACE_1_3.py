@@ -54,16 +54,16 @@ class TC_ACE_1_3(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
         print(result)
 
-    async def read_descriptor_expect_success(self, th, endpoint: int):
+    async def read_descriptor_expect_success(self, th):
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
-        await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=endpoint, cluster=cluster, attribute=attribute)
+        await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
-    async def read_descriptor_expect_unsupported_access(self, th, endpoint: int):
+    async def read_descriptor_expect_unsupported_access(self, th):
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
         await self.read_single_attribute_expect_error(
-            dev_ctrl=th, endpoint=endpoint, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
+            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
 
     def desc_TC_ACE_1_3(self) -> str:
         return "[TC-ACE-1.3] Subjects"
@@ -144,8 +144,6 @@ class TC_ACE_1_3(MatterBaseTest):
         cat2v3 = cat2_id | 0x0003
         logging.info('cat1v1 0x%x', cat1v1)
 
-        endpoint = 0
-
         self.step(1)
 
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
@@ -165,266 +163,266 @@ class TC_ACE_1_3(MatterBaseTest):
                                          paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
                                          catTags=[cat1v1, cat2v2])
 
-        self.step(2, endpoint)
+        self.step(2)
         TH0_admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[TH0_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint, cluster=0x001f)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=0x001f)])
         all_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
         acl = [TH0_admin_acl, all_view]
         await self.write_acl(acl)
 
-        self.step(3, endpoint)
-        await self.read_descriptor_expect_success(TH1, endpoint)
+        self.step(3)
+        await self.read_descriptor_expect_success(TH1)
 
-        self.step(4, endpoint)
-        await self.read_descriptor_expect_success(TH2, endpoint)
+        self.step(4)
+        await self.read_descriptor_expect_success(TH2)
 
-        self.step(5, endpoint)
-        await self.read_descriptor_expect_success(TH3, endpoint)
+        self.step(5)
+        await self.read_descriptor_expect_success(TH3)
 
-        self.step(6, endpoint)
+        self.step(6)
         th1_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[TH1_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
         acl = [TH0_admin_acl, th1_view]
         await self.write_acl(acl)
-        self.step(7, endpoint)
-        await self.read_descriptor_expect_success(TH1, endpoint)
+        self.step(7)
+        await self.read_descriptor_expect_success(TH1)
 
-        self.step(8, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH2, endpoint)
+        self.step(8)
+        await self.read_descriptor_expect_unsupported_access(TH2)
 
-        self.step(9, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH3, endpoint)
+        self.step(9)
+        await self.read_descriptor_expect_unsupported_access(TH3)
 
-        self.step(10, endpoint)
+        self.step(10)
         th2_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[TH2_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, th2_view]
         await self.write_acl(acl)
-        self.step(11, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH1, endpoint)
+        self.step(11)
+        await self.read_descriptor_expect_unsupported_access(TH1)
 
-        self.step(12, endpoint)
-        await self.read_descriptor_expect_success(TH2, endpoint)
+        self.step(12)
+        await self.read_descriptor_expect_success(TH2)
 
-        self.step(13, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH3, endpoint)
+        self.step(13)
+        await self.read_descriptor_expect_unsupported_access(TH3)
 
-        self.step(14, endpoint)
+        self.step(14)
         th3_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[TH3_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, th3_view]
         await self.write_acl(acl)
-        self.step(15, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH1, endpoint)
+        self.step(15)
+        await self.read_descriptor_expect_unsupported_access(TH1)
 
-        self.step(16, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH2, endpoint)
+        self.step(16)
+        await self.read_descriptor_expect_unsupported_access(TH2)
 
-        self.step(17, endpoint)
-        await self.read_descriptor_expect_success(TH3, endpoint)
+        self.step(17)
+        await self.read_descriptor_expect_success(TH3)
 
-        self.step(18, endpoint)
+        self.step(18)
         th12_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[TH1_nodeid, TH2_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, th12_view]
         await self.write_acl(acl)
-        self.step(19, endpoint)
-        await self.read_descriptor_expect_success(TH1, endpoint)
+        self.step(19)
+        await self.read_descriptor_expect_success(TH1)
 
-        self.step(20, endpoint)
-        await self.read_descriptor_expect_success(TH2, endpoint)
+        self.step(20)
+        await self.read_descriptor_expect_success(TH2)
 
-        self.step(21, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH3, endpoint)
+        self.step(21)
+        await self.read_descriptor_expect_unsupported_access(TH3)
 
-        self.step(22, endpoint)
+        self.step(22)
         th13_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[TH1_nodeid, TH3_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, th13_view]
         await self.write_acl(acl)
-        self.step(23, endpoint)
-        await self.read_descriptor_expect_success(TH1, endpoint)
+        self.step(23)
+        await self.read_descriptor_expect_success(TH1)
 
-        self.step(24, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH2, endpoint)
+        self.step(24)
+        await self.read_descriptor_expect_unsupported_access(TH2)
 
-        self.step(25, endpoint)
-        await self.read_descriptor_expect_success(TH3, endpoint)
+        self.step(25)
+        await self.read_descriptor_expect_success(TH3)
 
-        self.step(26, endpoint)
+        self.step(26)
         th23_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[TH2_nodeid, TH3_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, th23_view]
         await self.write_acl(acl)
-        self.step(27, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH1, endpoint)
+        self.step(27)
+        await self.read_descriptor_expect_unsupported_access(TH1)
 
-        self.step(28, endpoint)
-        await self.read_descriptor_expect_success(TH2, endpoint)
+        self.step(28)
+        await self.read_descriptor_expect_success(TH2)
 
-        self.step(29, endpoint)
-        await self.read_descriptor_expect_success(TH3, endpoint)
+        self.step(29)
+        await self.read_descriptor_expect_success(TH3)
 
-        self.step(30, endpoint)
+        self.step(30)
         th123_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[TH1_nodeid, TH2_nodeid, TH3_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, th123_view]
         await self.write_acl(acl)
-        self.step(31, endpoint)
-        await self.read_descriptor_expect_success(TH1, endpoint)
+        self.step(31)
+        await self.read_descriptor_expect_success(TH1)
 
-        self.step(32, endpoint)
-        await self.read_descriptor_expect_success(TH2, endpoint)
+        self.step(32)
+        await self.read_descriptor_expect_success(TH2)
 
-        self.step(33, endpoint)
-        await self.read_descriptor_expect_success(TH3, endpoint)
+        self.step(33)
+        await self.read_descriptor_expect_success(TH3)
 
-        self.step(34, endpoint)
+        self.step(34)
         cat1v1_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[acl_subject(cat1v1)],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
         acl = [TH0_admin_acl, cat1v1_view]
         await self.write_acl(acl)
 
-        self.step(35, endpoint)
-        await self.read_descriptor_expect_success(TH1, endpoint)
+        self.step(35)
+        await self.read_descriptor_expect_success(TH1)
 
-        self.step(36, endpoint)
-        await self.read_descriptor_expect_success(TH2, endpoint)
+        self.step(36)
+        await self.read_descriptor_expect_success(TH2)
 
-        self.step(37, endpoint)
-        await self.read_descriptor_expect_success(TH3, endpoint)
+        self.step(37)
+        await self.read_descriptor_expect_success(TH3)
 
-        self.step(38, endpoint)
+        self.step(38)
         cat1v2_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[acl_subject(cat1v2)],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, cat1v2_view]
         await self.write_acl(acl)
 
-        self.step(39, endpoint)
-        await self.read_descriptor_expect_success(TH1, endpoint)
+        self.step(39)
+        await self.read_descriptor_expect_success(TH1)
 
-        self.step(40, endpoint)
-        await self.read_descriptor_expect_success(TH2, endpoint)
+        self.step(40)
+        await self.read_descriptor_expect_success(TH2)
 
-        self.step(41, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH3, endpoint)
+        self.step(41)
+        await self.read_descriptor_expect_unsupported_access(TH3)
 
-        self.step(42, endpoint)
+        self.step(42)
         cat1v3_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[acl_subject(cat1v3)],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, cat1v3_view]
         await self.write_acl(acl)
 
-        self.step(43, endpoint)
-        await self.read_descriptor_expect_success(TH1, endpoint)
+        self.step(43)
+        await self.read_descriptor_expect_success(TH1)
 
-        self.step(44, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH2, endpoint)
+        self.step(44)
+        await self.read_descriptor_expect_unsupported_access(TH2)
 
-        self.step(45, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH3, endpoint)
+        self.step(45)
+        await self.read_descriptor_expect_unsupported_access(TH3)
 
-        self.step(46, endpoint)
+        self.step(46)
         cat2v1_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[acl_subject(cat2v1)],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, cat2v1_view]
         await self.write_acl(acl)
 
-        self.step(47, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH1, endpoint)
+        self.step(47)
+        await self.read_descriptor_expect_unsupported_access(TH1)
 
-        self.step(48, endpoint)
-        await self.read_descriptor_expect_success(TH2, endpoint)
+        self.step(48)
+        await self.read_descriptor_expect_success(TH2)
 
-        self.step(49, endpoint)
-        await self.read_descriptor_expect_success(TH3, endpoint)
+        self.step(49)
+        await self.read_descriptor_expect_success(TH3)
 
-        self.step(50, endpoint)
+        self.step(50)
         cat2v2_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[acl_subject(cat2v2)],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, cat2v2_view]
         await self.write_acl(acl)
 
-        self.step(51, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH1, endpoint)
+        self.step(51)
+        await self.read_descriptor_expect_unsupported_access(TH1)
 
-        self.step(52, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH2, endpoint)
+        self.step(52)
+        await self.read_descriptor_expect_unsupported_access(TH2)
 
-        self.step(53, endpoint)
-        await self.read_descriptor_expect_success(TH3, endpoint)
+        self.step(53)
+        await self.read_descriptor_expect_success(TH3)
 
-        self.step(54, endpoint)
+        self.step(54)
         cat2v3_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[acl_subject(cat2v3)],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)])
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0)])
 
         acl = [TH0_admin_acl, cat2v3_view]
         await self.write_acl(acl)
 
-        self.step(55, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH1, endpoint)
+        self.step(55)
+        await self.read_descriptor_expect_unsupported_access(TH1)
 
-        self.step(56, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH2, endpoint)
+        self.step(56)
+        await self.read_descriptor_expect_unsupported_access(TH2)
 
-        self.step(57, endpoint)
-        await self.read_descriptor_expect_unsupported_access(TH3, endpoint)
+        self.step(57)
+        await self.read_descriptor_expect_unsupported_access(TH3)
 
         self.step(58)
 

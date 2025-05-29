@@ -152,69 +152,36 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<B
 }
 
 /**
- * @brief Returns the length of the list of presets if the pending presets were to be applied. The size of the pending presets list
- *        calculated, after all the constraint checks are done, is the new size of the updated Presets attribute since the pending
- *        preset list is expected to have all existing presets with or without edits plus new presets.
- *        This is called before changes are actually applied.
+ * @brief Gets the maximum number of presets allowed for a given preset scenario.
  *
- * @param[in] delegate The delegate to use.
- *
- * @return count of the updated Presets attribute if the pending presets were applied to it. Return 0 for error cases.
+ * @param[in]  delegate The delegate to use.
+ * @param[in]  presetScenario The presetScenario to match with.
+ * @param[out] count The maximum number of presets for the specified presetScenario
+ * @return CHIP_NO_ERROR if the maximum number was determined, or an error if not
  */
-uint8_t CountNumberOfPendingPresets(Delegate * delegate)
+CHIP_ERROR MaximumPresetScenarioCount(Delegate * delegate, PresetScenarioEnum presetScenario, size_t & count)
 {
-    uint8_t numberOfPendingPresets = 0;
-
-    VerifyOrReturnValue(delegate != nullptr, 0);
-
-    for (uint8_t i = 0; true; i++)
-    {
-        PresetStructWithOwnedMembers pendingPreset;
-        CHIP_ERROR err = delegate->GetPendingPresetAtIndex(i, pendingPreset);
-
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            break;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "CountNumberOfPendingPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
-                         err.Format());
-            return 0;
-        }
-        numberOfPendingPresets++;
-    }
-
-    return numberOfPendingPresets;
-}
-
-/**
- * @brief Checks if the presetScenario is present in the PresetTypes attribute.
- *
- * @param[in] delegate The delegate to use.
- * @param[in] presetScenario The presetScenario to match with.
- *
- * @return true if the presetScenario is found, false otherwise.
- */
-bool PresetScenarioExistsInPresetTypes(Delegate * delegate, PresetScenarioEnum presetScenario)
-{
-    VerifyOrReturnValue(delegate != nullptr, false);
-
+    count = 0;
     for (uint8_t i = 0; true; i++)
     {
         PresetTypeStruct::Type presetType;
         auto err = delegate->GetPresetTypeAtIndex(i, presetType);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            // We exhausted the list trying to find the preset scenario
+            return CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
-            return false;
+            return err;
         }
-
         if (presetType.presetScenario == presetScenario)
         {
-            return true;
+            count = presetType.numberOfPresets;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -410,8 +377,16 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         }
     }
 
-    if (!PresetScenarioExistsInPresetTypes(delegate, preset.GetPresetScenario()))
+    size_t maximumPresetCount         = delegate->GetNumberOfPresets();
+    size_t maximumPresetScenarioCount = 0;
+    if (MaximumPresetScenarioCount(delegate, preset.GetPresetScenario(), maximumPresetScenarioCount) != CHIP_NO_ERROR)
     {
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
+
+    if (maximumPresetScenarioCount == 0)
+    {
+        // This is not a supported preset scenario
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
@@ -423,16 +398,42 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
     // Before adding this preset to the pending presets, if the expected length of the pending presets' list
     // exceeds the total number of presets supported, return RESOURCE_EXHAUSTED. Note that the preset has not been appended yet.
 
-    uint8_t numberOfPendingPresets = CountNumberOfPendingPresets(delegate);
-
-    // We will be adding one more preset, so reject if the length is already at max.
-    if (numberOfPendingPresets >= delegate->GetNumberOfPresets())
+    // We're going to append this preset, so let's assume a count as though it had already been inserted
+    size_t presetCount         = 1;
+    size_t presetScenarioCount = 1;
+    for (uint8_t i = 0; true; i++)
     {
+        PresetStructWithOwnedMembers otherPreset;
+        CHIP_ERROR err = delegate->GetPendingPresetAtIndex(i, otherPreset);
+
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            break;
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+        }
+        presetCount++;
+        if (preset.GetPresetScenario() == otherPreset.GetPresetScenario())
+        {
+            presetScenarioCount++;
+        }
+    }
+
+    if (presetCount > maximumPresetCount)
+    {
+        ChipLogError(Zcl, "Preset count exceeded %u: %u ", static_cast<unsigned>(maximumPresetCount),
+                     static_cast<unsigned>(presetCount));
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
 
-    // TODO #34556 : Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
-    // scenario. We plan to support only one preset for each presetScenario for our use cases so defer this for re-evaluation.
+    if (presetScenarioCount > maximumPresetScenarioCount)
+    {
+        ChipLogError(Zcl, "Preset scenario count exceeded %u: %u ", static_cast<unsigned>(maximumPresetScenarioCount),
+                     static_cast<unsigned>(presetScenarioCount));
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
 
     return delegate->AppendToPendingPresetList(preset);
 }
@@ -463,7 +464,7 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl,
-                         "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPresetAtIndex failed with error "
+                         "PrecommitPresets: GetPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
             return Status::InvalidInState;
@@ -515,7 +516,7 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl,
-                         "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPendingPresetAtIndex failed with error "
+                         "PrecommitPresets: GetPendingPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
             return Status::InvalidInState;

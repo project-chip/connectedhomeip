@@ -79,6 +79,11 @@ def ValidateTargetNames(context, parameter, values):
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
+    '--verbose',
+    default=False,
+    is_flag=True,
+    help='Pass verbose flag to ninja.')
+@click.option(
     '--target',
     default=[],
     multiple=True,
@@ -142,7 +147,7 @@ def ValidateTargetNames(context, parameter, values):
         'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
         'for using ccache when building examples.'))
 @click.pass_context
-def main(context, log_level, target, enable_link_map_file, repo,
+def main(context, log_level, verbose, target, enable_link_map_file, repo,
          out_prefix, ninja_jobs, pregen_dir, clean, dry_run, dry_run_output,
          enable_flashbundle, no_log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
@@ -168,7 +173,9 @@ before running this script.
     logging.info('Building targets: %s', CommaSeparate(requested_targets))
 
     context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, ninja_jobs=ninja_jobs, runner=runner)
+        repository_path=repo, output_prefix=out_prefix, verbose=verbose,
+        ninja_jobs=ninja_jobs, runner=runner
+    )
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,

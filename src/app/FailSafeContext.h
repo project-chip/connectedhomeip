@@ -56,6 +56,8 @@ public:
     void SetUpdateNocCommandInvoked() { mUpdateNocCommandHasBeenInvoked = true; }
     void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
     void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
+    void SetUpdateTermsAndConditionsHasBeenInvoked() { mUpdateTermsAndConditionsHasBeenInvoked = true; }
+    void RecordSetVidVerificationStatementHasBeenInvoked() { mSetVidVerificationStatementHasBeenInvoked = true; }
 
     /**
      * @brief
@@ -91,6 +93,8 @@ public:
     bool UpdateNocCommandHasBeenInvoked() const { return mUpdateNocCommandHasBeenInvoked; }
     bool AddTrustedRootCertHasBeenInvoked() const { return mAddTrustedRootCertHasBeenInvoked; }
     bool IsCsrRequestForUpdateNoc() const { return mIsCsrRequestForUpdateNoc; }
+    bool UpdateTermsAndConditionsHasBeenInvoked() const { return mUpdateTermsAndConditionsHasBeenInvoked; }
+    bool HasSetVidVerificationStatementHasBeenInvoked() const { return mSetVidVerificationStatementHasBeenInvoked; }
 
     FabricIndex GetFabricIndex() const
     {
@@ -109,8 +113,10 @@ private:
     bool mUpdateNocCommandHasBeenInvoked   = false;
     bool mAddTrustedRootCertHasBeenInvoked = false;
     // The fact of whether a CSR occurred at all is stored elsewhere.
-    bool mIsCsrRequestForUpdateNoc = false;
-    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
+    bool mIsCsrRequestForUpdateNoc                  = false;
+    FabricIndex mFabricIndex                        = kUndefinedFabricIndex;
+    bool mUpdateTermsAndConditionsHasBeenInvoked    = false;
+    bool mSetVidVerificationStatementHasBeenInvoked = false;
 
     /**
      * @brief
@@ -140,15 +146,16 @@ private:
     {
         SetFailSafeArmed(false);
 
-        mAddNocCommandHasBeenInvoked      = false;
-        mUpdateNocCommandHasBeenInvoked   = false;
-        mAddTrustedRootCertHasBeenInvoked = false;
-        mFailSafeBusy                     = false;
-        mIsCsrRequestForUpdateNoc         = false;
+        mAddNocCommandHasBeenInvoked               = false;
+        mUpdateNocCommandHasBeenInvoked            = false;
+        mAddTrustedRootCertHasBeenInvoked          = false;
+        mFailSafeBusy                              = false;
+        mIsCsrRequestForUpdateNoc                  = false;
+        mUpdateTermsAndConditionsHasBeenInvoked    = false;
+        mSetVidVerificationStatementHasBeenInvoked = false;
     }
 
     void FailSafeTimerExpired();
-    CHIP_ERROR CommitToStorage();
 };
 
 } // namespace app

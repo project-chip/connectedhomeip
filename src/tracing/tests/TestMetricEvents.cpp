@@ -523,39 +523,6 @@ TEST(TestMetricEvents, TestVerifyOrReturnLogErrorWithMetric)
     EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
-template <typename return_code_type>
-static return_code_type InvokeReturnErrorCodeWithMetricIf(MetricKey key, bool expr, const return_code_type & code)
-{
-    ReturnErrorCodeWithMetricIf(key, expr, code);
-    return return_code_type();
-}
-
-TEST(TestMetricEvents, TestReturnErrorCodeWithMetricIf)
-{
-    MetricEventBackend backend;
-    ScopedRegistration scope(backend);
-
-    auto err = InvokeReturnErrorCodeWithMetricIf("event0", DoubleOf(2) == 4, CHIP_ERROR_DUPLICATE_KEY_ID);
-    EXPECT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
-
-    auto retval = InvokeReturnErrorCodeWithMetricIf("event1", DoubleOf(3) == 9, 11);
-    EXPECT_EQ(retval, 0);
-
-    retval = InvokeReturnErrorCodeWithMetricIf("event2", DoubleOf(4) == 8, 22);
-    EXPECT_EQ(retval, 22);
-
-    err = InvokeReturnErrorCodeWithMetricIf("event3", DoubleOf(5) == 11, CHIP_ERROR_ACCESS_DENIED);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    std::vector<MetricEvent> expected = {
-        MetricEvent(MetricEvent::Type::kInstantEvent, "event0", CHIP_ERROR_DUPLICATE_KEY_ID),
-        MetricEvent(MetricEvent::Type::kInstantEvent, "event2", 22),
-    };
-
-    EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());
-    EXPECT_TRUE(std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
-}
-
 TEST(TestMetricEvents, TestExitNowWithMetric)
 {
     MetricEventBackend backend;

@@ -23,7 +23,9 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
 #include <FreeRTOS.h>
-
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+#include <mem.h>
+#endif
 namespace chip {
 namespace DeviceLayer {
 
@@ -41,22 +43,33 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-#ifdef CFG_USE_PSRAM
-    size_t freeHeapSize = xPortGetFreeHeapSize() + xPortGetFreeHeapSizePsram();
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+    struct meminfo info;
+    bflb_mem_usage(KMEM_HEAP, &info);
+    currentHeapFree = info.free_size;
 #else
-    size_t freeHeapSize      = xPortGetFreeHeapSize();
+#ifdef CFG_USE_PSRAM
+    currentHeapFree = xPortGetFreeHeapSize() + xPortGetFreeHeapSizePsram();
+#else
+    currentHeapFree          = xPortGetFreeHeapSize();
+#endif
 #endif
 
-    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+    struct meminfo info;
+    bflb_mem_usage(KMEM_HEAP, &info);
+    currentHeapUsed = info.total_size - info.free_size;
+#else
 #ifdef CFG_USE_PSRAM
     currentHeapUsed = (get_heap_size() + get_heap3_size() - xPortGetFreeHeapSize() - xPortGetFreeHeapSizePsram());
 #else
     currentHeapUsed          = (get_heap_size() - xPortGetFreeHeapSize());
+#endif
 #endif
 
     return CHIP_NO_ERROR;
@@ -64,11 +77,18 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+    struct meminfo info;
+    bflb_mem_usage(KMEM_HEAP, &info);
+    currentHeapHighWatermark = info.total_size - info.max_free_size;
+
+#else
 #ifdef CFG_USE_PSRAM
     currentHeapHighWatermark =
         get_heap_size() + get_heap3_size() - xPortGetMinimumEverFreeHeapSize() - xPortGetMinimumEverFreeHeapSizePsram();
 #else
     currentHeapHighWatermark = get_heap_size() - xPortGetMinimumEverFreeHeapSize();
+#endif
 #endif
 
     return CHIP_NO_ERROR;
@@ -233,7 +253,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ifp->type          = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
 #else
-    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
+    ifp->type                = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
 #endif
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();

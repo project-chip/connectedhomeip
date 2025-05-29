@@ -15,4 +15,5 @@ CHIPTool offers the following features:
 > pairing is implemented.
 
 For information about how to build the application, see the
-[Building Android CHIPTool](../../../docs/guides/android_building.md) guide.
+[Building Android CHIPTool](../../../docs/platforms/android/android_building.md)
+guide.

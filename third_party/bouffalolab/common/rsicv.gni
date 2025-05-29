@@ -17,5 +17,10 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/src/platform/device.gni")
-riscv_arch = "rv32imfc"
+if (chip_device_platform == "bl616") {
+  riscv_arch = "rv32imafcpzpsfoperand_xtheade"
+} else {
+  riscv_arch = "rv32imfc"
+}
+
 riscv_abi = "ilp32f"

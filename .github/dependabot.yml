@@ -38,6 +38,7 @@ updates:
       - dependency-name: "third_party/java_deps/repo"
       - dependency-name: "third_party/jlink/repo"
       - dependency-name: "third_party/jsoncpp/repo"
+      - dependency-name: "third_party/libdatachannel/repo"
       - dependency-name: "third_party/libwebsockets/repo"
       - dependency-name: "third_party/lwip/repo"
       - dependency-name: "third_party/mbed-mcu-boot/repo"

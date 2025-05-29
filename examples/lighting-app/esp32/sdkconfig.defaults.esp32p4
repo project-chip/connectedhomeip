@@ -1,0 +1,14 @@
+CONFIG_IDF_TARGET="esp32p4"
+
+# Enable BLE Host but use remote controller
+CONFIG_BT_NIMBLE_TRANSPORT_UART=n
+CONFIG_ESP_ENABLE_BT=y
+
+# Increase main task stack size
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=4096
+
+# Do not deinit BLE after commissioning
+CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING=n
+
+# ESP32-P4 Function EV Board use ESP32C6 as slave device
+CONFIG_SLAVE_IDF_TARGET_ESP32C6=y

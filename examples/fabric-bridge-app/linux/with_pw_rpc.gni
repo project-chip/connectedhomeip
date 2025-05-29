@@ -21,8 +21,8 @@ import("${chip_root}/config/standalone/args.gni")
 
 import("//build_overrides/pigweed.gni")
 
-pw_log_BACKEND = "$dir_pw_log_basic"
-pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
+pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
+pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
 pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"
 pw_trace_BACKEND = "$dir_pw_trace_tokenized"
 pw_unit_test_MAIN = "$dir_pw_unit_test:logging_main"
@@ -38,5 +38,4 @@ pw_build_LINK_DEPS = [
   "$dir_pw_log:impl",
 ]
 
-chip_use_pw_logging = true
 bridge_enable_pw_rpc = true

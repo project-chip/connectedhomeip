@@ -102,7 +102,7 @@ public:
      * This function can be overridden in order to implement a specific disallow mechanism.
      *
      */
-    virtual void AppMatter_DisallowDeviceToSleep(void) {}
+    virtual void AppMatter_DisallowDeviceToSleep(void);
 
     /**
      * \brief Allow entering low power mode.
@@ -110,7 +110,7 @@ public:
      * This function can be overridden in order to implement a specific allow mechanism.
      *
      */
-    virtual void AppMatter_AllowDeviceToSleep(void) {}
+    virtual void AppMatter_AllowDeviceToSleep(void);
 
     /**
      * \brief Print onboarding information.
@@ -204,6 +204,11 @@ private:
     static void StartCommissioning(intptr_t arg);
     static void StopCommissioning(intptr_t arg);
     static void SwitchCommissioningState(intptr_t arg);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+    static constexpr EndpointId kThreadBRMgmtEndpoint = 2;
+    bool mTbrmClusterEnabled                          = false;
+#endif
 };
 
 /**

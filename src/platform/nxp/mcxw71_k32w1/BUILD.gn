@@ -18,59 +18,28 @@ import("//build_overrides/openthread.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/common/ota/ota.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+# If external SDK is used, do not import ${nxp_sdk_name}.gni
+if (!nxp_external_sdk) {
+  import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+}
 
 assert(chip_device_platform == "nxp")
 assert(nxp_platform == "mcxw71_k32w1")
 
-assert(chip_with_low_power == 0 ||
-           (chip_with_low_power == 1 && chip_with_ot_cli == 0),
+assert(!nxp_use_low_power || (nxp_use_low_power && !nxp_enable_ot_cli),
        "Please disable low power if openthread CLI is needed!")
 
 source_set("nxp_factory_data") {
-  sources = [
-    "../common/factory_data/legacy/FactoryDataDriver.cpp",
-    "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
-    "../common/factory_data/legacy/FactoryDataProvider.cpp",
-    "../common/factory_data/legacy/FactoryDataProviderImpl.cpp",
-  ]
-
-  public = [
-    "${chip_root}/src/credentials/CHIPCert.h",
-    "${chip_root}/src/credentials/CertificationDeclaration.h",
-  ]
-
-  defines = [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
-
-  deps = [
-    ":nxp_platform",
-    "${chip_root}/src/credentials:credentials",
-  ]
 }
 
 source_set("nxp_ota") {
   public = [ "../common/ota/OTAImageProcessorImpl.h" ]
 
-  sources = [
-    "../common/ota/OTAFirmwareProcessor.cpp",
-    "../common/ota/OTAFirmwareProcessor.h",
-    "../common/ota/OTAHooks.cpp",
-    "../common/ota/OTAImageProcessorImpl.cpp",
-    "../common/ota/OTAImageProcessorImpl.h",
-    "../common/ota/OTATlvProcessor.cpp",
-    "../common/ota/OTATlvProcessor.h",
-  ]
-
-  if (chip_with_factory_data == 1 &&
-      chip_enable_ota_factory_data_processor == 1) {
-    sources += [
-      "../common/ota/OTAFactoryDataProcessor.cpp",
-      "../common/ota/OTAFactoryDataProcessor.h",
-    ]
-  }
+  sources = ota_sources
 
   deps = [
     ":nxp_platform",
@@ -79,19 +48,32 @@ source_set("nxp_ota") {
 }
 
 config("nxp_platform_config") {
+  defines = []
   include_dirs = [
     ".",
+    "../common",
     "../common/ble",
     "../common/crypto",
     "../common/factory_data/legacy",
     "../common/ota",
   ]
+
+  if (nxp_use_factory_data) {
+    defines += [ "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1" ]
+  }
+
+  # Needed for sources that use mbedtls
+  if (nxp_external_sdk) {
+    include_dirs += [
+      "${nxp_sdk_root}/middleware/mbedtls/include",
+      "${nxp_sdk_root}/middleware/mbedtls/port/sssapi",
+    ]
+  }
 }
 
 static_library("nxp_platform") {
-  deps = []
   defines = [
-    "CHIP_DEVICE_K32W1=1",
+    "NXP_DEVICE_K32W1_MCXW7X=1",
     "NXP_USE_MML=1",
   ]
 
@@ -113,8 +95,12 @@ static_library("nxp_platform") {
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
   ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+  ]
 
-  if (chip_key_storage == "fwk_nvm") {
+  if (nxp_nvm_component == "fwk_nvm") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=1" ]
 
     sources += [
@@ -125,19 +111,7 @@ static_library("nxp_platform") {
       "ram_storage.c",
       "ram_storage.h",
     ]
-  } else if (chip_key_storage == "littlefs") {
-    defines += [
-      "CHIP_PLAT_NVM_SUPPORT=3",
-      "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"platform/nxp/common/KeyValueStoreManagerImpl.h\"",
-    ]
-
-    sources += [
-      "../common/KeyValueStoreManagerImpl.cpp",
-      "../common/KeyValueStoreManagerImpl.h",
-      "../common/NXPConfig.h",
-      "../common/NXPConfigKS.cpp",
-    ]
-  } else if (chip_key_storage == "nvs") {
+  } else if (nxp_nvm_component == "nvs") {
     defines += [
       "gAppNvsExternalFlash_c=0",
       "gAppNvsInternalFlash_c=1",
@@ -152,7 +126,13 @@ static_library("nxp_platform") {
     ]
   }
 
-  if (chip_use_plain_dac_key) {
+  # When the app is built using cmake, we must ensure the OTA platform files are also compiled.
+  # When the app is built using gn, the app selects the nxp_ota target through its build file.
+  if (nxp_external_sdk && chip_enable_ota_requestor) {
+    sources += ota_sources
+  }
+
+  if (nxp_use_plain_dac_key) {
     defines += [ "CHIP_USE_PLAIN_DAC_KEY=1" ]
   } else {
     defines += [ "CHIP_USE_PLAIN_DAC_KEY=0" ]
@@ -170,7 +150,7 @@ static_library("nxp_platform") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  if (chip_with_low_power != 0) {
+  if (nxp_use_low_power) {
     sources += [ "LowPowerHooks.cpp" ]
   }
 
@@ -180,10 +160,9 @@ static_library("nxp_platform") {
       "../common/crypto/PersistentStorageOpKeystoreS200.cpp",
       "../common/crypto/PersistentStorageOpKeystoreS200.h",
     ]
-
-    if (chip_with_ot_cli == 1) {
-      defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
-    }
+    #if (nxp_enable_ot_cli) {
+    #  defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
+    #}
   }
 
   if (chip_enable_openthread) {
@@ -205,7 +184,7 @@ static_library("nxp_platform") {
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
 
-    if (use_smu2_dynamic) {
+    if (nxp_use_smu2_dynamic) {
       sources += [
         "SMU2Manager.cpp",
         "SMU2Manager.h",
@@ -213,10 +192,22 @@ static_library("nxp_platform") {
     }
   }
 
+  if (nxp_use_factory_data) {
+    sources += [
+      "../common/factory_data/legacy/FactoryDataDriver.cpp",
+      "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
+      "../common/factory_data/legacy/FactoryDataProvider.cpp",
+      "../common/factory_data/legacy/FactoryDataProviderImpl.cpp",
+    ]
+
+    defines += [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
+  }
+
   deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]
 
   public_deps += [
     "${chip_root}/examples/platform/nxp/${nxp_platform}/app/support:freertos_memory_utils",
+    "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/src/platform/logging:headers",

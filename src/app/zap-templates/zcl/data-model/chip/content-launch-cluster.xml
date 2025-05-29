@@ -25,10 +25,18 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
-
-    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="array" entryType="char_string" length="254" writable="false" optional="true">AcceptHeader</attribute>
-    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0"                       writable="false"  optional="true">SupportedStreamingProtocols</attribute>
-
+    
+    <attribute side="server" code="0x0000" name="AcceptHeader" define="CONTENT_LAUNCHER_ACCEPT_HEADER" type="array" entryType="char_string" length="254" optional="true">
+      <mandatoryConform>
+        <feature name="UP"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0001" name="SupportedStreamingProtocols" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="UP"/>
+      </mandatoryConform>
+    </attribute>
+    
     <command source="client" code="0x00" name="LaunchContent" response="LauncherResponse" optional="true">
       <description>Upon receipt, this SHALL launch the specified content with optional search criteria.</description>
       <arg name="Search" type="ContentSearchStruct"/>
@@ -36,6 +44,9 @@ limitations under the License.
       <arg name="Data" type="char_string" optional="true"/>
       <arg name="PlaybackPreferences" type="PlaybackPreferencesStruct" optional="true"/>
       <arg name="UseCurrentContext" type="boolean" optional="true"/>
+      <mandatoryConform>
+        <feature name="CS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x01" name="LaunchURL" response="LauncherResponse" optional="true">
@@ -43,12 +54,21 @@ limitations under the License.
       <arg name="ContentURL" type="char_string"/>
       <arg name="DisplayString" type="char_string" optional="true"/>
       <arg name="BrandingInformation" type="BrandingInformationStruct" optional="true"/>
+      <mandatoryConform>
+        <feature name="UP"/>
+      </mandatoryConform>
     </command>
 
     <command source="server" code="0x02" name="LauncherResponse" optional="true" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to LaunchContent command.</description>
       <arg name="Status" type="StatusEnum"/>
       <arg name="Data" type="char_string" optional="true"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CS"/>
+          <feature name="UP"/>
+        </orTerm>
+      </mandatoryConform>
     </command>
 
   </cluster>

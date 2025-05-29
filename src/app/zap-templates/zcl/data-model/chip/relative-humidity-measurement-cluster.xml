@@ -25,9 +25,17 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="RELATIVE_HUMIDITY_MEASURED_VALUE" type="int16u" writable="false" reportable="true" optional="false" isNullable="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="RELATIVE_HUMIDITY_MIN_MEASURED_VALUE" type="int16u" min="0x0000" max="0x270F" writable="false" optional="false" isNullable="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="RELATIVE_HUMIDITY_MAX_MEASURED_VALUE" type="int16u" min="0x0001" max="0x2710" writable="false" optional="false" isNullable="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="RELATIVE_HUMIDITY_TOLERANCE" type="int16u" min="0x0000" max="0x0800" writable="false" optional="true">Tolerance</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="RELATIVE_HUMIDITY_MEASURED_VALUE" type="int16u" reportable="true" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="RELATIVE_HUMIDITY_MIN_MEASURED_VALUE" type="int16u" min="0x0000" max="0x270F" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="RELATIVE_HUMIDITY_MAX_MEASURED_VALUE" type="int16u" min="0x0001" max="0x2710" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" name="Tolerance" define="RELATIVE_HUMIDITY_TOLERANCE" type="int16u" min="0x0000" max="0x0800" optional="true">
+      <optionalConform/>
+    </attribute>
   </cluster>
 </configurator>

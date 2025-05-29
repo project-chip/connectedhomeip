@@ -27,11 +27,12 @@
       }
       listFreer.add(listHolder_{{depth}});
       for (size_t i_{{depth}} = 0; i_{{depth}} < {{source}}.count; ++i_{{depth}}) {
-        if ( ! [{{source}}[i_{{depth}}] isKindOfClass: [{{asObjectiveCClass type cluster forceNotList=true}} class]] ) {
+        auto element_{{depth}} = MTR_SAFE_CAST({{source}}[i_{{depth}}], {{asObjectiveCClass type cluster forceNotList=true}});
+        if (!element_{{depth}}) {
           // Wrong kind of value.
+          MTR_LOG_ERROR("%@ incorrectly present in list of %@", {{source}}[i_{{depth}}], NSStringFromClass({{asObjectiveCClass type cluster forceNotList=true}}.class));
           {{errorCode}}
         }
-        auto element_{{depth}} = ({{asObjectiveCClass type cluster forceNotList=true}} *){{source}}[i_{{depth}}];
         {{>encode_value target=(concat "listHolder_" depth "->mList[i_" depth "]") source=(concat "element_" depth) cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isArray=false}}
       }
       {{target}} = ListType_{{depth}}(listHolder_{{depth}}->mList, {{source}}.count);
@@ -43,22 +44,16 @@
   {{target}} = AsByteSpan({{source}});
 {{else if (isCharString type)}}
   {{target}} = AsCharSpan({{source}});
+{{else if_is_struct type}}
+  {{#zcl_struct_items_by_struct_and_cluster_name type cluster}}
+   {{#if (isSupported (asUpperCamelCase ../cluster preserveAcronyms=true) struct=(asUpperCamelCase ../type preserveAcronyms=true) structField=(asStructPropertyName label))}}
+   {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asStructPropertyName label)) cluster=../cluster errorCode=../errorCode depth=(incrementDepth ../depth)}}
+   {{/if}}
+  {{/zcl_struct_items_by_struct_and_cluster_name}}
+{{else if_is_strongly_typed_chip_enum type}}
+  {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+{{else if_is_strongly_typed_bitmap type}}
+  {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
 {{else}}
-  {{#if_is_struct type}}
-    {{#zcl_struct_items_by_struct_and_cluster_name type cluster}}
-     {{#if (isSupported (asUpperCamelCase ../cluster preserveAcronyms=true) struct=(asUpperCamelCase ../type preserveAcronyms=true) structField=(asStructPropertyName label))}}
-     {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asStructPropertyName label)) cluster=../cluster errorCode=../errorCode depth=(incrementDepth ../depth)}}
-     {{/if}}
-    {{/zcl_struct_items_by_struct_and_cluster_name}}
-  {{else}}
-    {{#if_is_strongly_typed_chip_enum type}}
-      {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
-    {{else}}
-      {{#if_is_strongly_typed_bitmap type}}
-        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
-      {{else}}
-        {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
-      {{/if_is_strongly_typed_bitmap}}
-    {{/if_is_strongly_typed_chip_enum}}
-  {{/if_is_struct}}
+  {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
 {{/if}}

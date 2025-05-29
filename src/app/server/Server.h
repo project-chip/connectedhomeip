@@ -24,7 +24,7 @@
 #include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
-#include <app/DefaultAttributePersistenceProvider.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/FailSafeContext.h>
 #include <app/OperationalSessionSetupPool.h>
 #include <app/SimpleSubscriptionResumptionStorage.h>
@@ -33,6 +33,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
+#include <app/server/JointFabricDatastore.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -133,6 +134,8 @@ struct ServerInitParams
 
     // Application delegate to handle some commissioning lifecycle events
     AppDelegate * appDelegate = nullptr;
+    // device discovery timeout
+    System::Clock::Seconds32 discoveryTimeout = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS);
     // Port to use for Matter commissioning/operational traffic
     uint16_t operationalServicePort = CHIP_PORT;
     // Port to use for UDC if supported
@@ -188,6 +191,11 @@ struct ServerInitParams
     // If the ICD Check-In protocol use-case is supported and no strategy is provided, server will use the default strategy.
     app::ICDCheckInBackOffStrategy * icdCheckInBackOffStrategy = nullptr;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    // MUST NOT be null during initialization: every application must define the
+    // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
+    // for ember/zap-generated models.
+    chip::app::DataModel::Provider * dataModelProvider = nullptr;
 };
 
 /**
@@ -407,9 +415,11 @@ public:
 
     Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
 
-    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
+    app::DefaultSafeAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
+
+    app::JointFabricDatastore & GetJointFabricDatastore() { return mJointFabricDatastore; }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
@@ -452,6 +462,8 @@ private:
     void InitFailSafe();
     void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event);
     void CheckServerReadyEvent();
+
+    void PostFactoryResetEvent();
 
     static void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t);
 
@@ -680,13 +692,15 @@ private:
     app::SubscriptionResumptionStorage * mSubscriptionResumptionStorage;
     Credentials::GroupDataProvider * mGroupsProvider;
     Crypto::SessionKeystore * mSessionKeystore;
-    app::DefaultAttributePersistenceProvider mAttributePersister;
+    app::DefaultSafeAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
     app::reporting::ReportScheduler * mReportScheduler;
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;
+
+    app::JointFabricDatastore mJointFabricDatastore;
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;

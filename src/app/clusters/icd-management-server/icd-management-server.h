@@ -30,7 +30,7 @@
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 #include <app/ConcreteAttributePath.h>
-#include <app/icd/server/ICDMonitoringTable.h>
+#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 

@@ -45,6 +45,8 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
+namespace bridge {
+
 namespace {
 
 constexpr uint8_t kMaxRetries      = 10;
@@ -168,14 +170,11 @@ DECLARE_DYNAMIC_ENDPOINT(sIcdBridgedNodeEndpoint, icdBridgedNodeClusters);
 
 // TODO: this is a single version array, however we may have many
 //       different clusters that are independent.
-DataVersion sBridgedNodeDataVersions[ArraySize(bridgedNodeClusters)];
+DataVersion sBridgedNodeDataVersions[MATTER_ARRAY_SIZE(bridgedNodeClusters)];
 
 const EmberAfDeviceType sBridgedDeviceTypes[] = { { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
 } // namespace
-
-// Define the static member
-BridgedDeviceManager BridgedDeviceManager::sInstance;
 
 void BridgedDeviceManager::Init()
 {
@@ -343,3 +342,5 @@ std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByScopedNodeId(chip::S
     }
     return std::nullopt;
 }
+
+} // namespace bridge

@@ -34,10 +34,7 @@ public:
 
     // AppTaskFreeRTOS virtual methods
     void PreInitMatterStack() override;
-#if CONFIG_LOW_POWER
-    void AppMatter_DisallowDeviceToSleep() override;
-    void AppMatter_AllowDeviceToSleep() override;
-#endif
+    void PostInitMatterStack() override;
 
     // This returns an instance of this class.
     static AppTask & GetDefaultInstance();

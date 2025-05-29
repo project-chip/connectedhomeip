@@ -34,9 +34,15 @@ message AdministratorCommissioningChanged {
   optional uint32 opener_vendor_id = 4;
 }
 
+message ReachabilityChanged {
+  ScopedNode id = 1;
+  bool reachability = 2;
+}
+
 service FabricBridge {
   rpc AddSynchronizedDevice(SynchronizedDevice) returns (pw.protobuf.Empty){}
   rpc RemoveSynchronizedDevice(SynchronizedDevice) returns (pw.protobuf.Empty){}
   rpc ActiveChanged(KeepActiveChanged) returns (pw.protobuf.Empty){}
   rpc AdminCommissioningAttributeChanged(AdministratorCommissioningChanged) returns (pw.protobuf.Empty){}
+  rpc DeviceReachableChanged(ReachabilityChanged) returns (pw.protobuf.Empty){}
 }

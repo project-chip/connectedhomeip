@@ -108,7 +108,7 @@ def disconnect_device(devCtrl, nodeId):
     :return: node ID if connection successful or None if failed
     """
     try:
-        devCtrl.CloseSession(nodeId)
+        devCtrl.MarkSessionDefunct(nodeId)
     except exceptions.ChipStackException as ex:
         log.error("CloseSession failed {}".format(str(ex)))
         return False

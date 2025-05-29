@@ -121,8 +121,7 @@ limitations under the License.
         <define>OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
-        <attribute side="server" code="0x0000" define="DEFAULT_OTA_PROVIDERS" type="array" entryType="ProviderLocation" writable="true" optional="false">
-            <description>DefaultOTAProviders</description>
+        <attribute side="server" code="0x0000" name="DefaultOTAProviders" define="DEFAULT_OTA_PROVIDERS" type="array" entryType="ProviderLocation" writable="true" optional="false">
             <access op="read" privilege="view"/>
             <access op="write" privilege="administer"/>
         </attribute>

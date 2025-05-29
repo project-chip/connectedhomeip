@@ -148,10 +148,10 @@ std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
         VerifyOrReturnValue(locationId.size() <= kUniqueLocationIdMaxSize, nullptr, ChipLogError(Zcl, "Location id too long"));
     }
 
-    // std::make_unique does not have access to private constructor we workaround with using new
-    std::unique_ptr<EcosystemDeviceStruct> ret{ new EcosystemDeviceStruct(
+    PrivateToken token;
+    std::unique_ptr<EcosystemDeviceStruct> ret = std::make_unique<EcosystemDeviceStruct>(
         std::move(mDeviceName), mDeviceNameLastEditEpochUs, mBridgedEndpoint, mOriginalEndpoint, std::move(mDeviceTypes),
-        std::move(mUniqueLocationIds), mUniqueLocationIdsLastEditEpochUs, mFabricIndex) };
+        std::move(mUniqueLocationIds), mUniqueLocationIdsLastEditEpochUs, mFabricIndex, token);
     mIsAlreadyBuilt = true;
     return ret;
 }
@@ -221,9 +221,9 @@ std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build
         mLocationDescriptor.mLocationName.size() <= kLocationDescriptorNameMaxSize, nullptr,
         ChipLogError(Zcl, "Location Name must be less than %u bytes", static_cast<uint16_t>(kLocationDescriptorNameMaxSize)));
 
-    // std::make_unique does not have access to private constructor we workaround with using new
-    std::unique_ptr<EcosystemLocationStruct> ret{ new EcosystemLocationStruct(std::move(mLocationDescriptor),
-                                                                              mLocationDescriptorLastEditEpochUs) };
+    PrivateToken token;
+    std::unique_ptr<EcosystemLocationStruct> ret =
+        std::make_unique<EcosystemLocationStruct>(std::move(mLocationDescriptor), mLocationDescriptorLastEditEpochUs, token);
     mIsAlreadyBuilt = true;
     return ret;
 }
@@ -264,6 +264,7 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
     deviceInfo.mDeviceDirectory.push_back(std::move(aDevice));
+    mMatterContext.MarkDirty(aEndpoint, Attributes::DeviceDirectory::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -282,6 +283,7 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(key) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
     deviceInfo.mLocationDirectory[key] = std::move(aLocation);
+    mMatterContext.MarkDirty(aEndpoint, Attributes::LocationDirectory::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -374,4 +376,9 @@ chip::app::Clusters::EcosystemInformation::AttrAccess gAttrAccess;
 void MatterEcosystemInformationPluginServerInitCallback()
 {
     chip::app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterEcosystemInformationPluginServerShutdownCallback()
+{
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }

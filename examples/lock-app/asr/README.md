@@ -17,7 +17,7 @@ reference for creating your own application.
 ## Building and Commissioning
 
 Please refer
-[Building and Commissioning](../../../docs/guides/asr_getting_started_guide.md#building-the-example-application)
+[Building and Commissioning](../../../docs/platforms/asr/asr_getting_started_guide.md#building-the-example-application)
 guides to get started
 
 ```

@@ -18,6 +18,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# FIXME: https://github.com/project-chip/connectedhomeip/issues/36885
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
@@ -131,7 +132,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(6)
         sub_handler = ClusterAttributeChangeAccumulator(lvl)
-        await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
+        await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(7)
         cmd = lvl.Commands.MoveToLevelWithOnOff(level=max_level, transitionTime=100, optionsMask=0, optionsOverride=0)

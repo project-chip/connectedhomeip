@@ -23,6 +23,8 @@
 
 #include <string>
 
+namespace bridge {
+
 class BridgedDevice
 {
 public:
@@ -54,6 +56,9 @@ public:
 
     [[nodiscard]] bool IsReachable() const { return mReachable; }
     void SetReachable(bool reachable);
+    // Reachability attribute changed and requires marking attribute as dirty and sending
+    // event.
+    void ReachableChanged(bool reachable);
 
     void LogActiveChangeEvent(uint32_t promisedActiveDurationMs);
 
@@ -87,3 +92,5 @@ protected:
     BridgedAttributes mAttributes;
     AdminCommissioningAttributes mAdminCommissioningAttributes;
 };
+
+} // namespace bridge

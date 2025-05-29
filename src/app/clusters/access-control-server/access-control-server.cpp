@@ -102,6 +102,8 @@ private:
     CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
     CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+    CHIP_ERROR IsValidAclEntryList(const DataModel::DecodableList<AclStorage::DecodableEntry> & list);
+
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     CHIP_ERROR ReadCommissioningArl(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadArl(AttributeValueEncoder & aEncoder);
@@ -215,7 +217,7 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
             {
                 ReturnErrorOnFailure(encoder.Encode(encodableEntry));
             }
-            ReturnErrorCodeIf(err != CHIP_NO_ERROR && err != CHIP_ERROR_SENTINEL, err);
+            VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_SENTINEL, err);
         }
         return CHIP_NO_ERROR;
     });
@@ -233,7 +235,7 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
             uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
             CHIP_ERROR errStorage                   = storage.SyncGetKeyValue(
                 DefaultStorageKeyAllocator::AccessControlExtensionEntry(fabric.GetFabricIndex()).KeyName(), buffer, size);
-            ReturnErrorCodeIf(errStorage == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrReturnError(errStorage != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
             if (errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
                 continue;
@@ -262,6 +264,18 @@ CHIP_ERROR AccessControlAttribute::WriteImpl(const ConcreteDataAttributePath & a
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AccessControlAttribute::IsValidAclEntryList(const DataModel::DecodableList<AclStorage::DecodableEntry> & list)
+{
+    auto validationIterator = list.begin();
+    while (validationIterator.Next())
+    {
+        VerifyOrReturnError(validationIterator.GetValue().GetEntry().IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    ReturnErrorOnFailure(validationIterator.GetStatus());
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
@@ -280,6 +294,10 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
 
         VerifyOrReturnError(newCount <= maxCount, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+
+        // Validating all ACL entries in the ReplaceAll list before Updating or Deleting any entries. If any of the entries has an
+        // invalid field, the whole "ReplaceAll" list will be rejected.
+        ReturnErrorOnFailure(IsValidAclEntryList(list));
 
         auto iterator = list.begin();
         size_t i      = 0;
@@ -333,8 +351,8 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
     uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
     CHIP_ERROR errStorage                   = storage.SyncGetKeyValue(
         DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(), buffer, size);
-    ReturnErrorCodeIf(errStorage == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(errStorage != CHIP_NO_ERROR && errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, errStorage);
+    VerifyOrReturnError(errStorage != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(errStorage == CHIP_NO_ERROR || errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, errStorage);
 
     if (!aPath.IsListItemOperation())
     {
@@ -346,7 +364,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 
         if (count == 0)
         {
-            ReturnErrorCodeIf(errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+            VerifyOrReturnError(errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
             ReturnErrorOnFailure(storage.SyncDeleteKeyValue(
                 DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName()));
             AccessControlCluster::Structs::AccessControlExtensionStruct::Type item = {
@@ -367,7 +385,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
             }
             auto & item = iterator.GetValue();
             // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-            ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+            VerifyOrReturnError(item.data.size() <= kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
             ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
 
@@ -386,11 +404,11 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        ReturnErrorCodeIf(errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         AccessControlCluster::Structs::AccessControlExtensionStruct::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
         // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-        ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(item.data.size() <= kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
 
@@ -596,6 +614,22 @@ void MatterAccessControlPluginServerInitCallback()
         accessRestrictionProvider->AddListener(sAttribute);
     }
 #endif
+}
+
+void MatterAccessControlPluginServerShutdownCallback()
+{
+    ChipLogProgress(DataManagement, "AccessControlCluster: shutdown");
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+    if (accessRestrictionProvider != nullptr)
+    {
+        accessRestrictionProvider->RemoveListener(sAttribute);
+    }
+#endif
+
+    GetAccessControl().RemoveEntryListener(sAttribute);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&sAttribute);
 }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS

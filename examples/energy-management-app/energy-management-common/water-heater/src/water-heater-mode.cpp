@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <EnergyManagementAppCommonMain.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <water-heater-mode.h>
 
@@ -24,9 +25,12 @@ using chip::Protocols::InteractionModel::Status;
 template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
+namespace {
 
-static ExampleWaterHeaterModeDelegate * gWaterHeaterModeDelegate = nullptr;
-static ModeBase::Instance * gWaterHeaterModeInstance             = nullptr;
+ExampleWaterHeaterModeDelegate * gWaterHeaterModeDelegate = nullptr;
+ModeBase::Instance * gWaterHeaterModeInstance             = nullptr;
+
+} // namespace
 
 CHIP_ERROR ExampleWaterHeaterModeDelegate::Init()
 {
@@ -41,7 +45,7 @@ void ExampleWaterHeaterModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBas
 
 CHIP_ERROR ExampleWaterHeaterModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -50,7 +54,7 @@ CHIP_ERROR ExampleWaterHeaterModeDelegate::GetModeLabelByIndex(uint8_t modeIndex
 
 CHIP_ERROR ExampleWaterHeaterModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -60,7 +64,7 @@ CHIP_ERROR ExampleWaterHeaterModeDelegate::GetModeValueByIndex(uint8_t modeIndex
 
 CHIP_ERROR ExampleWaterHeaterModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -97,9 +101,27 @@ void WaterHeaterMode::Shutdown()
 
 void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
 {
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
     VerifyOrDie(gWaterHeaterModeDelegate == nullptr && gWaterHeaterModeInstance == nullptr);
     gWaterHeaterModeDelegate = new WaterHeaterMode::ExampleWaterHeaterModeDelegate;
-    gWaterHeaterModeInstance =
-        new ModeBase::Instance(gWaterHeaterModeDelegate, endpointId, WaterHeaterMode::Id, chip::to_underlying(Feature::kOnOff));
+    gWaterHeaterModeInstance = new ModeBase::Instance(gWaterHeaterModeDelegate, endpointId, WaterHeaterMode::Id, 0);
     gWaterHeaterModeInstance->Init();
+}
+
+void emberAfWaterHeaterModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
+    if (gWaterHeaterModeInstance)
+    {
+        gWaterHeaterModeInstance->Shutdown();
+    }
+    WaterHeaterMode::Shutdown();
 }
