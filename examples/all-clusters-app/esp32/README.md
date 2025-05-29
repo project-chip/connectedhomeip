@@ -74,3 +74,60 @@ If you wish to see the actual effect of the commands on `ESP32-DevKitC`,
 `ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
 `STATUS_LED_GPIO_NUM`. For `ESP32C3-DevKitM`, the on-board LED will show the
 actual effect of the commands.
+
+### Matter Stack Shutdown and Restart
+
+This document describes how to cleanly shutdown and restart the Matter stack on ESP32.
+Shutting down the Matter stack typically frees up approximately 100 KB of heap memory.
+
+To use the Matter shutdown and restart functionality, make sure the following configs are disabled in `menuconfig`.
+```
+CONFIG_ENABLE_CHIP_SHELL=n
+CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING=n #(if the device is not commissioned)
+```
+
+#### Matter Stack Shutdown Flow
+The code snippet below shows the shutdown flow for the Matter stack:
+```
+static void Shutdown(intptr_t context)
+{
+    {
+        DeviceLayer::StackLock lock;
+        Esp32AppServer::Shutdown();  // Shutdown Matter AppServer
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::ShutdownWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to shutdown the Wi-Fi stack");
+        return;
+    }
+#endif
+
+    ESPOpenThreadShutdown();         // Shutdown OpenThread (if used)
+    GetAppTask().StopAppTask();      // Stop the application task
+
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    CHIP_ERROR error = deviceMgr.Shutdown(&EchoCallbacks);  // Shutdown CHIPDeviceManager
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "CHIPDeviceManager Shutdown Failed: %" CHIP_ERROR_FORMAT, error.Format());
+        return;
+    }
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::StopShell();               // Stop the Matter shell (if enabled)
+#endif
+}
+```
+We do not deinitialize `esp_event_loop` and `nvs_flash` during shutdown, as they are still required for core ESP32 functionality.
+
+#### Restarting the Matter Stack
+
+To restart the Matter stack, perform the same sequence of initializations as done in `app_main()`. This includes:
+
+Initializing the Wi-Fi stack (if enabled)
+Reinitializing the Matter stack (via CHIPDeviceManager::Init())
+Starting the application task
+Initializing OpenThread (if used)
+Scheduling the Matter server initialization with PlatformMgr().ScheduleWork()

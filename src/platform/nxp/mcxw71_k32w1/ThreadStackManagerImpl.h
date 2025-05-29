@@ -79,6 +79,8 @@ private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
     CHIP_ERROR _InitThreadStack(void);
+    void _ShutdownThreadStack() {}
+    void _StopThreadStack() {}
 
     // ===== Members for internal use by the following friends.
 

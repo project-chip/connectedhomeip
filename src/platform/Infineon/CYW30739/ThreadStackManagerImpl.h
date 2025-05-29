@@ -45,6 +45,7 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
 public:
     // ===== Methods that implement the ThreadStackManager abstract interface.
     CHIP_ERROR _InitThreadStack();
+    void _ShutdownThreadStack() {}
 
     void SignalThreadActivityPending();
     void SignalThreadActivityPendingFromISR();
@@ -54,6 +55,7 @@ protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
     CHIP_ERROR _StartThreadTask();
+    void _StopThreadStack() {}
     void _LockThreadStack();
     bool _TryLockThreadStack();
     void _UnlockThreadStack();

@@ -104,6 +104,14 @@ public:
 
     /**
      * @brief
+     *   Shutdown CHIPDeviceManager
+     *
+     * @param cb Application's instance of the CHIPDeviceManagerCallbacks
+     */
+    CHIP_ERROR Shutdown(CHIPDeviceManagerCallbacks * cb);
+
+    /**
+     * @brief
      *   Fetch a pointer to the registered CHIPDeviceManagerCallbacks object.
      *
      */

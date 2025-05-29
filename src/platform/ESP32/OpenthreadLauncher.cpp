@@ -238,6 +238,11 @@ esp_err_t openthread_init_br_rcp(const esp_rcp_update_config_t * update_config)
     esp_openthread_register_rcp_failure_handler(rcp_failure_handler);
     return err;
 }
+
+void openthread_deinit_br_rcp(void)
+{
+    esp_rcp_update_deinit();
+}
 #endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
 
 esp_err_t openthread_init_stack(void)
