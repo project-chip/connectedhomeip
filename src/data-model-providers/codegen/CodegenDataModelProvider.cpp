@@ -167,14 +167,27 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
     if (!mPersistentStorageDelegate->SyncDoesKeyExist(kStorageKey.KeyName()))
     {
+        // Setting local cache to 1 and write to persistent storage
         mConfigurationVersion = 1;
         uint16_t size         = sizeof(mConfigurationVersion);
-        mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size);
+        if (mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size) != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "Not able to init ConfigurationVersion in presistent storage, only using local cache");
+        }
     }
     else
     {
         uint16_t size = sizeof(mConfigurationVersion);
-        mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size);
+        if (mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size) != CHIP_NO_ERROR)
+        {
+            // Due to failure of reading ConfigurationVersion from persisten storage,
+            // reset local cache to 1 and try to write the new value to persisten storage.
+            mConfigurationVersion = 1;
+            if (mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size) != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Not able to init ConfigurationVersion in presistent storage, only using local cache");
+            }
+        }
     }
 
     return mRegistry.SetContext(ServerClusterContext{
