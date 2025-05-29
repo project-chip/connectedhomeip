@@ -62,16 +62,20 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::ReadAttribute(const D
         return encoder.Encode(mLogic.GetLastNetworkID());
     case LastConnectErrorValue::Id:
         return encoder.Encode(mLogic.GetLastConnectErrorValue());
-    case SupportedThreadFeatures::Id:
-        return encoder.Encode(mLogic.GetThreadCapabilities());
     case Networks::Id:
         return mLogic.EncodeNetworks(encoder);
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
     case SupportedWiFiBands::Id:
         return mLogic.EncodeSupportedWiFiBands(encoder);
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    case SupportedThreadFeatures::Id:
+        return encoder.Encode(mLogic.GetThreadCapabilities());
     case ThreadVersion::Id:
         VerifyOrReturnError(mLogic.Features().Has(NetworkCommissioning::Feature::kThreadNetworkInterface),
                             Protocols::InteractionModel::Status::UnsupportedAttribute);
         return encoder.Encode(mLogic.GetThreadVersion());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
