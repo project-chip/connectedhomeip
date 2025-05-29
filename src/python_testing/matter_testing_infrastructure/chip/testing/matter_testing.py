@@ -37,7 +37,7 @@ from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from enum import Enum, IntFlag
+from enum import IntFlag
 from itertools import chain
 from typing import Any, Callable, Iterable, List, Optional, Tuple
 
