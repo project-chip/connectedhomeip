@@ -114,7 +114,7 @@ def is_disallowed(conformance: Callable):
 
 
 @dataclass
-class Conformance(Callable):
+class Conformance:
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
         ''' Evaluates the conformance of a specific cluster or device type element.
 
@@ -193,7 +193,7 @@ class literal(Conformance):
 
 
 # Conformance options that apply regardless of the element set of the cluster or device
-BASIC_CONFORMANCE: dict[str, Callable] = {
+BASIC_CONFORMANCE: dict[str, Conformance] = {
     MANDATORY_CONFORM: mandatory(),
     OPTIONAL_CONFORM: optional(),
     PROVISIONAL_CONFORM: provisional(),
@@ -222,7 +222,7 @@ class device_feature(Conformance):
     def __init__(self, feature: str):
         self.feature = feature
 
-    def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecisionWithChoice:
+    def __call__(self, feature_map: uint = uint(0), attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecisionWithChoice:
         return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
 
     def __str__(self):
@@ -264,7 +264,7 @@ def strip_outer_parentheses(inner: str) -> str:
 
 
 class optional_wrapper(Conformance):
-    def __init__(self, op: Callable, choice: Optional[Choice] = None):
+    def __init__(self, op: Conformance, choice: Optional[Choice] = None):
         self.op = op
         self.choice = choice
 
@@ -283,7 +283,7 @@ class optional_wrapper(Conformance):
 
 
 class mandatory_wrapper(Conformance):
-    def __init__(self, op: Callable):
+    def __init__(self, op: Conformance):
         self.op = op
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
@@ -294,7 +294,7 @@ class mandatory_wrapper(Conformance):
 
 
 class not_operation(Conformance):
-    def __init__(self, op: Callable):
+    def __init__(self, op: Conformance):
         if op.choice:
             raise ChoiceConformanceException('NOT operation called on choice conformance')
         self.op = op
@@ -321,7 +321,7 @@ class not_operation(Conformance):
 
 
 class and_operation(Conformance):
-    def __init__(self, op_list: list[Callable]):
+    def __init__(self, op_list: list[Conformance]):
         for op in op_list:
             if op.choice:
                 raise ChoiceConformanceException('AND operation with internal choice conformance')
@@ -349,10 +349,10 @@ class and_operation(Conformance):
 
 
 class or_operation(Conformance):
-    def __init__(self, op_list: list[Callable]):
+    def __init__(self, op_list: list[Conformance]):
         for op in op_list:
             if op.choice:
-                raise ChoiceConformanceException('AND operation with internal choice conformance')
+                raise ChoiceConformanceException('OR operation with internal choice conformance')
         self.op_list = op_list
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
@@ -374,10 +374,10 @@ class or_operation(Conformance):
 
 
 class greater_operation(Conformance):
-    def _type_ok(self, op: Callable):
+    def _type_ok(self, op: Conformance):
         return type(op) == attribute or type(op) == literal
 
-    def __init__(self, op1: Callable, op2: Callable):
+    def __init__(self, op1: Conformance, op2: Conformance):
         if not self._type_ok(op1) or not self._type_ok(op2):
             raise ConformanceException('Arithmetic operations can only have attribute or literal value children')
         self.op1 = op1
@@ -394,7 +394,7 @@ class greater_operation(Conformance):
 
 
 class otherwise(Conformance):
-    def __init__(self, op_list: list[Callable]):
+    def __init__(self, op_list: list[Conformance]):
         self.op_list = op_list
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
@@ -416,7 +416,7 @@ class otherwise(Conformance):
         return ', '.join(op_strs)
 
 
-def parse_basic_callable_from_xml(element: ElementTree.Element) -> Callable:
+def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
     if list(element):
         raise BasicConformanceException("parse_basic_callable_from_xml called for XML element with children")
     # This will throw a key error if this is not a basic element key.
@@ -426,16 +426,21 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Callable:
             return optional(choice)
         return BASIC_CONFORMANCE[element.tag]
     except KeyError:
-        if element.tag == CONDITION_TAG and element.get('name').lower() == ZIGBEE_CONDITION:
+        condition_name = element.get('name')
+        if element.tag == CONDITION_TAG and condition_name and condition_name.lower() == ZIGBEE_CONDITION:
             return zigbee()
         elif element.tag == LITERAL_TAG:
-            return literal(element.get('value'))
+            literal_value = element.get('value')
+            if literal_value is None:
+                raise ConformanceException(
+                    f"Literal tag missing 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
+            return literal(literal_value)
         else:
             raise BasicConformanceException(
                 f'parse_basic_callable_from_xml called for unknown element {str(element.tag)} {str(element.attrib)}')
 
 
-def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Callable]) -> Callable:
+def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Conformance]) -> Conformance:
     # optional can be a wrapper as well as a standalone
     # This can be any of the boolean operations, optional or otherwise
     choice = parse_choice(element)
@@ -465,7 +470,7 @@ def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Call
         raise ConformanceException(f'Unexpected conformance tag with children {element}')
 
 
-def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callable:
+def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Conformance:
     ''' Only allows basic, or wrappers over things that degrade to basic.'''
     if not list(element):
         try:
@@ -484,7 +489,7 @@ def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callabl
     return parse_wrapper_callable_from_xml(element, ops)
 
 
-def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Callable:
+def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Conformance:
     if not list(element):
         try:
             return parse_basic_callable_from_xml(element)
@@ -493,21 +498,36 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
             # something else.
             pass
         if element.tag == FEATURE_TAG:
+            feature_name = element.get('name')
+            if feature_name is None:
+                raise ConformanceException(
+                    f"Feature tag missing 'name' attribute for element: {ElementTree.tostring(element, encoding='unicode').strip()}")
             try:
-                return feature(params.feature_map[element.get('name')], element.get('name'))
+                return feature(params.feature_map[feature_name], feature_name)
             except KeyError:
-                raise ConformanceException(f'Conformance specifies feature not in feature table: {element.get("name")}')
+                raise ConformanceException(f'Conformance specifies feature "{feature_name}" not in feature table.')
         elif element.tag == ATTRIBUTE_TAG:
             # Some command conformance tags are marked as attribute, so if this key isn't in attribute, try command
             name = element.get('name')
+            if name is None:
+                raise ConformanceException(
+                    f"Attribute tag missing 'name' attribute for element: {ElementTree.tostring(element, encoding='unicode').strip()}")
+
             if name in params.attribute_map:
                 return attribute(params.attribute_map[name], name)
             elif name in params.command_map:
                 return command(params.command_map[name], name)
             else:
-                raise ConformanceException(f'Conformance specifies attribute or command not in table: {name}')
+                raise ConformanceException(f'Conformance specifies attribute or command "{name}" not in table.')
         elif element.tag == COMMAND_TAG:
-            return command(params.command_map[element.get('name')], element.get('name'))
+            command_name = element.get('name')
+            if command_name is None:
+                raise ConformanceException(
+                    f"Command tag missing 'name' attribute for element: {ElementTree.tostring(element, encoding='unicode').strip()}")
+            try:
+                return command(params.command_map[command_name], command_name)
+            except KeyError:
+                raise ConformanceException(f'Conformance specifies command "{command_name}" not in command table.')
         else:
             raise ConformanceException(
                 f'Unexpected xml conformance element with no children {str(element.tag)} {str(element.attrib)}')
