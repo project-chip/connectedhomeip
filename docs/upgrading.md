@@ -61,6 +61,120 @@ commandHandler->AddResponse(path, kReplyCommandId, replyEncoder);
 
 ```
 
+### Decoupling of `CommandHandlerInterface` from Ember Metadata
+
+CommandHandler Interface was coupled with Ember data in ways that caused bugs if
+not setup correctly, updates were made for decoupling, now this data is provided
+
+With this the interfaces
+[`CommandHandlerInterface::EnumerateGeneratedCommands`](#enumerategeneratedcommands),
+[`CommandHandlerInterface::EnumerateAcceptedCommands`](#enumerateacceptedcommands)
+go through some changes, a SHIM is provided to make the transition simpler
+
+#### Full Changes
+
+##### EnumerateGeneratedCommands
+
+Changed the old callback based iteration, into a ListBuilder based approach for
+the Enumeration of Generated Commands
+
+`CommandHandlerInterface::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
+becomes
+`CommandHandlerInterface::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ListBuilder<CommandId> & builder)`
+
+Changes for implementation
+
+-   old
+
+```cpp
+   for (auto && cmd : { ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
+   {
+       VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+   }
+```
+
+-   new
+
+```cpp
+   ReturnErrorOnFailure(
+        builder.AppendElements({ ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
+   )
+```
+
+##### EnumerateAcceptedCommands
+
+Expanded `EnumerateAcceptedCommands` Interface to provide the Access Information
+(Attributes and Qualities) using a ListBuilder
+
+`CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
+becomes
+`CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, ListBuilder<AcceptedCommandEntry> & builder)`
+
+Changes for implementation:
+
+-   Old
+
+```cpp
+    for (auto && cmd : {
+             Disable::Id,
+             EnableCharging::Id,
+         })
+    {
+        VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+    }
+
+    if (HasFeature(Feature::kV2x))
+    {
+        VerifyOrExit(callback(EnableDischarging::Id, context) == Loop::Continue, /**/);
+    }
+```
+
+-   new
+
+```cpp
+    using QF   = DataModel::CommandQualityFlags;
+    using Priv = Access::Privilege;
+    ReturnErrorOnFailure(builder.AppendElements({
+        { Disable::Id,        QF::kTimed, Priv::kOperate },
+        { EnableCharging::Id, QF::kTimed, Priv::kOperate },
+    }));
+    if (HasFeature(Feature::kV2x))
+    {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+        ReturnErrorOnFailure(
+            builder.Append({ EnableDischarging::Id, QF::kTimed, Priv::kOperate})
+        );
+    }
+```
+
+Important Notes:
+
+Use `EnsureAppendCapacity` before `ListBuilder::Append` to prevent buffer
+overflow when appending a single element, this function never allocates.
+
+#### SHIM updates
+
+If the changes above are too high friction for upgrading, we provide a Shim that
+allows to implement this changes with a very minimal change. It adds as little
+extra usage in size compared to the code above but should be decent for most
+cases.
+
+Tu use this Shim just replace inheriting CommandHandlerInterface to
+CommandHandlerInterfaceShim<> with a list of the clusters are required for your
+implementation
+
+```diff
+- #include <app/CommandHandlerInterface.h>
++ #include <app/CommandHandlerInterfaceShim.h>
+...
+- class Instance : public CommandHandlerInterface,
++ class Instance : public CommandHandlerInterfaceShim<NetworkCommissioning::Id>
+```
+
+```
+
+
+
 ### `CommandHandlerInterface` in `chip::app::InteractionModelEngine`
 
 Command handler lists were placed in a separate registry class that is
@@ -107,3 +221,4 @@ To use default attribute persistence, you need to pass in a
 `PersistentStorageDelegate` to `CodegenDataModelProviderInstance`. See example
 changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
 ).
+```
