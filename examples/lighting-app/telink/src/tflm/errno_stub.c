@@ -19,6 +19,7 @@
 #include <errno.h>
 
 /* This implementation provides a fallback for __errno symbol when using picolibc. */
-int *__errno(void) {
+int * __errno(void)
+{
     return &errno;
 }
