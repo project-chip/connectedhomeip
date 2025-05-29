@@ -23,7 +23,7 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
-config("openthread_k32w1_config") {
+config("openthread_mcxw71_config") {
   include_dirs = [ "${openthread_nxp_root}/src/mcxw/mcxw71" ]
 
   defines = [
@@ -64,19 +64,19 @@ config("openthread_k32w1_config") {
   ]
 }
 
-source_set("openthread_core_config_k32w1") {
+source_set("openthread_core_config_mcxw71") {
   sources = [
     "${openthread_nxp_root}/src/mcxw/mcxw71/openthread-core-mcxw71-config-check.h",
     "${openthread_nxp_root}/src/mcxw/mcxw71/openthread-core-mcxw71-config.h",
   ]
 
-  public_configs = [ ":openthread_k32w1_config" ]
+  public_configs = [ ":openthread_mcxw71_config" ]
   if (!nxp_external_sdk) {
     public_deps = [ nxp_sdk_target ]
   }
 }
 
-source_set("libopenthread-k32w1") {
+source_set("libopenthread-mcxw71") {
   sources = [
     "${openthread_nxp_root}/src/common/crypto.c",
     "${openthread_nxp_root}/src/mcxw/platform/alarm.c",
