@@ -18,14 +18,14 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for k32w1 platform.
+ *          for mcxw71 platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/nxp/mcxw71_k32w1/DiagnosticDataProviderImpl.h>
+#include <platform/nxp/mcxw71/DiagnosticDataProviderImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>

@@ -19,7 +19,7 @@
 
 /**
  *    @file
- *          Provides the SMU2 namespace for K32W1 platform using the NXP SDK.
+ *          Provides the SMU2 namespace for MCXW71 platform using the NXP SDK.
  *          This namespace implements all the necessary function to allocate
  *          OpenThread buffers from SMU2 region.
  */

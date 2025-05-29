@@ -20,7 +20,7 @@
 /**
  *    @file
  *          Provides implementations of the CHIP System Layer platform
- *          time/clock functions that are suitable for use on the K32W1 platform.
+ *          time/clock functions that are suitable for use on the MCXW71 platform.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
