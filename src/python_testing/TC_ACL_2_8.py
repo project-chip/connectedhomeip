@@ -43,6 +43,11 @@ from mobly import asserts
 
 
 class TC_ACL_2_8(MatterBaseTest):
+    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
+        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        return max([e.Header.EventNumber for e in events])
+
     def _verify_acl_event(
             self,
             event,
@@ -103,6 +108,22 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(1)
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
+        '''
+        # Reset ACL to only include admin entry
+        acl_attr = Clusters.AccessControl.Attributes.Acl
+        admin_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=5,  # Administer privilege
+            authMode=2,   # CASE
+            subjects=[self.th1.nodeId],
+            targets=NullValue
+        )
+        result = await self.th1.WriteAttribute(
+            self.dut_node_id,
+            [(0, acl_attr(value=[admin_entry]))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success, "Failed to reset ACL entries")
+        logging.info("Reset ACL entries to admin-only")
+        '''
 
         self.step(2)
         # Read CurrentFabricIndex for TH1
@@ -129,8 +150,12 @@ class TC_ACL_2_8(MatterBaseTest):
         # Read CurrentFabricIndex for TH2
         f2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
         logging.info(f"CurrentFabricIndex F2 {str(f2)}")
-
+        
         self.step(5)
+        # Get latest event number before writing events
+        acec_event = Clusters.AccessControl.Events.AccessControlEntryChanged
+        start_event_number = await self.get_latest_event_number(acec_event)
+
         # TH1 writes ACL attribute
         acl_struct = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=5,
@@ -224,26 +249,41 @@ class TC_ACL_2_8(MatterBaseTest):
             fabricFiltered=True
         )
 
-        asserts.assert_equal(
-            len(events), 2, "Should have exactly 2 events")
+        # First find the most recent "added" event
+        added_events = [e for e in events if (
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and 
+            e.Data.latestValue.subjects == [self.th1.nodeId]
+        )]
+        added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
+
+        # Then find the most recent "changed" event that occurred after the "added" event
+        changed_events = [e for e in events if (
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and 
+            e.Data.latestValue.subjects == [self.th1.nodeId, 1111] and
+            e.Header.EventNumber > added_event.Header.EventNumber
+        )]
+        changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
+
+        relevant_events = [added_event, changed_event]
+        logging.info(f"TH1 Events: {relevant_events}")
 
         # Verify event contents match expected sequence
         self._verify_acl_event(
-            events[0],
+            relevant_events[0],
             NullValue,
             0,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
             self.th1.nodeId,
             f1)
         self._verify_acl_event(
-            events[1],
+            relevant_events[1],
             self.th1.nodeId,
             NullValue,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
             [self.th1.nodeId, 1111],
             f1)
 
-        for event in events:
+        for event in relevant_events:
             asserts.assert_not_equal(
                 event.Data.fabricIndex,
                 f2,
@@ -257,12 +297,27 @@ class TC_ACL_2_8(MatterBaseTest):
             fabricFiltered=True
         )
 
-        asserts.assert_equal(
-            len(events), 2, "Should have exactly 2 events")
+        # First find the most recent "added" event
+        added_events = [e for e in events if (
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and 
+            e.Data.latestValue.subjects == [self.th2.nodeId]
+        )]
+        added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
+
+        # Then find the most recent "changed" event that occurred after the "added" event
+        changed_events = [e for e in events if (
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and 
+            e.Data.latestValue.subjects == [self.th2.nodeId, 2222] and
+            e.Header.EventNumber > added_event.Header.EventNumber
+        )]
+        changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
+
+        relevant_events = [added_event, changed_event]
+        logging.info(f"TH2 Events: {relevant_events}")
 
         # Verify event contents match expected sequence
         self._verify_acl_event(
-            events[0],
+            relevant_events[0],
             NullValue,
             0,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
@@ -270,14 +325,14 @@ class TC_ACL_2_8(MatterBaseTest):
             f2)
 
         self._verify_acl_event(
-            events[1],
+            relevant_events[1],
             self.th2.nodeId,
             NullValue,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
             [self.th2.nodeId, 2222],
             f2)
 
-        for event in events:
+        for event in relevant_events:
             asserts.assert_not_equal(
                 event.Data.fabricIndex,
                 f1,

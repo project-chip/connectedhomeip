@@ -96,6 +96,8 @@ class TC_ACL_2_6(MatterBaseTest):
         events_callback = EventChangeCallback(Clusters.AccessControl)
         await events_callback.start(self.default_controller, self.dut_node_id, 0)
 
+        latest_event_number = await self.get_latest_event_number(acec_event)
+
         # Read initial events
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
@@ -165,7 +167,8 @@ class TC_ACL_2_6(MatterBaseTest):
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
-            fabricFiltered=True
+            fabricFiltered=True,
+            eventNumberFilter=latest_event_number + 1
         )
         logging.info(f"Read events response: {events_response}")
 
@@ -244,12 +247,12 @@ class TC_ACL_2_6(MatterBaseTest):
 
         self.step(7)
         # Verify no events for invalid entry via read as well
-        latest_event_num = await self.get_latest_event_number(acec_event)
+        latest_event_number = await self.get_latest_event_number(acec_event)
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
             fabricFiltered=True,
-            eventNumberFilter=latest_event_num + 1
+            eventNumberFilter=latest_event_number + 1
         )
 
         # Check if any of the read events correspond to the invalid entry
@@ -260,7 +263,6 @@ class TC_ACL_2_6(MatterBaseTest):
                 asserts.fail(f"Found event for invalid entry in read response: {event.Data}")
 
         logging.info("No events found for invalid entry, as expected")
-
 
 if __name__ == "__main__":
     default_matter_test_main()
