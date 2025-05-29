@@ -25,11 +25,11 @@ from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum, auto
 from importlib.abc import Traversable
-from typing import Callable, Optional, Union
+from typing import Optional, Union
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
-from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, Conformance, ConformanceDecision, ConformanceException,
+from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException,
                                       ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                       parse_callable_from_xml, parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
@@ -757,7 +757,8 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
         ret.update(extras)
         for id, override in overrides.items():
             if override.conformance is not None:
-                ret[id].conformance = override.conformanceif override.read_access:
+                ret[id].conformance = override.conformance
+            if override.read_access:
                 ret[id].read_access = override.read_access
 
             if override.write_access:
