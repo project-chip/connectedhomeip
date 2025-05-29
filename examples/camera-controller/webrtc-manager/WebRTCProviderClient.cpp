@@ -282,7 +282,7 @@ void WebRTCProviderClient::OnDone(CommandSender * client)
     mCommandType = CommandType::kUndefined;
     mCommandSender.reset();
 
-    if (mState == State::AwaitingResponse)
+    if (mState == State::AwaitingResponse || mState == State::Connecting)
     {
         MoveToState(State::Idle);
     }
