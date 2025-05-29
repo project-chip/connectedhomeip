@@ -240,28 +240,47 @@ CHIP_ERROR WiFiPAFLayer::Init(chip::System::Layer * systemLayer)
     return CHIP_NO_ERROR;
 }
 
-void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
+void WiFiPAFLayer::Shutdown()
 {
-    ChipLogProgress(WiFiPAF, "WiFiPAF: Closing all WiFiPAF sessions to shutdown");
+    CloseAllConnections();
+    mSystemLayer = nullptr;
+    memset(&sWiFiPAFEndPointPool, 0, sizeof(sWiFiPAFEndPointPool));
+    return;
+}
+
+void WiFiPAFLayer::CloseAllConnections()
+{
+    ChipLogProgress(WiFiPAF, "WiFiPAF: Closing all WiFiPAF sessions");
     uint8_t i;
-    WiFiPAFSession * pPafSession;
 
     for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
-        pPafSession = &mPafInfoVect[i];
-        if (pPafSession->id == UINT32_MAX)
+        WiFiPAFSession * pPafSession = &mPafInfoVect[i];
+        if (pPafSession->id == kUndefinedWiFiPafSessionId)
         {
             // Unused session
             continue;
         }
-        ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", pPafSession->id);
-        OnCancelDevice(pPafSession->id, pPafSession->role);
-        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(pPafSession));
-        if (endPoint != nullptr)
-        {
-            endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
-        }
+        CloseConnection(PafInfoAccess::kAccSessionId, *pPafSession);
     }
+}
+
+void WiFiPAFLayer::CloseConnection(PafInfoAccess accType, const WiFiPAFSession & PafSession)
+{
+    WiFiPAFSession * pPafSession = GetPAFInfo(accType, PafSession);
+    ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", pPafSession->id);
+
+    WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(pPafSession));
+    // "endPoint" will be created after connection has been established (discovered or OnReplied)
+    // If the connection drops before connected, endPoint may be empty
+    if (endPoint != nullptr)
+    {
+        endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+        endPoint->mWiFiPafLayer = nullptr;
+    }
+
+    mWiFiPAFTransport->WiFiPAFCloseSession(*pPafSession);
+    CleanPafInfo(*pPafSession);
 }
 
 bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
@@ -498,7 +517,7 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
     return CHIP_ERROR_NOT_FOUND;
 }
 
-WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
+WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, const WiFiPAFSession & SessionInfo)
 {
     uint8_t i;
     WiFiPAFSession * pPafSession = nullptr;

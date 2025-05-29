@@ -572,8 +572,7 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
-        [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown();
 #endif
 
     // Release everything from the commissionee device pool here.
@@ -626,6 +625,14 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
         // We only support one BLE connection, so if this is BLE, close it
         ChipLogProgress(Discovery, "Closing all BLE connections");
         mSystemState->BleLayer()->CloseAllBleConnections();
+    }
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if ((mSystemState->WiFiPayLayer() != nullptr) && (device->GetDeviceTransportType() == Transport::Type::kWiFiPAF) &&
+        (device->IsSecureConnected() == true))
+    {
+        ChipLogProgress(Discovery, "Closing all WiFiPAF connections");
+        mSystemState->WiFiPayLayer()->CloseAllConnections();
     }
 #endif
     // Make sure that there will be no dangling pointer
@@ -943,6 +950,7 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
     {
         ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
                      err.Format());
+        self->CloseWiFiPAFConnection(device->GetDeviceId());
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         if (self->mPairingDelegate != nullptr)
@@ -1831,6 +1839,17 @@ void DeviceCommissioner::CloseBleConnection()
     // We should be able to distinguish different BLE connections if we want
     // to commission multiple devices at the same time over BLE.
     mSystemState->BleLayer()->CloseAllBleConnections();
+}
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void DeviceCommissioner::CloseWiFiPAFConnection(NodeId remoteDeviceId)
+{
+    WiFiPAF::WiFiPAFSession PafSession = {
+        .role   = WiFiPAF::kWiFiPafRole_Subscriber,
+        .nodeId = remoteDeviceId,
+    };
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().CloseConnection(WiFiPAF::PafInfoAccess::kAccNodeId, PafSession);
 }
 #endif
 
