@@ -24,6 +24,7 @@ zap_and_codegen/index
 BUG_REPORT
 upgrading
 issue_triage
+pull_request_guidelines
 ```
 
 ```{include} README.md

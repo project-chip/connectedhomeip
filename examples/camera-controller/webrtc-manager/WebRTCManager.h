@@ -27,6 +27,9 @@
 class WebRTCManager
 {
 public:
+    using ICECandidateStruct = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using StreamUsageEnum    = chip::app::Clusters::Globals::StreamUsageEnum;
+
     static WebRTCManager & Instance()
     {
         static WebRTCManager instance;
@@ -39,14 +42,13 @@ public:
 
     CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdp);
 
-    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates);
+    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates);
 
     CHIP_ERROR Connnect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
 
-    CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId,
-                            chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage);
+    CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage);
 
-    CHIP_ERROR SolicitOffer(chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage);
+    CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage);
 
     CHIP_ERROR ProvideAnswer(uint16_t sessionId, const std::string & sdp);
 
@@ -65,6 +67,9 @@ private:
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
     std::shared_ptr<rtc::DataChannel> mDataChannel;
 
+    uint16_t mPendingSessionId = 0;
     std::string mLocalDescription;
+    // Local vector to store the ICE Candidate strings coming from the WebRTC
+    // stack
     std::vector<std::string> mLocalCandidates;
 };

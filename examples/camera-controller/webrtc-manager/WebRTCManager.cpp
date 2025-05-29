@@ -81,8 +81,17 @@ CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorD
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideAnswer(sessionId, mLocalDescription); });
+    // Store sessionId for the delayed callback
+    mPendingSessionId = sessionId;
+
+    // Schedule the ProvideAnswer() call to run with a small delay to ensure the response is sent first
+    DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(300),
+        [](chip::System::Layer * systemLayer, void * appState) {
+            auto * self = static_cast<WebRTCManager *>(appState);
+            self->ProvideAnswer(self->mPendingSessionId, self->mLocalDescription);
+        },
+        this);
 
     return CHIP_NO_ERROR;
 }
@@ -102,13 +111,22 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
     rtc::Description answerDesc(sdp, rtc::Description::Type::Answer);
     mPeerConnection->setRemoteDescription(answerDesc);
 
-    // Schedule the ProvideICECandidates() call to run asynchronously.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() { ProvideICECandidates(sessionId); });
+    // Store sessionId for the delayed callback
+    mPendingSessionId = sessionId;
+
+    // Schedule the ProvideICECandidates() call to run with a small delay to ensure the response is sent first
+    DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(300),
+        [](chip::System::Layer * systemLayer, void * appState) {
+            auto * self = static_cast<WebRTCManager *>(appState);
+            self->ProvideICECandidates(self->mPendingSessionId);
+        },
+        this);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)
+CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates)
 {
     ChipLogProgress(Camera, "WebRTCManager::HandleICECandidates");
 
@@ -126,8 +144,19 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vec
 
     for (const auto & candidate : candidates)
     {
-        ChipLogProgress(Camera, "Applying candidate: %s", candidate.c_str());
-        mPeerConnection->addRemoteCandidate(candidate);
+        ChipLogProgress(Camera, "Applying candidate: %s",
+                        std::string(candidate.candidate.begin(), candidate.candidate.end()).c_str());
+        if (candidate.SDPMid.IsNull())
+        {
+            mPeerConnection->addRemoteCandidate(
+                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end())));
+        }
+        else
+        {
+            mPeerConnection->addRemoteCandidate(
+                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end()),
+                               std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end())));
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -171,6 +200,10 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mPeerConnection->onStateChange(
         [](rtc::PeerConnection::State state) { ChipLogProgress(Camera, "[PeerConnection State: %d]", static_cast<int>(state)); });
 
+    mPeerConnection->onSignalingStateChange([](rtc::PeerConnection::SignalingState state) {
+        ChipLogProgress(Camera, "[SignalingState State: %d]", static_cast<int>(state));
+    });
+
     mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
         ChipLogProgress(Camera, "[Gathering State: %d]", static_cast<int>(state));
     });
@@ -198,8 +231,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId,
-                                       Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage)
+CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer command to the peer device");
 
@@ -217,7 +249,7 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId,
     return err;
 }
 
-CHIP_ERROR WebRTCManager::SolicitOffer(Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage)
+CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage)
 {
     ChipLogProgress(Camera, "Sending SolicitOffer command to the peer device");
 
@@ -258,17 +290,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Convert mLocalCandidates (std::vector<std::string>) into a list of CharSpans.
-    std::vector<chip::CharSpan> candidateSpans;
-    candidateSpans.reserve(mLocalCandidates.size());
-    for (const auto & candidate : mLocalCandidates)
-    {
-        candidateSpans.push_back(chip::CharSpan(candidate.c_str(), static_cast<uint16_t>(candidate.size())));
-    }
-
-    auto ICECandidates = chip::app::DataModel::List<const chip::CharSpan>(candidateSpans.data(), candidateSpans.size());
-
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, ICECandidates);
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, mLocalCandidates);
 
     if (err != CHIP_NO_ERROR)
     {

@@ -257,15 +257,18 @@ private:
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
+    CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
-    WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
     uint16_t mApFreq;
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
+    bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
+    // The resource checking is needed right before sending data packets that they are initialized and connected.
+    bool mPafChannelAvailable = true;
 #endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);

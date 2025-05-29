@@ -59,7 +59,7 @@ namespace Dnssd {
         mHostname = hostname;
         mServiceRef = nullptr;
 
-        VerifyOrReturnError(CHIP_NO_ERROR == InterfacesMonitor::Init(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), addressType, interfaceId),
+        VerifyOrReturnError(CHIP_NO_ERROR == NetworkMonitor::Init(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), addressType, interfaceId),
             kDNSServiceErr_BadState);
 
         return kDNSServiceErr_NoError;
@@ -99,7 +99,7 @@ namespace Dnssd {
     void HostNameRegistrar::Unregister()
     {
         if (!IsLocalOnly()) {
-            StopMonitorInterfaces();
+            NetworkMonitor::Stop();
         }
         StopSharedConnection();
     }
