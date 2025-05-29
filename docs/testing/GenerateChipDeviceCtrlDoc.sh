@@ -15,15 +15,15 @@
 #
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-export PYTHONPATH="${SCRIPT_DIR}/../../src/controller/python"
+export PYTHONPATH="$SCRIPT_DIR/../../src/controller/python"
 FILENAME='ChipDeviceCtrlAPI.md'
 
 if [[ $# -ne 1 ]]; then
-  echo 'usage: GenerateChipDeviceCtrlDoc.sh build_directory'
-  exit 1
+    echo 'usage: GenerateChipDeviceCtrlDoc.sh build_directory'
+    exit 1
 fi
 
-pydoc-markdown -I ${SCRIPT_DIR}/../../src/controller/python --py3 -m chip.ChipDeviceCtrl '{
+pydoc-markdown -I "$SCRIPT_DIR"/../../src/controller/python --py3 -m chip.ChipDeviceCtrl '{
     renderer: {
       type: markdown,
       descriptive_class_title: false,
@@ -34,4 +34,4 @@ pydoc-markdown -I ${SCRIPT_DIR}/../../src/controller/python --py3 -m chip.ChipDe
     }
   }' >"$1"/"$FILENAME"
 
-awk '/\(\#chip.ChipDeviceCtrl/ {gsub(/\./, "", $0)} 1' $1/$FILENAME >$1/tmp && mv $1/tmp $1/$FILENAME
+awk '/\(\#chip.ChipDeviceCtrl/ {gsub(/\./, "", $0)} 1' "$1/$FILENAME" >"$1"/tmp && mv "$1"/tmp "$1/$FILENAME"
