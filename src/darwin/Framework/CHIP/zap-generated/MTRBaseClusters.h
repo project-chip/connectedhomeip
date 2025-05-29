@@ -115,31 +115,31 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command AddGroup
  *
- * Command description for AddGroup
+ * The AddGroup command allows a client to add group membership in a particular group for the server endpoint.
  */
 - (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params completion:(void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command ViewGroup
  *
- * Command description for ViewGroup
+ * The ViewGroup command allows a client to request that the server responds with a ViewGroupResponse command containing the name string for a particular group.
  */
 - (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params completion:(void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command GetGroupMembership
  *
- * Command description for GetGroupMembership
+ * The GetGroupMembership command allows a client to inquire about the group membership of the server endpoint, in a number of ways.
  */
 - (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params completion:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command RemoveGroup
  *
- * Command description for RemoveGroup
+ * The RemoveGroup command allows a client to request that the server removes the membership for the server endpoint, if any, in a particular group.
  */
 - (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params completion:(void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command RemoveAllGroups
  *
- * Command description for RemoveAllGroups
+ * The RemoveAllGroups command allows a client to direct the server to remove all group associations for the server endpoint.
  */
 - (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)removeAllGroupsWithCompletion:(MTRStatusCompletion)completion
@@ -147,7 +147,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command AddGroupIfIdentifying
  *
- * Command description for AddGroupIfIdentifying
+ * The AddGroupIfIdentifying command allows a client to add group membership in a particular group for the server endpoint, on condition that the endpoint is identifying itself.
  */
 - (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
@@ -15225,7 +15225,7 @@ MTR_PROVISIONALLY_AVAILABLE
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeSupportedFormatsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeCurrentConnectionsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeCurrentConnectionsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeCurrentConnectionsWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;

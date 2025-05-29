@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -98,7 +99,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZSetPosition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<int16_t> pan;
     Optional<int16_t> tilt;
@@ -139,7 +139,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<int16_t> panDelta;
     Optional<int16_t> tiltDelta;
@@ -178,7 +177,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZMoveToPreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t presetID = static_cast<uint8_t>(0);
 
@@ -214,7 +212,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZSavePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<uint8_t> presetID;
     chip::CharSpan name;
@@ -251,7 +248,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MPTZRemovePreset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t presetID = static_cast<uint8_t>(0);
 
@@ -287,7 +283,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DPTZSetViewport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
     Globals::Structs::ViewportStruct::Type viewport;
@@ -327,7 +322,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DPTZRelativeMove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
     Optional<int16_t> deltaX;

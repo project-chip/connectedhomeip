@@ -48470,11 +48470,13 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transportStatus", Tag=1, Type=PushAvStreamTransport.Enums.TransportStatusEnum),
                         ClusterObjectFieldDescriptor(Label="transportOptions", Tag=2, Type=typing.Optional[PushAvStreamTransport.Structs.TransportOptionsStruct]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             connectionID: 'uint' = 0
             transportStatus: 'PushAvStreamTransport.Enums.TransportStatusEnum' = 0
             transportOptions: 'typing.Optional[PushAvStreamTransport.Structs.TransportOptionsStruct]' = None
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class SupportedFormatStruct(ClusterObject):
