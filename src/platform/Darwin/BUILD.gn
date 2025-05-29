@@ -77,8 +77,8 @@ static_library("Darwin") {
     "SystemTimeSupport.cpp",
     "UserDefaults.h",
     "UserDefaults.mm",
-    "inet/InterfacesMonitor.h",
-    "inet/InterfacesMonitor.mm",
+    "inet/NetworkMonitor.h",
+    "inet/NetworkMonitor.mm",
   ]
 
   if (chip_enable_wifi) {
