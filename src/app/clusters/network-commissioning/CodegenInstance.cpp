@@ -39,3 +39,7 @@ void Instance::Shutdown()
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// unused bits ember wants
+void MatterNetworkCommissioningPluginServerInitCallback() {}
+void MatterNetworkCommissioningPluginServerShutdownCallback() {}
