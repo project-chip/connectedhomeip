@@ -39,6 +39,11 @@ public:
         DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
     {}
 
+    CHIP_ERROR Init() { return mLogic.Init(); }
+
+    // Undo of the init. Separate name as `Shutdown` has meaning for a server cluster
+    void Deinit() { mLogic.Shutdown(); }
+
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

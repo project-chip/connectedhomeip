@@ -59,11 +59,6 @@ class NetworkCommissioningLogic : private NetworkCommissioningLogicListNode,
                                   public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
 {
 public:
-    /**
-     * Register will register the network commissioning instance to the attribute and command dispatching route.
-     */
-    // TODO: init should be removed. It is not the cluste responsibility to register
-    //       so that we avoid globals
     CHIP_ERROR Init();
     void Shutdown();
 
