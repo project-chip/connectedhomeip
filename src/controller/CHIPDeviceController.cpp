@@ -835,7 +835,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
     {
-        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != WiFiPAF::State::kConnected)
+        if (DeviceLayer::ConnectivityMgr().GetWiFiPafLayer()->GetWiFiPAFState() != WiFiPAF::State::kConnected)
         {
             ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %lu",
                             params.GetPeerAddress().GetRemoteId());
@@ -849,7 +849,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                                                     .nodeId        = nodeId,
                                                     .discriminator = discriminator };
             ReturnErrorOnFailure(
-                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+                DeviceLayer::ConnectivityMgr().GetWiFiPafLayer()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
             DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
                                                             OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
