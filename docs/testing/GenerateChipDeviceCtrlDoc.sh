@@ -15,6 +15,7 @@
 #
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+export PYTHONPATH="${SCRIPT_DIR}/../../src/controller/python"
 FILENAME='ChipDeviceCtrlAPI.md'
 
 if [[ $# -ne 1 ]]; then
@@ -22,9 +23,7 @@ if [[ $# -ne 1 ]]; then
   exit 1
 fi
 
-export PYTHONPATH="${PYTHONPATH}:/Users/jdelgado/connectedhomeip/src/controller/python"
-
-pydoc-markdown -I ${SCRIPT_DIR}/../src/controller/python --py3 -m chip.ChipDeviceCtrl '{
+pydoc-markdown -I ${SCRIPT_DIR}/../../src/controller/python --py3 -m chip.ChipDeviceCtrl '{
     renderer: {
       type: markdown,
       descriptive_class_title: false,
@@ -34,4 +33,5 @@ pydoc-markdown -I ${SCRIPT_DIR}/../src/controller/python --py3 -m chip.ChipDevic
       add_full_prefix: true,
     }
   }' >"$1"/"$FILENAME"
+
 awk '/\(\#chip.ChipDeviceCtrl/ {gsub(/\./, "", $0)} 1' $1/$FILENAME >$1/tmp && mv $1/tmp $1/$FILENAME
