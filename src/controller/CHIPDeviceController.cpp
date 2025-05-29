@@ -628,7 +628,7 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
     }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if ((mSystemState->WiFiPayLayer() != nullptr) && (device->GetDeviceTransportType() == Transport::Type::kWiFiPAF) &&
+    if ((mSystemState->WiFiPafLayer() != nullptr) && (device->GetDeviceTransportType() == Transport::Type::kWiFiPAF) &&
         (device->IsSecureConnected() == true))
     {
         ChipLogProgress(Discovery, "Closing all WiFiPAF connections");
