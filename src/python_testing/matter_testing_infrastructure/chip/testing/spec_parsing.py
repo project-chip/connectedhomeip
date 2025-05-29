@@ -29,9 +29,9 @@ from typing import Callable, Optional, Union
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
-from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
-                                      ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
-                                      parse_callable_from_xml, parse_device_type_callable_from_xml)
+from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecisionWithChoice, ConformanceException, ConformanceParseParameters, feature,
+                                      is_disallowed, mandatory, optional, or_operation, parse_callable_from_xml,
+                                      parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                          EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
@@ -55,7 +55,7 @@ class SpecParsingException(Exception):
 
 
 # passing in feature map, attribute list, command list
-ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecision]
+ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecisionWithChoice]
 
 
 @dataclass
@@ -757,7 +757,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
         overrides = {k: v for k, v in derived.items() if k in base.keys()}
         ret.update(extras)
         for id, override in overrides.items():
-            if override.conformance:
+            if override.conformance is not None:
                 ret[id].conformance = override.conformance
             if override.read_access:
                 ret[id].read_access = override.read_access
