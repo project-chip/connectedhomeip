@@ -632,7 +632,7 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
         (device->IsSecureConnected() == true))
     {
         ChipLogProgress(Discovery, "Closing all WiFiPAF connections");
-        mSystemState->WiFiPayLayer()->CloseAllConnections();
+        mSystemState->WiFiPafLayer()->CloseAllConnections();
     }
 #endif
     // Make sure that there will be no dangling pointer
