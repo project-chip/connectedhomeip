@@ -464,7 +464,7 @@ void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
     {
         WiFiPAF::WiFiPAFSession InSessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
                                                   .nodeId        = mRemoteId};
-        WiFiPAF::WiFiPAFSession * pSession = DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, InSessionInfo);
+        WiFiPAF::WiFiPAFSession * pSession = DeviceLayer::ConnectivityMgr().GetWiFiPafLayer()->GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, InSessionInfo);
         if (pSession != nullptr)
         {
             DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pSession->id);
