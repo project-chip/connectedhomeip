@@ -79,4 +79,4 @@
 // NB: This file gets included during the build of OpenThread.  Hence
 // it cannot use "openthread" in the path to the included file.
 //
-#include "openthread-core-k32w1-config.h"
+#include "openthread-core-mcxw71-config.h"

@@ -55,7 +55,7 @@ openthread_external_mbedtls = mbedtls_target
 
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_platform_check_file =
-    "openthread-core-k32w1-config-check.h"
+    "openthread-core-mcxw71-config-check.h"
 openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/nxp/${nxp_platform}:openthread_core_config_k32w1" ]
 
 openthread_external_platform = "${chip_root}/third_party/openthread/platforms/nxp/${nxp_platform}:libopenthread-k32w1"
