@@ -91,7 +91,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.bleLayer = mSystemState->BleLayer();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    params.wifipaf_layer = mSystemState->WiFiPayLayer();
+    params.wifipaf_layer = mSystemState->WiFiPafLayer();
 #endif
     params.listenPort                = mListenPort;
     params.fabricIndependentStorage  = mFabricIndependentStorage;
