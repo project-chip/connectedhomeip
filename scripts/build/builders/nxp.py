@@ -49,16 +49,13 @@ class NxpBuildSystem(Enum):
 
 
 class NxpBoard(Enum):
-    K32W1 = auto()
     RT1060 = auto()
     RT1170 = auto()
     RW61X = auto()
     MCXW71 = auto()
 
     def Name(self, os_env):
-        if self == NxpBoard.K32W1:
-            return 'k32w1'
-        elif self == NxpBoard.RT1060:
+        if self == NxpBoard.RT1060:
             return 'rt1060'
         elif self == NxpBoard.RT1170:
             return 'rt1170'
@@ -73,9 +70,7 @@ class NxpBoard(Enum):
             raise Exception('Unknown board type: %r' % self)
 
     def FolderName(self, os_env):
-        if self == NxpBoard.K32W1:
-            return 'k32w1'
-        elif self == NxpBoard.RT1060:
+        if self == NxpBoard.RT1060:
             return 'rt/rt1060'
         elif self == NxpBoard.RT1170:
             return 'rt/rt1170'
@@ -157,7 +152,7 @@ class NxpBuilder(GnBuilder):
                  root,
                  runner,
                  app: NxpApp = NxpApp.LIGHTING,
-                 board: NxpBoard = NxpBoard.K32W1,
+                 board: NxpBoard = NxpBoard.MCXW71,
                  board_variant: NxpBoardVariant = None,
                  os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
                  build_system: NxpBuildSystem = NxpBuildSystem.GN,
@@ -235,8 +230,6 @@ class NxpBuilder(GnBuilder):
                     return "evkbmimxrt1060"
             case NxpBoard.RT1170:
                 return "evkbmimxrt1170"
-            case NxpBoard.K32W1:
-                return "k32w148evk"
             case NxpBoard.MCXW71:
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw71"
