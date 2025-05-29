@@ -84,11 +84,12 @@ void Shutdown();
 
 namespace RvcCleanMode {
 
-const uint8_t ModeQuick     = 0;
-const uint8_t ModeAuto      = 1;
-const uint8_t ModeDeepClean = 2;
-const uint8_t ModeQuiet     = 3;
-const uint8_t ModeMaxVac    = 4;
+const uint8_t ModeQuick      = 0;
+const uint8_t ModeAuto       = 1;
+const uint8_t ModeDeepClean  = 2;
+const uint8_t ModeQuiet      = 3;
+const uint8_t ModeMaxVac     = 4;
+const uint8_t ModeVacThenMop = 5;
 
 /// This is an application level delegate to handle RvcClean commands according to the specific business logic.
 class RvcCleanModeDelegate : public ModeBase::Delegate
@@ -111,7 +112,11 @@ private:
     ModeTagStructType modeTagsMaxVac[2] = { { .value = to_underlying(ModeTag::kVacuum) },
                                             { .value = to_underlying(ModeTag::kDeepClean) } };
 
-    const detail::Structs::ModeOptionStruct::Type kModeOptions[5] = {
+    ModeTagStructType modeTagsVacThenMop[3] = { { .value = to_underlying(ModeTag::kVacuum) },
+                                                { .value = to_underlying(ModeTag::kMop) },
+                                                { .value = to_underlying(ModeTag::kVacuumThenMop) } };
+
+    const detail::Structs::ModeOptionStruct::Type kModeOptions[6] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Quick"),
                                                  .mode     = ModeQuick,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsQuick) },
@@ -127,6 +132,9 @@ private:
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Max Vac"),
                                                  .mode     = ModeMaxVac,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsMaxVac) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Vacuum Then Mop"),
+                                                 .mode     = ModeVacThenMop,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsVacThenMop) }
     };
 
     CHIP_ERROR Init() override;
