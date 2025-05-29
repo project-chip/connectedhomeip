@@ -249,6 +249,7 @@ class TC_ACL_2_8(MatterBaseTest):
             fabricFiltered=True
         )
 
+        # Below event filtering and parsing is currently required in the event that the DUT is not reset before running this test.
         # First find the most recent "added" event
         added_events = [e for e in events if (
             e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and 

@@ -42,10 +42,16 @@ from mobly import asserts
 
 
 class TC_ACL_2_6(MatterBaseTest):
-    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
-        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
-        return max([e.Header.EventNumber for e in events])
+    async def get_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged, altitude: str) -> int:
+        if altitude == "min":
+            event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
+            events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+            return events[0].Header.EventNumber  # fallback to first event if no match found
+
+        if altitude == "max":
+            event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
+            events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+            return max([e.Header.EventNumber for e in events])
 
     # Compare events by their relevant fields instead of string representation
     def event_key(self, event):
@@ -96,15 +102,17 @@ class TC_ACL_2_6(MatterBaseTest):
         events_callback = EventChangeCallback(Clusters.AccessControl)
         await events_callback.start(self.default_controller, self.dut_node_id, 0)
 
-        latest_event_number = await self.get_latest_event_number(acec_event)
+        oldest_event_number = await self.get_event_number(acec_event, "min")
 
         # Read initial events
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
-            fabricFiltered=True
+            fabricFiltered=True,
+            eventNumberFilter=oldest_event_number
         )
         logging.info(f"Events response: {events_response}")
+        events_response = [events_response[0]]
 
         # If we found events via read, verify them
         expected_event = Clusters.AccessControl.Events.AccessControlEntryChanged(
@@ -120,6 +128,7 @@ class TC_ACL_2_6(MatterBaseTest):
             ),
             fabricIndex=f1
         )
+        asserts.assert_equal(len(events_response), 1, "Expected 1 event")
 
         # Verify read events match expectations
         found = False
@@ -128,6 +137,8 @@ class TC_ACL_2_6(MatterBaseTest):
                 found = True
                 break
         asserts.assert_true(found, "Expected event not found in read response")
+
+        latest_event_number = await self.get_event_number(acec_event, "max")
 
         self.step(4)
         # Write ACL attribute
@@ -247,7 +258,7 @@ class TC_ACL_2_6(MatterBaseTest):
 
         self.step(7)
         # Verify no events for invalid entry via read as well
-        latest_event_number = await self.get_latest_event_number(acec_event)
+        latest_event_number = await self.get_event_number(acec_event, "max")
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
