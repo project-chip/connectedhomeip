@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -20,7 +20,7 @@
 /**
  *    @file
  *          Defines platform-specific event types and data for the chip
- *          Device Layer on K32W061 platforms using the NXP SDK.
+ *          Device Layer on K32W1/MCXW71 platforms using the NXP SDK.
  */
 
 #pragma once
@@ -33,7 +33,7 @@ namespace DeviceLayer {
 namespace DeviceEventType {
 
 /**
- * Enumerates K32W1 platform-specific event types that are visible to the application.
+ * Enumerates K32W1/MCXW71 platform-specific event types that are visible to the application.
  */
 enum PublicPlatformSpecificEventTypes
 {
@@ -41,7 +41,7 @@ enum PublicPlatformSpecificEventTypes
 };
 
 /**
- * Enumerates K32W061 platform-specific event types that are internal to the chip Device Layer.
+ * Enumerates K32W1/MCXW71 platform-specific event types that are internal to the chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
@@ -51,7 +51,7 @@ enum InternalPlatformSpecificEventTypes
 } // namespace DeviceEventType
 
 /**
- * Represents platform-specific event information for NXP K32W061 platforms.
+ * Represents platform-specific event information for NXP K32W1/MCXW71 platforms.
  */
 
 struct ChipDevicePlatformEvent final
