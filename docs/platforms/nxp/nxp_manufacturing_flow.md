@@ -142,7 +142,6 @@ Here is the interpretation of the **optional** parameters:
 
 | platform  | tool                             | command                                                                                    | details                                                                                            |
 | --------- | -------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| `k32w1`   | `JLink`                          | `loadfile factory_data.bin 0xFE080`                                                        | NA                                                                                                 |
 | `mcxw71`  | `JLink`                          | `loadfile factory_data.bin 0xFE080`                                                        | NA                                                                                                 |
 | `rw61x`   | `JLink`                          | `loadfile factory_data.bin 0xBFFF000`                                                      | Here, `0xBFFF000` is the value of symbol `__FACTORY_DATA_START` from the corresponding `.map` file |
 | `rt1060`  | `MCUXpresso Flash Tool GUI`      | NA                                                                                         | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                       |
@@ -237,7 +236,6 @@ transferred to the `SSS`.
 
 Supported platforms:
 
--   `k32w1`
 -   `mcxw71`
 -   `rw61x`
 
