@@ -43,7 +43,7 @@ config("support_config") {
 source_set("freertos_memory_utils") {
   sources = []
 
-  if (nxp_platform == "mcxw71_k32w1") {
+  if (nxp_platform == "mcxw71") {
     sources += [
       "FreeRtosHooks.cpp",
     ]
