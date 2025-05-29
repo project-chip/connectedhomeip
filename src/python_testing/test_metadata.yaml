@@ -36,6 +36,8 @@ not_automated:
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_22.py
+      reason: It has no CI execution block, is not executed in CI
     - name: TC_DGGEN_3_2.py
       reason:
           src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test
@@ -121,10 +123,6 @@ not_automated:
     - name: TC_AVSUMTestBase.py
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
-    - name: TC_LTIME_3_1.py
-      reason:
-          Flaky/failing (maybe after removing defaults)
-          https://github.com/project-chip/connectedhomeip/issues/38860
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
