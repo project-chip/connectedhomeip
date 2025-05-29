@@ -56,8 +56,6 @@ class TC_FAN_3_5(MatterBaseTest):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[FC] TH checks the DUT for the presence of the OnOff cluster.",
                          "If the cluster is present, set it to On."),
-                # TestStep(3, "[FC] TH checks the DUT for support of the Step and MultiSpeed features.",
-                #          "If the DUT does not support both features, the test is skipped."),
                 TestStep(3, "[FC] TH reads from the DUT the SpeedMax attribute.",
                          "Store value for future reference."),
                 TestStep(4, "[FC] TH reads from the DUT the FanModeSequence attribute.",
