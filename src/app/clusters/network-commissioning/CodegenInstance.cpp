@@ -14,8 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
-
 #include "CodegenInstance.h"
 
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
