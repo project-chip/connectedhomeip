@@ -69,24 +69,6 @@ jobs:
               with:
                   gh-context: ${{ toJson(github) }}
 
-            - name: Build K32W1 examples
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-k32w1-freertos-lighting \
-                      build \
-                      --copy-artifacts-to out/artifacts \
-                  "
-            - name: Get K32W1 lighting app size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp k32w1+release light \
-                    out/artifacts/nxp-k32w1-freertos-lighting/chip-k32w1-light-example.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean build
-              run: rm -rf ./out
-
             - name: Build MCXW71 examples
               run: |
                   scripts/run_in_build_env.sh "\
