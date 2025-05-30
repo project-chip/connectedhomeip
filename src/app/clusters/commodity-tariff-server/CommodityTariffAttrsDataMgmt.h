@@ -26,64 +26,8 @@
 #include <type_traits>
 
 namespace chip {
-
-constexpr bool operator!=(const Span<const char> & lhs, const Span<const char> & rhs)
-{
-    if (lhs.size() != rhs.size())
-        return true; // Different lengths → not equal
-
-    if (lhs.data() == rhs.data())
-        return false; // Same pointer (or both null) → equal
-
-    // Compare byte-by-byte (safe for non-null-terminated data)
-    return !std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
-
-constexpr bool operator!=(const Span<const uint32_t> & lhs, const Span<const uint32_t> & rhs)
-{
-    if (lhs.size() != rhs.size())
-        return true; // Different lengths → not equal
-
-    if (lhs.data() == rhs.data())
-        return false; // Same pointer (or both null) → equal
-
-    // Compare byte-by-byte (safe for non-null-terminated data)
-    return !std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
-
 namespace app {
 namespace Clusters {
-
-constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
-{
-    return ((lhs.currency != rhs.currency) || (lhs.decimalPoints != rhs.decimalPoints));
-}
-
-constexpr bool operator!=(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs,
-                          const CommodityTariff::Structs::TariffPriceStruct::Type & rhs)
-{
-    return ((lhs.priceType != rhs.priceType) || (lhs.price != rhs.price) || (lhs.priceLevel != rhs.priceLevel));
-}
-
-constexpr bool operator!=(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs,
-                          const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
-{
-    return ((lhs.number != rhs.number) || (lhs.requiredState != rhs.requiredState));
-}
-
-constexpr bool operator!=(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs,
-                          const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs)
-{
-    return ((lhs.severity != rhs.severity) || (lhs.peakPeriod != rhs.peakPeriod));
-}
-
-constexpr bool operator!=(const Globals::Structs::PowerThresholdStruct::Type & lhs,
-                          const Globals::Structs::PowerThresholdStruct::Type & rhs)
-{
-    if (lhs.powerThresholdSource != rhs.powerThresholdSource)
-        return true;
-    return ((lhs.powerThreshold != rhs.powerThreshold) || (lhs.apparentPowerThreshold != rhs.apparentPowerThreshold));
-}
 namespace CommodityTariff {
 
 /**

@@ -20,6 +20,86 @@
 #include <cassert>
 #include <cstdint>
 
+namespace chip {
+
+// Ensure all operators are in the same namespace as their types
+
+// Span comparison operators
+inline bool operator==(const Span<const char> &a, const Span<const char> &b) {
+    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+}
+
+inline bool operator!=(const Span<const char> &a, const Span<const char> &b) {
+    return !(a == b);
+}
+
+inline bool operator==(const Span<const uint32_t>& a, const Span<const uint32_t>& b) {
+    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+}
+
+inline bool operator!=(const Span<const uint32_t>& a, const Span<const uint32_t>& b) {
+    return !(a == b);
+}
+
+namespace app {
+namespace Clusters {
+
+// CurrencyStruct
+inline bool operator==(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs) {
+    return (lhs.currency == rhs.currency) && (lhs.decimalPoints == rhs.decimalPoints);
+}
+
+inline bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs) {
+    return !(lhs == rhs);
+}
+
+// PowerThresholdStruct
+inline bool operator==(const Globals::Structs::PowerThresholdStruct::Type & lhs, const Globals::Structs::PowerThresholdStruct::Type & rhs) {
+    return (lhs.powerThresholdSource == rhs.powerThresholdSource) &&
+           (lhs.powerThreshold == rhs.powerThreshold) &&
+           (lhs.apparentPowerThreshold == rhs.apparentPowerThreshold);
+}
+
+inline bool operator!=(const Globals::Structs::PowerThresholdStruct::Type & lhs, const Globals::Structs::PowerThresholdStruct::Type & rhs) {
+    return !(lhs == rhs);
+}
+
+// TariffPriceStruct
+inline bool operator==(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs, const CommodityTariff::Structs::TariffPriceStruct::Type & rhs) {
+    return (lhs.priceType == rhs.priceType) &&
+           (lhs.price == rhs.price) &&
+           (lhs.priceLevel == rhs.priceLevel);
+}
+
+inline bool operator!=(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs, const CommodityTariff::Structs::TariffPriceStruct::Type & rhs) {
+    return !(lhs == rhs);
+}
+
+// AuxiliaryLoadSwitchSettingsStruct
+inline bool operator==(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs, 
+                      const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs) {
+    return (lhs.number == rhs.number) && (lhs.requiredState == rhs.requiredState);
+}
+
+inline bool operator!=(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs, 
+                      const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs) {
+    return !(lhs == rhs);
+}
+
+// PeakPeriodStruct
+inline bool operator==(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs, const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs) {
+    return (lhs.severity == rhs.severity) && (lhs.peakPeriod == rhs.peakPeriod);
+}
+
+inline bool operator!=(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs, const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs) {
+    return !(lhs == rhs);
+}
+
+} // namespace Clusters
+
+} // namespace app
+} // namespace chip
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Platform;
@@ -87,7 +167,9 @@ static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs, std::un
     return false;
 }
 
-static bool AreLabelsEqual(const Optional<DataModel::Nullable<CharSpan>> & lhs, const Optional<DataModel::Nullable<CharSpan>> & rhs)
+template <typename T>
+static bool AreOptionalNullableEqual(const Optional<DataModel::Nullable<T>> & lhs,
+                                     const Optional<DataModel::Nullable<T>> & rhs)
 {
     if (lhs.HasValue() != rhs.HasValue())
         return false;
@@ -99,6 +181,16 @@ static bool AreLabelsEqual(const Optional<DataModel::Nullable<CharSpan>> & lhs, 
         return true;
     return (lhs.Value().Value() != rhs.Value().Value());
 }
+
+template <typename T>
+static bool AreOptionalEqual(const Optional<T>& lhs,
+                             const Optional<T>& rhs)
+{
+    if (lhs.HasValue() != rhs.HasValue()) return false;
+    if (!lhs.HasValue()) return true;
+    return (lhs.Value() == rhs.Value());
+}
+
 }; // namespace CommonUtilities
 
 // TariffInfoDataClass
@@ -148,33 +240,15 @@ CHIP_ERROR TariffInfoDataClass::Validate(const ValueType & aValue) const
 
 bool TariffInfoDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    if (source.tariffLabel.IsNull() != destination.tariffLabel.IsNull())
-        return true;
-    if (!source.tariffLabel.IsNull() && source.tariffLabel.Value() != destination.tariffLabel.Value())
-        return true;
-
-    if (source.providerName.IsNull() != destination.providerName.IsNull())
-        return true;
-    if (!source.providerName.IsNull() && source.providerName.Value() != destination.providerName.Value())
-        return true;
-
-    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPricing))
+    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPricing) &&
+        !CommonUtilities::AreOptionalNullableEqual(source.currency, destination.currency))
     {
-        if (source.currency.HasValue() != destination.currency.HasValue())
-            return true;
-        if (source.currency.HasValue())
-        {
-            if (source.currency.Value().IsNull() != destination.currency.Value().IsNull())
-                return true;
-            if (!source.currency.Value().IsNull() && (source.currency.Value().Value() != destination.currency.Value().Value()))
-                return true;
-        }
+        return true;
     }
 
-    if (source.blockMode.IsNull() != destination.blockMode.IsNull())
-        return true;
-
-    return source.blockMode.IsNull() || source.blockMode.Value() != destination.blockMode.Value();
+    return (source.tariffLabel != destination.tariffLabel ||
+     source.providerName != destination.providerName ||
+     source.blockMode != destination.blockMode);
 }
 
 void TariffInfoDataClass::CleanupStructValue(PayloadType & aValue)
@@ -259,16 +333,16 @@ CHIP_ERROR DayEntriesDataClass::Validate(const ValueType & aValue) const
 
 bool DayEntriesDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    if (source.dayEntryID != destination.dayEntryID || source.startTime != destination.startTime ||
-        source.duration != destination.duration)
+    if ( !CommonUtilities::AreOptionalEqual(source.duration, destination.duration) )
     {
         return true;
     }
 
-    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kRandomization))
+    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kRandomization) &&
+        (!CommonUtilities::AreOptionalEqual(source.randomizationOffset, destination.randomizationOffset) ||
+         !CommonUtilities::AreOptionalEqual(source.randomizationType, destination.randomizationType)) )
     {
-        return (source.randomizationOffset != destination.randomizationOffset ||
-                source.randomizationType != destination.randomizationType);
+        return true;
     }
     return false;
 }
@@ -408,13 +482,9 @@ CHIP_ERROR TariffPeriodsDataClass::Validate(const ValueType & aValue) const
 
 bool TariffPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    if (source.label.IsNull() != destination.label.IsNull())
-        return true;
-    if (!source.label.IsNull() && source.label.Value() != destination.label.Value())
-        return true;
-    if (source.dayEntryIDs != destination.dayEntryIDs)
-        return true;
-    return (source.tariffComponentIDs != destination.tariffComponentIDs); // Both structs are equal
+    return (source.tariffComponentIDs != destination.tariffComponentIDs ||
+            source.dayEntryIDs != destination.dayEntryIDs ||
+            source.label != destination.label);
 }
 
 void TariffPeriodsDataClass::CleanupStructValue(PayloadType & aValue)
@@ -561,45 +631,49 @@ CHIP_ERROR TariffComponentsDataClass::Validate(const ValueType & aValue) const
 bool TariffComponentsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
 
-    if (!CommonUtilities::AreLabelsEqual(source.label, destination.label))
+    if (!CommonUtilities::AreOptionalEqual(source.label, destination.label)) return true;
+
+    //If PRICE feature are supported
+    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPricing) &&
+        !CommonUtilities::AreOptionalNullableEqual(source.price, destination.price))
+    {
         return true;
-
-    // If PRICE feature are supported
-    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPricing))
-    {
-        if (source.price.Value().Value() != destination.price.Value().Value())
-            return true;
     }
 
-    // If FCRED feature are supported
-    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kFriendlyCredit))
+    //If FCRED feature are supported
+    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kFriendlyCredit) &&
+        !CommonUtilities::AreOptionalEqual(source.friendlyCredit, destination.friendlyCredit))
     {
-        if (source.friendlyCredit.Value() != destination.friendlyCredit.Value())
-            return true;
+        return true;
     }
 
-    // If AUXLD feature are supported
-    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kAuxiliaryLoad))
+    //If AUXLD feature are supported
+    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kAuxiliaryLoad) &&
+        !CommonUtilities::AreOptionalEqual(source.auxiliaryLoad, destination.auxiliaryLoad))
     {
-        if (source.auxiliaryLoad.Value() != destination.auxiliaryLoad.Value())
-            return true;
+        return true;
     }
 
-    // If PEAKP feature are supported
-    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPeakPeriod))
+    //If PEAKP feature are supported
+    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPeakPeriod) &&
+        !CommonUtilities::AreOptionalEqual(source.peakPeriod, destination.peakPeriod))
     {
-        if (source.peakPeriod.Value() != destination.peakPeriod.Value())
-            return true;
+        return true;
     }
 
-    // If PWRTHLD feature are supported
-    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPowerThreshold))
+    //If PWRTHLD feature are supported
+    if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPowerThreshold) &&
+        !CommonUtilities::AreOptionalEqual(source.powerThreshold, destination.powerThreshold))
     {
-        if (source.powerThreshold.Value() != destination.powerThreshold.Value())
-            return true;
+        return true;
     }
 
-    return true;
+    if(!CommonUtilities::AreOptionalEqual(source.predicted, destination.predicted))
+    {
+        return true;
+    }
+
+    return !(source.threshold == destination.threshold);
 }
 
 void TariffComponentsDataClass::CleanupStructValue(PayloadType & aValue)
