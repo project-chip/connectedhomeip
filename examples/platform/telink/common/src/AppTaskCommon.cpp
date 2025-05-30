@@ -770,6 +770,14 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         }
 #endif
         break;
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        if (Internal::BLEMgrImpl().NeedToResetFailSafeTimer())
+        {
+            LOG_INF("BLE disconnected during commissioning.");
+            Internal::BLEMgrImpl().ClearResetFailSafeTimerFlag();
+            Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+        }
+        break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
