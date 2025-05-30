@@ -47,7 +47,7 @@ public:
     {
     public:
         HandlerContext(CommandHandler & commandHandler, const ConcreteCommandPath & requestPath, TLV::TLVReader & aReader) :
-            mCommandHandler(commandHandler), mRequestPath(requestPath), mPayload(aReader, commandHandler.GetAccessingFabricIndex())
+            mCommandHandler(commandHandler), mRequestPath(requestPath), mPayload(aReader)
         {}
 
         void SetCommandHandled() { mCommandHandled = true; }
@@ -68,18 +68,9 @@ public:
             return mPayload;
         }
 
-        /**
-         * Same thing, but returns the fabric-aware TLV reader.
-         */
-        DataModel::FabricAwareTLVReader & GetFabricAwareReader()
-        {
-            SetCommandHandled();
-            return mPayload;
-        }
-
         CommandHandler & mCommandHandler;
         const ConcreteCommandPath & mRequestPath;
-        DataModel::FabricAwareTLVReader mPayload;
+        TLV::TLVReader & mPayload;
         bool mCommandHandled = false;
     };
 
@@ -208,7 +199,8 @@ protected:
      * The provided function is expected to have the following signature:
      *  void Func(HandlerContext &handlerContext, const RequestT &requestPayload);
      */
-    template <typename RequestT, typename FuncT>
+    template <typename RequestT, typename FuncT,
+              typename std::enable_if_t<!DataModel::IsFabricScoped<RequestT>::value, bool> = true>
     void HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
         if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId()) &&
@@ -222,7 +214,49 @@ protected:
             // to handle this command since at this point, the caller is taking responsibility for handling
             // the command in its entirety, warts and all.
             //
-            if (DataModel::Decode(handlerContext.GetFabricAwareReader(), requestPayload) != CHIP_NO_ERROR)
+            handlerContext.SetCommandHandled();
+
+            if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+            {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                         Protocols::InteractionModel::Status::InvalidCommand);
+                return;
+            }
+
+            func(handlerContext, requestPayload);
+        }
+    }
+
+    /*
+     * Helper function to automatically de-serialize the data payload into a cluster object
+     * of type RequestT if the Cluster ID and Command ID in the context match. Upon successful
+     * de-serialization, the provided function is invoked and passed in a reference to the cluster object.
+     *
+     * Any errors encountered in this function prior to calling func result in the automatic generation of a status response.
+     * If `func` is called, the responsibility for doing so shifts to the callee to handle any further errors that are encountered.
+     *
+     * The provided function is expected to have the following signature:
+     *  void Func(HandlerContext &handlerContext, const RequestT &requestPayload);
+     */
+    template <typename RequestT, typename FuncT, typename std::enable_if_t<DataModel::IsFabricScoped<RequestT>::value, bool> = true>
+    void HandleCommand(HandlerContext & handlerContext, FuncT func)
+    {
+        if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId()) &&
+            (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+        {
+            RequestT requestPayload;
+
+            //
+            // If the command matches what the caller is looking for, let's mark this as being handled
+            // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+            // to handle this command since at this point, the caller is taking responsibility for handling
+            // the command in its entirety, warts and all.
+            //
+            handlerContext.SetCommandHandled();
+
+            DataModel::FabricAwareTLVReader reader(handlerContext.mPayload,
+                                                   handlerContext.mCommandHandler.GetAccessingFabricIndex());
+            if (DataModel::Decode(reader, requestPayload) != CHIP_NO_ERROR)
             {
                 handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
                                                          Protocols::InteractionModel::Status::InvalidCommand);
