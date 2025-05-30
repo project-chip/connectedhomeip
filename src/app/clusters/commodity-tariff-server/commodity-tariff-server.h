@@ -155,6 +155,25 @@ COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 
 /** @} */ // end of attribute_management
 
+struct TariffUpdateCtx {
+    /* DayEntryIDs */
+    std::unordered_set<uint32_t> DE_KeyIDs; /* Master - IDs of all given DayEntry items */
+
+    std::unordered_set<uint32_t> DP_DE_IDs; /* IDs mentioned in DayPattern items */
+    std::unordered_set<uint32_t> TP_DE_IDs; /* IDs mentioned in TariffPeriod items */
+    std::unordered_set<uint32_t> ID_DE_IDs; /* IDs mentioned in IndividualDays items */
+
+    /* TariffComponentIDs */
+    std::unordered_set<uint32_t> TC_KeyIDs; /* Master - IDs of all given TariffComponent items */
+    std::unordered_set<uint32_t> TP_TC_IDs; /* IDs mentioned in TariffPeriods items */
+
+    /* DayPatternsIDs */
+    std::unordered_set<uint32_t> DP_KeyIDs; /* Master - IDs of all given DayPattern items */
+    std::unordered_set<uint32_t> CP_DP_IDs; /* IDs mentioned in CalendarPeriods items */
+
+    BitMask<Feature> mFeature;
+};
+
 /**
  * @class CommodityTariffPrimaryData
  * @brief Container for primary tariff attribute storage
@@ -247,10 +266,10 @@ private:
 #undef X
 
     // Primary attrs update pipeline methods
-    bool TariffDataUpd_Init(const CommodityTariffPrimaryData & aNewData);
+    bool TariffDataUpd_Init(const CommodityTariffPrimaryData & aNewData, TariffUpdateCtx & UpdCtx);
     void TariffDataUpd_Commit();
     void TariffDataUpd_Abort();
-    bool TariffDataUpd_Validator();
+    bool TariffDataUpd_CrossValidator(const CommodityTariffPrimaryData & aNewData, TariffUpdateCtx & UpdCtx);
 
     // Current attrs (time depended) update methods
     void UpdateCurrentAttrs();

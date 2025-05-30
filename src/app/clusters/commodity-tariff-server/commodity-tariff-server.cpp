@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <cassert>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,26 +41,16 @@ void LockThreadTask(void) {}
 
 void UnlockThreadTask(void) {}
 
-bool CommodityTariffDataProvider::TariffDataUpd_Init(const CommodityTariffPrimaryData & aNewData)
+bool CommodityTariffDataProvider::TariffDataUpd_Init(const CommodityTariffPrimaryData & aNewData, TariffUpdateCtx & UpdCtx)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#define X(attrName, attrType) err = attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, this);
+#define X(attrName, attrType) err = attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, &UpdCtx);
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
     // TODO - Init the update cache
 
-    /*
-    #define X(attrName, attrType) \
-            if (!attrName##_MgmtObj.IsValid()) { \mServer
-                ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) is invalid",
-    Attributes::attrName::Id); \
-                allValid = false; \
-            }
-        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-    #undef X
-    */
     if (err != CHIP_NO_ERROR)
     {
         return false;
@@ -93,35 +84,104 @@ void CommodityTariffDataProvider::TariffDataUpd_Abort()
     // TODO - Deinit the update cache
 }
 
-bool CommodityTariffDataProvider::TariffDataUpd_Validator()
+bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTariffPrimaryData & aNewData, TariffUpdateCtx & UpdCtx)
 {
-    if (!TariffInfo_MgmtObj.GetValue().IsNull())
+    if (aNewData.mTariffInfo.IsNull())
     {
+        ChipLogError(NotSpecified, "TariffInfo not present!");
+        return false;
+    }
+    else if (aNewData.mDayEntries.empty())
+    {
+        ChipLogError(NotSpecified, "DayEntries not present!");
+        return false;
+    }
+    else if (aNewData.mTariffComponents.empty())
+    {
+        ChipLogError(NotSpecified, "TariffComponents not present!");
+        return false;
+    }
+    else if (aNewData.mTariffPeriods.empty())
+    {
+        ChipLogError(NotSpecified, "TariffPeriods not present!");
         return false;
     }
 
-    // TODO - Use the update cache
+    assert(!UpdCtx.DE_KeyIDs.empty());
+    assert(!UpdCtx.TC_KeyIDs.empty());
 
-    // CheckDayEntries
-    // CheckDayPatterns
-    // CheckIndividualDays
+    assert(!UpdCtx.TP_DE_IDs.empty()); // Something went wrong if TariffPeriods has no DayEntries IDs
+    assert(!UpdCtx.TP_TC_IDs.empty()); // Something went wrong if TariffPeriods has no TariffComponents IDs
 
-    // CheckTariffComponents
+    // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
+    for (const auto& item : UpdCtx.TP_DE_IDs) {
+        if (!UpdCtx.DE_KeyIDs.count(item)) {
+            return false; // The item not found in original list
+        }
+    }
 
-    // CheckTariffPeriods
+    // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
+    for (const auto& item : UpdCtx.TP_TC_IDs) {
+        if (!UpdCtx.TC_KeyIDs.count(item)) {
+            return false; // The item not found in original list
+        }
+    }
 
-    // CalendarPeriods
+    if (!aNewData.mDayPatterns.empty())
+    {
+        assert(!UpdCtx.DP_KeyIDs.empty());
+        assert(!UpdCtx.DP_DE_IDs.empty()); // Something went wrong if DP has no DE IDs
+
+        // Checks that all DP_DEs are in main DE list:
+        for (const auto& item : UpdCtx.DP_DE_IDs) {
+            if (!UpdCtx.DE_KeyIDs.count(item)) {
+                return false; // The item not found in original list
+            }
+        }
+    }
+
+    if (!aNewData.mIndividualDays.IsNull())
+    {
+        assert(!UpdCtx.ID_DE_IDs.empty()); // Something went wrong if IndividualDays has no DE IDs
+
+        // Checks that all ID_DE_IDs are in main DE list:
+        for (const auto& item : UpdCtx.ID_DE_IDs) {
+            if (!UpdCtx.DE_KeyIDs.count(item)) {
+                return false; // The item not found in original list
+            }
+
+            if (UpdCtx.DP_DE_IDs.count(item))
+            {
+                return false; // If same item from ID list has found in DP list
+            }
+        }
+    }
+
+    //
+    if (!aNewData.mCalendarPeriods.IsNull())
+    {
+        assert(!UpdCtx.CP_DP_IDs.empty()); // Something went wrong if CP has no DP IDs
+
+        // Checks that all ID_DE_IDs are in main DE list:
+        for (const auto& item : UpdCtx.CP_DP_IDs) {
+            if (!UpdCtx.DP_KeyIDs.count(item)) {
+                return false; // The item not found in original list
+            }
+        }
+    }
 
     return true;
 }
 
 void CommodityTariffDataProvider::TariffDataUpdate(const CommodityTariffPrimaryData & newData)
 {
-    if (!TariffDataUpd_Init(newData))
+    TariffUpdateCtx UpdCtx = { .mFeature = this->mFeature };
+
+    if (!TariffDataUpd_Init(newData, UpdCtx))
     {
         ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
     }
-    else if (!TariffDataUpd_Validator())
+    else if (!TariffDataUpd_CrossValidator(newData, UpdCtx))
     {
         ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
     }
