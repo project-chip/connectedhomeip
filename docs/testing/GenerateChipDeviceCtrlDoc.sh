@@ -30,7 +30,7 @@ pydoc-markdown -I "$SCRIPT_DIR"/../../src/controller/python --py3 -m chip.ChipDe
       render_toc: true,
       render_toc_title: "ChipDeviceCtrl.py API",
       insert_header_anchors: false,
-      add_full_prefix: true,
+      add_full_prefix: false,
     }
   }' >"$1"/"$FILENAME"
 
