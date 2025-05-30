@@ -832,11 +832,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         {
             ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %lu",
                             params.GetPeerAddress().GetRemoteId());
-            if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-            {
-                ChipLogError(Controller, "Wi-Fi Management should have been started now.");
-                ExitNow(CHIP_ERROR_INTERNAL);
-            }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
             auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
             const SetupDiscriminator connDiscriminator(params.GetSetupDiscriminator().value());
