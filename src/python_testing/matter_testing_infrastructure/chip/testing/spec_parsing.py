@@ -429,9 +429,9 @@ class ClusterParser:
                                                 Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue),
                                             write_optional=write_optional)
         # Add in the global attributes for the base class
-        for id_enum_val in GlobalAttributeIds:
+        for id in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
-            attributes[uint(id_enum_val.value)] = XmlAttribute(name=id_enum_val.to_name(), datatype="", conformance=mandatory(
+            attributes[uint(id.value)] = XmlAttribute(name=id.to_name(), datatype="", conformance=mandatory(
             ), read_access=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView), write_access=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue), write_optional=False)
         return attributes
 
@@ -710,15 +710,15 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     if temp_control_id in clusters and not clusters[temp_control_id].attributes:
         view = typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
                            Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView)
-        none_access = typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                                  Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)
+        none = typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
+                           Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)
         clusters[temp_control_id].attributes = {
-            uint(0x00): XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none_access, write_optional=False),
-            uint(0x01): XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none_access, write_optional=False),
-            uint(0x02): XmlAttribute(name='MaxTemperature', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none_access, write_optional=False),
-            uint(0x03): XmlAttribute(name='Step', datatype='temperature', conformance=feature(uint(0x04), 'STEP'), read_access=view, write_access=none_access, write_optional=False),
-            uint(0x04): XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(uint(0x02), 'TL'), read_access=view, write_access=none_access, write_optional=False),
-            uint(0x05): XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(uint(0x02), 'TL'), read_access=view, write_access=none_access, write_optional=False),
+            uint(0x00): XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
+            uint(0x01): XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
+            uint(0x02): XmlAttribute(name='MaxTemperature', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
+            uint(0x03): XmlAttribute(name='Step', datatype='temperature', conformance=feature(uint(0x04), 'STEP'), read_access=view, write_access=none, write_optional=False),
+            uint(0x04): XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(uint(0x02), 'TL'), read_access=view, write_access=none, write_optional=False),
+            uint(0x05): XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(uint(0x02), 'TL'), read_access=view, write_access=none, write_optional=False),
         }
 
     # TODO: Need automated parsing for atomic attributes.
@@ -732,13 +732,13 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     if clusters[thermostat_id].revision >= 8:
         presents_id = uint(clusters[thermostat_id].attribute_map[presets_name])
         schedules_id = uint(clusters[thermostat_id].attribute_map[schedules_name])
-        conformance_obj = or_operation([conformance_support.attribute(presents_id, presets_name),
-                                        conformance_support.attribute(schedules_id, schedules_name)])
+        conformance = or_operation([conformance_support.attribute(presents_id, presets_name),
+                                    conformance_support.attribute(schedules_id, schedules_name)])
 
         clusters[thermostat_id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
-            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance_obj, privilege=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate))
+            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance, privilege=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate))
         clusters[thermostat_id].generated_commands[atomic_response_cmd_id] = XmlCommand(
-            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance_obj, privilege=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate))
+            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate))
         clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
         clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
 
@@ -760,10 +760,15 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                 ret[id].conformance = override.conformance
             if override.read_access:
                 ret[id].read_access = override.read_access
-
             if override.write_access:
                 ret[id].write_access = override.write_access
 
+        for attr_id, attribute in ret.items():
+            if attribute.read_access == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue and \
+               attribute.write_access == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
+                location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=attr_id)
+                problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                              severity=ProblemSeverity.WARNING, problem=f'Attribute {attribute.name} (ID: {attr_id}) in cluster {cluster_id} has unknown read and write access after combining base and derived values.'))
         return ret
 
     # We have the information now about which clusters are derived, so we need to fix them up. Apply first the base cluster,
