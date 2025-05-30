@@ -25,19 +25,23 @@ namespace chip {
 // Ensure all operators are in the same namespace as their types
 
 // Span comparison operators
-inline bool operator==(const Span<const char> &a, const Span<const char> &b) {
+inline bool operator==(const Span<const char> & a, const Span<const char> & b)
+{
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
 }
 
-inline bool operator!=(const Span<const char> &a, const Span<const char> &b) {
+inline bool operator!=(const Span<const char> & a, const Span<const char> & b)
+{
     return !(a == b);
 }
 
-inline bool operator==(const Span<const uint32_t>& a, const Span<const uint32_t>& b) {
+inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
+{
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
 }
 
-inline bool operator!=(const Span<const uint32_t>& a, const Span<const uint32_t>& b) {
+inline bool operator!=(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
+{
     return !(a == b);
 }
 
@@ -45,53 +49,66 @@ namespace app {
 namespace Clusters {
 
 // CurrencyStruct
-inline bool operator==(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs) {
+inline bool operator==(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
+{
     return (lhs.currency == rhs.currency) && (lhs.decimalPoints == rhs.decimalPoints);
 }
 
-inline bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs) {
+inline bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
+{
     return !(lhs == rhs);
 }
 
 // PowerThresholdStruct
-inline bool operator==(const Globals::Structs::PowerThresholdStruct::Type & lhs, const Globals::Structs::PowerThresholdStruct::Type & rhs) {
-    return (lhs.powerThresholdSource == rhs.powerThresholdSource) &&
-           (lhs.powerThreshold == rhs.powerThreshold) &&
-           (lhs.apparentPowerThreshold == rhs.apparentPowerThreshold);
+inline bool operator==(const Globals::Structs::PowerThresholdStruct::Type & lhs,
+                       const Globals::Structs::PowerThresholdStruct::Type & rhs)
+{
+    return (lhs.powerThresholdSource == rhs.powerThresholdSource) && (lhs.powerThreshold == rhs.powerThreshold) &&
+        (lhs.apparentPowerThreshold == rhs.apparentPowerThreshold);
 }
 
-inline bool operator!=(const Globals::Structs::PowerThresholdStruct::Type & lhs, const Globals::Structs::PowerThresholdStruct::Type & rhs) {
+inline bool operator!=(const Globals::Structs::PowerThresholdStruct::Type & lhs,
+                       const Globals::Structs::PowerThresholdStruct::Type & rhs)
+{
     return !(lhs == rhs);
 }
 
 // TariffPriceStruct
-inline bool operator==(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs, const CommodityTariff::Structs::TariffPriceStruct::Type & rhs) {
-    return (lhs.priceType == rhs.priceType) &&
-           (lhs.price == rhs.price) &&
-           (lhs.priceLevel == rhs.priceLevel);
+inline bool operator==(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs,
+                       const CommodityTariff::Structs::TariffPriceStruct::Type & rhs)
+{
+    return (lhs.priceType == rhs.priceType) && (lhs.price == rhs.price) && (lhs.priceLevel == rhs.priceLevel);
 }
 
-inline bool operator!=(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs, const CommodityTariff::Structs::TariffPriceStruct::Type & rhs) {
+inline bool operator!=(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs,
+                       const CommodityTariff::Structs::TariffPriceStruct::Type & rhs)
+{
     return !(lhs == rhs);
 }
 
 // AuxiliaryLoadSwitchSettingsStruct
-inline bool operator==(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs, 
-                      const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs) {
+inline bool operator==(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs,
+                       const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
+{
     return (lhs.number == rhs.number) && (lhs.requiredState == rhs.requiredState);
 }
 
-inline bool operator!=(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs, 
-                      const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs) {
+inline bool operator!=(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs,
+                       const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
+{
     return !(lhs == rhs);
 }
 
 // PeakPeriodStruct
-inline bool operator==(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs, const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs) {
+inline bool operator==(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs,
+                       const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs)
+{
     return (lhs.severity == rhs.severity) && (lhs.peakPeriod == rhs.peakPeriod);
 }
 
-inline bool operator!=(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs, const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs) {
+inline bool operator!=(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs,
+                       const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs)
+{
     return !(lhs == rhs);
 }
 
@@ -168,8 +185,7 @@ static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs, std::un
 }
 
 template <typename T>
-static bool AreOptionalNullableEqual(const Optional<DataModel::Nullable<T>> & lhs,
-                                     const Optional<DataModel::Nullable<T>> & rhs)
+static bool AreOptionalNullableEqual(const Optional<DataModel::Nullable<T>> & lhs, const Optional<DataModel::Nullable<T>> & rhs)
 {
     if (lhs.HasValue() != rhs.HasValue())
         return false;
@@ -183,11 +199,12 @@ static bool AreOptionalNullableEqual(const Optional<DataModel::Nullable<T>> & lh
 }
 
 template <typename T>
-static bool AreOptionalEqual(const Optional<T>& lhs,
-                             const Optional<T>& rhs)
+static bool AreOptionalEqual(const Optional<T> & lhs, const Optional<T> & rhs)
 {
-    if (lhs.HasValue() != rhs.HasValue()) return false;
-    if (!lhs.HasValue()) return true;
+    if (lhs.HasValue() != rhs.HasValue())
+        return false;
+    if (!lhs.HasValue())
+        return true;
     return (lhs.Value() == rhs.Value());
 }
 
@@ -246,9 +263,8 @@ bool TariffInfoDataClass::CompareStructValue(const PayloadType & source, const P
         return true;
     }
 
-    return (source.tariffLabel != destination.tariffLabel ||
-     source.providerName != destination.providerName ||
-     source.blockMode != destination.blockMode);
+    return (source.tariffLabel != destination.tariffLabel || source.providerName != destination.providerName ||
+            source.blockMode != destination.blockMode);
 }
 
 void TariffInfoDataClass::CleanupStructValue(PayloadType & aValue)
@@ -333,14 +349,14 @@ CHIP_ERROR DayEntriesDataClass::Validate(const ValueType & aValue) const
 
 bool DayEntriesDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    if ( !CommonUtilities::AreOptionalEqual(source.duration, destination.duration) )
+    if (!CommonUtilities::AreOptionalEqual(source.duration, destination.duration))
     {
         return true;
     }
 
     if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kRandomization) &&
         (!CommonUtilities::AreOptionalEqual(source.randomizationOffset, destination.randomizationOffset) ||
-         !CommonUtilities::AreOptionalEqual(source.randomizationType, destination.randomizationType)) )
+         !CommonUtilities::AreOptionalEqual(source.randomizationType, destination.randomizationType)))
     {
         return true;
     }
@@ -482,8 +498,7 @@ CHIP_ERROR TariffPeriodsDataClass::Validate(const ValueType & aValue) const
 
 bool TariffPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    return (source.tariffComponentIDs != destination.tariffComponentIDs ||
-            source.dayEntryIDs != destination.dayEntryIDs ||
+    return (source.tariffComponentIDs != destination.tariffComponentIDs || source.dayEntryIDs != destination.dayEntryIDs ||
             source.label != destination.label);
 }
 
@@ -631,44 +646,45 @@ CHIP_ERROR TariffComponentsDataClass::Validate(const ValueType & aValue) const
 bool TariffComponentsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
 
-    if (!CommonUtilities::AreOptionalEqual(source.label, destination.label)) return true;
+    if (!CommonUtilities::AreOptionalEqual(source.label, destination.label))
+        return true;
 
-    //If PRICE feature are supported
+    // If PRICE feature are supported
     if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPricing) &&
         !CommonUtilities::AreOptionalNullableEqual(source.price, destination.price))
     {
         return true;
     }
 
-    //If FCRED feature are supported
+    // If FCRED feature are supported
     if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kFriendlyCredit) &&
         !CommonUtilities::AreOptionalEqual(source.friendlyCredit, destination.friendlyCredit))
     {
         return true;
     }
 
-    //If AUXLD feature are supported
+    // If AUXLD feature are supported
     if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kAuxiliaryLoad) &&
         !CommonUtilities::AreOptionalEqual(source.auxiliaryLoad, destination.auxiliaryLoad))
     {
         return true;
     }
 
-    //If PEAKP feature are supported
+    // If PEAKP feature are supported
     if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPeakPeriod) &&
         !CommonUtilities::AreOptionalEqual(source.peakPeriod, destination.peakPeriod))
     {
         return true;
     }
 
-    //If PWRTHLD feature are supported
+    // If PWRTHLD feature are supported
     if (CommonUtilities::InstanceHasFeature(mOwnerInstance, CommodityTariff::Feature::kPowerThreshold) &&
         !CommonUtilities::AreOptionalEqual(source.powerThreshold, destination.powerThreshold))
     {
         return true;
     }
 
-    if(!CommonUtilities::AreOptionalEqual(source.predicted, destination.predicted))
+    if (!CommonUtilities::AreOptionalEqual(source.predicted, destination.predicted))
     {
         return true;
     }
