@@ -349,7 +349,7 @@ std::optional<ActionReturnStatus> CheckFailSafeArmed(FabricIndex fabricIndex)
     return std::nullopt;
 }
 
-#define CHECK_FAILSFE_ARMED(fabricIndex)                                                                                           \
+#define CHECK_FAILSAFE_ARMED(fabricIndex)                                                                                           \
     if (std::optional<ActionReturnStatus> status = CheckFailSafeArmed(fabricIndex); status.has_value())                            \
     {                                                                                                                              \
         return status;                                                                                                             \
@@ -365,7 +365,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
 
-    CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
+    CHECK_FAILSAFE_ARMED(handler.GetAccessingFabricIndex());
 
     if (req.ssid.empty() || req.ssid.size() > DeviceLayer::Internal::kMaxWiFiSSIDLength)
     {
@@ -554,7 +554,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 
     MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
 
-    CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
+    CHECK_FAILSAFE_ARMED(handler.GetAccessingFabricIndex());
 
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
@@ -595,7 +595,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleRemoveNetwork
 {
     MATTER_TRACE_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
 
-    CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
+    CHECK_FAILSAFE_ARMED(handler.GetAccessingFabricIndex());
 
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
@@ -630,7 +630,7 @@ NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const 
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    CHECK_FAILSFE_ARMED(handler.GetAccessingFabricIndex());
+    CHECK_FAILSAFE_ARMED(handler.GetAccessingFabricIndex());
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
