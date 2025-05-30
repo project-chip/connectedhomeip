@@ -424,6 +424,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2
         self.step(7)
 
+        # TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         await asyncio.wait_for(
             change_networks(
                 test=self,
@@ -560,6 +561,7 @@ class TC_CNET_4_11(MatterBaseTest):
             ),
             timeout=TIMEOUT
         )
+        logger.info(f" --- Step 18: Breadcrumb is: {breadcrumb}")
         # Verify that the breadcrumb value is set to 3
         asserts.assert_equal(breadcrumb, 3, f"Expected breadcrumb to be 3, but got: {breadcrumb}")
 
