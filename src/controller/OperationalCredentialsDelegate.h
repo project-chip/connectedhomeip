@@ -20,6 +20,7 @@
 
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/DLLUtil.h>
@@ -68,6 +69,46 @@ public:
                                         Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
     /**
+     * @brief Sign the Intermediate CA Certificate (ICAC) using the delegate's RCAC key.
+     *
+     * This method is responsible for signing the ICAC that will be returned to the device.
+     *
+     * @param[in] icaCsr ByteSpan containing the ICA certificate signing request (CSR).
+     * @param     icac   MutableByteSpan where the resulting signed ICAC will be written.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    virtual CHIP_ERROR SignICAC(const ByteSpan & icaCsr, MutableByteSpan & icac) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Sign the Node Operational Certificate (NOC) using the delegate's key, the provided CSR and ICAC.
+     *
+     * This method generates the NOC by signing the provided CSR (`nocCsr`) using the delegate's credentials.
+     * The resulting NOC is returned in the `noc` output parameter.
+     *
+     * @param icac   ByteSpan containing the Intermediate Certificate Authority Certificate (ICAC) to be used in the signing chain.
+     * @param nocCsr ByteSpan containing the Certificate Signing Request (CSR) for the NOC.
+     * @param noc    MutableByteSpan where the resulting signed NOC will be written.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    virtual CHIP_ERROR SignNOC(const ByteSpan & icac, const ByteSpan & nocCsr, MutableByteSpan & noc)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * @brief Obtain the CSR (Certificate Signing Request) for the Intermediate CA Certificate (ICAC).
+     *
+     * This method generates a CSR for the ICAC that will later be signed to create the ICAC.
+     *
+     * @param[out] icaCsr MutableByteSpan where the generated CSR will be written.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    virtual CHIP_ERROR ObtainICACSR(MutableByteSpan & icaCsr) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
      *   This function sets the node ID for which the next NOC Chain would be requested. The node ID is
      *   provided as a hint, and the delegate implementation may chose to ignore it and pick node ID of
      *   their choice.
@@ -80,6 +121,13 @@ public:
      *   fabric ID.
      */
     virtual void SetFabricIdForNextNOCRequest(FabricId fabricId) {}
+
+    /**
+     *   This function sets the CAT values for which the next NOC Chain should be generated. This API is
+     *   not required to be implemented if the delegate implementation has other mechanisms to find the
+     *   CAT values.
+     */
+    virtual void SetCATValuesForNextNOCRequest(CATValues cats) {}
 
     virtual CHIP_ERROR ObtainCsrNonce(MutableByteSpan & csrNonce)
     {
