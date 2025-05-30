@@ -57,79 +57,26 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0110" name="Mounted Dimmable Load Control" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x030A" name="Thermostat Controller" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial release"/>
-    <revision revision="2" summary="Add superset classification and usage guidance for both device types"/>
+    <revision revision="1" summary="Initial Matter revision"/>
   </revisionHistory>
-  <classification superset="Dimmable Plug-In Unit" class="simple" scope="endpoint"/>
+  <classification class="simple" scope="endpoint"/>
   <clusters>
-    <cluster id="0x0003" name="Identify" side="server">
-      <mandatoryConform/>
-      <commands>
-        <command id="0x0040" name="TriggerEffect">
-          <mandatoryConform/>
-        </command>
-      </commands>
+    <cluster id="0x0003" name="Identify" side="client">
+      <optionalConform/>
     </cluster>
-    <cluster id="0x0004" name="Groups" side="server">
-      <mandatoryConform/>
+    <cluster id="0x0004" name="Groups" side="client">
+      <optionalConform/>
     </cluster>
-    <cluster id="0x0006" name="On/Off" side="server">
-      <mandatoryConform/>
-      <features>
-        <feature code="" name="Lighting">
-          <mandatoryConform/>
-        </feature>
-      </features>
-    </cluster>
-    <cluster id="0x0008" name="Level Control" side="server">
-      <mandatoryConform/>
-      <features>
-        <feature code="" name="OnOff">
-          <mandatoryConform/>
-        </feature>
-        <feature code="" name="Lighting">
-          <mandatoryConform/>
-        </feature>
-      </features>
-      <attributes>
-        <attribute code="0x0000" name="CurrentLevel">
-          <constraint>
-            <between>
-              <from value="1"/>
-              <to value="254"/>
-            </between>
-          </constraint>
-        </attribute>
-        <attribute code="0x0002" name="MinLevel">
-          <constraint>
-            <allowed value="1"/>
-          </constraint>
-        </attribute>
-        <attribute code="0x0003" name="MaxLevel">
-          <constraint>
-            <allowed value="254"/>
-          </constraint>
-        </attribute>
-      </attributes>
-    </cluster>
-    <cluster id="0x0062" name="Scenes Management" side="server">
+    <cluster id="0x0062" name="Scenes Management" side="client">
       <otherwiseConform>
         <provisionalConform/>
-        <mandatoryConform/>
+        <optionalConform/>
       </otherwiseConform>
-      <commands>
-        <command id="0x0040" name="CopyScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-      </commands>
     </cluster>
-    <cluster id="0x0406" name="Occupancy Sensing" side="client">
-      <optionalConform/>
+    <cluster id="0x0201" name="Thermostat" side="client">
+      <mandatoryConform/>
     </cluster>
   </clusters>
 </deviceType>
