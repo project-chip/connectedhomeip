@@ -46,10 +46,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::MoveToHue::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToHue::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -59,7 +59,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveHue::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveHue::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -69,7 +68,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepHue::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepHue::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -79,7 +77,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToSaturation::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToSaturation::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -89,7 +86,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveSaturation::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveSaturation::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -99,7 +95,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepSaturation::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepSaturation::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -109,7 +104,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToHueAndSaturation::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToHueAndSaturation::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -119,7 +113,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToColor::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToColor::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -129,7 +122,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveColor::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveColor::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -139,7 +131,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepColor::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepColor::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -149,7 +140,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToColorTemperature::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToColorTemperature::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -159,7 +149,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::EnhancedMoveToHue::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::EnhancedMoveToHue::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -169,7 +158,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::EnhancedMoveHue::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::EnhancedMoveHue::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -179,7 +167,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::EnhancedStepHue::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::EnhancedStepHue::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -189,7 +176,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::EnhancedMoveToHueAndSaturation::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::EnhancedMoveToHueAndSaturation::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -200,7 +186,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::ColorLoopSet::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ColorLoopSet::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -210,7 +195,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StopMoveStep::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StopMoveStep::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -220,7 +204,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveColorTemperature::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveColorTemperature::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -230,7 +213,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepColorTemperature::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepColorTemperature::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -269,10 +251,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::RetrieveLogsRequest::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::RetrieveLogsRequest::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -311,10 +293,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::ResetCounts::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ResetCounts::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -353,10 +335,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::KeySetWrite::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::KeySetWrite::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -366,7 +348,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::KeySetRead::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::KeySetRead::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -376,7 +357,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::KeySetRemove::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::KeySetRemove::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -386,7 +366,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::KeySetReadAllIndices::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::KeySetReadAllIndices::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -425,10 +404,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::AddGroup::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AddGroup::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -438,7 +417,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::ViewGroup::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ViewGroup::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -448,7 +426,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::GetGroupMembership::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::GetGroupMembership::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -458,7 +435,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::RemoveGroup::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::RemoveGroup::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -468,7 +444,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::RemoveAllGroups::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::RemoveAllGroups::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -478,7 +453,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::AddGroupIfIdentifying::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AddGroupIfIdentifying::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -517,10 +491,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::Identify::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Identify::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -530,7 +504,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::TriggerEffect::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::TriggerEffect::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -569,10 +542,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::MoveToLevel::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToLevel::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -582,7 +555,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::Move::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Move::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -592,7 +564,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::Step::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Step::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -602,7 +573,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::Stop::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Stop::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -612,7 +582,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveToLevelWithOnOff::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveToLevelWithOnOff::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -622,7 +591,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::MoveWithOnOff::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::MoveWithOnOff::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -632,7 +600,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StepWithOnOff::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StepWithOnOff::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -642,7 +609,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::StopWithOnOff::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::StopWithOnOff::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -681,10 +647,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::AnnounceOTAProvider::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AnnounceOTAProvider::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -724,10 +690,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::Off::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Off::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -737,7 +703,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::On::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::On::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -747,7 +712,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::Toggle::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::Toggle::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -757,7 +721,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::OffWithEffect::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::OffWithEffect::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -767,7 +730,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::OnWithRecallGlobalScene::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::OnWithRecallGlobalScene::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -777,7 +739,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::OnWithTimedOff::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::OnWithTimedOff::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -816,10 +777,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::AttestationRequest::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AttestationRequest::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -830,7 +791,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::CertificateChainRequest::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::CertificateChainRequest::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -841,7 +801,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::CSRRequest::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::CSRRequest::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -851,7 +810,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::AddNOC::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AddNOC::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -861,7 +819,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::UpdateNOC::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::UpdateNOC::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -871,7 +828,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::UpdateFabricLabel::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::UpdateFabricLabel::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -881,7 +837,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::RemoveFabric::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::RemoveFabric::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -891,7 +846,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             break;
         }
         case Commands::AddTrustedRootCertificate::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::AddTrustedRootCertificate::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -931,10 +885,10 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
         case Commands::ResetCounts::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::ResetCounts::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)

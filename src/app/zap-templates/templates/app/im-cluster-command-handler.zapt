@@ -33,11 +33,11 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled = false;
     {
+        DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
         switch (aCommandPath.mCommandId)
         {
     {{/first}}
         case Commands::{{asUpperCamelCase commandName}}::Id: {
-            DataModel::FabricAwareTLVReader reader(aDataTlv, apCommandObj->GetAccessingFabricIndex());
             Commands::{{asUpperCamelCase commandName}}::DecodableType commandData;
             TLVError = DataModel::Decode(reader, commandData);
             if (TLVError == CHIP_NO_ERROR)
