@@ -261,21 +261,19 @@ class TC_CNET_4_11(MatterBaseTest):
             TestStep(5, "TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1"),
             TestStep(6, "TH reads Networks attribute from the DUT"),
             TestStep(7, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2"),
-            # TestStep(8, "TH changes its WiFi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"),
-            TestStep(9, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
-            TestStep(10, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
-            TestStep(11, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0."),
-            TestStep(12, "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"),
-            TestStep(13, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network"),
-            TestStep(14, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
-            TestStep(15, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"),
-            TestStep(16, "TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1"),
-            TestStep(17, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3"),
-            # TestStep(18, "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"),
-            TestStep(19, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
-            TestStep(20, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
-            TestStep(21, "TH sends the CommissioningComplete command to the DUT"),
-            TestStep(22, "TH reads Networks attribute from the DUT"),
+            TestStep(8, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
+            TestStep(9, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
+            TestStep(10, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0."),
+            TestStep(11, "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"),
+            TestStep(12, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network"),
+            TestStep(13, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
+            TestStep(14, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"),
+            TestStep(15, "TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1"),
+            TestStep(16, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3"),
+            TestStep(17, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
+            TestStep(18, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
+            TestStep(19, "TH sends the CommissioningComplete command to the DUT"),
+            TestStep(20, "TH reads Networks attribute from the DUT"),
         ]
 
     def desc_TC_CNET_4_11(self):
@@ -352,7 +350,6 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH finds the index of the Networks list entry with NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as 'userwifi_netidx'
         self.step(3)
 
-        # TODO: move following (step 3) to step 2 in Spec
         # Verify that the Networks attribute list has an entry with the following fields:
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is TRUE
@@ -442,7 +439,7 @@ class TC_CNET_4_11(MatterBaseTest):
         )
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
-        self.step(9)
+        self.step(8)
 
         # Verify that the TH successfully connects to the DUT
         logger.info(f" --- Step 9: Verifiying that TH successfully connects to the DUT on {wifi_2nd_ap_ssid}")
@@ -450,7 +447,7 @@ class TC_CNET_4_11(MatterBaseTest):
         await self.verify_operational_network(wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
-        self.step(10)
+        self.step(9)
 
         # Verify that the breadcrumb value is set to 2
         breadcrumb = await self.read_single_attribute_check_success(
@@ -463,7 +460,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0.
         # This forcibly disarms the fail-safe and is expected to cause the changes of
         # configuration to NetworkCommissioning cluster done so far to be reverted.
-        self.step(11)
+        self.step(10)
 
         logger.info(" --- Step 11: Setting ArmFailSafe to 0.")
         response = await self.send_single_cmd(
@@ -476,10 +473,8 @@ class TC_CNET_4_11(MatterBaseTest):
             "ArmFailSafeResponse error code is not OK.",
         )
 
-        # TODO: step 12 is manual step, need to remove from here and from test spec
         # TH changes its WiFi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
-        # How does it change? is it automatic or need to use ConnectNetwork? if so, look at step 7
-        self.step(12)
+        self.step(11)
 
         await asyncio.wait_for(
             connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials),
@@ -489,14 +484,14 @@ class TC_CNET_4_11(MatterBaseTest):
         await asyncio.sleep(WIFI_WAIT_SECONDS)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
-        self.step(13)
+        self.step(12)
 
         logger.info(f" --- Step 13: Verifiying that TH successfully connects to the DUT on {wifi_1st_ap_ssid}")
         await asyncio.sleep(WIFI_WAIT_SECONDS)
         await self.verify_operational_network(wifi_1st_ap_ssid)
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
-        self.step(14)
+        self.step(13)
 
         await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
@@ -505,7 +500,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # Successful command execution is implied if no exception is raised.
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1
-        self.step(15)
+        self.step(14)
 
         response = await self.send_single_cmd(
             cmd=cnet.Commands.RemoveNetwork(
@@ -525,7 +520,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
         # Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1
-        self.step(16)
+        self.step(15)
 
         logger.info("--- Step 16: Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
@@ -544,8 +539,9 @@ class TC_CNET_4_11(MatterBaseTest):
                                       f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
 
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3
-        self.step(17)
+        self.step(16)
 
+        # TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         logger.info(f" --- Step 17: Attempting to connect to: {wifi_2nd_ap_ssid}")
         await change_networks(
             test=self,
@@ -555,12 +551,8 @@ class TC_CNET_4_11(MatterBaseTest):
             breadcrumb=3
         )
 
-        # TODO: same as step 8, remove from here and from spec
-        # TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
-        # self.step(18)
-
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
-        self.step(19)
+        self.step(17)
 
         # Verify that the TH successfully connects to the DUT
         logger.info(f" --- Step 19: Verifiying that TH successfully connects to the DUT at {wifi_2nd_ap_ssid}")
@@ -568,7 +560,7 @@ class TC_CNET_4_11(MatterBaseTest):
         await self.verify_operational_network(wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
-        self.step(20)
+        self.step(18)
 
         breadcrumb = await asyncio.wait_for(
             self.read_single_attribute_check_success(
@@ -581,7 +573,7 @@ class TC_CNET_4_11(MatterBaseTest):
         asserts.assert_equal(breadcrumb, 3, f"Expected breadcrumb to be 3, but got: {breadcrumb}")
 
         # TH sends the CommissioningComplete command to the DUT
-        self.step(21)
+        self.step(19)
 
         # Disarm the failsafe
         logger.info(" --- Step 21: Disarming the failsafe")
@@ -594,7 +586,7 @@ class TC_CNET_4_11(MatterBaseTest):
                              f"Expected CommissioningCompleteResponse to be 0, but got {response.errorCode}")
 
         # TH reads Networks attribute from the DUT
-        self.step(22)
+        self.step(20)
 
         # Verify that the Networks attribute list has an entry with the following fields:
         networks = await asyncio.wait_for(
