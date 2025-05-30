@@ -965,6 +965,6 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
                      0x01040200: PrebuiltDataModelDirectory.k1_4_2}
 
     if specification_version not in version_to_dm.keys():
-        raise ConformanceException(f"Unknown specification_version {specification_version:08X}")
+        raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")
 
     return version_to_dm[specification_version]
