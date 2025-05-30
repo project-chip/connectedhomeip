@@ -22369,6 +22369,8 @@ class ElectricalEnergyMeasurement(Cluster):
             kExportedEnergy = 0x2
             kCumulativeEnergy = 0x4
             kPeriodicEnergy = 0x8
+            kApparentEnergy = 0x10
+            kReactiveEnergy = 0x20
 
     class Structs:
         @dataclass
@@ -22443,6 +22445,8 @@ class ElectricalEnergyMeasurement(Cluster):
                         ClusterObjectFieldDescriptor(Label="endTimestamp", Tag=2, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="startSystime", Tag=3, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="endSystime", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="apparentEnergy", Tag=5, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="reactiveEnergy", Tag=6, Type=typing.Optional[int]),
                     ])
 
             energy: 'int' = 0
@@ -22450,6 +22454,8 @@ class ElectricalEnergyMeasurement(Cluster):
             endTimestamp: 'typing.Optional[uint]' = None
             startSystime: 'typing.Optional[uint]' = None
             endSystime: 'typing.Optional[uint]' = None
+            apparentEnergy: 'typing.Optional[int]' = None
+            reactiveEnergy: 'typing.Optional[int]' = None
 
     class Attributes:
         @dataclass
@@ -48481,11 +48487,13 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transportStatus", Tag=1, Type=PushAvStreamTransport.Enums.TransportStatusEnum),
                         ClusterObjectFieldDescriptor(Label="transportOptions", Tag=2, Type=typing.Optional[PushAvStreamTransport.Structs.TransportOptionsStruct]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             connectionID: 'uint' = 0
             transportStatus: 'PushAvStreamTransport.Enums.TransportStatusEnum' = 0
             transportOptions: 'typing.Optional[PushAvStreamTransport.Structs.TransportOptionsStruct]' = None
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class SupportedFormatStruct(ClusterObject):

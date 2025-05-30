@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:132
+            image: ghcr.io/project-chip/chip-build-nxp:133
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -149,7 +149,7 @@ jobs:
             - name: Build RT1060 thermostat example app
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
-                  == 'true'
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -163,7 +163,7 @@ jobs:
             - name: Build RT1170 all clusters example app
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
-                  == 'true'
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -219,7 +219,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:132
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:133
 
         steps:
             - name: Checkout
@@ -235,10 +235,13 @@ jobs:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                      pigweed:
+                        - 'src/pw_backends/**'
+                        - 'third_party/pigweed/**'
             - name: Build NXP Zephyr examples
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
-                  == 'true'
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \

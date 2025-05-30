@@ -3339,6 +3339,20 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("endSystime");
 
+    if (value.isMember("apparentEnergy"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "apparentEnergy");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.apparentEnergy, value["apparentEnergy"]));
+    }
+    valueCopy.removeMember("apparentEnergy");
+
+    if (value.isMember("reactiveEnergy"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "reactiveEnergy");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.reactiveEnergy, value["reactiveEnergy"]));
+    }
+    valueCopy.removeMember("reactiveEnergy");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -3350,6 +3364,8 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.endTimestamp);
     ComplexArgumentParser::Finalize(request.startSystime);
     ComplexArgumentParser::Finalize(request.endSystime);
+    ComplexArgumentParser::Finalize(request.apparentEnergy);
+    ComplexArgumentParser::Finalize(request.reactiveEnergy);
 }
 
 CHIP_ERROR
@@ -7305,6 +7321,13 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("transportOptions");
 
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -7314,6 +7337,7 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.connectionID);
     ComplexArgumentParser::Finalize(request.transportStatus);
     ComplexArgumentParser::Finalize(request.transportOptions);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
