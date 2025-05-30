@@ -19,6 +19,8 @@ import("//build_overrides/pigweed.gni")
 import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
+
 import("device.gni")
 
 if (chip_enable_openthread) {
@@ -171,6 +173,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD=1",
         "CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=1",
       ]
+    }
+
+    if (chip_with_trusty_os) {
+      defines += [ "CHIP_ATTESTATION_TRUSTY_OS=1" ]
     }
 
     defines += [
