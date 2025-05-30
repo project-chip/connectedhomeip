@@ -258,19 +258,36 @@ CHIP_ERROR EncodeExtensions(CertType certType, const Crypto::P256PublicKey & SKI
     {
         ASN1_START_SEQUENCE
         {
-            if ((certType == CertType::kICA) || (certType == CertType::kRoot))
+            switch(certType)
             {
-                ReturnErrorOnFailure(EncodeCASpecificExtensions(writer));
+                case CertType::kICA:
+                case CertType::kRoot:
+                {
+                    ReturnErrorOnFailure(EncodeCASpecificExtensions(writer));
+                    break;
+                }
+                case CertType::kNode:
+                {
+                    ReturnErrorOnFailure(EncodeNOCSpecificExtensions(writer));
+                    break;
+                }
+                case CertType::kVidVerificationSigner:
+                {
+                    ReturnErrorOnFailure(EncodeVendorIdVerificationSignerSpecificExtensions(writer));
+                    break;
+                }
+                case CertType::kFirmwareSigning:
+                case CertType::kNetworkIdentity:
+                {
+                    // Nothing to encode extra for those.
+                    break;
+                }
+                default:
+                {
+                    // Unknown/invalid certificate type should not happen.
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
             }
-            else if (certType == CertType::kNode)
-            {
-                ReturnErrorOnFailure(EncodeNOCSpecificExtensions(writer));
-            }
-            else if (certType == CertType::kVidVerificationSigner)
-            {
-                ReturnErrorOnFailure(EncodeVendorIdVerificationSignerSpecificExtensions(writer));
-            }
-
             ReturnErrorOnFailure(EncodeSubjectKeyIdentifierExtension(SKI, writer));
 
             ReturnErrorOnFailure(EncodeAuthorityKeyIdentifierExtension(AKI, writer));

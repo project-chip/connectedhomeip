@@ -42,7 +42,7 @@ OptionDef gCmdOptionDefs[] =
 {
     { "type",                kArgumentRequired, 't' },
     { "subject-chip-id",     kArgumentRequired, 'i' },
-    { "subject-matter-id",   kArgumentRequired, 'i' },
+    { "subject-matter-id",   kArgumentRequired, 'i' }, //< Same as --subject-chip-id, as a legal alias.
     { "subject-fab-id",      kArgumentRequired, 'f' },
     { "subject-cat",         kArgumentRequired, 'a' },
     { "subject-cn-u",        kArgumentRequired, 'c' },
