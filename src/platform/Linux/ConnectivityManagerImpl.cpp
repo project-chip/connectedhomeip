@@ -1079,13 +1079,10 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
                                                   NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback)
 {
     GAutoPtr<GVariant> argsDeleter(g_variant_ref_sink(args)); // args may be floating, ensure we don't leak it
-
     CHIP_ERROR ret = CHIP_NO_ERROR;
     GAutoPtr<GError> err;
-    gboolean result;
 
-    const gchar * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
-
+    const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
     if (strcmp(networkPath, "/") != 0)
     {
@@ -1112,24 +1109,20 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     mPafChannelAvailable = false;
 #endif
 
-    result = wpa_supplicant_1_interface_call_add_network_sync(
-        mWpaSupplicant.iface.get(), args, &mWpaSupplicant.networkPath.GetReceiver(), nullptr, &err.GetReceiver());
-
-    if (result)
+    if (wpa_supplicant_1_interface_call_add_network_sync(mWpaSupplicant.iface.get(), args,
+                                                         &mWpaSupplicant.networkPath.GetReceiver(), nullptr, &err.GetReceiver()))
     {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: added network: %s", mWpaSupplicant.networkPath.get());
+
         // Note: wpa_supplicant will return immediately if the network is already connected, but it will still try reconnect in the
         // background. The client still need to wait for a few seconds for this reconnect operation. So we always disconnect from
         // the network we are connected and ignore any errors.
         wpa_supplicant_1_interface_call_disconnect_sync(mWpaSupplicant.iface.get(), nullptr, nullptr);
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: added network: %s", mWpaSupplicant.networkPath.get());
 
-        wpa_supplicant_1_interface_call_select_network(
-            mWpaSupplicant.iface.get(), mWpaSupplicant.networkPath.get(), nullptr,
-            reinterpret_cast<GAsyncReadyCallback>(
-                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
-                    return self->_ConnectWiFiNetworkAsyncCallback(sourceObject_, res_);
-                }),
-            this);
+        mWpaSupplicantMutex.unlock();
+        PlatformMgrImpl().GLibMatterContextInvokeSync(
+            +[](ConnectivityManagerImpl * self) { return self->_ConnectWiFiNetworkAsyncImpl(); }, this);
+        mWpaSupplicantMutex.lock();
 
         mpConnectCallback = apCallback;
     }
@@ -1715,41 +1708,42 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiP
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
-void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * sourceObject, GAsyncResult * res)
+void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncDone(GObject * sourceObject, GAsyncResult * res)
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     GAutoPtr<GError> err;
+    if (!wpa_supplicant_1_interface_call_select_network_finish(mWpaSupplicant.iface.get(), res, &err.GetReceiver()))
+    {
+        ChipLogError(DeviceLayer, "Failed to perform connect network: %s", err == nullptr ? "unknown error" : err->message);
+        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            if (mpConnectCallback != nullptr)
+            {
+                // TODO(#14175): Replace this with actual thread attach result.
+                mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
+                mpConnectCallback = nullptr;
+            }
+            mpConnectCallback = nullptr;
+        });
+    }
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncImpl()
+{
+    // When connecting to signals, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    {
-        gboolean result =
-            wpa_supplicant_1_interface_call_select_network_finish(mWpaSupplicant.iface.get(), res, &err.GetReceiver());
-        if (!result)
-        {
-            ChipLogError(DeviceLayer, "Failed to perform connect network: %s", err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-                if (mpConnectCallback != nullptr)
-                {
-                    // TODO(#14175): Replace this with actual thread attach result.
-                    mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
-                    mpConnectCallback = nullptr;
-                }
-                mpConnectCallback = nullptr;
-            });
+    wpa_supplicant_1_interface_call_select_network(
+        mWpaSupplicant.iface.get(), mWpaSupplicant.networkPath.get(), nullptr,
+        reinterpret_cast<GAsyncReadyCallback>(+[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+            return self->_ConnectWiFiNetworkAsyncDone(sourceObject_, res_);
+        }),
+        this);
 
-            return;
-        }
-
-        result = wpa_supplicant_1_interface_call_save_config_sync(mWpaSupplicant.iface.get(), nullptr, &err.GetReceiver());
-        if (result)
-        {
-            ChipLogProgress(DeviceLayer, "wpa_supplicant: save config succeeded!");
-        }
-        else
-        {
-            ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to save config: %s", err ? err->message : "unknown error");
-        }
-    }
+    return CHIP_NO_ERROR;
 }
 
 void ConnectivityManagerImpl::PostNetworkConnect()

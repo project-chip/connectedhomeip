@@ -194,10 +194,11 @@ public:
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
 
 private:
+    void _ConnectWiFiNetworkAsyncDone(GObject * sourceObject, GAsyncResult * res);
+    CHIP_ERROR _ConnectWiFiNetworkAsyncImpl();
     CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
-    void _ConnectWiFiNetworkAsyncCallback(GObject * sourceObject, GAsyncResult * res);
 #endif
 
 public:
