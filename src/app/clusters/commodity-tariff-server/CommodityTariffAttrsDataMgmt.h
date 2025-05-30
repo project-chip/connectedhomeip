@@ -177,18 +177,6 @@ public:
     /// @brief Check if the final payload is an enum
     static constexpr bool IsPayloadEnum() { return IsEnum<PayloadType>::value; }
 
-    /// @brief Get the name of the payload type
-    static const char * PayloadTypeName() { return typeid(PayloadType).name(); }
-
-    // Compile-time type check method
-    void InspectTypes()
-    {
-        // This will force a compile error showing the types
-        static_assert(sizeof(ValueType) == -1, "ValueType inspection");
-        static_assert(sizeof(WrappedType) == -1, "WrappedType inspection");
-        static_assert(sizeof(PayloadType) == -1, "PayloadType inspection");
-    }
-
     /**
      * @brief Construct a new data class instance
      * @param aValueStorage Reference to external value storage
@@ -286,7 +274,6 @@ public:
         }
         else
         {
-            InspectTypes();
             static_assert(false, "Unexpected type");
         }
     }
