@@ -166,6 +166,10 @@ if (chip_build_tests) {
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
     }
+
+    if (chip_device_config_enable_joint_fabric) {
+      tests += [ "${chip_root}/src/app/server/tests" ]
+    }
   }
 
   chip_test_group("example_tests") {
