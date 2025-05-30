@@ -20,5 +20,5 @@ help:
 %: Makefile
 	mkdir -p "$(SOURCEDIR)"
 	mkdir -p "${PYTHON_API_DIR}"
-	docs/testing/GenerateChipDeviceCtrlDoc.sh ${PYTHON_API_DIR}
+	testing/GenerateChipDeviceCtrlDoc.sh ${PYTHON_API_DIR}
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
