@@ -41,7 +41,7 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-s
+
             # Bootstrap and checkout for internal scripts (like idl_lint)
             # to run
             - name: Checkout submodules & Bootstrap
