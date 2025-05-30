@@ -99,7 +99,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
             .version         = 10,
             .extendedAddress = 2345,
             .rssi            = 10,
-            .lqi             = 1,
+            .lqi             = 10,
         },
         ThreadScanResponse{
             .panId           = 321,
@@ -110,7 +110,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
             .version         = 100,
             .extendedAddress = 0x1234,
             .rssi            = 20,
-            .lqi             = 2,
+            .lqi             = 20,
         },
         ThreadScanResponse{
             .panId           = 123,
@@ -121,7 +121,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
             .version         = 100,
             .extendedAddress = 0x1234,
             .rssi            = 5,
-            .lqi             = 2,
+            .lqi             = 5,
         },
     };
     ThreadScanResponseToTLV encoder(NetworkCommissioningStatusEnum::kSuccess, ""_span, &fakeResponses);
@@ -180,13 +180,13 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
         //   the size limits of the response.
         ASSERT_EQ(items.size(), 3u);
 
-        ASSERT_EQ(items[0].rssi,  20);
+        ASSERT_EQ(items[0].lqi,  20);
         ASSERT_EQ(items[0].panId, 321);
 
-        ASSERT_EQ(items[1].rssi, 10);
+        ASSERT_EQ(items[1].lqi, 10);
         ASSERT_EQ(items[1].panId, 100);
 
-        ASSERT_EQ(items[2].rssi, 5);
+        ASSERT_EQ(items[2].lqi, 5);
         ASSERT_EQ(items[2].panId, 123);
     }
 }
