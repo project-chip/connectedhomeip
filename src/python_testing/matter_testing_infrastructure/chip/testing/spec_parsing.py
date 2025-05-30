@@ -18,6 +18,7 @@
 import importlib
 import importlib.resources as pkg_resources
 import logging
+import pathlib
 import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
@@ -563,6 +564,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_3 = auto()
     k1_4 = auto()
     k1_4_1 = auto()
+    k1_4_2 = auto()
     k1_5 = auto()
 
     @property
@@ -573,6 +575,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.4"
         if self == PrebuiltDataModelDirectory.k1_4_1:
             return "1.4.1"
+        if self == PrebuiltDataModelDirectory.k1_4_2:
+            return "1.4.2"
         if self == PrebuiltDataModelDirectory.k1_5:
             return "1.5_in_progress"
         raise KeyError("Invalid enum: %r" % self)
@@ -600,18 +604,21 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     """
     # Early return if data_model_directory is already a Traversable type
     if not isinstance(data_model_directory, PrebuiltDataModelDirectory):
-        return data_model_directory
+        # data_model_directory is a Traversable (e.g. pathlib.Path to an extracted root)
+        # We need to append the data_model_level (e.g. "clusters")
+        return data_model_directory.joinpath(data_model_level.dirname)
 
     # If it's a prebuilt directory, build the path based on the version and data model level
-    zip_path_traversable = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+    zip_file_traversable = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
         'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
 
     # When zip_path_traversable is a file path from pkg_resources for a .zip file,
-    # we open it and then pass the file object to zipfile.Path along with the internal path.
-    with zip_path_traversable.open('rb') as zip_file_handle:
-        path = zipfile.Path(zip_file_handle, at=data_model_level.dirname)
+    # we construct a zipfile.Path pointing to the appropriate directory within the zip.
+    # zipfile.Path can take a Traversable (like pathlib.Path) that points to a zip archive
+    # as its first argument. It will manage opening/closing this archive itself.
+    path_inside_zip = zipfile.Path(typing.cast(pathlib.Path, zip_file_traversable), at=data_model_level.dirname)
 
-    return path
+    return path_inside_zip
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> typing.Tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
