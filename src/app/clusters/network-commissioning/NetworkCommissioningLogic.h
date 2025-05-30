@@ -86,9 +86,6 @@ public:
     HandleAddOrUpdateWiFiNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                  const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
     std::optional<DataModel::ActionReturnStatus>
-    HandleAddOrUpdateWiFiNetworkWithPDC(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                        const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus>
     HandleAddOrUpdateThreadNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                    const NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::DecodableType & req);
     std::optional<DataModel::ActionReturnStatus>
@@ -104,6 +101,11 @@ public:
     std::optional<DataModel::ActionReturnStatus>
     HandleQueryIdentity(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                         const NetworkCommissioning::Commands::QueryIdentity::DecodableType & req);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAddOrUpdateWiFiNetworkWithPDC(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                        const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
     // Attribute handling
     CHIP_ERROR SetInterfaceEnabled(bool enabled) { return mpBaseDriver->SetEnabled(enabled); }

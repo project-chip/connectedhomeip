@@ -382,7 +382,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
         if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
         {
-            HandleAddOrUpdateWiFiNetworkWithPDC(handler, req);
+            HandleAddOrUpdateWiFiNetworkWithPDC(handler, commandPath, req);
             return;
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -443,14 +443,14 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 std::optional<ActionReturnStatus>
-NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & handler,
+NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & handler, const ConcreteCommandPath & commandPath,
                                                                const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
     // Credentials must be empty when configuring for PDC, it's only present to keep the command shape compatible.
     if (!req.credentials.empty())
     {
         handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "credentials");
-        return;
+        return std::nullopt;
     }
 
     auto && networkIdentity = req.networkIdentity.Value(); // presence checked by caller
@@ -458,20 +458,20 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & 
         Credentials::ValidateChipNetworkIdentity(networkIdentity) != CHIP_NO_ERROR)
     {
         handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "networkIdentity");
-        return;
+        return std::nullopt;
     }
 
     if (req.clientIdentifier.HasValue() && req.clientIdentifier.Value().size() != CertificateKeyId::size())
     {
         handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "clientIdentifier");
-        return;
+        return std::nullopt;
     }
 
     bool provePossession = req.possessionNonce.HasValue();
     if (provePossession && req.possessionNonce.Value().size() != kPossessionNonceSize)
     {
         handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "possessionNonce");
-        return;
+        return std::nullopt;
     }
 
     auto err = CHIP_NO_ERROR;
@@ -496,7 +496,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & 
             if (!clientIdentityNetworkIndex.HasValue())
             {
                 handler.AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound, "clientIdentifier");
-                return;
+                return std::nullopt;
             }
         }
 
@@ -543,8 +543,9 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AddOrUpdateWiFiNetwork with PDC failed: %" CHIP_ERROR_FORMAT, err.Format());
-        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
+        return Protocols::InteractionModel::Status::Failure;
     }
+    return std::nullopt;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
