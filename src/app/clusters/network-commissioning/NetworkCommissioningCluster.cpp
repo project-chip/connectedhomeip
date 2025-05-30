@@ -104,10 +104,6 @@ std::optional<DataModel::ActionReturnStatus> NetworkCommissioningCluster::Invoke
 
     VerifyOrReturnError(!mLogic.IsProcessingAsyncCommand(), Protocols::InteractionModel::Status::Busy);
 
-    // // Since mPath is used for building the response command, and we have checked that we are not pending the response of another
-    // // command above. So it is safe to set the mPath here and not clear it when return.
-    // mPath = ctxt.mRequestPath;
-
     switch (request.path.mCommandId)
     {
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP || CHIP_DEVICE_CONFIG_ENABLE_THREAD)
