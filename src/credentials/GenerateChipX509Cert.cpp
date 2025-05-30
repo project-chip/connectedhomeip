@@ -258,35 +258,30 @@ CHIP_ERROR EncodeExtensions(CertType certType, const Crypto::P256PublicKey & SKI
     {
         ASN1_START_SEQUENCE
         {
-            switch(certType)
+            switch (certType)
             {
-                case CertType::kICA:
-                case CertType::kRoot:
-                {
-                    ReturnErrorOnFailure(EncodeCASpecificExtensions(writer));
-                    break;
-                }
-                case CertType::kNode:
-                {
-                    ReturnErrorOnFailure(EncodeNOCSpecificExtensions(writer));
-                    break;
-                }
-                case CertType::kVidVerificationSigner:
-                {
-                    ReturnErrorOnFailure(EncodeVendorIdVerificationSignerSpecificExtensions(writer));
-                    break;
-                }
-                case CertType::kFirmwareSigning:
-                case CertType::kNetworkIdentity:
-                {
-                    // Nothing to encode extra for those.
-                    break;
-                }
-                default:
-                {
-                    // Unknown/invalid certificate type should not happen.
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
+            case CertType::kICA:
+            case CertType::kRoot: {
+                ReturnErrorOnFailure(EncodeCASpecificExtensions(writer));
+                break;
+            }
+            case CertType::kNode: {
+                ReturnErrorOnFailure(EncodeNOCSpecificExtensions(writer));
+                break;
+            }
+            case CertType::kVidVerificationSigner: {
+                ReturnErrorOnFailure(EncodeVendorIdVerificationSignerSpecificExtensions(writer));
+                break;
+            }
+            case CertType::kFirmwareSigning:
+            case CertType::kNetworkIdentity: {
+                // Nothing to encode extra for those.
+                break;
+            }
+            default: {
+                // Unknown/invalid certificate type should not happen.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
             }
             ReturnErrorOnFailure(EncodeSubjectKeyIdentifierExtension(SKI, writer));
 
