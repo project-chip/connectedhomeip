@@ -952,10 +952,10 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         # The expression (specification_version & uint(0xFFFF00FF)) might be inferred as int by mypy.
         specification_version = uint(int(specification_version) & int(uint(0xFFFF00FF)))
 
-    version_to_dm = {uint(0x01030000): PrebuiltDataModelDirectory.k1_3,
-                     uint(0x01040000): PrebuiltDataModelDirectory.k1_4,
-                     uint(0x01040100): PrebuiltDataModelDirectory.k1_4_1,
-                     uint(0x01050000): PrebuiltDataModelDirectory.k1_5}
+    version_to_dm = {0x01030000: PrebuiltDataModelDirectory.k1_3,
+                     0x01040000: PrebuiltDataModelDirectory.k1_4,
+                     0x01040100: PrebuiltDataModelDirectory.k1_4_1,
+                     0x01040200: PrebuiltDataModelDirectory.k1_4_2}
 
     if specification_version not in version_to_dm.keys():
         raise ConformanceException(f"Unknown specification_version {specification_version:08X}")
