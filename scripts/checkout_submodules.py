@@ -43,7 +43,7 @@ ALL_PLATFORMS = set([
     'nrfconnect',
     'nuttx',
     'qpg',
-    'realtek_bee',
+    'realtek',
     'stm32',
     'telink',
     'tizen',
