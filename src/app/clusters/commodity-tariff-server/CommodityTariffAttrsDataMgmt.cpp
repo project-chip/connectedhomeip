@@ -141,7 +141,7 @@ static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLeng
 static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
 
 // static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
-// static constexpr size_t kIndividualDaysAttrMaxLength = 50;
+ static constexpr size_t kIndividualDaysAttrMaxLength = 50;
 
 // static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
 // static constexpr size_t kDayStructItemMaxDayEntryIDs = 96;
@@ -294,8 +294,8 @@ static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, 
 {
     VerifyOrReturnError_LogSend(entryNewValue.startTime < 1499, CHIP_ERROR_INVALID_ARGUMENT,
                                 "DayEntry startTime must be less 1499");
-    VerifyOrReturnError_LogSend(entryNewValue.startTime >= *prev_time, CHIP_ERROR_INVALID_ARGUMENT,
-                                "DayEntry startTime must be order");
+    VerifyOrReturnError_LogSend(entryNewValue.startTime > *prev_time, CHIP_ERROR_INVALID_ARGUMENT,
+                                "DayEntries must be order by startTime");
 
     if (entryNewValue.duration.HasValue() && entryNewValue.duration.Value() >= 1440)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -341,8 +341,6 @@ CHIP_ERROR DayEntriesDataClass::Validate(const ValueType & aValue) const
         {
             break;
         }
-
-        tmp_startTime = item.startTime;
     }
     return err;
 }
@@ -598,7 +596,7 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         if (!powerThreshold.powerThresholdSource.IsNull())
         {
             VerifyOrReturnError(EnsureKnownEnumValue(powerThreshold.powerThresholdSource.Value()) !=
-                                    PowerThresholdSourceEnum::kUnknownEnumValue,
+                                PowerThresholdSourceEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
@@ -735,16 +733,39 @@ void TariffComponentsDataClass::CleanupStructValue(PayloadType & aValue)
 }
 
 // IndividualDaysDataClass
-
 CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    auto & newList = aValue.Value();
+    uint32_t tmpDate = 0;
+    std::unordered_set<uint32_t> ID_DE_IDs;
 
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kIndividualDaysAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH,
+                                "Incorrect IndividualDays length");
+
+    for (const auto & item : newList)
+    {
+        VerifyOrReturnError_LogSend(item.date > tmpDate, CHIP_ERROR_INVALID_ARGUMENT,
+                        "IndividualDays must be order by startTime");
+        VerifyOrReturnError(EnsureKnownEnumValue(item.dayType) !=
+                            DayTypeEnum::kUnknownEnumValue,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+
+        if (CommonUtilities::HasDuplicateIDs(item.dayEntryIDs, ID_DE_IDs))
+        {
+            err =  CHIP_ERROR_DUPLICATE_KEY_ID;
+            break;
+        }
+        tmpDate = item.date;
+    }
+    return err;
 }
 
 bool IndividualDaysDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    return true;
+    return (source.date != destination.date ||
+            source.dayType != destination.dayType ||
+            source.dayEntryIDs != destination.dayEntryIDs);
 }
 
 void IndividualDaysDataClass::CleanupStructValue(PayloadType & aValue)
@@ -756,13 +777,36 @@ void IndividualDaysDataClass::CleanupStructValue(PayloadType & aValue)
 
 CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    auto & newList = aValue.Value();
+    uint32_t tmpStartDate = 0;
+    std::unordered_set<uint32_t> CP_DP_IDs;
 
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kIndividualDaysAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH,
+                                "Incorrect IndividualDays length");
+
+    for (const auto & item : newList)
+    {
+        if (!item.startDate.IsNull())
+        {
+            VerifyOrReturnError_LogSend(item.startDate.Value() > tmpStartDate, CHIP_ERROR_INVALID_ARGUMENT,
+                            "IndividualDays must be order by startTime");
+        }
+
+        if (CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CP_DP_IDs))
+        {
+            err =  CHIP_ERROR_DUPLICATE_KEY_ID;
+            break;
+        }
+        tmpStartDate = item.startDate.Value();
+    }
+    return err;
 }
 
 bool CalendarPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    return true;
+    return (source.startDate != destination.startDate ||
+            source.dayPatternIDs != destination.dayPatternIDs);
 }
 
 void CalendarPeriodsDataClass::CleanupStructValue(PayloadType & aValue)
