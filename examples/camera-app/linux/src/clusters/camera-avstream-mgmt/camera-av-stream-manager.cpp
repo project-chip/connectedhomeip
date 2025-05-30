@@ -351,6 +351,18 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         mCameraDeviceHAL->GetCameraHALInterface().SetStatusLightEnabled(GetCameraAVStreamMgmtServer()->GetStatusLightEnabled());
         break;
     }
+    case ImageRotation::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageRotation(GetCameraAVStreamMgmtServer()->GetImageRotation());
+        break;
+    }
+    case ImageFlipHorizontal::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipHorizontal(GetCameraAVStreamMgmtServer()->GetImageFlipHorizontal());
+        break;
+    }
+    case ImageFlipVertical::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipVertical(GetCameraAVStreamMgmtServer()->GetImageFlipVertical());
+        break;
+    }
     default:
         ChipLogProgress(Camera, "Unknown Attribute with AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
     }

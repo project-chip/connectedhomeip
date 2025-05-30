@@ -221,6 +221,13 @@ void CameraApp::InitializeCameraAVStreamMgmt()
         mAVStreamMgmtServerPtr->SetStatusLightEnabled(mCameraDevice->GetCameraHALInterface().GetStatusLightEnabled());
     }
 
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
+    {
+        mAVStreamMgmtServerPtr->SetImageRotation(mCameraDevice->GetCameraHALInterface().GetImageRotation());
+        mAVStreamMgmtServerPtr->SetImageFlipVertical(mCameraDevice->GetCameraHALInterface().GetImageFlipVertical());
+        mAVStreamMgmtServerPtr->SetImageFlipHorizontal(mCameraDevice->GetCameraHALInterface().GetImageFlipHorizontal());
+    }
+
     mAVStreamMgmtServerPtr->Init();
 }
 

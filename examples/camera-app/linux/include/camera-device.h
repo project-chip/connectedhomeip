@@ -40,17 +40,17 @@
 static constexpr uint32_t kMaxContentBufferSizeBytes = 4096;
 static constexpr uint32_t kMaxNetworkBandwidthMbps   = 128;
 static constexpr uint8_t kMaxConcurrentEncoders      = 1;
-static constexpr uint32_t kMaxEncodedPixelRate       = 27648000; // 720p at 30fps
+static constexpr uint32_t kMaxEncodedPixelRate       = 27648000;// 720p at 30fps
 static constexpr uint8_t kSpeakerMinLevel            = 1;
-static constexpr uint8_t kSpeakerMaxLevel            = 254; // Spec constraint
-static constexpr uint8_t kSpeakerMaxChannelCount     = 8;   // Same as Microphone
+static constexpr uint8_t kSpeakerMaxLevel            = 254;     // Spec constraint
+static constexpr uint8_t kSpeakerMaxChannelCount     = 8;       // Same as Microphone
 static constexpr uint8_t kMicrophoneMinLevel         = 1;
-static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
-static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
-static constexpr uint16_t kMinResolutionWidth        = 640;  // Low SD resolution
-static constexpr uint16_t kMinResolutionHeight       = 360;  // Low SD resolution
-static constexpr uint16_t kMaxResolutionWidth        = 1920; // 1080p resolution
-static constexpr uint16_t kMaxResolutionHeight       = 1080; // 1080p resolution
+static constexpr uint8_t kMicrophoneMaxLevel         = 254;     // Spec constraint
+static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;       // Spec Constraint in AudioStreamAllocate
+static constexpr uint16_t kMinResolutionWidth        = 640;     // Low SD resolution
+static constexpr uint16_t kMinResolutionHeight       = 360;     // Low SD resolution
+static constexpr uint16_t kMaxResolutionWidth        = 1920;    // 1080p resolution
+static constexpr uint16_t kMaxResolutionHeight       = 1080;    // 1080p resolution
 static constexpr uint16_t kSnapshotStreamFrameRate   = 30;
 static constexpr uint16_t kMaxVideoFrameRate         = 120;
 static constexpr uint16_t kMinVideoFrameRate         = 30;
@@ -60,6 +60,8 @@ static constexpr uint32_t kMinKeyFrameIntervalMsec   = 1000;    // 1 sec
 static constexpr uint32_t kMaxKeyFrameIntervalMsec   = 10000;   // 10 sec
 static constexpr uint16_t kVideoSensorWidthPixels    = 1920;    // 1080p resolution
 static constexpr uint16_t kVideoSensorHeightPixels   = 1080;    // 1080p resolution
+static constexpr uint16_t kMinImageRotation          = 0;
+static constexpr uint16_t kMaxImageRotation          = 359;     // Spec constraint
 
 #define INVALID_SPKR_LEVEL (0)
 
@@ -217,6 +219,16 @@ public:
     uint8_t GetMicrophoneMaxLevel() override { return mMicrophoneMaxLevel; }
     uint8_t GetMicrophoneMinLevel() override { return mMicrophoneMinLevel; }
 
+    // Get/Set image control attributes
+    CameraError SetImageRotation(uint16_t imageRotation) override;
+    uint16_t GetImageRotation() override {return mImageRotation; }
+    
+    CameraError SetImageFlipHorizontal(bool imageFlipHorizontal) override;
+    bool GetImageFlipHorizontal() override {return mImageFlipHorizontal; }
+    
+    CameraError SetImageFlipVertical(bool imageFlipVertical) override;
+    bool GetImageFlipVertical() override {return mImageFlipVertical; }
+
     // Does camera have local storage
     bool HasLocalStorage() override { return false; }
 
@@ -306,6 +318,9 @@ private:
     bool mLocalVideoRecordingEnabled       = false;
     bool mLocalSnapshotRecordingEnabled    = false;
     bool mStatusLightEnabled               = false;
+    uint16_t mImageRotation                = kMinImageRotation;
+    bool mImageFlipHorizontal              = false;
+    bool mImageFlipVertical                = false;
 
     std::vector<StreamUsageEnum> mRankedStreamPriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 };
