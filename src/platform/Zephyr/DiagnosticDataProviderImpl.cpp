@@ -295,8 +295,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         NetworkInterface * ifp = new NetworkInterface();
 
         interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
-        ifp->name          = CharSpan::fromCharString(ifp->Name);
-        ifp->isOperational = true;
+        ifp->name = CharSpan::fromCharString(ifp->Name);
         Inet::InterfaceType interfaceType;
         if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)
         {
@@ -330,9 +329,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         CHIP_ERROR error;
         uint8_t addressSize;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        if (interfaceType == Inet::InterfaceType::Thread)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        if (interfaceType == Inet::InterfaceType::WiFi)
         {
+            ifp->isOperational = ConnectivityMgr().IsWiFiStationConnected();
+            error              = interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress));
+        }
+        else
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+            if (interfaceType == Inet::InterfaceType::Thread)
+        {
+            ifp->isOperational = ConnectivityMgr().IsThreadAttached();
+
             static_assert(OT_EXT_ADDRESS_SIZE <= sizeof(ifp->MacAddress), "Unexpected extended address size");
             error       = ThreadStackMgr().GetPrimary802154MACAddress(ifp->MacAddress);
             addressSize = OT_EXT_ADDRESS_SIZE;
@@ -340,7 +349,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         else
 #endif
         {
-            error = interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress));
+            ifp->isOperational = true;
+            error              = interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress));
         }
 
         if (error != CHIP_NO_ERROR)
