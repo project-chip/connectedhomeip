@@ -431,7 +431,7 @@ class ClusterParser:
         # Add in the global attributes for the base class
         for id in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
-            attributes[uint(id.value)] = XmlAttribute(name=id.to_name(), datatype="", conformance=mandatory(
+            attributes[uint(id)] = XmlAttribute(name=id.to_name(), datatype="", conformance=mandatory(
             ), read_access=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView), write_access=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue), write_optional=False)
         return attributes
 
@@ -458,9 +458,9 @@ class ClusterParser:
             conformance = self.parse_conformance(conformance_xml)
 
             if conformance is not None:
-                _, _, privilege_val = self.parse_access(element, access_xml, conformance)
+                _, _, privilege = self.parse_access(element, access_xml, conformance)
                 commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
-                                           privilege=privilege_val if privilege_val is not None else typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)))
+                                           privilege=privilege if privilege is not None else typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)))
         return commands
 
     def parse_commands(self, command_type: CommandType) -> dict[uint, XmlCommand]:
@@ -475,9 +475,9 @@ class ClusterParser:
             if code in commands:
                 conformance = or_operation([conformance, commands[code].conformance])
 
-            _, _, privilege_val = self.parse_access(element, access_xml, conformance)
+            _, _, privilege = self.parse_access(element, access_xml, conformance)
             commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
-                                              privilege=privilege_val if privilege_val is not None else typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue))
+                                              privilege=privilege if privilege is not None else typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue))
         return commands
 
     def parse_events(self) -> dict[uint, XmlEvent]:
