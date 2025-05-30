@@ -98,10 +98,12 @@ public:
     HandleReorderNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                          const NetworkCommissioning::Commands::ReorderNetwork::DecodableType & req);
     std::optional<DataModel::ActionReturnStatus> HandleNonConcurrentConnectNetwork();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     std::optional<DataModel::ActionReturnStatus>
     HandleQueryIdentity(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                         const NetworkCommissioning::Commands::QueryIdentity::DecodableType & req);
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
     std::optional<DataModel::ActionReturnStatus>
     HandleAddOrUpdateWiFiNetworkWithPDC(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                         const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
