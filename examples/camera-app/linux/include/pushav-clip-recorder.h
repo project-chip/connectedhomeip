@@ -45,8 +45,8 @@ extern "C" {
  */
 struct BufferData
 {
-    uint8_t * mPtr;    ///< Pointer to buffer data
-    size_t mSize;      ///< Size left in the buffer
+    uint8_t * mPtr; ///< Pointer to buffer data
+    size_t mSize;   ///< Size left in the buffer
 };
 
 /**
@@ -58,60 +58,62 @@ struct BufferData
 class PushAVClipRecorder
 {
 public:
-
     /**
      * @struct ClipInfoStruct
      * @brief Contains clip configuration and runtime state
      */
-    struct ClipInfoStruct {
-        bool mHasVideo;                             ///< Video recording enabled flag
-        bool mHasAudio;                             ///< Audio recording enabled flag
-        int mClipId;                                ///< Current clip identifier
-        int mMaxClipDuration;                       ///< Maximum clip duration in seconds
-        int mInitialDuration;                       ///< Initial clip duration in seconds
-        int mAugmentationDuration;                  ///< Duration increment on motion detect
-        int mChunkDuration;                         ///< Segment duration in seconds
-        std::string mRecorderId;                    ///< Unique recorder identifier
-        std::string mOutputPath;                    ///< Base output directory path
-        AVRational mInputTimeBase;                  ///< Input time base
-        uint16_t mAudioStreamId;                    ///< Audio stream identifier
-        uint16_t mVideoStreamId;                    ///< Video stream identifier
-        std::string mUrl;                           ///< URL for uploading clips;
-        int mTriggerType;                           ///< Recording trigger type
+    struct ClipInfoStruct
+    {
+        bool mHasVideo;            ///< Video recording enabled flag
+        bool mHasAudio;            ///< Audio recording enabled flag
+        int mClipId;               ///< Current clip identifier
+        int mMaxClipDuration;      ///< Maximum clip duration in seconds
+        int mInitialDuration;      ///< Initial clip duration in seconds
+        int mAugmentationDuration; ///< Duration increment on motion detect
+        int mChunkDuration;        ///< Segment duration in seconds
+        std::string mRecorderId;   ///< Unique recorder identifier
+        std::string mOutputPath;   ///< Base output directory path
+        AVRational mInputTimeBase; ///< Input time base
+        uint16_t mAudioStreamId;   ///< Audio stream identifier
+        uint16_t mVideoStreamId;   ///< Video stream identifier
+        std::string mUrl;          ///< URL for uploading clips;
+        int mTriggerType;          ///< Recording trigger type
     };
 
     /**
      * @struct AudioInfoStruct
      * @brief Audio stream configuration parameters
      */
-    struct AudioInfoStruct {
-        uint64_t mChannelLayout;                    ///< Audio channel layout
-        int mChannels;                              ///< Number of audio channels
-        AVCodecID mAudioCodecId;                    ///< Audio codec identifier
-        int mSampleRate;                            ///< Sampling rate in Hz
-        int mBitRate;                               ///< Audio bitrate in bps
-        int64_t mAudioPts;                          ///< Audio presentation timestamp
-        int64_t mAudioDts;                          ///< Audio decoding timestamp
-        int mAudioStreamIndex;                      ///< Audio stream index
-        int mAudioFrameDuration;                    ///< Audio frame duration in samples
-        AVRational mAudioTimeBase;                  ///< Audio time base
+    struct AudioInfoStruct
+    {
+        uint64_t mChannelLayout;   ///< Audio channel layout
+        int mChannels;             ///< Number of audio channels
+        AVCodecID mAudioCodecId;   ///< Audio codec identifier
+        int mSampleRate;           ///< Sampling rate in Hz
+        int mBitRate;              ///< Audio bitrate in bps
+        int64_t mAudioPts;         ///< Audio presentation timestamp
+        int64_t mAudioDts;         ///< Audio decoding timestamp
+        int mAudioStreamIndex;     ///< Audio stream index
+        int mAudioFrameDuration;   ///< Audio frame duration in samples
+        AVRational mAudioTimeBase; ///< Audio time base
     };
 
     /**
      * @struct VideoInfoStruct
      * @brief Video stream configuration parameters
      */
-    struct VideoInfoStruct {
-        AVCodecID mVideoCodecId;                    ///< Video codec identifier
-        int64_t mVideoPts;                          ///< Video presentation timestamp
-        int64_t mVideoDts;                          ///< Video decoding timestamp
-        int mWidth;                                 ///< Video frame width
-        int mHeight;                                ///< Video frame height
-        int mFrameRate;                             ///< Video frame rate (fps)
-        int mVideoFrameDuration;                    ///< Video frame duration (μs)
-        AVRational mVideoTimeBase;                  ///< Video time base
-        int mVideoStreamIndex;                      ///< Video stream index
-        uint32_t mBitRate;                          ///< Video bitrate in bps
+    struct VideoInfoStruct
+    {
+        AVCodecID mVideoCodecId;   ///< Video codec identifier
+        int64_t mVideoPts;         ///< Video presentation timestamp
+        int64_t mVideoDts;         ///< Video decoding timestamp
+        int mWidth;                ///< Video frame width
+        int mHeight;               ///< Video frame height
+        int mFrameRate;            ///< Video frame rate (fps)
+        int mVideoFrameDuration;   ///< Video frame duration (μs)
+        AVRational mVideoTimeBase; ///< Video time base
+        int mVideoStreamIndex;     ///< Video stream index
+        uint32_t mBitRate;         ///< Video bitrate in bps
     };
 
     /// @name Construction/Destruction
@@ -141,9 +143,9 @@ private:
 
     /// @name Stream Configuration
     /// @{
-    ClipInfoStruct mClipInfo;    ///< Clip configuration parameters
-    AudioInfoStruct mAudioInfo;  ///< Audio stream parameters
-    VideoInfoStruct mVideoInfo;  ///< Video stream parameters
+    ClipInfoStruct mClipInfo;   ///< Clip configuration parameters
+    AudioInfoStruct mAudioInfo; ///< Audio stream parameters
+    VideoInfoStruct mVideoInfo; ///< Video stream parameters
     /// @}
 
     AVFormatContext * mFormatContext;
@@ -153,18 +155,18 @@ private:
     AVIOContext * mAvioContext;
     AVCodecContext * mAudioEncoderContext;
     std::thread mWorkerThread;
-    std::atomic<bool> mWorkerRunning{false};
+    std::atomic<bool> mWorkerRunning{ false };
     std::mutex mQueueMutex;
     std::condition_variable mCondition;
 
     std::queue<AVPacket *> mAudioQueue;
     std::queue<AVPacket *> mVideoQueue;
 
-    int mLastFragmentId = 0;
+    int mLastFragmentId          = 0;
     int64_t mCurrentClipStartPts = AV_NOPTS_VALUE;
     int64_t mFoundFirstIFramePts = -1;
-    int64_t currentPts    = AV_NOPTS_VALUE;
-    bool mMetadataSet = false;
+    int64_t currentPts           = AV_NOPTS_VALUE;
+    bool mMetadataSet            = false;
 
     PushAVUploader mUploader;
 
