@@ -998,8 +998,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1077,8 +1075,6 @@ limitations under the License.
             <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1318,8 +1314,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1354,8 +1348,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1422,8 +1414,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1449,8 +1439,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1476,8 +1464,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1509,8 +1495,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1541,8 +1525,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1566,8 +1548,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1591,8 +1571,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1616,8 +1594,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1641,8 +1617,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1673,8 +1647,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1743,7 +1715,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1808,7 +1779,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1845,8 +1815,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1909,8 +1877,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1976,7 +1942,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -2137,13 +2102,6 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
                 <requireAttribute>SERVER_LIST</requireAttribute>
@@ -2163,13 +2121,6 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
                 <requireAttribute>SERVER_LIST</requireAttribute>
@@ -2201,13 +2152,6 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
                 <requireAttribute>SERVER_LIST</requireAttribute>
@@ -2665,7 +2609,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
                 <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
