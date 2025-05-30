@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-
 import asyncio
 import logging
 import platform
@@ -71,7 +70,6 @@ async def connect_wifi_linux(ssid, password):
                 break
 
         # Let's try to connect
-        logger.info(f" --- connect_wifi_linux: Connecting to '{ssid}'...")
         result = subprocess.run(
             ["nmcli", "d", "wifi", "connect", ssid, "password", password],
             capture_output=True, text=True
@@ -173,7 +171,7 @@ def is_network_switch_successful(err):
 
 async def change_networks(test, cluster, ssid, password, breadcrumb):
     # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
-    # so they loose connection between each other. Thus, ConnectNetwork throws an exception
+    # so they loose connection between each other. Thus, ConnectNetwork can throw an exception
     retry = 1
     while retry <= MAX_RETRIES:
         try:
@@ -223,6 +221,7 @@ class TC_CNET_4_11(MatterBaseTest):
         networks = None
         retry = 1
         while retry <= MAX_RETRIES:
+            logger.info(f" --- verify_operational_network: Trying to verify operational network: {retry}/{MAX_RETRIES}")
             try:
                 networks = await asyncio.wait_for(
                     self.read_single_attribute_check_success(
@@ -248,7 +247,7 @@ class TC_CNET_4_11(MatterBaseTest):
         for idx, network in enumerate(networks):
             if network.networkID == ssid.encode():
                 asserts.assert_true(network.connected, f"Wifi network {ssid} is not connected.")
-                logger.info(f" --- verify_operational_network: Connected to SSID: {ssid}")
+                logger.info(f" --- verify_operational_network: DUT connected to SSID: {ssid}")
                 break
 
     def steps_TC_CNET_4_11(self):
@@ -387,7 +386,6 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(5)
 
         # Add second network
-        logger.info(" --- Step 5: Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
         response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
@@ -426,7 +424,6 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2
         self.step(7)
 
-        logger.info(f" --- Step 7: Attempting to connect to: {wifi_2nd_ap_ssid}")
         await asyncio.wait_for(
             change_networks(
                 test=self,
@@ -442,7 +439,6 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(8)
 
         # Verify that the TH successfully connects to the DUT
-        logger.info(f" --- Step 9: Verifiying that TH successfully connects to the DUT on {wifi_2nd_ap_ssid}")
         await asyncio.sleep(WIFI_WAIT_SECONDS)
         await self.verify_operational_network(wifi_2nd_ap_ssid)
 
@@ -454,7 +450,7 @@ class TC_CNET_4_11(MatterBaseTest):
             cluster=cgen,
             attribute=cgen.Attributes.Breadcrumb
         )
-        logger.info(f" --- Step 10: Breadcrumb is: {breadcrumb}")
+        logger.info(f" --- Step 9: Breadcrumb is: {breadcrumb}")
         asserts.assert_equal(breadcrumb, 2, f"Expected breadcrumb to be 2, but got: {breadcrumb}")
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0.
@@ -462,7 +458,6 @@ class TC_CNET_4_11(MatterBaseTest):
         # configuration to NetworkCommissioning cluster done so far to be reverted.
         self.step(10)
 
-        logger.info(" --- Step 11: Setting ArmFailSafe to 0.")
         response = await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
@@ -486,7 +481,6 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
         self.step(12)
 
-        logger.info(f" --- Step 13: Verifiying that TH successfully connects to the DUT on {wifi_1st_ap_ssid}")
         await asyncio.sleep(WIFI_WAIT_SECONDS)
         await self.verify_operational_network(wifi_1st_ap_ssid)
 
@@ -522,7 +516,6 @@ class TC_CNET_4_11(MatterBaseTest):
         # Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1
         self.step(15)
 
-        logger.info("--- Step 16: Adding second wifi test network")
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
         response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
@@ -542,7 +535,6 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(16)
 
         # TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
-        logger.info(f" --- Step 17: Attempting to connect to: {wifi_2nd_ap_ssid}")
         await change_networks(
             test=self,
             cluster=cnet,
@@ -555,7 +547,6 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(17)
 
         # Verify that the TH successfully connects to the DUT
-        logger.info(f" --- Step 19: Verifiying that TH successfully connects to the DUT at {wifi_2nd_ap_ssid}")
         await asyncio.sleep(WIFI_WAIT_SECONDS)
         await self.verify_operational_network(wifi_2nd_ap_ssid)
 
@@ -576,7 +567,6 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(19)
 
         # Disarm the failsafe
-        logger.info(" --- Step 21: Disarming the failsafe")
         cmd = cgen.Commands.CommissioningComplete()
         response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
 
@@ -603,7 +593,6 @@ class TC_CNET_4_11(MatterBaseTest):
             if network.networkID == wifi_2nd_ap_ssid.encode():
                 userwifi_2nd_netidx = idx
                 asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid} is not connected.")
-                logger.info(f" --- Connected to 2nd SSID: {wifi_2nd_ap_ssid}")
                 break
         asserts.assert_true(userwifi_2nd_netidx is not None, "Wifi network not found")
 
