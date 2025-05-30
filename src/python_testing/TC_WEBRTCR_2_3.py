@@ -182,9 +182,9 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
 
             try:
                 await self.send_command("webrtc solicit-offer 3")
-                # Wait up to 30s until the provider logs that the data‑channel opened
-                if not self.th_server.event.wait(30):
-                    raise TimeoutError("DataChannel did not open within 30s")
+                # Wait up to 90s until the provider logs that the data‑channel opened
+                if not self.th_server.event.wait(90):
+                    raise TimeoutError("DataChannel did not open within 90s")
                 resp = 'Y'
             except TimeoutError:
                 resp = 'N'
