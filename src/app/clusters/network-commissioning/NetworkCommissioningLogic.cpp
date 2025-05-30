@@ -698,7 +698,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleQueryIdentity
     if (req.keyIdentifier.size() != CertificateKeyId::size())
     {
         handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "keyIdentifier");
-        returns std::nullopt;
+        return std::nullopt;
     }
     CertificateKeyId keyIdentifier(req.keyIdentifier.data());
 
