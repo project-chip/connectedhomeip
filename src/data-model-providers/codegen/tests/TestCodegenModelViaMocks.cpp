@@ -1208,7 +1208,8 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     EXPECT_EQ(info2->GetWritePrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
 
     // test a read-only attribute, which will not have a write privilege
-    std::optional<AttributeEntry> info3 = finder.Find(ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), kReadOnlyAttributeId));
+    std::optional<AttributeEntry> info3 =
+        finder.Find(ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), kReadOnlyAttributeId));
     ASSERT_TRUE(info3.has_value());
     EXPECT_FALSE(info3->HasFlags(AttributeQualityFlags::kListAttribute));       // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(info3->GetReadPrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
@@ -1228,7 +1229,8 @@ TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
 
     ASSERT_TRUE(info1.has_value());
 
-    std::optional<AttributeEntry> info2 = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
+    std::optional<AttributeEntry> info2 =
+        finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
     ASSERT_TRUE(info2.has_value());
 
     std::optional<AttributeEntry> info3 = finder.Find(
