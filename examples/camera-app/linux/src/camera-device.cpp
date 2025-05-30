@@ -386,26 +386,25 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     g_object_set(source, "device", device.c_str(), nullptr);
 #endif
 
-    if (!pipeline || !source || !capsfilter || !jpegdec || !videoconvert || !x264enc || !rtph264pay || !udpsink)
+    // Check for any nullptr among the created elements
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { pipeline, "pipeline" },         //
+        { source, "source" },             //
+        { capsfilter, "mjpeg_caps" },     //
+        { jpegdec, "jpegdec" },           //
+        { videoconvert, "videoconvert" }, //
+        { x264enc, "encoder" },           //
+        { rtph264pay, "rtph264" },        //
+        { udpsink, "udpsink" }            //
+    };
+    const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
+
+    // If any element creation failed, log the error and unreference the elements
+    if (isElementFactoryMakeFailed)
     {
         ChipLogError(Camera, "Not all elements could be created.");
-
-        if (pipeline)
-            gst_object_unref(pipeline);
-        if (source)
-            gst_object_unref(source);
-        if (capsfilter)
-            gst_object_unref(capsfilter);
-        if (videoconvert)
-            gst_object_unref(videoconvert);
-        if (jpegdec)
-            gst_object_unref(jpegdec);
-        if (x264enc)
-            gst_object_unref(x264enc);
-        if (rtph264pay)
-            gst_object_unref(rtph264pay);
-        if (udpsink)
-            gst_object_unref(udpsink);
+        // Unreference the elements that were created
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, udpsink);
 
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
@@ -457,24 +456,25 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
     source = gst_element_factory_make("pulsesrc", "source");
 #endif
 
-    if (!pipeline || !source || !capsfilter || !audioconvert || !opusenc || !rtpopuspay || !udpsink)
+    // Check for any nullptr among the created elements
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { pipeline, "pipeline" },          //
+        { source, "source" },              //
+        { capsfilter, "filter" },          //
+        { audioconvert, "audio-convert" }, //
+        { opusenc, "opus-encoder" },       //
+        { rtpopuspay, "rtpopuspay" },      //
+        { udpsink, "udpsink" }             //
+    };
+    const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
+
+    // If any element creation failed, log the error and unreference the elements
+    if (isElementFactoryMakeFailed)
     {
         ChipLogError(Camera, "Not all elements could be created.");
 
-        if (pipeline)
-            gst_object_unref(pipeline);
-        if (source)
-            gst_object_unref(source);
-        if (capsfilter)
-            gst_object_unref(capsfilter);
-        if (audioconvert)
-            gst_object_unref(audioconvert);
-        if (opusenc)
-            gst_object_unref(opusenc);
-        if (rtpopuspay)
-            gst_object_unref(rtpopuspay);
-        if (udpsink)
-            gst_object_unref(udpsink);
+        // Unreference the elements that were created
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, audioconvert, opusenc, rtpopuspay, udpsink);
 
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
