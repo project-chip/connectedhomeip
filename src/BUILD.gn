@@ -52,6 +52,7 @@ if (chip_build_tests) {
     tests = [
       "${chip_root}/src/access/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
+      "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -166,6 +167,10 @@ if (chip_build_tests) {
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
+    }
+
+    if (chip_device_config_enable_joint_fabric) {
+      tests += [ "${chip_root}/src/app/server/tests" ]
     }
   }
 

@@ -21,9 +21,10 @@
 #include <commands/interactive/InteractiveCommands.h>
 #include <thread>
 #include <unistd.h>
-#include <webrtc_manager/WebRTCManager.h>
+#include <webrtc-manager/WebRTCManager.h>
 
 using namespace ::chip;
+using StreamUsageEnum = chip::app::Clusters::Globals::StreamUsageEnum;
 
 namespace webrtc {
 
@@ -48,7 +49,7 @@ CHIP_ERROR ProvideOfferCommand::RunCommand()
     }
 
     // Convert the stream usage into its enum type:
-    auto streamUsage = static_cast<app::Clusters::WebRTCTransportProvider::StreamUsageEnum>(mStreamUsage);
+    auto streamUsage = static_cast<StreamUsageEnum>(mStreamUsage);
 
     return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage);
 }
@@ -58,7 +59,7 @@ CHIP_ERROR SolicitOfferCommand::RunCommand()
     ChipLogProgress(Camera, "Run SolicitOfferCommand");
 
     // Convert the stream usage into its enum type:
-    auto streamUsage = static_cast<app::Clusters::WebRTCTransportProvider::StreamUsageEnum>(mStreamUsage);
+    auto streamUsage = static_cast<StreamUsageEnum>(mStreamUsage);
 
     return WebRTCManager::Instance().SolicitOffer(streamUsage);
 }
