@@ -222,10 +222,10 @@ public:
     // Get/Set image control attributes
     CameraError SetImageRotation(uint16_t imageRotation) override;
     uint16_t GetImageRotation() override {return mImageRotation; }
-    
+
     CameraError SetImageFlipHorizontal(bool imageFlipHorizontal) override;
     bool GetImageFlipHorizontal() override {return mImageFlipHorizontal; }
-    
+
     CameraError SetImageFlipVertical(bool imageFlipVertical) override;
     bool GetImageFlipVertical() override {return mImageFlipVertical; }
 

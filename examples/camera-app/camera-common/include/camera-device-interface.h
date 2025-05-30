@@ -309,7 +309,7 @@ public:
 
         virtual CameraError SetImageFlipVertical(bool imageFlipVertical) = 0;
         virtual bool GetImageFlipVertical() = 0;
-        
+
         // Does camera have local storage
         virtual bool HasLocalStorage() = 0;
 

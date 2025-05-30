@@ -833,21 +833,21 @@ CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
 }
 
 // Set image rotation attributes
-CameraError CameraDevice::SetImageRotation(uint16_t imageRotation) 
+CameraError CameraDevice::SetImageRotation(uint16_t imageRotation)
 {
     mImageRotation = imageRotation;
 
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::SetImageFlipHorizontal(bool imageFlipHorizontal) 
+CameraError CameraDevice::SetImageFlipHorizontal(bool imageFlipHorizontal)
 {
     mImageFlipHorizontal = imageFlipHorizontal;
 
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::SetImageFlipVertical(bool imageFlipVertical) 
+CameraError CameraDevice::SetImageFlipVertical(bool imageFlipVertical)
 {
     mImageFlipVertical = imageFlipVertical;
 
