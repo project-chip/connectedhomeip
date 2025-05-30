@@ -153,9 +153,6 @@ NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, Eth
 
 CHIP_ERROR NetworkCommissioningLogic::Init()
 {
-    // FIXME: proper init and registration
-    // ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    // VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init(this));
     mLastNetworkingStatusValue.SetNull();
