@@ -58,6 +58,12 @@ class TC_CNET_4_10(MatterBaseTest):
     def desc_TC_CNET_4_10(self):
         return '[TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command [DUT-Server]'
 
+    def pics_TC_CNET_4_10(self):
+        return [
+            'CNET.S',
+            'CNET.S.F01'
+        ]
+
     def steps_TC_CNET_4_10(self):
         return [
             TestStep(1, test_plan_support.commission_if_required(),
