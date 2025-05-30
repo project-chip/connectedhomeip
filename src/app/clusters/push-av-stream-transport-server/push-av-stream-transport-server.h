@@ -303,6 +303,7 @@ struct TransportConfigurationStorage : public TransportConfigurationStruct
     {
         connectionID    = aTransportConfigurationStorage.connectionID;
         transportStatus = aTransportConfigurationStorage.transportStatus;
+        fabricIndex     = aTransportConfigurationStorage.fabricIndex;
 
         mTransportOptionsPtr = aTransportConfigurationStorage.mTransportOptionsPtr;
 
@@ -350,12 +351,6 @@ struct TransportConfigurationStorage : public TransportConfigurationStruct
 
 private:
     std::shared_ptr<TransportOptionsStorage> mTransportOptionsPtr;
-};
-
-struct TransportConfigurationStorageWithFabricIndex
-{
-    TransportConfigurationStorage transportConfiguration;
-    FabricIndex fabricIndex;
 };
 
 /** @brief
@@ -423,7 +418,16 @@ public:
      *   @param connectionIDList [in]       represent the list of connectionIDs for which new transport status to apply.
      *   @param transportStatus  [in]       represents the updated status of the connection(s).
      *
-     *   @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with Failure.
+     *  If the transportStatus field is set to Inactive(1).Disable transmissions on the transport.Remove any queued items for
+     *  upload.Cancel any uploads currently in progress.
+     *  Emit GeneratePushTransportEndEvent on stop.
+     *
+     *  Else If the TransportStatus field is set to Active(0).Enable transmissions on the transport.
+     *  If the transports trigger type is Continuous,begin Transmission immediately.
+     *  Else If the transports trigger type is Command or Motion, and the underlying trigger is currently active and still within
+     *  the Time Control Bounds,begin Transmission immediately.
+     *  Emit GeneratePushTransportBeginEvent on start.
+     *  @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with Failure.
      */
     virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
                                                                    TransportStatusEnum transportStatus) = 0;
@@ -441,7 +445,7 @@ public:
      *   Emitting of PushTransportBegin event is handled by the server when delegate returns success.
      *
      *   The delegate should emit PushTransportEnd Event using GeneratePushTransportEndEvent() API when timeControl values when
-transmission ends.
+         transmission ends.
      *   @return Success if the stream transport trigger is successful; otherwise, the command SHALL be rejected with Failure.
      */
     virtual Protocols::InteractionModel::Status
@@ -547,7 +551,7 @@ transmission ends.
      * The required buffers are managed by TransportConfigurationStorage, the delegate function is expected to populate the vector
      * correctly.
      */
-    virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorageWithFabricIndex> & currentConnections) = 0;
+    virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
@@ -623,7 +627,7 @@ private:
     /*Moved from TransportConfigurationStruct to TransportConfigurationStructWithFabricIndex
      * to perform fabric index checks
      */
-    std::vector<TransportConfigurationStorageWithFabricIndex> mCurrentConnections;
+    std::vector<TransportConfigurationStorage> mCurrentConnections;
 
     /**
      * IM-level implementation of read
@@ -643,13 +647,12 @@ private:
     // Helper functions
     uint16_t GenerateConnectionID();
 
-    TransportConfigurationStorageWithFabricIndex * FindStreamTransportConnection(const uint16_t connectionID);
+    TransportConfigurationStorage * FindStreamTransportConnection(const uint16_t connectionID);
 
-    TransportConfigurationStorageWithFabricIndex * FindStreamTransportConnectionWithinFabric(const uint16_t connectionID,
-                                                                                             FabricIndex fabricIndex);
+    TransportConfigurationStorage * FindStreamTransportConnectionWithinFabric(const uint16_t connectionID, FabricIndex fabricIndex);
 
     // Add/Remove Management functions for transport
-    UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStorageWithFabricIndex & transportConfiguration);
+    UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStorage & transportConfiguration);
 
     void RemoveStreamTransportConnection(const uint16_t connectionID);
 
