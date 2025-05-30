@@ -149,7 +149,6 @@ private:
     struct IsStruct : std::integral_constant<bool, !IsNumeric<U>::value && !IsEnum<U>::value && !std::is_pointer<U>::value>
     {
     };
-
 public:
     using ValueType   = T;
     using WrappedType = ExtractWrappedType_t<ValueType>;
@@ -222,6 +221,22 @@ public:
     bool IsValid() { return is_valid; }
 
     /**
+     * @brief Validate a new value
+     * @param newValue The value to validate
+     * @return CHIP_NO_ERROR if valid, an err code otherwise
+     */
+    CHIP_ERROR ValidateValue(const ValueType & aValue)
+    {
+        CHIP_ERROR err = Validate(aValue);
+        if ( err == CHIP_NO_ERROR)
+        {
+            is_valid = true;
+        }
+
+        return err;
+    }
+
+    /**
      * @brief Performs a pre-validation of arguments value before assigning it as newValue
      * @param aValue New value for future update mValue
      */
@@ -233,7 +248,7 @@ public:
 
         mAuxData = aUpdCtx;
 
-        err = Validate(aValue);
+        err = ValidateValue(aValue);
 
         if (CHIP_NO_ERROR == err)
         {
@@ -319,7 +334,7 @@ protected:
     /**
      * @brief Validate a new value
      * @param newValue The value to validate
-     * @return true if valid, false otherwise
+     * @return CHIP_NO_ERROR if valid, an err code otherwise
      *
      * @note Derived classes should override for custom validation
      */

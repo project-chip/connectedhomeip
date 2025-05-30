@@ -68,7 +68,7 @@ void CommodityTariffDataProvider::TariffDataUpd_Commit()
 #define X(attrName, attrType)                                                                                                      \
     if (attrName##_MgmtObj.HasChanged())                                                                                           \
     {                                                                                                                              \
-        ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) updated", Attributes::attrName::Id); \
+        ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute " #attrName " (Id %d) updated", Attributes::attrName::Id); \
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, Attributes::attrName::Id);                        \
     }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
