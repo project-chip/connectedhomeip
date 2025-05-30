@@ -398,107 +398,95 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (g_variant_n_children(changedProperties) > 0)
+    const char * state = nullptr;
+    // We are only interested in the "State" property changes.
+    VerifyOrReturn(g_variant_lookup(changedProperties, "State", "&s", &state));
+
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (g_strcmp0(state, "associating") == 0)
     {
-        GAutoPtr<GVariantIter> iter;
-        const char * key;
-        GVariant * value;
+        mAssociationStarted = true;
+    }
+    else if (g_strcmp0(state, "disconnected") == 0)
+    {
+        int reason = wpa_supplicant_1_interface_get_disconnect_reason(mWpaSupplicant.iface.get());
 
-        WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
-
-        g_variant_get(changedProperties, "a{sv}", &iter.GetReceiver());
-
-        while (g_variant_iter_loop(iter.get(), "{&sv}", &key, &value))
+        if (delegate)
         {
-            if (g_strcmp0(key, "State") == 0)
+            chip::DeviceLayer::StackLock stackLock;
+            delegate->OnDisconnectionDetected(reason);
+            delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kConnected));
+        }
+
+        if (mAssociationStarted)
+        {
+            uint8_t associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kUnknown);
+            uint16_t status                 = WLAN_STATUS_UNSPECIFIED_FAILURE;
+
+            switch (abs(reason))
             {
-                const char * state = g_variant_get_string(value, nullptr);
-                if (g_strcmp0(state, "associating") == 0)
+            case WLAN_REASON_DISASSOC_DUE_TO_INACTIVITY:
+            case WLAN_REASON_DISASSOC_AP_BUSY:
+            case WLAN_REASON_DISASSOC_STA_HAS_LEFT:
+            case WLAN_REASON_DISASSOC_LOW_ACK:
+            case WLAN_REASON_BSS_TRANSITION_DISASSOC:
+                associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAssociationFailed);
+                status                  = wpa_supplicant_1_interface_get_assoc_status_code(mWpaSupplicant.iface.get());
+                break;
+            case WLAN_REASON_PREV_AUTH_NOT_VALID:
+            case WLAN_REASON_DEAUTH_LEAVING:
+            case WLAN_REASON_IEEE_802_1X_AUTH_FAILED:
+                associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAuthenticationFailed);
+                status                  = wpa_supplicant_1_interface_get_auth_status_code(mWpaSupplicant.iface.get());
+                break;
+            default:
+                break;
+            }
+
+            DeviceLayer::SystemLayer().ScheduleLambda([this, reason]() {
+                if (mpConnectCallback != nullptr)
                 {
-                    mAssociationStarted = true;
+                    mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason);
+                    mpConnectCallback = nullptr;
                 }
-                else if (g_strcmp0(state, "disconnected") == 0)
-                {
-                    int reason = wpa_supplicant_1_interface_get_disconnect_reason(mWpaSupplicant.iface.get());
+            });
 
-                    if (delegate)
-                    {
-                        chip::DeviceLayer::StackLock stackLock;
-                        delegate->OnDisconnectionDetected(reason);
-                        delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kConnected));
-                    }
-
-                    if (mAssociationStarted)
-                    {
-                        uint8_t associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kUnknown);
-                        uint16_t status                 = WLAN_STATUS_UNSPECIFIED_FAILURE;
-
-                        switch (abs(reason))
-                        {
-                        case WLAN_REASON_DISASSOC_DUE_TO_INACTIVITY:
-                        case WLAN_REASON_DISASSOC_AP_BUSY:
-                        case WLAN_REASON_DISASSOC_STA_HAS_LEFT:
-                        case WLAN_REASON_DISASSOC_LOW_ACK:
-                        case WLAN_REASON_BSS_TRANSITION_DISASSOC:
-                            associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAssociationFailed);
-                            status                  = wpa_supplicant_1_interface_get_assoc_status_code(mWpaSupplicant.iface.get());
-                            break;
-                        case WLAN_REASON_PREV_AUTH_NOT_VALID:
-                        case WLAN_REASON_DEAUTH_LEAVING:
-                        case WLAN_REASON_IEEE_802_1X_AUTH_FAILED:
-                            associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAuthenticationFailed);
-                            status                  = wpa_supplicant_1_interface_get_auth_status_code(mWpaSupplicant.iface.get());
-                            break;
-                        default:
-                            break;
-                        }
-
-                        DeviceLayer::SystemLayer().ScheduleLambda([this, reason]() {
-                            if (mpConnectCallback != nullptr)
-                            {
-                                mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason);
-                                mpConnectCallback = nullptr;
-                            }
-                        });
-
-                        if (delegate)
-                        {
-                            chip::DeviceLayer::StackLock stackLock;
-                            delegate->OnAssociationFailureDetected(associationFailureCause, status);
-                        }
-                    }
-
-                    DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
-
-                    mAssociationStarted = false;
-                }
-                else if (g_strcmp0(state, "associated") == 0)
-                {
-                    if (delegate)
-                    {
-                        chip::DeviceLayer::StackLock stackLock;
-                        delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kNotConnected));
-                    }
-
-                    DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
-                }
-                else if (g_strcmp0(state, "completed") == 0)
-                {
-                    if (mAssociationStarted)
-                    {
-                        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-                            if (mpConnectCallback != nullptr)
-                            {
-                                mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
-                                mpConnectCallback = nullptr;
-                            }
-                            ConnectivityMgrImpl().PostNetworkConnect();
-                        });
-                    }
-                    mAssociationStarted = false;
-                }
+            if (delegate)
+            {
+                chip::DeviceLayer::StackLock stackLock;
+                delegate->OnAssociationFailureDetected(associationFailureCause, status);
             }
         }
+
+        DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
+
+        mAssociationStarted = false;
+    }
+    else if (g_strcmp0(state, "associated") == 0)
+    {
+        if (delegate)
+        {
+            chip::DeviceLayer::StackLock stackLock;
+            delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kNotConnected));
+        }
+
+        DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
+    }
+    else if (g_strcmp0(state, "completed") == 0)
+    {
+        if (mAssociationStarted)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                if (mpConnectCallback != nullptr)
+                {
+                    mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+                    mpConnectCallback = nullptr;
+                }
+                ConnectivityMgrImpl().PostNetworkConnect();
+            });
+        }
+        mAssociationStarted = false;
     }
 }
 
