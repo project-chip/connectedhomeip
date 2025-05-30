@@ -26,6 +26,8 @@
 #include <lib/core/TLVTypes.h>
 #include <platform/NetworkCommissioning.h>
 
+#include <vector>
+
 namespace {
 
 using namespace chip;
@@ -171,9 +173,12 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
 
         // assert expectations:
         //   - values exist
-        //   - values sorted by LQI in decreasing order (based on our implementation).
+        //   - values sorted by RSSI in decreasing order (this is our implementation)
         //
-        //   Actual spec requirement:
+        // NOTE: this does NOT match spec which says to use LQI
+        //       Open issue: https://github.com/project-chip/connectedhomeip/issues/39309
+        //
+        // Actual spec requirement:
         //
         //   The order in which results are reported is implementation-specific.
         //   Results SHOULD be reported in decreasing LQI order, to maximize the
@@ -181,14 +186,17 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
         //   the size limits of the response.
         ASSERT_EQ(items.size(), 3u);
 
-        ASSERT_EQ(items[0].lqi, 20);
-        ASSERT_EQ(items[0].panId, 321);
+        ASSERT_EQ(items[0].rssi, -5);
+        ASSERT_EQ(items[0].lqi, 5);
+        ASSERT_EQ(items[0].panId, 123);
 
-        ASSERT_EQ(items[1].lqi, 10);
-        ASSERT_EQ(items[1].panId, 100);
+        ASSERT_EQ(items[1].rssi, -10);
+        ASSERT_EQ(items[1].lqi, 20);
+        ASSERT_EQ(items[1].panId, 321);
 
-        ASSERT_EQ(items[2].lqi, 5);
-        ASSERT_EQ(items[2].panId, 123);
+        ASSERT_EQ(items[2].rssi, -33);
+        ASSERT_EQ(items[2].lqi, 10);
+        ASSERT_EQ(items[2].panId, 100);
     }
 }
 
