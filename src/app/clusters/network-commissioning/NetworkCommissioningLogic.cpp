@@ -690,6 +690,7 @@ NetworkCommissioningLogic::HandleReorderNetwork(CommandHandler & handler, const 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleQueryIdentity(CommandHandler & handler,
+                                                                                 const ConcreteCommandPath &commandPath,
                                                                                  const Commands::QueryIdentity::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleQueryIdentity", "NetworkCommissioning");

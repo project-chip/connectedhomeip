@@ -150,7 +150,7 @@ std::optional<DataModel::ActionReturnStatus> NetworkCommissioningCluster::Invoke
     case QueryIdentity::Id: {
         QueryIdentity::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return mLogic.HandleQueryIdentity(*handler, request_data);
+        return mLogic.HandleQueryIdentity(*handler, request.path, request_data);
     }
 #endif
     default:
