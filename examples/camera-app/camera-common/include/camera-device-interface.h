@@ -302,13 +302,13 @@ public:
 
         // Get/Set image control attributes
         virtual CameraError SetImageRotation(uint16_t imageRotation) = 0;
-        virtual uint16_t GetImageRotation() = 0;
+        virtual uint16_t GetImageRotation()                          = 0;
 
         virtual CameraError SetImageFlipHorizontal(bool imageFlipHorizontal) = 0;
-        virtual bool GetImageFlipHorizontal() = 0;
+        virtual bool GetImageFlipHorizontal()                                = 0;
 
         virtual CameraError SetImageFlipVertical(bool imageFlipVertical) = 0;
-        virtual bool GetImageFlipVertical() = 0;
+        virtual bool GetImageFlipVertical()                              = 0;
 
         // Does camera have local storage
         virtual bool HasLocalStorage() = 0;
