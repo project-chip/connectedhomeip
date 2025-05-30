@@ -176,6 +176,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
         //   - values sorted by RSSI in decreasing order (this is our implementation)
         //
         // NOTE: this does NOT match spec which says to use LQI
+        //       Open issue: https://github.com/project-chip/connectedhomeip/issues/39309
         //
         // Actual spec requirement:
         //
