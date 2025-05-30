@@ -27,8 +27,6 @@
 
 namespace chip {
 namespace app {
-namespace Clusters {
-namespace CommodityTariff {
 
 /**
  * @class CTC_BaseDataClass
@@ -429,7 +427,5 @@ protected:
     virtual void CleanupStructValue(PayloadType & aValue) { (void) aValue; }
 };
 
-} // namespace CommodityTariff
-} // namespace Clusters
 } // namespace app
 } // namespace chip
