@@ -25,6 +25,10 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/constants.h"
+    "${CLUSTER_DIR}/NetworkCommissioningCluster.cpp"
+    "${CLUSTER_DIR}/NetworkCommissioningCluster.h"
+    "${CLUSTER_DIR}/NetworkCommissioningLogic.cpp"
+    "${CLUSTER_DIR}/NetworkCommissioningLogic.h"
     "${CLUSTER_DIR}/ThreadScanResponse.cpp"
     "${CLUSTER_DIR}/ThreadScanResponse.h"
     "${CLUSTER_DIR}/WifiScanResponse.cpp"
