@@ -394,10 +394,8 @@ void ConnectivityManagerImpl::UpdateNetworkStatus()
         MakeOptional(GetDisconnectReason()));
 }
 
-void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * proxy, GVariant * changedProperties)
+void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * changedProperties)
 {
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
     const char * state = nullptr;
     // We are only interested in the "State" property changes.
     VerifyOrReturn(g_variant_lookup(changedProperties, "State", "&s", &state));
@@ -410,7 +408,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
     }
     else if (g_strcmp0(state, "disconnected") == 0)
     {
-        int reason = wpa_supplicant_1_interface_get_disconnect_reason(mWpaSupplicant.iface.get());
+        int reason = wpa_supplicant_1_interface_get_disconnect_reason(iface);
 
         if (delegate)
         {
@@ -432,13 +430,13 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
             case WLAN_REASON_DISASSOC_LOW_ACK:
             case WLAN_REASON_BSS_TRANSITION_DISASSOC:
                 associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAssociationFailed);
-                status                  = wpa_supplicant_1_interface_get_assoc_status_code(mWpaSupplicant.iface.get());
+                status                  = wpa_supplicant_1_interface_get_assoc_status_code(iface);
                 break;
             case WLAN_REASON_PREV_AUTH_NOT_VALID:
             case WLAN_REASON_DEAUTH_LEAVING:
             case WLAN_REASON_IEEE_802_1X_AUTH_FAILED:
                 associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAuthenticationFailed);
-                status                  = wpa_supplicant_1_interface_get_auth_status_code(mWpaSupplicant.iface.get());
+                status                  = wpa_supplicant_1_interface_get_auth_status_code(iface);
                 break;
             default:
                 break;
@@ -507,13 +505,13 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
 
         g_signal_connect(
             mWpaSupplicant.iface.get(), "g-properties-changed",
-            G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * properties, const char * const * invalidatedProps,
-                           ConnectivityManagerImpl * self) { return self->_OnWpaPropertiesChanged(proxy, properties); }),
+            G_CALLBACK(+[](WpaSupplicant1Interface * iface, GVariant * properties, const char * const * invalidatedProps,
+                           ConnectivityManagerImpl * self) { return self->_OnWpaPropertiesChanged(iface, properties); }),
             this);
 
         g_signal_connect(mWpaSupplicant.iface.get(), "scan-done",
-                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, gboolean success, ConnectivityManagerImpl * self) {
-                             return self->_OnWpaInterfaceScanDone(proxy, success);
+                         G_CALLBACK(+[](WpaSupplicant1Interface * iface, gboolean success, ConnectivityManagerImpl * self) {
+                             return self->_OnWpaInterfaceScanDone(iface, success);
                          }),
                          this);
     }
@@ -2334,12 +2332,11 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     return true;
 }
 
-void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * proxy, gboolean success)
+void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success)
 {
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
     ChipLogProgress(DeviceLayer, "wpa_supplicant: network scan done");
-    char ** bsss    = wpa_supplicant_1_interface_dup_bsss(mWpaSupplicant.iface.get());
+
+    char ** bsss    = wpa_supplicant_1_interface_dup_bsss(iface);
     char ** oldBsss = bsss;
     if (bsss == nullptr)
     {
