@@ -76,6 +76,7 @@ static_library("openiotsdk") {
 
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
   ]
 

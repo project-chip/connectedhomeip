@@ -75,6 +75,7 @@ static_library("mw320") {
 
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
   ]
 
@@ -86,7 +87,6 @@ static_library("mw320") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
-    deps += [ "${chip_root}/src/app:app_config" ]
 
     if (chip_mdns == "platform") {
       sources += [ "../../OpenThread/MdnsImpl.cpp" ]

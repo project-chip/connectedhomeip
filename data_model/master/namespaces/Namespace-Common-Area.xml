@@ -61,8 +61,8 @@ Davis, CA 95616, USA
   <tags>
     <tag id="0x0000" name="Aisle"/>
     <tag id="0x0001" name="Attic"/>
-    <tag id="0x0002" name="Back Door"/>
-    <tag id="0x0003" name="Back Yard"/>
+    <tag id="0x0002" name="BackDoor"/>
+    <tag id="0x0003" name="BackYard"/>
     <tag id="0x0004" name="Balcony"/>
     <tag id="0x0005" name="Ballroom"/>
     <tag id="0x0006" name="Bathroom">
@@ -73,7 +73,7 @@ Davis, CA 95616, USA
     <tag id="0x0009" name="Boxroom">
       <description>A small room typically used for storage</description>
     </tag>
-    <tag id="0x000A" name="Breakfast Room"/>
+    <tag id="0x000A" name="BreakfastRoom"/>
     <tag id="0x000B" name="Carport"/>
     <tag id="0x000C" name="Cellar"/>
     <tag id="0x000D" name="Cloakroom"/>
@@ -82,15 +82,15 @@ Davis, CA 95616, USA
     </tag>
     <tag id="0x000F" name="Conservatory"/>
     <tag id="0x0010" name="Corridor"/>
-    <tag id="0x0011" name="Craft Room"/>
+    <tag id="0x0011" name="CraftRoom"/>
     <tag id="0x0012" name="Cupboard"/>
     <tag id="0x0013" name="Deck"/>
     <tag id="0x0014" name="Den">
       <description>A small, comfortable room for individual activities such as work or hobbies</description>
     </tag>
     <tag id="0x0015" name="Dining"/>
-    <tag id="0x0016" name="Drawing Room"/>
-    <tag id="0x0017" name="Dressing Room"/>
+    <tag id="0x0016" name="DrawingRoom"/>
+    <tag id="0x0017" name="DressingRoom"/>
     <tag id="0x0018" name="Driveway"/>
     <tag id="0x0019" name="Elevator"/>
     <tag id="0x001A" name="Ensuite">
@@ -98,83 +98,83 @@ Davis, CA 95616, USA
     </tag>
     <tag id="0x001B" name="Entrance"/>
     <tag id="0x001C" name="Entryway"/>
-    <tag id="0x001D" name="Family Room"/>
+    <tag id="0x001D" name="FamilyRoom"/>
     <tag id="0x001E" name="Foyer"/>
-    <tag id="0x001F" name="Front Door"/>
-    <tag id="0x0020" name="Front Yard"/>
-    <tag id="0x0021" name="Game Room"/>
+    <tag id="0x001F" name="FrontDoor"/>
+    <tag id="0x0020" name="FrontYard"/>
+    <tag id="0x0021" name="GameRoom"/>
     <tag id="0x0022" name="Garage"/>
-    <tag id="0x0023" name="Garage Door"/>
+    <tag id="0x0023" name="GarageDoor"/>
     <tag id="0x0024" name="Garden"/>
-    <tag id="0x0025" name="Garden Door"/>
-    <tag id="0x0026" name="Guest Bathroom">
+    <tag id="0x0025" name="GardenDoor"/>
+    <tag id="0x0026" name="GuestBathroom">
       <description>Also known as Guest Restroom</description>
     </tag>
-    <tag id="0x0027" name="Guest Bedroom"/>
-    <tag id="0x0029" name="Guest Room">
+    <tag id="0x0027" name="GuestBedroom"/>
+    <tag id="0x0029" name="GuestRoom">
       <description>Also known as Guest Bedroom</description>
     </tag>
     <tag id="0x002A" name="Gym"/>
     <tag id="0x002B" name="Hallway"/>
-    <tag id="0x002C" name="Hearth Room">
+    <tag id="0x002C" name="HearthRoom">
       <description>A cozy room containing a fireplace or other point heat source</description>
     </tag>
-    <tag id="0x002D" name="Kids Room"/>
-    <tag id="0x002E" name="Kids Bedroom"/>
+    <tag id="0x002D" name="KidsRoom"/>
+    <tag id="0x002E" name="KidsBedroom"/>
     <tag id="0x002F" name="Kitchen"/>
-    <tag id="0x0031" name="Laundry Room"/>
+    <tag id="0x0031" name="LaundryRoom"/>
     <tag id="0x0032" name="Lawn"/>
     <tag id="0x0033" name="Library"/>
-    <tag id="0x0034" name="Living Room"/>
+    <tag id="0x0034" name="LivingRoom"/>
     <tag id="0x0035" name="Lounge"/>
-    <tag id="0x0036" name="Media/TV Room"/>
+    <tag id="0x0036" name="MediaTvRoom"/>
     <tag id="0x0037" name="Mud Room">
       <description>A space used to remove soiled garments prior to entering the domicile proper</description>
     </tag>
     <tag id="0x0038" name="Music Room"/>
     <tag id="0x0039" name="Nursery"/>
     <tag id="0x003A" name="Office"/>
-    <tag id="0x003B" name="Outdoor Kitchen"/>
+    <tag id="0x003B" name="OutdoorKitchen"/>
     <tag id="0x003C" name="Outside"/>
     <tag id="0x003D" name="Pantry">
       <description>AKA a larder, a place where food is stored</description>
     </tag>
-    <tag id="0x003E" name="Parking Lot"/>
+    <tag id="0x003E" name="ParkingLot"/>
     <tag id="0x003F" name="Parlor"/>
     <tag id="0x0040" name="Patio"/>
-    <tag id="0x0041" name="Play Room"/>
-    <tag id="0x0042" name="Pool Room">
+    <tag id="0x0041" name="PlayRoom"/>
+    <tag id="0x0042" name="PoolRoom">
       <description>A room centered around a pool/billiards table</description>
     </tag>
     <tag id="0x0043" name="Porch"/>
-    <tag id="0x0044" name="Primary Bathroom"/>
-    <tag id="0x0045" name="Primary Bedroom"/>
+    <tag id="0x0044" name="PrimaryBathroom"/>
+    <tag id="0x0045" name="PrimaryBedroom"/>
     <tag id="0x0046" name="Ramp"/>
-    <tag id="0x0047" name="Reception Room"/>
-    <tag id="0x0048" name="Recreation Room"/>
+    <tag id="0x0047" name="ReceptionRoom"/>
+    <tag id="0x0048" name="RecreationRoom"/>
     <tag id="0x004A" name="Roof"/>
     <tag id="0x004B" name="Sauna"/>
     <tag id="0x004C" name="Scullery">
       <description>A utility space for cleaning dishes and laundry</description>
     </tag>
-    <tag id="0x004D" name="Sewing Room"/>
+    <tag id="0x004D" name="SewingRoom"/>
     <tag id="0x004E" name="Shed"/>
-    <tag id="0x004F" name="Side Door"/>
-    <tag id="0x0050" name="Side Yard"/>
-    <tag id="0x0051" name="Sitting Room"/>
+    <tag id="0x004F" name="SideDoor"/>
+    <tag id="0x0050" name="SideYard"/>
+    <tag id="0x0051" name="SittingRoom"/>
     <tag id="0x0052" name="Snug">
       <description>An informal space meant to be &apos;cozy&apos;, &apos;snug&apos;, relaxed, meant to share with family or friends</description>
     </tag>
     <tag id="0x0053" name="Spa"/>
     <tag id="0x0054" name="Staircase"/>
-    <tag id="0x0055" name="Steam Room"/>
-    <tag id="0x0056" name="Storage Room"/>
+    <tag id="0x0055" name="SteamRoom"/>
+    <tag id="0x0056" name="StorageRoom"/>
     <tag id="0x0057" name="Studio"/>
     <tag id="0x0058" name="Study"/>
-    <tag id="0x0059" name="Sun Room"/>
-    <tag id="0x005A" name="Swimming Pool"/>
+    <tag id="0x0059" name="SunRoom"/>
+    <tag id="0x005A" name="SwimmingPool"/>
     <tag id="0x005B" name="Terrace"/>
-    <tag id="0x005C" name="Utility Room"/>
+    <tag id="0x005C" name="UtilityRoom"/>
     <tag id="0x005D" name="Ward">
       <description>The innermost area of a large home</description>
     </tag>

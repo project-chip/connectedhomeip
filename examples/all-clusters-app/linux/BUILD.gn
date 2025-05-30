@@ -30,10 +30,12 @@ if (chip_enable_pw_rpc) {
 
 source_set("chip-all-clusters-common") {
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/MeterIdentificationEventTriggers.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/camera-av-settings-user-level-management-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/camera-av-stream-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/chime-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
@@ -48,6 +50,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/meter-identification-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/occupancy-sensing-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
@@ -59,6 +62,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/software-diagnostics-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/soil-measurement-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
@@ -97,6 +101,8 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]

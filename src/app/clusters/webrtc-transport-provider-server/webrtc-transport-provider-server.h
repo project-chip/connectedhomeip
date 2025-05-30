@@ -28,8 +28,11 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-using ICEServerDecodableStruct = Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = Structs::WebRTCSessionStruct::Type;
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
 /**
  * @brief
@@ -50,9 +53,9 @@ public:
         Optional<DataModel::Nullable<uint16_t>> audioStreamId;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
-        Optional<BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
         NodeId peerNodeId;
         FabricIndex fabricIndex;
+        EndpointId originatingEndpointId;
     };
 
     struct ProvideOfferRequestArgs : OfferRequestArgs
@@ -124,23 +127,12 @@ public:
      *   method returns `CHIP_NO_ERROR`. If an error is returned, `outSession` is left unmodified or
      *   set to an invalid state.
      *
-     * @param[in]  peerId
-     *   Identifies the peer (requestor) connection over which this command was received. The delegate can
-     *   use this `PeerId` to retrieve or track any existing secure session state as needed.
-     *
-     * @param[in] originatingEndpointId
-     *   The server implementing this handler (acting as the WebRTC Provider) MUST use this
-     *   endpoint ID as the target when sending commands back to the Requestor device.
-     *   This ensures that commands sent back by this Provider server correctly reach the
-     *   corresponding application logic on the Requestor device.
-     *
      * @return
      *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated.
      *   - CHIP_ERROR_NO_MEMORY if the device cannot allocate a new session.
      *   - Appropriate error otherwise.
      */
-    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession,
-                                          const ScopedNodeId & peerId, EndpointId originatingEndpointId) = 0;
+    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) = 0;
 
     /**
      * @brief
@@ -168,13 +160,15 @@ public:
      *   (i.e., Trickle ICE).
      *
      * @param[in] sessionId  The current session ID.
-     * @param[in] candidates A list of ICE candidate strings.
+     * @param[in] candidates A list of ICE candidate structs.
+     * Note: The callee cannot reference the `candidates` vector after this call
+     * returns, and must copy the contents over for later use, if required.
      *
      * @return CHIP_ERROR
      *   - CHIP_NO_ERROR on success
      *   - An error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) = 0;
+    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) = 0;
 
     /**
      * @brief

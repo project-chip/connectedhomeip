@@ -62,45 +62,34 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0430" name="Soil Measurement"/>
+    <clusterId id="0x0430" name="Soil Measurement">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="SOIL" scope="Endpoint"/>
   <attributes>
-    <attribute id="0x0000" name="SoilMoistureMeasuredValue" type="percent">
+    <attribute id="0x0000" name="SoilMeasurementLimits" type="list">
+      <entry type="MeasurementAccuracyStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <minCount value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="SoilMoistureMeasuredValue" type="percent">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
       <constraint>
         <between>
-          <attribute name="MinMeasuredValue"/>
-          <attribute name="MaxMeasuredValue"/>
+          <from>
+            <attribute name="SoilMeasurementLimits" value="MinMeasuredValue"/>
+          </from>
+          <to>
+            <attribute name="SoilMeasurementLimits" value="MaxMeasuredValue"/>
+          </to>
         </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0001" name="MinMeasuredValue" type="percent">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
-      <mandatoryConform/>
-      <constraint>
-        <max value="99"/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0002" name="MaxMeasuredValue" type="percent">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
-      <mandatoryConform/>
-      <constraint>
-        <between>
-          <from value="MinMeasuredValue + 1"/>
-          <to value="100"/>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0003" name="Tolerance" type="percent" default="10">
-      <access read="true" readPrivilege="view"/>
-      <optionalConform/>
-      <constraint>
-        <max value="10"/>
       </constraint>
     </attribute>
   </attributes>

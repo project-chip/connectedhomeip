@@ -53,8 +53,19 @@ public:
     static void ServiceEvents(Layer & aLayer) {}
 };
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+template <class LayerImpl>
+class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerDispatch, LayerImpl>::value>::type>
+{
+public:
+    static bool HasServiceEvents() { return true; }
+    static void ServiceEvents(Layer & aLayer)
+    {
+        LayerDispatch & layer = static_cast<LayerDispatch &>(aLayer);
+        layer.HandleDispatchQueueEvents(chip::System::Clock::kZero);
+    }
+};
+#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS
 template <class LayerImpl>
 class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerSocketsLoop, LayerImpl>::value>::type>
 {
@@ -68,8 +79,7 @@ public:
         layer.HandleEvents();
     }
 };
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 

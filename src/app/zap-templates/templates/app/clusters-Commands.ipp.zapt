@@ -1,0 +1,85 @@
+{{> header}}
+// This file is generated from clusters-Commands.ipp.zapt
+
+#include <clusters/{{asUpperCamelCase name}}/Commands.h>
+
+#include <app/data-model/StructDecodeIterator.h>
+#include <app/data-model/WrappedStructEncoder.h>
+#include <app/data-model/Decode.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace {{asUpperCamelCase name}} {
+namespace Commands {
+{{#zcl_commands}}
+namespace {{asUpperCamelCase name}} {
+
+{{#if (isClient source)}}
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
+{{else}}
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const {
+{{/if}}
+    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
+    {{#zcl_command_arguments~}}
+
+    {{~#if_is_fabric_scoped_struct type cluster=../../name~}}
+    {{#if (isClient parent.source)}}
+    encoder.EncodeRequestCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    {{else}}
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), aWriter.mAccessingFabricIndex, {{asLowerCamelCase label}});
+    {{/if}}
+    {{else}}
+    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    {{/if_is_fabric_scoped_struct}}
+
+    {{~/zcl_command_arguments}}
+    return encoder.Finalize();
+}
+
+{{#if (isClient source)}}
+{{#if isFabricScoped~}}
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader, FabricIndex aAccessingFabricIndex) {
+{{else}}
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+{{/if}}
+{{else}}
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+{{/if}}
+    detail::StructDecodeIterator __iterator(reader);
+    while (true) {
+        uint8_t __context_tag  = 0;
+        CHIP_ERROR err = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        {{#zcl_command_arguments~}}
+        {{#not_first}}
+        else
+        {{/not_first}}
+        {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
+        if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
+        {
+            err = DataModel::Decode(reader, {{asLowerCamelCase label}});
+
+            {{~#if_is_fabric_scoped_struct type cluster=../../name~}}
+            {{#if (isClient parent.source)}}
+            if (err == CHIP_NO_ERROR)
+            {
+                {{asLowerCamelCase label}}.SetFabricIndex(aAccessingFabricIndex);
+            }
+            {{/if}}
+            {{/if_is_fabric_scoped_struct~}}
+        }
+        {{/zcl_command_arguments}}
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace {{asUpperCamelCase name}}.
+{{/zcl_commands}}
+} // namespace Commands
+} // namespace {{asUpperCamelCase name}}
+} // namespace Clusters
+} // namespace app
+} // namespace chip
