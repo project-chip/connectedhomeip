@@ -29,6 +29,8 @@ namespace NetworkCommissioning {
 class WifiScanResponseToTLV : public chip::app::DataModel::EncodableToTLV
 {
 public:
+    /// Object will iterate over `networks` during `EncodeTo`
+    /// However it does NOT take ownership (expects caller to manage release)
     WifiScanResponseToTLV(NetworkCommissioningStatusEnum status, CharSpan debugText,
                           DeviceLayer::NetworkCommissioning::WiFiScanResponseIterator * networks) :
         mStatus(status),
@@ -40,6 +42,9 @@ public:
 private:
     NetworkCommissioningStatusEnum mStatus;
     CharSpan mDebugText;
+
+    // User of class will release mNetworks, this class only uses it for
+    // iterating
     DeviceLayer::NetworkCommissioning::WiFiScanResponseIterator * mNetworks;
 };
 

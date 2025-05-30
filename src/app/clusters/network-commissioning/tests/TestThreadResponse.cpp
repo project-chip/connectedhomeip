@@ -103,7 +103,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
             .lqi             = 2,
         },
     };
-    ThreadScanResponseToTLV encoder(NetworkCommissioningStatusEnum::kSuccess, ""_span, nullptr);
+    ThreadScanResponseToTLV encoder(NetworkCommissioningStatusEnum::kSuccess, ""_span, &fakeResponses);
 
     TLVWriter writer;
     uint8_t buffer[128];

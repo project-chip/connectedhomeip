@@ -103,7 +103,7 @@ TEST_F(TestWifiResponseEncoding, TestSuccessEncode)
                                            }
 
     };
-    WifiScanResponseToTLV encoder(NetworkCommissioningStatusEnum::kSuccess, ""_span, nullptr);
+    WifiScanResponseToTLV encoder(NetworkCommissioningStatusEnum::kSuccess, ""_span, &fakeResponses);
 
     TLVWriter writer;
     uint8_t buffer[128];
