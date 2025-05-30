@@ -85,7 +85,7 @@ CHIP_ERROR LoadResponses(DeviceLayer::NetworkCommissioning::ThreadScanResponseIt
         // TODO: this is a sort (insertion sort even, so O(n^2)) in a O(n) loop.
         ///      There should be some better alternatives to not have some O(n^3) processing complexity.
         Sorting::InsertionSort(scanResponseArray.Get(), scanResponseArrayLength,
-                               [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.lqi > b.lqi; });
+                               [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
     }
 
     validResponses = Span<ThreadScanResponse>(scanResponseArray.Get(), scanResponseArrayLength);
