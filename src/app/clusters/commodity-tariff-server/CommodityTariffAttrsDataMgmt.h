@@ -361,11 +361,13 @@ protected:
         bool is_neq = false;
         if (a.IsNull() || b.IsNull())
         {
+            /* if both are null then they are equal
+               if one is null and the other isn't, we don't need to look at the values */
             is_neq = a.IsNull() != b.IsNull();
         }
-
-        if (!is_neq)
+        else
         {
+            /* both are non null, so we can safely compare .Values() */
             if constexpr (IsList<WrappedType>::value)
             {
                 is_neq = ListsNotEqual(a.Value(), b.Value());
