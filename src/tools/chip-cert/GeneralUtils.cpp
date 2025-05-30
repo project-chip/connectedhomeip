@@ -94,7 +94,8 @@ bool InitOpenSSL()
         ReportOpenSSLErrorAndExit("OBJ_create", res = false);
     }
 
-    gNIDChipVidVerificationSignerId = OBJ_create("1.3.6.1.4.1.37244.1.7", "ChipVidVerificationSignerId", "ChipVidVerificationSignerId");
+    gNIDChipVidVerificationSignerId =
+        OBJ_create("1.3.6.1.4.1.37244.1.7", "ChipVidVerificationSignerId", "ChipVidVerificationSignerId");
     if (gNIDChipVidVerificationSignerId == 0)
     {
         ReportOpenSSLErrorAndExit("OBJ_create", res = false);

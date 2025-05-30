@@ -1633,7 +1633,7 @@ TEST_F(TestChipCert, TestChipCert_GenerateVidVerificationSignerCert)
 
     {
         CertType certType = CertType::kNotSpecified;
-        uint64_t certId = 0;
+        uint64_t certId   = 0;
 
         EXPECT_EQ(certData.mSubjectDN.GetCertType(certType), CHIP_NO_ERROR);
         EXPECT_EQ(certType, CertType::kVidVerificationSigner);
@@ -1667,13 +1667,15 @@ TEST_F(TestChipCert, TestChipCert_GenerateVidVerificationSignerCert)
     // Test error case: VidVerificationSigner cert subject provided a fabric ID attribute.
     vvs_params.SubjectDN.Clear();
     EXPECT_EQ(vvs_params.SubjectDN.AddAttribute_MatterFabricId(0xFAB00000FAB00001), CHIP_NO_ERROR);
-    EXPECT_EQ(NewVidVerificationSignerX509Cert(vvs_params, vvs_keypair.Pubkey(), keypair, signed_cert_span1), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(NewVidVerificationSignerX509Cert(vvs_params, vvs_keypair.Pubkey(), keypair, signed_cert_span1),
+              CHIP_ERROR_INVALID_ARGUMENT);
 
     // Test that serial number cannot be negative.
     vvs_params.SubjectDN.Clear();
     EXPECT_EQ(vvs_params.SubjectDN.AddAttribute_MatterVidVerificationSignerId(0xEECDABCDABCDABCD), CHIP_NO_ERROR);
     vvs_params.SerialNumber = -1;
-    EXPECT_EQ(NewVidVerificationSignerX509Cert(vvs_params, vvs_keypair.Pubkey(), keypair, signed_cert_span1), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(NewVidVerificationSignerX509Cert(vvs_params, vvs_keypair.Pubkey(), keypair, signed_cert_span1),
+              CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestChipCert, TestChipCert_VerifyGeneratedCerts)

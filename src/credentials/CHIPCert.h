@@ -107,17 +107,17 @@ enum
  */
 enum class CertType : uint8_t
 {
-    kNotSpecified    = 0x00, /**< The certificate's type has not been specified. */
-    kRoot            = 0x01, /**< A Matter Root certificate (RCAC). */
-    kICA             = 0x02, /**< A Matter Intermediate CA certificate (ICAC). */
-    kNode            = 0x03, /**< A Matter node operational certificate (NOC). */
-    kFirmwareSigning = 0x04, /**< A Matter firmware signing certificate. Note that Matter doesn't
-                                  specify how firmware images are signed and implementation of
-                                  firmware image signing is manufacturer-specific. The Matter
-                                  certificate format supports encoding of firmware signing
-                                  certificates if chosen by the manufacturer to use them. */
-    kNetworkIdentity = 0x05, /**< A Matter Network (Client) Identity. */
-    kVidVerificationSigner = 0x06 /**< A Matter VendorID Verification Signer Certificate. */
+    kNotSpecified    = 0x00,       /**< The certificate's type has not been specified. */
+    kRoot            = 0x01,       /**< A Matter Root certificate (RCAC). */
+    kICA             = 0x02,       /**< A Matter Intermediate CA certificate (ICAC). */
+    kNode            = 0x03,       /**< A Matter node operational certificate (NOC). */
+    kFirmwareSigning = 0x04,       /**< A Matter firmware signing certificate. Note that Matter doesn't
+                                        specify how firmware images are signed and implementation of
+                                        firmware image signing is manufacturer-specific. The Matter
+                                        certificate format supports encoding of firmware signing
+                                        certificates if chosen by the manufacturer to use them. */
+    kNetworkIdentity       = 0x05, /**< A Matter Network (Client) Identity. */
+    kVidVerificationSigner = 0x06  /**< A Matter VendorID Verification Signer Certificate. */
 };
 
 /** X.509 Certificate Key Purpose Flags
@@ -330,7 +330,10 @@ public:
     {
         return AddAttribute(ASN1::kOID_AttributeType_MatterCASEAuthTag, val);
     }
-    inline CHIP_ERROR AddAttribute_MatterVidVerificationSignerId(uint64_t val) { return AddAttribute(ASN1::kOID_AttributeType_MatterVidVerificationSignerId, val); }
+    inline CHIP_ERROR AddAttribute_MatterVidVerificationSignerId(uint64_t val)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_MatterVidVerificationSignerId, val);
+    }
 
     /**
      * @brief Determine type of a CHIP certificate.
@@ -646,8 +649,9 @@ CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableBy
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewVidVerificationSignerX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                          const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
+CHIP_ERROR NewVidVerificationSignerX509Cert(const X509CertRequestParams & requestParams,
+                                            const Crypto::P256PublicKey & subjectPubkey, const Crypto::P256Keypair & issuerKeypair,
+                                            MutableByteSpan & x509Cert);
 
 /**
  * @brief
@@ -684,7 +688,8 @@ inline bool IsChip64bitDNAttr(chip::ASN1::OID oid)
 {
     return (oid == chip::ASN1::kOID_AttributeType_MatterNodeId || oid == chip::ASN1::kOID_AttributeType_MatterFirmwareSigningId ||
             oid == chip::ASN1::kOID_AttributeType_MatterICACId || oid == chip::ASN1::kOID_AttributeType_MatterRCACId ||
-            oid == chip::ASN1::kOID_AttributeType_MatterFabricId || oid == chip::ASN1::kOID_AttributeType_MatterVidVerificationSignerId);
+            oid == chip::ASN1::kOID_AttributeType_MatterFabricId ||
+            oid == chip::ASN1::kOID_AttributeType_MatterVidVerificationSignerId);
 }
 
 /**

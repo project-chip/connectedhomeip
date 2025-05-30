@@ -485,8 +485,9 @@ DLL_EXPORT CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams
     return NewChipX509Cert(requestParams, subjectPubkey, issuerKeypair, x509Cert);
 }
 
-CHIP_ERROR NewVidVerificationSignerX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                          const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
+CHIP_ERROR NewVidVerificationSignerX509Cert(const X509CertRequestParams & requestParams,
+                                            const Crypto::P256PublicKey & subjectPubkey, const Crypto::P256Keypair & issuerKeypair,
+                                            MutableByteSpan & x509Cert)
 {
     CertType certType;
 
