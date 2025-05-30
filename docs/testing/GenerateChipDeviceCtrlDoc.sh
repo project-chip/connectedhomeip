@@ -36,4 +36,3 @@ pydoc-markdown -I "$SCRIPT_DIR"/../../src/controller/python --py3 -m chip.ChipDe
 
 # awk '/\(\#chip.ChipDeviceCtrl/ {gsub(/\./, "", $0)} 1' "$1/$FILENAME" >"$1"/tmp && mv "$1"/tmp "$1/$FILENAME"
 sed -E 's/\(#chip[^)]+\)//g' "$1/$FILENAME" >"$1/tmp" && mv "$1/tmp" "$1/$FILENAME"
-
