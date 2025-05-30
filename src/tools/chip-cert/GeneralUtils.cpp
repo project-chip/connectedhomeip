@@ -40,6 +40,7 @@ using namespace chip::ASN1;
 int gNIDChipNodeId;
 int gNIDChipFirmwareSigningId;
 int gNIDChipICAId;
+int gNIDChipVidVerificationSignerId;
 int gNIDChipRootId;
 int gNIDChipFabricId;
 int gNIDChipCASEAuthenticatedTag;
@@ -56,6 +57,7 @@ bool InitOpenSSL()
     ERR_load_crypto_strings();
     OpenSSL_add_all_algorithms();
 
+    // TODO(#39306) Rename a lot of ChipXxx to MatterXxx.
     gNIDChipNodeId = OBJ_create("1.3.6.1.4.1.37244.1.1", "ChipNodeId", "ChipNodeId");
     if (gNIDChipNodeId == 0)
     {
@@ -75,7 +77,7 @@ bool InitOpenSSL()
     }
 
     gNIDChipRootId = OBJ_create("1.3.6.1.4.1.37244.1.4", "ChipRootId", "ChipRootId");
-    if (gNIDChipICAId == 0)
+    if (gNIDChipRootId == 0)
     {
         ReportOpenSSLErrorAndExit("OBJ_create", res = false);
     }
@@ -88,6 +90,12 @@ bool InitOpenSSL()
 
     gNIDChipCASEAuthenticatedTag = OBJ_create("1.3.6.1.4.1.37244.1.6", "ChipCASEAuthenticatedTag", "ChipCASEAuthenticatedTag");
     if (gNIDChipCASEAuthenticatedTag == 0)
+    {
+        ReportOpenSSLErrorAndExit("OBJ_create", res = false);
+    }
+
+    gNIDChipVidVerificationSignerId = OBJ_create("1.3.6.1.4.1.37244.1.7", "ChipVidVerificationSignerId", "ChipVidVerificationSignerId");
+    if (gNIDChipVidVerificationSignerId == 0)
     {
         ReportOpenSSLErrorAndExit("OBJ_create", res = false);
     }
@@ -107,6 +115,7 @@ bool InitOpenSSL()
     ASN1_STRING_TABLE_add(gNIDChipNodeId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipFirmwareSigningId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipICAId, 16, 16, B_ASN1_UTF8STRING, 0);
+    ASN1_STRING_TABLE_add(gNIDChipVidVerificationSignerId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipRootId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipFabricId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipCASEAuthenticatedTag, 8, 8, B_ASN1_UTF8STRING, 0);

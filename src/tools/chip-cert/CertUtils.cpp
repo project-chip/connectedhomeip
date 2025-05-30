@@ -103,6 +103,9 @@ bool ToolChipDN::SetCertName(X509_NAME * name) const
         case kOID_AttributeType_MatterICACId:
             attrNID = gNIDChipICAId;
             break;
+        case kOID_AttributeType_MatterVidVerificationSignerId:
+            attrNID = gNIDChipVidVerificationSignerId;
+            break;
         case kOID_AttributeType_MatterRCACId:
             attrNID = gNIDChipRootId;
             break;
