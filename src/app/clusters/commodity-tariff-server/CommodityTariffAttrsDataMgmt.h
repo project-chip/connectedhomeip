@@ -312,7 +312,7 @@ public:
 protected:
     T & mValue;             // Reference to the applied value storage
     T & mNewValue = mValue; // Reference to a value for updating
-    void * mAuxData;  // Pointer to an auxiliary data which can be used in some method implementations
+    void * mAuxData;        // Pointer to an auxiliary data which can be used in some method implementations
     bool is_valid   = false;
     bool is_changed = false;
 
