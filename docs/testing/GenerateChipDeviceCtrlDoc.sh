@@ -18,7 +18,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)
 export PYTHONPATH="$SCRIPT_DIR/../../src/controller/python"
 FILENAME='ChipDeviceCtrlAPI.md'
 
-if [ "$#" -ne 1 ]; then
+if [[ $# -ne 1 ]]; then
   echo 'usage: GenerateChipDeviceCtrlDoc.sh build_directory'
   exit 1
 fi
