@@ -155,7 +155,8 @@ COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 
 /** @} */ // end of attribute_management
 
-struct TariffUpdateCtx {
+struct TariffUpdateCtx
+{
     /* DayEntryIDs */
     std::unordered_set<uint32_t> DE_KeyIDs; /* Master - IDs of all given DayEntry items */
 

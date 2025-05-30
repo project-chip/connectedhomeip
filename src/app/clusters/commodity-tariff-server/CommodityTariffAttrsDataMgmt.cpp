@@ -141,7 +141,7 @@ static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLeng
 static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
 
 // static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
- static constexpr size_t kIndividualDaysAttrMaxLength = 50;
+static constexpr size_t kIndividualDaysAttrMaxLength = 50;
 
 // static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
 // static constexpr size_t kDayStructItemMaxDayEntryIDs = 96;
@@ -320,10 +320,10 @@ static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, 
 
 CHIP_ERROR DayEntriesDataClass::Validate(const ValueType & aValue) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto & newList = aValue;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    auto & newList                           = aValue;
     std::unordered_set<uint32_t> & DE_KeyIDs = ((TariffUpdateCtx *) mAuxData)->DE_KeyIDs;
-    uint16_t tmp_startTime = 0;
+    uint16_t tmp_startTime                   = 0;
 
     VerifyOrReturnError_LogSend(newList.size() > 0 && newList.size() <= kDayEntriesAttrMaxLength, CHIP_ERROR_INVALID_LIST_LENGTH,
                                 "Incorrect DayEntries length");
@@ -394,8 +394,8 @@ static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue
 
 CHIP_ERROR DayPatternsDataClass::Validate(const ValueType & aValue) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto & newList = aValue;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    auto & newList                           = aValue;
     std::unordered_set<uint32_t> & DP_KeyIDs = ((TariffUpdateCtx *) mAuxData)->DP_KeyIDs;
     std::unordered_set<uint32_t> & DP_DE_IDs = ((TariffUpdateCtx *) mAuxData)->DP_DE_IDs;
     // uint8_t tmpDoW = 0;
@@ -475,8 +475,8 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
 
 CHIP_ERROR TariffPeriodsDataClass::Validate(const ValueType & aValue) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto & newList = aValue;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    auto & newList                           = aValue;
     std::unordered_set<uint32_t> & TP_DE_IDs = ((TariffUpdateCtx *) mAuxData)->TP_DE_IDs;
     std::unordered_set<uint32_t> & TP_TC_IDs = ((TariffUpdateCtx *) mAuxData)->TP_TC_IDs;
 
@@ -558,8 +558,7 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
     }
 
     // If AUXLD feature are supported
-    if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kAuxiliaryLoad) &&
-        entryNewValue.auxiliaryLoad.HasValue())
+    if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kAuxiliaryLoad) && entryNewValue.auxiliaryLoad.HasValue())
     {
         const auto & auxiliaryLoad = entryNewValue.auxiliaryLoad.Value();
 
@@ -576,8 +575,7 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
     }
 
     // If PEAKP feature are supported
-    if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPeakPeriod) &&
-        entryNewValue.peakPeriod.HasValue())
+    if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPeakPeriod) && entryNewValue.peakPeriod.HasValue())
     {
         const auto & peakPeriod = entryNewValue.peakPeriod.Value();
 
@@ -596,7 +594,7 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         if (!powerThreshold.powerThresholdSource.IsNull())
         {
             VerifyOrReturnError(EnsureKnownEnumValue(powerThreshold.powerThresholdSource.Value()) !=
-                                PowerThresholdSourceEnum::kUnknownEnumValue,
+                                    PowerThresholdSourceEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
@@ -617,8 +615,8 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
 
 CHIP_ERROR TariffComponentsDataClass::Validate(const ValueType & aValue) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto & newList = aValue;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    auto & newList                           = aValue;
     std::unordered_set<uint32_t> & TC_KeyIDs = ((TariffUpdateCtx *) mAuxData)->TC_KeyIDs;
 
     VerifyOrReturnError((newList.size() > 0 && newList.size() <= kTariffComponentsAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH);
@@ -735,25 +733,22 @@ void TariffComponentsDataClass::CleanupStructValue(PayloadType & aValue)
 // IndividualDaysDataClass
 CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto & newList = aValue.Value();
-    uint32_t tmpDate = 0;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    auto & newList                           = aValue.Value();
+    uint32_t tmpDate                         = 0;
     std::unordered_set<uint32_t> & ID_DE_IDs = ((TariffUpdateCtx *) mAuxData)->ID_DE_IDs;
 
-    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kIndividualDaysAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH,
-                                "Incorrect IndividualDays length");
+    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kIndividualDaysAttrMaxLength),
+                                CHIP_ERROR_INVALID_LIST_LENGTH, "Incorrect IndividualDays length");
 
     for (const auto & item : newList)
     {
-        VerifyOrReturnError_LogSend(item.date > tmpDate, CHIP_ERROR_INVALID_ARGUMENT,
-                        "IndividualDays must be order by startTime");
-        VerifyOrReturnError(EnsureKnownEnumValue(item.dayType) !=
-                            DayTypeEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError_LogSend(item.date > tmpDate, CHIP_ERROR_INVALID_ARGUMENT, "IndividualDays must be order by startTime");
+        VerifyOrReturnError(EnsureKnownEnumValue(item.dayType) != DayTypeEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (CommonUtilities::HasDuplicateIDs(item.dayEntryIDs, ID_DE_IDs))
         {
-            err =  CHIP_ERROR_DUPLICATE_KEY_ID;
+            err = CHIP_ERROR_DUPLICATE_KEY_ID;
             break;
         }
         tmpDate = item.date;
@@ -763,8 +758,7 @@ CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
 
 bool IndividualDaysDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    return (source.date != destination.date ||
-            source.dayType != destination.dayType ||
+    return (source.date != destination.date || source.dayType != destination.dayType ||
             source.dayEntryIDs != destination.dayEntryIDs);
 }
 
@@ -777,25 +771,25 @@ void IndividualDaysDataClass::CleanupStructValue(PayloadType & aValue)
 
 CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto & newList = aValue.Value();
-    uint32_t tmpStartDate = 0;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    auto & newList                           = aValue.Value();
+    uint32_t tmpStartDate                    = 0;
     std::unordered_set<uint32_t> & CP_DP_IDs = ((TariffUpdateCtx *) mAuxData)->CP_DP_IDs;
 
-    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kIndividualDaysAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH,
-                                "Incorrect IndividualDays length");
+    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kIndividualDaysAttrMaxLength),
+                                CHIP_ERROR_INVALID_LIST_LENGTH, "Incorrect IndividualDays length");
 
     for (const auto & item : newList)
     {
         if (!item.startDate.IsNull())
         {
             VerifyOrReturnError_LogSend(item.startDate.Value() > tmpStartDate, CHIP_ERROR_INVALID_ARGUMENT,
-                            "IndividualDays must be order by startTime");
+                                        "IndividualDays must be order by startTime");
         }
 
         if (CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CP_DP_IDs))
         {
-            err =  CHIP_ERROR_DUPLICATE_KEY_ID;
+            err = CHIP_ERROR_DUPLICATE_KEY_ID;
             break;
         }
         tmpStartDate = item.startDate.Value();
@@ -805,8 +799,7 @@ CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
 
 bool CalendarPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    return (source.startDate != destination.startDate ||
-            source.dayPatternIDs != destination.dayPatternIDs);
+    return (source.startDate != destination.startDate || source.dayPatternIDs != destination.dayPatternIDs);
 }
 
 void CalendarPeriodsDataClass::CleanupStructValue(PayloadType & aValue)

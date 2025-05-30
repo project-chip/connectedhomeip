@@ -84,7 +84,8 @@ void CommodityTariffDataProvider::TariffDataUpd_Abort()
     // TODO - Deinit the update cache
 }
 
-bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTariffPrimaryData & aNewData, TariffUpdateCtx & UpdCtx)
+bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTariffPrimaryData & aNewData,
+                                                               TariffUpdateCtx & UpdCtx)
 {
     if (aNewData.mTariffInfo.IsNull())
     {
@@ -114,15 +115,19 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTa
     assert(!UpdCtx.TP_TC_IDs.empty()); // Something went wrong if TariffPeriods has no TariffComponents IDs
 
     // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
-    for (const auto& item : UpdCtx.TP_DE_IDs) {
-        if (!UpdCtx.DE_KeyIDs.count(item)) {
+    for (const auto & item : UpdCtx.TP_DE_IDs)
+    {
+        if (!UpdCtx.DE_KeyIDs.count(item))
+        {
             return false; // The item not found in original list
         }
     }
 
     // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
-    for (const auto& item : UpdCtx.TP_TC_IDs) {
-        if (!UpdCtx.TC_KeyIDs.count(item)) {
+    for (const auto & item : UpdCtx.TP_TC_IDs)
+    {
+        if (!UpdCtx.TC_KeyIDs.count(item))
+        {
             return false; // The item not found in original list
         }
     }
@@ -133,8 +138,10 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTa
         assert(!UpdCtx.DP_DE_IDs.empty()); // Something went wrong if DP has no DE IDs
 
         // Checks that all DP_DEs are in main DE list:
-        for (const auto& item : UpdCtx.DP_DE_IDs) {
-            if (!UpdCtx.DE_KeyIDs.count(item)) {
+        for (const auto & item : UpdCtx.DP_DE_IDs)
+        {
+            if (!UpdCtx.DE_KeyIDs.count(item))
+            {
                 return false; // The item not found in original list
             }
         }
@@ -145,8 +152,10 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTa
         assert(!UpdCtx.ID_DE_IDs.empty()); // Something went wrong if IndividualDays has no DE IDs
 
         // Checks that all ID_DE_IDs are in main DE list:
-        for (const auto& item : UpdCtx.ID_DE_IDs) {
-            if (!UpdCtx.DE_KeyIDs.count(item)) {
+        for (const auto & item : UpdCtx.ID_DE_IDs)
+        {
+            if (!UpdCtx.DE_KeyIDs.count(item))
+            {
                 return false; // The item not found in original list
             }
 
@@ -163,8 +172,10 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTa
         assert(!UpdCtx.CP_DP_IDs.empty()); // Something went wrong if CP has no DP IDs
 
         // Checks that all ID_DE_IDs are in main DE list:
-        for (const auto& item : UpdCtx.CP_DP_IDs) {
-            if (!UpdCtx.DP_KeyIDs.count(item)) {
+        for (const auto & item : UpdCtx.CP_DP_IDs)
+        {
+            if (!UpdCtx.DP_KeyIDs.count(item))
+            {
                 return false; // The item not found in original list
             }
         }
