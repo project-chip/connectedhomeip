@@ -165,9 +165,6 @@ COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 class CommodityTariffPrimaryData
 {
 public:
-    CommodityTariffPrimaryData()          = default;
-    virtual ~CommodityTariffPrimaryData() = default;
-
     // Primary attribute storage
 #define X(attrName, attrType) attrType m##attrName;
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
