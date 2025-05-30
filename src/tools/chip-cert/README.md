@@ -2,36 +2,36 @@
 
 ## Table of Contents
 
-- [Matter/CHIP Certificate Tool](#matterchip-certificate-tool)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Directory Structure](#directory-structure)
-    - [/src/tools/chip-cert](#srctoolschip-cert)
-  - [Usage Examples](#usage-examples)
-    - [Building](#building)
-  - [Operational Certificates Usage Examples](#operational-certificates-usage-examples)
-    - [Attestation Certificates Usage Examples](#attestation-certificates-usage-examples)
-  - [Command Reference](#command-reference)
-    - [help](#help)
-    - [gen-cert](#gen-cert)
-    - [convert-cert](#convert-cert)
-    - [convert-key](#convert-key)
-    - [resign-cert](#resign-cert)
-    - [validate-cert](#validate-cert)
-    - [print-cert](#print-cert)
-    - [gen-att-cert](#gen-att-cert)
-    - [validate-att-cert](#validate-att-cert)
-    - [gen-cd](#gen-cd)
-      - [gen-cd example](#gen-cd-example)
-    - [print-cd](#print-cd)
-      - [print-cd example](#print-cd-example)
-    - [version](#version)
+-   [Matter/CHIP Certificate Tool](#matterchip-certificate-tool)
+    -   [Table of Contents](#table-of-contents)
+    -   [Introduction](#introduction)
+    -   [Directory Structure](#directory-structure)
+        -   [/src/tools/chip-cert](#srctoolschip-cert)
+    -   [Usage Examples](#usage-examples)
+        -   [Building](#building)
+    -   [Operational Certificates Usage Examples](#operational-certificates-usage-examples)
+        -   [Attestation Certificates Usage Examples](#attestation-certificates-usage-examples)
+    -   [Command Reference](#command-reference)
+        -   [help](#help)
+        -   [gen-cert](#gen-cert)
+        -   [convert-cert](#convert-cert)
+        -   [convert-key](#convert-key)
+        -   [resign-cert](#resign-cert)
+        -   [validate-cert](#validate-cert)
+        -   [print-cert](#print-cert)
+        -   [gen-att-cert](#gen-att-cert)
+        -   [validate-att-cert](#validate-att-cert)
+        -   [gen-cd](#gen-cd)
+            -   [gen-cd example](#gen-cd-example)
+        -   [print-cd](#print-cd)
+            -   [print-cd example](#print-cd-example)
+        -   [version](#version)
 
 ## Introduction
 
-Matter/CHIP Certificate Tool (chip-cert) provides command line interface (CLI) utility
-used for generating and manipulating Matter operational and attestation certificates
-and private key material (for testing).
+Matter/CHIP Certificate Tool (chip-cert) provides command line interface (CLI)
+utility used for generating and manipulating Matter operational and attestation
+certificates and private key material (for testing).
 
 ## Directory Structure
 
