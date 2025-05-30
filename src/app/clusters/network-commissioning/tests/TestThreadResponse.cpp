@@ -98,7 +98,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
             .channel         = 12,
             .version         = 10,
             .extendedAddress = 2345,
-            .rssi            = 10,
+            .rssi            = -33,
             .lqi             = 10,
         },
         ThreadScanResponse{
@@ -109,7 +109,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
             .channel         = 1,
             .version         = 100,
             .extendedAddress = 0x1234,
-            .rssi            = 20,
+            .rssi            = -10,
             .lqi             = 20,
         },
         ThreadScanResponse{
@@ -120,7 +120,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
             .channel         = 1,
             .version         = 100,
             .extendedAddress = 0x1234,
-            .rssi            = 5,
+            .rssi            = -5,
             .lqi             = 5,
         },
     };
@@ -170,7 +170,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
 
         // assert expectations:
         //   - values exist
-        //   - values sorted by RSSI in decreasing order (based on our implementation).
+        //   - values sorted by LQI in decreasing order (based on our implementation).
         //
         //   Actual spec requirement:
         //
