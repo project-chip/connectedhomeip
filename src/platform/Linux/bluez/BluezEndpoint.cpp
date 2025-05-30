@@ -287,7 +287,7 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
     GVariant * options = g_variant_builder_end(&optionsBuilder);
 
     bluez_gatt_manager1_call_register_application(
-        gattMgr.get(), mpRootPath, options, nullptr,
+        gattMgr.get(), mRootPath.get(), options, nullptr,
         +[](GObject * aObj, GAsyncResult * aResult, void * self) {
             reinterpret_cast<BluezEndpoint *>(self)->RegisterGattApplicationDone(aObj, aResult);
         },
@@ -335,8 +335,8 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
     VerifyOrExit(conn != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = conn->Init(*this));
 
-    mpPeerDevicePath           = g_strdup(objectPath);
-    mConnMap[mpPeerDevicePath] = conn;
+    mPeerDevicePath.reset(g_strdup(objectPath));
+    mConnMap[mPeerDevicePath.get()] = conn;
 
     ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
@@ -369,9 +369,9 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
     BluezObjectSkeleton * object;
     BluezGattService1 * service;
 
-    mpServicePath = g_strdup_printf("%s/service", mpRootPath);
-    ChipLogDetail(DeviceLayer, "CREATE service object at %s", mpServicePath);
-    object = bluez_object_skeleton_new(mpServicePath);
+    mServicePath.reset(g_strdup_printf("%s/service", mRootPath.get()));
+    ChipLogDetail(DeviceLayer, "CREATE service object at %s", mServicePath.get());
+    object = bluez_object_skeleton_new(mServicePath.get());
 
     service = bluez_gatt_service1_skeleton_new();
     bluez_gatt_service1_set_uuid(service, aUUID);
@@ -394,7 +394,7 @@ BluezConnection * BluezEndpoint::GetBluezConnection(const char * aPath)
 
 BluezConnection * BluezEndpoint::GetBluezConnectionViaDevice()
 {
-    return GetBluezConnection(mpPeerDevicePath);
+    return GetBluezConnection(mPeerDevicePath.get());
 }
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -520,8 +520,8 @@ void BluezEndpoint::SetupGattServer(GDBusConnection * aConn)
 {
     VerifyOrReturn(!mIsCentral);
 
-    mpRootPath = g_strdup_printf("/chipoble/%04x", getpid() & 0xffff);
-    mRoot.reset(g_dbus_object_manager_server_new(mpRootPath));
+    mRootPath.reset(g_strdup_printf("/chipoble/%04x", getpid() & 0xffff));
+    mRoot.reset(g_dbus_object_manager_server_new(mRootPath.get()));
 
     SetupGattService();
 
@@ -585,10 +585,6 @@ void BluezEndpoint::Shutdown()
             return CHIP_NO_ERROR;
         },
         this);
-
-    g_free(mpRootPath);
-    g_free(mpServicePath);
-    g_free(mpPeerDevicePath);
 
     mIsInitialized = false;
 }
