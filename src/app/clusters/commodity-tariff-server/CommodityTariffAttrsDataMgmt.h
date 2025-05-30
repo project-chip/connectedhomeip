@@ -225,13 +225,13 @@ public:
      * @brief Performs a pre-validation of arguments value before assigning it as newValue
      * @param aValue New value for future update mValue
      */
-    CHIP_ERROR UpdateBegin(const T & aValue, void * aSrvInstance)
+    CHIP_ERROR UpdateBegin(const T & aValue, void * aUpdCtx)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        assert(aSrvInstance != nullptr);
+        assert(aUpdCtx != nullptr);
 
-        mOwnerInstance = aSrvInstance;
+        mAuxData = aUpdCtx;
 
         err = Validate(aValue);
 
@@ -312,7 +312,7 @@ public:
 protected:
     T & mValue;             // Reference to the applied value storage
     T & mNewValue = mValue; // Reference to a value for updating
-    void * mOwnerInstance;
+    void * mAuxData;  // Pointer to an auxiliary data which can be used in some method implementations
     bool is_valid   = false;
     bool is_changed = false;
 
