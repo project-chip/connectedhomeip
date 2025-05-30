@@ -314,52 +314,11 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     }
     else
     {
-#if 1 //!ENABLE_SE05X_KEY_IMPORT
         if (CHIP_NO_ERROR == (error = Deserialize_H(this, &mPublicKey, &mKeypair, input)))
         {
             mInitialized = true;
         }
         return error;
-#else
-
-        sss_object_t sss_object = { 0 };
-        sss_status_t sss_status = kStatus_SSS_Fail;
-        uint32_t keyid          = 0;
-        uint8_t keyid_buffer[4] = { 0 };
-        uint8_t key[128]        = { 0 };
-        uint8_t header[]        = EC_NIST_P256_KP_HEADER;
-        uint8_t pub_header[]    = EC_NIST_P256_KP_PUB_HEADER;
-        size_t key_length       = 0;
-
-        memcpy(&key[key_length], header, sizeof(header));
-        key_length += sizeof(header);
-        if ((privkey[0] & 0x80))
-        {
-            key[key_length++] = 0x00;
-        }
-        memcpy(&key[key_length], privkey, kP256_PrivateKey_Length);
-        key_length += kP256_PrivateKey_Length;
-        memcpy(&key[key_length], pub_header, sizeof(pub_header));
-        key_length += sizeof(pub_header);
-        memcpy(&key[key_length], input.ConstBytes(), public_key.Length());
-        key_length += public_key.Length();
-
-        error = DRBG_get_bytes(keyid_buffer, sizeof(keyid_buffer));
-        VerifyOrReturnError(error == CHIP_NO_ERROR, error);
-
-        keyid = (keyid_buffer[3] << (8 * 3)) + (keyid_buffer[2] << (8 * 2)) + (keyid_buffer[1] << (8 * 1)) +
-            (keyid_buffer[0] << (8 * 0));
-
-        sss_status = sss_key_object_init(&sss_object, &gex_sss_chip_ctx.ks);
-        VerifyOrReturnError(sss_status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-        sss_status = sss_key_object_allocate_handle(&sss_object, keyid, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P, 256,
-                                                    kKeyObject_Mode_Persistent);
-        VerifyOrReturnError(sss_status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-        sss_status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &sss_object, key, key_length, 256, NULL, 0);
-        VerifyOrReturnError(sss_status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-
-        return CHIP_NO_ERROR;
-#endif
     }
 }
 
