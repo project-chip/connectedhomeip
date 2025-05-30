@@ -25,7 +25,6 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -40,6 +39,7 @@ attr = cnet.Attributes
 
 
 async def connect_wifi_linux(ssid, password):
+    """ Connects to WiFi with the SSID and Password provided as arguments using 'nmcli' in Linux."""
     if isinstance(ssid, bytes):
         ssid = ssid.decode()
     if isinstance(password, bytes):
@@ -96,6 +96,7 @@ async def connect_wifi_linux(ssid, password):
 
 
 async def connect_wifi_mac(ssid, password):
+    """ Connects to WiFi with the SSID and Password provided as arguments using 'networksetup' in Mac."""
     if not shutil.which("networksetup"):
         logger.error(" --- connect_wifi_mac: 'networksetup' is not present. Please install 'networksetup'.")
         return None
@@ -131,10 +132,12 @@ async def connect_wifi_mac(ssid, password):
 
 
 async def connect_host_wifi(ssid, password):
+    """ Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi function """
     os_name = platform.system()
     logger.info(f" --- connect_host_wifi: OS detected: {os_name}")
 
     # Let's try to connect the TH to the second network a few times, to avoid network instability
+    os_name = None
     retry = 1
     while retry <= MAX_RETRIES:
         logger.info(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{MAX_RETRIES}")
@@ -162,6 +165,7 @@ async def connect_host_wifi(ssid, password):
 
 
 def is_network_switch_successful(err):
+    """ Verifies if networkingStatus is 0 (kSuccess) """
     return (
         err is None or
         (hasattr(err, "networkingStatus") and
@@ -235,7 +239,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 # Let's wait a couple of seconds to change networks
                 await asyncio.sleep(WIFI_WAIT_SECONDS)
             finally:
-                if networks and networks[0].connected:
+                if networks and len(networks) > 0 and networks[0].connected:
                     logger.info(f" --- verify_operational_network: networks: {networks}")
                     break
                 else:
