@@ -19,8 +19,8 @@ export PYTHONPATH="$SCRIPT_DIR/../../src/controller/python"
 FILENAME='ChipDeviceCtrlAPI.md'
 
 if [[ $# -ne 1 ]]; then
-  echo 'usage: GenerateChipDeviceCtrlDoc.sh build_directory'
-  exit 1
+    echo 'usage: GenerateChipDeviceCtrlDoc.sh build_directory'
+    exit 1
 fi
 
 pydoc-markdown -I "$SCRIPT_DIR"/../../src/controller/python --py3 -m chip.ChipDeviceCtrl '{
