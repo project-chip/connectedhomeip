@@ -191,7 +191,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
         ASSERT_EQ(items[0].panId, 123);
 
         ASSERT_EQ(items[1].rssi, -10);
-        ASSERT_EQ(items[1].lqi,   20);
+        ASSERT_EQ(items[1].lqi, 20);
         ASSERT_EQ(items[1].panId, 321);
 
         ASSERT_EQ(items[2].rssi, -33);
