@@ -26,6 +26,8 @@
 #include <lib/core/TLVTypes.h>
 #include <platform/NetworkCommissioning.h>
 
+#include <vector>
+
 namespace {
 
 using namespace chip;

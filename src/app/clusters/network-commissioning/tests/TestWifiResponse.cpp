@@ -25,6 +25,7 @@
 #include <platform/NetworkCommissioning.h>
 
 #include <array>
+#include <vector>
 
 namespace {
 
