@@ -17,9 +17,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/network-commissioning/ThreadScanResponse.h>
+#include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Ids.h>
 #include <clusters/NetworkCommissioning/Structs.h>
-#include <clusters/NetworkCommissioning/Commands.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVReader.h>
@@ -164,7 +164,8 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
         std::vector<ThreadInterfaceScanResultStruct::DecodableType> items;
 
         auto value = response.threadScanResults.Value().begin();
-        while (value.Next()) {
+        while (value.Next())
+        {
             items.push_back(value.GetValue());
         }
 
@@ -180,7 +181,7 @@ TEST_F(TestThreadResponseEncoding, TestSuccessEncode)
         //   the size limits of the response.
         ASSERT_EQ(items.size(), 3u);
 
-        ASSERT_EQ(items[0].lqi,  20);
+        ASSERT_EQ(items[0].lqi, 20);
         ASSERT_EQ(items[0].panId, 321);
 
         ASSERT_EQ(items[1].lqi, 10);
