@@ -47,13 +47,13 @@ private:
     ModeTagStructType ModeTagsMapping[1]  = { { .value = to_underlying(ModeTag::kMapping) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Idle"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Idle"_span,
                                                  .mode     = ModeIdle,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Cleaning"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Cleaning"_span,
                                                  .mode     = ModeCleaning,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsCleaning) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Mapping"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Mapping"_span,
                                                  .mode     = ModeMapping,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsMapping) },
     };
@@ -117,22 +117,22 @@ private:
                                                 { .value = to_underlying(ModeTag::kVacuumThenMop) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[6] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Quick"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Quick"_span,
                                                  .mode     = ModeQuick,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsQuick) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Auto"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Auto"_span,
                                                  .mode     = ModeAuto,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsAuto) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Deep Clean"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Deep Clean"_span,
                                                  .mode     = ModeDeepClean,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDeepClean) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Quiet"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Quiet"_span,
                                                  .mode     = ModeQuiet,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsQuiet) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Max Vac"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Max Vac"_span,
                                                  .mode     = ModeMaxVac,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsMaxVac) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Vacuum Then Mop"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Vacuum Then Mop"_span,
                                                  .mode     = ModeVacThenMop,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsVacThenMop) }
     };
