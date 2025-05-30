@@ -41,6 +41,7 @@ RUN set -x \
     cmake \
     curl \
     flex \
+    ffmpeg \
     g++ \
     generate-ninja \
     git \
