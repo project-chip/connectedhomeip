@@ -113,7 +113,6 @@ uint16_t getIndexLevelControl(EndpointId endpointId)
 {
     return emberAfGetClusterServerEndpointIndex(endpointId, LevelControl::Id, kLevelControlCount);
 }
-constexpr uint8_t kMinLevel  = 1;
 constexpr uint8_t kMaxLevel  = 254;
 constexpr uint8_t kNullLevel = 255;
 
