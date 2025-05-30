@@ -349,7 +349,7 @@ std::optional<ActionReturnStatus> CheckFailSafeArmed(FabricIndex fabricIndex)
     return std::nullopt;
 }
 
-#define CHECK_FAILSAFE_ARMED(fabricIndex)                                                                                           \
+#define CHECK_FAILSAFE_ARMED(fabricIndex)                                                                                          \
     if (std::optional<ActionReturnStatus> status = CheckFailSafeArmed(fabricIndex); status.has_value())                            \
     {                                                                                                                              \
         return status;                                                                                                             \
@@ -690,7 +690,7 @@ NetworkCommissioningLogic::HandleReorderNetwork(CommandHandler & handler, const 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleQueryIdentity(CommandHandler & handler,
-                                                                                 const ConcreteCommandPath &commandPath,
+                                                                                 const ConcreteCommandPath & commandPath,
                                                                                  const Commands::QueryIdentity::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleQueryIdentity", "NetworkCommissioning");
