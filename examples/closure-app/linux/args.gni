@@ -12,20 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/network-commissioning.cpp"
-)
+# CHIPProjectConfig.h
 
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/constants.h"
-    "${CLUSTER_DIR}/ThreadScanResponse.cpp"
-    "${CLUSTER_DIR}/ThreadScanResponse.h"
-    "${CLUSTER_DIR}/WifiScanResponse.cpp"
-    "${CLUSTER_DIR}/WifiScanResponse.h"
-)
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/config/standalone/args.gni")
+
+chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_system_project_config_include = "<SystemProjectConfig.h>"
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/closure-app/linux/include" ]
+chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
