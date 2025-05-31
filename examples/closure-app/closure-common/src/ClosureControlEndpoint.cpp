@@ -18,7 +18,6 @@
 
 #include <ClosureControlEndpoint.h>
 #include <ClosureManager.h>
-#include "cmsis_os2.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -58,7 +57,6 @@ enum class ClosureControlTestEventTrigger : uint64_t
 Status PrintOnlyDelegate::HandleCalibrateCommand(DataModel::Nullable<ElapsedS> & countdownTime)
 {
     ChipLogError(AppServer, "###########HandleCalibrateCommand###############");
-    osDelay(1000);
     ClosureManager::GetInstance().OnCalibrateCommand(countdownTime);
     // Add the calibration logic here
     return Status::Success;
@@ -69,7 +67,6 @@ Status PrintOnlyDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum>
                                               DataModel::Nullable<ElapsedS> & countdownTime)
 {
     ChipLogProgress(AppServer, "###########HandleMoveToCommand###############");
-    osDelay(1000);
     ClosureManager::GetInstance().OnMoveToCommand(countdownTime);
     // Add the move to logic here
     return Status::Success;
@@ -78,7 +75,6 @@ Status PrintOnlyDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum>
 Status PrintOnlyDelegate::HandleStopCommand()
 {
     ChipLogProgress(AppServer, "###########HandleStopCommand###############");
-    osDelay(1000);
     ClosureManager::GetInstance().OnStopCommand();
     return Status::Success;
 }
@@ -182,33 +178,26 @@ CHIP_ERROR ClosureControlEndpoint::Init()
 void ClosureControlEndpoint::OnActionComplete(uint8_t action) 
 {
     ChipLogError(AppServer, "#######OnActionComplete 0############");
-    osDelay(1000);
     ClosureManager::Action_t closureAction = static_cast<ClosureManager::Action_t>(action);
     switch (closureAction)
     {
     case ClosureManager::Action_t::STOP_ACTION:
         mLogic.SetCountdownTimeFromDelegate(0);
             ChipLogError(AppServer, "#######OnActionComplete 3############");
-            osDelay(1000);
         mLogic.GenerateMovementCompletedEvent();
             ChipLogError(AppServer, "#######OnActionComplete 4############");
-            osDelay(1000);
         break;
     case ClosureManager::Action_t::CALIBRATE_ACTION:
     {
         DataModel::Nullable<GenericOverallState> overallState = DataModel::NullNullable;
         mLogic.SetMainState(MainStateEnum::kStopped);
         ChipLogError(AppServer, "#######OnActionComplete 5-1############");
-            osDelay(1000);
         mLogic.SetOverallState(overallState);
             ChipLogError(AppServer, "#######OnActionComplete 5############");
-            osDelay(1000);
         mLogic.SetCountdownTimeFromDelegate(0);
             ChipLogError(AppServer, "#######OnActionComplete 6############");
-            osDelay(1000);
         mLogic.GenerateMovementCompletedEvent();
             ChipLogError(AppServer, "#######OnActionComplete 7############");
-            osDelay(1000);
         break;
     }
     case ClosureManager::Action_t::MOVE_TO_ACTION:
@@ -216,7 +205,6 @@ void ClosureControlEndpoint::OnActionComplete(uint8_t action)
         ClusterState state;
         state = mLogic.GetState();
         ChipLogError(AppServer, "#######OnActionComplete 8############");
-        osDelay(1000);
         
         if (!state.mOverallTarget.IsNull())
         {
@@ -241,21 +229,16 @@ void ClosureControlEndpoint::OnActionComplete(uint8_t action)
 
         mLogic.SetOverallState(state.mOverallState);
         ChipLogError(AppServer, "#######OnActionComplete 5############");
-        osDelay(1000);
         mLogic.SetMainState(MainStateEnum::kStopped);
         ChipLogError(AppServer, "#######OnActionComplete 9############");
-            osDelay(1000);
         mLogic.SetCountdownTimeFromDelegate(0);
             ChipLogError(AppServer, "#######OnActionComplete 6############");
-            osDelay(1000);
         mLogic.GenerateMovementCompletedEvent();
             ChipLogError(AppServer, "#######OnActionComplete 7############");
-            osDelay(1000);
         break;
     }
     default:
         ChipLogError(AppServer, "Invalid action received in OnActionComplete");
-        osDelay(1000);
         return;
     }
 }

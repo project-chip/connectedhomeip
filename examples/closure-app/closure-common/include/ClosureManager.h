@@ -29,19 +29,17 @@
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
 #include <lib/core/DataModelTypes.h>
-#include <AppEvent.h>
 
 class ClosureManager
 {
 public:
     enum Action_t
     {
-        STOP_ACTION = 0,
-        CALIBRATE_ACTION,
-        MOVE_TO_ACTION,
-        
-        INVALID_ACTION
-    } Action;
+        CALIBRATE_ACTION = 0,
+        STOP_ACTION      = 1,
+        MOVE_TO_ACTION   = 2,
+        INVALID_ACTION   = 3
+    }Action;
     /**
      * @brief Initializes the ClosureManager.
      *
@@ -54,6 +52,10 @@ public:
     void OnCalibrateCommand(chip::app::DataModel::Nullable<chip::ElapsedS> & countdownTime);
     void OnMoveToCommand(chip::app::DataModel::Nullable<chip::ElapsedS> & countdownTime);
     void OnStopCommand();
+    
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
 
 private:
     static ClosureManager sClosureMgr;
@@ -61,10 +63,16 @@ private:
     static constexpr chip::EndpointId kClosureEndpoint       = 1;
     static constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
     static constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
-
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
     
-    static void HandleClosureAction(AppEvent * aEvent);
+    /**
+     * @brief
+     *  The callback function to be called when "movement timer" expires.
+     */
+    static void HandleCalibrateActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleStopActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleMoveToActionTimer(chip::System::Layer * layer, void * aAppState);
+    
+    void HandleClosureAction(ClosureManager::Action_t action);
+
+    
 };

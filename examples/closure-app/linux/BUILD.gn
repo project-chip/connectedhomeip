@@ -36,6 +36,7 @@ executable("closure-app") {
     "${chip_root}/examples/closure-app/closure-common/src/ClosureDimensionEndpoint.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
+    "ClosureManager.cpp",
   ]
 
   deps = [
