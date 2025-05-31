@@ -54,9 +54,7 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
     kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
     kAttestationRevocationCheck, ///< Verify Revocation Status of device's DAC chain
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     kJCMTrustVerification,       ///< Perform JCM trust verification steps
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
     kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
@@ -557,7 +555,6 @@ public:
         return *this;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     // Check for Joint Commissioning Method
     Optional<bool> UseJCM() const { return mUseJCM; }
 
@@ -567,7 +564,6 @@ public:
         mUseJCM = MakeOptional(useJCM);
         return *this;
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     ICDRegistrationStrategy GetICDRegistrationStrategy() const { return mICDRegistrationStrategy; }
     CommissioningParameters & SetICDRegistrationStrategy(ICDRegistrationStrategy icdRegistrationStrategy)
@@ -698,9 +694,7 @@ private:
     bool mCheckForMatchingFabric                     = false;
     Span<const app::AttributePathParams> mExtraReadPaths;
 
- #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     Optional<bool> mUseJCM;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 };
 
 struct RequestedCertificate
@@ -894,7 +888,6 @@ public:
     virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
     virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
     virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;
-    virtual void CleanupCommissioning()                                                                             = 0;
 };
 
 } // namespace Controller

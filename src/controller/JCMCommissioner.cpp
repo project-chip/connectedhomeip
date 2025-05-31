@@ -16,14 +16,15 @@
  */
 
 #include "JCMCommissioner.h"
+
 #include "JCMTrustVerification.h"
-#include <controller/JCMCommissioner.h>
 #include <controller/CommissioningDelegate.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/AllocatorUtils.h>
 #include <controller/JCMCommissioner.h>
 #include <credentials/CHIPCert.h>
 
@@ -126,6 +127,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
             case Fabrics::Id: {
                 Fabrics::TypeInfo::DecodableType fabrics;
                 ReturnErrorOnFailure(attributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
+                bool foundMatchingFabricIndex = false;
 
                 auto iter = fabrics.begin();
                 while (iter.Next())
@@ -148,9 +150,16 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
                             ChipLogError(Controller, "JCM: Per-home RCAC are not supported by JF for now!");
                             return CHIP_ERROR_CANCELLED;
                         }
+
+                        foundMatchingFabricIndex = true;
                         ChipLogProgress(Controller, "JCM: Successfully parsed the Administrator Fabric Table");
                         break;
                     }
+                }
+
+                if (!foundMatchingFabricIndex)
+                {
+                    return CHIP_ERROR_NOT_FOUND;
                 }
                 return CHIP_NO_ERROR;
             }
@@ -165,24 +174,12 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
 
                     if (nocStruct.fabricIndex == mInfo.adminFabricIndex)
                     {
-                        if (!mInfo.adminNOC.Alloc(nocStruct.noc.size()))
-                        {
-                            ChipLogError(Controller, "JCM: DeviceCommissioner::ParseJFAdministratorInfo - cannot allocate memory for admin noc");
-                            return CHIP_ERROR_NO_MEMORY;
-                        }
-
-                        memcpy(mInfo.adminNOC.Get(), nocStruct.noc.data(), nocStruct.noc.size());
+                        ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mInfo.adminNOC, nocStruct.noc));
 
                         if (!nocStruct.icac.IsNull())
                         {
                             auto icac = nocStruct.icac.Value();
-                            if (!mInfo.adminICAC.Alloc(icac.size()))
-                            {
-                                ChipLogError(Controller, "JCM: DeviceCommissioner::ParseJFAdministratorInfo - cannot allocate memory for admin icac");
-                                return CHIP_ERROR_NO_MEMORY;
-                            }
-    
-                            memcpy(mInfo.adminICAC.Get(), icac.data(), icac.size());
+                            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mInfo.adminICAC, icac));
                         }
                         else
                         {
@@ -239,18 +236,13 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
 
                        if (trustedCAPublicKey.Matches(fabricTableRootPublicKey) && trustedCA.size())
                        {
-                            if (!mInfo.adminRCAC.Alloc(trustedCA.size()))
-                            {
-                                ChipLogError(Controller, "JCM: DeviceCommissioner::ParseJFAdministratorInfo - cannot allocate memory for admin rcac");
-                                return CHIP_ERROR_NO_MEMORY;
-                            }
-
-                            memcpy(mInfo.adminRCAC.Get(), trustedCA.data(), trustedCA.size());
-                            ChipLogProgress(Controller, "JCM: Successfully parsed the Administrator RCAC");
+                            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mInfo.adminRCAC, trustedCA));
+                           
                             foundMatchingRcac = true;
                             break;
                        }
                    }
+
                    if (!foundMatchingRcac)
                    {
                        ChipLogError(Controller, "JCM: Cannot find a matching RCAC!");
@@ -400,7 +392,7 @@ void JCMDeviceCommissioner::AdvanceTrustVerificationStage(JCMTrustVerificationRe
 void JCMDeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
     mNextStage = JCMTrustVerificationStage::kIdle;
-    mInfo.clear();
+    mInfo.Cleanup();
 
     DeviceCommissioner::CleanupCommissioning(proxy, nodeId, completionStatus);
 }

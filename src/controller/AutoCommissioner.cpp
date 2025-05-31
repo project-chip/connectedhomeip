@@ -20,6 +20,7 @@
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
+#include <lib/support/AllocatorUtils.h>
 #include <lib/support/SafeInt.h>
 
 #include <cstring>
@@ -381,16 +382,12 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kAttestationVerification:
         return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         if (mParams.UseJCM().ValueOr(false)) {
             return CommissioningStage::kJCMTrustVerification;
         }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         return CommissioningStage::kSendOpCertSigningRequest;
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case CommissioningStage::kJCMTrustVerification:
         return CommissioningStage::kSendOpCertSigningRequest;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kValidateCSR;
     case CommissioningStage::kValidateCSR:
@@ -942,22 +939,6 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
 
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(proxy, nextStage));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AutoCommissioner::AllocateMemoryAndCopySpan(Platform::ScopedMemoryBufferWithSize<uint8_t> & scopedBuffer, ByteSpan span)
-{
-    if (!span.size())
-    {
-        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
-    }
-
-    if (!scopedBuffer.Alloc(span.size()))
-    {
-        ChipLogError(Controller, "AutoCommissioner: AllocateMemoryAndCopySpan failed");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    memcpy(scopedBuffer.Get(), span.data(), scopedBuffer.AllocatedSize());
     return CHIP_NO_ERROR;
 }
 

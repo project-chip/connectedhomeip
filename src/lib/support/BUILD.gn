@@ -183,6 +183,8 @@ static_library("support") {
   output_name = "libSupportLayer"
 
   sources = [
+    "AllocatorUtils.cpp",
+    "AllocatorUtils.h",
     "Base64.cpp",
     "Base64.h",
     "BitFlags.h",

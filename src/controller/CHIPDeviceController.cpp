@@ -3360,14 +3360,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    {
-        /* TODO: send SignVidVerificationRequest */
-        CommissioningStageComplete(CHIP_NO_ERROR);
-        break;
-    }
-#endif
- #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case CommissioningStage::kJCMTrustVerification: {
         CHIP_ERROR err = StartJCMTrustVerification(proxy);
         if (err != CHIP_NO_ERROR)
@@ -3378,7 +3370,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         break;
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     case CommissioningStage::kSendOpCertSigningRequest: {
         if (!params.GetCSRNonce().HasValue())

@@ -37,7 +37,7 @@ struct JCMTrustVerificationInfo {
     Platform::ScopedMemoryBufferWithSize<uint8_t> adminICAC;
     Platform::ScopedMemoryBufferWithSize<uint8_t> adminNOC;
 
-    void clear() {
+    void Cleanup() {
         adminEndpointId = kInvalidEndpointId;
         adminFabricIndex = kUndefinedFabricIndex;
         adminFabricId = 0;

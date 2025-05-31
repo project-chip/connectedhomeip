@@ -860,11 +860,9 @@ protected:
     // to the PairingDelegate upon arm failsafe command completion.
     virtual void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     /* This function start the JCM verification steps
      */
-    virtual CHIP_ERROR StartJCMTrustVerification(DeviceProxy * device) { return CHIP_ERROR_NOT_IMPLEMENTED; };
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    virtual CHIP_ERROR StartJCMTrustVerification(DeviceProxy * device) { return CHIP_NO_ERROR; };
 
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
