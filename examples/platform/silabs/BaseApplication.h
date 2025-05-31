@@ -197,6 +197,9 @@ protected:
      */
     virtual CHIP_ERROR AppInit() = 0;
 
+    /* A stub for backward compatibility */
+    void InitCompleteCallback(CHIP_ERROR err);
+
     /**
      * @brief Function called to start the function timer
      *

@@ -8206,6 +8206,16 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
             } else {
                 value.endSystime = nil;
             }
+            if (cppValue.Value().apparentEnergy.HasValue()) {
+                value.apparentEnergy = [NSNumber numberWithLongLong:cppValue.Value().apparentEnergy.Value()];
+            } else {
+                value.apparentEnergy = nil;
+            }
+            if (cppValue.Value().reactiveEnergy.HasValue()) {
+                value.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.Value().reactiveEnergy.Value()];
+            } else {
+                value.reactiveEnergy = nil;
+            }
         }
         return value;
     }
@@ -8241,6 +8251,16 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
                 value.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().endSystime.Value()];
             } else {
                 value.endSystime = nil;
+            }
+            if (cppValue.Value().apparentEnergy.HasValue()) {
+                value.apparentEnergy = [NSNumber numberWithLongLong:cppValue.Value().apparentEnergy.Value()];
+            } else {
+                value.apparentEnergy = nil;
+            }
+            if (cppValue.Value().reactiveEnergy.HasValue()) {
+                value.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.Value().reactiveEnergy.Value()];
+            } else {
+                value.reactiveEnergy = nil;
             }
         }
         return value;
@@ -8278,6 +8298,16 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
             } else {
                 value.endSystime = nil;
             }
+            if (cppValue.Value().apparentEnergy.HasValue()) {
+                value.apparentEnergy = [NSNumber numberWithLongLong:cppValue.Value().apparentEnergy.Value()];
+            } else {
+                value.apparentEnergy = nil;
+            }
+            if (cppValue.Value().reactiveEnergy.HasValue()) {
+                value.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.Value().reactiveEnergy.Value()];
+            } else {
+                value.reactiveEnergy = nil;
+            }
         }
         return value;
     }
@@ -8313,6 +8343,16 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
                 value.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().endSystime.Value()];
             } else {
                 value.endSystime = nil;
+            }
+            if (cppValue.Value().apparentEnergy.HasValue()) {
+                value.apparentEnergy = [NSNumber numberWithLongLong:cppValue.Value().apparentEnergy.Value()];
+            } else {
+                value.apparentEnergy = nil;
+            }
+            if (cppValue.Value().reactiveEnergy.HasValue()) {
+                value.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.Value().reactiveEnergy.Value()];
+            } else {
+                value.reactiveEnergy = nil;
             }
         }
         return value;
@@ -18563,6 +18603,7 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                 } else {
                     newElement_0.transportOptions = nil;
                 }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

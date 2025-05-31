@@ -267,6 +267,26 @@ void RvcDevice::HandleDockedMessage()
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked));
 }
 
+void RvcDevice::HandleEmptyingDustBinMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin));
+}
+
+void RvcDevice::HandleCleaningMopMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop));
+}
+
+void RvcDevice::HandleFillingWaterTankMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank));
+}
+
+void RvcDevice::HandleUpdatingMapsMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps));
+}
+
 void RvcDevice::HandleChargerFoundMessage()
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() !=
@@ -394,6 +414,34 @@ void RvcDevice::HandleErrorEvent(const std::string & error)
     else if (error == "MopCleaningPadMissing")
     {
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing);
+    }
+    else if (error == "LowBattery")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kLowBattery);
+    }
+    else if (error == "CannotReachTargetArea")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kCannotReachTargetArea);
+    }
+    else if (error == "DirtyWaterTankFull")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankFull);
+    }
+    else if (error == "DirtyWaterTankMissing")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankMissing);
+    }
+    else if (error == "WheelsJammed")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWheelsJammed);
+    }
+    else if (error == "BrushJammed")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kBrushJammed);
+    }
+    else if (error == "NavigationSensorObscured")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kNavigationSensorObscured);
     }
     else
     {
