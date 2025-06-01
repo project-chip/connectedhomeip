@@ -334,7 +334,7 @@ void init()
         if (epIndex < kLevelControlCount)
         {
             VerifyOrDieWithMsg(LevelControl::Attributes::CurrentLevel::Set(endpointId, kMinLevel) == Status::Success, DeviceLayer,
-                               "Failed to initialize Current Level to 0 for Endpoint: %d", endpointId);
+                               "Failed to initialize Current Level to %d for Endpoint: %%d", kMinLevel, endpointId);
         }
 
         VerifyOrDieWithMsg(OnOff::Attributes::OnOff::Set(endpointId, false) == Status::Success, DeviceLayer,
