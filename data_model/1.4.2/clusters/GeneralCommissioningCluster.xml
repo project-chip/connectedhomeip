@@ -68,7 +68,7 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="CGEN" scope="Node"/>
   <features>
     <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement">
-      <mandatoryConform/>
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
