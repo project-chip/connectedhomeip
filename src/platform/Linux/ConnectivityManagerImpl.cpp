@@ -85,23 +85,6 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-static void StopSignalHandler(int signum)
-{
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
-        switch (role)
-        {
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(id);
-            break;
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
-            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(id);
-            break;
-        }
-    });
-}
-#endif
-
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -148,14 +131,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    pmWiFiPAF = &WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-    pmWiFiPAF->Init(&DeviceLayer::SystemLayer());
-
-    struct sigaction sa = {};
-    sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = SA_RESETHAND;
-    sigaction(SIGINT, &sa, nullptr);
-    sigaction(SIGTERM, &sa, nullptr);
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
 #endif
 
     return CHIP_NO_ERROR;
@@ -783,6 +759,33 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
 
+CHIP_ERROR ConnectivityManagerImpl::StartWiFiManagementSync()
+{
+    if (IsWiFiManagementStarted())
+    {
+        return CHIP_NO_ERROR;
+    }
+    ChipLogProgress(DeviceLayer, "Start and sync Wi-Fi Management.");
+    static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
+    static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
+    StartWiFiManagement();
+    for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
+    {
+        if (IsWiFiManagementStarted())
+        {
+            break;
+        }
+        usleep(kWiFiStartCheckTimeUsec);
+    }
+    if (!IsWiFiManagementStarted())
+    {
+        ChipLogError(DeviceLayer, "Wi-Fi Management can't be started.");
+        return CHIP_ERROR_INTERNAL;
+    }
+    ChipLogProgress(DeviceLayer, "Wi-Fi Management is started");
+    return CHIP_NO_ERROR;
+}
+
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -818,6 +821,9 @@ enum nan_service_protocol_type
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParam & InArgs)
 {
+    CHIP_ERROR result = StartWiFiManagementSync();
+    VerifyOrReturnError(result == CHIP_NO_ERROR, result);
+
     GAutoPtr<GError> err;
     guint publish_id;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
@@ -1561,6 +1567,9 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState,
                                                       OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
 {
+    CHIP_ERROR result = StartWiFiManagementSync();
+    VerifyOrReturnError(result == CHIP_NO_ERROR, result);
+
     ChipLogProgress(Controller, "WiFi-PAF: Try to subscribe the NAN-USD devices");
 
     guint subscribe_id;

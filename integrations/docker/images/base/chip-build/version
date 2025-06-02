@@ -1,1 +1,1 @@
-132 : [Telink] Update Docker image (Zephyr update)
+135 : Upgrade docker to build with gcovr for coverage

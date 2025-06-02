@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
 
 assert(chip_device_platform == "darwin")
 
@@ -77,9 +78,15 @@ static_library("Darwin") {
     "SystemTimeSupport.cpp",
     "UserDefaults.h",
     "UserDefaults.mm",
-    "inet/InterfacesMonitor.h",
-    "inet/InterfacesMonitor.mm",
+    "inet/NetworkMonitor.h",
+    "inet/NetworkMonitor.mm",
+    "system/SystemLayerImplDispatch.h",
+    "system/SystemLayerImplDispatch.mm",
   ]
+
+  if (chip_system_config_use_sockets) {
+    sources += [ "system/SystemLayerImplDispatchSockets.mm" ]
+  }
 
   if (chip_enable_wifi) {
     sources += [

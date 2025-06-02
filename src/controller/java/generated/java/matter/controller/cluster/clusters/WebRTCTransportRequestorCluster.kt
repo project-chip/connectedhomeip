@@ -93,7 +93,7 @@ class WebRTCTransportRequestorCluster(
     ICETransportPolicy: String?,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 1u
+    val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -131,7 +131,7 @@ class WebRTCTransportRequestorCluster(
   }
 
   suspend fun answer(webRTCSessionID: UShort, sdp: String, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 2u
+    val commandId: UInt = 1u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -156,10 +156,10 @@ class WebRTCTransportRequestorCluster(
 
   suspend fun ICECandidates(
     webRTCSessionID: UShort,
-    ICECandidates: List<String>,
+    ICECandidates: List<WebRTCTransportRequestorClusterICECandidateStruct>,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 3u
+    val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -170,7 +170,7 @@ class WebRTCTransportRequestorCluster(
     val TAG_ICE_CANDIDATES_REQ: Int = 1
     tlvWriter.startArray(ContextSpecificTag(TAG_ICE_CANDIDATES_REQ))
     for (item in ICECandidates.iterator()) {
-      tlvWriter.put(AnonymousTag, item)
+      item.toTlv(AnonymousTag, tlvWriter)
     }
     tlvWriter.endArray()
     tlvWriter.endStructure()
@@ -187,7 +187,7 @@ class WebRTCTransportRequestorCluster(
   }
 
   suspend fun end(webRTCSessionID: UShort, reason: UByte, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 4u
+    val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)

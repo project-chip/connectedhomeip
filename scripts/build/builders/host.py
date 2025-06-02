@@ -350,7 +350,7 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
-                 enable_ipv4=True, enable_ble=True, enable_wifi=True,
+                 enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
@@ -382,6 +382,9 @@ class HostBuilder(GnBuilder):
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
             self.extra_gn_options.append('chip_enable_ble=false')
+
+        if not enable_wifipaf:
+            self.extra_gn_options.append('chip_device_config_enable_wifipaf=false')
 
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
