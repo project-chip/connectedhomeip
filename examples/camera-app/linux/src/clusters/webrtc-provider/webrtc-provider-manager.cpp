@@ -235,6 +235,19 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
         ChipLogProgress(Camera, "mMediaController is null. Failed to Register WebRTC Transport");
         return;
     }
+
+    // Set the Video track on the transport
+    if (mVideoTrack && mWebrtcTransportMap[sessionId])
+    {
+        mWebrtcTransportMap[sessionId]->SetVideoTrack(mVideoTrack);
+    }
+
+    // Set the Audio track on the transport
+    if (mAudioTrack && mWebrtcTransportMap[sessionId])
+    {
+        mWebrtcTransportMap[sessionId]->SetAudioTrack(mAudioTrack);
+    }
+
     mMediaController->RegisterTransport(mWebrtcTransportMap[sessionId].get(), mVideoStreamID, mAudioStreamID);
 }
 
@@ -296,6 +309,24 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         mWebrtcTransportMap[args.sessionId] =
             std::unique_ptr<WebrtcTransport>(new WebrtcTransport(args.sessionId, mPeerId.GetNodeId(), mPeerConnection));
     }
+
+    // Only set up onTrack callback if you expect to RECEIVE tracks (answerer role)
+    mPeerConnection->onTrack([this, sessionId = args.sessionId](std::shared_ptr<rtc::Track> track) {
+        ChipLogProgress(Camera, "Remote track received for session %u", sessionId);
+
+        // Check if this is a video track based on the media description
+        auto description = track->description();
+        if (description.type() == "video")
+        {
+            mVideoTrack = track;
+            ChipLogProgress(Camera, "Video track updated from remote peer");
+        }
+        else if (description.type() == "audio")
+        {
+            mAudioTrack = track;
+            ChipLogProgress(Camera, "Audio track updated from remote peer");
+        }
+    });
 
     MoveToState(State::SendingAnswer);
     rtc::Description remoteOffer(args.sdp, rtc::Description::Type::Offer);

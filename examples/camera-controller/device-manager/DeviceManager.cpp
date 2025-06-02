@@ -18,9 +18,11 @@
 
 #include "DeviceManager.h"
 
+#include <app/data-model/Nullable.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
+#include <webrtc-manager/WebRTCManager.h>
 
 #include <cstring>
 #include <errno.h>
@@ -32,6 +34,7 @@
 #include <unistd.h>
 
 using namespace chip;
+using StreamUsageEnum = chip::app::Clusters::Globals::StreamUsageEnum;
 
 namespace camera {
 
@@ -88,15 +91,20 @@ CHIP_ERROR DeviceManager::AllocateVideoStream(NodeId nodeId, uint8_t streamUsage
                      "). Error: %" CHIP_ERROR_FORMAT,
                      ChipLogValueX64(nodeId), error.Format());
     }
+    else
+    {
+        mNodeId      = nodeId;
+        mStreamUsage = streamUsage;
+    }
 
     return error;
 }
 
-CHIP_ERROR DeviceManager::DeallocateVideoStream(NodeId nodeId, uint16_t videoStreamID)
+CHIP_ERROR DeviceManager::DeallocateVideoStream(NodeId nodeId, uint16_t videoStreamId)
 {
     ChipLogProgress(Camera, "Deallocate a video stream on the camera device.");
 
-    CHIP_ERROR error = mAVStreamManagment.DeallocateVideoStream(nodeId, kCameraEndpointId, videoStreamID);
+    CHIP_ERROR error = mAVStreamManagment.DeallocateVideoStream(nodeId, kCameraEndpointId, videoStreamId);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -139,10 +147,37 @@ void DeviceManager::HandleVideoStreamAllocateResponse(TLV::TLVReader & data)
 
     // Log all fields
     ChipLogProgress(Camera, "DecodableType fields:");
-    ChipLogProgress(Camera, "  videoStreamID: %u", value.videoStreamID);
+    ChipLogProgress(Camera, "  videoStreamId: %u", value.videoStreamID);
 
-    // Start video streaming process
-    StartVideoStreamProcess(value.videoStreamID);
+    InitiateWebRTCSession(value.videoStreamID);
+}
+
+void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
+{
+    ChipLogProgress(Camera, "DeviceManager: Initiating WebRTC session for node=0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+
+    // Connect to the WebRTC transport provider on the device
+    CHIP_ERROR err = WebRTCManager::Instance().Connnect(*mCommissioner, mNodeId, kCameraEndpointId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to connect WebRTC manager. Error: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+
+    auto videoStreamIdNullable = app::DataModel::MakeNullable(videoStreamId);
+    auto videoStreamIdOptional = MakeOptional(videoStreamIdNullable);
+    auto streamUsage           = static_cast<StreamUsageEnum>(mStreamUsage);
+
+    // Provide the offer to establish the WebRTC session
+    err = WebRTCManager::Instance().ProvideOffer(app::DataModel::NullNullable,                // session ID (null)
+                                                 streamUsage,                                 // stream‑usage field
+                                                 videoStreamIdOptional,                       // videoStreamID you just built
+                                                 MakeOptional(app::DataModel::NullNullable)); // audioStreamID (null)
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to provide an offer. Error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void DeviceManager::StartVideoStreamProcess(uint16_t streamID)

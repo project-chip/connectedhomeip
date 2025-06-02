@@ -46,7 +46,9 @@ public:
 
     CHIP_ERROR Connnect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
 
-    CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage);
+    CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage,
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
     CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage);
 

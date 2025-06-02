@@ -23,8 +23,11 @@
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
+#include <arpa/inet.h>
 #include <cstdio>
+#include <netinet/in.h>
 #include <string>
+#include <sys/socket.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -36,6 +39,9 @@ namespace {
 constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
+
+constexpr const char * kStreamGstDestIp    = "127.0.0.1";
+constexpr uint16_t kVideoStreamGstDestPort = 5000;
 
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
@@ -243,10 +249,27 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
     });
 
+    int sock             = socket(AF_INET, SOCK_DGRAM, 0);
+    sockaddr_in addr     = {};
+    addr.sin_family      = AF_INET;
+    addr.sin_addr.s_addr = inet_addr(kStreamGstDestIp);
+    addr.sin_port        = htons(kVideoStreamGstDestPort);
+
     rtc::Description::Video media("video", rtc::Description::Direction::RecvOnly);
     media.addH264Codec(kVideoH264PayloadType);
     media.setBitrate(kVideoBitRate);
     mTrack = mPeerConnection->addTrack(media);
+
+    auto session = std::make_shared<rtc::RtcpReceivingSession>();
+    mTrack->setMediaHandler(session);
+
+    mTrack->onMessage(
+        [session, sock, addr](rtc::binary message) {
+            // This is an RTP packet
+            sendto(sock, reinterpret_cast<const char *>(message.data()), int(message.size()), 0,
+                   reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
+        },
+        nullptr);
 
     ChipLogProgress(Camera, "Generate and set the SDP");
     mPeerConnection->setLocalDescription();
@@ -254,7 +277,9 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage)
+CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage,
+                                       Optional<app::DataModel::Nullable<uint16_t>> videoStreamId,
+                                       Optional<app::DataModel::Nullable<uint16_t>> audioStreamId)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer command to the peer device");
 
@@ -264,11 +289,8 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR err =
-        mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
-                                           MakeOptional(DataModel::NullNullable), // "Null" for video
-                                           MakeOptional(DataModel::NullNullable)  // "Null" for audio
-        );
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage,
+                                                        kWebRTCRequesterDynamicEndpointId, videoStreamId, audioStreamId);
 
     if (err != CHIP_NO_ERROR)
     {

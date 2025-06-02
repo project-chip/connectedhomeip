@@ -69,11 +69,15 @@ public:
 
 private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
+    chip::NodeId mNodeId                                 = chip::kUndefinedNodeId;
+    uint8_t mStreamUsage                                 = 0;
     std::map<uint16_t, pid_t> mVideoStreamProcesses; // Stream ID -> Process ID mapping
 
     AVStreamManagement mAVStreamManagment;
 
     void HandleVideoStreamAllocateResponse(chip::TLV::TLVReader & data);
+
+    void InitiateWebRTCSession(uint16_t videoStreamId);
 
     void StartVideoStreamProcess(uint16_t streamID);
 };
