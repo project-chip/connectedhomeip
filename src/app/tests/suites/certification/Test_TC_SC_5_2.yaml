@@ -220,7 +220,37 @@ tests:
                 value: ""
 
     - label:
-          "Step 9: TH removes the Group key set that was added by sending a
+          "Step 9: TH sends a RemoveGroup Command to the Groups cluster with
+          the GroupID field set to 0x0101. The command is sent as a group
+          command using GroupID 0x0103"
+      PICS: G.S.C03.Rsp
+      groupId: 0x0103
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+
+    - label:
+          "Step 10: TH sends a ViewGroup Command to the Groups cluster on
+          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0101 to
+          confirm that the RemoveGroup command from step 9 was successful"
+      PICS: G.S.C01.Rsp
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+      response:
+          values:
+              - name: "Status"
+                value: 0x8B
+              - name: "GroupID"
+                value: 0x0101
+
+    - label:
+          "Step 11: TH removes the Group key set that was added by sending a
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a3"
       PICS: GRPKEY.S.C03.Rsp
@@ -232,14 +262,14 @@ tests:
                 value: 0x01a3
 
     - label:
-          "Step 10: TH cleans up the groups by sending the RemoveAllGroups
+          "Step 12: TH cleans up the groups by sending the RemoveAllGroups
           command to the DUT on PIXIT.G.ENDPOINT"
       PICS: G.S.C04.Rsp
       endpoint: Groups.Endpoint
       command: "RemoveAllGroups"
 
     - label:
-          "Step 11: TH writes the ACL attribute in the Access Control cluster to
+          "Step 13: TH writes the ACL attribute in the Access Control cluster to
           remove Manage privileges for group 0x0103 and maintain the current
           administrative privileges for the TH. The following access control
           list shall be used: List item 1 (TH admin): 1)Privilege: Administer
