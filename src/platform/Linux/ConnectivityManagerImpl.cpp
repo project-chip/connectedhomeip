@@ -1994,18 +1994,16 @@ CHIP_ERROR ConnectivityManagerImpl::StopAutoScan()
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
-    GAutoPtr<GError> err;
-    gboolean result;
-
     ChipLogDetail(DeviceLayer, "wpa_supplicant: disabling auto scan");
 
-    result = wpa_supplicant_1_interface_call_auto_scan_sync(
-        mWpaSupplicant.iface.get(), "" /* empty string means disabling auto scan */, nullptr, &err.GetReceiver());
-    if (!result)
+    GAutoPtr<GError> err;
+    if (!wpa_supplicant_1_interface_call_auto_scan_sync(mWpaSupplicant.iface.get(), "" /* empty string means disabling auto scan */,
+                                                        nullptr, &err.GetReceiver()))
     {
         ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto network scan: %s", err ? err->message : "unknown");
         return CHIP_ERROR_INTERNAL;
     }
+
     return CHIP_NO_ERROR;
 }
 
@@ -2017,11 +2015,9 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(ssid.size() <= sizeof(sInterestedSSID), CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR ret = CHIP_NO_ERROR;
     GAutoPtr<GError> err;
     GVariant * args = nullptr;
     GVariantBuilder builder;
-    gboolean result;
 
     memcpy(sInterestedSSID, ssid.data(), ssid.size());
     sInterestedSSIDLen = ssid.size();
@@ -2030,20 +2026,16 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
     g_variant_builder_add(&builder, "{sv}", "Type", g_variant_new_string("active"));
     args = g_variant_builder_end(&builder);
 
-    result = wpa_supplicant_1_interface_call_scan_sync(mWpaSupplicant.iface.get(), args, nullptr, &err.GetReceiver());
-
-    if (result)
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: initialized network scan.");
-        mpScanCallback = callback;
-    }
-    else
+    mpScanCallback = callback;
+    if (!wpa_supplicant_1_interface_call_scan_sync(mWpaSupplicant.iface.get(), args, nullptr, &err.GetReceiver()))
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to start network scan: %s", err ? err->message : "unknown error");
-        ret = CHIP_ERROR_INTERNAL;
+        mpScanCallback = nullptr;
+        return CHIP_ERROR_INTERNAL;
     }
 
-    return ret;
+    ChipLogProgress(DeviceLayer, "wpa_supplicant: initialized network scan");
+    return CHIP_NO_ERROR;
 }
 
 namespace {
