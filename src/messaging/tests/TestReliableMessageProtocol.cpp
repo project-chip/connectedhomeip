@@ -1798,8 +1798,8 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     ASSERT_NE(rm, nullptr);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     constexpr uint32_t kMaxMRPTransmits = 5; // Counting the initial message.
@@ -1863,8 +1863,8 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     loopback.mDroppedMessageCount = 0;
 
     mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
@@ -1957,8 +1957,8 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     ASSERT_NE(rm, nullptr);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     constexpr uint32_t kMaxMRPTransmits = 5; // Counting the initial message.
@@ -2076,7 +2076,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     TestReliablityAnalyticDelegate testAnalyticsDelegate;
     rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
 
-    constexpr auto kTestRetryInterval = System::Clock::Milliseconds32(30_ms32);
+    constexpr auto kTestRetryInterval = System::Clock::Milliseconds32(70_ms32);
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
@@ -2103,7 +2103,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
 
-    // Wait for the initial message to fail (should take less than 50ms)
+    // Wait for the initial message to fail (should take less than 100ms)
     GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     DrainAndServiceIO();
 
@@ -2223,8 +2223,8 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFail
     rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     const auto expectedFabricIndex = exchange->GetSessionHandle()->GetFabricIndex();
@@ -2358,8 +2358,8 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEsta
     rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        70_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     ASSERT_TRUE(exchange->GetSessionHandle()->AsSecureSession()->IsPASESession());
