@@ -1807,22 +1807,24 @@ CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSp
 
 class PemEncoder
 {
-  public:
-    static constexpr size_t kNumBytesPerLine = 48u;
+public:
+    static constexpr size_t kNumBytesPerLine   = 48u;
     static constexpr size_t kMinLineBufferSize = 64u + 1u; // PEM expects 64 characters wide and a null terminator at least.
-    static_assert(kMinLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1), "Internal incoherence of library configuration!");
+    static_assert(kMinLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1),
+                  "Internal incoherence of library configuration!");
 
     /**
      * @brief Construct a PEM encoder for element type `encodedElement` whose DER data is in `derBytes` span.
      *
-     * @param encodedElement - Element type string to include in header/footer (e.g. "CERTIFICATE"). Caller must provide correct uppercase.
+     * @param encodedElement - Element type string to include in header/footer (e.g. "CERTIFICATE"). Caller must provide correct
+     * uppercase.
      * @param derBytes - Byte span containing data to encode. May be empty.
      */
-    explicit PemEncoder(const char* encodedElement, ByteSpan derBytes) : mEncodedElement(encodedElement), mDerBytes(derBytes) {}
+    explicit PemEncoder(const char * encodedElement, ByteSpan derBytes) : mEncodedElement(encodedElement), mDerBytes(derBytes) {}
 
     // No copies.
-    PemEncoder(const PemEncoder&) = delete;
-    PemEncoder& operator=(const PemEncoder&) = delete;
+    PemEncoder(const PemEncoder &)             = delete;
+    PemEncoder & operator=(const PemEncoder &) = delete;
 
     /**
      * @brief Returns the next line of the encoding, if anything left to do.
@@ -1841,22 +1843,23 @@ class PemEncoder
      * @return true if there is a line given back to accumulate.
      * @return false if the encoding is complete.
      */
-    bool NextLine(char *destStr, size_t destSize);
+    bool NextLine(char * destStr, size_t destSize);
 
     bool IsDone() const { return mState == State::kDone; }
 
-  private:
-    enum State : int {
+private:
+    enum State : int
+    {
         kPrintHeader = 0,
-        kPrintBody = 1,
+        kPrintBody   = 1,
         kPrintFooter = 2,
         kEndIterator = 3,
-        kDone = 4,
+        kDone        = 4,
     };
 
-    const char* mEncodedElement; // "CERTIFICATE", "EC PUBLIC KEY", etc. Must be capitalized by caller.
+    const char * mEncodedElement; // "CERTIFICATE", "EC PUBLIC KEY", etc. Must be capitalized by caller.
     ByteSpan mDerBytes;
-    State mState = State::kPrintHeader;
+    State mState           = State::kPrintHeader;
     size_t mProcessedBytes = 0;
     char mInternalStringBuf[kMinLineBufferSize]; // Will be copied-out to callers.
 };

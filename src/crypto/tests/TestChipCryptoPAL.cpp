@@ -96,7 +96,7 @@ using TestHKDF_sha                      = HKDF_sha;
 using TestHMAC_sha                      = HMAC_sha;
 
 // Trivial StringJoin to use for PEM encoding testing.
-std::string StringJoin(const std::vector<std::string>& elements, const std::string& delimiter)
+std::string StringJoin(const std::vector<std::string> & elements, const std::string & delimiter)
 {
     if (elements.empty())
     {
@@ -3266,7 +3266,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
 
     // Ensure that encoding with empty buffer works to not touch anything.
     {
-        char outputBuf1Byte[1] = {'\1'};
+        char outputBuf1Byte[1] = { '\1' };
         PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
         size_t numLines = 0;
 
@@ -3283,7 +3283,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
 
     // Ensure that encoding with small buffer
     {
-        char outputBufTooSmall[PemEncoder::kMinLineBufferSize - 1] = {'\1'};
+        char outputBufTooSmall[PemEncoder::kMinLineBufferSize - 1] = { '\1' };
         PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
         size_t numLines = 0;
 
@@ -3301,8 +3301,17 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
 
     // Known cert case: sTestCert_PAA_FFF1_Cert should succeed
     {
-        const char* kExpectedPemForPaa = "-----BEGIN CERTIFICATE-----\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZMBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END CERTIFICATE-----";
-        char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {'\1'};
+        const char * kExpectedPemForPaa =
+            "-----BEGIN "
+            "CERTIFICATE-----"
+            "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
+            "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
+            "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
+            "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
+            "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END CERTIFICATE-----";
+        char outputBufOkSize[PemEncoder::kMinLineBufferSize] = { '\1' };
         std::vector<std::string> pemLines;
 
         PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
@@ -3316,7 +3325,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
             // No lines should have overflowed.
             ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
 
-            pemLines.push_back(std::string{outputBufOkSize});
+            pemLines.push_back(std::string{ outputBufOkSize });
             outputBufOkSize[0] = '\1';
         }
 
@@ -3327,7 +3336,16 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
 
     // Known cert case, different heading requested: sTestCert_PAA_FFF1_Cert should succeed with "ROBOTO" instead of "CERTIFICATE".
     {
-        const char* kExpectedPemForPaa = "-----BEGIN ROBOTO-----\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZMBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END ROBOTO-----";
+        const char * kExpectedPemForPaa =
+            "-----BEGIN "
+            "ROBOTO-----"
+            "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
+            "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
+            "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
+            "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
+            "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END ROBOTO-----";
         char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {};
         std::vector<std::string> pemLines;
 
@@ -3339,7 +3357,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
             ++numLines;
             // No lines should have overflowed.
             ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
-            pemLines.push_back(std::string{outputBufOkSize});
+            pemLines.push_back(std::string{ outputBufOkSize });
             EXPECT_FALSE(encoder.IsDone());
         }
         EXPECT_TRUE(encoder.IsDone());
@@ -3358,7 +3376,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
 
     // Empty body case shoudld succeed. Casedness is for the client to deal with.
     {
-        const char* kExpectedPem = "-----BEGIN EMPTY_thing-----\n-----END EMPTY_thing-----";
+        const char * kExpectedPem                            = "-----BEGIN EMPTY_thing-----\n-----END EMPTY_thing-----";
         char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {};
         std::vector<std::string> pemLines;
 
@@ -3370,7 +3388,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
             ++numLines;
             // No lines should have overflowed.
             ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
-            pemLines.push_back(std::string{outputBufOkSize});
+            pemLines.push_back(std::string{ outputBufOkSize });
         }
 
         std::string finalPem = StringJoin(pemLines, "\n");
@@ -3380,12 +3398,12 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
 
     // Single-byte should also work.
     {
-        const char* kExpectedPem = "-----BEGIN SINGLE_BYTE-----\nAA==\n-----END SINGLE_BYTE-----";
+        const char * kExpectedPem                            = "-----BEGIN SINGLE_BYTE-----\nAA==\n-----END SINGLE_BYTE-----";
         char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {};
         std::vector<std::string> pemLines;
 
         const uint8_t kOneByte[1] = { 0 };
-        PemEncoder encoder("SINGLE_BYTE", ByteSpan{kOneByte});
+        PemEncoder encoder("SINGLE_BYTE", ByteSpan{ kOneByte });
         size_t numLines = 0;
 
         while (encoder.NextLine(outputBufOkSize, sizeof(outputBufOkSize)))
@@ -3393,7 +3411,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
             ++numLines;
             // No lines should have overflowed.
             ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
-            pemLines.push_back(std::string{outputBufOkSize});
+            pemLines.push_back(std::string{ outputBufOkSize });
         }
 
         std::string finalPem = StringJoin(pemLines, "\n");
@@ -3403,7 +3421,8 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
 
     // Clamping of very long headings should work.
     {
-        const char* kExpectedPem = "-----BEGIN SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOP-----\n-----END SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQR-----";
+        const char * kExpectedPem = "-----BEGIN SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOP-----\n-----END "
+                                    "SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQR-----";
         char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {};
         std::vector<std::string> pemLines;
 
@@ -3415,7 +3434,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
             ++numLines;
             // No lines should have overflowed.
             ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
-            pemLines.push_back(std::string{outputBufOkSize});
+            pemLines.push_back(std::string{ outputBufOkSize });
         }
 
         std::string finalPem = StringJoin(pemLines, "\n");

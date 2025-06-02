@@ -1256,57 +1256,58 @@ CHIP_ERROR VerifyCertificateSigningRequestFormat(const uint8_t * csr, size_t csr
     return CHIP_NO_ERROR;
 }
 
-bool PemEncoder::NextLine(char *destStr, size_t destSize)
+bool PemEncoder::NextLine(char * destStr, size_t destSize)
 {
     StringBuilderBase stringBuilder(mInternalStringBuf, sizeof(mInternalStringBuf));
-    bool hasMore = false;
+    bool hasMore        = false;
     bool bufferTooSmall = destSize < kMinLineBufferSize;
 
-    switch(mState)
+    switch (mState)
     {
-        case State::kPrintHeader: {
-            if (!bufferTooSmall)
-            {
-                // The `.48s` is to make sure the header is not wider than out internal string buffer. We clamp the header.
-                stringBuilder.AddFormat("-----BEGIN %.48s-----", mEncodedElement);
-            }
-            mState = mDerBytes.empty() ? State::kPrintFooter : State::kPrintBody;
-            hasMore = true;
-            break;
+    case State::kPrintHeader: {
+        if (!bufferTooSmall)
+        {
+            // The `.48s` is to make sure the header is not wider than out internal string buffer. We clamp the header.
+            stringBuilder.AddFormat("-----BEGIN %.48s-----", mEncodedElement);
         }
-        case State::kPrintBody: {
-            size_t remaining = mDerBytes.size() - mProcessedBytes;
-            size_t chunkSizeBytes = std::min(remaining, static_cast<size_t>(kNumBytesPerLine));
-            if (!bufferTooSmall)
-            {
-                size_t encodedLen = static_cast<size_t>(Base64Encode(mDerBytes.data() + mProcessedBytes, static_cast<uint16_t>(chunkSizeBytes), mInternalStringBuf));
-                VerifyOrDie(encodedLen < kMinLineBufferSize);
-                mInternalStringBuf[encodedLen] = '\0';
-            }
+        mState  = mDerBytes.empty() ? State::kPrintFooter : State::kPrintBody;
+        hasMore = true;
+        break;
+    }
+    case State::kPrintBody: {
+        size_t remaining      = mDerBytes.size() - mProcessedBytes;
+        size_t chunkSizeBytes = std::min(remaining, static_cast<size_t>(kNumBytesPerLine));
+        if (!bufferTooSmall)
+        {
+            size_t encodedLen = static_cast<size_t>(
+                Base64Encode(mDerBytes.data() + mProcessedBytes, static_cast<uint16_t>(chunkSizeBytes), mInternalStringBuf));
+            VerifyOrDie(encodedLen < kMinLineBufferSize);
+            mInternalStringBuf[encodedLen] = '\0';
+        }
 
-            mProcessedBytes += chunkSizeBytes;
-            mState = (mProcessedBytes < mDerBytes.size()) ? State::kPrintBody : State::kPrintFooter;
-            hasMore = true;
-            break;
+        mProcessedBytes += chunkSizeBytes;
+        mState  = (mProcessedBytes < mDerBytes.size()) ? State::kPrintBody : State::kPrintFooter;
+        hasMore = true;
+        break;
+    }
+    case State::kPrintFooter: {
+        if (!bufferTooSmall)
+        {
+            // The `.50s` is to make sure the header is not wider than out internal string buffer. We clamp the footer.
+            stringBuilder.AddFormat("-----END %.50s-----", mEncodedElement);
         }
-        case State::kPrintFooter: {
-            if (!bufferTooSmall)
-            {
-                // The `.50s` is to make sure the header is not wider than out internal string buffer. We clamp the footer.
-                stringBuilder.AddFormat("-----END %.50s-----", mEncodedElement);
-            }
-            mState = State::kEndIterator;
-            hasMore = true;
-            break;
-        }
-        case State::kEndIterator:
-        case State::kDone:
-        default: {
-            // Default initialized StringBuilder: empty output.
-            mState = State::kDone;
-            hasMore = false;
-            break;
-        }
+        mState  = State::kEndIterator;
+        hasMore = true;
+        break;
+    }
+    case State::kEndIterator:
+    case State::kDone:
+    default: {
+        // Default initialized StringBuilder: empty output.
+        mState  = State::kDone;
+        hasMore = false;
+        break;
+    }
     }
 
     // This is safe with any buffer size;
