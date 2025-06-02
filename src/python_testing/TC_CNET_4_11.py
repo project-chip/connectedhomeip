@@ -126,7 +126,7 @@ async def connect_wifi_mac(ssid, password):
     except subprocess.CalledProcessError as e:
         logger.error(f" --- connect_wifi_mac: Error connecting with networksetup: {e.stderr.strip()}")
     except Exception as e:
-        logger.error(f"[ --- connect_wifi_mac: Unexpected exception while trying to connect to {ssid}: {e}")
+        logger.error(f" --- connect_wifi_mac: Unexpected exception while trying to connect to {ssid}: {e}")
     finally:
         return result
 
