@@ -214,8 +214,7 @@ class TC_CADMIN(MatterBaseTest):
                 self.th1.CommissionOnNetwork,
                 nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234,
                 exception_type=ChipStackError,
-                assert_func=lambda e: asserts.assert_equal(e.err, 0x0000007E,
-                                                           "Expected to return Trying to add NOC for fabric that already exists")
+                expected_error_code=0x0000007E,
             )
             """
             expected error:
