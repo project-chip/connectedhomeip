@@ -137,11 +137,11 @@ async def connect_host_wifi(ssid, password):
     logger.info(f" --- connect_host_wifi: OS detected: {os_name}")
 
     # Let's try to connect the TH to the second network a few times, to avoid network instability
-    os_name = None
     retry = 1
     while retry <= MAX_RETRIES:
         logger.info(f" --- connect_host_wifi: Trying to connect to {ssid} - {retry}/{MAX_RETRIES}")
         try:
+            conn = None
             if os_name == "Linux":
                 conn = await connect_wifi_linux(ssid, password)
             elif os_name == "Darwin":
