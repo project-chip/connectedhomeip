@@ -1281,7 +1281,7 @@ bool PemEncoder::NextLine(char * destStr, size_t destSize)
         {
             size_t encodedLen = static_cast<size_t>(
                 Base64Encode(mDerBytes.data() + mProcessedBytes, static_cast<uint16_t>(chunkSizeBytes), mInternalStringBuf));
-            VerifyOrDie(encodedLen < kMinLineBufferSize);
+            VerifyOrDie(encodedLen < sizeof(mInternalStringBuf));
             mInternalStringBuf[encodedLen] = '\0';
         }
 
