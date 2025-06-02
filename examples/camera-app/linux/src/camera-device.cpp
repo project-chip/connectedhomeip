@@ -431,11 +431,13 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    // Start the network stream source after the Gstreamer pipeline is setup
-    mNetworkVideoSource.Start(streamID);
+    // TODO:: Start the network stream source after the Gstreamer pipeline is setup
+    // mNetworkVideoSource.Start(streamID);
 
     // Store in stream context
     it->videoContext = videoPipeline;
+
+    ChipLogProgress(Camera, "Video is PLAYING …");
 
     return CameraError::SUCCESS;
 }
@@ -837,8 +839,8 @@ void CameraDevice::InitializeAudioStreams()
 {
     // Create single audio stream with typical supported parameters
     AudioStream audioStream = { { 1 /* Id */, StreamUsageEnum::kLiveView /* StreamUsage */, AudioCodecEnum::kOpus,
-                                  2 /* ChannelCount */, 48000 /* SampleRate */, 20000 /* BitRate*/, 24 /* BitDepth */,
-                                  0 /* RefCount */ },
+                                  kMicrophoneMaxChannelCount /* ChannelCount(Max from Spec) */, 48000 /* SampleRate */,
+                                  20000 /* BitRate*/, 24 /* BitDepth */, 0 /* RefCount */ },
                                 false,
                                 nullptr };
 

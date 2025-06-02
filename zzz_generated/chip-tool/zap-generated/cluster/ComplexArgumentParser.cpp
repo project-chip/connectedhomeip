@@ -7321,6 +7321,13 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("transportOptions");
 
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -7330,6 +7337,7 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.connectionID);
     ComplexArgumentParser::Finalize(request.transportStatus);
     ComplexArgumentParser::Finalize(request.transportOptions);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
