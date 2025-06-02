@@ -33,7 +33,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
+#include <app/clusters/general-diagnostics-server/general-fault-listener.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
