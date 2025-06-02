@@ -262,7 +262,7 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
     {}
 
-    return CHIP_NO_ERROR;
+    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
 } // namespace Clusters
