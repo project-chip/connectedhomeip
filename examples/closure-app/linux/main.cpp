@@ -20,9 +20,9 @@
 #include <AppMain.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -96,7 +96,8 @@ void ApplicationInit()
 
     if (pTestEventDelegate != nullptr)
     {
-        VerifyOrDie(pTestEventDelegate->AddHandler(&ep1.GetDelegate()) == CHIP_NO_ERROR);}
+        VerifyOrDie(pTestEventDelegate->AddHandler(&ep1.GetDelegate()) == CHIP_NO_ERROR);
+    }
 
     DeviceLayer::PlatformMgr().UnlockChipStack();
 }
