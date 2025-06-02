@@ -208,9 +208,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.NodeLabel,
             exception_type=ChipStackError,
-            assert_func=lambda e: asserts.assert_equal(
-                e.err, 0x00000032, "Expected to timeout as DUT_CE is no longer on network"
-            ),
+            expected_error_code=0x00000032,
             error_msg="Expected exception not thrown"
         )
 
