@@ -140,12 +140,12 @@ Here is the interpretation of the **optional** parameters:
 
 ## 3. Write provisioning data
 
-| platform  | tool                             | command                                                                                    | details                                                                                            |
-| --------- | -------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| `mcxw71`  | `JLink`                          | `loadfile factory_data.bin 0xFE080`                                                        | NA                                                                                                 |
-| `rw61x`   | `JLink`                          | `loadfile factory_data.bin 0xBFFF000`                                                      | Here, `0xBFFF000` is the value of symbol `__FACTORY_DATA_START` from the corresponding `.map` file |
-| `rt1060`  | `MCUXpresso Flash Tool GUI`      | NA                                                                                         | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                       |
-| `rt1170`  | `MCUXpresso Flash Tool GUI`      | NA                                                                                         | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                       |
+| platform | tool                        | command                               | details                                                                                            |
+| -------- | --------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `mcxw71` | `JLink`                     | `loadfile factory_data.bin 0xFE080`   | NA                                                                                                 |
+| `rw61x`  | `JLink`                     | `loadfile factory_data.bin 0xBFFF000` | Here, `0xBFFF000` is the value of symbol `__FACTORY_DATA_START` from the corresponding `.map` file |
+| `rt1060` | `MCUXpresso Flash Tool GUI` | NA                                    | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                       |
+| `rt1170` | `MCUXpresso Flash Tool GUI` | NA                                    | The address is given by the `__FACTORY_DATA_START` symbol in the `.map` file                       |
 
 ## 4. Build app and usage
 
