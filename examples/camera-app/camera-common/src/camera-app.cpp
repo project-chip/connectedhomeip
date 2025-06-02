@@ -89,6 +89,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
     {
         features.Set(CameraAvStreamManagement::Feature::kNightVision);
+        optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
