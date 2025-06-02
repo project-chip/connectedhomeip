@@ -158,7 +158,7 @@ should be found.
 ```
 $ cd ~/connectedhomeip/examples/jf-admin-app/linux/out/debug
 $ rm -rf jfa_b_kvs && touch jfa_b_kvs
-$ ./jfa-app --capabilities 0x4 --passcode 110220055 --discriminator 384 --secured-device-port 5555 --rpc-server-port 33055 --KVS jfa_b_kvs
+$ ./jfa-app --capabilities 0x4 --passcode 110220055 --discriminator 3841 --secured-device-port 5555 --rpc-server-port 33055 --KVS jfa_b_kvs
 ```
 
 -   Start jf-control-app
