@@ -78,6 +78,14 @@ class TC_SOIL_2_2(MatterBaseTest):
         min_bound = soil_moisture_limits.minMeasuredValue
         max_bound = soil_moisture_limits.maxMeasuredValue
 
+        if self.is_pics_sdk_ci_only:
+            # Set the initial soil moisture, since it inits as null. Pick a random value between min_bound and max_bound
+            irand = randrange(min_bound, max_bound)
+            logging.info(f"Simulated soil moisture value: {irand}")
+
+            command_dict = {"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": irand, "EndpointId": endpoint}
+            self._send_named_pipe_command(command_dict)
+
         self.step(3)
         measurement = await self.read_soil_attribute_expect_success(endpoint=endpoint, attribute=attributes.SoilMoistureMeasuredValue)
         asserts.assert_true(measurement != NullValue, "SoilMoistureMeasuredValue is NullValue")
