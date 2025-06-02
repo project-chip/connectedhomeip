@@ -392,7 +392,6 @@ if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
 endif()
 
-
 # When using the pregenerated files, there is a edge case where an error appears for
 # undeclared argument chip_code_pre_generated_directory. To get around with it we are
 # disabling the --fail-on-unused-args flag.
@@ -465,9 +464,16 @@ endif()
 add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
                      REQUIRES ${matter_requires})
 
+# TODO: Hack alert:
+#   - "platform" for ESP32 builds some clusters, specifically NetworkCommissioning clusters
+#     which are implemented by the application-specific codegen cluster instances
+#   - this makes the libchip link against IDF main as well to have the cluster implementation
+#     built in
+#   - as a result we add "libmain" forcefully here (and it is odd/wrong)
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
                                                 matterlib
+                                                "${CMAKE_BINARY_DIR}/esp-idf/main/libmain.a"
                                                 -Wl,--end-group)
 
 # Make the component dependent on our CHIP build
