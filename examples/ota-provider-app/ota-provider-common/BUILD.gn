@@ -30,7 +30,10 @@ chip_data_model("ota-provider-common") {
     "OTAProviderExample.h",
   ]
 
-  deps = [ "${chip_root}/src/protocols/bdx" ]
+  deps = [
+    "${chip_root}/src/app/clusters/ota-provider:user-consent",
+    "${chip_root}/src/protocols/bdx",
+  ]
 
   is_server = true
 

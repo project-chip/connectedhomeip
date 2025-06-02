@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
  * The access grants the Matter stack can observe.  Only modified while in
  * Initializing state or on the Matter queue.
  */
-@property (nonatomic, strong, readonly) NSSet<MTRAccessGrant *> * matterAccessGrants;
+@property (atomic, copy, readonly) NSArray<MTRAccessGrant *> * matterAccessGrants;
 
 @end
 

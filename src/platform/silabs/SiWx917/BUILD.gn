@@ -89,6 +89,7 @@ static_library("SiWx917") {
     "${chip_root}/src/platform:platform_base",
   ]
   deps = [
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
     "${sl_provision_root}:headers",
   ]

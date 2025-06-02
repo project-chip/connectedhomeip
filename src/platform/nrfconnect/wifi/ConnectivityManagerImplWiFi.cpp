@@ -70,7 +70,7 @@ bool ConnectivityManagerImplWiFi::_IsWiFiStationApplicationControlled(void)
 
 bool ConnectivityManagerImplWiFi::_IsWiFiStationConnected(void)
 {
-    return (WiFiManager::StationStatus::CONNECTED == WiFiManager::Instance().GetStationStatus());
+    return (WiFiManager::StationStatus::FULLY_PROVISIONED == WiFiManager::Instance().GetStationStatus());
 }
 
 System::Clock::Timeout ConnectivityManagerImplWiFi::_GetWiFiStationReconnectInterval(void)

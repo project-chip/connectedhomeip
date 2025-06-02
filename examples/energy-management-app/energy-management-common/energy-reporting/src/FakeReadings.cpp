@@ -19,7 +19,6 @@
 #include <DEMManufacturerDelegate.h>
 #include <EnergyManagementAppCommonMain.h>
 
-#include <EnergyTimeUtils.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>

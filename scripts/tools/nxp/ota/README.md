@@ -16,8 +16,6 @@ For details related to the OTA implementation, please see
 
 ## Supported platforms
 
--   `k32w0`
--   `k32w1`
 -   `mcxw71`
 
 ## Usage

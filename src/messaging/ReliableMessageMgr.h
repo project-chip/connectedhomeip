@@ -67,6 +67,9 @@ public:
         System::Clock::Timestamp nextRetransTime; /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;                        /**< The number of times we have tried to send this entry,
                                                        including both successfully and failure send. */
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+        System::Clock::Timestamp initialSentTime; /**< Timestamp when the initial message was sent */
+#endif                                            // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     };
 
     ReliableMessageMgr(ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);

@@ -17,11 +17,11 @@
 #include <app/AttributePathExpandIterator.h>
 
 #include <app/GlobalAttributes.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 #include <optional>
 
@@ -181,33 +181,12 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
     // Advance the existing attribute id if it can be advanced.
     VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardAttributeId(), std::nullopt);
 
-    // Ensure (including ordering) that GlobalAttributesNotInMetadata is reported as needed
-    for (unsigned i = 0; i < MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata); i++)
-    {
-        if (GlobalAttributesNotInMetadata[i] != mPosition.mOutputPath.mAttributeId)
-        {
-            continue;
-        }
-
-        unsigned nextAttributeIndex = i + 1;
-        if (nextAttributeIndex < MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata))
-        {
-            return GlobalAttributesNotInMetadata[nextAttributeIndex];
-        }
-
-        // Reached the end of global attributes. Since global attributes are
-        // reported last, finishing global attributes means everything completed.
-        return std::nullopt;
-    }
-
     if (mAttributeIndex < mAttributes.size())
     {
         return mAttributes[mAttributeIndex].attributeId;
     }
 
-    // Finished the data model, start with global attributes
-    static_assert(MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata) > 0);
-    return GlobalAttributesNotInMetadata[0];
+    return std::nullopt;
 }
 
 std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()

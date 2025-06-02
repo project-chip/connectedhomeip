@@ -39,12 +39,11 @@ class NuttXApp(Enum):
 class NuttXBoard(Enum):
     SIM = auto()
 
-
-def NuttXTarget(board, app):
-    if board == NuttXBoard.SIM:
-        if app == NuttXApp.LIGHT:
-            return 'sim:matter'
-    return 'none'
+    @property
+    def board_config(self):
+        # Only one possible board is defined, so return it
+        # This can grow if we add more boards
+        return 'sim:matter'
 
 
 class NuttXBuilder(Builder):
@@ -69,20 +68,19 @@ class NuttXBuilder(Builder):
         self.board = board
 
     def generate(self):
-        self._Execute(['mkdir', '-p', self.output_dir],
-                      title='Generating ' + self.identifier)
-
-    def _build(self):
-        logging.info('Compiling NuttX %s at %s, ',
-                     NuttXTarget(self.board, self.app), self.output_dir)
+        self._Execute(['mkdir', '-p', self.output_dir], title='Preparing output directory for ' + self.identifier)
         nuttx_dir = os.path.join(os.sep, 'opt', 'nuttx', 'nuttx')
 
         self._Execute(['cmake', '-S', nuttx_dir, '-B', self.output_dir, '-DCHIP_ROOT=' + os.getenv('PW_PROJECT_ROOT'),
-                       '-DBOARD_CONFIG=' + NuttXTarget(self.board, self.app),
+                       '-DBOARD_CONFIG=' + self.board.board_config,
                        '-DCMAKE_C_COMPILER=/opt/nuttx/gcc-13/bin/gcc',
                        '-DCMAKE_CXX_COMPILER=/opt/nuttx/gcc-13/bin/g++',
                        '-GNinja'],
-                      title='Building ' + self.identifier)
+                      title='Configuring ' + self.identifier)
+
+    def _build(self):
+        logging.info('Compiling NuttX %s at %s, ',
+                     self.board.board_config, self.output_dir)
         self._Execute(['cmake', '--build', self.output_dir])
 
     def build_outputs(self):
