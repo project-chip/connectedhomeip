@@ -537,6 +537,18 @@ TEST_F(TestCASESession, SecurePairingHandshakeTest)
     SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner, delegateCommissioner);
 }
 
+TEST_F(TestCASESession, BadSignatureSigma2)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateCommissioner;
+    CASESession pairingCommissioner;
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    chip::FaultInjection::GetManager().FailAtFault(chip::FaultInjection::kFault_CASECorruptSigma2Signature, 0, 1);
+
+    SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner, delegateCommissioner);
+}
+
 TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
 {
     // TODO: Add cases for mismatching IPK config between initiator/responder
