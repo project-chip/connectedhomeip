@@ -42,6 +42,14 @@
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <tracing/macros.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include "ThreadScanResponse.h"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+#include "WifiScanResponse.h"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+
 #include <array>
 #include <utility>
 
@@ -56,16 +64,7 @@ using namespace DeviceLayer::NetworkCommissioning;
 
 namespace {
 
-// For WiFi and Thread scan results, each item will cost ~60 bytes in TLV, thus 15 is a safe upper bound of scan results.
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP || CHIP_DEVICE_CONFIG_ENABLE_THREAD
-constexpr size_t kMaxNetworksInScanResponse = 15;
-#endif
-
 constexpr uint16_t kCurrentClusterRevision = 2;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-constexpr size_t kPossessionNonceSize = 32;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 // Note: CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE can be 0, this disables debug text
 using DebugTextStorage = std::array<char, CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE>;
@@ -137,212 +136,6 @@ private:
 /// Convenience macro to auto-create a variable for you to release the given name at
 /// the exit of the current scope.
 #define DEFER_AUTO_RELEASE(name) AutoRelease autoRelease##__COUNTER__(name)
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-
-/// Handles encoding a WifiScanResponseIterator into a TLV response structure
-class WifiScanResponseToTLV : public chip::app::DataModel::EncodableToTLV
-{
-public:
-    WifiScanResponseToTLV(Status status, CharSpan debugText, WiFiScanResponseIterator * networks) :
-        mStatus(status), mDebugText(debugText), mNetworks(networks)
-    {}
-
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
-    {
-        return EncodeTo(writer, tag);
-    }
-
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override;
-
-private:
-    Status mStatus;
-    CharSpan mDebugText;
-    WiFiScanResponseIterator * mNetworks;
-};
-
-CHIP_ERROR WifiScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outerType));
-
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), mStatus));
-    if (mDebugText.size() != 0)
-    {
-        ReturnErrorOnFailure(
-            DataModel::Encode(writer, TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kDebugText), mDebugText));
-    }
-
-    {
-        TLV::TLVType listContainerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kWiFiScanResults),
-                                                   TLV::kTLVType_Array, listContainerType));
-
-        if ((mStatus == Status::kSuccess) && (mNetworks != nullptr))
-        {
-            WiFiScanResponse scanResponse;
-            size_t networksEncoded = 0;
-            while (mNetworks->Next(scanResponse))
-            {
-                Structs::WiFiInterfaceScanResultStruct::Type result;
-                result.security = scanResponse.security;
-                result.ssid     = ByteSpan(scanResponse.ssid, scanResponse.ssidLen);
-                result.bssid    = ByteSpan(scanResponse.bssid, sizeof(scanResponse.bssid));
-                result.channel  = scanResponse.channel;
-                result.wiFiBand = scanResponse.wiFiBand;
-                result.rssi     = scanResponse.rssi;
-                ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), result));
-
-                ++networksEncoded;
-                if (networksEncoded >= kMaxNetworksInScanResponse)
-                {
-                    break;
-                }
-            }
-        }
-
-        ReturnErrorOnFailure(writer.EndContainer(listContainerType));
-    }
-
-    return writer.EndContainer(outerType);
-}
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-/// Handles encoding a ThreadScanResponseIterator into a TLV response structure.
-class ThreadScanResponseToTLV : public chip::app::DataModel::EncodableToTLV
-{
-public:
-    ThreadScanResponseToTLV(Status status, CharSpan debugText, ThreadScanResponseIterator * networks) :
-        mStatus(status), mDebugText(debugText), mNetworks(networks)
-    {}
-
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
-    {
-        return EncodeTo(writer, tag);
-    }
-
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override;
-
-private:
-    Status mStatus;
-    CharSpan mDebugText;
-    ThreadScanResponseIterator * mNetworks;
-
-    /// Fills up scanResponseArray with valid and de-duplicated thread responses from mNetworks.
-    /// Handles sorting and keeping only larger rssi
-    ///
-    /// Returns the valid list of scan responses into `validResponses`, which is only valid
-    /// as long as scanResponseArray is valid.
-    CHIP_ERROR LoadResponses(Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
-                             Span<ThreadScanResponse> & validResponses) const;
-};
-
-CHIP_ERROR ThreadScanResponseToTLV::LoadResponses(Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
-                                                  Span<ThreadScanResponse> & validResponses) const
-{
-    VerifyOrReturnError(scanResponseArray.Alloc(std::min(mNetworks->Count(), kMaxNetworksInScanResponse)), CHIP_ERROR_NO_MEMORY);
-
-    ThreadScanResponse scanResponse;
-    size_t scanResponseArrayLength = 0;
-    for (; mNetworks != nullptr && mNetworks->Next(scanResponse);)
-    {
-        if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
-            (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
-        {
-            continue;
-        }
-
-        bool isDuplicated = false;
-
-        for (size_t i = 0; i < scanResponseArrayLength; i++)
-        {
-            if ((scanResponseArray[i].panId == scanResponse.panId) &&
-                (scanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
-            {
-                if (scanResponseArray[i].rssi < scanResponse.rssi)
-                {
-                    scanResponseArray[i] = scanResponseArray[--scanResponseArrayLength];
-                }
-                else
-                {
-                    isDuplicated = true;
-                }
-                break;
-            }
-        }
-
-        if (isDuplicated)
-        {
-            continue;
-        }
-
-        if (scanResponseArrayLength < kMaxNetworksInScanResponse)
-        {
-            scanResponseArrayLength++;
-        }
-        scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
-
-        // TODO: this is a sort (insertion sort even, so O(n^2)) in a O(n) loop.
-        ///      There should be some better alternatives to not have some O(n^3) processing complexity.
-        Sorting::InsertionSort(scanResponseArray.Get(), scanResponseArrayLength,
-                               [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
-    }
-
-    validResponses = Span<ThreadScanResponse>(scanResponseArray.Get(), scanResponseArrayLength);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ThreadScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    Platform::ScopedMemoryBuffer<ThreadScanResponse> responseArray;
-    Span<ThreadScanResponse> responseSpan;
-
-    ReturnErrorOnFailure(LoadResponses(responseArray, responseSpan));
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outerType));
-
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), mStatus));
-    if (mDebugText.size() != 0)
-    {
-        ReturnErrorOnFailure(
-            DataModel::Encode(writer, TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kDebugText), mDebugText));
-    }
-
-    {
-        TLV::TLVType listContainerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kThreadScanResults),
-                                                   TLV::kTLVType_Array, listContainerType));
-
-        for (const ThreadScanResponse & response : responseSpan)
-        {
-            Structs::ThreadInterfaceScanResultStruct::Type result;
-            uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
-
-            Encoding::BigEndian::Put64(extendedAddressBuffer, response.extendedAddress);
-            result.panId           = response.panId;
-            result.extendedPanId   = response.extendedPanId;
-            result.networkName     = CharSpan(response.networkName, response.networkNameLen);
-            result.channel         = response.channel;
-            result.version         = response.version;
-            result.extendedAddress = ByteSpan(extendedAddressBuffer);
-            result.rssi            = response.rssi;
-            result.lqi             = response.lqi;
-
-            ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), result));
-        }
-
-        ReturnErrorOnFailure(writer.EndContainer(listContainerType));
-    }
-
-    return writer.EndContainer(outerType);
-}
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 } // namespace
 
@@ -1429,24 +1222,6 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
 
 exit:
     return CHIP_NO_ERROR;
-}
-
-bool NullNetworkDriver::GetEnabled()
-{
-    // Disable the interface and it cannot be enabled since there are no physical interfaces.
-    return false;
-}
-
-uint8_t NullNetworkDriver::GetMaxNetworks()
-{
-    // The minimal value of MaxNetworks should be 1 per spec.
-    return 1;
-}
-
-NetworkIterator * NullNetworkDriver::GetNetworks()
-{
-    // Instance::Read accepts nullptr as an empty NetworkIterator.
-    return nullptr;
 }
 
 } // namespace NetworkCommissioning

@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -71,7 +72,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
@@ -107,12 +107,11 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -124,7 +123,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;

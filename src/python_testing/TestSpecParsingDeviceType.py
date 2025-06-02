@@ -250,7 +250,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         one_three, one_three_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_3)
         one_four, one_four_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
         one_four_one, one_four_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_1)
-        one_five, one_five_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        one_four_two, one_four_two_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_2)
 
         asserts.assert_equal(len(one_three_problems), 0, "Problems found when parsing 1.3 spec")
         asserts.assert_equal(len(one_four_problems), 0, "Problems found when parsing 1.4 spec")
@@ -258,12 +258,12 @@ class TestSpecParsingDeviceType(MatterBaseTest):
 
         # Current ballot has a bunch of problems related to IDs being allocated for closures and TBR. These should all
         # mention ID-TBD as the id, so let's pull those out for now and make sure there are no UNKNOWN problems.
-        filtered_ballot_problems = [p for p in one_five_problems if 'ID-TBD' not in p.problem]
+        filtered_ballot_problems = [p for p in one_four_two_problems if 'ID-TBD' not in p.problem]
         asserts.assert_equal(len(filtered_ballot_problems), 0, "Problems found when parsing master spec")
 
-        asserts.assert_greater(len(set(one_five.keys()) - set(one_three.keys())),
+        asserts.assert_greater(len(set(one_four_two.keys()) - set(one_three.keys())),
                                0, "Master dir does not contain any device types not in 1.3")
-        asserts.assert_greater(len(set(one_five.keys()) - set(one_four.keys())),
+        asserts.assert_greater(len(set(one_four_two.keys()) - set(one_four.keys())),
                                0, "Master dir does not contain any device types not in 1.4")
         asserts.assert_greater(len(set(one_four.keys()) - set(one_three.keys())),
                                0, "1.4 dir does not contain any clusters not in 1.3")
@@ -271,10 +271,10 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                              "Number of device types in 1.4 and 1.4.1 does not match")
         asserts.assert_equal(set(one_three.keys()) - set(one_four.keys()),
                              set(), "There are some 1.3 device types that are unexpectedly not included in the 1.4 spec")
-        asserts.assert_equal(set(one_four.keys())-set(one_five.keys()),
-                             set(), "There are some 1.4 device types that are unexpectedly not included in the TOT spec")
-        asserts.assert_equal(set(one_three.keys())-set(one_five.keys()),
-                             set(), "There are some 1.3 device types that are unexpectedly not included in the TOT spec")
+        asserts.assert_equal(set(one_four.keys())-set(one_four_two.keys()),
+                             set(), "There are some 1.4 device types that are unexpectedly not included in the 1.4.2 spec")
+        asserts.assert_equal(set(one_three.keys())-set(one_four_two.keys()),
+                             set(), "There are some 1.3 device types that are unexpectedly not included in the 1.4.2 spec")
 
     def test_application_device_type_on_root(self):
         self.test = DeviceConformanceTests()
@@ -320,9 +320,9 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_in(expected_light_superset, supersets, "Did not find expected light superset")
         asserts.assert_in(expected_dimmer_switch, supersets, "Did not find expected switch superset")
 
-        # 1.5 has some interesting stuff where we have equivalent device types, so check that explicitly
-        xml_device_types_1_5, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
-        supersets = get_supersets(xml_device_types_1_5)
+        # 1.4.2 has some interesting stuff where we have equivalent device types, so check that explicitly
+        xml_device_types_1_4_2, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_2)
+        supersets = get_supersets(xml_device_types_1_4_2)
 
         expected_onoff_plugin = set([self.dt_ids['mountedonoffcontrol'], self.dt_ids['onoffpluginunit']])
         expected_dimmable_plugin = set([self.dt_ids['mounteddimmableloadcontrol'], self.dt_ids['dimmablepluginunit']])
