@@ -184,6 +184,12 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+bool ConnectivityManagerImpl::_IsWiFiInterfaceEnabled()
+{
+    // Check if the interface is not disabled, e.g. due to rfkill or some other reasons.
+    return g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "interface_disabled") != 0;
+}
+
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
@@ -231,9 +237,6 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled()
 
 bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 {
-    bool ret            = false;
-    const gchar * state = nullptr;
-
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED)
@@ -242,15 +245,14 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
         return false;
     }
 
-    state = wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get());
-    if (g_strcmp0(state, "completed") == 0)
+    if (g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "completed") == 0)
     {
         mConnectivityFlag.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity)
             .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-        ret = true;
+        return true;
     }
 
-    return ret;
+    return false;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
@@ -1081,6 +1083,9 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     GAutoPtr<GVariant> argsDeleter(g_variant_ref_sink(args)); // args may be floating, ensure we don't leak it
     CHIP_ERROR ret = CHIP_NO_ERROR;
     GAutoPtr<GError> err;
+
+    VerifyOrReturnError(_IsWiFiInterfaceEnabled(), CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, "WPA supplicant: WiFi interface is disabled (blocked)"));
 
     const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
