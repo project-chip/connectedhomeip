@@ -30,23 +30,20 @@ Instance * MeterIdentification::GetInstance()
     return gMeterIdentificationCluster.get();
 }
 
-CHIP_ERROR MeterIdentificationInit(chip::EndpointId endpointId)
+void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(!gMeterIdentificationCluster);
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gMeterIdentificationCluster == nullptr);
     gMeterIdentificationCluster =
         std::make_unique<Instance>(endpointId, chip::BitMask<Feature, uint32_t>(Feature::kPowerThreshold));
     gMeterIdentificationCluster->Init();
-
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MeterIdentificationShutdown()
+void emberAfMeterIdentificationClusterShutdownCallback(chip::EndpointId endpointId)
 {
     if (gMeterIdentificationCluster)
     {
         gMeterIdentificationCluster->Shutdown();
         gMeterIdentificationCluster.reset(nullptr);
     }
-
-    return CHIP_NO_ERROR;
 }

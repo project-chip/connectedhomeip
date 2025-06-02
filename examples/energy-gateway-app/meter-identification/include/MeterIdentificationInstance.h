@@ -11,8 +11,6 @@ namespace Clusters {
 namespace MeterIdentification {
 
 Instance * GetInstance();
-void Init();
-void Shutdown();
 
 } // namespace MeterIdentification
 } // namespace Clusters

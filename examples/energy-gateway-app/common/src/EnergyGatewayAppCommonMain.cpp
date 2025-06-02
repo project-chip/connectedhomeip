@@ -72,7 +72,6 @@ void ElectricalEnergyTariffInit()
 
     VerifyOrDie(CommodityPriceInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
     VerifyOrDie(ElectricalGridConditionsInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
-    VerifyOrDie(MeterIdentificationInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
 
     // set the descriptor TagList to include "ElectricalEnergy" and "Current" (to indicate the ActiveTariff)
     SetTagList(kElectricalEnergyTariffEndpointId,
@@ -82,5 +81,4 @@ void ElectricalEnergyTariffInit()
 void ElectricalEnergyTariffShutdown()
 {
     ChipLogDetail(AppServer, "Energy Gateway App : ElectricalEnergyTariffShutdown()");
-    MeterIdentificationShutdown();
 }
