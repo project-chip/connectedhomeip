@@ -67,6 +67,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <string>
+#include <vector>
+
 #if CHIP_CRYPTO_MBEDTLS || CHIP_CRYPTO_PSA
 #include <mbedtls/memory_buffer_alloc.h>
 #endif
@@ -91,6 +94,24 @@ using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
 using TestPBKDF2_sha256                 = PBKDF2_sha256;
 using TestHKDF_sha                      = HKDF_sha;
 using TestHMAC_sha                      = HMAC_sha;
+
+// Trivial StringJoin to use for PEM encoding testing.
+std::string StringJoin(const std::vector<std::string>& elements, const std::string& delimiter)
+{
+    if (elements.empty())
+    {
+        return "";
+    }
+
+    std::string outStr = elements[0];
+
+    for (size_t i = 1; i < elements.size(); ++i)
+    {
+        outStr += delimiter + elements[i];
+    }
+
+    return outStr;
+}
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
 #if defined(MBEDTLS_MEMORY_DEBUG)
@@ -3237,5 +3258,168 @@ TEST_F(TestChipCryptoPAL, GenerateVendorIdVerificationToBeSignedWorks)
                                                          vendorIdVerificationTbs),
                   CHIP_NO_ERROR);
         EXPECT_TRUE(vendorIdVerificationTbs.data_equal(kExpectedVendorIdVerificationTbsSpan));
+    }
+}
+
+TEST_F(TestChipCryptoPAL, PemEncodingWorks)
+{
+
+    // Ensure that encoding with empty buffer works to not touch anything.
+    {
+        char outputBuf1Byte[1] = {'\1'};
+        PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
+        size_t numLines = 0;
+
+        while (encoder.NextLine(outputBuf1Byte, 0))
+        {
+            ++numLines;
+            // No attempt to touch the buffer should have occured.
+            EXPECT_EQ(outputBuf1Byte[0], '\1');
+        }
+
+        // Should have tried to go through, even though nothing was written.
+        EXPECT_EQ(numLines, 12u);
+    }
+
+    // Ensure that encoding with small buffer
+    {
+        char outputBufTooSmall[PemEncoder::kMinLineBufferSize - 1] = {'\1'};
+        PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
+        size_t numLines = 0;
+
+        while (encoder.NextLine(outputBufTooSmall, sizeof(outputBufTooSmall)))
+        {
+            ++numLines;
+            // Empty line should have occurred for buffer too small.
+            EXPECT_EQ(outputBufTooSmall[0], '\0');
+            outputBufTooSmall[0] = '\1';
+        }
+
+        // Should have tried to go through, even though nothing was written.
+        EXPECT_EQ(numLines, 12u);
+    }
+
+    // Known cert case: sTestCert_PAA_FFF1_Cert should succeed
+    {
+        const char* kExpectedPemForPaa = "-----BEGIN CERTIFICATE-----\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZMBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END CERTIFICATE-----";
+        char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {'\1'};
+        std::vector<std::string> pemLines;
+
+        PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
+        size_t numLines = 0;
+
+        while (encoder.NextLine(outputBufOkSize, sizeof(outputBufOkSize)))
+        {
+            ++numLines;
+            // Empty line should have occurred for buffer too small.
+            EXPECT_NE(outputBufOkSize[0], '\0');
+            // No lines should have overflowed.
+            ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
+
+            pemLines.push_back(std::string{outputBufOkSize});
+            outputBufOkSize[0] = '\1';
+        }
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPemForPaa);
+        EXPECT_EQ(numLines, 12u);
+    }
+
+    // Known cert case, different heading requested: sTestCert_PAA_FFF1_Cert should succeed with "ROBOTO" instead of "CERTIFICATE".
+    {
+        const char* kExpectedPemForPaa = "-----BEGIN ROBOTO-----\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZMBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END ROBOTO-----";
+        char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {};
+        std::vector<std::string> pemLines;
+
+        PemEncoder encoder("ROBOTO", TestCerts::sTestCert_PAA_FFF1_Cert);
+        size_t numLines = 0;
+
+        while (encoder.NextLine(outputBufOkSize, sizeof(outputBufOkSize)))
+        {
+            ++numLines;
+            // No lines should have overflowed.
+            ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
+            pemLines.push_back(std::string{outputBufOkSize});
+            EXPECT_FALSE(encoder.IsDone());
+        }
+        EXPECT_TRUE(encoder.IsDone());
+
+        // One more call should still leave it done, with empty string output.
+        outputBufOkSize[0] = 'A';
+        outputBufOkSize[1] = '\0';
+        EXPECT_FALSE(encoder.NextLine(outputBufOkSize, sizeof(outputBufOkSize)));
+        EXPECT_EQ(outputBufOkSize[0], '\0');
+
+        // Result should match exactly the expected PEM.
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPemForPaa);
+        EXPECT_EQ(numLines, 12u);
+    }
+
+    // Empty body case shoudld succeed. Casedness is for the client to deal with.
+    {
+        const char* kExpectedPem = "-----BEGIN EMPTY_thing-----\n-----END EMPTY_thing-----";
+        char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {};
+        std::vector<std::string> pemLines;
+
+        PemEncoder encoder("EMPTY_thing", ByteSpan{});
+        size_t numLines = 0;
+
+        while (encoder.NextLine(outputBufOkSize, sizeof(outputBufOkSize)))
+        {
+            ++numLines;
+            // No lines should have overflowed.
+            ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
+            pemLines.push_back(std::string{outputBufOkSize});
+        }
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
+        EXPECT_EQ(numLines, 2u);
+    }
+
+    // Single-byte should also work.
+    {
+        const char* kExpectedPem = "-----BEGIN SINGLE_BYTE-----\nAA==\n-----END SINGLE_BYTE-----";
+        char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {};
+        std::vector<std::string> pemLines;
+
+        const uint8_t kOneByte[1] = { 0 };
+        PemEncoder encoder("SINGLE_BYTE", ByteSpan{kOneByte});
+        size_t numLines = 0;
+
+        while (encoder.NextLine(outputBufOkSize, sizeof(outputBufOkSize)))
+        {
+            ++numLines;
+            // No lines should have overflowed.
+            ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
+            pemLines.push_back(std::string{outputBufOkSize});
+        }
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
+        EXPECT_EQ(numLines, 3u);
+    }
+
+    // Clamping of very long headings should work.
+    {
+        const char* kExpectedPem = "-----BEGIN SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOP-----\n-----END SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQR-----";
+        char outputBufOkSize[PemEncoder::kMinLineBufferSize] = {};
+        std::vector<std::string> pemLines;
+
+        PemEncoder encoder("SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQRSTUVWXYZ_123456789", ByteSpan{});
+        size_t numLines = 0;
+
+        while (encoder.NextLine(outputBufOkSize, sizeof(outputBufOkSize)))
+        {
+            ++numLines;
+            // No lines should have overflowed.
+            ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
+            pemLines.push_back(std::string{outputBufOkSize});
+        }
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
+        EXPECT_EQ(numLines, 2u);
     }
 }

@@ -32,6 +32,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/support/Base64.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
@@ -1803,6 +1804,62 @@ CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteS
  * @brief Extracts Issuer Distinguished Name from X509 Certificate. The value is copied into buffer in a raw ASN.1 X.509 format.
  **/
 CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer);
+
+class PemEncoder
+{
+  public:
+    static constexpr size_t kNumBytesPerLine = 48u;
+    static constexpr size_t kMinLineBufferSize = 64u + 1u; // PEM expects 64 characters wide and a null terminator at least.
+    static_assert(kMinLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1), "Internal incoherence of library configuration!");
+
+    /**
+     * @brief Construct a PEM encoder for element type `encodedElement` whose DER data is in `derBytes` span.
+     *
+     * @param encodedElement - Element type string to include in header/footer (e.g. "CERTIFICATE"). Caller must provide correct uppercase.
+     * @param derBytes - Byte span containing data to encode. May be empty.
+     */
+    explicit PemEncoder(const char* encodedElement, ByteSpan derBytes) : mEncodedElement(encodedElement), mDerBytes(derBytes) {}
+
+    // No copies.
+    PemEncoder(const PemEncoder&) = delete;
+    PemEncoder& operator=(const PemEncoder&) = delete;
+
+    /**
+     * @brief Returns the next line of the encoding, if anything left to do.
+     *
+     * If `destSize` == 0, nothing will be written. Otherwise if `destSize < kMinLineBufferSize`,
+     * only a null-terminator is written. Otherwise the line is filled with the next line
+     * of PEM encoding. Line is guaranteed null-terminated. Even if nothing good
+     * is written, encoder proceeds to the next line.
+     * When header/footer are written, the heading type (`encodedElement` value) such as
+     * `CERTIFICATE` is clamped so that the entire header line with `-----BEGIN ${encodedElement}-----`
+     * and footer line with `-----END ${encodedElement}-----` are not wider than 64 bytes. This
+     * will not happen in practice with the types of things this is meant to encode.
+     *
+     * @param destStr - null-terminated char buffer to receive the line.
+     * @param destSize - size of the char buffer, including null-terminator.
+     * @return true if there is a line given back to accumulate.
+     * @return false if the encoding is complete.
+     */
+    bool NextLine(char *destStr, size_t destSize);
+
+    bool IsDone() const { return mState == State::kDone; }
+
+  private:
+    enum State : int {
+        kPrintHeader = 0,
+        kPrintBody = 1,
+        kPrintFooter = 2,
+        kEndIterator = 3,
+        kDone = 4,
+    };
+
+    const char* mEncodedElement; // "CERTIFICATE", "EC PUBLIC KEY", etc. Must be capitalized by caller.
+    ByteSpan mDerBytes;
+    State mState = State::kPrintHeader;
+    size_t mProcessedBytes = 0;
+    char mInternalStringBuf[kMinLineBufferSize]; // Will be copied-out to callers.
+};
 
 /**
  * @brief Checks for resigned version of the certificate in the list and returns it.
