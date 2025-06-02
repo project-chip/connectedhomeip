@@ -50,6 +50,7 @@
 namespace chip {
 namespace System {
     namespace {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         struct TimerCompleteBlockCallbackContext {
             dispatch_block_t block;
         };
@@ -62,6 +63,7 @@ namespace System {
             }
             delete ctx;
         }
+#endif
     }
 
     void LayerImplDispatch::EnableTimer(const char * source, TimerList::Node * timer)
@@ -134,12 +136,14 @@ namespace System {
             dispatch_async(dispatchQueue, ^{
                 block();
             });
-            return CHIP_NO_ERROR;
         }
-
-        TimerCompleteBlockCallbackContext * ctx = new TimerCompleteBlockCallbackContext { .block = block };
-        VerifyOrReturnError(ctx != nullptr, CHIP_ERROR_NO_MEMORY);
-        return ScheduleWork(TimerCompleteBlockCallback, ctx);
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        else {
+            std::lock_guard<std::mutex> lock(mTestQueueMutex);
+            mTestQueuedBlocks.emplace_back(block);
+        }
+#endif
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR LayerImplDispatch::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
@@ -276,6 +280,20 @@ namespace System {
     void LayerImplDispatch::HandleTimerEvents(Clock::Timeout timeout)
     {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        std::vector<dispatch_block_t> queuedBlocks;
+        {
+            std::lock_guard<std::mutex> lock(mTestQueueMutex);
+            queuedBlocks.swap(mTestQueuedBlocks);
+        }
+
+        for (auto & block : queuedBlocks) {
+            __auto_type * ctx = new TimerCompleteBlockCallbackContext { .block = block };
+            VerifyOrDie(nullptr != ctx);
+            CHIP_ERROR error = ScheduleWork(TimerCompleteBlockCallback, ctx);
+            LogErrorOnFailure(error);
+            VerifyOrDo(CHIP_NO_ERROR == error, delete ctx);
+        }
+
         // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
         // since that could result in infinite handling of new timers blocking any other progress.
         VerifyOrDieWithMsg(mExpiredTimers.Empty(), DeviceLayer, "Re-entry into HandleEvents from a timer callback?");

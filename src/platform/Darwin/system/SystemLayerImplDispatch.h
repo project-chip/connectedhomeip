@@ -28,6 +28,11 @@
 #include <system/SystemLayer.h>
 #include <system/SystemTimer.h>
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#include <mutex>
+#include <vector>
+#endif
+
 namespace chip {
 namespace System {
 
@@ -143,6 +148,11 @@ private:
 #endif
         return nullptr != queue;
     }
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    std::mutex mTestQueueMutex;
+    std::vector<dispatch_block_t> mTestQueuedBlocks;
+#endif
 };
 
 using LayerImpl = LayerImplDispatch;
