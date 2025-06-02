@@ -363,8 +363,7 @@ tests:
           [1651471175.522467][4012:4012] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label:
-          "Step 7: DUT sends KeySetRemove Command to TH"
+    - label: "Step 7: DUT sends KeySetRemove Command to TH"
       PICS: GRPKEY.C.C03.Tx
       verification: |
           ./chip-tool groupkeymanagement key-set-remove 42 1 0
@@ -373,8 +372,8 @@ tests:
 
           [1708328664.952463][17247:17247] CHIP:DMG: InvokeRequestMessage =
           [1708328664.952466][17247:17247] CHIP:DMG: {
-          [1708328664.952469][17247:17247] CHIP:DMG:         suppressResponse = false, 
-          [1708328664.952472][17247:17247] CHIP:DMG:         timedRequest = false, 
+          [1708328664.952469][17247:17247] CHIP:DMG:         suppressResponse = false,
+          [1708328664.952472][17247:17247] CHIP:DMG:         timedRequest = false,
           [1708328664.952474][17247:17247] CHIP:DMG:         InvokeRequests =
           [1708328664.952479][17247:17247] CHIP:DMG:         [
           [1708328664.952481][17247:17247] CHIP:DMG:                 CommandDataIB =
@@ -386,20 +385,19 @@ tests:
           [1708328664.952499][17247:17247] CHIP:DMG:                                 CommandId = 0x3,
           [1708328664.952502][17247:17247] CHIP:DMG:                         },
           [1708328664.952505][17247:17247] CHIP:DMG:                         
-          [1708328664.952508][17247:17247] CHIP:DMG:                         CommandFields = 
+          [1708328664.952508][17247:17247] CHIP:DMG:                         CommandFields =
           [1708328664.952511][17247:17247] CHIP:DMG:                         {
-          [1708328664.952515][17247:17247] CHIP:DMG:                                 0x0 = 42, 
+          [1708328664.952515][17247:17247] CHIP:DMG:                                 0x0 = 42,
           [1708328664.952518][17247:17247] CHIP:DMG:                         },
           [1708328664.952520][17247:17247] CHIP:DMG:                 },
-          [1708328664.952524][17247:17247] CHIP:DMG:                 
+          [1708328664.952524][17247:17247] CHIP:DMG:
           [1708328664.952527][17247:17247] CHIP:DMG:         ],
-          [1708328664.952531][17247:17247] CHIP:DMG:         
+          [1708328664.952531][17247:17247] CHIP:DMG:
           [1708328664.952533][17247:17247] CHIP:DMG:         InteractionModelRevision = 11
           [1708328664.952536][17247:17247] CHIP:DMG: },
       disabled: true
 
-    - label:
-          "Step 8: DUT sends KeySetReadAllIndices Command to TH"
+    - label: "Step 8: DUT sends KeySetReadAllIndices Command to TH"
       PICS: GRPKEY.C.C04.Tx
       verification: |
           ./chip-tool groupkeymanagement key-set-read-all-indices   1 0
@@ -408,8 +406,8 @@ tests:
 
           [1708328722.189390][17247:17247] CHIP:DMG: InvokeRequestMessage =
           [1708328722.189403][17247:17247] CHIP:DMG: {
-          [1708328722.189413][17247:17247] CHIP:DMG:         suppressResponse = false, 
-          [1708328722.189425][17247:17247] CHIP:DMG:         timedRequest = false, 
+          [1708328722.189413][17247:17247] CHIP:DMG:         suppressResponse = false,
+          [1708328722.189425][17247:17247] CHIP:DMG:         timedRequest = false,
           [1708328722.189434][17247:17247] CHIP:DMG:         InvokeRequests =
           [1708328722.189451][17247:17247] CHIP:DMG:         [
           [1708328722.189461][17247:17247] CHIP:DMG:                 CommandDataIB =
@@ -420,14 +418,14 @@ tests:
           [1708328722.189518][17247:17247] CHIP:DMG:                                 ClusterId = 0x3f,
           [1708328722.189529][17247:17247] CHIP:DMG:                                 CommandId = 0x4,
           [1708328722.189540][17247:17247] CHIP:DMG:                         },
-          [1708328722.189553][17247:17247] CHIP:DMG:                         
-          [1708328722.189564][17247:17247] CHIP:DMG:                         CommandFields = 
+          [1708328722.189553][17247:17247] CHIP:DMG:
+          [1708328722.189564][17247:17247] CHIP:DMG:                         CommandFields =
           [1708328722.189575][17247:17247] CHIP:DMG:                         {
           [1708328722.189586][17247:17247] CHIP:DMG:                         },
           [1708328722.189596][17247:17247] CHIP:DMG:                 },
-          [1708328722.189611][17247:17247] CHIP:DMG:                 
+          [1708328722.189611][17247:17247] CHIP:DMG:
           [1708328722.189620][17247:17247] CHIP:DMG:         ],
-          [1708328722.189637][17247:17247] CHIP:DMG:         
+          [1708328722.189637][17247:17247] CHIP:DMG:
           [1708328722.189647][17247:17247] CHIP:DMG:         InteractionModelRevision = 11
           [1708328722.189655][17247:17247] CHIP:DMG: },
       disabled: true
