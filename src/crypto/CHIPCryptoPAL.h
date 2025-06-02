@@ -1853,8 +1853,8 @@ private:
         kPrintHeader = 0,
         kPrintBody   = 1,
         kPrintFooter = 2,
-        kEndIterator = 3,
-        kDone        = 4,
+        kEndIterator = 3, // The last run through `NextLine` uses that state to return false on NextLine without being done yet.
+        kDone        = 4, // This is the terminal state that indicates there is nothing more after.
     };
 
     const char * mEncodedElement; // "CERTIFICATE", "EC PUBLIC KEY", etc. Must be capitalized by caller.

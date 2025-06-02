@@ -1276,7 +1276,7 @@ bool PemEncoder::NextLine(char * destStr, size_t destSize)
     }
     case State::kPrintBody: {
         size_t remaining      = mDerBytes.size() - mProcessedBytes;
-        size_t chunkSizeBytes = std::min(remaining, static_cast<size_t>(kNumBytesPerLine));
+        size_t chunkSizeBytes = std::min(remaining, kNumBytesPerLine);
         if (!bufferTooSmall)
         {
             size_t encodedLen = static_cast<size_t>(
