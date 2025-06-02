@@ -117,9 +117,7 @@ public:
     bool operator==(const PeerAddress & other) const
     {
         // Compare common fields
-        if (mTransportType != other.mTransportType ||
-            mIPAddress != other.mIPAddress ||
-            mPort != other.mPort ||
+        if (mTransportType != other.mTransportType || mIPAddress != other.mIPAddress || mPort != other.mPort ||
             mInterface != other.mInterface)
         {
             return false;
