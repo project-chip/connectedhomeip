@@ -605,8 +605,8 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     # Early return if data_model_directory is already a Traversable type
     if not isinstance(data_model_directory, PrebuiltDataModelDirectory):
         # data_model_directory is a Traversable (e.g. pathlib.Path to an extracted root)
-        # We need to append the data_model_level (e.g. "clusters")
-        return data_model_directory.joinpath(data_model_level.dirname)
+        # Return directly as per the docstring - it should already contain the correct directory structure
+        return data_model_directory
 
     # If it's a prebuilt directory, build the path based on the version and data model level
     zip_file_traversable = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
