@@ -254,8 +254,6 @@ template("qpg_sdk") {
         "${chip_root}/third_party/qpg_sdk:qpg_glue_lib",
         "${chip_root}/third_party/qpg_sdk:qpg_openthread_glue_lib",
         "${chip_root}/third_party/qpg_sdk:qpg_stack_lib",
-
-        # "${chip_root}/third_party/qpg_sdk:qpg_freertos_lib",
       ]
 
       if (mbedtls_alt_enabled) {

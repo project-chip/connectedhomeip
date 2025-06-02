@@ -14,6 +14,5 @@
 
 import("qpg_sdk.gni")
 
-#arm_arch = "armv7e-m"
 arm_abi = "aapcs"
 arm_cpu = "cortex-m4"
