@@ -45,7 +45,7 @@ struct NodeDataModelConfiguration
 class ProviderMetadataTree
 {
 public:
-    // This sub-class provides the scoped where the configuration version get bumped.
+    // This updater class provides a scope where the configuration version get bumped.
     // It is used to provide RAII for the ConfigurationVersion where the value is bumped when deconstructed
     // and provides a stable interface for clients to perform the bump.
     class ScopedConfigurationVersionUpdater

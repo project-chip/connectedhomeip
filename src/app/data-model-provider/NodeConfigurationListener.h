@@ -20,9 +20,7 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-/// A global class that listens for node configuration changes detection.
-///
-/// Platforms are expected to notify listeners of node configurations changes.
+/// A class that listens for node configuration changes.
 class NodeConfigurationListener
 {
 public:
