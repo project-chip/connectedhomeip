@@ -81,6 +81,10 @@
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#include <app/server/JointFabricDatastore.h> //nogncheck
+#endif                                       // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 namespace chip {
 
 inline constexpr size_t kMaxBlePendingPackets = 1;
@@ -133,6 +137,8 @@ struct ServerInitParams
 
     // Application delegate to handle some commissioning lifecycle events
     AppDelegate * appDelegate = nullptr;
+    // device discovery timeout
+    System::Clock::Seconds32 discoveryTimeout = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS);
     // Port to use for Matter commissioning/operational traffic
     uint16_t operationalServicePort = CHIP_PORT;
     // Port to use for UDC if supported
@@ -416,6 +422,10 @@ public:
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    app::JointFabricDatastore & GetJointFabricDatastore() { return mJointFabricDatastore; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
 
@@ -694,6 +704,10 @@ private:
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    app::JointFabricDatastore mJointFabricDatastore;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;

@@ -18,6 +18,7 @@
 
 #include "InteractiveCommands.h"
 
+#include <device-manager/DeviceManager.h>
 #include <platform/logging/LogV.h>
 #include <system/SystemClock.h>
 
@@ -44,22 +45,47 @@ constexpr char kCategoryAutomation[]             = "Automation";
 // File pointer for the log file
 FILE * sLogFile = nullptr;
 
+// Global flag to signal shutdown
+std::atomic<bool> sShutdownRequested(false);
+
 std::queue<std::string> sCommandQueue;
 std::mutex sQueueMutex;
 std::condition_variable sQueueCondition;
 
 void ReadCommandThread()
 {
-    char * command;
-    while (true)
+    for (;;)
     {
-        command = readline(kInteractiveModePrompt);
-        if (command != nullptr && *command)
+        // `readline()` allocates with `malloc()`.  Wrap it in a smart
+        // pointer so we cannot leak it on every early–return/throw path.
+        std::unique_ptr<char, decltype(&std::free)> rawLine{ readline(kInteractiveModePrompt), &std::free };
+
+        if (!rawLine) // EOF or fatal error → shut down cleanly
         {
-            std::unique_lock<std::mutex> lock(sQueueMutex);
-            sCommandQueue.push(command);
-            free(command);
+            std::lock_guard<std::mutex> lk{ sQueueMutex };
+            sCommandQueue.emplace(kInteractiveModeStopCommand);
             sQueueCondition.notify_one();
+            break;
+        }
+
+        // Ignore empty lines produced by just hitting <Enter>.
+        if (*rawLine == '\0')
+            continue;
+
+        // Copy into an owning `std::string` before the pointer vanishes.
+        std::string line{ rawLine.get() };
+
+        {
+            std::lock_guard<std::mutex> lk{ sQueueMutex };
+            sCommandQueue.push(line);
+        }
+        sQueueCondition.notify_one();
+
+        // Bail out when the user asks to quit.
+        if (line == kInteractiveModeStopCommand)
+        {
+            ChipLogProgress(NotSpecified, "ReadCommandThread exit on quit");
+            break;
         }
     }
 }
@@ -111,27 +137,24 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 
 } // namespace
 
-char * InteractiveStartCommand::GetCommand(char * command)
+std::string InteractiveStartCommand::GetCommand() const
 {
     std::unique_lock<std::mutex> lock(sQueueMutex);
-    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty(); });
 
-    std::string cmd = sCommandQueue.front();
-    sCommandQueue.pop();
+    // Wait until queue is not empty OR shutdown is requested
+    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty() || sShutdownRequested.load(); });
 
-    if (command != nullptr)
+    if (sShutdownRequested.load())
     {
-        free(command);
-        command = nullptr;
+        return {}; // empty string signals caller to exit
     }
 
-    command = new char[cmd.length() + 1];
-    strcpy(command, cmd.c_str());
+    std::string command = sCommandQueue.front();
+    sCommandQueue.pop();
 
-    // Do not save empty lines
-    if (command != nullptr && *command)
+    if (!command.empty())
     {
-        add_history(command);
+        add_history(command.c_str());
         write_history(GetHistoryFilePath().c_str());
     }
 
@@ -174,32 +197,31 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     std::thread readCommands(ReadCommandThread);
     readCommands.detach();
 
-    char * command = nullptr;
     int status;
     while (true)
     {
-        command = GetCommand(command);
-        if (command != nullptr && !ParseCommand(command, &status))
+        std::string command = GetCommand();
+        if (command.empty())
+        {
+            break;
+        }
+
+        if (!ParseCommand(command, &status))
         {
             break;
         }
     }
 
-    if (command != nullptr)
-    {
-        free(command);
-        command = nullptr;
-    }
-
+    camera::DeviceManager::Instance().Shutdown();
     SetCommandExitStatus(CHIP_NO_ERROR);
     CloseLogFile();
 
     return CHIP_NO_ERROR;
 }
 
-bool InteractiveCommand::ParseCommand(char * command, int * status)
+bool InteractiveCommand::ParseCommand(const std::string & command, int * status)
 {
-    if (strcmp(command, kInteractiveModeStopCommand) == 0)
+    if (command == kInteractiveModeStopCommand)
     {
         // If scheduling the cleanup fails, there is not much we can do.
         // But if something went wrong while the application is leaving it could be because things have
@@ -210,7 +232,7 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 
     ClearLine();
 
-    *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
+    *status = mHandler->RunInteractive(command.c_str(), GetStorageDirectory(), NeedsOperationalAdvertising());
 
     return true;
 }
@@ -436,6 +458,8 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
 
     gInteractiveServerResult.Reset();
     SetCommandExitStatus(CHIP_NO_ERROR);
+    CloseLogFile();
+
     return CHIP_NO_ERROR;
 }
 
@@ -457,10 +481,16 @@ bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
     gInteractiveServerResult.Setup(isAsyncReport, timeout);
     VerifyOrReturnValue(!isAsyncReport, true);
 
+    ChipLogProgress(NotSpecified, "OnWebSocketMessageReceived: %s", msg);
     auto shouldStop = ParseCommand(msg, &gInteractiveServerResult.mStatus);
     mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
     return shouldStop;
+}
+
+void InteractiveServerCommand::StopCommand()
+{
+    mWebSocketServer.Stop();
 }
 
 CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
@@ -472,4 +502,19 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
         gInteractiveServerResult.Reset();
     }
     return CHIP_NO_ERROR;
+}
+
+void StopInteractiveEventLoop()
+{
+    ChipLogProgress(NotSpecified, "Stop Interactive EventLoop, exiting...");
+
+    sShutdownRequested.store(true);
+    sQueueCondition.notify_one();
+
+    InteractiveServerCommand * command =
+        static_cast<InteractiveServerCommand *>(CommandMgr().GetCommandByName("interactive", "server"));
+    if (command)
+    {
+        command->StopCommand();
+    }
 }

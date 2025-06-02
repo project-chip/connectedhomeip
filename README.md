@@ -34,6 +34,8 @@
 [![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/cirque.yaml)
 [![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/qemu.yaml)
 
+-   [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
+
 **Tools**
 
 [![ZAP Templates](https://github.com/project-chip/connectedhomeip/workflows/ZAP/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/zap_templates.yaml)
@@ -41,6 +43,7 @@
 **Documentation**
 
 [![Documentation Build](https://github.com/project-chip/connectedhomeip/actions/workflows/docbuild.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/docbuild.yaml)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
 
 -   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
 
