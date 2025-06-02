@@ -37,6 +37,19 @@ jobs:
         run: |
           python3 -m venv venv
           venv/bin/pip3 install -r docs/requirements.txt
+      # --- Generate .md before build HTML ---
+      - name: Generate ChipDeviceCtrl API Markdown
+        working-directory: matter
+        run: |
+          mkdir -p _build/src/testing
+          ./docs/testing/GenerateChipDeviceCtrlDoc.sh _build/src/testing
+      # --- Build HTML ---
+      - name: Build documentation
+        working-directory: matter/docs
+        run: |
+          source ../venv/bin/activate
+          make html
+          touch _build/html/.nojekyll
       - name: Build documentation
         working-directory: matter/docs
         run: |
