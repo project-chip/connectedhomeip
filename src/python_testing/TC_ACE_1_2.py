@@ -138,9 +138,7 @@ class TC_ACE_1_2(MatterBaseTest):
             keepSubscriptions=False,
             autoResubscribe=False,
             exception_type=ChipStackError,
-            assert_func=lambda e: asserts.assert_equal(
-                e.err, 0x580, "Incorrect error message received from subscription with no permission"
-            ),
+            expected_error_code=0x580,
             error_msg="Incorrectly subscribed to attribute with invalid permissions"
         )
 
@@ -156,9 +154,7 @@ class TC_ACE_1_2(MatterBaseTest):
             keepSubscriptions=False,
             autoResubscribe=False,
             exception_type=ChipStackError,
-            assert_func=lambda e: asserts.assert_equal(
-                e.err, 0x580, "Incorrect error message received from subscription with no permission"
-            ),
+            expected_error_code=0x580,
             error_msg="Incorrectly subscribed to event with invalid permissions"
         )
 
@@ -311,9 +307,7 @@ class TC_ACE_1_2(MatterBaseTest):
             keepSubscriptions=False,
             autoResubscribe=False,
             exception_type=ChipStackError,
-            assert_func=lambda e: asserts.assert_equal(
-                e.err, 0x580, "Incorrect error message received from subscription with no permission"
-            ),
+            expected_error_code=0x580,
             error_msg="Incorrectly subscribed to attribute with invalid permissions"
         )
 

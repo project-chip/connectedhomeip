@@ -2197,7 +2197,7 @@ class CommissionDeviceTest(MatterBaseTest):
             raise signals.TestAbortAll("Failed to commission node(s)")
 
 
-async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackError, assert_func=None, error_msg="Unexpected success", **kwargs):
+async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackError, expected_error_code=None, error_msg="Unexpected success", **kwargs):
     '''
     Explanation:
 
@@ -2218,13 +2218,13 @@ async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackEr
 
     Helper function:
 
-        await run_with_error_check(coroutine_func, *args, exception_type=ChipStackError, assert_func=None, error_msg="Unexpected success", **kwargs)
+        await run_with_error_check(coroutine_func, *args, exception_type=ChipStackError, expected_error_code=None, error_msg="Unexpected success", **kwargs)
 
         - coroutine_func: Is the function you want to run in the try block (e.g self.TH2.ReadAttribute)
         - *args: Captures positional arguments (e.g self.dut_node_id)
         - **kwargs: Captures named arguments (e.g nodeid=self.dut_node_id. In this case the argument is named with nodeid)
         - excection_type: Name of the exception (e.g ChipStackError)
-        - assert_func: Assertion function (e.g assert_func=lambda e: asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subscription with no permission"))
+        - expected_error_code: Error code to compare with e.err
         - error_msg: Error message
 
     Example usage:
@@ -2248,9 +2248,7 @@ async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackEr
             keepSubscriptions=False,                                                                    # Function's parameter
             autoResubscribe=False,                                                                      # Function's parameter
             exception_type=ChipStackError,                                                              # Exception type
-            assert_func=lambda e: asserts.assert_equal(                                                 # Assertion function
-                e.err, ERROR_CODE, "Incorrect error message received from subscription with no permission"
-            ),
+            expected_error_code=ERROR_CODE
             error_msg="Incorrectly subscribed to attribute with invalid permissions"                    # Error message
         )
 
@@ -2260,10 +2258,10 @@ async def run_with_error_check(coroutine_func, *args, exception_type=ChipStackEr
         await coroutine_func(*args, **kwargs)
         asserts.fail(error_msg)
     except exception_type as e:
-        if assert_func is None:
-            asserts.fail(f"Exception caught: {e}, but no assertion function was provided to validate it")
+        if expected_error_code is None:
+            asserts.fail(f"Exception caught: {e}, but no expected error code was provided")
         else:
-            assert_func(e)
+            asserts.assert_equal(e.err, expected_error_code, f"Expected error code {expected_error_code}, but got {e.err}")
 
 
 def default_matter_test_main():
