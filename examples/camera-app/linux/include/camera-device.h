@@ -160,7 +160,7 @@ public:
 
     std::vector<StreamUsageEnum> & GetSupportedStreamUsages() override;
 
-    std::vector<StreamUsageEnum> & GetRankedStreamPriorities() override { return mRankedStreamPriorities; }
+    std::vector<StreamUsageEnum> & GetStreamUsagePriorities() override { return mStreamUsagePriorities; }
 
     // Sets the Default Camera Viewport
     CameraError SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) override;
@@ -322,7 +322,7 @@ private:
     bool mImageFlipHorizontal              = false;
     bool mImageFlipVertical                = false;
 
-    std::vector<StreamUsageEnum> mRankedStreamPriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 };
 
 } // namespace Camera
