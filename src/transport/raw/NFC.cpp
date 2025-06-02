@@ -71,7 +71,7 @@ bool NFCBase::CanSendToPeer(const Transport::PeerAddress & address)
         return false;
     }
 
-    bool canSendToPeer = chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().CanSendToPeer(address);
+    bool canSendToPeer = DeviceLayer::Internal::NFCCommissioningMgrImpl().CanSendToPeer(address);
     if (canSendToPeer)
     {
         mState = State::kConnected;
