@@ -15,15 +15,16 @@
 #    limitations under the License.
 
 from chip.ChipDeviceCtrl import TransportPayloadCapability
-from chip.clusters import CameraAvStreamManagement, WebRTCTransportProvider
+from chip.clusters import WebRTCTransportProvider
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.webrtc import PeerConnection, WebRTCManager
 from mobly import asserts
+from TC_WEBRTC_Utils import WebRTCTestHelper
 from test_plan_support import commission_if_required
 
 
-class TC_WEBRTC_1_1(MatterBaseTest):
+class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_1(self) -> list[TestStep]:
         steps = [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
@@ -60,25 +61,9 @@ class TC_WEBRTC_1_1(MatterBaseTest):
         )
         asserts.assert_equal(len(current_sessions), 0, "Found an existing WebRTC session")
 
-        # Allocate video stream in camera app to receive actual video stream
-        # This step is not from test plan
-        resolution = CameraAvStreamManagement.Structs.VideoResolutionStruct(width=640, height=480)
-
-        await self.send_single_cmd(
-            cmd=CameraAvStreamManagement.Commands.VideoStreamAllocate(
-                streamUsage=0,
-                videoCodec=0,
-                minFrameRate=30,
-                maxFrameRate=30,
-                minBitRate=10000,
-                maxBitRate=10000,
-                minFragmentLen=1,
-                maxFragmentLen=10,
-                minResolution=resolution,
-                maxResolution=resolution,
-            ),
-            endpoint=endpoint,
-        )
+        # Allocate video stream in DUT if possible, to receive actual video stream
+        # This step is not part of test plan
+        aVideoStreamID = await self.allocate_video_stream(endpoint)
 
         # Test Invokation
 
@@ -91,7 +76,7 @@ class TC_WEBRTC_1_1(MatterBaseTest):
                 webRTCSessionID=NullValue,
                 sdp=offer,
                 streamUsage=WebRTCTransportProvider.Enums.StreamUsageEnum.kLiveView,
-                videoStreamID=NullValue,
+                videoStreamID=aVideoStreamID,
                 audioStreamID=NullValue,
                 originatingEndpointID=1,
             ),
@@ -133,7 +118,7 @@ class TC_WEBRTC_1_1(MatterBaseTest):
         webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
         self.step(6)
-        if not self.is_pics_sdk_ci_only:
+        if not self.is_pics_sdk_ci_only and aVideoStreamID != NullValue:
             self.wait_for_user_input("Verify WebRTC session is established")
         else:
             webrtc_peer.wait_for_session_establishment()

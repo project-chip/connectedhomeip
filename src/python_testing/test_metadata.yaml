@@ -141,6 +141,8 @@ not_automated:
       reason:
           Depends on Python WebRTC bindings. Will be enabled once local tests
           are fully verified.
+    - name: TC_WEBRTC_Utils.py
+      reason: Helper methods for WebRTC TCs, not a standalone test.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
