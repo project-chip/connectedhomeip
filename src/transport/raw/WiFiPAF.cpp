@@ -40,29 +40,6 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
     mWiFiPAFLayer = DeviceLayer::ConnectivityMgr().GetWiFiPAF();
     SetWiFiPAFLayerTransportToSelf();
     mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
-
-    if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-    {
-        ChipLogError(Inet, "Wi-Fi Management has not started, do it now.");
-        static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
-        static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
-        DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-        {
-            for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
-            {
-                if (DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-                {
-                    break;
-                }
-                usleep(kWiFiStartCheckTimeUsec);
-            }
-        }
-        if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-        {
-            ChipLogError(Inet, "Wi-Fi Management taking too long to start - device configuration will be reset.");
-        }
-        ChipLogProgress(Inet, "Wi-Fi Management is started");
-    }
     return CHIP_NO_ERROR;
 }
 
@@ -141,6 +118,11 @@ CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
     mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
 
     return CHIP_NO_ERROR;
+}
+
+bool WiFiPAFBase::WiFiPAFResourceAvailable(void)
+{
+    return DeviceLayer::ConnectivityMgr().WiFiPAFResourceAvailable();
 }
 
 CHIP_ERROR WiFiPAFBase::SendAfterConnect(PacketBufferHandle && msg)

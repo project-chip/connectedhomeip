@@ -125,7 +125,7 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
         return std::nullopt;
     }
 
-    return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
+    return info->HasFlags(DataModel::AttributeQualityFlags::kListAttribute);
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -774,10 +774,9 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
 
-    std::optional<DataModel::AttributeEntry> attributeEntry;
     DataModel::AttributeFinder finder(mDataModelProvider);
 
-    attributeEntry = finder.Find(aPath);
+    std::optional<DataModel::AttributeEntry> attributeEntry = finder.Find(aPath);
 
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
@@ -790,7 +789,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     }
 
     // Allow writes on writable attributes only
-    VerifyOrReturnValue(attributeEntry->writePrivilege.has_value(), Status::UnsupportedWrite);
+    VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
 
     bool checkAcl = true;
     if (mLastSuccessfullyWrittenPath.has_value())
@@ -825,7 +824,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     }
 
     // validate that timed write is enforced
-    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->flags.Has(DataModel::AttributeQualityFlags::kTimed),
+    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
 
     return Status::Success;

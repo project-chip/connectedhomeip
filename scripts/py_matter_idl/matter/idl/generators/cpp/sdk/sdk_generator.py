@@ -14,7 +14,8 @@
 #
 import os
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
+from matter.idl.generators import CodeGenerator
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, FieldQuality, Idl,
                                          Struct)
 
@@ -122,14 +123,14 @@ class SdkGenerator(CodeGenerator):
                 "Build.jinja": "BUILD.gn",
 
                 # contains `*Entry` items for attributes and commands
-                "ClusterMetadataHeader.jinja": "Metadata.h",
+                "Metadata.h.jinja": "Metadata.h",
 
                 # contains id definitions
-                "AttributeIds.jinja": "AttributeIds.h",
-                "ClusterId.jinja": "ClusterId.h",
-                "CommandIds.jinja": "CommandIds.h",
-                "EventIds.jinja": "EventIds.h",
-                "Ids.jinja": "Ids.h",
+                "AttributeIds.h.jinja": "AttributeIds.h",
+                "ClusterId.h.jinja": "ClusterId.h",
+                "CommandIds.h.jinja": "CommandIds.h",
+                "EventIds.h.jinja": "EventIds.h",
+                "Ids.h.jinja": "Ids.h",
             }
 
             for template_path, output_file in build_targets.items():

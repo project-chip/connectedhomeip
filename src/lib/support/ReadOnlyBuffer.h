@@ -165,6 +165,16 @@ public:
     /// so its lifetime is assumed to be longer than the usage of this list.
     [[nodiscard]] CHIP_ERROR ReferenceExisting(SpanType span) { return ReferenceExistingElementArrayRaw(span.data(), span.size()); }
 
+    /// Reference methods attempt to reference the existing array IN PLACE
+    /// so its lifetime is assumed to be longer than the usage of this list.
+    ///
+    /// IMPORTANT: do NOT use `ReferenceExisting({a,b,c,...})` as this does not meet the lifetime requirement
+    template <size_t N>
+    [[nodiscard]] CHIP_ERROR ReferenceExisting(const T (&buffer)[N])
+    {
+        return ReferenceExistingElementArrayRaw(buffer, N);
+    }
+
     /// Append always attempts to append/extend existing memory.
     ///
     /// Automatically attempts to allocate sufficient space to fulfill the element
@@ -174,6 +184,18 @@ public:
     /// as this class does not expose buffer access except by releasing ownership
     /// via `Take`)
     [[nodiscard]] CHIP_ERROR AppendElements(SpanType span) { return AppendElementArrayRaw(span.data(), span.size()); }
+
+    /// Append always attempts to append/extend existing memory.
+    ///
+    /// Automatically attempts to allocate sufficient space to fulfill the element
+    /// requirements.
+    ///
+    /// Can be used like `AppendElements({foo, bar, baz})`
+    template <size_t N>
+    [[nodiscard]] CHIP_ERROR AppendElements(const T (&buffer)[N])
+    {
+        return AppendElementArrayRaw(buffer, N);
+    }
 
     /// Append a single element.
     /// Sufficent append capacity MUST exist.
