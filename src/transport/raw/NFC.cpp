@@ -101,7 +101,7 @@ CHIP_ERROR NFCBase::SendMessage(const Transport::PeerAddress & address, System::
     VerifyOrReturnError(address.GetTransportType() == Type::kNfc, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kConnected, CHIP_ERROR_INCORRECT_STATE);
 
-    chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().SendToNfcTag(address, std::move(msgBuf));
+    DeviceLayer::Internal::NFCCommissioningMgrImpl().SendToNfcTag(address, std::move(msgBuf));
 
     return CHIP_NO_ERROR;
 }
