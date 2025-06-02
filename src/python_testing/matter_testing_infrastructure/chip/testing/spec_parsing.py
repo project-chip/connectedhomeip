@@ -611,12 +611,8 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     # If it's a prebuilt directory, build the path based on the version and data model level
     zip_file_traversable = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
         'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
-
-    # When zip_path_traversable is a file path from pkg_resources for a .zip file,
-    # we construct a zipfile.Path pointing to the appropriate directory within the zip.
-    # zipfile.Path can take a Traversable (like pathlib.Path) that points to a zip archive
-    # as its first argument. It will manage opening/closing this archive itself.
-    path_inside_zip = zipfile.Path(typing.cast(pathlib.Path, zip_file_traversable), at=data_model_level.dirname)
+    zip_root = zipfile.Path(typing.cast(pathlib.Path, zip_file_traversable))
+    path_inside_zip = zip_root / data_model_level.dirname
 
     return path_inside_zip
 
