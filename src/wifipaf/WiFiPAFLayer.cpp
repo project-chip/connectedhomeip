@@ -268,6 +268,7 @@ void WiFiPAFLayer::CloseAllConnections()
 void WiFiPAFLayer::CloseConnection(PafInfoAccess accType, const WiFiPAFSession & PafSession)
 {
     WiFiPAFSession * pPafSession = GetPAFInfo(accType, PafSession);
+    VerifyOrReturn(pPafSession != nullptr);
     ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", pPafSession->id);
 
     WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(pPafSession));
@@ -278,9 +279,11 @@ void WiFiPAFLayer::CloseConnection(PafInfoAccess accType, const WiFiPAFSession &
         endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
         endPoint->mWiFiPafLayer = nullptr;
     }
-
-    mWiFiPAFTransport->WiFiPAFCloseSession(*pPafSession);
-    CleanPafInfo(*pPafSession);
+    else
+    {
+        // WiFiPAFCloseSession will also be called in DoClose() of WiFiPAFEndPoint
+        mWiFiPAFTransport->WiFiPAFCloseSession(*pPafSession);
+    }
 }
 
 bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)

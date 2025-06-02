@@ -298,11 +298,24 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
     return err;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CONFIG_NETWORK_LAYER_BLE
+#endif
 }
 
 CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (mWaitingForDiscovery[kWiFiPAFTransport] == true)
+    {
+        WiFiPAF::WiFiPAFSession InSessionInfo = { .role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber, .nodeId = mRemoteId };
+        WiFiPAF::WiFiPAFSession * pSession =
+            DeviceLayer::ConnectivityMgr().GetWiFiPafLayer()->GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, InSessionInfo);
+        if (pSession != nullptr)
+        {
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pSession->id);
+        }
+    }
+    DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+#endif
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
     return CHIP_NO_ERROR;
 }
