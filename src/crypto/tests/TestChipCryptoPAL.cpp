@@ -3358,9 +3358,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
             // No lines should have overflowed.
             ASSERT_LT(strnlen(outputBufOkSize, PemEncoder::kMinLineBufferSize), PemEncoder::kMinLineBufferSize);
             pemLines.push_back(std::string{ outputBufOkSize });
-            EXPECT_FALSE(encoder.IsDone());
         }
-        EXPECT_TRUE(encoder.IsDone());
 
         // One more call should still leave it done, with empty string output.
         outputBufOkSize[0] = 'A';

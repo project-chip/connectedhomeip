@@ -1838,6 +1838,18 @@ public:
      * and footer line with `-----END ${encodedElement}-----` are not wider than 64 bytes. This
      * will not happen in practice with the types of things this is meant to encode.
      *
+     * Usage should be in a loop, for example:
+     *
+     *   char lineBuf[PemEncoder::kMinLineBufferSize] = {};
+     *   std::vector<std::string> pemLines;
+     *
+     *   PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
+     *
+     *   while (encoder.NextLine(lineBuf, sizeof(lineBuf)))
+     *   {
+     *       pemLines.push_back(std::string{ lineBuf });
+     *   }
+     *
      * @param destStr - null-terminated char buffer to receive the line.
      * @param destSize - size of the char buffer, including null-terminator.
      * @return true if there is a line given back to accumulate.
@@ -1845,16 +1857,13 @@ public:
      */
     bool NextLine(char * destStr, size_t destSize);
 
-    bool IsDone() const { return mState == State::kDone; }
-
 private:
     enum State : int
     {
         kPrintHeader = 0,
         kPrintBody   = 1,
         kPrintFooter = 2,
-        kEndIterator = 3, // The last run through `NextLine` uses that state to return false on NextLine without being done yet.
-        kDone        = 4, // This is the terminal state that indicates there is nothing more after.
+        kDone        = 3,
     };
 
     const char * mEncodedElement; // "CERTIFICATE", "EC PUBLIC KEY", etc. Must be capitalized by caller.

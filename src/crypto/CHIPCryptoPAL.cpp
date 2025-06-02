@@ -1296,12 +1296,10 @@ bool PemEncoder::NextLine(char * destStr, size_t destSize)
             // The `.50s` is to make sure the header is not wider than out internal string buffer. We clamp the footer.
             stringBuilder.AddFormat("-----END %.50s-----", mEncodedElement);
         }
-        mState  = State::kEndIterator;
+        mState  = State::kDone;
         hasMore = true;
         break;
     }
-    case State::kEndIterator:
-        [[fallthrough]];
     case State::kDone:
         [[fallthrough]];
     default: {
