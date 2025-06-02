@@ -2,7 +2,6 @@ import argparse
 import datetime
 import json
 import logging
-import multiprocessing
 import os.path
 import pathlib
 import random
@@ -13,9 +12,8 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Awaitable, Callable, Literal, Optional
 
-import uvicorn
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -26,22 +24,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-# Monkey patch uvicorn to make the underlying transport available to us.
-# That will let us access the ssl context and get the client certificate information.
-from uvicorn.protocols.http.h11_impl import H11Protocol
 from zeroconf import ServiceInfo, Zeroconf
-
-http_tools_protocol_old__should_upgrade = H11Protocol._should_upgrade
-
-
-def http_tools_protocol_new__should_upgrade(self):
-    http_tools_protocol_old__should_upgrade(self)
-    self.scope["transport"] = self.transport
-
-
-H11Protocol._should_upgrade = http_tools_protocol_new__should_upgrade
-
-# End monkey patch
 
 
 class WorkingDirectory:
@@ -238,9 +221,9 @@ class CAHierarchy:
         self,
         name: str,
         cert: x509.Certificate,
-        key: Union[CertificateIssuerPrivateKeyTypes, None],
+        key: Optional[CertificateIssuerPrivateKeyTypes],
         bundle_root: bool,
-    ) -> tuple[str, str]:
+    ) -> tuple[Optional[Path], Path]:
         """
         Private method that help with saving certificate and key to the hierarchy folder.
         This tool isn't meant to be used in production, but instead to help with development
@@ -250,7 +233,7 @@ class CAHierarchy:
         cert_path = self.directory / f"{name}.pem"
         key_path = self.directory / f"{name}.key" if key else None
 
-        if key:
+        if key and key_path:
             with open(key_path, "wb") as f:
                 f.write(
                     key.private_bytes(
@@ -505,7 +488,7 @@ class PushAvServer:
         See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
         for the exact content.
         """
-        cert_details = req.scope["transport"].get_extra_info("ssl_object").getpeercert()
+        cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
 
         logging.debug(f"segment_upload. stream_id={stream_id} file_path:{file_path}")
 
@@ -606,7 +589,6 @@ class PushAvContext:
         self.host = host
         self.port = port
         self.dns = "localhost" if dns is None else f"{dns}._http._tcp_.local."
-        self.proc: multiprocessing.Process | None = None
 
         # Create CA hierarchies (for webserver and devices)
         self.device_hierarchy = CAHierarchy(self.directory.mkdir("certs", "device"), "device", "client")
@@ -633,41 +615,38 @@ class PushAvContext:
         pas = PushAvServer(self.directory, self.device_hierarchy)
         self.app.include_router(pas.router)
 
-    def start_in_background(self):
-        if self.proc:
-            logging.warning("Attempting to start a server when one is already running, no new server is being started.")
-            return
-
+    async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None,):
+        """
+        Start the PUSH AV server. Note that method do not check if a server is already running.
+        """
         # Advertise over mDNS
         if self.svc_info:
             logging.info("Advertising the service as %s", self.svc_info)
             self.zeroconf.register_service(self.svc_info)
 
-        def background_job():
-            # Start the web server
-            try:
-                uvicorn.run(
-                    self.app,
-                    host=self.host,
-                    port=self.port,
-                    ssl_keyfile=self.server_key_file,
-                    ssl_certfile=self.server_cert_file,
-                    ssl_cert_reqs=ssl.CERT_OPTIONAL,
-                    ssl_ca_certs=self.device_hierarchy.root_cert_path,
-                )
-            finally:
-                if self.svc_info:
-                    self.zeroconf.unregister_service(self.svc_info)
+        # Start the web server
+        from hypercorn.asyncio import serve
+        from hypercorn.config import Config
+        import asyncio
+        bind = (self.host or "127.0.0.1") + ":" + (str(self.port or 8000))
+        config = Config.from_mapping(
+            bind=bind,
+            quic_bind=bind,
+            alpn_protocols=["h2"],
+            keyfile=self.server_key_file,
+            certfile=self.server_cert_file,
+            ca_certs=self.device_hierarchy.root_cert_path,
+            verify_mode=ssl.CERT_OPTIONAL
+        )
 
-        # Spawning the function results in python not being able to pickle the full context
-        # (most notably cryptography's rust bindings). So instead we force use forks as the
-        # way to create processes.
-        multiprocessing.set_start_method('fork')
-        self.proc = multiprocessing.Process(target=background_job, daemon=True)
-        self.proc.start()
+        try:
+            await serve(self.app, config, shutdown_trigger=shutdown_trigger)
 
-    def terminate(self):
-        self.proc.terminate()
+        finally:
+            if self.svc_info:
+                self.zeroconf.unregister_service(self.svc_info)
+
+    def cleanup(self):
         self.directory.cleanup()
 
 
@@ -697,7 +676,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns)
-    ctx.start_in_background()
-    print(ctx.proc)
-    ctx.proc.join()
-    ctx.terminate()
+    import asyncio
+    import signal
+
+    shutdown_event = asyncio.Event()
+
+    def _signal_handler():
+        print("SIGINT received. Shutting down web server.")
+        shutdown_event.set()
+
+    loop = asyncio.get_event_loop()
+    loop.add_signal_handler(signal.SIGINT, _signal_handler)
+    loop.run_until_complete(ctx.start(shutdown_trigger=shutdown_event.wait))
+
+    ctx.cleanup()
