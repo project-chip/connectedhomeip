@@ -400,11 +400,12 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
     {
         int reason = wpa_supplicant_1_interface_get_disconnect_reason(iface);
 
-        if (delegate)
+        if (delegate != nullptr)
         {
-            chip::DeviceLayer::StackLock stackLock;
-            delegate->OnDisconnectionDetected(reason);
-            delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kNotConnected));
+            DeviceLayer::SystemLayer().ScheduleLambda([delegate, reason]() {
+                delegate->OnDisconnectionDetected(reason);
+                delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kNotConnected));
+            });
         }
 
         if (mAssociationStarted)
@@ -439,11 +440,11 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                     mpConnectCallback = nullptr;
                 }
             });
-
-            if (delegate)
+            if (delegate != nullptr)
             {
-                chip::DeviceLayer::StackLock stackLock;
-                delegate->OnAssociationFailureDetected(associationFailureCause, status);
+                DeviceLayer::SystemLayer().ScheduleLambda([delegate, associationFailureCause, status]() {
+                    delegate->OnAssociationFailureDetected(associationFailureCause, status);
+                });
             }
         }
 
@@ -453,12 +454,11 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
     }
     else if (g_strcmp0(state, "associated") == 0)
     {
-        if (delegate)
+        if (delegate != nullptr)
         {
-            chip::DeviceLayer::StackLock stackLock;
-            delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kConnected));
+            DeviceLayer::SystemLayer().ScheduleLambda(
+                [delegate]() { delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kConnected)); });
         }
-
         DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
     }
     else if (g_strcmp0(state, "completed") == 0)
