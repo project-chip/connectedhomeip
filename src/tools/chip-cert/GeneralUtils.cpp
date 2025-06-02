@@ -27,6 +27,9 @@
 
 #include "chip-cert.h"
 
+#include <memory>
+#include <utility>
+
 #include <errno.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>
@@ -320,7 +323,7 @@ bool WriteDataIntoFile(const char * fileName, const uint8_t * data, size_t dataL
     {
         VerifyOrExit(CanCastTo<uint32_t>(BASE64_ENCODED_LEN(dataLen)), res = false);
         dataToWriteLen = static_cast<uint32_t>(BASE64_ENCODED_LEN(dataLen));
-        dataBuf        = std::unique_ptr<uint8_t[]>(new uint8_t[dataToWriteLen]);
+        dataBuf        = std::make_unique<uint8_t[]>(dataToWriteLen);
         dataToWrite    = dataBuf.get();
 
         VerifyOrExit(Base64Encode(data, static_cast<uint32_t>(dataLen), dataBuf.get(), dataToWriteLen, dataToWriteLen),
@@ -330,7 +333,7 @@ bool WriteDataIntoFile(const char * fileName, const uint8_t * data, size_t dataL
     {
         VerifyOrExit(CanCastTo<uint32_t>(HEX_ENCODED_LENGTH(dataLen)), res = false);
         dataToWriteLen = static_cast<uint32_t>(HEX_ENCODED_LENGTH(dataLen));
-        dataBuf        = std::unique_ptr<uint8_t[]>(new uint8_t[dataToWriteLen]);
+        dataBuf        = std::make_unique<uint8_t[]>(dataToWriteLen);
         dataToWrite    = dataBuf.get();
 
         VerifyOrExit(BytesToHex(data, dataLen, Uint8::to_char(dataBuf.get()), dataToWriteLen, HexFlags::kUppercase) ==

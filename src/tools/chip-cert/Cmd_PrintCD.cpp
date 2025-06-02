@@ -23,6 +23,9 @@
  *
  */
 
+#include <memory>
+#include <utility>
+
 #include "chip-cert.h"
 
 #include <credentials/CertificationDeclaration.h>
@@ -170,7 +173,7 @@ bool ReadCD(const char * fileNameOrStr, MutableByteSpan cd)
     {
         VerifyOrReturnError(ReadFileIntoMem(fileNameOrStr, nullptr, cdLen), false);
 
-        cdBuf = std::unique_ptr<uint8_t[]>(new uint8_t[cdLen]);
+        cdBuf = std::make_unique<uint8_t[]>(cdLen);
 
         VerifyOrReturnError(ReadFileIntoMem(fileNameOrStr, cdBuf.get(), cdLen), false);
 
@@ -193,7 +196,7 @@ bool ReadCD(const char * fileNameOrStr, MutableByteSpan cd)
             return false;
         }
 
-        cdBuf = std::unique_ptr<uint8_t[]>(new uint8_t[cdLen]);
+        cdBuf = std::make_unique<uint8_t[]>(cdLen);
         memcpy(cdBuf.get(), fileNameOrStr, cdLen);
     }
 
