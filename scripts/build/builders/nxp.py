@@ -160,7 +160,6 @@ class NxpBuilder(GnBuilder):
                  smu2: bool = False,
                  enable_factory_data: bool = False,
                  convert_dac_pk: bool = False,
-                 use_fro32k: bool = False,
                  enable_lit: bool = False,
                  enable_rotating_id: bool = False,
                  has_sw_version_2: bool = False,
@@ -193,7 +192,6 @@ class NxpBuilder(GnBuilder):
         self.smu2 = smu2
         self.enable_factory_data = enable_factory_data
         self.convert_dac_pk = convert_dac_pk
-        self.use_fro32k = use_fro32k
         self.enable_lit = enable_lit
         self.enable_rotating_id = enable_rotating_id
         self.has_sw_version_2 = has_sw_version_2
@@ -253,9 +251,6 @@ class NxpBuilder(GnBuilder):
 
         if self.convert_dac_pk:
             args.append('nxp_convert_dac_private_key=true')
-
-        if self.use_fro32k:
-            args.append('use_fro_32k=1')
 
         if self.enable_lit:
             args.append('chip_enable_icd_lit=true')
