@@ -40,10 +40,10 @@
 static constexpr uint32_t kMaxContentBufferSizeBytes = 4096;
 static constexpr uint32_t kMaxNetworkBandwidthMbps   = 128;
 static constexpr uint8_t kMaxConcurrentEncoders      = 1;
-static constexpr uint32_t kMaxEncodedPixelRate       = 27648000; // 720p at 30fps
 static constexpr uint8_t kSpeakerMinLevel            = 1;
 static constexpr uint8_t kSpeakerMaxLevel            = 254; // Spec constraint
 static constexpr uint8_t kSpeakerMaxChannelCount     = 8;   // Same as Microphone
+static constexpr uint32_t kMaxEncodedPixelRate       = 248832000; // 1080p at 120fps(1920 * 1080 * 120)
 static constexpr uint8_t kMicrophoneMinLevel         = 1;
 static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
 static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate

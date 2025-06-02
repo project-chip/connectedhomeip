@@ -774,10 +774,9 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
 
-    std::optional<DataModel::AttributeEntry> attributeEntry;
     DataModel::AttributeFinder finder(mDataModelProvider);
 
-    attributeEntry = finder.Find(aPath);
+    std::optional<DataModel::AttributeEntry> attributeEntry = finder.Find(aPath);
 
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
