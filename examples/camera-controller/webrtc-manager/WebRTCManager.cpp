@@ -34,8 +34,8 @@ namespace {
 
 // Constants
 constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
-constexpr int kVideoH264Codec                 = 96;
-constexpr int kVideoBitRate                   = 3000;
+constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
+constexpr int kVideoBitRate         = 3000;
 
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
@@ -244,7 +244,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     });
 
     rtc::Description::Video media("video", rtc::Description::Direction::RecvOnly);
-    media.addH264Codec(kVideoH264Codec);
+    media.addH264Codec(kVideoH264PayloadType);
     media.setBitrate(kVideoBitRate);
     mTrack = mPeerConnection->addTrack(media);
 
