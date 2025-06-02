@@ -74,7 +74,8 @@ if(CONFIG_TFLM_FEATURE)
                  src/tflm/models/micro_speech_quantized_model_data.h
                  src/tflm/micro_speech/micro_model_settings.h
                  src/tflm/micro_speech/tflite_micro_micro_speech.cpp
-                 src/tflm/micro_speech/tflite_micro_micro_speech.h)
+                 src/tflm/micro_speech/tflite_micro_micro_speech.h
+                 src/tflm/errno_stub.c)
 endif()
 
 chip_configure_data_model(app
