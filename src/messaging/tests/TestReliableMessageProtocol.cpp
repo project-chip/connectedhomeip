@@ -2103,7 +2103,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
 
-    // Wait for the initial message to fail (should take less than 100ms)
+    // Wait for the first retransmission to be sent (occurs after at least 100ms but less than 1000ms)
     GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     DrainAndServiceIO();
 
