@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -81,7 +82,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
 
@@ -116,11 +116,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> currentPrice;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -132,7 +131,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<Structs::CommodityPriceStruct::DecodableType> currentPrice;
 
@@ -151,7 +149,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
 
@@ -186,11 +183,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::CommodityPriceStruct::Type> priceForecast;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -202,7 +198,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType> priceForecast;
 

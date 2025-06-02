@@ -33,11 +33,11 @@ class EncodableToTLV
 public:
     virtual ~EncodableToTLV() = default;
 
-    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const
+    virtual CHIP_ERROR EncodeTo(FabricAwareTLVWriter & writer, TLV::Tag tag) const
     {
         // By default, just ignore the fabric index.  Implementations that care
         // about it should override as needed.
-        return EncodeTo(writer, tag);
+        return EncodeTo(writer.mTLVWriter, tag);
     }
     virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const = 0;
 };
