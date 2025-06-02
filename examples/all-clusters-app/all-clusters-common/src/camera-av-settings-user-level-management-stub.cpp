@@ -123,10 +123,9 @@ Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStr
     return Status::Success;
 }
 
-Status
-AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                        Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                        Globals::Structs::ViewportStruct::Type & aViewport)
+Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
+                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
+                                                               Globals::Structs::ViewportStruct::Type & aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate

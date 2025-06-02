@@ -53,11 +53,11 @@ public:
                                                          Optional<uint8_t> aZoom) override;
     Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset) override;
     Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) override;
-    Protocols::InteractionModel::Status
-    DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport) override;
-    Protocols::InteractionModel::Status
-    DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                     Globals::Structs::ViewportStruct::Type & aViewport) override;
+    Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
+                                                        Globals::Structs::ViewportStruct::Type aViewport) override;
+    Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
+                                                         Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
+                                                         Globals::Structs::ViewportStruct::Type & aViewport) override;
 
     void SetCameraDeviceHAL(CameraDeviceInterface * aCameraDevice);
 
