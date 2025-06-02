@@ -43,8 +43,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         if (currentMode != RvcRunMode::ModeIdle && newMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-            response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
+            response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
             return;
         }
 
@@ -61,8 +60,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         if (newMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-            response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
+            response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
             return;
         }
 
@@ -78,7 +76,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
 
     // If we fall through at any point, it's because the change is not supported in the current state.
     response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-    response.statusText.SetValue(chip::CharSpan::fromCharString("This change is not allowed at this time"));
+    response.statusText.SetValue("This change is not allowed at this time"_span);
 }
 
 void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
@@ -88,7 +86,7 @@ void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::
     if (rvcRunCurrentMode != RvcRunMode::ModeIdle)
     {
         response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Change of the cleaning mode is only allowed in Idle."));
+        response.statusText.SetValue("Change of the cleaning mode is only allowed in Idle."_span);
         return;
     }
 
