@@ -24,8 +24,8 @@
  *
  */
 
-#include <utility>
 #include <memory>
+#include <utility>
 
 #include "chip-cert.h"
 
