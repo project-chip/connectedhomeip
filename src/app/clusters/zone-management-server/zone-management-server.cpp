@@ -44,13 +44,14 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-ZoneManagementServer::ZoneManagementServer(ZoneManagementDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                        const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones,
-                        uint8_t aMaxZones, uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
+ZoneManagementServer::ZoneManagementServer(ZoneManagementDelegate & aDelegate, EndpointId aEndpointId,
+                                           const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs,
+                                           uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
+                                           const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
     CommandHandlerInterface(MakeOptional(aEndpointId), ZoneManagement::Id),
-    AttributeAccessInterface(MakeOptional(aEndpointId), ZoneManagement::Id), mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxUserDefinedZones(aMaxUserDefinedZones),
-    mMaxZones(aMaxZones), mSensitivityMax(aSensitivityMax), mTwoDCartesianMax(aTwoDCartesianMax)
+    AttributeAccessInterface(MakeOptional(aEndpointId), ZoneManagement::Id), mDelegate(aDelegate), mEndpointId(aEndpointId),
+    mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones),
+    mSensitivityMax(aSensitivityMax), mTwoDCartesianMax(aTwoDCartesianMax)
 {
     mDelegate.SetZoneManagementServer(this);
 }
@@ -71,18 +72,15 @@ CHIP_ERROR ZoneManagementServer::Init()
     // Perform constraint checks
     if (HasFeature(Feature::kUserDefined))
     {
-        VerifyOrReturnError(
-            mMaxUserDefinedZones >= 5, CHIP_ERROR_INVALID_ARGUMENT,
-            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxUserDefinedZones configuration error", mEndpointId));
+        VerifyOrReturnError(mMaxUserDefinedZones >= 5, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxUserDefinedZones configuration error", mEndpointId));
     }
 
-    VerifyOrReturnError(
-        mMaxZones >= 1, CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
+    VerifyOrReturnError(mMaxZones >= 1, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
 
-    VerifyOrReturnError(
-        mSensitivityMax >= 2 && mSensitivityMax <= 10, CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(Zcl, "ZoneManagement[ep=%d]: SensitivityMax configuration error", mEndpointId));
+    VerifyOrReturnError(mSensitivityMax >= 2 && mSensitivityMax <= 10, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: SensitivityMax configuration error", mEndpointId));
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
@@ -144,38 +142,35 @@ CHIP_ERROR ZoneManagementServer::Read(const ConcreteReadAttributePath & aPath, A
         ReturnErrorOnFailure(aEncoder.Encode(mFeatures));
         break;
     case MaxUserDefinedZones::Id:
-        VerifyOrReturnError(HasFeature(Feature::kUserDefined), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl,
-                                         "ZoneManagement[ep=%d]: can not get MaxUserDefinedZones, feature is not supported",
-                                         mEndpointId));
+        VerifyOrReturnError(
+            HasFeature(Feature::kUserDefined), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get MaxUserDefinedZones, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mMaxUserDefinedZones));
         break;
     case MaxZones::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mMaxZones));
         break;
     case Zones::Id:
-        ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeZones(encoder); }));
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeZones(encoder); }));
         break;
     case Triggers::Id:
-        ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeTriggers(encoder); }));
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeTriggers(encoder); }));
         break;
     case SensitivityMax::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mSensitivityMax));
         break;
     case Sensitivity::Id:
-        VerifyOrReturnError(!HasFeature(Feature::kPerZoneSens), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl,
-                                         "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSens feature is supported",
-                                         mEndpointId));
+        VerifyOrReturnError(
+            !HasFeature(Feature::kPerZoneSens), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSens feature is supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSensitivity));
         break;
     case TwoDCartesianMax::Id:
-        VerifyOrReturnError(HasFeature(Feature::kTwoDCart), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl,
-                                         "ZoneManagement[ep=%d]: can not get TwoDCartesianMax, feature is not supported",
-                                         mEndpointId));
+        VerifyOrReturnError(
+            HasFeature(Feature::kTwoDCart), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get TwoDCartesianMax, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mTwoDCartesianMax));
         break;
     }
@@ -190,10 +185,9 @@ CHIP_ERROR ZoneManagementServer::Write(const ConcreteDataAttributePath & aPath, 
     switch (aPath.mAttributeId)
     {
     case Sensitivity::Id: {
-        VerifyOrReturnError(!HasFeature(Feature::kPerZoneSens), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-                            ChipLogError(Zcl,
-                                         "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSens feature is supported",
-                                         mEndpointId));
+        VerifyOrReturnError(
+            !HasFeature(Feature::kPerZoneSens), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSens feature is supported", mEndpointId));
         uint8_t sensitivity;
         ReturnErrorOnFailure(aDecoder.Decode(sensitivity));
         return SetSensitivity(sensitivity);
@@ -265,8 +259,7 @@ void ZoneManagementServer::InvokeCommand(HandlerContext & handlerContext)
         else
         {
             HandleCommand<Commands::RemoveZone::DecodableType>(
-                handlerContext,
-                [this](HandlerContext & ctx, const auto & commandData) { HandleRemoveZone(ctx, commandData); });
+                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleRemoveZone(ctx, commandData); });
         }
         return;
 
@@ -282,8 +275,7 @@ void ZoneManagementServer::InvokeCommand(HandlerContext & handlerContext)
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Removing Trigger", mEndpointId);
 
         HandleCommand<Commands::RemoveTrigger::DecodableType>(
-            handlerContext,
-            [this](HandlerContext & ctx, const auto & commandData) { HandleRemoveTrigger(ctx, commandData); });
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleRemoveTrigger(ctx, commandData); });
         return;
     }
 }
@@ -315,7 +307,7 @@ void ZoneManagementServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
                                                          const Commands::UpdateTwoDCartesianZone::DecodableType & commandData)
 {
     auto & zoneID = commandData.zoneID;
-    auto & zone = commandData.zone;
+    auto & zone   = commandData.zone;
 
     // Call the delegate
     Status status = mDelegate.UpdateTwoDCartesianZone(zoneID, zone);
@@ -352,8 +344,7 @@ void ZoneManagementServer::HandleGetTwoDCartesianZone(HandlerContext & ctx,
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void ZoneManagementServer::HandleRemoveZone(HandlerContext & ctx,
-                                            const Commands::RemoveZone::DecodableType & commandData)
+void ZoneManagementServer::HandleRemoveZone(HandlerContext & ctx, const Commands::RemoveZone::DecodableType & commandData)
 {
     auto & zoneID = commandData.zoneID;
 
@@ -370,7 +361,7 @@ void ZoneManagementServer::HandleRemoveZone(HandlerContext & ctx,
 }
 
 void ZoneManagementServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
-                                            const Commands::CreateOrUpdateTrigger::DecodableType & commandData)
+                                                       const Commands::CreateOrUpdateTrigger::DecodableType & commandData)
 {
     auto & trigger = commandData.trigger;
 
@@ -386,8 +377,7 @@ void ZoneManagementServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
 
-void ZoneManagementServer::HandleRemoveTrigger(HandlerContext & ctx,
-                                               const Commands::RemoveTrigger::DecodableType & commandData)
+void ZoneManagementServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::RemoveTrigger::DecodableType & commandData)
 {
     auto & zoneID = commandData.zoneID;
 

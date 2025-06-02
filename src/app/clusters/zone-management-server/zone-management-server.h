@@ -50,8 +50,7 @@ public:
     virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStruct & zone,
                                                                         uint16_t & outZoneID) = 0;
 
-    virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID,
-                                                                        const TwoDCartesianZoneStruct & zone) = 0;
+    virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStruct & zone) = 0;
 
     virtual Protocols::InteractionModel::Status GetTwoDCartesianZone(const DataModel::Nullable<uint16_t> zoneID,
                                                                      const std::vector<TwoDCartesianZoneStruct> & outZones) = 0;
@@ -74,10 +73,7 @@ private:
      *
      * @param aZoneManagementServer  A pointer to the ZoneManagementServer object related to this delegate object.
      */
-    void SetZoneManagementServer(ZoneManagementServer * aZoneManagementServer)
-    {
-        mZoneManagementServer = aZoneManagementServer;
-    }
+    void SetZoneManagementServer(ZoneManagementServer * aZoneManagementServer) { mZoneManagementServer = aZoneManagementServer; }
 
 protected:
     ZoneManagementServer * GetZoneManagementServer() const { return mZoneManagementServer; }
@@ -91,7 +87,6 @@ enum class OptionalAttribute : uint32_t
 class ZoneManagementServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
-
     /**
      * @brief Creates a Zone Management cluster instance. The Init() function needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
@@ -113,11 +108,11 @@ public:
      * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
      *
      */
-   ZoneManagementServer(ZoneManagementDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                        const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones,
-                        uint8_t aMaxZones, uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
+    ZoneManagementServer(ZoneManagementDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+                         const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
+                         uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
 
-   ~ZoneManagementServer() overrise;
+    ~ZoneManagementServer() overrise;
 
     /**
      * @brief Initialise the Zone Management server instance.
@@ -136,15 +131,9 @@ public:
     CHIP_ERROR SetSensitivity(uint8_t aSensitivity);
 
     // Attribute Getters
-    const std::vector<ZoneInformationStruct> & GetZones() const
-    {
-        return mZones;
-    }
+    const std::vector<ZoneInformationStruct> & GetZones() const { return mZones; }
 
-    const std::vector<ZoneTriggerControlStruct> & GetTriggers() const
-    {
-        return mTriggers;
-    }
+    const std::vector<ZoneTriggerControlStruct> & GetTriggers() const { return mTriggers; }
 
     uint8_t GetMaxUserDefinedZones() const { return mMaxUserDefinedZones; }
     uint8_t GetMaxZones() const { return mMaxZones; }
