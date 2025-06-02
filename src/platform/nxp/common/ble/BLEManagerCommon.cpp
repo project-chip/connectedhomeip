@@ -932,10 +932,6 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
     uint8_t deviceId = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", deviceId);
 
-#if gClkUseFro32K && defined(nxp_use_low_power) && (nxp_use_low_power == 1)
-    PWR_DisallowDeviceToSleep();
-#endif
-
     mDeviceIds.insert(deviceId);
 
     if (mServiceMode == kCHIPoBLE_Enabled)
@@ -954,10 +950,6 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
 {
     uint8_t deviceId = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is disconnected with device: %d.\n", deviceId);
-
-#if gClkUseFro32K && defined(nxp_use_low_power) && (nxp_use_low_power == 1)
-    PWR_AllowDeviceToSleep();
-#endif
 
     mDeviceIds.erase(deviceId);
 
