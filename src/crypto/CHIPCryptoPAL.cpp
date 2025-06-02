@@ -1301,7 +1301,9 @@ bool PemEncoder::NextLine(char * destStr, size_t destSize)
         break;
     }
     case State::kEndIterator:
+        [[fallthrough]];
     case State::kDone:
+        [[fallthrough]];
     default: {
         // Default initialized StringBuilder: empty output.
         mState  = State::kDone;
