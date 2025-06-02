@@ -33,8 +33,8 @@ tests:
 
     - label:
           "Step 1: TH reads MaxGroupKeysPerFabric attribute from
-          GroupKeyManagement cluster on DUT using a fabric-filtered read. Save
-          the value as Max_GrpKey for future use."
+          GroupKeyManagement cluster on DUT. Save the value as
+          Max_GrpKey for future use."
       PICS: GRPKEY.S.A0003
       command: "readAttribute"
       attribute: "MaxGroupKeysPerFabric"
@@ -849,3 +849,36 @@ tests:
                 value: 0x01b
       response:
           error: NOT_FOUND
+
+    - label:
+          "Step 26: TH removes all the existing GroupKeySetID that were added
+          in Step 21 by sending a KeySetRemove command starting from
+          GroupKeySetID 1 to the GroupKeyManagement cluster."
+      verification: |
+          ./chip-tool groupkeymanagement key-set-remove 1 1 0
+
+          Verify DUT sends SUCCESS(0x00) response on TH(chip-tool)  Logs and below is the sample log provided for the raspi platform:
+
+          [1708327827.594276][17431:17433] CHIP:DMG:                                 StatusIB =
+          [1708327827.594280][17431:17433] CHIP:DMG:                                 {
+          [1708327827.594283][17431:17433] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1708327827.594286][17431:17433] CHIP:DMG:                                 },
+
+
+          ./chip-tool groupkeymanagement key-set-remove 2 1 0
+
+          Verify DUT sends SUCCESS(0x00) response on TH(chip-tool)  Logs and below is the sample log provided for the raspi platform:
+
+          [1708327827.594276][17431:17433] CHIP:DMG:                                 StatusIB =
+          [1708327827.594280][17431:17433] CHIP:DMG:                                 {
+          [1708327827.594283][17431:17433] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1708327827.594286][17431:17433] CHIP:DMG:                                 },
+      PICS: GRPKEY.S.C03.Rsp
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
