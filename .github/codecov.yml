@@ -1,0 +1,6 @@
+parsers:
+  gcov:
+    branch_detection:
+      conditional: false
+      loop: false
+      method: false
