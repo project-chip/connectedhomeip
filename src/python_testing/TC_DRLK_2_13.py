@@ -591,6 +591,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 logging.info(
                     "Skipping execution from Step 29a to step 35 since 'max_aliro_keys_supported > numberofcredentialsupportedperuser' as per test plan spec")
                 self.mark_all_remaining_steps_skipped("29a")
+                return
             else:
                 # Perform setUser as we have removed user in previous step and SetCredentials always expects a user with index to be present
                 self.step("29a")

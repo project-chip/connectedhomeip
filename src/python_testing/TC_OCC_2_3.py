@@ -98,6 +98,7 @@ class TC_OCC_2_3(MatterBaseTest):
         if attributes.HoldTime.attribute_id not in attribute_list:
             logging.info("No HoldTime attribute supports. Terminate this test case")
             self.mark_all_remaining_steps_skipped(4)
+            return
         holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
 
         self.step(4)

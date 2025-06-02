@@ -538,6 +538,7 @@ class TC_SwitchTests(MatterBaseTest):
         if not has_ms_feature:
             logging.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
             self.mark_all_remaining_steps_skipped("2")
+            return
 
         # Step 2: Set up subscription to all events and attributes of Switch cluster on the endpoint
         self.step(2)

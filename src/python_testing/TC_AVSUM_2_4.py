@@ -164,6 +164,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             else:
                 self.skip_step(10)
             self.mark_all_remaining_steps_skipped(11)
+            return
         else:
             self.skip_step(6)
             self.skip_step(7)
