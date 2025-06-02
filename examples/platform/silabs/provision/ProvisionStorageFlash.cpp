@@ -730,15 +730,16 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     // TODO: Implement Getter
     // Adding the same return twice to have the function structure
     return CHIP_ERROR_NOT_IMPLEMENTED;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 }
 
 } // namespace Provision
