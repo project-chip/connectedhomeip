@@ -220,8 +220,8 @@ tests:
                 value: ""
 
     - label:
-          "Step 9: TH sends a RemoveGroup Command to the Groups cluster with
-          the GroupID field set to 0x0101. The command is sent as a group command
+          "Step 9: TH sends a RemoveGroup Command to the Groups cluster with the
+          GroupID field set to 0x0101. The command is sent as a group command
           using GroupID 0x0103"
       PICS: G.S.C03.Rsp
       groupId: 0x0103
