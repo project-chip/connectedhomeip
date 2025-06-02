@@ -100,6 +100,8 @@ public:
 
     void OnFabricRemoved(FabricIndex removedIndex);
 
+    // Function called when NFC-based commissioning has been started.
+    // Advertising can be stopped.
     void OnNfcBasedCommissioningStarting();
 
     // CommissioningModeProvider implementation.

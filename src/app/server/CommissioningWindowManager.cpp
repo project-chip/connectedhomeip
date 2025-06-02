@@ -260,29 +260,6 @@ void CommissioningWindowManager::OnNfcBasedCommissioningStarting()
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 
     StopAdvertisement(/* aShuttingDown = */ false);
-
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
-    // This should never be armed because we don't allow CASE sessions to arm the failsafe when the commissioning window is open and
-    // we check that the failsafe is not armed before opening the commissioning window. None the less, it is good to double-check.
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (failSafeContext.IsFailSafeArmed())
-    {
-        ChipLogError(AppServer, "Error - arm failsafe is already armed on PASE session establishment completion");
-    }
-    else
-    {
-        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex,
-                                          System::Clock::Seconds16(CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC));
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
-            HandleFailedAttempt(err);
-        }
-    }
-
-    // When doing NFC-based commissioning, PASE session is done between
-    // the NFC Tag and the Commissioner. MCU is not involved
-    mServer->GetSecureSessionManager().ExpireAllPASESessions();
 }
 
 CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds32 commissioningTimeout)
