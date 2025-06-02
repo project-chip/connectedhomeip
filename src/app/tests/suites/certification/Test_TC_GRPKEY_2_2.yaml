@@ -879,6 +879,6 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Enter 'y' after success"
+                value: "Enter 'y' after success of all commands"
               - name: "expectedValue"
                 value: "y"
