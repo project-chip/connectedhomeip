@@ -238,7 +238,7 @@ public:
         // This also sets the default priority of the stream usages.
         virtual std::vector<StreamUsageEnum> & GetSupportedStreamUsages() = 0;
 
-        // Get stream usge priorities as an ordered list. This is expected to
+        // Get stream usage priorities as an ordered list. This is expected to
         // be a subset of the SupportedStreamUsages.
         virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities() = 0;
 
