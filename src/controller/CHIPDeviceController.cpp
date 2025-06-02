@@ -571,9 +571,6 @@ void DeviceCommissioner::Shutdown()
         mUdcServer = nullptr;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown();
-#endif
 
     // Release everything from the commissionee device pool here.
     // Make sure to use ReleaseCommissioneeDevice so we don't keep dangling
@@ -631,8 +628,13 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
     if ((mSystemState->WiFiPafLayer() != nullptr) && (device->GetDeviceTransportType() == Transport::Type::kWiFiPAF) &&
         (device->IsSecureConnected() == true))
     {
-        ChipLogProgress(Discovery, "Closing all WiFiPAF connections");
-        mSystemState->WiFiPafLayer()->CloseAllConnections();
+        auto PeerAddress = device->GetPeerAddress();
+        ChipLogProgress(Discovery, "Closing WiFiPAF connections, nodeId: %lu", PeerAddress.GetRemoteId());
+        WiFiPAF::WiFiPAFSession PafSession = {
+            .role   = WiFiPAF::kWiFiPafRole_Subscriber,
+            .nodeId = PeerAddress.GetRemoteId(),
+        };
+        mSystemState->WiFiPafLayer()->CloseConnection(WiFiPAF::PafInfoAccess::kAccNodeId, PafSession);
     }
 #endif
     // Make sure that there will be no dangling pointer
@@ -948,9 +950,10 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
-        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
+        auto PeerAddr = device->GetPeerAddress();
+        ChipLogError(Controller, "WiFi-PAF: Subscription Error, NodeId = %lu, err = %" CHIP_ERROR_FORMAT, PeerAddr.GetRemoteId(),
                      err.Format());
-        self->CloseWiFiPAFConnection(device->GetDeviceId());
+        self->CloseWiFiPAFConnection(PeerAddr.GetRemoteId());
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         if (self->mPairingDelegate != nullptr)
