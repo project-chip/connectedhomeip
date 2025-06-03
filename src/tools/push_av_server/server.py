@@ -1,10 +1,12 @@
 import argparse
+import asyncio
 import datetime
 import json
 import logging
 import os.path
 import pathlib
 import random
+import signal
 import socket
 import ssl
 import string
@@ -14,8 +16,6 @@ import tempfile
 from pathlib import Path
 from typing import Awaitable, Callable, Literal, Optional
 
-import asyncio
-import signal
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
