@@ -139,13 +139,19 @@ def run_fuzz_test(context):
         if context.run_mode == FuzzTestMode.UNIT_TEST_MODE:
             subprocess.run([context.fuzz_test_binary_path, ], env=env, check=True)
             logging.info("Fuzz Test Suite executed in Unit Test Mode.\n")
-
         elif context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
-            subprocess.run([context.fuzz_test_binary_path, f"--fuzz={context.selected_fuzz_test_case}"], env=env, check=True)
+            # Use Popen instead of run() so we can always terminate cleanly and avoid profraw file issues
+            process = subprocess.Popen(
+                [context.fuzz_test_binary_path, f"--fuzz={context.selected_fuzz_test_case}"],
+                env=env
+            )
+            process.wait()
 
-    # in FuzzTestMode.CONTINUOUS_FUZZ_MODE, the fuzzing will run indefinitely until stopped by the user
     except KeyboardInterrupt:
-        logging.info("\n===============\nContinuous-Mode Fuzzing Stopped")
+        logging.info("\nFuzzing Interrupted by the user \n")
+        if context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
+            process.terminate()
+            process.wait()
 
     except Exception as e:
         raise ValueError(f"Error running fuzz test: {e}")
