@@ -189,8 +189,10 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 
 #ifdef AV_STREAM_GST_USE_TEST_SRC
     source = gst_element_factory_make("videotestsrc", "source");
+    g_object_set(source, "pattern", kBallAnimationPattern, nullptr);
 #else
     source = gst_element_factory_make("v4l2src", "source");
+    g_object_set(source, "device", device.c_str(), nullptr);
 #endif
 
     if (!pipeline || !source || !capsfilter || !jpegdec || !videoconvert || !x264enc || !rtph264pay || !udpsink)
@@ -224,14 +226,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     g_object_set(capsfilter, "caps", caps, nullptr);
     gst_caps_unref(caps);
 
-    // Configure source device
-#ifdef AV_STREAM_GST_USE_TEST_SRC
-    g_object_set(source, "pattern", kBallAnimationPattern, nullptr);
-#else
-    g_object_set(source, "device", device.c_str(), nullptr);
-#endif
-
-    // Configure encoder / sink for low‑latency RTP
+    // Configure encoder for low‑latency
     gst_util_set_object_arg(G_OBJECT(x264enc), "tune", "zerolatency");
     g_object_set(udpsink, "host", STREAM_GST_DEST_IP, "port", VIDEO_STREAM_GST_DEST_PORT, "sync", FALSE, "async", FALSE, nullptr);
 
@@ -431,11 +426,13 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    // Start the network stream source after the Gstreamer pipeline is setup
-    mNetworkVideoSource.Start(streamID);
+    // TODO:: Start the network stream source after the Gstreamer pipeline is setup
+    // mNetworkVideoSource.Start(streamID);
 
     // Store in stream context
     it->videoContext = videoPipeline;
+
+    ChipLogProgress(Camera, "Video is PLAYING …");
 
     return CameraError::SUCCESS;
 }
@@ -837,8 +834,8 @@ void CameraDevice::InitializeAudioStreams()
 {
     // Create single audio stream with typical supported parameters
     AudioStream audioStream = { { 1 /* Id */, StreamUsageEnum::kLiveView /* StreamUsage */, AudioCodecEnum::kOpus,
-                                  2 /* ChannelCount */, 48000 /* SampleRate */, 20000 /* BitRate*/, 24 /* BitDepth */,
-                                  0 /* RefCount */ },
+                                  kMicrophoneMaxChannelCount /* ChannelCount(Max from Spec) */, 48000 /* SampleRate */,
+                                  20000 /* BitRate*/, 24 /* BitDepth */, 0 /* RefCount */ },
                                 false,
                                 nullptr };
 

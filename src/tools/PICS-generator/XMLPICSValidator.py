@@ -62,6 +62,7 @@ pics_xml_file_list = pics_xml_file_list_loader(xml_template_path_str, True)
 print("Build list of spec XML")
 xml_clusters, problems = build_xml_clusters(Path(f"{args.dm_xml}/clusters"))
 
+
 for cluster in xml_clusters:
     pics_xml_file_name = map_cluster_name_to_pics_xml(xml_clusters[cluster].name, pics_xml_file_list)
 

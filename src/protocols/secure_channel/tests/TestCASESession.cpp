@@ -314,13 +314,12 @@ CHIP_ERROR InitCredentialSets()
         ReturnErrorOnFailure(
             opKeysSerialized.SetLength(sTestCert_Node01_02_PublicKey.size() + sTestCert_Node01_02_PrivateKey.size()));
 
+        // TestCerts::sTestCert_Node01_02_Chip is issued by sTestCert_Root01_Chip directly without an ICAC
         chip::ByteSpan rcacSpan(sTestCert_Root01_Chip);
-        chip::ByteSpan icacSpan(sTestCert_ICA01_Chip);
         chip::ByteSpan nocSpan(sTestCert_Node01_02_Chip);
         chip::ByteSpan opKeySpan(opKeysSerialized.ConstBytes(), opKeysSerialized.Length());
 
-        ReturnErrorOnFailure(
-            gCommissionerFabrics.AddNewFabricForTest(rcacSpan, icacSpan, nocSpan, opKeySpan, &gCommissionerFabricIndex));
+        ReturnErrorOnFailure(gCommissionerFabrics.AddNewFabricForTest(rcacSpan, {}, nocSpan, opKeySpan, &gCommissionerFabricIndex));
     }
 
     const FabricInfo * newFabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
