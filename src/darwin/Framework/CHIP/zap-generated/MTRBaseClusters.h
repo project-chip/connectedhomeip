@@ -16634,6 +16634,15 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (void)globalEchoRequestWithParams:(MTRUnitTestingClusterGlobalEchoRequestParams *)params completion:(void (^)(MTRUnitTestingClusterGlobalEchoResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
+ * Command TestCheckCommandFlags
+ *
+ * Command that returns Success if the CommandFlags pass all checks at the IM layer.
+        Otherwise, return appropriate StatusCode back.
+ */
+- (void)testCheckCommandFlagsWithParams:(MTRUnitTestingClusterTestCheckCommandFlagsParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)testCheckCommandFlagsWithCompletion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+/**
  * Command TestDifferentVendorMeiRequest
  *
  * Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent.
