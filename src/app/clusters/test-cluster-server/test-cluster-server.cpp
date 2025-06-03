@@ -1181,7 +1181,7 @@ bool emberAfUnitTestingClusterGlobalEchoRequestCallback(CommandHandler * command
 }
 
 bool emberAfUnitTestingClusterTestCheckCommandFlagsCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                                 const Commands::TestCheckCommandFlagsOrder::DecodableType & commandData)
+                                                            const Commands::TestCheckCommandFlags::DecodableType & commandData)
 {
     commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     return true;
