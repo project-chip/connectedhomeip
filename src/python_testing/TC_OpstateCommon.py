@@ -983,13 +983,13 @@ class TC_OPSTATE_BASE():
                  TestStep(2, "TH reads the DeviceTypeList from the Descriptor Cluster"),
                  TestStep(3, "If any device is in the set that mandates the OperationCompletion event, set istestmandated to True"),
                  TestStep(4, "If the test is mandated, but the event is not in the PICS, fail the test case"),
-                 TestStep(5, "If the test us not mandated, and the event is not in the PICS, skip all remaining steps"),
+                 TestStep(5, "If the test is not mandated, and the event is not in the PICS, skip all remaining steps"),
                  TestStep(6, "Set up a subscription to the OperationCompletion event"),
                  TestStep(7, "Manually put the DUT into a state wherein it can receive a Start Command"),
                  TestStep(8, "TH sends Start command to the DUT"),
                  TestStep(9, "TH reads from the DUT the CountdownTime attribute"),
-                 TestStep(
-                     10, "If the CountdownTime is not null, TH reads from the DUT the OperationalState attribute, otherwise skip all remaining steps"),
+                 TestStep(10, "If the CountdownTime is not null, TH reads from the DUT the OperationalState attribute,",
+                          "otherwise skip all remaining steps"),
                  TestStep(11, "TH waits for initial-countdown-time"),
                  TestStep(12, "TH sends Stop command to the DUT"),
                  TestStep(13, "TH waits for OperationCompletion event"),
@@ -1047,7 +1047,7 @@ class TC_OPSTATE_BASE():
         # Check to see if this test is mandated for the device type in question, that is, we expect support for the OpComplete Event
         istestmandated = self.opcomplete_test_mandated(device_type_list)
 
-        # STEP 4: If the test is mandated, but the event is not in the PICS, fail the test case"),
+        # STEP 4: If the test is mandated, but the event is not in the PICS, fail the test case
         self.step(4)
         if istestmandated and not opcomplete_pics:
             # Device type requires the event, PICS is missing the event, fail
