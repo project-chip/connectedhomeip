@@ -39,28 +39,28 @@ public:
      * @brief
      *   Called after the current device is rebooted.
      */
-    virtual void OnDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
+    virtual void OnDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason) = 0;
 
     /**
      * @brief
      *   Called when the Node detects a hardware fault has been raised.
      */
     virtual void OnHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                        const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+                                        const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current) = 0;
 
     /**
      * @brief
      *   Called when the Node detects a radio fault has been raised.
      */
     virtual void OnRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                                     const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+                                     const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current) = 0;
 
     /**
      * @brief
      *   Called when the Node detects a network fault has been raised.
      */
     virtual void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                                       const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+                                       const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current) = 0;
 
     /**
      * @brief
