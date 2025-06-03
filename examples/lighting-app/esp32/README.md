@@ -25,6 +25,22 @@ ESP32-C6 supports both Wi-Fi and Thread transport protocols.
     idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32c6_thread" set-target esp32c6 build
     ```
 
+### Building example for Target ESP32-C5
+
+ESP32-C5 supports both Wi-Fi and Thread transport protocols.
+
+-   To build for Matter Over Wi-Fi
+
+    ```
+    idf.py --preview set-target esp32c5 build
+    ```
+
+-   To build for Matter Over Thread, use custom configuration file
+
+    ```
+    idf.py --preview -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32c5_thread" set-target esp32c5 build
+    ```
+
 ### Enabling ESP-Insights:
 
 -   Before building the app, enable the option: ESP_INSIGHTS_ENABLED through
