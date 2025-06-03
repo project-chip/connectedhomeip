@@ -66,13 +66,20 @@ public:
      * @brief
      *   Returns the set global general fault listener. If there isn't one set, it may return nullptr
      */
-    static GeneralFaultListener * GeneralFaultListener::GetGlobalListener();
+    static GeneralFaultListener * GetGlobalListener();
 
     /**
      * @brief
      *   Sets the global general fault listener. 
      */
-    static void GeneralFaultListener::SetGlobalListener(GeneralFaultListener * newValue);
+    static void SetGlobalListener(GeneralFaultListener * newValue);
+
+    static void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason){
+        if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
+        {
+            listener->OnDeviceReboot(bootReason);
+        }
+    }
 
     static void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
                                 const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current){
@@ -82,7 +89,7 @@ public:
         }
     }
 
-    virtual void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
+    static void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
                              const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current){
         if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
         {
@@ -90,7 +97,7 @@ public:
         }
     }
 
-    virtual void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
+    static void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current){
         if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
         {
