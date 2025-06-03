@@ -26,6 +26,7 @@
 
 #include <pw_unit_test/framework.h>
 
+#include "credentials/tests/CHIPCert_test_vectors.h"
 #include <credentials/CHIPCert.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
@@ -36,6 +37,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -44,8 +46,6 @@
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
-
-#include "credentials/tests/CHIPCert_test_vectors.h"
 
 using namespace chip;
 using namespace Credentials;
@@ -177,6 +177,10 @@ public:
         {
             mNumBusyResponses++;
         }
+        if (error == CHIP_ERROR_INVALID_CASE_PARAMETER)
+        {
+            mNumInvalidParamResponse++;
+        }
     }
 
     void OnSessionEstablished(const SessionHandle & session) override
@@ -190,9 +194,10 @@ public:
     SessionHolder mSession;
 
     // TODO: Rename mNumPairing* to mNumEstablishment*
-    uint32_t mNumPairingErrors   = 0;
-    uint32_t mNumPairingComplete = 0;
-    uint32_t mNumBusyResponses   = 0;
+    uint32_t mNumPairingErrors        = 0;
+    uint32_t mNumPairingComplete      = 0;
+    uint32_t mNumBusyResponses        = 0;
+    uint32_t mNumInvalidParamResponse = 0;
 };
 
 class TestOperationalKeystore : public chip::Crypto::OperationalKeystore
@@ -272,6 +277,8 @@ CASEServer gPairingServer;
 
 NodeId Node01_01 = 0xDEDEDEDE00010001;
 NodeId Node01_02 = 0xDEDEDEDE00010002;
+
+constexpr uint8_t faultInjectionSuccessCode = 0;
 
 CHIP_ERROR InitTestIpk(GroupDataProvider & groupDataProvider, const FabricInfo & fabricInfo, size_t numIpks)
 {
@@ -537,18 +544,6 @@ TEST_F(TestCASESession, SecurePairingHandshakeTest)
     SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner, delegateCommissioner);
 }
 
-TEST_F(TestCASESession, BadSignatureSigma2)
-{
-    TemporarySessionManager sessionManager(*this);
-    TestCASESecurePairingDelegate delegateCommissioner;
-    CASESession pairingCommissioner;
-    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
-
-    chip::FaultInjection::GetManager().FailAtFault(chip::FaultInjection::kFault_CASECorruptSigma2Signature, 0, 1);
-
-    SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner, delegateCommissioner);
-}
-
 TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
 {
     // TODO: Add cases for mismatching IPK config between initiator/responder
@@ -647,6 +642,84 @@ TEST_F(TestCASESession, ClientReceivesBusyTest)
     EXPECT_EQ(delegateCommissioner2.mNumBusyResponses, 1u);
 
     gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, Sigma2BadSignature)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateCommissioner;
+    TestCASESecurePairingDelegate delegateAccessory;
+    CASESession pairingCommissioner;
+    CASESession pairingAccessory;
+
+    // Corrupt Sigma2 Signature using Fault Injection
+    EXPECT_EQ(chip::FaultInjection::GetManager().FailAtFault(chip::FaultInjection::kFault_CASECorruptSigma2Signature, 0, 1),
+              faultInjectionSuccessCode);
+
+    // Prepare CASE Handshake
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
+                                                              ScopedNodeId(), Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner.EstablishSession(
+                  sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                  nullptr, nullptr, &delegateCommissioner, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 1u);
+
+    EXPECT_EQ(delegateAccessory.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, Sigma3BadSignature)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateCommissioner;
+    TestCASESecurePairingDelegate delegateAccessory;
+    CASESession pairingCommissioner;
+    CASESession pairingAccessory;
+
+    // Corrupt Sigma2 Signature using Fault Injection
+    EXPECT_EQ(chip::FaultInjection::GetManager().FailAtFault(chip::FaultInjection::kFault_CASECorruptSigma3Signature, 0, 1),
+              faultInjectionSuccessCode);
+
+    // Prepare CASE Handshake
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
+                                                              ScopedNodeId(), Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner.EstablishSession(
+                  sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                  nullptr, nullptr, &delegateCommissioner, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 1u);
+
+    EXPECT_EQ(delegateCommissioner.mNumInvalidParamResponse, 1u);
 }
 
 struct Sigma1Params
