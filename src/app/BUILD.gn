@@ -347,7 +347,7 @@ source_set("required-privileges") {
   # is part of application code, the visibility is broad. However generally DO NOT USE THIS
   # unless you are creating a new CodegenDataModelProvider based item
   visibility = [
-    "//:*", # Top-level apps (e.g. //:bouffalolab-lighting does this)
+    "//:*",  # Top-level apps (e.g. //:bouffalolab-lighting does this)
     "${chip_root}/examples/*",
     "${chip_root}/src/app/util/*",
     "${chip_root}/src/controller/data_model",
