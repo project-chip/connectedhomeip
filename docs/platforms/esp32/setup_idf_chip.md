@@ -40,6 +40,14 @@ step.
     ./install.sh
     ```
 
+-   ESP32-C5 requires IDF v5.5 or newer, current can use
+    [IDF release/v5.5](https://github.com/espressif/esp-idf/tree/release/v5.5)
+    When set target, need to add '--preview' parameter as below:
+
+    ```
+    idf.py --preview set-target esp32c5
+    ```
+
 ## Setup Matter environment
 
 ### Install Prerequisites
