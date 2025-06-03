@@ -69,7 +69,7 @@ class TC_ACL_2_8(MatterBaseTest):
         )]
         asserts.assert_true(len(added_events) > 0, f"Expected 'added' event for node {expected_add_subject_node_id} not found")
         added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
-        
+
         # Guarantee we have a valid added_event
         asserts.assert_is_not_none(added_event, f"Added event for node {expected_add_subject_node_id} must not be None")
 
@@ -82,7 +82,7 @@ class TC_ACL_2_8(MatterBaseTest):
         asserts.assert_true(len(changed_events) > 0,
                             f"Expected 'changed' event for node {expected_add_subject_node_id} not found after the 'added' event")
         changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
-        
+
         # Guarantee we have a valid changed_event
         asserts.assert_is_not_none(changed_event, f"Changed event for node {expected_add_subject_node_id} must not be None")
 
