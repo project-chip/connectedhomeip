@@ -374,7 +374,7 @@ private:
 
 struct TransportConfigurationStorage : public TransportConfigurationStruct
 {
-    TransportConfigurationStorage(){}
+    TransportConfigurationStorage() {}
 
     TransportConfigurationStorage(const TransportConfigurationStorage & aTransportConfigurationStorage)
     {
