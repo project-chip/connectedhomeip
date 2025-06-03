@@ -57,6 +57,10 @@ PushAvStreamTransportServer::PushAvStreamTransportServer(PushAvStreamTransportDe
 
 PushAvStreamTransportServer::~PushAvStreamTransportServer()
 {
+    for (const auto & timerContext : mtimerContexts)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
+    }
     Shutdown();
 }
 
@@ -90,11 +94,15 @@ CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeSupportedFormats(const Attr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder,
+                                                                        FabricIndex fabricIndex)
 {
     for (const auto & currentConnections : mCurrentConnections)
     {
-        ReturnErrorOnFailure(encoder.Encode(currentConnections));
+        if (currentConnections.fabricIndex == fabricIndex)
+        {
+            ReturnErrorOnFailure(encoder.Encode(currentConnections));
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -125,6 +133,27 @@ PushAvStreamTransportServer::UpsertStreamTransportConnection(const TransportConf
     return result;
 }
 
+PushAvStreamTransportServer::UpsertResultEnum
+PushAvStreamTransportServer::UpsertTimerAppState(std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext> timerAppState)
+{
+    UpsertResultEnum result;
+    auto it = std::find_if(mtimerContexts.begin(), mtimerContexts.end(),
+                           [id = timerAppState->connectionID](const auto & existing) { return existing->connectionID == id; });
+
+    if (it != mtimerContexts.end())
+    {
+        *it    = timerAppState;
+        result = UpsertResultEnum::kUpdated;
+    }
+    else
+    {
+        mtimerContexts.push_back(timerAppState);
+        result = UpsertResultEnum::kInserted;
+    }
+
+    return result;
+}
+
 void PushAvStreamTransportServer::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
 {
     size_t originalSize = mCurrentConnections.size();
@@ -145,6 +174,22 @@ void PushAvStreamTransportServer::RemoveStreamTransportConnection(const uint16_t
     }
 }
 
+void PushAvStreamTransportServer::RemoveTimerAppState(const uint16_t connectionID)
+{
+    // Erase-Remove idiom
+    auto it = std::remove_if(mtimerContexts.begin(), mtimerContexts.end(),
+                             [connectionID](const std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext> & s) {
+                                 if (s->connectionID == connectionID)
+                                 {
+                                     DeviceLayer::SystemLayer().CancelTimer(NULL, static_cast<void *>(s.get()));
+                                     return true; // Remove from vector
+                                 }
+                                 return false; // Keep in vector
+                             });
+
+    mtimerContexts.erase(it, mtimerContexts.end());
+}
+
 CHIP_ERROR PushAvStreamTransportServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == PushAvStreamTransport::Id);
@@ -162,8 +207,9 @@ CHIP_ERROR PushAvStreamTransportServer::Read(const ConcreteReadAttributePath & a
         break;
 
     case CurrentConnections::Id:
-        ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeCurrentConnections(encoder); }));
+        ReturnErrorOnFailure(aEncoder.EncodeList([this, &aEncoder](const auto & encoder) -> CHIP_ERROR {
+            return this->ReadAndEncodeCurrentConnections(encoder, aEncoder.AccessingFabricIndex());
+        }));
         break;
     }
 
@@ -311,21 +357,20 @@ void PushAvStreamTransportServer::PushAVStreamTransportDeallocateCallback(System
 
         // Remove connection from CurrentConnections
         transportDeallocateContext->instance->RemoveStreamTransportConnection(connectionID);
+        transportDeallocateContext->instance->RemoveTimerAppState(connectionID);
     }
     else
     {
         ChipLogError(Zcl, "Push AV Stream Transport Deallocate timer expired. %s", "Deallocation Failed");
     }
-
-    delete transportDeallocateContext;
 }
 
 void PushAvStreamTransportServer::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
 {
     uint32_t timeoutMs = timeoutSec * MILLISECOND_TICKS_PER_SECOND;
 
-    PushAVStreamTransportDeallocateCallbackContext * transportDeallocateContext =
-        new (std::nothrow) PushAVStreamTransportDeallocateCallbackContext{ this, connectionID };
+    std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext> transportDeallocateContext{ new (
+        std::nothrow) PushAVStreamTransportDeallocateCallbackContext{ this, connectionID } };
 
     if (transportDeallocateContext == nullptr)
     {
@@ -335,12 +380,16 @@ void PushAvStreamTransportServer::ScheduleTransportDeallocate(uint16_t connectio
 
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeoutMs),
                                                            PushAVStreamTransportDeallocateCallback,
-                                                           static_cast<void *>(transportDeallocateContext));
+                                                           static_cast<void *>(transportDeallocateContext.get()));
 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to schedule deallocate: timeout=%" PRIu32 ", status=%" CHIP_ERROR_FORMAT, timeoutSec,
                      err.Format());
+    }
+    else
+    {
+        UpsertTimerAppState(transportDeallocateContext);
     }
 }
 
@@ -355,7 +404,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     VerifyOrReturn(transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid streamUsage ",
                      AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(), {
@@ -364,9 +413,9 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
 
-    VerifyOrReturn(transportOptions.url.size() <= 2000, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing videoStreamID and audioStreamID",
-                     AttributeAccessInterface::GetEndpointId().Value());
+    VerifyOrReturn(transportOptions.url.size() <= kMaxUrlLength, {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: URL length: %ld exceeding max allowed length of 2000",
+                     AttributeAccessInterface::GetEndpointId().Value(), transportOptions.url.size());
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
@@ -375,7 +424,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     VerifyOrReturn(triggerOptions.triggerType != TransportTriggerTypeEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid triggerType ",
                      AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
@@ -409,6 +458,12 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
                         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
                     });
                 }
+            }
+
+            if (iter.GetStatus() != CHIP_NO_ERROR)
+            {
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+                return;
             }
         }
 
@@ -456,20 +511,14 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         });
     }
 
-    VerifyOrReturn(transportOptions.ingestMethod != IngestMethodsEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method ",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-    });
-
     // Todo: TLSEndpointID Validation
 
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 
-    VerifyOrReturn(transportOptions.ingestMethod != IngestMethodsEnum::kUnknownEnumValue, {
+    VerifyOrReturn(ingestMethod != IngestMethodsEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method ",
                      AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     ContainerOptionsStruct containerOptions = commandData.transportOptions.containerOptions;
@@ -477,7 +526,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     VerifyOrReturn(containerOptions.containerType != ContainerFormatEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Container Format ",
                      AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     if (containerOptions.containerType == ContainerFormatEnum::kCmaf)
@@ -490,9 +539,13 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 
         if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
         {
-            VerifyOrReturn(containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size() <= kMaxCENCKeyLength, {
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key constraint Error",
-                             AttributeAccessInterface::GetEndpointId().Value());
+            VerifyOrReturn(containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size() == kMaxCENCKeyLength, {
+                ChipLogError(
+                    Zcl,
+                    "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key constraint Error, actual length: %ld not "
+                    "equal to expected length of 16",
+                    AttributeAccessInterface::GetEndpointId().Value(),
+                    containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size());
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             });
         }
@@ -514,9 +567,12 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             });
 
-            VerifyOrReturn(containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size() <= kMaxCENCKeyIDLength, {
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key ID constraint Error",
-                             AttributeAccessInterface::GetEndpointId().Value());
+            VerifyOrReturn(containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size() == kMaxCENCKeyIDLength, {
+                ChipLogError(Zcl,
+                             "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key ID constraint Error, actual "
+                             "length: %ld not equal to expected length of 16",
+                             AttributeAccessInterface::GetEndpointId().Value(),
+                             containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size());
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             });
         }
@@ -538,8 +594,8 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         ChipLogError(Zcl,
                      "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method and Container Format Combination : (Ingest Method: "
                      "%02X and Container Format: %02X)",
-                     AttributeAccessInterface::GetEndpointId().Value(), static_cast<uint8_t>(ingestMethod),
-                     static_cast<uint8_t>(containerOptions.containerType));
+                     AttributeAccessInterface::GetEndpointId().Value(), to_underlying(ingestMethod),
+                     to_underlying(containerOptions.containerType));
         ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, status);
         return;
     }
@@ -573,7 +629,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Resource Exhausted",
                      AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
@@ -617,7 +673,7 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
         }
     }
 
-    if (transportOptions.audioStreamID.HasValue() && transportOptions.audioStreamID.Value().IsNull())
+    if (transportOptions.audioStreamID.HasValue() == true)
     {
         if (transportOptions.audioStreamID.Value().IsNull() == true)
         {
@@ -707,6 +763,7 @@ void PushAvStreamTransportServer::HandleDeallocatePushTransport(
     {
         // Remove connection from CurrentConnections
         RemoveStreamTransportConnection(connectionID);
+        RemoveTimerAppState(connectionID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
@@ -778,6 +835,11 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
                         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
                     });
                 }
+            }
+            if (iter.GetStatus() != CHIP_NO_ERROR)
+            {
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+                return;
             }
         }
 
@@ -938,7 +1000,7 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
     VerifyOrReturn(activationReason != TriggerActivationReasonEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Activation Reason ",
                      AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> timeControl = commandData.timeControl;
@@ -1131,3 +1193,7 @@ Status PushAvStreamTransportDelegate::GeneratePushTransportEndEvent(const uint16
  *
  */
 void MatterPushAvStreamTransportPluginServerInitCallback() {}
+void MatterPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "Shuting Push AV Stream Transport server cluster on endpoint %d", endpoint);
+}

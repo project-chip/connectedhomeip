@@ -65,15 +65,13 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 
         mTransportZoneOptions = aTransportTriggerOptionsStorage.mTransportZoneOptions;
 
+        motionZones = aTransportTriggerOptionsStorage.motionZones;
+
         // Rebind motionZones to point to the copied vector if it was set
-        if (aTransportTriggerOptionsStorage.motionZones.HasValue() && !aTransportTriggerOptionsStorage.motionZones.Value().IsNull())
+        if (motionZones.HasValue() == true && motionZones.Value().IsNull() == false)
         {
-            motionZones.SetValue(DataModel::Nullable<DataModel::List<const TransportZoneOptionsStruct>>(
-                Span<TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
-        }
-        else
-        {
-            motionZones.Missing();
+            motionZones.SetValue(DataModel::MakeNullable(
+                DataModel::List<const TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
         }
 
         motionSensitivity = aTransportTriggerOptionsStorage.motionSensitivity;
@@ -83,16 +81,17 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
         return *this;
     }
 
-    TransportTriggerOptionsStorage(Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions)
+    TransportTriggerOptionsStorage & operator=(const Structs::TransportTriggerOptionsStruct::DecodableType aTransportTriggerOptions)
     {
-        triggerType = triggerOptions.triggerType;
+        triggerType = aTransportTriggerOptions.triggerType;
 
-        if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion && triggerOptions.motionZones.HasValue())
+        auto & motionZonesList = aTransportTriggerOptions.motionZones;
+
+        if (triggerType == TransportTriggerTypeEnum::kMotion && motionZonesList.HasValue())
         {
-            if (triggerOptions.motionZones.Value().IsNull() == false)
+            if (motionZonesList.Value().IsNull() == false)
             {
-                auto & motionZonesList = triggerOptions.motionZones;
-                auto iter              = motionZonesList.Value().Value().begin();
+                auto iter = motionZonesList.Value().Value().begin();
 
                 while (iter.Next())
                 {
@@ -100,13 +99,55 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
                     mTransportZoneOptions.push_back(transportZoneOption);
                 }
 
-                motionZones.SetValue(DataModel::Nullable<DataModel::List<const TransportZoneOptionsStruct>>(
-                    Span<TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
+                motionZones.SetValue(DataModel::MakeNullable(
+                    DataModel::List<const TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
+            }
+            else
+            {
+                motionZones.Value().SetNull();
             }
         }
         else
         {
-            motionZones.Missing();
+            motionZones.ClearValue();
+        }
+
+        motionSensitivity = aTransportTriggerOptions.motionSensitivity;
+        motionTimeControl = aTransportTriggerOptions.motionTimeControl;
+        maxPreRollLen     = aTransportTriggerOptions.maxPreRollLen;
+
+        return *this;
+    }
+
+    TransportTriggerOptionsStorage(Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions)
+    {
+        triggerType = triggerOptions.triggerType;
+
+        auto & motionZonesList = triggerOptions.motionZones;
+
+        if (triggerType == TransportTriggerTypeEnum::kMotion && motionZonesList.HasValue())
+        {
+            if (motionZonesList.Value().IsNull() == false)
+            {
+                auto iter = motionZonesList.Value().Value().begin();
+
+                while (iter.Next())
+                {
+                    auto & transportZoneOption = iter.GetValue();
+                    mTransportZoneOptions.push_back(transportZoneOption);
+                }
+
+                motionZones.SetValue(DataModel::MakeNullable(
+                    DataModel::List<const TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
+            }
+            else
+            {
+                motionZones.Value().SetNull();
+            }
+        }
+        else
+        {
+            motionZones.ClearValue();
         }
 
         motionSensitivity = triggerOptions.motionSensitivity;
@@ -135,58 +176,79 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 
         std::memcpy(mCENCKeyIDBuffer, aCMAFContainerOptionsStorage.mCENCKeyIDBuffer, sizeof(mCENCKeyIDBuffer));
 
-        if (aCMAFContainerOptionsStorage.CENCKey.HasValue())
+        CENCKey = aCMAFContainerOptionsStorage.CENCKey;
+
+        CENCKeyID = aCMAFContainerOptionsStorage.CENCKeyID;
+
+        if (CENCKey.HasValue())
         {
             CENCKey.SetValue(ByteSpan(mCENCKeyBuffer, aCMAFContainerOptionsStorage.CENCKey.Value().size()));
-        }
-        else
-        {
-            CENCKey.Missing();
         }
 
         metadataEnabled = aCMAFContainerOptionsStorage.metadataEnabled;
 
-        if (aCMAFContainerOptionsStorage.CENCKeyID.HasValue())
+        if (CENCKeyID.HasValue())
         {
             CENCKeyID.SetValue(ByteSpan(mCENCKeyIDBuffer, aCMAFContainerOptionsStorage.CENCKeyID.Value().size()));
-        }
-        else
-        {
-            CENCKeyID.Missing();
         }
 
         return *this;
     }
 
-    CMAFContainerOptionsStorage(Optional<Structs::CMAFContainerOptionsStruct::Type> CMAFContainerOptions)
+    CMAFContainerOptionsStorage & operator=(const Structs::CMAFContainerOptionsStruct::Type aCMAFContainerOptions)
     {
-        if (CMAFContainerOptions.HasValue() == true)
+        chunkDuration = aCMAFContainerOptions.chunkDuration;
+
+        CENCKey = aCMAFContainerOptions.CENCKey;
+
+        CENCKeyID = aCMAFContainerOptions.CENCKeyID;
+
+        if (CENCKey.HasValue())
         {
-            chunkDuration = CMAFContainerOptions.Value().chunkDuration;
+            MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
+            CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
+            CENCKey.SetValue(CENCKeyBuffer);
+        }
 
-            if (CMAFContainerOptions.Value().CENCKey.HasValue())
-            {
-                MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
-                CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKey.Value(), CENCKeyBuffer);
-                CENCKey.SetValue(CENCKeyBuffer);
-            }
-            else
-            {
-                CENCKey.Missing();
-            }
+        metadataEnabled = aCMAFContainerOptions.metadataEnabled;
 
-            metadataEnabled = CMAFContainerOptions.Value().metadataEnabled;
+        if (CENCKeyID.HasValue())
+        {
+            MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
+            CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
+            CENCKeyID.SetValue(CENCKeyIDBuffer);
+        }
 
-            if (CMAFContainerOptions.Value().CENCKey.HasValue())
-            {
-                MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
-                CopySpanToMutableSpan(CMAFContainerOptions.Value().CENCKeyID.Value(), CENCKeyIDBuffer);
-                CENCKeyID.SetValue(CENCKeyIDBuffer);
-            }
-            else
-            {
-                CENCKeyID.Missing();
-            }
+        return *this;
+    }
+
+    CMAFContainerOptionsStorage(Structs::CMAFContainerOptionsStruct::Type CMAFContainerOptions)
+    {
+
+        chunkDuration = CMAFContainerOptions.chunkDuration;
+
+        if (CMAFContainerOptions.CENCKey.HasValue())
+        {
+            MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
+            CopySpanToMutableSpan(CMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
+            CENCKey.SetValue(CENCKeyBuffer);
+        }
+        else
+        {
+            CENCKey.ClearValue();
+        }
+
+        metadataEnabled = CMAFContainerOptions.metadataEnabled;
+
+        if (CMAFContainerOptions.CENCKey.HasValue())
+        {
+            MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
+            CopySpanToMutableSpan(CMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
+            CENCKeyID.SetValue(CENCKeyIDBuffer);
+        }
+        else
+        {
+            CENCKeyID.ClearValue();
         }
     }
 
@@ -203,11 +265,31 @@ struct ContainerOptionsStorage : public ContainerOptionsStruct
 
     ContainerOptionsStorage & operator=(const ContainerOptionsStorage & aContainerOptionsStorage)
     {
-        containerType = aContainerOptionsStorage.containerType;
+        containerType        = aContainerOptionsStorage.containerType;
+        CMAFContainerOptions = aContainerOptionsStorage.CMAFContainerOptions;
 
-        mCMAFContainerStorage = aContainerOptionsStorage.mCMAFContainerStorage;
+        if (containerType == ContainerFormatEnum::kCmaf)
+        {
+            mCMAFContainerStorage = aContainerOptionsStorage.mCMAFContainerStorage;
+            CMAFContainerOptions.SetValue(mCMAFContainerStorage);
+        }
 
-        CMAFContainerOptions.SetValue(mCMAFContainerStorage);
+        return *this;
+    }
+
+    ContainerOptionsStorage & operator=(const Structs::ContainerOptionsStruct::DecodableType aContainerOptions)
+    {
+        containerType = aContainerOptions.containerType;
+
+        if (containerType == ContainerFormatEnum::kCmaf)
+        {
+            mCMAFContainerStorage = aContainerOptions.CMAFContainerOptions.Value();
+            CMAFContainerOptions.SetValue(mCMAFContainerStorage);
+        }
+        else
+        {
+            CMAFContainerOptions.ClearValue();
+        }
 
         return *this;
     }
@@ -218,12 +300,12 @@ struct ContainerOptionsStorage : public ContainerOptionsStruct
 
         if (containerType == ContainerFormatEnum::kCmaf)
         {
-            mCMAFContainerStorage = CMAFContainerOptionsStorage(containerOptions.CMAFContainerOptions);
+            mCMAFContainerStorage = containerOptions.CMAFContainerOptions.Value();
             CMAFContainerOptions.SetValue(mCMAFContainerStorage);
         }
         else
         {
-            CMAFContainerOptions.Missing();
+            CMAFContainerOptions.ClearValue();
         }
     }
 
@@ -273,12 +355,12 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         CopyCharSpanToMutableCharSpanWithTruncation(transportOptions.url, urlBuffer);
         url = urlBuffer;
 
-        mTriggerOptionsStorage = TransportTriggerOptionsStorage(transportOptions.triggerOptions);
+        mTriggerOptionsStorage = transportOptions.triggerOptions;
         triggerOptions         = mTriggerOptionsStorage;
 
         ingestMethod = transportOptions.ingestMethod;
 
-        mContainerOptionsStorage = ContainerOptionsStorage(transportOptions.containerOptions);
+        mContainerOptionsStorage = transportOptions.containerOptions;
         containerOptions         = mContainerOptionsStorage;
 
         expiryTime = transportOptions.expiryTime;
@@ -292,7 +374,7 @@ private:
 
 struct TransportConfigurationStorage : public TransportConfigurationStruct
 {
-    TransportConfigurationStorage() {}
+    TransportConfigurationStorage(){}
 
     TransportConfigurationStorage(const TransportConfigurationStorage & aTransportConfigurationStorage)
     {
@@ -313,7 +395,7 @@ struct TransportConfigurationStorage : public TransportConfigurationStruct
         }
         else
         {
-            transportOptions.Missing();
+            transportOptions.ClearValue();
         }
 
         return *this;
@@ -332,7 +414,7 @@ struct TransportConfigurationStorage : public TransportConfigurationStruct
         }
         else
         {
-            transportOptions.Missing();
+            transportOptions.ClearValue();
         }
     }
     std::shared_ptr<TransportOptionsStorage> GetTransportOptionsPtr() const { return mTransportOptionsPtr; }
@@ -345,7 +427,7 @@ struct TransportConfigurationStorage : public TransportConfigurationStruct
         }
         else
         {
-            transportOptions.Missing();
+            transportOptions.ClearValue();
         }
     }
 
@@ -374,13 +456,14 @@ public:
      *   @param connectionID[in]            Indicates the connectionID to allocate.
      *
      *   @return Success if the allocation is successful and a PushTransportConnectionID was produced; otherwise, the command SHALL
-     * be rejected with Failure.
+     *   be rejected with Failure.
      *
-     *   The buffers storing URL, Trigger Options, Motion Zones, Container Options is owned by the PushAVStreamTransport Server.
-     *   The buffers are allocated on success of AllocatePushTransport and deallocated on success of DeallocatePushTransport
-     * command. The delegate is expected to process the transport following transport options: URL :  Validate the URL
+
+     *   The delegate is expected to process the transport following transport options: URL :  Validate the URL
      *   StreamUsage,VideoStreamID,AudioStreamID for selection of Stream.
+     *
      *   Allocate the transport and map it to the connectionID.
+     *
      *   On Success TransportConfigurationStruct is sent as response by the server.
      */
     virtual Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
@@ -404,8 +487,9 @@ public:
      *   @param transportOptions [out]      represents the Transport Options to modify.
      *
      *   The buffers storing URL, Trigger Options, Motion Zones, Container Options is owned by the PushAVStreamTransport Server.
+     *
      *   The allocated buffers are cleared and reassigned on success of ModifyPushTransport and deallocated on success of
-     * DeallocatePushTransport.
+     *   DeallocatePushTransport.
      *
      *   @return Success if the stream transport modification is successful; otherwise, the command SHALL be rejected with Failure.
      */
@@ -420,13 +504,17 @@ public:
      *
      *  If the transportStatus field is set to Inactive(1).Disable transmissions on the transport.Remove any queued items for
      *  upload.Cancel any uploads currently in progress.
+     *
      *  Emit GeneratePushTransportEndEvent on stop.
      *
      *  Else If the TransportStatus field is set to Active(0).Enable transmissions on the transport.
      *  If the transports trigger type is Continuous,begin Transmission immediately.
+     *
      *  Else If the transports trigger type is Command or Motion, and the underlying trigger is currently active and still within
      *  the Time Control Bounds,begin Transmission immediately.
+     *
      *  Emit GeneratePushTransportBeginEvent on start.
+     *
      *  @return Success if the stream transport status is successfully set; otherwise, the command SHALL be rejected with Failure.
      */
     virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
@@ -444,8 +532,9 @@ public:
      *
      *   Emitting of PushTransportBegin event is handled by the server when delegate returns success.
      *
-     *   The delegate should emit PushTransportEnd Event using GeneratePushTransportEndEvent() API when timeControl values when
-         transmission ends.
+     *   The delegate should emit PushTransportEnd Event using GeneratePushTransportEndEvent() API when timeControl values indicates
+     *   end of transmission.
+     *
      *   @return Success if the stream transport trigger is successful; otherwise, the command SHALL be rejected with Failure.
      */
     virtual Protocols::InteractionModel::Status
@@ -603,8 +692,6 @@ public:
 
     bool HasFeature(Feature feature) const;
 
-    static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
-
 private:
     enum class UpsertResultEnum : uint8_t
     {
@@ -617,6 +704,8 @@ private:
         PushAvStreamTransportServer * instance;
         uint16_t connectionID;
     };
+
+    std::vector<std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext>> mtimerContexts;
 
     PushAvStreamTransportDelegate & mDelegate;
 
@@ -641,7 +730,7 @@ private:
     void LoadPersistentAttributes();
 
     // Helpers to read list items via delegate APIs
-    CHIP_ERROR ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder, FabricIndex fabricIndex);
     CHIP_ERROR ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     // Helper functions
@@ -656,13 +745,19 @@ private:
 
     void RemoveStreamTransportConnection(const uint16_t connectionID);
 
+    static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
+
+    UpsertResultEnum UpsertTimerAppState(std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext> timerAppState);
+
+    void RemoveTimerAppState(const uint16_t connectionID);
+
     /**
      * @brief Schedule deallocate with a given timeout
      *
      * @param endpointId    endpoint where DoorLockServer is running
      * @param timeoutSec    timeout in seconds
      */
-    void ScheduleTransportDeallocate(chip::EndpointId endpointId, uint32_t timeoutSec);
+    void ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);
 
     /**
      * @brief Inherited from CommandHandlerInterface
