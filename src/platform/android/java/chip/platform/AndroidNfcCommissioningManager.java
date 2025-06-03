@@ -141,19 +141,20 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     boolean isExtendedLengthApduSupported = mIsoDep.isExtendedLengthApduSupported();
     Log.d(TAG, "isExtendedLengthApduSupported: " + isExtendedLengthApduSupported);
 
-    workerHandler.post(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          selectMatterApplication();
-          setIsoDepTimeout(ISODEP_TIMEOUT_IN_MS);
+    workerHandler.post(
+        new Runnable() {
+          @Override
+          public void run() {
+            try {
+              selectMatterApplication();
+              setIsoDepTimeout(ISODEP_TIMEOUT_IN_MS);
 
-        } catch (IOException e) {
-          e.printStackTrace();
-          mPlatform.onNfcTagError();
-        }
-      }
-    });
+            } catch (IOException e) {
+              e.printStackTrace();
+              mPlatform.onNfcTagError();
+            }
+          }
+        });
   }
 
   ///////////////////////////////////////////////////////////////////////////////////
