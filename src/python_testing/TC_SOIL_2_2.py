@@ -27,6 +27,7 @@
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 1
+#       --app-pipe_prefix /tmp/chip_all_clusters_fifo_
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -83,9 +84,7 @@ class TC_SOIL_2_2(MatterBaseTest):
             # Set the initial soil moisture, since it inits as null. Pick a random value between min_bound and max_bound
             irand = randrange(min_bound, max_bound)
             logging.info(f"Simulated soil moisture value: {irand}")
-
-            command_dict = {"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": irand, "EndpointId": endpoint}
-            self._send_named_pipe_command(command_dict)
+            self.write_to_app_pipe({"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": irand, "EndpointId": endpoint})
 
         self.step(3)
         measurement = await self.read_soil_attribute_expect_success(endpoint=endpoint, attribute=attributes.SoilMoistureMeasuredValue)
@@ -98,9 +97,8 @@ class TC_SOIL_2_2(MatterBaseTest):
             # Simulate a change in soil moisture. Pick a random value between min_bound and max_bound
             irand = randrange(min_bound, max_bound)
             logging.info(f"Simulated soil moisture value: {irand}")
+            self.write_to_app_pipe({"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": irand, "EndpointId": endpoint})
 
-            command_dict = {"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": irand, "EndpointId": endpoint}
-            self._send_named_pipe_command(command_dict)
         else:
             self.wait_for_user_input(
                 prompt_msg="Perform action to change the moisture of the measured medium and wait for measurement, then continue")
