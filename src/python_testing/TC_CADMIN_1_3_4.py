@@ -212,12 +212,12 @@ class TC_CADMIN(MatterBaseTest):
             params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
 
             self.step(13)
-            await run_with_error_check(
-                self.th1.CommissionOnNetwork,
-                nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234,
-                exception_type=ChipStackError,
-                expected_error_code=0x0000007E,
-            )
+            # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12
+            with asserts.assert_raises(ChipStackError) as cm:
+                await self.th1.CommissionOnNetwork(nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
+            asserts.assert_equal(cm.exception.err, 0x0000007E,
+                                 "Expected to return Trying to add NOC for fabric that already exists")
+
             """
             expected error:
                 [2024-10-08 11:57:43.144125][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Device returned status 9 on receiving the NOC
