@@ -214,7 +214,7 @@ def generate_coverage_report(context, output_dir_arg):
     cmd = ["genhtml"]
 
     errors_to_ignore = [
-        "inconsistent", "source"
+        "inconsistent", "source", "unmapped"
     ]
     for e in errors_to_ignore:
         cmd.append("--ignore-errors")
