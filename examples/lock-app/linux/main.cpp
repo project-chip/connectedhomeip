@@ -27,7 +27,6 @@ using namespace chip::app;
 
 namespace {
 // Variables for handling named pipe commands
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_lock_app_fifo-";
 NamedPipeCommands sChipNamedPipeCommands;
 LockAppCommandDelegate sLockAppCommandDelegate;
 
@@ -35,10 +34,9 @@ LockAppCommandDelegate sLockAppCommandDelegate;
 
 void ApplicationInit()
 {
-    const char * app_id = LinuxDeviceOptions::GetInstance().app_id;
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    std::string path = kChipEventFifoPathPrefix + std::string(app_id);
-    if (sChipNamedPipeCommands.Start(path, &sLockAppCommandDelegate) != CHIP_NO_ERROR)
+    if (path != "" and (sChipNamedPipeCommands.Start(path, &sLockAppCommandDelegate) != CHIP_NO_ERROR) )
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();

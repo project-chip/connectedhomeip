@@ -79,7 +79,6 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_";
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
@@ -235,11 +234,8 @@ ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
 void ApplicationInit()
 {
-    const char * app_id = LinuxDeviceOptions::GetInstance().app_id;
-
-    std::string path = kChipEventFifoPathPrefix + std::string(app_id);
-
-    if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    if (path != "" and (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();

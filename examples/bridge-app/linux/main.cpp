@@ -64,7 +64,6 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_bridge_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 BridgeCommandDelegate sBridgeCommandDelegate;
 
@@ -1085,11 +1084,9 @@ void ApplicationInit()
         }
     }
 
-    const char * app_id = LinuxDeviceOptions::GetInstance().app_id;
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    std::string path = kChipEventFifoPathPrefix + std::string(app_id);
-
-    if (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR)
+    if (path != "" and (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
