@@ -42,7 +42,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, run_with_error_check
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -129,34 +129,26 @@ class TC_ACE_1_2(MatterBaseTest):
         if print_steps:
             self.print_step(13, "Subscribe to the ACL attribute, expect INVALID_ACTION")
 
-        await run_with_error_check(
-            self.TH2.ReadAttribute,
-            nodeid=self.dut_node_id,
-            attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
-            reportInterval=(1, 5),
-            fabricFiltered=False,
-            keepSubscriptions=False,
-            autoResubscribe=False,
-            exception_type=ChipStackError,
-            expected_error_code=0x580,
-            error_msg="Incorrectly subscribed to attribute with invalid permissions"
-        )
+        with asserts.assert_raises(ChipStackError) as cm:
+            await self.TH2.ReadAttribute(nodeid=self.dut_node_id,
+                                         attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+                                         reportInterval=(1, 5),
+                                         fabricFiltered=False,
+                                         keepSubscriptions=False,
+                                         autoResubscribe=False)
+        asserts.assert_equal(cm.exception.err, 0x580, "Incorrectly subscribed to attribute with invalid permissions")
 
         if print_steps:
             self.print_step(14, "Subscribe to the AccessControlEntryChanged event, expect INVALID_ACTION")
 
-        await run_with_error_check(
-            self.TH2.ReadEvent,
-            nodeid=self.dut_node_id,
-            events=[(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
-            reportInterval=(1, 5),
-            fabricFiltered=False,
-            keepSubscriptions=False,
-            autoResubscribe=False,
-            exception_type=ChipStackError,
-            expected_error_code=0x580,
-            error_msg="Incorrectly subscribed to event with invalid permissions"
-        )
+        with asserts.assert_raises(ChipStackError) as cm:
+            await self.TH2.ReadEvent(nodeid=self.dut_node_id,
+                                     events=[(0, Clusters.AccessControl.Events.AccessControlEntryChanged)],
+                                     reportInterval=(1, 5),
+                                     fabricFiltered=False,
+                                     keepSubscriptions=False,
+                                     autoResubscribe=False)
+        asserts.assert_equal(cm.exception.err, 0x580, "Incorrectly subscribed to attribute with invalid permissions")
 
     @async_test_body
     async def test_TC_ACE_1_2(self):
@@ -298,18 +290,15 @@ class TC_ACE_1_2(MatterBaseTest):
         await self.steps_admin_subscription_error(print_steps=False)
 
         self.print_step(29, "TH2 attempts to subscribe to the breadcrumb attribute - expect error")
-        await run_with_error_check(
-            self.TH2.ReadAttribute,
-            nodeid=self.dut_node_id,
-            attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb)],
-            reportInterval=(1, 5),
-            fabricFiltered=False,
-            keepSubscriptions=False,
-            autoResubscribe=False,
-            exception_type=ChipStackError,
-            expected_error_code=0x580,
-            error_msg="Incorrectly subscribed to attribute with invalid permissions"
-        )
+
+        with asserts.assert_raises(ChipStackError) as cm:
+            await self.TH2.ReadAttribute(nodeid=self.dut_node_id,
+                                         attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+                                         reportInterval=(1, 5),
+                                         fabricFiltered=False,
+                                         keepSubscriptions=False,
+                                         autoResubscribe=False)
+        asserts.assert_equal(cm.exception.err, 0x580, "Incorrectly subscribed to attribute with invalid permissions")
 
 
 if __name__ == "__main__":
