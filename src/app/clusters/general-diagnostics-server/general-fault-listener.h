@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <platform/GeneralFaults.h>
 #include <clusters/GeneralDiagnostics/Events.h>
+#include <platform/GeneralFaults.h>
 
 namespace chip {
 namespace app {
@@ -32,7 +32,7 @@ namespace GeneralDiagnostics {
 class GeneralFaultListener
 {
 public:
-    GeneralFaultListener() = default;
+    GeneralFaultListener()          = default;
     virtual ~GeneralFaultListener() = default;
 
     /**
@@ -46,21 +46,21 @@ public:
      *   Called when the Node detects a hardware fault has been raised.
      */
     virtual void OnHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+                                        const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
 
     /**
      * @brief
      *   Called when the Node detects a radio fault has been raised.
      */
     virtual void OnRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                             const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+                                     const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
 
     /**
      * @brief
      *   Called when the Node detects a network fault has been raised.
      */
     virtual void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                               const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+                                       const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
 
     /**
      * @brief
@@ -74,7 +74,8 @@ public:
      */
     static void SetGlobalListener(GeneralFaultListener * newValue);
 
-    static void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason){
+    static void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason)
+    {
         if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
         {
             listener->OnDeviceReboot(bootReason);
@@ -82,7 +83,8 @@ public:
     }
 
     static void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current){
+                                                 const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current)
+    {
         if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
         {
             listener->OnHardwareFaultsDetect(previous, current);
@@ -90,7 +92,8 @@ public:
     }
 
     static void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                             const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current){
+                                              const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current)
+    {
         if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
         {
             listener->OnRadioFaultsDetect(previous, current);
@@ -98,7 +101,8 @@ public:
     }
 
     static void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                               const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current){
+                                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current)
+    {
         if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
         {
             listener->OnNetworkFaultsDetect(previous, current);

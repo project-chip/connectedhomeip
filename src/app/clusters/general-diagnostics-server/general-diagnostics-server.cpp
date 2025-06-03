@@ -32,8 +32,8 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <clusters/GeneralDiagnostics/Events.h>
-#include <lib/support/ScopedBuffer.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <zap-generated/gen_config.h>
@@ -389,9 +389,9 @@ void GeneralDiagnosticsGlobalInstance::HandlePayloadTestRequest(HandlerContext &
 
 GeneralDiagnosticsGlobalInstance gGeneralDiagnosticsInstance;
 
-class GeneralFaultListenerImpl : public GeneralDiagnostics::GeneralFaultListener{
+class GeneralFaultListenerImpl : public GeneralDiagnostics::GeneralFaultListener
+{
 public:
-
     // Gets called when the device has been rebooted.
     void OnDeviceReboot(BootReasonEnum bootReason) override
     {
@@ -415,7 +415,7 @@ public:
 
     // Get called when the Node detects a hardware fault has been raised.
     void OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
-                                                        const GeneralFaults<kMaxHardwareFaults> & current) override
+                                const GeneralFaults<kMaxHardwareFaults> & current) override
     {
         ChipLogDetail(Zcl, "GeneralDiagnostics: OnHardwareFaultsDetect");
 
@@ -423,14 +423,14 @@ public:
         {
             // If General Diagnostics cluster is implemented on this endpoint
             MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
+                                                   GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
 
             // Record HardwareFault event
             EventNumber eventNumber;
             DataModel::List<const HardwareFaultEnum> currentList(reinterpret_cast<const HardwareFaultEnum *>(current.data()),
-                                                                current.size());
+                                                                 current.size());
             DataModel::List<const HardwareFaultEnum> previousList(reinterpret_cast<const HardwareFaultEnum *>(previous.data()),
-                                                                previous.size());
+                                                                  previous.size());
             Events::HardwareFaultChange::Type event{ currentList, previousList };
 
             if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -442,7 +442,7 @@ public:
 
     // Get called when the Node detects a radio fault has been raised.
     void OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
-                                                    const GeneralFaults<kMaxRadioFaults> & current) override
+                             const GeneralFaults<kMaxRadioFaults> & current) override
     {
         ChipLogDetail(Zcl, "GeneralDiagnostics: OnRadioFaultsDetect");
 
@@ -450,13 +450,14 @@ public:
         {
             // If General Diagnostics cluster is implemented on this endpoint
             MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
+                                                   GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
 
             // Record RadioFault event
             EventNumber eventNumber;
-            DataModel::List<const RadioFaultEnum> currentList(reinterpret_cast<const RadioFaultEnum *>(current.data()), current.size());
+            DataModel::List<const RadioFaultEnum> currentList(reinterpret_cast<const RadioFaultEnum *>(current.data()),
+                                                              current.size());
             DataModel::List<const RadioFaultEnum> previousList(reinterpret_cast<const RadioFaultEnum *>(previous.data()),
-                                                            previous.size());
+                                                               previous.size());
             Events::RadioFaultChange::Type event{ currentList, previousList };
 
             if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -468,7 +469,7 @@ public:
 
     // Get called when the Node detects a network fault has been raised.
     void OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
-                                                        const GeneralFaults<kMaxNetworkFaults> & current) override
+                               const GeneralFaults<kMaxNetworkFaults> & current) override
     {
         ChipLogDetail(Zcl, "GeneralDiagnostics: OnNetworkFaultsDetect");
 
@@ -476,14 +477,14 @@ public:
         {
             // If General Diagnostics cluster is implemented on this endpoint
             MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
+                                                   GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
 
             // Record NetworkFault event
             EventNumber eventNumber;
             DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()),
                                                                 current.size());
             DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
-                                                                previous.size());
+                                                                 previous.size());
             Events::NetworkFaultChange::Type event{ currentList, previousList };
 
             if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -515,7 +516,8 @@ void MatterGeneralDiagnosticsPluginServerInitCallback()
         GeneralDiagnostics::GeneralFaultListener::GlobalNotifyDeviceReboot(bootReason);
     }
 
-    if (GeneralFaultListener::GetGlobalListener() == nullptr) {
+    if (GeneralFaultListener::GetGlobalListener() == nullptr)
+    {
         GeneralFaultListener::SetGlobalListener(&GeneralFaultListenerImpl::Instance());
     }
 }
@@ -527,7 +529,8 @@ void MatterGeneralDiagnosticsPluginServerShutdownCallback()
     AttributeAccessInterfaceRegistry::Instance().Unregister(&gGeneralDiagnosticsInstance);
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gGeneralDiagnosticsInstance);
 
-    if (GeneralFaultListener::GetGlobalListener() == &GeneralFaultListenerImpl::Instance()) {
+    if (GeneralFaultListener::GetGlobalListener() == &GeneralFaultListenerImpl::Instance())
+    {
         GeneralFaultListener::SetGlobalListener(nullptr);
     }
 }
