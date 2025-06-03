@@ -132,7 +132,7 @@ async def connect_wifi_mac(ssid, password):
 
 
 async def connect_host_wifi(ssid, password):
-    """ Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi function """
+    """ Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi function. """
     os_name = platform.system()
     logger.info(f" --- connect_host_wifi: OS detected: {os_name}")
 
@@ -174,6 +174,8 @@ def is_network_switch_successful(err):
 
 
 async def change_networks(test, cluster, ssid, password, breadcrumb):
+    """ Changes networks in DUT by sending ConnectNetwork command and
+        changes TH network by calling connect_host_wifi function."""
     # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
     # so they loose connection between each other. Thus, ConnectNetwork can throw an exception
     retry = 1
