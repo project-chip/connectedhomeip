@@ -25,7 +25,6 @@ from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, Ho
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
-from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
@@ -762,13 +761,6 @@ def BuildIMXTarget():
     return target
 
 
-def BuildMW320Target():
-    target = BuildTarget('mw320', MW320Builder)
-    target.AppendFixedTargets(
-        [TargetPart('all-clusters-app', app=MW320App.ALL_CLUSTERS)])
-    return target
-
-
 def BuildGenioTarget():
     target = BuildTarget('genio', GenioBuilder)
     target.AppendFixedTargets([TargetPart('lighting-app', app=GenioApp.LIGHT)])
@@ -881,7 +873,6 @@ BUILD_TARGETS = [
     BuildInfineonTarget(),
     BuildNxpTarget(),
     BuildMbedTarget(),
-    BuildMW320Target(),
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
     BuildNuttXTarget(),
