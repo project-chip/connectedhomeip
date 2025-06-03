@@ -799,6 +799,35 @@ tests:
               - name: "OptionsOverride"
                 value: 1
 
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep15d
+              maxValue: 65535
+
+    - label: "Wait 10s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 15g: Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep15d
+              maxValue: 65535
+
     - label:
           "Step 16a: TH sends ColorLoopSet command to with UpdateFlag attribute
           to 0x1 (UpdateAction) and Action attribute to 0x0 (De-activate) to
