@@ -42,7 +42,6 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-
 NamedPipeCommands sChipNamedPipeCommands;
 LightingAppCommandDelegate sLightingAppCommandDelegate;
 } // namespace
@@ -78,7 +77,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
 void ApplicationInit()
 {
-    std::string path = std:string(LinuxDeviceOptions::GetInstance().app_pipe);
+    std::string path = std : string(LinuxDeviceOptions::GetInstance().app_pipe);
 
     if (path != "" and (sChipNamedPipeCommands.Start(path, &sLightingAppCommandDelegate) != CHIP_NO_ERROR))
     {

@@ -36,7 +36,7 @@ void ApplicationInit()
 {
     std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    if (path != "" and (sChipNamedPipeCommands.Start(path, &sLockAppCommandDelegate) != CHIP_NO_ERROR) )
+    if (path != "" and (sChipNamedPipeCommands.Start(path, &sLockAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
