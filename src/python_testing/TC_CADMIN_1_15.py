@@ -39,7 +39,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, run_with_error_check
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import MdnsDiscovery
 from mobly import asserts
 
@@ -201,16 +201,12 @@ class TC_CADMIN_1_15(MatterBaseTest):
         await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(11)
-        await run_with_error_check(
-            self.read_single_attribute_check_success,
-            dev_ctrl=self.th2,
-            endpoint=0,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.NodeLabel,
-            exception_type=ChipStackError,
-            expected_error_code=0x00000032,
-            error_msg="Expected exception not thrown"
-        )
+        with asserts.assert_raises(ChipStackError) as cm:
+            await self.read_single_attribute_check_success(dev_ctrl=self.th2,
+                                                           endpoint=0,
+                                                           cluster=Clusters.BasicInformation,
+                                                           attribute=Clusters.BasicInformation.Attributes.NodeLabel)
+        asserts.assert_equal(cm.exception.err, 0x00000032, "Expected to timeout as DUT_CE is no longer on network")
 
         self.step(12)
         fabrics2 = await self.get_fabrics(th=self.th1)
