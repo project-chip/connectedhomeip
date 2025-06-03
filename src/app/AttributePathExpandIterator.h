@@ -114,6 +114,14 @@ public:
     /// Can also optionally ask for the corresponding AttributeEntry (e.g. to validate
     /// read/write options).
     ///
+    /// @param entry - an optional out argument for the corresponding attribute entry metadata
+    ///                for the given path. This is to be used by callers to validate other
+    ///                path information like ACL since the iterator needs a ACL fetch anyway.
+    ///
+    /// NOTE: for fixed paths, iteration may return "std::nullopt" entry to signify
+    ///       that the path is not actually valid (but needs returning as it is a non-wildcard
+    ///       iteration)
+    ///
     /// On success, true is returned and `path` is filled with the next path in the
     /// expansion.
     /// On iteration completion, false is returned and the content of path IS NOT DEFINED.

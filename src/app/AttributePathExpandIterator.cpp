@@ -170,15 +170,11 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttribute(std::optio
             // We get here if:
             //   - entry is NOT valid (this is not a valid attribute)
             //   - path is NOT a wildcard (i.e. we were asked to explicitly return it)
-            // as a result, we have no way to generate a "REAL" attribute metadata, so return one
-            // that is not accessible at all
+            // as a result, we have no way to generate a "REAL" attribute metadata.
+            // So even though we return a valid attribute id, entry will be empty
             if (entry)
             {
-                entry->emplace(mPosition.mAttributePath->mValue.mAttributeId, // forced ID (even if invalid)
-                               BitMask<AttributeQualityFlags>{},              // no flags we know of
-                               std::nullopt,                                  // read privilege */
-                               std::nullopt                                   // write privilege
-                );
+                entry->reset();
             }
             // forced ID (even if invalid)
             return mPosition.mAttributePath->mValue.mAttributeId;

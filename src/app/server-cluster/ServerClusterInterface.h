@@ -155,7 +155,7 @@ public:
     ///   - `path` MUST match one of the paths returned by GetPaths.
     virtual CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) = 0;
 
-    /// Retreive information about a specific genreated event.
+    /// Retrieve information about a specific generated event.
     ///
     /// In particular information regarding access, so that event reads can be validated.
     virtual CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) = 0;
