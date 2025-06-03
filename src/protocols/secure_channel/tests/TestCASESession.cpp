@@ -644,7 +644,9 @@ TEST_F(TestCASESession, ClientReceivesBusyTest)
     gPairingServer.Shutdown();
 }
 
-/* This tests that Corruping Signature during a CASE Handshake will lead to CASE Failing and to the Correct Error returned.
+#if CHIP_WITH_NLFAULTINJECTION
+
+/* This tests that Corrupting Signature during a CASE Handshake will lead to CASE Failing and to the Correct Error returned.
     Test will be repeated twice; by injecting a Fault in the Signature of Sigma2 and of Sigma3 */
 TEST_F(TestCASESession, BadSignatureFailsCASE)
 {
@@ -696,6 +698,7 @@ TEST_F(TestCASESession, BadSignatureFailsCASE)
         }
     }
 }
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 struct Sigma1Params
 {
