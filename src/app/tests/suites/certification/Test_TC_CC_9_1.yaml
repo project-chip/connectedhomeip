@@ -790,8 +790,14 @@ tests:
               maxValue: 65535
 
     - label: "Step 15f: TH sends StopMoveStep command"
-      PICS: CC.C.C47.Tx && CC.C.F01
-      wait: "StopMoveStep"
+      PICS: CC.S.C47.Rsp && (CC.S.F002 || CC.S.F03 || CC.S.F04)
+      command: "StopMoveStep"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 1
+              - name: "OptionsOverride"
+                value: 1
 
     - label:
           "Step 16a: TH sends ColorLoopSet command to with UpdateFlag attribute
