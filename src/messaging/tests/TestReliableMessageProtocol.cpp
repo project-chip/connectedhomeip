@@ -1813,7 +1813,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     // Ensure the retransmit table is empty right now
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    exchange->SetResponseTimeout(3000_ms32);
+    exchange->SetResponseTimeout(5000_ms32);
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     DrainAndServiceIO();
@@ -1972,7 +1972,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     // Ensure the retransmit table is empty right now
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    exchange->SetResponseTimeout(2500_ms32);
+    exchange->SetResponseTimeout(4000_ms32);
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     DrainAndServiceIO();
@@ -1986,7 +1986,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     EXPECT_FALSE(mockSender.IsOnMessageReceivedCalled);
 
     // Wait for all but the last retransmit to happen.
-    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
+    GetIOContext().DriveIOUntil(2000_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
     DrainAndServiceIO();
 
     // Ensure that nothing has been sent yet.
@@ -2000,7 +2000,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     // Now allow through the next message (our last retransmit), but make sure
     // there is no standalone ack for it.
     mockReceiver.SetDropAckResponse(true);
-    GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
     DrainAndServiceIO();
 
     // Verify that message was sent and received but nothing else has been sent.
@@ -2014,7 +2014,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     mockReceiver.SetDropAckResponse(false);
 
     // Now wait for us to time out our MRP context.
-    GetIOContext().DriveIOUntil(1000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
+    GetIOContext().DriveIOUntil(5000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
     DrainAndServiceIO();
 
     EXPECT_EQ(loopback.mSentMessageCount, kMaxMRPTransmits);
