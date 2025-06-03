@@ -151,7 +151,8 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttribute(std::optio
             std::optional<DataModel::AttributeEntry> foundEntry = finder.Find(attributePath);
 
             // if the entry is valid, we can just return it
-            if (foundEntry.has_value()) {
+            if (foundEntry.has_value())
+            {
                 if (entry)
                 {
                     entry->emplace(*foundEntry);

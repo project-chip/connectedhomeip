@@ -77,7 +77,7 @@ public:
         static Position StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return Position(path); }
 
         /// Copies are allowed
-        Position(const Position &) = default;
+        Position(const Position &)                   = default;
         Position & operator=(const Position & other) = default;
 
         Position() : mAttributePath(nullptr) {}
@@ -138,13 +138,13 @@ private:
     /// the current mOutputPath and mpAttributePath.
     ///
     /// returns true if such a next value was found.
-    bool AdvanceOutputPath(std::optional<DataModel::AttributeEntry> *entry);
+    bool AdvanceOutputPath(std::optional<DataModel::AttributeEntry> * entry);
 
     /// Get the next attribute ID in mOutputPath(endpoint/cluster) if one is available.
     /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
     ///
     /// Respects path expansion/values in mpAttributePath
-    std::optional<AttributeId> NextAttribute(std::optional<DataModel::AttributeEntry> *entry);
+    std::optional<AttributeId> NextAttribute(std::optional<DataModel::AttributeEntry> * entry);
 
     /// Get the next cluster ID in mOutputPath(endpoint) if one is available.
     /// Will start from the beginning if current mOutputPath.mClusterId is kInvalidClusterId
