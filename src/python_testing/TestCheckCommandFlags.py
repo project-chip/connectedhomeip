@@ -58,6 +58,7 @@ class TestCheckCommandFlags(MatterBaseTest):
         # session to receive InvalidTransportType status code.
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=1, timedRequestTimeoutMs=1000)
+            asserts.fail("Unexpected success for Command requiring LargePayload session. Expecting InvalidTransportType error")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidTransportType,
                                  "Failed to verify INVALID_TRANSPORT_TYPE for a LargePayload message")
