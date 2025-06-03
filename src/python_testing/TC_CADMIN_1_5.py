@@ -282,7 +282,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
             # Converting error code to useable format to do assert with
         code = int(((cm.exception.msg.split(":"))[2]), 16)
         asserts.assert_equal(code, Clusters.AdministratorCommissioning.Enums.StatusCode.kBusy,
-                             f'Failed to open commissioning window due to an unexpected error code of {e.code}')
+                             f'Failed to open commissioning window due to an unexpected error code of {cm.exception.code}')
 
         self.step(15)
         await self.th2.CommissionOnNetwork(
