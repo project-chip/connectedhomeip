@@ -78,23 +78,7 @@ public:
 
         /// Copies are allowed
         Position(const Position &) = default;
-        Position & operator=(const Position & other)
-        {
-            if (this != &other)
-            {
-                mAttributePath = other.mAttributePath;
-                mOutputPath    = other.mOutputPath;
-                if (other.mEntry)
-                {
-                    mEntry.emplace(*other.mEntry);
-                }
-                else
-                {
-                    mEntry.reset();
-                }
-            }
-            return *this;
-        }
+        Position & operator=(const Position & other) = default;
 
         Position() : mAttributePath(nullptr) {}
 
@@ -116,7 +100,6 @@ public:
 
         SingleLinkedListNode<AttributePathParams> * mAttributePath;
         ConcreteAttributePath mOutputPath;
-        std::optional<DataModel::AttributeEntry> mEntry;
     };
 
     AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position);
@@ -155,13 +138,13 @@ private:
     /// the current mOutputPath and mpAttributePath.
     ///
     /// returns true if such a next value was found.
-    bool AdvanceOutputPath();
+    bool AdvanceOutputPath(std::optional<DataModel::AttributeEntry> *entry);
 
     /// Get the next attribute ID in mOutputPath(endpoint/cluster) if one is available.
     /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
     ///
     /// Respects path expansion/values in mpAttributePath
-    std::optional<DataModel::AttributeEntry> NextAttribute();
+    std::optional<AttributeId> NextAttribute(std::optional<DataModel::AttributeEntry> *entry);
 
     /// Get the next cluster ID in mOutputPath(endpoint) if one is available.
     /// Will start from the beginning if current mOutputPath.mClusterId is kInvalidClusterId
