@@ -181,6 +181,11 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             logging.info("Removing KVS path: %s" % match.group("path"))
             pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
+        # Search for the app-pipe from script args to add it into the app args
+        if match := re.search(r"--app-pipe (?P<pipe_path>[^ ]+)", script_args):
+            logging.info("Adding app-pipe into app-arguments: %s" % match.group("pipe_path"))
+            app_args += f" --app-pipe {match.group('pipe_path')}"
+
     if factory_reset:
         # Remove Python test admin storage if provided
         if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
