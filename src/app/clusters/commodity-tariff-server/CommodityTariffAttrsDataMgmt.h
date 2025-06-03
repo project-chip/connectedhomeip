@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <cassert>
+#include <cstdint>
 #include <cstring>
 #include <type_traits>
 
@@ -149,14 +150,6 @@ private:
     struct IsStruct : std::integral_constant<bool, !IsNumeric<U>::value && !IsEnum<U>::value && !std::is_pointer<U>::value>
     {
     };
-public:
-    using ValueType   = T;
-    using WrappedType = ExtractWrappedType_t<ValueType>;
-    using PayloadType = ExtractPayloadType_t<WrappedType>;
-
-    /*static constexpr bool IsValueNullableList() {
-        return IsNullable<T>::value && IsList<WrappedType>::value;
-    }*/
 
     static constexpr bool IsValueNullable()
     {
@@ -175,6 +168,111 @@ public:
     static constexpr bool IsPayloadEnum() { return IsEnum<PayloadType>::value; }
 
     /**
+     * @enum StorageStates
+     * @brief Tracks the progress of value updates
+     */
+    enum class StorageState : uint8_t {
+        kEmpty,              // A value not initiated (default state)
+        kHold,               // mValue holds some valid data
+    };
+
+
+    /**
+     * @enum UpdateState
+     * @brief Tracks the progress of value updates
+     */
+    enum class UpdateState : uint8_t {
+        kIdle,                         // mNewValue not active, mValue has default/null state
+        kInitiated,                             // mNewValue activated (memory allocated), mValue holds data
+        kAssigned,                              // mNewValue holds new data, mValue holds old data
+        kValidated,                             // mNewValue data validated, mValue holds old data
+        kChanged,                               // mNewValue differs from mValue
+        //kCommitInProgress,                    // Update commit initiated
+        //kRollbackInProgress                   // Update rollback initiated
+    };
+
+
+    using valueType   = T;
+    using wrappedType = ExtractWrappedType_t<valueType>;
+    using payloadType = ExtractPayloadType_t<wrappedType>;
+
+    /**
+     * @brief Validate a new value
+     * @return CHIP_NO_ERROR if valid, an err code otherwise
+     */
+    CHIP_ERROR ValidateValue()
+    {
+        CHIP_ERROR err = Validate(mNewValue);
+        if ( err == CHIP_NO_ERROR)
+        {
+            mUpdateState = UpdateState::kValidated;
+        }
+
+        return err;
+    }
+
+    /**
+     * @brief Clean up the current value based on type
+     */
+    void CleanupValue()
+    {
+        if constexpr (IsValueNullable())
+        {
+            if (!mValue.IsNull())
+            {
+                // For Nullable<Struct>, clean up the struct if needed
+                if constexpr (IsList<wrappedType>::value)
+                {
+                    CleanupList(mValue.Value());
+                }
+                else if constexpr (IsStruct<wrappedType>::value)
+                {
+                    CleanupStruct(mValue.Value());
+                }
+            }
+            mValue.SetNull();
+        }
+        else if constexpr (IsValueList())
+        {
+            CleanupList(mValue);
+        }
+    }
+
+    /**
+     * @brief Clean up list memory
+     * @param list The list to clean up
+     *
+     * Calls CleanupListItem for each element and frees the list memory
+     */
+    void CleanupList(DataModel::List<payloadType> & list)
+    {
+        for (auto & item : list)
+        {
+            CleanupStruct(item);
+        }
+        if (list.data())
+        {
+            chip::Platform::MemoryFree(list.data());
+            list = DataModel::List<payloadType>();
+        }
+    }
+
+    /**
+     * @brief Clean up struct item resources
+     * @param aValue Pointer to the item to clean up
+     *
+     * @note Derived classes should override for complex list items
+     */
+    void CleanupStruct(payloadType & aValue)
+    {
+        CleanupStructValue(aValue);
+    }
+public:
+    using ValueType   = valueType;
+    using WrappedType = wrappedType;
+    using PayloadType = payloadType;
+
+    /**
      * @brief Construct a new data class instance
      * @param aValueStorage Reference to external value storage
      *
@@ -183,7 +281,7 @@ public:
      * - List types: initialized as empty list
      * - Others: left uninitialized
      */
-    explicit CTC_BaseDataClass(T & aValueStorage) : mValue(aValueStorage), mNewValue(mValue)
+    explicit CTC_BaseDataClass(T & aValueStorage, uint16_t aAttrId) : mValue(aValueStorage), mNewValue(mValue), mAttrId(aAttrId)
     {
         if constexpr (IsValueNullable())
         {
@@ -191,8 +289,11 @@ public:
         }
         else if constexpr (IsValueList())
         {
-            mValue = ValueType();
+            mValue = valueType();
         }
+
+        mHoldState = StorageState::kEmpty;
+        mUpdateState = UpdateState::kIdle;
     }
 
     /// @brief Virtual destructor for proper cleanup
@@ -216,43 +317,90 @@ public:
      * @brief Indicates that the newValue has changed against current mValue
      * @return true if value has changed
      */
-    bool HasChanged() { return is_changed; }
+    bool HasChanged() { return (mUpdateState == UpdateState::kChanged); }
 
-    bool IsValid() { return is_valid; }
+    bool IsValid() { return (mUpdateState == UpdateState::kValidated); }
 
-    /**
-     * @brief Validate a new value
-     * @param newValue The value to validate
-     * @return CHIP_NO_ERROR if valid, an err code otherwise
-     */
-    CHIP_ERROR ValidateValue(const ValueType & aValue)
+    CHIP_ERROR CreateNewValue(uint16_t size)
     {
-        CHIP_ERROR err = Validate(aValue);
-        if ( err == CHIP_NO_ERROR)
+        if constexpr (IsValueList() || IsList<wrappedType>::value)
         {
-            is_valid = true;
+            auto* buffer = static_cast<PayloadType*>(
+                    chip::Platform::MemoryCalloc(size, sizeof(PayloadType))
+                );
+
+            if (!buffer) {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+
+            if constexpr (IsValueNullable())
+            {
+                mNewValue.SetNoNull(DataModel::List<PayloadType>(buffer, size));
+            }
+            else {
+                mNewValue = DataModel::List<PayloadType>(buffer, size);
+            }
+        }
+        else
+        {
+            mNewValue = WrappedType();
         }
 
-        return err;
+       mUpdateState = UpdateState::kInitiated;
+
+        return CHIP_NO_ERROR;
+    }
+
+    WrappedType * GetNewValue()
+    {
+        if (mUpdateState < UpdateState::kInitiated)
+        {
+            return nullptr;            
+        }
+
+        return &unwrapValue(mNewValue);
+    }
+
+    /**
+     * This call SHALL be use after 
+     */
+    CHIP_ERROR MarkIsStored()
+    {
+        if (mUpdateState == UpdateState::kInitiated)
+        {
+            mUpdateState = UpdateState::kAssigned;            
+        }
     }
 
     /**
      * @brief Performs a pre-validation of arguments value before assigning it as newValue
      * @param aValue New value for future update mValue
      */
-    CHIP_ERROR UpdateBegin(const T & aValue, void * aUpdCtx)
+    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (* aUpdCb)(uint16_t, void *))
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
+        if (mUpdateState == UpdateState::kIdle)
+        {
+            return CHIP_NO_ERROR;
+        }
+
         assert(aUpdCtx != nullptr);
+        assert(aUpdCb != nullptr);
+
+        if (mUpdateState != UpdateState::kAssigned)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
 
         mAuxData = aUpdCtx;
+        mAuxCb = aUpdCb;
 
-        err = ValidateValue(aValue);
+        err = ValidateValue();
 
         if (CHIP_NO_ERROR == err)
         {
-            mNewValue = aValue;
+            mUpdateState = UpdateState::kValidated; 
         };
 
         return err;
@@ -260,75 +408,63 @@ public:
 
     void UpdateCommit()
     {
-        if (!CompareValues())
+        if (mUpdateState == UpdateState::kValidated)
+        {
+            if (CompareValues())  // If NewValue and mValue are different
+            {
+                mUpdateState = UpdateState::kChanged;
+            }
+        }
+        else if (mHoldState == StorageState::kEmpty && 
+                 mUpdateState == UpdateState::kIdle)
         {
             return;
         }
-
-        is_changed = true;
-
-        if constexpr (IsValueNullable())
-        {
-            if (!mNewValue.IsNull())
-            {
-                WrappedType & tempValue = mNewValue.Value();
-                CleanupValue();
-                mValue.SetNonNull(tempValue);
-            }
-            else
-            {
-                mValue.SetNull();
-            }
-        }
-        else if constexpr (IsValueList())
-        {
-            CleanupValue();
-            mValue = mNewValue;
-        }
         else
         {
-            static_assert(false, "Unexpected type");
+            //Unexpected storage/update state
+            assert(false);
         }
+
+        if (mHoldState == StorageState::kHold)
+        {
+            CleanupValue();
+            mHoldState = StorageState::kEmpty;
+        }
+
+        if (mUpdateState == UpdateState::kChanged)
+        {
+            mValue = mNewValue;
+            mHoldState = StorageState::kHold;
+            if (mAuxCb != nullptr)
+            {
+                mAuxCb(mAttrId, mAuxData);
+            }
+        }
+
+        mUpdateState = UpdateState::kIdle;
     }
 
     void UpdateAbort()
     {
-        is_valid  = false;
         mNewValue = mValue;
-    }
 
-    /**
-     * @brief Clean up the current value based on type
-     */
-    void CleanupValue()
-    {
-        if constexpr (IsValueNullable())
+        if (mUpdateState != UpdateState::kIdle)
         {
-            if (!mValue.IsNull())
-            {
-                // For Nullable<Struct>, clean up the struct if needed
-                if constexpr (IsList<WrappedType>::value)
-                {
-                    CleanupList(mValue.Value());
-                }
-                else if constexpr (IsStruct<WrappedType>::value)
-                {
-                    CleanupStructValue(mValue.Value());
-                }
-            }
-            mValue.SetNull();
+            //cleanup new value
         }
-        else if constexpr (IsValueList())
-        {
-            CleanupList(mValue);
-        }
+        mUpdateState = UpdateState::kIdle;
     }
-
 protected:
     T & mValue;             // Reference to the applied value storage
     T & mNewValue = mValue; // Reference to a value for updating
     void * mAuxData;        // Pointer to an auxiliary data which can be used in some method implementations
-    bool is_valid   = false;
+    const uint16_t mAttrId;
+    void (* mAuxCb)(uint16_t, void *);
+
+    StorageState mHoldState = StorageState::kEmpty;
+    UpdateState mUpdateState = UpdateState::kIdle;
+
     bool is_changed = false;
 
     /**
@@ -338,7 +474,7 @@ protected:
      *
      * @note Derived classes should override for custom validation
      */
-    virtual CHIP_ERROR Validate(const ValueType & aValue) const { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR Validate(const valueType & aValue) const { return CHIP_NO_ERROR; }
 
     virtual bool CompareStructValue(const PayloadType & source, const PayloadType & destination) const
     {
@@ -414,31 +550,7 @@ protected:
         }
     }
 
-    /**
-     * @brief Clean up list memory
-     * @param list The list to clean up
-     *
-     * Calls CleanupListItem for each element and frees the list memory
-     */
-    void CleanupList(DataModel::List<PayloadType> & list)
-    {
-        for (auto & item : list)
-        {
-            CleanupStructValue(item);
-        }
-        if (list.data())
-        {
-            chip::Platform::MemoryFree(list.data());
-            list = DataModel::List<PayloadType>();
-        }
-    }
 
-    /**
-     * @brief Clean up struct item resources
-     * @param item Pointer to the item to clean up
-     *
-     * @note Derived classes should override for complex list items
-     */
     virtual void CleanupStructValue(PayloadType & aValue) { (void) aValue; }
 };
 

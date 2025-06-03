@@ -129,7 +129,7 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
     class attrName##DataClass : public CTC_BaseDataClass<attrType>                                                                 \
     {                                                                                                                              \
     public:                                                                                                                        \
-        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage) {}                              \
+        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}                              \
         ~attrName##DataClass() override = default;                                                                                 \
                                                                                                                                    \
     protected:                                                                                                                     \
@@ -142,7 +142,7 @@ COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
     class attrName##DataClass : public CTC_BaseDataClass<attrType>                                                                 \
     {                                                                                                                              \
     public:                                                                                                                        \
-        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage) {}                              \
+        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}                              \
         ~attrName##DataClass() override = default;                                                                                 \
                                                                                                                                    \
     protected:                                                                                                                     \
@@ -173,6 +173,7 @@ struct TariffUpdateCtx
     std::unordered_set<uint32_t> CP_DP_IDs; /* IDs mentioned in CalendarPeriods items */
 
     BitMask<Feature> mFeature;
+    EndpointId aEndpoint;
 };
 
 /**
@@ -232,18 +233,17 @@ public:
 
     /**
      * @brief Process incoming tariff data updates
-     * @param newData The new tariff data to apply
      *
      * This method implements a three-phase update process:
      * 1. Initial validation (TariffDataUpd_Init)
      * 2. Cross-field validation (TariffDataUpd_CrossValidator)
      * 3. Commit or abort (TariffDataUpd_Commit/Abort)
      */
-    void TariffDataUpdate(const CommodityTariffPrimaryData & newData);
+    void TariffDataUpdate();
 
     // Attribute accessors
 #define X(attrName, attrType)                                                                                                      \
-    attrType & Get##attrName() { return attrName##_MgmtObj.GetValue(); }
+    attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
@@ -262,15 +262,15 @@ private:
     CommodityTariffPrimaryData mTariffData;
 
     // Attribute management objects
-#define X(attrName, attrType) attrName##DataClass attrName##_MgmtObj{ mTariffData.m##attrName };
+#define X(attrName, attrType) attrName##DataClass m##attrName##_MgmtObj{ mTariffData.m##attrName };
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
     // Primary attrs update pipeline methods
-    bool TariffDataUpd_Init(const CommodityTariffPrimaryData & aNewData, TariffUpdateCtx & UpdCtx);
+    bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx);
     void TariffDataUpd_Commit();
     void TariffDataUpd_Abort();
-    bool TariffDataUpd_CrossValidator(const CommodityTariffPrimaryData & aNewData, TariffUpdateCtx & UpdCtx);
+    bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx);
 
     // Current attrs (time depended) update methods
     void UpdateCurrentAttrs();
