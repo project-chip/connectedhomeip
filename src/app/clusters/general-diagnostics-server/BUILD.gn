@@ -27,5 +27,5 @@ source_set("general-fault-listener") {
 }
 
 group("general-diagnostics-server") {
-    public_deps = [ ":general-fault-listener" ]
+  public_deps = [ ":general-fault-listener" ]
 }
