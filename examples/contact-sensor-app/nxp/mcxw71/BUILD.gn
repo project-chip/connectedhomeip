@@ -41,7 +41,7 @@ common_example_dir = "${chip_root}/examples/platform/nxp/common"
 support_common_platform_dir =
     "${nxp_sdk_matter_support_root}/examples/platform/common"
 
-mcxw71_k32w1_sdk("sdk") {
+mcxw71_sdk("sdk") {
   defines = []
   include_dirs = []
   sources = []
@@ -92,7 +92,7 @@ mcxw71_k32w1_sdk("sdk") {
   ]
 }
 
-mcxw71_k32w1_executable("contact_sensor_app") {
+mcxw71_executable("contact_sensor_app") {
   output_name = "chip-mcxw71-contact-example"
 
   defines = []
