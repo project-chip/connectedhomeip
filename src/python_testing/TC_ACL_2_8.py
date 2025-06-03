@@ -53,12 +53,12 @@ class TC_ACL_2_8(MatterBaseTest):
     def _get_relevant_acl_events(self, all_events: list, expected_add_subject_node_id: int, expected_change_subject_node_ids: list) -> list:
         """
         Extracts the most recent 'added' and 'changed' events for a specific node from all events.
-        
+
         Args:
             all_events: List of all AccessControlEntryChanged events
             expected_add_subject_node_id: Node ID expected in the 'added' event subjects
             expected_change_subject_node_ids: List of node IDs expected in the 'changed' event subjects
-            
+
         Returns:
             List containing the relevant 'added' and 'changed' events in chronological order
         """
@@ -76,7 +76,8 @@ class TC_ACL_2_8(MatterBaseTest):
             e.Data.latestValue.subjects == expected_change_subject_node_ids and
             e.Header.EventNumber > added_event.Header.EventNumber
         )]
-        asserts.assert_true(len(changed_events) > 0, f"Expected 'changed' event for node {expected_add_subject_node_id} not found after the 'added' event")
+        asserts.assert_true(len(changed_events) > 0,
+                            f"Expected 'changed' event for node {expected_add_subject_node_id} not found after the 'added' event")
         changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
 
         return [added_event, changed_event]
