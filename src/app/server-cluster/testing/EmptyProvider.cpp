@@ -14,8 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "access/Privilege.h"
-#include "lib/core/CHIPError.h"
 #include <app/server-cluster/testing/EmptyProvider.h>
 
 namespace chip {
