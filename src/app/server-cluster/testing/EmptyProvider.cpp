@@ -44,8 +44,8 @@ CHIP_ERROR EmptyProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuild
 
 CHIP_ERROR EmptyProvider::EventInfo(const app::ConcreteEventPath & path, app::DataModel::EventEntry & eventInfo)
 {
-    eventInfo.readPrivilege = Access::Privilege::kView;
-    return CHIP_NO_ERROR;
+    // no events in empty providers as there are no clusters
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
 CHIP_ERROR EmptyProvider::ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)
