@@ -41,6 +41,7 @@ jobs:
       - name: Generate ChipDeviceCtrl API Markdown
         working-directory: matter
         run: |
+          source venv/bin/activate
           mkdir -p _build/src/testing
           bash ./docs/testing/GenerateChipDeviceCtrlDoc.sh _build/src/testing
           test -s _build/src/testing/ChipDeviceCtrlAPI.md
