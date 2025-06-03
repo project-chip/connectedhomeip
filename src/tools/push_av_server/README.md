@@ -31,7 +31,8 @@ $ patch -d $VIRTUAL_ENV_DIRECTORY < src/tools/push_av_server/hypercorn.patch
 Here is an example of an interaction with the push AV server tool.
 
 ```sh
-$ python server.py --working-directory ~/.pavstest
+# You can omit `--strict-mode` if you want the ref server to accept uploads on any URL paths
+$ python server.py --working-directory ~/.pavstest --strict-mode
 
 
 # First let's create a device key and certificate.

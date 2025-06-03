@@ -14,6 +14,8 @@ import tempfile
 from pathlib import Path
 from typing import Awaitable, Callable, Literal, Optional
 
+import asyncio
+import signal
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -672,7 +674,6 @@ class PushAvContext:
         # Start the web server
         from hypercorn.asyncio import serve
         from hypercorn.config import Config
-        import asyncio
         bind = (self.host or "127.0.0.1") + ":" + (str(self.port or 8000))
         config = Config.from_mapping(
             bind=bind,
@@ -723,8 +724,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns, args.strict_mode)
-    import asyncio
-    import signal
 
     shutdown_event = asyncio.Event()
 
