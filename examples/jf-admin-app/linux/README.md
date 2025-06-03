@@ -9,16 +9,28 @@ An example application that acts as a Joint Fabric Administrator.
 
 <hr>
 
-## Building the Example Application on Linux
+## Prepare for building
+
+Before running any other build command, the `scripts/activate.sh` environment
+setup script should be sourced at the top level. This script takes care of
+downloading GN, ninja, and setting up a Python environment with libraries used
+to build and test.
+
+Run the following command at the top level:
+
+          $ source scripts/activate.sh
+
+## Checking if submodules are up to date
 
 -   Pull the required submodules
 
-          $ scripts/checkout_submodules.py --shallow --platform linux
+          $ ./third_party/connectedhomeip/scripts/checkout_submodules.py --shallow --platform linux
+
+## Building the Example Application on Linux
 
 -   Build the example application:
 
           $ cd ~/connectedhomeip/examples/jf-admin-app/linux
-          $ source ../third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
           $ ninja -C out/debug
 
