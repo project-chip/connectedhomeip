@@ -139,7 +139,9 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         ret = await self.send_clean_change_to_mode_cmd(newMode=old_current_mode)
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
 
-        if self.check_pics("RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE"):
+        can_test_mode_failure = self.check_pics("RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE")
+        can_manually_control = self.check_pics("RVCCLEANM.S.M.CAN_MANUALLY_CONTROLLED")
+        if can_test_mode_failure and can_manually_control:
             asserts.assert_true(self.mode_fail in modes,
                                 "The MODE_CHANGE_FAIL PIXIT value (%d) is not a supported mode" % (self.mode_fail))
             self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.mode_fail))

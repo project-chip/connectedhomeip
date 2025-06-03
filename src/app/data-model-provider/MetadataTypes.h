@@ -112,7 +112,7 @@ enum class AttributeQualityFlags : uint32_t
 
 struct AttributeEntry
 {
-    AttributeId attributeId;
+    const AttributeId attributeId;
 
     // Constructor
 
@@ -150,6 +150,14 @@ struct AttributeEntry
     }
 
     [[nodiscard]] constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & to_underlying(f)) != 0; }
+
+    bool operator==(const AttributeEntry & other) const
+    {
+        return (attributeId == other.attributeId) && (mask.flags == other.mask.flags) &&
+            (mask.readPrivilege == other.mask.readPrivilege) && (mask.writePrivilege == other.mask.writePrivilege);
+    }
+
+    bool operator!=(const AttributeEntry & other) const { return !(*this == other); }
 
 private:
     // Constant used to narrow binary expressions

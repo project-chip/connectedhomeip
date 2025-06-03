@@ -770,9 +770,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_performScheduledTimeUpdate
 {
+    MTRDeviceState currentState;
+    {
+        std::lock_guard lock(_lock);
+        currentState = _state;
+    }
+
     std::lock_guard lock(_timeSyncLock);
     // Device needs to still be reachable
-    if (self.state != MTRDeviceStateReachable) {
+    if (currentState != MTRDeviceStateReachable) {
         MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", self);
         return;
     }

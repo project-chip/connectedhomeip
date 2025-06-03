@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -93,7 +94,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::QueryImage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::VendorId vendorID  = static_cast<chip::VendorId>(0);
     uint16_t productID       = static_cast<uint16_t>(0);
@@ -149,7 +149,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::QueryImageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<uint32_t> delayedActionTime;
@@ -160,7 +159,7 @@ public:
     Optional<bool> userConsentNeeded;
     Optional<chip::ByteSpan> metadataForRequestor;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -172,7 +171,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::QueryImageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<uint32_t> delayedActionTime;
@@ -199,7 +197,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan updateToken;
     uint32_t newVersion = static_cast<uint32_t>(0);
@@ -237,12 +234,11 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     ApplyUpdateActionEnum action = static_cast<ApplyUpdateActionEnum>(0);
     uint32_t delayedActionTime   = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -254,7 +250,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     ApplyUpdateActionEnum action = static_cast<ApplyUpdateActionEnum>(0);
     uint32_t delayedActionTime   = static_cast<uint32_t>(0);
@@ -275,7 +270,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::NotifyUpdateApplied::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan updateToken;
     uint32_t softwareVersion = static_cast<uint32_t>(0);
