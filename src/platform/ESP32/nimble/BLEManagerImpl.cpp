@@ -63,7 +63,9 @@
 #include "nimble/nimble_port_freertos.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
-
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+#include <app/clusters/general-commissioning-server/general-commissioning-server.h>
+#endif //CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
 // Not declared in any header file, hence requires a forward declaration.
 extern "C" void ble_store_config_init(void);
 
@@ -91,7 +93,13 @@ struct ESP32ChipServiceData
     uint8_t ServiceUUID[2];
     ChipBLEDeviceIdentificationInfo DeviceIdInfo;
 };
-
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+struct ESP32ChipServiceNetworkRecoveryData
+{
+    uint8_t ServiceUUID[2];
+    ChipBLEDeviceNetworkRecoveryIdentificationInfo DeviceNwRecoIdInfo;
+};
+#endif
 const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFFF6 };
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -1081,7 +1089,51 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ChipLogError(DeviceLayer, "ble_svc_gap_device_name_set() failed: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+    ///Just for the wifi network recovery
+    bool wifiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+    bool wifiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+    bool wifiConnected   = ConnectivityMgr().IsWiFiStationConnected();
+    ChipLogProgress(DeviceLayer, "BLE Checking WiFi connetion status: P=%d,E=%d,C=%d", wifiProvisioned, wifiEnabled, wifiConnected);
+    chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type reason;
+    chip::app::Clusters::GeneralCommissioning::GetNetworkRecoveryReasonValue(reason);
+if (wifiProvisioned && (!reason.IsNull())) //The device had been provisionded, consider to start the network recovery advertising.
+{
+    chip::Ble::ChipBLEDeviceNetworkRecoveryIdentificationInfo deviceNwRecoveryIdInfo;
 
+    memset(mMatterAdvData, 0, sizeof(mMatterAdvData));
+    mMatterAdvData[index++] = 0x02;                                                                // length
+    mMatterAdvData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                            // AD type : flags
+    mMatterAdvData[index++] = CHIP_ADV_DATA_FLAGS;                                                 // AD value
+    mMatterAdvData[index++] = kServiceDataTypeSize + sizeof(ESP32ChipServiceNetworkRecoveryData);  // length
+    mMatterAdvData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                     // AD type: (Service Data - 16-bit UUID)
+    mMatterAdvData[index++] = static_cast<uint8_t>(ShortUUID_CHIPoBLEService.value & 0xFF);        // AD value
+    mMatterAdvData[index++] = static_cast<uint8_t>((ShortUUID_CHIPoBLEService.value >> 8) & 0xFF); // AD value
+    uint64_t identifier;
+    identifier = chip::app::Clusters::GeneralCommissioning::GetRecoveryIdentifier();
+    deviceNwRecoveryIdInfo.Init();
+    deviceNwRecoveryIdInfo.SetRecoveryReason((uint8_t)reason.Value());
+    deviceNwRecoveryIdInfo.SetRecoveryId(identifier);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
+    {
+        deviceNwRecoveryIdInfo.SetAdditionalDataFlag(true);
+    }
+    else
+    {
+        deviceNwRecoveryIdInfo.SetAdditionalDataFlag(false);
+    }
+#endif
+    VerifyOrExit(index + sizeof(deviceNwRecoveryIdInfo) <= sizeof(mMatterAdvData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
+    memcpy(&mMatterAdvData[index], &deviceNwRecoveryIdInfo, sizeof(deviceNwRecoveryIdInfo));
+    index = static_cast<uint8_t>(index + sizeof(deviceNwRecoveryIdInfo));
+
+	ChipLogProgress(DeviceLayer, "Start network recovery BLE advertisement");
+}
+else
+#endif //CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+{
     memset(mMatterAdvData, 0, sizeof(mMatterAdvData));
     mMatterAdvData[index++] = 0x02;                                                         // length
     mMatterAdvData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                     // AD type : flags
@@ -1122,7 +1174,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(mMatterAdvData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
     memcpy(&mMatterAdvData[index], &deviceIdInfo, sizeof(deviceIdInfo));
     index = static_cast<uint8_t>(index + sizeof(deviceIdInfo));
-
+}
     mMatterAdvDataLen = index;
 exit:
     return err;
@@ -1264,7 +1316,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     constexpr uint8_t kServiceDataTypeSize = 1;
 
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
-
+    #if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+    ///Just for the wifi network recovery
+    bool wifiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+    bool wifiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+    bool wifiConnected   = ConnectivityMgr().IsWiFiStationConnected();
+    chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type reason;
+    chip::app::Clusters::GeneralCommissioning::GetNetworkRecoveryReasonValue(reason);
+    #endif
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
     // bottom digits of the Chip device id.
     uint16_t discriminator;
@@ -1283,7 +1342,44 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ChipLogError(DeviceLayer, "ble_svc_gap_device_name_set() failed: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
+#if CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+    ///Just for the wifi network recovery
+    ChipLogProgress(DeviceLayer, "BLE Checking WiFi connetion status: P=%d,E=%d,C=%d", wifiProvisioned, wifiEnabled, wifiConnected);
+if (wifiProvisioned && (!reason.IsNull())) //The device had been provisionded, consider to start the network recovery advertising.
+{
+    chip::Ble::ChipBLEDeviceNetworkRecoveryIdentificationInfo deviceNwRecoveryIdInfo;
+    memset(advData, 0, sizeof(advData));
+    advData[index++] = 0x02;                                                                // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                            // AD type : flags
+    advData[index++] = CHIP_ADV_DATA_FLAGS;                                                 // AD value
+    advData[index++] = kServiceDataTypeSize + sizeof(ESP32ChipServiceNetworkRecoveryData);  // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                     // AD type: (Service Data - 16-bit UUID)
+    advData[index++] = static_cast<uint8_t>(ShortUUID_CHIPoBLEService.value & 0xFF);        // AD value
+    advData[index++] = static_cast<uint8_t>((ShortUUID_CHIPoBLEService.value >> 8) & 0xFF); // AD value
+    uint64_t identifier;
+    identifier = chip::app::Clusters::GeneralCommissioning::GetRecoveryIdentifier();
+    deviceNwRecoveryIdInfo.Init();
+    deviceNwRecoveryIdInfo.SetRecoveryReason((uint8_t)reason.Value());
+    deviceNwRecoveryIdInfo.SetRecoveryId(identifier);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
+    {
+        deviceNwRecoveryIdInfo.SetAdditionalDataFlag(true);
+    }
+    else
+    {
+        deviceNwRecoveryIdInfo.SetAdditionalDataFlag(false);
+    }
+#endif
+    VerifyOrExit(index + sizeof(deviceNwRecoveryIdInfo) <= sizeof(advData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
+    memcpy(&advData[index], &deviceNwRecoveryIdInfo, sizeof(deviceNwRecoveryIdInfo));
+    index = static_cast<uint8_t>(index + sizeof(deviceNwRecoveryIdInfo));
 
+    ChipLogProgress(DeviceLayer, "Start network recovery BLE advertisement");
+}
+else
+#endif //CHIP_DEVICE_CONFIG_NETWORK_RECOVERY_REQUIRED
+{
     memset(advData, 0, sizeof(advData));
     advData[index++] = 0x02;                                                                // length
     advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                            // AD type : flags
@@ -1324,7 +1420,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(advData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
     memcpy(&advData[index], &deviceIdInfo, sizeof(deviceIdInfo));
     index = static_cast<uint8_t>(index + sizeof(deviceIdInfo));
-
+}
     // Construct the Chip BLE Service Data to be sent in the scan response packet.
     err = MapBLEError(ble_gap_adv_set_data(advData, sizeof(advData)));
     if (err != CHIP_NO_ERROR)

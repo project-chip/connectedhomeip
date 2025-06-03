@@ -134,5 +134,82 @@ struct ChipBLEDeviceIdentificationInfo
 
 } __attribute__((packed));
 
+/**
+ * chip BLE Device Network Recovery Identification Information Block
+ *
+ * Defines the over-the-air encoded format of the device network recovery identification information block that appears
+ * within chip BLE service advertisement data.
+ */
+struct ChipBLEDeviceNetworkRecoveryIdentificationInfo
+{
+    constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
+    constexpr static uint8_t kRecovryReasonMask             = 0x0f;
+    constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
+    constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
+
+    uint8_t OpCode;
+
+    // DeviceRecoReasonAndAdvVersion contains the high 4 bits of the advertisement and low 4 bits of Recovery Reason.
+    // The advertisement version in its high 4 bits. Bits[7:4]
+    // The Device Recovery Reason in its low 4 bits. Bits[3:0]
+    uint8_t DeviceNwRecoveryReasonAndAdvVersion;
+    uint8_t DeviceNetworkRecoveryId[8]; //64-bit Network Recovery ID
+    uint8_t AdditionalDataFlag;
+
+    void Init() { memset(this, 0, sizeof(*this)); OpCode = 1;} //0x01 (Network Recovery mode)
+
+    uint64_t GetRecoveryId() const { return chip::Encoding::BigEndian::Get64(DeviceNetworkRecoveryId); }
+
+    void SetRecoveryId(uint64_t recoveryId) { chip::Encoding::BigEndian::Put64(DeviceNetworkRecoveryId, recoveryId); }
+
+    uint8_t GetRecoveryReason() const
+    {
+        uint8_t recoveryReason = static_cast<uint8_t>(DeviceNwRecoveryReasonAndAdvVersion & kRecovryReasonMask);
+        return recoveryReason;
+    }
+
+    // Use only 4 bits to set Network Recovery Reason
+    void SetRecoveryReason(uint8_t recoveryReason)
+    {
+        //Network Recovery Reason is 4 bit long from 0th to 3st
+        recoveryReason =
+            static_cast<uint8_t>(recoveryReason & kRecovryReasonMask);
+        DeviceNwRecoveryReasonAndAdvVersion =
+            static_cast<uint8_t>((DeviceNwRecoveryReasonAndAdvVersion & ~kRecovryReasonMask) | recoveryReason);
+    }
+
+    uint8_t GetAdvertisementVersion() const
+    {
+        uint8_t advertisementVersion = static_cast<uint8_t>((DeviceNwRecoveryReasonAndAdvVersion & kAdvertisementVersionMask) >>
+                                                            kAdvertisementVersionShiftBits);
+        return advertisementVersion;
+    }
+
+    // Use only 4 bits to set advertisement version
+    void SetAdvertisementVersion(uint8_t advertisementVersion)
+    {
+        // Advertisement Version is 4 bit long from 4th to 7th
+        advertisementVersion =
+            static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
+        DeviceNwRecoveryReasonAndAdvVersion =
+            static_cast<uint8_t>((DeviceNwRecoveryReasonAndAdvVersion & ~kAdvertisementVersionMask) | advertisementVersion);
+    }
+
+    uint8_t GetAdditionalDataFlag() const { return (AdditionalDataFlag & kAdditionalDataFlagMask); }
+
+    void SetAdditionalDataFlag(bool flag)
+    {
+        if (flag)
+        {
+            AdditionalDataFlag |= kAdditionalDataFlagMask;
+        }
+        else
+        {
+            AdditionalDataFlag &= static_cast<uint8_t>(~kAdditionalDataFlagMask);
+        }
+    }
+
+} __attribute__((packed));
+
 } /* namespace Ble */
 } /* namespace chip */
