@@ -24,6 +24,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -36,6 +37,7 @@
 #       --storage-path admin_storage.json
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: false
@@ -51,9 +53,9 @@ from time import sleep
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, has_feature,
+                                         run_if_endpoint_matches)
 from chip.tlv import TLVReader
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main, run_with_error_check)
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
@@ -279,7 +281,7 @@ class TC_CADMIN(MatterBaseTest):
         ]
 
     def pics_TC_CADMIN_1_4(self) -> list[str]:
-        return ["CADMIN.S"]
+        return ["CADMIN.S.F00"]
 
     def steps_TC_CADMIN_1_4(self) -> list[TestStep]:
         return [
@@ -300,11 +302,11 @@ class TC_CADMIN(MatterBaseTest):
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
 

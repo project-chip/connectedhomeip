@@ -135,7 +135,30 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
 
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+
+    auto context = GetExchangeContext();
+    // If we have no exchange or it has no session, we won't be able to send a
+    // response anyway, so it doesn't matter how we encode it, but we have unit
+    // tests that have a kinda-broken CommandHandler with no session... just use
+    // kUndefinedFabricIndex in those cases.
+    //
+    // Note that just calling GetAccessingFabricIndex() here is not OK, because
+    // we may have gone async already and our exchange/session may be gone, so
+    // that would crash.  Which is one of the reasons GetAccessingFabricIndex()
+    // is not allowed to be called once we have gone async.
+    FabricIndex accessingFabricIndex;
+    if (context && context->HasSessionHandle())
+    {
+        accessingFabricIndex = context->GetSessionHandle()->GetFabricIndex();
+    }
+    else
+    {
+        accessingFabricIndex = kUndefinedFabricIndex;
+    }
+
+    DataModel::FabricAwareTLVWriter responseWriter(*writer, accessingFabricIndex);
+
+    ReturnErrorOnFailure(aEncodable.EncodeTo(responseWriter, TLV::ContextTag(CommandDataIB::Tag::kFields)));
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 

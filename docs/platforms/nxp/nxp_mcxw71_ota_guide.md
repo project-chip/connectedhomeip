@@ -1,4 +1,4 @@
-# NXP `MCXW71/K32W1` OTA guide
+# NXP `MCXW71` OTA guide
 
 ### Convert `srec` into `sb3` file
 
@@ -14,7 +14,7 @@ In `OTAP` application
 
 -   select OTA protocol => `OTAP` Matter
 -   Browse File
--   follow default options (KW45/K32W148, Preserve NVM)
+-   follow default options (Preserve NVM)
 -   image information: will update "Application Core (MCU)" - this will generate
     the image only for the CM33 core
 -   keep other settings at default values
@@ -73,7 +73,7 @@ The OTA image used must be updated to include the new factory data.
 The OTA topology used for OTA testing is illustrated in the figure below.
 Topology is similar with the one used for Matter Test Events.
 
-![OTA_TOPOLOGY](../../../examples/platform/nxp/mcxw71_k32w1/doc/images/ota_topology.JPG)
+![OTA_TOPOLOGY](../../../examples/platform/nxp/mcxw71/doc/images/ota_topology.JPG)
 
 The concept for OTA is the next one:
 

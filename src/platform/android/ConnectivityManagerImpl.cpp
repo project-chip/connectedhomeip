@@ -121,11 +121,6 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision() {}
 
-bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    return false;
-}
-
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

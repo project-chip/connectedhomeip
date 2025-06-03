@@ -27,7 +27,6 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
   val friendlyName: String,
   val vendorID: UInt,
   val icac: ByteArray,
-  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct {\n")
@@ -35,7 +34,6 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
     append("\tfriendlyName : $friendlyName\n")
     append("\tvendorID : $vendorID\n")
     append("\ticac : $icac\n")
-    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -46,7 +44,6 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
       put(ContextSpecificTag(TAG_FRIENDLY_NAME), friendlyName)
       put(ContextSpecificTag(TAG_VENDOR_ID), vendorID)
       put(ContextSpecificTag(TAG_ICAC), icac)
-      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -56,7 +53,6 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
     private const val TAG_FRIENDLY_NAME = 2
     private const val TAG_VENDOR_ID = 3
     private const val TAG_ICAC = 4
-    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -67,7 +63,6 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
       val friendlyName = tlvReader.getString(ContextSpecificTag(TAG_FRIENDLY_NAME))
       val vendorID = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_ID))
       val icac = tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
-      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -76,7 +71,6 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
         friendlyName,
         vendorID,
         icac,
-        fabricIndex,
       )
     }
   }

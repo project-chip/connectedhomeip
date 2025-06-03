@@ -190,6 +190,7 @@ public:
     WiFiPAF::WiFiPAFLayer * GetWiFiPAF();
     void WiFiPafSetApFreq(const uint16_t freq);
     CHIP_ERROR WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
+    bool WiFiPAFResourceAvailable();
 #endif
 
     // WiFi AP methods
@@ -261,7 +262,6 @@ private:
 
     CHIP_ERROR Init();
     void OnPlatformEvent(const ChipDeviceEvent * event);
-    bool CanStartWiFiScan();
     void OnWiFiScanDone();
     void OnWiFiStationProvisionChange();
 
@@ -479,6 +479,11 @@ inline CHIP_ERROR ConnectivityManager::WiFiPAFShutdown(uint32_t id, WiFiPAF::WiF
 {
     return static_cast<ImplClass *>(this)->_WiFiPAFShutdown(id, role);
 }
+
+inline bool ConnectivityManager::WiFiPAFResourceAvailable()
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFResourceAvailable();
+}
 #endif
 
 inline bool ConnectivityManager::IsThreadEnabled()
@@ -630,11 +635,6 @@ inline CHIP_ERROR ConnectivityManager::Init()
 inline void ConnectivityManager::OnPlatformEvent(const ChipDeviceEvent * event)
 {
     static_cast<ImplClass *>(this)->_OnPlatformEvent(event);
-}
-
-inline bool ConnectivityManager::CanStartWiFiScan()
-{
-    return static_cast<ImplClass *>(this)->_CanStartWiFiScan();
 }
 
 inline void ConnectivityManager::OnWiFiScanDone()
