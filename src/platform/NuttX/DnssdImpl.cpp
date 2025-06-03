@@ -861,7 +861,7 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
                                    nullptr, resolveContext->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve,
                                    reinterpret_cast<void *>(resolveContext->mNumber));
     // Otherwise the resolver will be freed in the callback
-    if (resolver == nullptr)
+    if (resolveContext->mResolver == nullptr)
     {
         error = CHIP_ERROR_INTERNAL;
         FreeResolveContext(resolveContext->mNumber);
