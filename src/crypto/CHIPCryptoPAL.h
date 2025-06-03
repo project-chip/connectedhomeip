@@ -37,6 +37,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -1808,11 +1809,6 @@ CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSp
 class PemEncoder
 {
 public:
-    static constexpr size_t kNumBytesPerLine   = 48u;
-    static constexpr size_t kMinLineBufferSize = 64u + 1u; // PEM expects 64 characters wide and a null terminator at least.
-    static_assert(kMinLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1),
-                  "Internal incoherence of library configuration!");
-
     /**
      * @brief Construct a PEM encoder for element type `encodedElement` whose DER data is in `derBytes` span.
      *
@@ -1827,12 +1823,11 @@ public:
     PemEncoder & operator=(const PemEncoder &) = delete;
 
     /**
-     * @brief Returns the next line of the encoding, if anything left to do.
+     * @brief Returns the pointer to the next null-terminated line of the encoding, or nullptr if done.
      *
-     * If `destSize` == 0, nothing will be written. Otherwise if `destSize < kMinLineBufferSize`,
-     * only a null-terminator is written. Otherwise the line is filled with the next line
-     * of PEM encoding. Line is guaranteed null-terminated. Even if nothing good
-     * is written, encoder proceeds to the next line.
+     * The returned pointer has the lifetime of this class and during that lifetime will always point
+     * to valid memory.
+     *
      * When header/footer are written, the heading type (`encodedElement` value) such as
      * `CERTIFICATE` is clamped so that the entire header line with `-----BEGIN ${encodedElement}-----`
      * and footer line with `-----END ${encodedElement}-----` are not wider than 64 bytes. This
@@ -1840,24 +1835,27 @@ public:
      *
      * Usage should be in a loop, for example:
      *
-     *   char lineBuf[PemEncoder::kMinLineBufferSize] = {};
      *   std::vector<std::string> pemLines;
      *
      *   PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
      *
-     *   while (encoder.NextLine(lineBuf, sizeof(lineBuf)))
+     *   const char* line = encoder.NextLine();
+     *   while (line)
      *   {
-     *       pemLines.push_back(std::string{ lineBuf });
+     *       pemLines.push_back(std::string{ line });
+     *       line = encoder.NextLine();
      *   }
      *
-     * @param destStr - null-terminated char buffer to receive the line.
-     * @param destSize - size of the char buffer, including null-terminator.
-     * @return true if there is a line given back to accumulate.
-     * @return false if the encoding is complete.
+     * @return a pointer to the internal line buffer for next line or nullptr when done.
      */
-    bool NextLine(char * destStr, size_t destSize);
+    const char* NextLine();
 
 private:
+    static constexpr size_t kNumBytesPerLine   = 48u;
+    static constexpr size_t kLineBufferSize = 64u + 1u; // PEM expects 64 characters wide and a null terminator at least.
+    static_assert(kLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1),
+                  "Internal incoherence of library configuration!");
+
     enum State : int
     {
         kPrintHeader = 0,
@@ -1870,7 +1868,7 @@ private:
     ByteSpan mDerBytes;
     State mState           = State::kPrintHeader;
     size_t mProcessedBytes = 0;
-    char mInternalStringBuf[kMinLineBufferSize]; // Will be copied-out to callers.
+    StringBuilder<kLineBufferSize> mStringBuilder{};
 };
 
 /**
