@@ -16,10 +16,11 @@
  */
 #pragma once
 
-#include "access/Privilege.h"
-#include "lib/core/CHIPError.h"
+#include <access/Privilege.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <lib/core/CHIPError.h>
+
 #include <optional>
 
 namespace chip {
