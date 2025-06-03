@@ -71,7 +71,7 @@ CHIP_ERROR GenericFaultTestEventTriggerHandler::HandleEventTrigger(uint64_t even
         ReturnErrorOnFailure(networkFaultsCurrent.add(to_underlying(NetworkFaultEnum::kNetworkJammed)));
         ReturnErrorOnFailure(networkFaultsCurrent.add(to_underlying(NetworkFaultEnum::kConnectionFailed)));
 
-        app::Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(networkFaultsPrevious, networkFaultsCurrent);
+        app::Clusters::GeneralDiagnostics::GeneralFaultListener::GlobalNotifyNetworkFaultsDetect(networkFaultsPrevious, networkFaultsCurrent);
     }
 
     return CHIP_ERROR_INVALID_ARGUMENT;

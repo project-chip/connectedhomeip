@@ -670,7 +670,7 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kConnectionFailed)));
-        Clusters::GeneralDiagnostics::GeneralFaultListener::GlobalNetworkFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GeneralFaultListener::GlobalNotifyNetworkFaultsDetect(previous, current);
     }
     else
     {

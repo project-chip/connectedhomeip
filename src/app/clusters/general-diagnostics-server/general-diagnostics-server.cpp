@@ -512,7 +512,7 @@ void MatterGeneralDiagnosticsPluginServerInitCallback()
 
     if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
     {
-        GeneralDiagnosticsServer::Instance().OnDeviceReboot(bootReason);
+        GeneralDiagnostics::GeneralFaultListener::GlobalNotifyDeviceReboot(bootReason);
     }
 
     if (GeneralFaultListener::GetGlobalListener() == nullptr) {
