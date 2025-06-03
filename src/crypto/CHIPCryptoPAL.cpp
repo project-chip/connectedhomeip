@@ -1304,6 +1304,10 @@ const char * PemEncoder::NextLine()
     }
     }
 
+    // All the string should have fit based on the logic. It would be a public
+    // API invariant failure if this ever fails.
+    VerifyOrDie(mStringBuilder.Fit());
+
     return hasLine ? mStringBuilder.c_str() : nullptr;
 }
 

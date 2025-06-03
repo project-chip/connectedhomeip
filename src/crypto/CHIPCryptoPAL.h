@@ -1813,7 +1813,7 @@ public:
      * @brief Construct a PEM encoder for element type `encodedElement` whose DER data is in `derBytes` span.
      *
      * LIFETIME: both encodedElement and derBytes lifetime must be >= PemEncoder lifetime.
-     *           PemEncoder references these while processing NextLine calls.
+     *           PemEncoder references these while processing `NextLine()` calls.
      *
      * @param encodedElement - Element type string to include in header/footer (e.g. "CERTIFICATE"). Caller must provide correct
      * uppercase.
