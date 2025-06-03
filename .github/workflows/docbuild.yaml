@@ -43,6 +43,7 @@ jobs:
         run: |
           mkdir -p _build/src/testing
           bash ./docs/testing/GenerateChipDeviceCtrlDoc.sh _build/src/testing
+          test -s _build/src/testing/ChipDeviceCtrlAPI.md
       # --- Build HTML ---
       - name: Build documentation
         working-directory: matter/docs
