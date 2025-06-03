@@ -50,6 +50,37 @@ class TC_ACL_2_8(MatterBaseTest):
             raise AssertionError(f"No events found for {acec_event} to determine the latest event number.")
         return max([e.Header.EventNumber for e in events])
 
+    def _get_relevant_acl_events(self, all_events: list, expected_add_subject_node_id: int, expected_change_subject_node_ids: list) -> list:
+        """
+        Extracts the most recent 'added' and 'changed' events for a specific node from all events.
+        
+        Args:
+            all_events: List of all AccessControlEntryChanged events
+            expected_add_subject_node_id: Node ID expected in the 'added' event subjects
+            expected_change_subject_node_ids: List of node IDs expected in the 'changed' event subjects
+            
+        Returns:
+            List containing the relevant 'added' and 'changed' events in chronological order
+        """
+        # First find the most recent "added" event
+        added_events = [e for e in all_events if (
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
+            e.Data.latestValue.subjects == [expected_add_subject_node_id]
+        )]
+        asserts.assert_true(len(added_events) > 0, f"Expected 'added' event for node {expected_add_subject_node_id} not found")
+        added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
+
+        # Then find the most recent "changed" event that occurred after the "added" event
+        changed_events = [e for e in all_events if (
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
+            e.Data.latestValue.subjects == expected_change_subject_node_ids and
+            e.Header.EventNumber > added_event.Header.EventNumber
+        )]
+        asserts.assert_true(len(changed_events) > 0, f"Expected 'changed' event for node {expected_add_subject_node_id} not found after the 'added' event")
+        changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
+
+        return [added_event, changed_event]
+
     def _verify_acl_event(
             self,
             event,
@@ -232,24 +263,7 @@ class TC_ACL_2_8(MatterBaseTest):
         )
 
         # Below event filtering and parsing is currently required in the event that the DUT is not reset before running this test.
-        # First find the most recent "added" event
-        added_events = [e for e in events if (
-            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-            e.Data.latestValue.subjects == [self.th1.nodeId]
-        )]
-        asserts.assert_true(len(added_events) > 0, "Expected 'added' event for TH1 not found")
-        added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
-
-        # Then find the most recent "changed" event that occurred after the "added" event
-        changed_events = [e for e in events if (
-            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
-            e.Data.latestValue.subjects == [self.th1.nodeId, 1111] and
-            e.Header.EventNumber > added_event.Header.EventNumber
-        )]
-        asserts.assert_true(len(changed_events) > 0, "Expected 'changed' event for TH1 not found after the 'added' event")
-        changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
-
-        relevant_events = [added_event, changed_event]
+        relevant_events = self._get_relevant_acl_events(events, self.th1.nodeId, [self.th1.nodeId, 1111])
         logging.info(f"TH1 Events: {relevant_events}")
 
         # Verify event contents match expected sequence
@@ -282,24 +296,7 @@ class TC_ACL_2_8(MatterBaseTest):
             fabricFiltered=True
         )
 
-        # First find the most recent "added" event
-        added_events = [e for e in events if (
-            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-            e.Data.latestValue.subjects == [self.th2.nodeId]
-        )]
-        asserts.assert_true(len(added_events) > 0, "Expected 'added' event for TH2 not found")
-        added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
-
-        # Then find the most recent "changed" event that occurred after the "added" event
-        changed_events = [e for e in events if (
-            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
-            e.Data.latestValue.subjects == [self.th2.nodeId, 2222] and
-            e.Header.EventNumber > added_event.Header.EventNumber
-        )]
-        asserts.assert_true(len(changed_events) > 0, "Expected 'changed' event for TH2 not found after the 'added' event")
-        changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
-
-        relevant_events = [added_event, changed_event]
+        relevant_events = self._get_relevant_acl_events(events, self.th2.nodeId, [self.th2.nodeId, 2222])
         logging.info(f"TH2 Events: {relevant_events}")
 
         # Verify event contents match expected sequence
