@@ -66,9 +66,9 @@ public:
     /// Default implementation just returns the global attributes required by the API contract.
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-
     /// Must only be implemented if event readability is relevant
-    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override {
+    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override
+    {
         eventInfo.readPrivilege = Access::Privilege::kView;
         return CHIP_NO_ERROR;
     }
