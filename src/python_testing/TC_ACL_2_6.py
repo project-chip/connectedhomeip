@@ -42,20 +42,14 @@ from mobly import asserts
 
 
 class TC_ACL_2_6(MatterBaseTest):
-    async def get_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged, altitude: str) -> int:
+    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
 
         if not events:
-            raise AssertionError(f"No events found for {acec_event} to determine {altitude} event number.")
+            raise AssertionError(f"No events found for {acec_event} to determine latest event number.")
 
-        if altitude == "min":
-            return min(e.Header.EventNumber for e in events)
-        elif altitude == "max":
-            return max(e.Header.EventNumber for e in events)
-        else:
-            # It might be good to raise an error for an unexpected altitude value.
-            raise ValueError(f"Invalid altitude specified: {altitude}")
+        return max(e.Header.EventNumber for e in events)
 
     # Compare events by their relevant fields instead of string representation
     def event_key(self, event):
@@ -106,14 +100,11 @@ class TC_ACL_2_6(MatterBaseTest):
         events_callback = EventChangeCallback(Clusters.AccessControl)
         await events_callback.start(self.default_controller, self.dut_node_id, 0)
 
-        oldest_event_number = await self.get_event_number(acec_event, "min")
-
         # Read initial events
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
-            fabricFiltered=True,
-            eventNumberFilter=oldest_event_number
+            fabricFiltered=True
         )
         logging.info(f"Events response: {events_response}")
         events_response = [events_response[0]]
@@ -142,7 +133,7 @@ class TC_ACL_2_6(MatterBaseTest):
                 break
         asserts.assert_true(found, "Expected event not found in read response")
 
-        latest_event_number = await self.get_event_number(acec_event, "max")
+        latest_event_number = await self.get_latest_event_number(acec_event)
 
         self.step(4)
         # Write ACL attribute
@@ -262,7 +253,7 @@ class TC_ACL_2_6(MatterBaseTest):
 
         self.step(7)
         # Verify no events for invalid entry via read as well
-        latest_event_number = await self.get_event_number(acec_event, "max")
+        latest_event_number = await self.get_latest_event_number(acec_event)
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
