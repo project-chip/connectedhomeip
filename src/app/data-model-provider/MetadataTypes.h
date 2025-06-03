@@ -112,7 +112,7 @@ enum class AttributeQualityFlags : uint32_t
 
 struct AttributeEntry
 {
-    AttributeId attributeId;
+    const AttributeId attributeId;
 
     // Constructor
 
