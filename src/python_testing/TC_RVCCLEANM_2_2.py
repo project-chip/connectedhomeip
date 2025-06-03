@@ -29,7 +29,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
-#       --app-pipe /tmp/chip_rvc_fifo_
+#       --app-pipe /tmp/rvccleanm_2_2_fifo
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
