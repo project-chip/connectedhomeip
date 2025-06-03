@@ -25,7 +25,7 @@ import asyncio
 import logging
 from enum import IntFlag
 from functools import partial
-from typing import TYPE_CHECKING, Any, Callable, Type
+from typing import TYPE_CHECKING, Callable, Type
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
@@ -95,8 +95,7 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
         ValueError: If AttributeList value is not a list type
         KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS
     """
-    # Cast result to Any to satisfy mypy about subsequent .Attributes access
-    cluster: Any = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+    cluster: Type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
@@ -104,10 +103,12 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
     if cluster not in wildcard.attributes[endpoint]:
         return False
 
-    if cluster.Attributes.AttributeList not in wildcard.attributes[endpoint][cluster]:
+    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
+    if cluster.Attributes.AttributeList not in wildcard.attributes[endpoint][cluster]:  # type: ignore[attr-defined]
         return False
 
-    attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
+    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
+    attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]  # type: ignore[attr-defined]
     if not isinstance(attr_list, list):
         raise ValueError(
             f"Failed to read mandatory AttributeList attribute value for cluster {cluster} on endpoint {endpoint}: {attr_list}.")
@@ -154,8 +155,7 @@ def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
         ValueError: If AcceptedCommandList value is not a list type
         KeyError: If command's cluster_id is not found in ALL_CLUSTERS
     """
-    # Cast result to Any to satisfy mypy about subsequent .Attributes access
-    cluster: Any = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+    cluster: Type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
@@ -163,10 +163,12 @@ def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
     if cluster not in wildcard.attributes[endpoint]:
         return False
 
-    if cluster.Attributes.AcceptedCommandList not in wildcard.attributes[endpoint][cluster]:
+    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
+    if cluster.Attributes.AcceptedCommandList not in wildcard.attributes[endpoint][cluster]:  # type: ignore[attr-defined]
         return False
 
-    cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]
+    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
+    cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]  # type: ignore[attr-defined]
     if not isinstance(cmd_list, list):
         raise ValueError(
             f"Failed to read mandatory AcceptedCommandList command value for cluster {cluster} on endpoint {endpoint}: {cmd_list}.")
@@ -204,11 +206,11 @@ def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
     if cluster not in wildcard.attributes[endpoint]:
         return False
 
-    # Access cluster.Attributes.FeatureMap with a type ignore
+    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
     if cluster.Attributes.FeatureMap not in wildcard.attributes[endpoint][cluster]:  # type: ignore[attr-defined]
         return False
 
-    # Access the feature map value
+    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
     feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]  # type: ignore[attr-defined]
     if not isinstance(feature_map, int):
         raise ValueError(
