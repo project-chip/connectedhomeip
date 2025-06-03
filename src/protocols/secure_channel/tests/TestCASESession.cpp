@@ -691,7 +691,7 @@ TEST_F(TestCASESession, Sigma3BadSignature)
     CASESession pairingCommissioner;
     CASESession pairingAccessory;
 
-    // Corrupt Sigma2 Signature using Fault Injection
+    // Corrupt Sigma3 Signature using Fault Injection
     EXPECT_EQ(chip::FaultInjection::GetManager().FailAtFault(chip::FaultInjection::kFault_CASECorruptSigma3Signature, 0, 1),
               faultInjectionSuccessCode);
 
