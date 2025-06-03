@@ -35,7 +35,6 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/EventPathParams.h>
-#include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -65,7 +64,8 @@ namespace {
  *    - Cluster::View in case the path is a wildcard for the event id
  *    - Event read if the path is a concrete event path
  */
-bool MayHaveAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath & path, const EventPathParams & aEventPath,
+bool MayHaveAccessibleEventPathForEndpointAndCluster(DataModel::Provider * aProvider, const ConcreteClusterPath & path,
+                                                     const EventPathParams & aEventPath,
                                                      const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     Access::RequestPath requestPath{ .cluster     = path.mClusterId,
@@ -77,8 +77,18 @@ bool MayHaveAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath &
     if (!aEventPath.HasWildcardEventId())
     {
         requestPath.entityId = aEventPath.mEventId;
-        requiredPrivilege =
-            RequiredPrivilege::ForReadEvent(ConcreteEventPath(path.mEndpointId, path.mClusterId, aEventPath.mEventId));
+
+        DataModel::EventEntry eventInfo;
+        if (aProvider->EventInfo(
+                {
+                    aEventPath.mEndpointId,
+                    aEventPath.mClusterId,
+                    aEventPath.mEventId,
+                },
+                eventInfo) == CHIP_NO_ERROR)
+        {
+            requiredPrivilege = eventInfo.readPrivilege;
+        }
     }
 
     return (Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requiredPrivilege) == CHIP_NO_ERROR);
@@ -89,14 +99,14 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
 {
     if (!aEventPath.HasWildcardClusterId())
     {
-        return MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, aEventPath.mClusterId), aEventPath,
-                                                               aSubjectDescriptor);
+        return MayHaveAccessibleEventPathForEndpointAndCluster(aProvider, ConcreteClusterPath(aEndpoint, aEventPath.mClusterId),
+                                                               aEventPath, aSubjectDescriptor);
     }
 
     for (auto & cluster : aProvider->ServerClustersIgnoreError(aEndpoint))
     {
-        if (MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, cluster.clusterId), aEventPath,
-                                                            aSubjectDescriptor))
+        if (MayHaveAccessibleEventPathForEndpointAndCluster(aProvider, ConcreteClusterPath(aEndpoint, cluster.clusterId),
+                                                            aEventPath, aSubjectDescriptor))
         {
             return true;
         }
@@ -130,7 +140,8 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
 class AutoReleaseSubscriptionInfoIterator
 {
 public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) :
+        mIterator(iterator) {};
     ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
 
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
@@ -601,17 +612,22 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             auto state = AttributePathExpandIterator::Position::StartIterating(&paramsList);
             AttributePathExpandIterator pathIterator(GetDataModelProvider(), state);
             ConcreteAttributePath readPath;
+            std::optional<DataModel::AttributeEntry> entry;
 
             // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
             // AttributePathExpandIterator. So we just need to check the ACL bits.
-            while (pathIterator.Next(readPath))
+            while (pathIterator.Next(readPath, &entry))
             {
                 // leave requestPath.entityId optional value unset to indicate wildcard
                 Access::RequestPath requestPath{ .cluster     = readPath.mClusterId,
                                                  .endpoint    = readPath.mEndpointId,
                                                  .requestType = Access::RequestType::kAttributeReadRequest };
-                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
-                                                       RequiredPrivilege::ForReadAttribute(readPath));
+                Access::Privilege requiredPrivilege = Access::Privilege::kView;
+                if (entry.has_value())
+                {
+                    requiredPrivilege = entry->GetReadPrivilege().value_or(Access::Privilege::kView);
+                }
+                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requiredPrivilege);
                 if (err == CHIP_NO_ERROR)
                 {
                     aHasValidAttributePath = true;
@@ -624,7 +640,9 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
 
-            if (IsExistentAttributePath(concretePath))
+            std::optional<DataModel::AttributeEntry> entry = FindAttributeEntry(concretePath);
+
+            if (entry.has_value())
             {
                 Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
                                                  .endpoint    = concretePath.mEndpointId,
@@ -632,7 +650,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                                                  .entityId    = paramsList.mValue.mAttributeId };
 
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
-                                                       RequiredPrivilege::ForReadAttribute(concretePath));
+                                                       entry->GetReadPrivilege().value_or(Access::Privilege::kView));
                 if (err == CHIP_NO_ERROR)
                 {
                     aHasValidAttributePath = true;
@@ -1614,10 +1632,10 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
     return err;
 }
 
-bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath & path)
+std::optional<DataModel::AttributeEntry> InteractionModelEngine::FindAttributeEntry(const ConcreteAttributePath & path)
 {
     DataModel::AttributeFinder finder(mDataModelProvider);
-    return finder.Find(path).has_value();
+    return finder.Find(path);
 }
 
 void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)
@@ -1631,8 +1649,9 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedLi
 
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
-            !IsExistentAttributePath(
-                ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)))
+            !FindAttributeEntry(
+                 ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId))
+                 .has_value())
         {
             prev  = path1;
             path1 = path1->mpNext;

@@ -16,17 +16,18 @@
  *    limitations under the License.
  */
 
+#include "app/data-model-provider/Provider.h"
 #include <access/AccessControl.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
-#include <assert.h>
-#include <inttypes.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+#include <cassert>
+#include <cinttypes>
 
 using namespace chip::TLV;
 
@@ -552,11 +553,17 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
 
     ReturnErrorOnFailure(ret);
 
+    DataModel::EventEntry eventInfo;
+    if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
+    {
+        eventInfo.readPrivilege = Access::Privilege::kView;
+    }
+    Access::Privilege requestPrivilege = eventInfo.readPrivilege;
+
     Access::RequestPath requestPath{ .cluster     = event.mClusterId,
                                      .endpoint    = event.mEndpointId,
                                      .requestType = Access::RequestType::kEventReadRequest,
                                      .entityId    = event.mEventId };
-    Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
     CHIP_ERROR accessControlError =
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
     if (accessControlError != CHIP_NO_ERROR)

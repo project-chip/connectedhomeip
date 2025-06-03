@@ -54,10 +54,11 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
     {
         if (mPosition.mOutputPath.mClusterId != kInvalidClusterId)
         {
-            std::optional<AttributeId> nextAttribute = NextAttributeId();
+            std::optional<AttributeEntry> nextAttribute = NextAttribute();
             if (nextAttribute.has_value())
             {
-                mPosition.mOutputPath.mAttributeId = *nextAttribute;
+                mPosition.mEntry.emplace(*nextAttribute);
+                mPosition.mOutputPath.mAttributeId = nextAttribute->attributeId;
                 mPosition.mOutputPath.mExpanded    = mPosition.mAttributePath->mValue.IsWildcardPath();
                 return true;
             }
@@ -93,13 +94,24 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
     }
 }
 
-bool AttributePathExpandIterator::Next(ConcreteAttributePath & path)
+bool AttributePathExpandIterator::Next(ConcreteAttributePath & path, std::optional<DataModel::AttributeEntry> * entry)
 {
     while (mPosition.mAttributePath != nullptr)
     {
         if (AdvanceOutputPath())
         {
             path = mPosition.mOutputPath;
+            if (entry != nullptr)
+            {
+                if (mPosition.mEntry)
+                {
+                    entry->emplace(*mPosition.mEntry);
+                }
+                else
+                {
+                    entry->reset();
+                }
+            }
             return true;
         }
         mPosition.mAttributePath = mPosition.mAttributePath->mpNext;
@@ -109,25 +121,7 @@ bool AttributePathExpandIterator::Next(ConcreteAttributePath & path)
     return false;
 }
 
-bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
-{
-    switch (attributeId)
-    {
-    case Clusters::Globals::Attributes::GeneratedCommandList::Id:
-    case Clusters::Globals::Attributes::AcceptedCommandList::Id:
-    case Clusters::Globals::Attributes::AttributeList::Id:
-        return true;
-    default:
-        break;
-    }
-
-    DataModel::AttributeFinder finder(mDataModelProvider);
-
-    const ConcreteAttributePath attributePath(mPosition.mOutputPath.mEndpointId, mPosition.mOutputPath.mClusterId, attributeId);
-    return finder.Find(attributePath).has_value();
-}
-
-std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
+std::optional<DataModel::AttributeEntry> AttributePathExpandIterator::NextAttribute()
 {
     if (mPosition.mOutputPath.mAttributeId == kInvalidAttributeId)
     {
@@ -162,14 +156,28 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
             //
             // For wildcard expansion, we validate that this is a valid attribute for the given
             // cluster on the given endpoint. If not a wildcard expansion, return it as-is.
-            if (mPosition.mAttributePath->mValue.IsWildcardPath())
+            DataModel::AttributeFinder finder(mDataModelProvider);
+
+            const ConcreteAttributePath attributePath(mPosition.mOutputPath.mEndpointId, mPosition.mOutputPath.mClusterId,
+                                                      mPosition.mAttributePath->mValue.mAttributeId);
+            std::optional<DataModel::AttributeEntry> entry = finder.Find(attributePath);
+
+            if (entry.has_value() || mPosition.mAttributePath->mValue.IsWildcardPath())
             {
-                if (!IsValidAttributeId(mPosition.mAttributePath->mValue.mAttributeId))
-                {
-                    return std::nullopt;
-                }
+                return entry;
             }
-            return mPosition.mAttributePath->mValue.mAttributeId;
+
+            // We get here if:
+            //   - entry is NOT valid (this is not a valid attribute)
+            //   - path is NOT a wildcard (i.e. we were asked to explicitly return it)
+            // as a result, we have no way to generate a "REAL" attribute metadata, so return one
+            // that is not accessible at all
+            return DataModel::AttributeEntry{
+                mPosition.mAttributePath->mValue.mAttributeId, // forced ID (even if invalid)
+                BitMask<AttributeQualityFlags>{},              // no flags we know of
+                std::nullopt,                                  // read privilege */
+                std::nullopt                                   // write privilege
+            };
         }
         mAttributeIndex = 0;
     }
@@ -183,7 +191,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
 
     if (mAttributeIndex < mAttributes.size())
     {
-        return mAttributes[mAttributeIndex].attributeId;
+        return mAttributes[mAttributeIndex];
     }
 
     return std::nullopt;

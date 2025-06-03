@@ -341,6 +341,17 @@ source_set("required-privileges") {
 
     public_configs = [ ":config-controller-dynamic-server" ]
   }
+
+  # These files are for CODE GENERATION ONLY, so technically
+  # CodegenDataModelProvider should be the only one using this. Since CodegenDataModelProvider
+  # is part of application code, the visibility is broad. However generally DO NOT USE THIS
+  # unless you are creating a new CodegenDataModelProvider based item
+  visibility = [
+    "${chip_root}/examples/*",
+    "${chip_root}/src/app/util/*",
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/data-model-providers/codegen/*",
+  ]
 }
 
 source_set("status-response") {
@@ -403,7 +414,6 @@ source_set("command-handler-impl") {
   public_deps = [
     ":command-handler-interface",
     ":paths",
-    ":required-privileges",
     ":status-response",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",

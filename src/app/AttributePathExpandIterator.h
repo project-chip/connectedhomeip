@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include "access/Privilege.h"
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -76,8 +77,24 @@ public:
         static Position StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return Position(path); }
 
         /// Copies are allowed
-        Position(const Position &)             = default;
-        Position & operator=(const Position &) = default;
+        Position(const Position &) = default;
+        Position & operator=(const Position & other)
+        {
+            if (this != &other)
+            {
+                mAttributePath = other.mAttributePath;
+                mOutputPath    = other.mOutputPath;
+                if (other.mEntry)
+                {
+                    mEntry.emplace(*other.mEntry);
+                }
+                else
+                {
+                    mEntry.reset();
+                }
+            }
+            return *this;
+        }
 
         Position() : mAttributePath(nullptr) {}
 
@@ -99,6 +116,7 @@ public:
 
         SingleLinkedListNode<AttributePathParams> * mAttributePath;
         ConcreteAttributePath mOutputPath;
+        std::optional<DataModel::AttributeEntry> mEntry;
     };
 
     AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position);
@@ -110,10 +128,13 @@ public:
 
     /// Get the next path of the expansion (if one exists).
     ///
+    /// Can also optionally ask for the corresponding AttributeEntry (e.g. to validate
+    /// read/write options).
+    ///
     /// On success, true is returned and `path` is filled with the next path in the
     /// expansion.
     /// On iteration completion, false is returned and the content of path IS NOT DEFINED.
-    bool Next(ConcreteAttributePath & path);
+    bool Next(ConcreteAttributePath & path, std::optional<DataModel::AttributeEntry> * entry = nullptr);
 
 private:
     static constexpr size_t kInvalidIndex = std::numeric_limits<size_t>::max();
@@ -140,7 +161,7 @@ private:
     /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
     ///
     /// Respects path expansion/values in mpAttributePath
-    std::optional<AttributeId> NextAttributeId();
+    std::optional<DataModel::AttributeEntry> NextAttribute();
 
     /// Get the next cluster ID in mOutputPath(endpoint) if one is available.
     /// Will start from the beginning if current mOutputPath.mClusterId is kInvalidClusterId
@@ -153,11 +174,6 @@ private:
     ///
     /// Respects path expansion/values in mpAttributePath
     std::optional<EndpointId> NextEndpointId();
-
-    /// Checks if the given attributeId is valid for the current mOutputPath(endpoint/cluster)
-    ///
-    /// Meaning that it is known to the data model OR it is a always-there global attribute.
-    bool IsValidAttributeId(AttributeId attributeId);
 };
 
 /// RollbackAttributePathExpandIterator is an AttributePathExpandIterator wrapper that rolls back the Next()

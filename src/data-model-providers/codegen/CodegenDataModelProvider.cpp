@@ -250,6 +250,12 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
     return std::make_optional<unsigned>(idx);
 }
 
+CHIP_ERROR CodegenDataModelProvider::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
+{
+    eventInfo.readPrivilege = RequiredPrivilege::ForReadEvent(path);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
                                                     ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder)
 {

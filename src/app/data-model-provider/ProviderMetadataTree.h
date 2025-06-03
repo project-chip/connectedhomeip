@@ -16,13 +16,14 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/List.h>
+#include <clusters/Descriptor/Structs.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 
@@ -50,6 +51,9 @@ public:
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     virtual CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) = 0;
 #endif
+
+    // Fetch event metadata for a specific event
+    virtual CHIP_ERROR EventInfo(const ConcreteEventPath & path, EventEntry & eventInfo) = 0;
 
     /// Attribute lists contain all attributes. This MUST include all global
     /// attributes (See SPEC 7.13 Global Elements / Global Attributes Table).

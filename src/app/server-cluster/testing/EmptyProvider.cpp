@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "access/Privilege.h"
+#include "lib/core/CHIPError.h"
 #include <app/server-cluster/testing/EmptyProvider.h>
 
 namespace chip {
@@ -40,6 +42,12 @@ CHIP_ERROR EmptyProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuil
 CHIP_ERROR EmptyProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::DeviceTypeEntry> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
+}
+
+CHIP_ERROR EmptyProvider::EventInfo(const app::ConcreteEventPath & path, app::DataModel::EventEntry & eventInfo)
+{
+    eventInfo.readPrivilege = Access::Privilege::kView;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EmptyProvider::ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)

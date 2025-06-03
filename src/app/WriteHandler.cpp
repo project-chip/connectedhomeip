@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "access/Privilege.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
@@ -24,7 +25,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -812,7 +812,8 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
                                          .endpoint    = aPath.mEndpointId,
                                          .requestType = Access::RequestType::kAttributeWriteRequest,
                                          .entityId    = aPath.mAttributeId };
-        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, RequiredPrivilege::ForWriteAttribute(aPath));
+
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, *attributeEntry->GetWritePrivilege());
 
         if (err != CHIP_NO_ERROR)
         {

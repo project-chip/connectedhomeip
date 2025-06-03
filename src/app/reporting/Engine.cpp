@@ -23,7 +23,6 @@
 #include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -532,11 +531,17 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
             aHasEncodedData = true;
         }
 
+        DataModel::EventEntry eventInfo;
+        if (mpImEngine->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
+        {
+            eventInfo.readPrivilege = Access::Privilege::kView;
+        }
+        Privilege requestPrivilege = eventInfo.readPrivilege;
+
         RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
                                  .endpoint    = current->mValue.mEndpointId,
                                  .requestType = RequestType::kEventReadRequest,
                                  .entityId    = current->mValue.mEventId };
-        Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
