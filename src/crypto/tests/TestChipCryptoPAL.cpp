@@ -3267,7 +3267,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
     {
         size_t numLines = 0;
         std::vector<std::string> pemLines;
-        const char* pemLine = nullptr;
+        const char * pemLine = nullptr;
 
         PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
         while ((pemLine = encoder.NextLine()))
@@ -3282,15 +3282,15 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
         ASSERT_EQ(encoder.NextLine(), nullptr);
 
         const char * kExpectedPemForPaa =
-    "-----BEGIN "
-    "CERTIFICATE-----"
-    "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
-    "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
-    "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
-    "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
-    "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
-    "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
-    "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END CERTIFICATE-----";
+            "-----BEGIN "
+            "CERTIFICATE-----"
+            "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
+            "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
+            "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
+            "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
+            "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END CERTIFICATE-----";
 
         std::string finalPem = StringJoin(pemLines, "\n");
         EXPECT_STREQ(finalPem.c_str(), kExpectedPemForPaa);
@@ -3301,7 +3301,7 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
     {
         size_t numLines = 0;
         std::vector<std::string> pemLines;
-        const char* pemLine = nullptr;
+        const char * pemLine = nullptr;
 
         PemEncoder encoder("ROBOTO", TestCerts::sTestCert_PAA_FFF1_Cert);
         while ((pemLine = encoder.NextLine()))
@@ -3312,16 +3312,16 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
         ASSERT_EQ(pemLine, nullptr);
 
         // Result should match exactly the expected PEM.
-            const char * kExpectedPemForPaa =
-        "-----BEGIN "
-        "ROBOTO-----"
-        "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
-        "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
-        "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
-        "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
-        "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
-        "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
-        "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END ROBOTO-----";
+        const char * kExpectedPemForPaa =
+            "-----BEGIN "
+            "ROBOTO-----"
+            "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
+            "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
+            "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
+            "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
+            "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END ROBOTO-----";
 
         std::string finalPem = StringJoin(pemLines, "\n");
         EXPECT_STREQ(finalPem.c_str(), kExpectedPemForPaa);
@@ -3330,20 +3330,20 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
 
     // Empty body case shoudld succeed. Casedness is for the client to deal with.
     {
-      size_t numLines = 0;
-      std::vector<std::string> pemLines;
-      const char* pemLine = nullptr;
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+        const char * pemLine = nullptr;
 
-      PemEncoder encoder("EMPTY_thing", ByteSpan{});
-      while ((pemLine = encoder.NextLine()))
-      {
-        ++numLines;
-        pemLines.push_back(std::string{ pemLine });
-      }
-      ASSERT_EQ(pemLine, nullptr);
+        PemEncoder encoder("EMPTY_thing", ByteSpan{});
+        while ((pemLine = encoder.NextLine()))
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+        }
+        ASSERT_EQ(pemLine, nullptr);
 
-      const char * kExpectedPem                            = "-----BEGIN EMPTY_thing-----\n-----END EMPTY_thing-----";
-        std::string finalPem = StringJoin(pemLines, "\n");
+        const char * kExpectedPem = "-----BEGIN EMPTY_thing-----\n-----END EMPTY_thing-----";
+        std::string finalPem      = StringJoin(pemLines, "\n");
         EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
         EXPECT_EQ(numLines, 2u);
     }
@@ -3352,19 +3352,19 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
     {
         size_t numLines = 0;
         std::vector<std::string> pemLines;
-        const char* pemLine = nullptr;
+        const char * pemLine = nullptr;
 
-      const uint8_t kOneByte[1] = { 0 };
-      PemEncoder encoder("SINGLE_BYTE", ByteSpan{ kOneByte });
+        const uint8_t kOneByte[1] = { 0 };
+        PemEncoder encoder("SINGLE_BYTE", ByteSpan{ kOneByte });
         while ((pemLine = encoder.NextLine()))
         {
-          ++numLines;
-          pemLines.push_back(std::string{ pemLine });
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
         }
         ASSERT_EQ(pemLine, nullptr);
 
-        const char * kExpectedPem                            = "-----BEGIN SINGLE_BYTE-----\nAA==\n-----END SINGLE_BYTE-----";
-        std::string finalPem = StringJoin(pemLines, "\n");
+        const char * kExpectedPem = "-----BEGIN SINGLE_BYTE-----\nAA==\n-----END SINGLE_BYTE-----";
+        std::string finalPem      = StringJoin(pemLines, "\n");
         EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
         EXPECT_EQ(numLines, 3u);
     }
@@ -3375,16 +3375,16 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
         std::vector<std::string> pemLines;
 
         PemEncoder encoder("SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQRSTUVWXYZ_123456789", ByteSpan{});
-        const char* pemLine = encoder.NextLine();
+        const char * pemLine = encoder.NextLine();
         while (pemLine)
         {
-          ++numLines;
-          pemLines.push_back(std::string{ pemLine });
-          pemLine = encoder.NextLine();
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+            pemLine = encoder.NextLine();
         }
         ASSERT_EQ(pemLine, nullptr);
 
-                const char * kExpectedPem = "-----BEGIN SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOP-----\n-----END "
+        const char * kExpectedPem = "-----BEGIN SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOP-----\n-----END "
                                     "SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQR-----";
 
         std::string finalPem = StringJoin(pemLines, "\n");

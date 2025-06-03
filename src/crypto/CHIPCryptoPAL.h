@@ -1848,13 +1848,12 @@ public:
      *
      * @return a pointer to the internal line buffer for next line or nullptr when done.
      */
-    const char* NextLine();
+    const char * NextLine();
 
 private:
-    static constexpr size_t kNumBytesPerLine   = 48u;
-    static constexpr size_t kLineBufferSize = 64u + 1u; // PEM expects 64 characters wide and a null terminator at least.
-    static_assert(kLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1),
-                  "Internal incoherence of library configuration!");
+    static constexpr size_t kNumBytesPerLine = 48u;
+    static constexpr size_t kLineBufferSize  = 64u + 1u; // PEM expects 64 characters wide and a null terminator at least.
+    static_assert(kLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1), "Internal incoherence of library configuration!");
 
     enum State : int
     {

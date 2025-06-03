@@ -1256,7 +1256,7 @@ CHIP_ERROR VerifyCertificateSigningRequestFormat(const uint8_t * csr, size_t csr
     return CHIP_NO_ERROR;
 }
 
-const char* PemEncoder::NextLine()
+const char * PemEncoder::NextLine()
 {
     bool hasLine = false;
 
