@@ -20,8 +20,10 @@ source_set("general-fault-listener") {
     "general-fault-listener.h",
   ]
 
-  public_deps =
-      [ "${chip_root}/zzz_generated/app-common/clusters/GeneralDiagnostics" ]
+  public_deps = [ 
+    "${chip_root}/zzz_generated/app-common/clusters/GeneralDiagnostics",
+    "${chip_root}/src/platform:platform"
+  ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
