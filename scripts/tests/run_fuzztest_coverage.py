@@ -350,9 +350,11 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
 
     if test_case.strip().lower() == "all":
         context.run_mode = FuzzTestMode.UNIT_TEST_MODE
-    else:
+    elif test_case in test_cases:
         context.run_mode = FuzzTestMode.CONTINUOUS_FUZZ_MODE
         context.selected_fuzz_test_case = test_case
+    else:
+        raise ValueError(f"Test case '{test_case}' not found in the list of test cases for {context.fuzz_test_binary_name} ")
 
     return context
 
