@@ -40,7 +40,11 @@ TEST_F(TestQNameString, Construction)
     {
         const testing::TestQName<2> kShort({ "some", "test" });
         QNameString heapQName(kShort.Serialized());
-        EXPECT_NE(heapQName.c_str(), "");
+        EXPECT_STREQ(heapQName.c_str(), "some.test");
+
+        mdns::Minimal::SerializedQNameIterator SInvalid;
+        QNameString heapQNameI(SInvalid);
+        EXPECT_STREQ(heapQNameI.c_str(), "(!INVALID!)");
     }
 }
 } // namespace
