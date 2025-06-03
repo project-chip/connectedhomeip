@@ -268,7 +268,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                     success = False
                 problems.extend(feature_choice_problems + attribute_choice_problems + command_choice_problem)
 
-        print(f'success = {success}')
         return success, problems
 
     def check_revisions(self, ignore_in_progress: bool):
