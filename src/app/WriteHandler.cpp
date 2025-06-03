@@ -813,6 +813,8 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
                                          .requestType = Access::RequestType::kAttributeWriteRequest,
                                          .entityId    = aPath.mAttributeId };
 
+        // NOTE: we know that attributeEntry has a GetWriteProvilege based on the check above.
+        //       so we just directly reference it.
         CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, *attributeEntry->GetWritePrivilege());
 
         if (err != CHIP_NO_ERROR)
