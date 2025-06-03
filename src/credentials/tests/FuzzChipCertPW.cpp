@@ -12,13 +12,13 @@ using namespace chip;
 using namespace chip::Credentials;
 using namespace fuzztest;
 
-/******************************************   Helper Functions: Seed Providers   *********************************** */
+/*-----------------------------------  Helper Functions: Seed Providers   -----------------------------------*/
 /******************************************************************************************************************* */
 
-std::string OpCertsDir = "credentials/test/operational-certificates-error-cases/";
-auto isChipFile        = [](std::string_view name) { return absl::EndsWith(name, ".chip"); };
-auto isDerFile         = [](std::string_view name) { return absl::EndsWith(name, ".der"); };
-auto isChipRCACFile    = [](std::string_view name) { return absl::StrContains(name, "RCAC") && absl::EndsWith(name, ".chip"); };
+const std::string OpCertsDir = "credentials/test/operational-certificates-error-cases/";
+auto isChipFile              = [](std::string_view name) { return absl::EndsWith(name, ".chip"); };
+auto isDerFile               = [](std::string_view name) { return absl::EndsWith(name, ".der"); };
+auto isChipRCACFile = [](std::string_view name) { return absl::StrContains(name, "RCAC") && absl::EndsWith(name, ".chip"); };
 
 // Lambda that reads certificates from a directory and returns them as a vector of strings, to be used as seeds
 auto seedProvider = [](auto filterFunction) -> std::vector<std::string> {
@@ -58,7 +58,7 @@ void ChipCertFuzzer(const std::string & fuzzChipCerts)
 }
 FUZZ_TEST(FuzzChipCert, ChipCertFuzzer).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isChipFile)));
 
-/******************************************************************************************************************* */
+/*-----------------------------------  Chip Cert FuzzTests  -----------------------------------*/
 /******************************************************************************************************************* */
 
 // The Property function for DecodeChipCertFuzzer, The FUZZ_TEST Macro will call this function.
@@ -118,9 +118,7 @@ void ValidateChipRCACFuzz(const std::string & fuzzRcacCerts)
 
 FUZZ_TEST(FuzzChipCert, ValidateChipRCACFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isChipRCACFile)));
 
-/*------------------------------------------------  DER Cert FuzzTests  ------------------------------------------------*/
-
-/******************************************************************************** */
+/*-----------------------------------  DER Cert FuzzTests  -----------------------------------*/
 /******************************************************************************** */
 
 void ConvertX509CertToChipCertFuzz(const std::string & fuzzDerCerts)
@@ -131,8 +129,6 @@ void ConvertX509CertToChipCertFuzz(const std::string & fuzzDerCerts)
     MutableByteSpan outCert(outCertBuf);
 
     ConvertX509CertToChipCert(span, outCert);
-
-    // std::cout << err.Format() << std::endl;
 }
 FUZZ_TEST(FuzzChipCert, ConvertX509CertToChipCertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isDerFile)));
 
@@ -143,8 +139,7 @@ void ExtractSubjectDNFromX509CertFuzz(const std::string & fuzzDerCerts)
 {
     ByteSpan span(reinterpret_cast<const uint8_t *>(fuzzDerCerts.data()), fuzzDerCerts.size());
     ChipDN subjectDN;
-    CHIP_ERROR err = ExtractSubjectDNFromX509Cert(span, subjectDN);
-    std::cout << err.Format() << std::endl;
+    ExtractSubjectDNFromX509Cert(span, subjectDN);
 }
 FUZZ_TEST(FuzzChipCert, ExtractSubjectDNFromX509CertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isDerFile)));
 
