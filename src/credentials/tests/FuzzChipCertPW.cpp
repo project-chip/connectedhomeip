@@ -31,8 +31,7 @@ auto seedProvider = [](auto filterFunction) -> std::vector<std::string> {
     {
         std::cout << "No Matching Seed files found in the chosen directory" << std::endl;
     }
-    // DEBUG: do we have the correct number of files as seeds?
-    // std::cout << std::endl << "tupleVector.size() = " << tupleVector.size() << std::endl;
+    // DEBUG TIP: print tupleVector.size() here to check that we have the correct number of files as seeds.
     for (auto & [fileContents] : tupleVector)
     {
         seeds.push_back(fileContents);
