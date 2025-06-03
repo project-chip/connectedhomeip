@@ -70,7 +70,7 @@ public:
 
     /**
      * @brief
-     *   Sets the global general fault listener. 
+     *   Sets the global general fault listener.
      */
     static void SetGlobalListener(GeneralFaultListener * newValue);
 
