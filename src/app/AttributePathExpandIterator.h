@@ -77,8 +77,8 @@ public:
         static Position StartIterating(SingleLinkedListNode<AttributePathParams> * path) { return Position(path); }
 
         /// Copies are allowed
-        Position(const Position &)                   = default;
-        Position & operator=(const Position & other) = default;
+        Position(const Position &)             = default;
+        Position & operator=(const Position &) = default;
 
         Position() : mAttributePath(nullptr) {}
 
