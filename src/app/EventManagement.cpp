@@ -553,18 +553,14 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     ReturnErrorOnFailure(ret);
 
     DataModel::EventEntry eventInfo;
-    if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
-    {
-        eventInfo.readPrivilege = Access::Privilege::kView;
-    }
-    Access::Privilege requestPrivilege = eventInfo.readPrivilege;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo));
 
     Access::RequestPath requestPath{ .cluster     = event.mClusterId,
                                      .endpoint    = event.mEndpointId,
                                      .requestType = Access::RequestType::kEventReadRequest,
                                      .entityId    = event.mEventId };
     CHIP_ERROR accessControlError =
-        Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
+        Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, eventInfo.readPrivilege);
     if (accessControlError != CHIP_NO_ERROR)
     {
         VerifyOrReturnError((accessControlError == CHIP_ERROR_ACCESS_DENIED) ||
