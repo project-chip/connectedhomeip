@@ -288,7 +288,11 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-// Implements a Search for the AcceptedCommandEntry in multiple clusters
+// Implements a search for the AcceptedCommandEntry in multiple clusters
+// If no Clusters are provided it will search all clusters
+// Replacement for old Accepted Command Entry from Ember metadata using the ClusterMetadataProvider
+// Provided for legacy compatibility
+// We provide this function for convenience, however it is not expected to be used long-term
 template <ClusterId... TClusterIds>
 DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command)
 {
