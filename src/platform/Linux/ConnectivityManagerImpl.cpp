@@ -186,6 +186,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 bool ConnectivityManagerImpl::_IsWiFiInterfaceEnabled()
 {
+    VerifyOrReturnValue(mWpaSupplicant.iface, false);
     // Check if the interface is not disabled, e.g. due to rfkill or some other reasons.
     return g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "interface_disabled") != 0;
 }
