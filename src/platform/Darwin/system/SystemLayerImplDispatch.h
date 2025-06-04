@@ -28,6 +28,11 @@
 #include <system/SystemLayer.h>
 #include <system/SystemTimer.h>
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#include <mutex>
+#include <vector>
+#endif
+
 namespace chip {
 namespace System {
 
@@ -55,7 +60,7 @@ public:
     CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) override;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    // LayerSocket overrides.
+    // LayerSockets overrides.
     CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) override;
     CHIP_ERROR SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data) override;
     CHIP_ERROR RequestCallbackOnPendingRead(SocketWatchToken token) override;
@@ -126,6 +131,28 @@ protected:
     ObjectLifeCycle mLayerState;
 
     dispatch_queue_t mDispatchQueue = nullptr;
+
+private:
+    inline bool HasTimerSource(TimerList::Node * timer)
+    {
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        VerifyOrDie(nullptr != timer->mTimerSource);
+#endif
+        return nullptr != timer->mTimerSource;
+    }
+
+    inline bool HasDispatchQueue(dispatch_queue_t queue)
+    {
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        VerifyOrDie(nullptr != queue);
+#endif
+        return nullptr != queue;
+    }
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    std::mutex mTestQueueMutex;
+    std::vector<dispatch_block_t> mTestQueuedBlocks;
+#endif
 };
 
 using LayerImpl = LayerImplDispatch;
