@@ -21,7 +21,6 @@ import os
 import re
 import subprocess
 import xml.etree.ElementTree as ElementTree
-from dataclasses import dataclass
 from pathlib import Path
 
 import click
