@@ -634,7 +634,7 @@ private:
     Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
 
     /**
-     * Check if the given attribute path is a valid path in the data model provider.
+     * Find the AttributeEntry that corresponds to the given attribute.
      */
     std::optional<DataModel::AttributeEntry> FindAttributeEntry(const ConcreteAttributePath & path);
 
