@@ -29,7 +29,7 @@ from typing import Callable, Optional, Union
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
-from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
+from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceDecisionWithChoice, ConformanceException,
                                       ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                       parse_callable_from_xml, parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
@@ -55,7 +55,7 @@ class SpecParsingException(Exception):
 
 
 # passing in feature map, attribute list, command list
-ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecision]
+ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecisionWithChoice]
 
 
 @dataclass
