@@ -267,7 +267,15 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         return CHIP_NO_ERROR;
     }
 
-    outStatus = StatusIB(Status::Success);
+    if (err != CHIP_NO_ERROR)
+    {
+        outStatus = StatusIB(err);
+    }
+    else
+    {
+        outStatus = StatusIB(Status::Success);
+    }
+
     return err;
 }
 
