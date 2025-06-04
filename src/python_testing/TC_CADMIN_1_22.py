@@ -33,7 +33,6 @@
 
 import logging
 import random
-from time import sleep
 
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import CommissioningParameters
@@ -97,7 +96,9 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-        sleep(1)
+        window_status = await self.support.get_window_status(th=self.th1)
+        asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
+                             "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(4)
         window_status = await self.support.get_window_status(th=self.th1)
