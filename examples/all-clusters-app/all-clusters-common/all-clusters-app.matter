@@ -451,17 +451,17 @@ cluster Groups = 4 {
     char_string<16> groupName = 1;
   }
 
-  /** Command description for AddGroup */
+  /** The AddGroup command allows a client to add group membership in a particular group for the server endpoint. */
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  /** Command description for ViewGroup */
+  /** The ViewGroup command allows a client to request that the server responds with a ViewGroupResponse command containing the name string for a particular group. */
   fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  /** Command description for GetGroupMembership */
+  /** The GetGroupMembership command allows a client to inquire about the group membership of the server endpoint, in a number of ways. */
   fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  /** Command description for RemoveGroup */
+  /** The RemoveGroup command allows a client to request that the server removes the membership for the server endpoint, if any, in a particular group. */
   fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  /** Command description for RemoveAllGroups */
+  /** The RemoveAllGroups command allows a client to direct the server to remove all group associations for the server endpoint. */
   fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  /** Command description for AddGroupIfIdentifying */
+  /** The AddGroupIfIdentifying command allows a client to add group membership in a particular group for the server endpoint, on condition that the endpoint is identifying itself. */
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
@@ -1338,7 +1338,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
 cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   attribute access(write: manage) char_string<35> activeLocale = 0;
   readonly attribute char_string supportedLocales[] = 1;
@@ -4409,7 +4409,7 @@ cluster ElectricalPowerMeasurement = 144 {
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
 cluster ElectricalEnergyMeasurement = 145 {
-  revision 1;
+  revision 2;
 
   shared enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
@@ -4436,6 +4436,8 @@ cluster ElectricalEnergyMeasurement = 145 {
     kExportedEnergy = 0x2;
     kCumulativeEnergy = 0x4;
     kPeriodicEnergy = 0x8;
+    kApparentEnergy = 0x10;
+    kReactiveEnergy = 0x20;
   }
 
   shared struct MeasurementAccuracyRangeStruct {
@@ -4470,6 +4472,8 @@ cluster ElectricalEnergyMeasurement = 145 {
     optional epoch_s endTimestamp = 2;
     optional systime_ms startSystime = 3;
     optional systime_ms endSystime = 4;
+    optional energy_mvah apparentEnergy = 5;
+    optional energy_mvarh reactiveEnergy = 6;
   }
 
   info event CumulativeEnergyMeasured = 0 {
@@ -6995,6 +6999,19 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface to soil measurement functionality, including configuration and provision of notifications of soil measurements. */
+provisional cluster SoilMeasurement = 1072 {
+  revision 1;
+
+  readonly attribute MeasurementAccuracyStruct soilMoistureMeasurementLimits = 0;
+  readonly attribute nullable percent soilMoistureMeasuredValue = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
   revision 1;
@@ -7968,6 +7985,9 @@ internal cluster UnitTesting = 4294048773 {
   /** Command that takes arguments that are global structs/enums and the
         response just echoes them back. */
   command GlobalEchoRequest(GlobalEchoRequestRequest): GlobalEchoResponse = 25;
+  /** Command that returns Success if the CommandFlags pass all checks at the IM layer.
+        Otherwise, return appropriate StatusCode back. */
+  fabric timed command TestCheckCommandFlags(): DefaultSuccess = 26;
   /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
   command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }
@@ -8414,7 +8434,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
 
     handle command OpenCommissioningWindow;
@@ -9713,6 +9733,16 @@ endpoint 1 {
     ram      attribute clusterRevision default = 3;
   }
 
+  server cluster SoilMeasurement {
+    callback attribute soilMoistureMeasurementLimits;
+    callback attribute soilMoistureMeasuredValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+  }
+
   server cluster WakeOnLan {
     ram      attribute MACAddress;
     ram      attribute featureMap default = 0;
@@ -9926,6 +9956,7 @@ endpoint 1 {
     handle command TestSecondBatchHelperRequest;
     handle command StringEchoRequest;
     handle command GlobalEchoRequest;
+    handle command TestCheckCommandFlags;
     handle command TestDifferentVendorMeiRequest;
     handle command TestDifferentVendorMeiResponse;
   }

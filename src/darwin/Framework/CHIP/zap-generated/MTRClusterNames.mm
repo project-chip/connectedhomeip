@@ -12252,6 +12252,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"GlobalEchoRequest";
             break;
 
+        case MTRCommandIDTypeClusterUnitTestingCommandTestCheckCommandFlagsID:
+            result = @"TestCheckCommandFlags";
+            break;
+
         case MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiRequestID:
             result = @"TestDifferentVendorMeiRequest";
             break;

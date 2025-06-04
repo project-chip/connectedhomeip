@@ -60624,6 +60624,11 @@ public class ChipClusters {
 
     public void readCurrentConnectionsAttribute(
         CurrentConnectionsAttributeCallback callback) {
+      readCurrentConnectionsAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readCurrentConnectionsAttributeWithFabricFilter(
+        CurrentConnectionsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_CONNECTIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -60632,7 +60637,7 @@ public class ChipClusters {
             List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, true);
+        }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeCurrentConnectionsAttribute(
@@ -66510,6 +66515,19 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(field1, field2);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+
+    public void testCheckCommandFlags(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 26L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 

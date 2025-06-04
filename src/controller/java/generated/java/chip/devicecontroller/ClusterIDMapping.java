@@ -20505,6 +20505,7 @@ public class ClusterIDMapping {
             TestSecondBatchHelperRequest(23L),
             StringEchoRequest(24L),
             GlobalEchoRequest(25L),
+            TestCheckCommandFlags(26L),
             TestDifferentVendorMeiRequest(4294049962L),;
             private final long id;
             Command(long id) {

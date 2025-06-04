@@ -14717,6 +14717,12 @@ class ChipClusters:
                     "field2": "int",
                 },
             },
+            0x0000001A: {
+                "commandId": 0x0000001A,
+                "commandName": "TestCheckCommandFlags",
+                "args": {
+                },
+            },
             0xFFF200AA: {
                 "commandId": 0xFFF200AA,
                 "commandName": "TestDifferentVendorMeiRequest",

@@ -6361,6 +6361,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "StringEchoRequest";
         case chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::Id:
             return "GlobalEchoRequest";
+        case chip::app::Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id:
+            return "TestCheckCommandFlags";
         case chip::app::Clusters::UnitTesting::Commands::TestDifferentVendorMeiRequest::Id:
             return "TestDifferentVendorMeiRequest";
         default:
@@ -7053,6 +7055,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Water Leak Detector";
     case 0x00000044:
         return "Rain Sensor";
+    case 0x00000045:
+        return "Soil Sensor";
     case 0x00000070:
         return "Refrigerator";
     case 0x00000071:

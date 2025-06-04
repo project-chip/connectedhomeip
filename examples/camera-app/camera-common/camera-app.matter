@@ -451,17 +451,17 @@ cluster Groups = 4 {
     char_string<16> groupName = 1;
   }
 
-  /** Command description for AddGroup */
+  /** The AddGroup command allows a client to add group membership in a particular group for the server endpoint. */
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  /** Command description for ViewGroup */
+  /** The ViewGroup command allows a client to request that the server responds with a ViewGroupResponse command containing the name string for a particular group. */
   fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  /** Command description for GetGroupMembership */
+  /** The GetGroupMembership command allows a client to inquire about the group membership of the server endpoint, in a number of ways. */
   fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  /** Command description for RemoveGroup */
+  /** The RemoveGroup command allows a client to request that the server removes the membership for the server endpoint, if any, in a particular group. */
   fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  /** Command description for RemoveAllGroups */
+  /** The RemoveAllGroups command allows a client to direct the server to remove all group associations for the server endpoint. */
   fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  /** Command description for AddGroupIfIdentifying */
+  /** The AddGroupIfIdentifying command allows a client to add group membership in a particular group for the server endpoint, on condition that the endpoint is identifying itself. */
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
@@ -896,7 +896,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
 cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   attribute access(write: manage) char_string<35> activeLocale = 0;
   readonly attribute char_string supportedLocales[] = 1;

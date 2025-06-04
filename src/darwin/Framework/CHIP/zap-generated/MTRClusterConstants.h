@@ -7360,6 +7360,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterUnitTestingCommandTestSecondBatchHelperRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000017,
     MTRCommandIDTypeClusterUnitTestingCommandStringEchoRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000018,
     MTRCommandIDTypeClusterUnitTestingCommandGlobalEchoRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000019,
+    MTRCommandIDTypeClusterUnitTestingCommandTestCheckCommandFlagsID MTR_PROVISIONALLY_AVAILABLE = 0x0000001A,
     MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiRequestID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200AA,
     MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiResponseID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200BB,
 
@@ -7858,6 +7859,7 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeWaterValveID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000042,
     MTRDeviceTypeIDTypeWaterLeakDetectorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000043,
     MTRDeviceTypeIDTypeRainSensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000044,
+    MTRDeviceTypeIDTypeSoilSensorID MTR_PROVISIONALLY_AVAILABLE = 0x00000045,
     MTRDeviceTypeIDTypeRefrigeratorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000070,
     MTRDeviceTypeIDTypeTemperatureControlledCabinetID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000071,
     MTRDeviceTypeIDTypeRoomAirConditionerID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000072,
