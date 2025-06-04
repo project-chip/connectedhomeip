@@ -22685,6 +22685,14 @@
               "isEnabled": 1
             },
             {
+              "name": "TestCheckCommandFlags",
+              "code": 26,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
               "name": "TestDifferentVendorMeiRequest",
               "code": 4294049962,
               "mfgCode": null,

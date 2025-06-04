@@ -65,11 +65,12 @@ private:
     WebRTCRequestorDelegate mWebRTCRequestorDelegate;
 
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
-    std::shared_ptr<rtc::DataChannel> mDataChannel;
 
     uint16_t mPendingSessionId = 0;
     std::string mLocalDescription;
     // Local vector to store the ICE Candidate strings coming from the WebRTC
     // stack
     std::vector<std::string> mLocalCandidates;
+
+    std::shared_ptr<rtc::Track> mTrack;
 };

@@ -261,17 +261,17 @@ public:
     CameraError SetTilt(int16_t aTilt) override;
     CameraError SetZoom(uint8_t aZoom) override;
 
-    std::vector<VideoStream> & GetAvailableVideoStreams() override { return videoStreams; }
+    std::vector<VideoStream> & GetAvailableVideoStreams() override { return mVideoStreams; }
 
-    std::vector<AudioStream> & GetAvailableAudioStreams() override { return audioStreams; }
+    std::vector<AudioStream> & GetAvailableAudioStreams() override { return mAudioStreams; }
 
-    std::vector<SnapshotStream> & GetAvailableSnapshotStreams() override { return snapshotStreams; }
+    std::vector<SnapshotStream> & GetAvailableSnapshotStreams() override { return mSnapshotStreams; }
 
 private:
     int videoDeviceFd = -1;
-    std::vector<VideoStream> videoStreams;       // Vector to hold available video streams
-    std::vector<AudioStream> audioStreams;       // Vector to hold available audio streams
-    std::vector<SnapshotStream> snapshotStreams; // Vector to hold available snapshot streams
+    std::vector<VideoStream> mVideoStreams;       // Vector to hold available video streams
+    std::vector<AudioStream> mAudioStreams;       // Vector to hold available audio streams
+    std::vector<SnapshotStream> mSnapshotStreams; // Vector to hold available snapshot streams
 
     void InitializeVideoStreams();
     void InitializeAudioStreams();
