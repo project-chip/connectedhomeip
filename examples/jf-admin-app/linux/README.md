@@ -24,7 +24,7 @@ Run the following command at the top level:
 
 -   Pull the required submodules
 
-          $ ./third_party/connectedhomeip/scripts/checkout_submodules.py --shallow --platform linux
+          $ ./scripts/checkout_submodules.py --shallow --platform linux
 
 ## Building the Example Application on Linux
 
