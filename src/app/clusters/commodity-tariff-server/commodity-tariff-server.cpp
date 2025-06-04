@@ -41,68 +41,24 @@ void LockThreadTask(void) {}
 
 void UnlockThreadTask(void) {}
 
-bool CommodityTariffDataProvider::TariffDataUpd_Init(const CommodityTariffPrimaryData & aNewData, TariffUpdateCtx & UpdCtx)
+bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-#define X(attrName, attrType) err = attrName##_MgmtObj.UpdateBegin(aNewData.m##attrName, &UpdCtx);
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-    // TODO - Init the update cache
-
-    if (err != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-void CommodityTariffDataProvider::TariffDataUpd_Commit()
-{
-#define X(attrName, attrType) attrName##_MgmtObj.UpdateCommit();
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-#define X(attrName, attrType)                                                                                                      \
-    if (attrName##_MgmtObj.HasChanged())                                                                                           \
-    {                                                                                                                              \
-        ChipLogProgress(NotSpecified, "EGW-CTC: New value for attribute " #attrName " (Id %d) updated", Attributes::attrName::Id); \
-        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, Attributes::attrName::Id);                        \
-    }
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-}
-
-void CommodityTariffDataProvider::TariffDataUpd_Abort()
-{
-#define X(attrName, attrType) attrName##_MgmtObj.UpdateAbort();
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-    // TODO - Deinit the update cache
-}
-
-bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTariffPrimaryData & aNewData,
-                                                               TariffUpdateCtx & UpdCtx)
-{
-    if (aNewData.mTariffInfo.IsNull())
+    if (!mTariffInfo_MgmtObj.IsValid())
     {
         ChipLogError(NotSpecified, "TariffInfo not present!");
         return false;
     }
-    else if (aNewData.mDayEntries.empty())
+    else if (mDayEntries_MgmtObj.IsValid())
     {
         ChipLogError(NotSpecified, "DayEntries not present!");
         return false;
     }
-    else if (aNewData.mTariffComponents.empty())
+    else if (mTariffComponents_MgmtObj.IsValid())
     {
         ChipLogError(NotSpecified, "TariffComponents not present!");
         return false;
     }
-    else if (aNewData.mTariffPeriods.empty())
+    else if (mTariffPeriods_MgmtObj.IsValid())
     {
         ChipLogError(NotSpecified, "TariffPeriods not present!");
         return false;
@@ -132,7 +88,7 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTa
         }
     }
 
-    if (!aNewData.mDayPatterns.empty())
+    if (mDayPatterns_MgmtObj.IsValid())
     {
         assert(!UpdCtx.DP_KeyIDs.empty());
         assert(!UpdCtx.DP_DE_IDs.empty()); // Something went wrong if DP has no DE IDs
@@ -147,7 +103,7 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTa
         }
     }
 
-    if (!aNewData.mIndividualDays.IsNull())
+    if (mIndividualDays_MgmtObj.IsValid())
     {
         assert(!UpdCtx.ID_DE_IDs.empty()); // Something went wrong if IndividualDays has no DE IDs
 
@@ -167,7 +123,7 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTa
     }
 
     //
-    if (!aNewData.mCalendarPeriods.IsNull())
+    if (mCalendarPeriods_MgmtObj.IsValid())
     {
         assert(!UpdCtx.CP_DP_IDs.empty()); // Something went wrong if CP has no DP IDs
 
@@ -182,27 +138,6 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(const CommodityTa
     }
 
     return true;
-}
-
-void CommodityTariffDataProvider::TariffDataUpdate(const CommodityTariffPrimaryData & newData)
-{
-    TariffUpdateCtx UpdCtx = { .mFeature = this->mFeature };
-
-    if (!TariffDataUpd_Init(newData, UpdCtx))
-    {
-        ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
-    }
-    else if (!TariffDataUpd_CrossValidator(newData, UpdCtx))
-    {
-        ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
-    }
-    else
-    {
-        TariffDataUpd_Commit();
-        ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
-        return;
-    }
-    TariffDataUpd_Abort();
 }
 
 CHIP_ERROR CommodityTariffServer::Init()
