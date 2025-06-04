@@ -144,8 +144,8 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
 /// `attributeId` may be kInvalidAttributeId to signify wildcard permission check
 /// on the underlying cluster
 bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const AttributeId attributeId,
-                           const Access::SubjectDescriptor & subjectDescriptor,
-                           const std::optional<DataModel::AttributeEntry> & entry)
+                                const Access::SubjectDescriptor & subjectDescriptor,
+                                const std::optional<DataModel::AttributeEntry> & entry)
 {
     if (!entry.has_value() || !entry->GetReadPrivilege().has_value())
     {
@@ -171,8 +171,7 @@ bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const Attribut
 class AutoReleaseSubscriptionInfoIterator
 {
 public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) :
-        mIterator(iterator) {};
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
     ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
 
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
