@@ -239,7 +239,28 @@ public:
      * 2. Cross-field validation (TariffDataUpd_CrossValidator)
      * 3. Commit or abort (TariffDataUpd_Commit/Abort)
      */
-    void TariffDataUpdate();
+    void TariffDataUpdate()
+    {
+        TariffUpdateCtx UpdCtx = { .mFeature = this->mFeature };
+        
+        if (!TariffDataUpd_Init(UpdCtx))
+        {
+            ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
+        }
+        else if (!TariffDataUpd_CrossValidator(UpdCtx))
+        {
+            ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
+        }
+        else
+        {
+            TariffDataUpd_Commit();
+            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+            return;
+        }
+
+        // TODO - shall we do cleanup for UpdCtx?
+        TariffDataUpd_Abort();
+    }
 
     // Attribute accessors
 #define X(attrName, attrType)                                                                                                      \
@@ -266,11 +287,42 @@ private:
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
+    static void TariffDataUpd_AttrChangeCb( uint16_t aAttrId , void * CbCtx )
+    {
+        TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
+        ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
+        MatterReportingAttributeChangeCallback(UpdCtx->aEndpoint, CommodityTariff::Id, aAttrId);
+    }
+
     // Primary attrs update pipeline methods
-    bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx);
-    void TariffDataUpd_Commit();
-    void TariffDataUpd_Abort();
+    bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+#define X(attrName, attrType) err = m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb);
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+        if (err != CHIP_NO_ERROR)
+        {
+            return false;
+        }
+        return true;
+    }
+
     bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx);
+
+    void TariffDataUpd_Commit()
+    {
+#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateCommit();
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+    }
+
+    void TariffDataUpd_Abort()
+    {
+#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateAbort();
+        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+    }
 
     // Current attrs (time depended) update methods
     void UpdateCurrentAttrs();

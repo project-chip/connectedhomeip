@@ -41,56 +41,6 @@ void LockThreadTask(void) {}
 
 void UnlockThreadTask(void) {}
 
-static void TariffDataUpd_AttrChangeCb( uint16_t aAttrId , void * CbCtx )
-{
-    TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
-    ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
-    MatterReportingAttributeChangeCallback(UpdCtx->aEndpoint, CommodityTariff::Id, aAttrId);
-}
-
-bool CommodityTariffDataProvider::TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-#define X(attrName, attrType) err = m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb);
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-    // TODO - Init the update cache
-
-    if (err != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-void CommodityTariffDataProvider::TariffDataUpd_Commit()
-{
-#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateCommit();
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-#define X(attrName, attrType)                                                                                                      \
-    if (m##attrName##_MgmtObj.HasChanged())                                                                                           \
-    {                                                                                                                              \
-        ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute " #attrName " (Id %d) updated", Attributes::attrName::Id); \
-        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, Attributes::attrName::Id);                        \
-    }
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-}
-
-void CommodityTariffDataProvider::TariffDataUpd_Abort()
-{
-#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateAbort();
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-
-    // TODO - Deinit the update cache
-}
-
 bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 {
     if (!mTariffInfo_MgmtObj.IsValid())
@@ -188,27 +138,6 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(TariffUpdateCtx &
     }
 
     return true;
-}
-
-void CommodityTariffDataProvider::TariffDataUpdate()
-{
-    TariffUpdateCtx UpdCtx = { .mFeature = this->mFeature };
-
-    if (!TariffDataUpd_Init(UpdCtx))
-    {
-        ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
-    }
-    else if (!TariffDataUpd_CrossValidator(UpdCtx))
-    {
-        ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
-    }
-    else
-    {
-        TariffDataUpd_Commit();
-        ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
-        return;
-    }
-    TariffDataUpd_Abort();
 }
 
 CHIP_ERROR CommodityTariffServer::Init()
