@@ -23,8 +23,8 @@ ti_simplelink_sysconfig_target =
 
 ti_simplelink_board = "LP_EM_CC1354P10_6"
 
-if(ti_simplelink_board == "CC2674R10"){
-    ti_simplelink_device = "CC2674R10RGZ"
+if (ti_simplelink_board == "CC2674R10") {
+  ti_simplelink_device = "CC2674R10RGZ"
 }
 
 # Size Optimizations

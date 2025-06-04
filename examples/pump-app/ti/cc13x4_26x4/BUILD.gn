@@ -34,13 +34,19 @@ ti_simplelink_sdk("sdk") {
 
 ti_sysconfig("sysconfig") {
   if (ti_simplelink_board == "LP_EM_CC2674P10") {
-    sources = [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc2674p10.syscfg" ]
+    sources =
+        [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc2674p10.syscfg" ]
   } else if (ti_simplelink_board == "LP_EM_CC1354P10_6") {
-    sources = [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc1354p10_6.syscfg" ]
-  } else if (ti_simplelink_board == "LP_EM_CC1354P10_1"){
-    sources = [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc1354p10_1.syscfg" ]
-  } else if (ti_simplelink_board == "CC2674R10"){
-    sources = [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc2674r10.syscfg" ]
+    sources = [
+      "${chip_root}/examples/platform/ti/sysconfig/chip_cc1354p10_6.syscfg",
+    ]
+  } else if (ti_simplelink_board == "LP_EM_CC1354P10_1") {
+    sources = [
+      "${chip_root}/examples/platform/ti/sysconfig/chip_cc1354p10_1.syscfg",
+    ]
+  } else if (ti_simplelink_board == "CC2674R10") {
+    sources =
+        [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc2674r10.syscfg" ]
   } else {
     error("Board not supported")
   }

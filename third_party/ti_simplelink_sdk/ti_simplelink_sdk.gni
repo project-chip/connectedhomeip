@@ -65,7 +65,7 @@ template("ti_sysconfig") {
         ti_simplelink_board == "LP_EM_CC1354P10_1") {
       defines = [ "DeviceFamily_CC13X4" ]
     } else if (ti_simplelink_board == "LP_EM_CC2674P10" ||
-                 ti_simplelink_board == "CC2674R10") {
+               ti_simplelink_board == "CC2674R10") {
       defines = [ "DeviceFamily_CC26X4" ]
     }
   }
@@ -193,7 +193,7 @@ template("ti_simplelink_sdk") {
         ti_simplelink_board == "LP_EM_CC1354P10_6") {
       defines += [ "DeviceFamily_CC13X4" ]
     } else if (ti_simplelink_board == "LP_EM_CC2674P10" ||
-              ti_simplelink_board == "CC2674R10") {
+               ti_simplelink_board == "CC2674R10") {
       defines += [ "DeviceFamily_CC26X4" ]
     }
     if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
@@ -386,7 +386,7 @@ template("ti_simplelink_sdk") {
     ]
     libs += [ "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a" ]
     if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
-        ti_simplelink_board == "CC2674R10" ) {
+        ti_simplelink_board == "CC2674R10") {
       libs += [
         "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/OneLib.a",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/StackWrapper.a",
