@@ -69,7 +69,7 @@ not setup correctly, updates were made for decoupling, now this data is provided
 With this the interfaces
 [`CommandHandlerInterface::EnumerateGeneratedCommands`](#enumerategeneratedcommands),
 [`CommandHandlerInterface::EnumerateAcceptedCommands`](#enumerateacceptedcommands)
-go through some changes, a SHIM is provided to make the transition simpler
+go through some changes, a shim is provided to make the transition simpler
 
 #### Full Changes
 
