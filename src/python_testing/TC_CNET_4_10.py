@@ -35,8 +35,7 @@ class TC_CNET_4_10(MatterBaseTest):
            in the --endpoint command-line argument, with a FeatureMap attribute of 2.
         3. DUT is commissioned on the operational network specified
            in the --thread-dataset-hex command-line argument.
-        4. TH can communicate with the DUT on the operational network specified
-           in the --thread-dataset-hex command-line argument.
+        4. TH can communicate with the DUT on the commissioned network.
         5. PIXIT.CNET.THREAD_1ST_EXTPANID is a valid 8-byte Thread Extended PAN ID
            (hex string) of the operational network provided via the --hex-arg command-line argument.
 
