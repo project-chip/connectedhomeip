@@ -205,6 +205,5 @@ static_library("inet") {
     cflags -= [ "-Wconversion" ]
   } else if (chip_system_config_use_network_framework) {
     sources += darwin_sources
-    cflags += [ "-fobjc-arc" ]
   }
 }
