@@ -104,26 +104,15 @@ CHIP_ERROR SetUpCodePairer::Connect()
         if (ShouldDiscoverUsing(RendezvousInformationFlag::kBLE))
         {
             CHIP_ERROR err = StartDiscoveryOverBLE();
-            if (err != CHIP_NO_ERROR)
+            if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE))
             {
                 ChipLogError(Controller, "Failed to start discovery over BLE: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
-
-        if (ShouldDiscoverUsing(RendezvousInformationFlag::kSoftAP))
-        {
-            CHIP_ERROR err = StartDiscoveryOverSoftAP();
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Controller, "Failed to start discovery over SoftAP: %" CHIP_ERROR_FORMAT, err.Format());
-            }
-        }
         if (ShouldDiscoverUsing(RendezvousInformationFlag::kWiFiPAF))
         {
-            ChipLogProgress(Controller,
-                            "WiFi-PAF: has RendezvousInformationFlag::kWiFiPAF or has no discovery capabilities bitmask");
             CHIP_ERROR err = StartDiscoveryOverWiFiPAF();
-            if (err != CHIP_NO_ERROR)
+            if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE))
             {
                 ChipLogError(Controller, "Failed to start discovery over WiFiPAF: %" CHIP_ERROR_FORMAT, err.Format());
             }
@@ -252,17 +241,6 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverDNSSD()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetUpCodePairer::StartDiscoveryOverSoftAP()
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-CHIP_ERROR SetUpCodePairer::StopDiscoveryOverSoftAP()
-{
-    mWaitingForDiscovery[kSoftAPTransport] = false;
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -298,7 +276,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
     return err;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CONFIG_NETWORK_LAYER_BLE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 }
 
 CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
@@ -625,7 +603,6 @@ void SetUpCodePairer::StopAllDiscoveryAttempts()
 {
     LogErrorOnFailure(StopDiscoveryOverBLE());
     LogErrorOnFailure(StopDiscoveryOverDNSSD());
-    LogErrorOnFailure(StopDiscoveryOverSoftAP());
     LogErrorOnFailure(StopDiscoveryOverWiFiPAF());
 
     // Just in case any of those failed to reset the waiting state properly.
