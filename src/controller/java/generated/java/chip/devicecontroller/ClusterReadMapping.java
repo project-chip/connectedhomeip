@@ -2283,6 +2283,28 @@ public class ClusterReadMapping {
           readGeneralCommissioningTCUpdateDeadlineCommandParams
         );
         result.put("readTCUpdateDeadlineAttribute", readGeneralCommissioningTCUpdateDeadlineAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningRecoveryIdentifierCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningRecoveryIdentifierAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readRecoveryIdentifierAttribute(
+              (ChipClusters.OctetStringAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
+          readGeneralCommissioningRecoveryIdentifierCommandParams
+        );
+        result.put("readRecoveryIdentifierAttribute", readGeneralCommissioningRecoveryIdentifierAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningNetworkRecoveryReasonCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningNetworkRecoveryReasonAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readNetworkRecoveryReasonAttribute(
+              (ChipClusters.GeneralCommissioningCluster.NetworkRecoveryReasonAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedGeneralCommissioningClusterNetworkRecoveryReasonAttributeCallback(),
+          readGeneralCommissioningNetworkRecoveryReasonCommandParams
+        );
+        result.put("readNetworkRecoveryReasonAttribute", readGeneralCommissioningNetworkRecoveryReasonAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readGeneralCommissioningGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGeneralCommissioningGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

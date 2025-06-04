@@ -465,7 +465,7 @@ public:
 
     CHIP_ERROR GetProductId(uint16_t & productId) override { return mDefaultProvider->GetProductId(productId); }
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
-    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductURL(buf, bufSize); }
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductLabel(buf, bufSize); }
 
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override
@@ -581,15 +581,19 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #ifdef CONFIG_RENDEZVOUS_MODE
     rendezvousFlags = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
-#endif
 
     err = Platform::MemoryInit();
     SuccessOrExit(err);
 
     err = ParseArguments(argc, argv, customOptions);
     SuccessOrExit(err);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (LinuxDeviceOptions::GetInstance().mWiFiPAF)
+    {
+        rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
+    }
+#endif
 
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
