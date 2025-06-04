@@ -296,7 +296,7 @@ fully provisioned, BLE advertising will stop.
 #### Bluetooth LE Rendezvous
 
 Pairing this application with `ble-thread` can be done with any of the enabled
-[CHIP Controller](../../../src/controller/README.md) applications. Use the
+[CHIP Controller](../../../../src/controller/README.md) applications. Use the
 information printed on the console to aide in pairing the device. The controller
 application can also be used to control the example app with the cluster
 commands.

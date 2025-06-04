@@ -68,5 +68,5 @@ By default, the same [chip_cc2674r10.syscfg](../../../../examples/platform/ti/sy
 But if pin functions are not identical across the two applications, it'd be better to have two separate files, one per application.
 
 One way to achieve this:
-1. Copy the file [chip_cc2674r10.syscfg](../../../../examples/platform/ti/sysconfig/chip_cc2674r10.syscfg) to the local application folder (for lighting-app you can copy it [here](../../../../examples/lighting-app/ti/cc13x4_26x4/)).
-2. Then in [BUILD.gn](../../../../examples/lighting-app/ti/cc13x4_26x4/BUILD.gn) modify the respective path of `sources` in `ti_sysconfig("sysconfig")` to the local copy from step 1 (e.g. "${chip_root}/examples/lighting-app/ti/cc13x4_26x4/chip_cc2674r10.syscfg")
+1. Copy the file [chip_cc2674r10.syscfg](../../../../examples/platform/ti/sysconfig/chip_cc2674r10.syscfg) to the local application folder (for lighting-app you can copy it at `examples/lighting-app/ti/cc13x4_26x4/`).
+2. Then in [BUILD.gn](../../../../examples/lighting-app/ti/cc13x4_26x4/BUILD.gn) modify the respective path of `sources` in `ti_sysconfig("sysconfig")` to the local copy from step 1 (e.g. `"${chip_root}/examples/lighting-app/ti/cc13x4_26x4/chip_cc2674r10.syscfg"`)
