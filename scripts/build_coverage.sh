@@ -40,7 +40,7 @@ _install_lcov
 
 _install_gcovr() {
     if ! gcovr --version >/dev/null 2>&1; then
-        echo "lcov not installed. Installing..."
+        echo "gcovr not installed. Installing..."
         pip3 install gcovr==8.3
     fi
 }
