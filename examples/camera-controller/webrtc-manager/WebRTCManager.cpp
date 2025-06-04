@@ -34,6 +34,49 @@ namespace {
 
 // Constants
 constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
+constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
+constexpr int kVideoBitRate         = 3000;
+
+const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
+{
+    switch (state)
+    {
+    case rtc::PeerConnection::State::New:
+        return "New";
+
+    case rtc::PeerConnection::State::Connecting:
+        return "Connecting";
+
+    case rtc::PeerConnection::State::Connected:
+        return "Connected";
+
+    case rtc::PeerConnection::State::Disconnected:
+        return "Disconnected";
+
+    case rtc::PeerConnection::State::Failed:
+        return "Failed";
+
+    case rtc::PeerConnection::State::Closed:
+        return "Closed";
+    }
+    return "N/A";
+}
+
+const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
+{
+    switch (state)
+    {
+    case rtc::PeerConnection::GatheringState::New:
+        return "New";
+
+    case rtc::PeerConnection::GatheringState::InProgress:
+        return "InProgress";
+
+    case rtc::PeerConnection::GatheringState::Complete:
+        return "Complete";
+    }
+    return "N/A";
+}
 
 } // namespace
 
@@ -41,13 +84,7 @@ WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicE
 
 WebRTCManager::~WebRTCManager()
 {
-    // Close the data channel and peer connection if they exist
-    if (mDataChannel)
-    {
-        mDataChannel->close();
-        mDataChannel.reset();
-    }
-
+    // Close the peer connection if they exist
     if (mPeerConnection)
     {
         mPeerConnection->close();
@@ -182,6 +219,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     // Create the peer connection
     rtc::Configuration config;
+    config.iceServers.emplace_back("stun:stun.l.google.com:19302");
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
     mPeerConnection->onLocalDescription([this](rtc::Description desc) {
@@ -197,36 +235,21 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         ChipLogProgress(Camera, "%s", candidateStr.c_str());
     });
 
-    mPeerConnection->onStateChange(
-        [](rtc::PeerConnection::State state) { ChipLogProgress(Camera, "[PeerConnection State: %d]", static_cast<int>(state)); });
-
-    mPeerConnection->onSignalingStateChange([](rtc::PeerConnection::SignalingState state) {
-        ChipLogProgress(Camera, "[SignalingState State: %d]", static_cast<int>(state));
+    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
+        ChipLogProgress(Camera, "[PeerConnection State: %s]", GetPeerConnectionStateStr(state));
     });
 
     mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
-        ChipLogProgress(Camera, "[Gathering State: %d]", static_cast<int>(state));
+        ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
     });
 
-    // Create a data channel for this offerer
-    mDataChannel = mPeerConnection->createDataChannel(kWebRTCDataChannelName);
+    rtc::Description::Video media("video", rtc::Description::Direction::RecvOnly);
+    media.addH264Codec(kVideoH264PayloadType);
+    media.setBitrate(kVideoBitRate);
+    mTrack = mPeerConnection->addTrack(media);
 
-    if (mDataChannel)
-    {
-        mDataChannel->onOpen(
-            [&]() { ChipLogProgress(Camera, "[DataChannel open: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown"); });
-
-        mDataChannel->onClosed([&]() {
-            ChipLogProgress(Camera, "[DataChannel closed: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown");
-        });
-
-        mDataChannel->onMessage([](auto data) {
-            if (std::holds_alternative<std::string>(data))
-            {
-                ChipLogProgress(Camera, "[Received: %s]", std::get<std::string>(data).c_str());
-            }
-        });
-    }
+    ChipLogProgress(Camera, "Generate and set the SDP");
+    mPeerConnection->setLocalDescription();
 
     return CHIP_NO_ERROR;
 }
@@ -234,6 +257,12 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer command to the peer device");
+
+    if (mLocalDescription.empty())
+    {
+        ChipLogError(Camera, "No local SDP to send");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     CHIP_ERROR err =
         mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
