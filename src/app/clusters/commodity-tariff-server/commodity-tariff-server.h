@@ -158,19 +158,19 @@ COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 struct TariffUpdateCtx
 {
     /* DayEntryIDs */
-    std::unordered_set<uint32_t> DE_KeyIDs; /* Master - IDs of all given DayEntry items */
+    std::unordered_set<uint32_t> DayEntryKeyIDs; /* Master - IDs of all given DayEntry items */
 
-    std::unordered_set<uint32_t> DP_DE_IDs; /* IDs mentioned in DayPattern items */
-    std::unordered_set<uint32_t> TP_DE_IDs; /* IDs mentioned in TariffPeriod items */
-    std::unordered_set<uint32_t> ID_DE_IDs; /* IDs mentioned in IndividualDays items */
+    std::unordered_set<uint32_t> DayPatternsDayEntryIDs; /* IDs mentioned in DayPattern items */
+    std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs; /* IDs mentioned in TariffPeriod items */
+    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs; /* IDs mentioned in IndividualDays items */
 
     /* TariffComponentIDs */
-    std::unordered_set<uint32_t> TC_KeyIDs; /* Master - IDs of all given TariffComponent items */
-    std::unordered_set<uint32_t> TP_TC_IDs; /* IDs mentioned in TariffPeriods items */
+    std::unordered_set<uint32_t> TariffComponentKeyIDs; /* Master - IDs of all given TariffComponent items */
+    std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs; /* IDs mentioned in TariffPeriods items */
 
     /* DayPatternsIDs */
-    std::unordered_set<uint32_t> DP_KeyIDs; /* Master - IDs of all given DayPattern items */
-    std::unordered_set<uint32_t> CP_DP_IDs; /* IDs mentioned in CalendarPeriods items */
+    std::unordered_set<uint32_t> DayPatternKeyIDs; /* Master - IDs of all given DayPattern items */
+    std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs; /* IDs mentioned in CalendarPeriods items */
 
     BitMask<Feature> mFeature;
     EndpointId aEndpoint;

@@ -322,8 +322,6 @@ public:
      */
     const T & GetValue() const { return mValue; };
 
-    WrappedType GetPayload() const { return unwrapValue(mValue); }
-
     /**
      * @brief Indicates that the newValue has changed against current mValue
      * @return true if value has changed
@@ -352,6 +350,10 @@ public:
      */
     CHIP_ERROR CreateNewValue(uint16_t size)
     {
+        if (mUpdateState != UpdateState::kIdle) {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
         if constexpr (IsValueList() || IsList<wrappedType>::value)
         {
             if (size < 1)
@@ -387,8 +389,7 @@ public:
             }            
         }
 
-       mUpdateState = UpdateState::kInitiated;
-
+        mUpdateState = UpdateState::kInitiated;
         return CHIP_NO_ERROR;
     }
 
