@@ -114,12 +114,17 @@ public:
     /// read/write options).
     ///
     /// @param entry - an optional out argument for the corresponding attribute entry metadata
-    ///                for the given path. This is to be used by callers to validate other
-    ///                path information like ACL since the iterator needs a ACL fetch anyway.
+    ///                for the given path. Since the expand iterator looks over cluster metadata
+    ///                to generate valid paths, the metadata information is `free` to receive
+    ///                by the caller.
     ///
-    /// NOTE: for fixed paths, iteration may return "std::nullopt" entry to signify
-    ///       that the path is not actually valid (but needs returning as it is a non-wildcard
-    ///       iteration)
+    /// NOTES:
+    ///   - returning the `entry` information is done here as a convenience/optimization
+    ///     to avoid extra lookups for metadata. Callers are free to use `expanded path` instead
+    ///     and not ask for the entry data.
+    ///   - `entry` may be `std::nullopt`: AttributePathExpandIterator will return non-wildcard
+    ///     paths as-is and those may be invalid. If a path is not valid for the DataModel::Provider
+    ///     then entry will be `std::nullopt`.
     ///
     /// On success, true is returned and `path` is filled with the next path in the
     /// expansion.
