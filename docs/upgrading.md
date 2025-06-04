@@ -75,7 +75,7 @@ go through some changes, a shim is provided to make the transition simpler
 
 ##### EnumerateGeneratedCommands
 
-Changed the old callback based iteration, into a ListBuilder based approach for
+Changed the old callback based iteration into a ListBuilder based approach for
 the Enumeration of Generated Commands
 
 `CommandHandlerInterface::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
@@ -152,15 +152,15 @@ Important Notes:
 Use `EnsureAppendCapacity` before `ListBuilder::Append` to prevent buffer
 overflow when appending a single element, this function never allocates.
 
-#### SHIM updates
+#### Backwards compatibility
 
-If the changes above are too high friction for upgrading, we provide a Shim that
-allows to implement this changes with a very minimal change. It adds as little
-extra usage in size compared to the code above but should be decent for most
+If the changes above are too high friction for upgrading, we provide a shim that
+allow implementing these changes with a very minimal change. It adds a little
+extra codesize compared to the code above but should be decent for most
 cases.
 
-Tu use this Shim just replace inheriting CommandHandlerInterface to
-CommandHandlerInterfaceShim<> with a list of the clusters are required for your
+To use this shim just replace inheriting from CommandHandlerInterface with inheriting from
+CommandHandlerInterfaceShim<> with a list of the cluster IDs required for your
 implementation
 
 ```diff
