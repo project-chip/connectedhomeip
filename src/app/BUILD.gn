@@ -274,9 +274,13 @@ static_library("interaction-model") {
       "${chip_root}/src/access:provider-impl",
       "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/app/common:attribute-type",
+      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
     ]
 
-    public_configs += [ ":config-controller-dynamic-server" ]
+    public_configs += [
+      ":config-controller-dynamic-server",
+      "${chip_root}/src/app/dynamic_server:mock-codegen-config",
+    ]
   }
 }
 
