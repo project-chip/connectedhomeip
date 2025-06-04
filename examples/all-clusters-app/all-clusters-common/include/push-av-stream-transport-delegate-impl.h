@@ -45,7 +45,7 @@ public:
                                                               const uint16_t connectionID);
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID);
     Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                            const Structs::TransportOptionsStruct::DecodableType transportOptions);
+                                                            const TransportOptionsStorage transportOptions);
     Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
                                                            TransportStatusEnum transportStatus);
 

@@ -393,47 +393,36 @@ void PushAvStreamTransportServer::ScheduleTransportDeallocate(uint16_t connectio
     }
 }
 
-void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & ctx,
-                                                              const Commands::AllocatePushTransport::DecodableType & commandData)
+Status PushAvStreamTransportServer::ValidateIncomingTransportOptions(
+    const Structs::TransportOptionsStruct::DecodableType & transportOptions)
 {
-    Commands::AllocatePushTransportResponse::Type response;
-    auto & transportOptions = commandData.transportOptions;
-
     // Contraints check on incoming transport Options
+    VerifyOrReturnValue(transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, Status::ConstraintError,
+                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid streamUsage ",
+                                     AttributeAccessInterface::GetEndpointId().Value()));
 
-    VerifyOrReturn(transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid streamUsage ",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
+    VerifyOrReturnValue(transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(),
+                        Status::InvalidCommand,
+                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing videoStreamID and audioStreamID",
+                                     AttributeAccessInterface::GetEndpointId().Value()));
 
-    VerifyOrReturn(transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(), {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing videoStreamID and audioStreamID",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-    });
-
-    VerifyOrReturn(transportOptions.url.size() <= kMaxUrlLength, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: URL length: %ld exceeding max allowed length of 2000",
-                     AttributeAccessInterface::GetEndpointId().Value(), transportOptions.url.size());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
+    VerifyOrReturnValue(
+        transportOptions.url.size() >= kMinUrlLength && transportOptions.url.size() <= kMaxUrlLength, Status::ConstraintError,
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: URL length: %u not in allowed length range of 13 to 2000",
+                     AttributeAccessInterface::GetEndpointId().Value(),
+                     static_cast<uint32_t>(AttributeAccessInterface::GetEndpointId().Value(), transportOptions.url.size())));
 
     auto & triggerOptions = transportOptions.triggerOptions;
 
-    VerifyOrReturn(triggerOptions.triggerType != TransportTriggerTypeEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid triggerType ",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
+    VerifyOrReturnValue(triggerOptions.triggerType != TransportTriggerTypeEnum::kUnknownEnumValue, Status::ConstraintError,
+                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid triggerType ",
+                                     AttributeAccessInterface::GetEndpointId().Value()));
 
     if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
     {
-        VerifyOrReturn(triggerOptions.motionZones.HasValue(), {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing motion zones ",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        });
+        VerifyOrReturnValue(triggerOptions.motionZones.HasValue(), Status::InvalidCommand,
+                            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing motion zones ",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
 
         if (triggerOptions.motionZones.Value().IsNull() == false)
         {
@@ -446,137 +435,187 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
 
                 if (mFeatures.Has(Feature::kPerZoneSensitivity))
                 {
-                    VerifyOrReturn(transportZoneOption.sensitivity.HasValue(), {
-                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Zone Sensitivity ",
-                                     AttributeAccessInterface::GetEndpointId().Value());
-                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                    });
+                    VerifyOrReturnValue(transportZoneOption.sensitivity.HasValue(), Status::InvalidCommand,
+                                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Zone Sensitivity ",
+                                                     AttributeAccessInterface::GetEndpointId().Value()));
 
-                    VerifyOrReturn(transportZoneOption.sensitivity.Value() >= 1 && transportZoneOption.sensitivity.Value() <= 10, {
-                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Zone Sensitivity Constraint Error",
-                                     AttributeAccessInterface::GetEndpointId().Value());
-                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                    });
+                    VerifyOrReturnValue(transportZoneOption.sensitivity.Value() >= 1 &&
+                                            transportZoneOption.sensitivity.Value() <= 10,
+                                        Status::ConstraintError,
+                                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Zone Sensitivity Constraint Error",
+                                                     AttributeAccessInterface::GetEndpointId().Value()));
+                }
+                else
+                {
+                    VerifyOrReturnValue(
+                        transportZoneOption.sensitivity.HasValue() == false, Status::InvalidCommand,
+                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Found Zone Sensitivity which is not expected.",
+                                     AttributeAccessInterface::GetEndpointId().Value()));
                 }
             }
 
             if (iter.GetStatus() != CHIP_NO_ERROR)
             {
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                return;
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Motion Zones TLV Validation failed",
+                             AttributeAccessInterface::GetEndpointId().Value());
+                return Status::InvalidCommand;
             }
         }
 
-        if (mFeatures.Has(Feature::kPerZoneSensitivity) == false)
-        {
-            VerifyOrReturn(triggerOptions.motionSensitivity.HasValue(), {
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Motion Sensitivity ",
-                             AttributeAccessInterface::GetEndpointId().Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            });
-            VerifyOrReturn(
-                triggerOptions.motionSensitivity.Value().Value() >= 1 && triggerOptions.motionSensitivity.Value().Value() <= 10, {
-                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Motion Sensitivity Constraint Error",
-                                 AttributeAccessInterface::GetEndpointId().Value());
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                });
-        }
+        VerifyOrReturnValue(triggerOptions.motionTimeControl.HasValue(), Status::InvalidCommand,
+                            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Motion Time Control ",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
 
-        VerifyOrReturn(triggerOptions.motionTimeControl.HasValue(), {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Motion Time Control ",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        });
-
-        VerifyOrReturn(triggerOptions.motionTimeControl.Value().initialDuration >= 1, {
+        VerifyOrReturnValue(
+            triggerOptions.motionTimeControl.Value().initialDuration >= 1, Status::ConstraintError,
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Motion Time Control (InitialDuration) Constraint Error",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        });
+                         AttributeAccessInterface::GetEndpointId().Value()));
 
-        VerifyOrReturn(triggerOptions.motionTimeControl.Value().maxDuration >= 1, {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Motion Time Control (MaxDuration) Constraint Error",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        });
+        VerifyOrReturnValue(triggerOptions.motionTimeControl.Value().maxDuration >= 1, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "HandleAllocatePushTransport[ep=%d]: Motion Time Control (MaxDuration) Constraint Error",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
+    }
+    else
+    {
+
+        VerifyOrReturnValue(triggerOptions.motionZones.HasValue() == false, Status::InvalidCommand,
+                            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Found motion zones which is not expected",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
+
+        VerifyOrReturnValue(triggerOptions.motionTimeControl.HasValue() == false, Status::InvalidCommand,
+                            ChipLogError(Zcl,
+                                         "HandleAllocatePushTransport[ep=%d]: Found Motion Time Control which is not expected ",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
+    }
+
+    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion && mFeatures.Has(Feature::kPerZoneSensitivity) == false)
+    {
+        VerifyOrReturnValue(triggerOptions.motionSensitivity.HasValue(), Status::InvalidCommand,
+                            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Motion Sensitivity ",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
+
+        VerifyOrReturnValue(triggerOptions.motionSensitivity.Value().Value() >= 1 &&
+                                triggerOptions.motionSensitivity.Value().Value() <= 10,
+                            Status::ConstraintError,
+                            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Motion Sensitivity Constraint Error",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
+    }
+    else
+    {
+        VerifyOrReturnValue(triggerOptions.motionSensitivity.HasValue() == false, Status::InvalidCommand,
+                            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Found Motion Sensitivity which is not expected ",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
     }
 
     if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
         triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand)
     {
-        VerifyOrReturn(triggerOptions.maxPreRollLen.HasValue(), {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Max Pre Roll Len field ",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        });
+        VerifyOrReturnValue(triggerOptions.maxPreRollLen.HasValue(), Status::InvalidCommand,
+                            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Max Pre Roll Len field ",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
     }
+    else
+    {
+        VerifyOrReturnValue(triggerOptions.maxPreRollLen.HasValue() == false, Status::InvalidCommand,
+                            ChipLogError(Zcl,
+                                         "HandleAllocatePushTransport[ep=%d]: Found Max Pre Roll Len field which is not expected.",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
+    }
+
+    IngestMethodsEnum ingestMethod = transportOptions.ingestMethod;
+
+    VerifyOrReturnValue(ingestMethod != IngestMethodsEnum::kUnknownEnumValue, Status::ConstraintError,
+                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method ",
+                                     AttributeAccessInterface::GetEndpointId().Value()));
+
+    ContainerOptionsStruct containerOptions = transportOptions.containerOptions;
+
+    VerifyOrReturnValue(containerOptions.containerType != ContainerFormatEnum::kUnknownEnumValue, Status::ConstraintError,
+                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Container Format ",
+                                     AttributeAccessInterface::GetEndpointId().Value()));
+
+    if (containerOptions.containerType == ContainerFormatEnum::kCmaf)
+    {
+        VerifyOrReturnValue(containerOptions.CMAFContainerOptions.HasValue(), Status::InvalidCommand,
+                            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing CMAF Container Options ",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
+
+        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
+        {
+            VerifyOrReturnValue(
+                containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size() == kMaxCENCKeyLength, Status::ConstraintError,
+                ChipLogError(
+                    Zcl,
+                    "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key constraint Error, actual length: %u not "
+                    "equal to expected length of 16",
+                    AttributeAccessInterface::GetEndpointId().Value(),
+                    static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size())));
+        }
+
+        if (!mFeatures.Has(Feature::kMetadata))
+        {
+            VerifyOrReturnValue(
+                containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue() == false, Status::InvalidCommand,
+                ChipLogError(
+                    Zcl, "HandleAllocatePushTransport[ep=%d]: Found CMAF Container Options MetadataEnabled which is not expected.",
+                    AttributeAccessInterface::GetEndpointId().Value()));
+        }
+
+        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
+        {
+            VerifyOrReturnValue(containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), Status::InvalidCommand,
+                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing CMAF Container Options CENC Key ID ",
+                                             AttributeAccessInterface::GetEndpointId().Value()));
+
+            VerifyOrReturnValue(
+                containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size() == kMaxCENCKeyIDLength,
+                Status::ConstraintError,
+                ChipLogError(Zcl,
+                             "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key ID constraint Error, actual "
+                             "length: %u not equal to expected length of 16",
+                             AttributeAccessInterface::GetEndpointId().Value(),
+                             static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size())));
+        }
+        else
+        {
+            VerifyOrReturnValue(
+                containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue() == false, Status::InvalidCommand,
+                ChipLogError(Zcl,
+                             "HandleAllocatePushTransport[ep=%d]: Found CMAF Container Options CENC Key ID which is not expected",
+                             AttributeAccessInterface::GetEndpointId().Value()));
+        }
+    }
+    else
+    {
+        VerifyOrReturnValue(containerOptions.CMAFContainerOptions.HasValue() == false, Status::InvalidCommand,
+                            ChipLogError(Zcl,
+                                         "HandleAllocatePushTransport[ep=%d]: Found CMAF Container Options which is not expected ",
+                                         AttributeAccessInterface::GetEndpointId().Value()));
+    }
+
+    return Status::Success;
+}
+
+void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & ctx,
+                                                              const Commands::AllocatePushTransport::DecodableType & commandData)
+{
+    Commands::AllocatePushTransportResponse::Type response;
+    auto & transportOptions = commandData.transportOptions;
+
+    Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
+
+    VerifyOrReturn(transportOptionsValidityStatus == Status::Success, {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TransportOptions of command data is not Valid",
+                     AttributeAccessInterface::GetEndpointId().Value());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, transportOptionsValidityStatus);
+    });
 
     // Todo: TLSEndpointID Validation
 
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 
-    VerifyOrReturn(ingestMethod != IngestMethodsEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method ",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
-
     ContainerOptionsStruct containerOptions = commandData.transportOptions.containerOptions;
-
-    VerifyOrReturn(containerOptions.containerType != ContainerFormatEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Container Format ",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
-
-    if (containerOptions.containerType == ContainerFormatEnum::kCmaf)
-    {
-        VerifyOrReturn(containerOptions.CMAFContainerOptions.HasValue(), {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing CMAF Container Options ",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        });
-
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturn(containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size() == kMaxCENCKeyLength, {
-                ChipLogError(
-                    Zcl,
-                    "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key constraint Error, actual length: %ld not "
-                    "equal to expected length of 16",
-                    AttributeAccessInterface::GetEndpointId().Value(),
-                    containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            });
-        }
-
-        if (mFeatures.Has(Feature::kMetadata))
-        {
-            VerifyOrReturn(containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue(), {
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing CMAF Container Options MetadataEnabled ",
-                             AttributeAccessInterface::GetEndpointId().Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            });
-        }
-
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturn(containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), {
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing CMAF Container Options CENC Key ID ",
-                             AttributeAccessInterface::GetEndpointId().Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            });
-
-            VerifyOrReturn(containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size() == kMaxCENCKeyIDLength, {
-                ChipLogError(Zcl,
-                             "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key ID constraint Error, actual "
-                             "length: %ld not equal to expected length of 16",
-                             AttributeAccessInterface::GetEndpointId().Value(),
-                             containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            });
-        }
-    }
 
     bool isFormatSupported = false;
 
@@ -777,120 +816,12 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
     auto & transportOptions = commandData.transportOptions;
 
     // Contraints check on incoming transport Options
+    Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
 
-    VerifyOrReturn(transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid streamUsage ",
+    VerifyOrReturn(transportOptionsValidityStatus == Status::Success, {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TransportOptions of command data is not Valid",
                      AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-    });
-
-    VerifyOrReturn(transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(), {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing videoStreamID and audioStreamID",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-    });
-
-    VerifyOrReturn(transportOptions.url.size() <= 2000, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing videoStreamID and audioStreamID",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
-
-    auto & triggerOptions = transportOptions.triggerOptions;
-
-    VerifyOrReturn(triggerOptions.triggerType != TransportTriggerTypeEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid triggerType ",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-    });
-
-    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
-    {
-        VerifyOrReturn(triggerOptions.motionZones.HasValue(), {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing motion zones ",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        });
-
-        if (triggerOptions.motionZones.Value().IsNull() == false)
-        {
-            auto & motionZonesList = triggerOptions.motionZones;
-            auto iter              = motionZonesList.Value().Value().begin();
-
-            while (iter.Next())
-            {
-                auto & transportZoneOption = iter.GetValue();
-
-                if (mFeatures.Has(Feature::kPerZoneSensitivity))
-                {
-                    VerifyOrReturn(transportZoneOption.sensitivity.HasValue(), {
-                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Zone Sensitivity ",
-                                     AttributeAccessInterface::GetEndpointId().Value());
-                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                    });
-
-                    VerifyOrReturn(transportZoneOption.sensitivity.Value() >= 1 && transportZoneOption.sensitivity.Value() <= 10, {
-                        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Zone Sensitivity Constraint Error",
-                                     AttributeAccessInterface::GetEndpointId().Value());
-                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                    });
-                }
-            }
-            if (iter.GetStatus() != CHIP_NO_ERROR)
-            {
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                return;
-            }
-        }
-
-        if (mFeatures.Has(Feature::kPerZoneSensitivity) == false)
-        {
-            VerifyOrReturn(triggerOptions.motionSensitivity.HasValue(), {
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Motion Sensitivity ",
-                             AttributeAccessInterface::GetEndpointId().Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            });
-            VerifyOrReturn(
-                triggerOptions.motionSensitivity.Value().Value() >= 1 && triggerOptions.motionSensitivity.Value().Value() <= 10, {
-                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Motion Sensitivity Constraint Error",
-                                 AttributeAccessInterface::GetEndpointId().Value());
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                });
-        }
-
-        VerifyOrReturn(triggerOptions.motionTimeControl.HasValue(), {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Motion Time Control ",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        });
-
-        VerifyOrReturn(triggerOptions.motionTimeControl.Value().initialDuration >= 1, {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Motion Time Control (InitialDuration) Constraint Error",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        });
-
-        VerifyOrReturn(triggerOptions.motionTimeControl.Value().maxDuration >= 1, {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Motion Time Control (MaxDuration) Constraint Error",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        });
-    }
-
-    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
-        triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand)
-    {
-        VerifyOrReturn(triggerOptions.maxPreRollLen.HasValue(), {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Missing Max Pre Roll Len field ",
-                         AttributeAccessInterface::GetEndpointId().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        });
-    }
-
-    VerifyOrReturn(transportOptions.ingestMethod != IngestMethodsEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method ",
-                     AttributeAccessInterface::GetEndpointId().Value());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, transportOptionsValidityStatus);
     });
 
     FabricIndex fabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
@@ -923,7 +854,7 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
         return;
     }
     // Call the delegate
-    status = mDelegate.ModifyPushTransport(connectionID, transportOptions);
+    status = mDelegate.ModifyPushTransport(connectionID, *transportOptionsPtr);
 
     if (status == Status::Success)
     {
@@ -1080,7 +1011,7 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
 
     if (status == Status::Success)
     {
-        mDelegate.GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason));
+        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason));
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -1140,9 +1071,9 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-Status PushAvStreamTransportDelegate::GeneratePushTransportBeginEvent(const uint16_t connectionID,
-                                                                      const TransportTriggerTypeEnum triggerType,
-                                                                      const Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServer::GeneratePushTransportBeginEvent(const uint16_t connectionID,
+                                                                    const TransportTriggerTypeEnum triggerType,
+                                                                    const Optional<TriggerActivationReasonEnum> activationReason)
 {
     Events::PushTransportBegin::Type event;
     EventNumber eventNumber;
@@ -1151,19 +1082,19 @@ Status PushAvStreamTransportDelegate::GeneratePushTransportBeginEvent(const uint
     event.triggerType      = triggerType;
     event.activationReason = activationReason;
 
-    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    CHIP_ERROR err = LogEvent(event, AttributeAccessInterface::GetEndpointId().Value(), eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Endpoint %d - Unable to generate PushAVTransportBegin event: %" CHIP_ERROR_FORMAT, mEndpointId,
-                     err.Format());
+        ChipLogError(AppServer, "Endpoint %d - Unable to generate PushAVTransportBegin event: %" CHIP_ERROR_FORMAT,
+                     AttributeAccessInterface::GetEndpointId().Value(), err.Format());
         return Status::Failure;
     }
     return Status::Success;
 }
 
-Status PushAvStreamTransportDelegate::GeneratePushTransportEndEvent(const uint16_t connectionID,
-                                                                    const TransportTriggerTypeEnum triggerType,
-                                                                    const Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServer::GeneratePushTransportEndEvent(const uint16_t connectionID,
+                                                                  const TransportTriggerTypeEnum triggerType,
+                                                                  const Optional<TriggerActivationReasonEnum> activationReason)
 {
     Events::PushTransportEnd::Type event;
     EventNumber eventNumber;
@@ -1172,11 +1103,11 @@ Status PushAvStreamTransportDelegate::GeneratePushTransportEndEvent(const uint16
     event.triggerType      = triggerType;
     event.activationReason = activationReason;
 
-    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    CHIP_ERROR err = LogEvent(event, AttributeAccessInterface::GetEndpointId().Value(), eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Endpoint %d - Unable to generate PushAVTransportEnd event: %" CHIP_ERROR_FORMAT, mEndpointId,
-                     err.Format());
+        ChipLogError(AppServer, "Endpoint %d - Unable to generate PushAVTransportEnd event: %" CHIP_ERROR_FORMAT,
+                     AttributeAccessInterface::GetEndpointId().Value(), err.Format());
         return Status::Failure;
     }
     return Status::Success;

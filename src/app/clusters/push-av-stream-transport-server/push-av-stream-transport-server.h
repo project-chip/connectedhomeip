@@ -29,6 +29,7 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
+static constexpr size_t kMinUrlLength       = 13u;
 static constexpr size_t kMaxUrlLength       = 2000u;
 static constexpr size_t kMaxCENCKeyLength   = 16u;
 static constexpr size_t kMaxCENCKeyIDLength = 16u;
@@ -458,7 +459,6 @@ public:
      *   @return Success if the allocation is successful and a PushTransportConnectionID was produced; otherwise, the command SHALL
      *   be rejected with Failure.
      *
-
      *   The delegate is expected to process the transport following transport options: URL :  Validate the URL
      *   StreamUsage,VideoStreamID,AudioStreamID for selection of Stream.
      *
@@ -488,13 +488,13 @@ public:
      *
      *   The buffers storing URL, Trigger Options, Motion Zones, Container Options is owned by the PushAVStreamTransport Server.
      *
-     *   The allocated buffers are cleared and reassigned on success of ModifyPushTransport and deallocated on success of
-     *   DeallocatePushTransport.
+     *   The allocated buffers are cleared and reassigned to modified transportOptions on success of ModifyPushTransport and
+     *   deallocated on success of DeallocatePushTransport.
      *
      *   @return Success if the stream transport modification is successful; otherwise, the command SHALL be rejected with Failure.
      */
-    virtual Protocols::InteractionModel::Status
-    ModifyPushTransport(const uint16_t connectionID, const Structs::TransportOptionsStruct::DecodableType transportOptions) = 0;
+    virtual Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
+                                                                    const TransportOptionsStorage transportOptions) = 0;
 
     /**
      *   @brief Handle Command Delegate for Stream transport modification.
@@ -648,14 +648,6 @@ public:
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
-    // Send Push AV Stream Transport events
-    Protocols::InteractionModel::Status
-    GeneratePushTransportBeginEvent(const uint16_t connectionID, const TransportTriggerTypeEnum triggerType,
-                                    const Optional<TriggerActivationReasonEnum> activationReason);
-    Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID,
-                                                                      const TransportTriggerTypeEnum triggerType,
-                                                                      const Optional<TriggerActivationReasonEnum> activationReason);
-
 protected:
     EndpointId mEndpointId = 0;
 };
@@ -691,6 +683,14 @@ public:
     void Shutdown();
 
     bool HasFeature(Feature feature) const;
+
+    // Send Push AV Stream Transport events
+    Protocols::InteractionModel::Status
+    GeneratePushTransportBeginEvent(const uint16_t connectionID, const TransportTriggerTypeEnum triggerType,
+                                    const Optional<TriggerActivationReasonEnum> activationReason);
+    Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID,
+                                                                      const TransportTriggerTypeEnum triggerType,
+                                                                      const Optional<TriggerActivationReasonEnum> activationReason);
 
 private:
     enum class UpsertResultEnum : uint8_t
@@ -744,6 +744,9 @@ private:
     UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStorage & transportConfiguration);
 
     void RemoveStreamTransportConnection(const uint16_t connectionID);
+
+    Protocols::InteractionModel::Status
+    ValidateIncomingTransportOptions(const Structs::TransportOptionsStruct::DecodableType & transportOptions);
 
     static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
 
