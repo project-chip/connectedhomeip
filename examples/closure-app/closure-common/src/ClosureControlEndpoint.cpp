@@ -138,6 +138,7 @@ CHIP_ERROR PrintOnlyDelegate::HandleEventTrigger(uint64_t eventTrigger)
         break;
     case ClosureControlTestEventTrigger::kClearEvent:
         // TODO
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
         break;
     default:
         err = CHIP_ERROR_INVALID_ARGUMENT;
