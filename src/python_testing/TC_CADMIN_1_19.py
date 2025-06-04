@@ -39,11 +39,7 @@ from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
 
-class TC_CADMIN_1_19(MatterBaseTest):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.support = CADMINSupport(self)
-
+class TC_CADMIN_1_19(CADMINSupport):
     def steps_TC_CADMIN_1_19(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
@@ -91,7 +87,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
         self.step(3)
-        fabrics = await self.support.get_fabrics(th=self.th1)
+        fabrics = await self.get_fabrics(th=self.th1)
         initial_number_of_fabrics = len(fabrics)
 
         self.step(4)

@@ -1745,8 +1745,19 @@ def _find_test_class():
     Raises:
       SystemExit: Raised if the number of test classes is not exactly one.
     """
-    subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
-    subclasses = [c for c in subclasses if c.__name__ != "MatterBaseTest"]
+    def get_subclasses(cls: Any):
+        subclasses = utils.find_subclasses_in_module([cls], sys.modules['__main__'])
+        subclasses = [c for c in subclasses if c.__name__ != cls.__name__]
+        print(f'subclasses of {cls} : {subclasses}')
+        return subclasses
+
+    def has_subclasses(cls: Any):
+        return get_subclasses(cls) != []
+
+    subclasses_matter_test_base = get_subclasses(MatterBaseTest)
+    subclasses = [s for s in subclasses_matter_test_base if not has_subclasses(s)]
+    print(f'subclasses: {subclasses}')
+
     if len(subclasses) != 1:
         print(
             'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %

@@ -44,11 +44,7 @@ from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
 
-class TC_CADMIN_1_22_24(MatterBaseTest):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.support = CADMINSupport(self)
-
+class TC_CADMIN_1_22_24(CADMINSupport):
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
             params = await self.th1.OpenCommissioningWindow(
@@ -93,7 +89,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         sleep(1)
 
         self.step(4)
-        window_status = await self.support.get_window_status(th=self.th1)
+        window_status = await self.get_window_status(th=self.th1)
         asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 
@@ -111,7 +107,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                                  "Expected to error as we provided failure value for opening commissioning window")
 
         self.step(6)
-        window_status2 = await self.support.get_window_status(th=self.th1)
+        window_status2 = await self.get_window_status(th=self.th1)
         asserts.assert_equal(window_status2, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 
@@ -149,9 +145,9 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         # TODO: Issue noticed when initially attempting to check window status after waiting for timeout to occur, issue is detailed here: https://github.com/project-chip/connectedhomeip/issues/35983
         # Workaround in place below until above issue resolved
         try:
-            window_status = await self.support.get_window_status(th=self.th1)
+            window_status = await self.get_window_status(th=self.th1)
         except asyncio.CancelledError:
-            window_status = await self.support.get_window_status(th=self.th1)
+            window_status = await self.get_window_status(th=self.th1)
 
         asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
@@ -170,7 +166,7 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                                  "Expected to error as we provided failure value for opening commissioning window")
 
         self.step(6)
-        window_status2 = await self.support.get_window_status(th=self.th1)
+        window_status2 = await self.get_window_status(th=self.th1)
         asserts.assert_equal(window_status2, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 
