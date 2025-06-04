@@ -41,7 +41,7 @@ else:
 mcuboot_hex = intelhex.IntelHex()
 mcuboot_hex.fromfile(mcuboot_hex_file, format='hex')
 
-#MCUBoot image has a very large address range due to the CCFG - we can allow the Matter Image to overlap with the MCUBoot image
+# MCUBoot image has a very large address range due to the CCFG - we can allow the Matter Image to overlap with the MCUBoot image
 ota_image.merge(mcuboot_hex, overlap='ignore')
 
 ota_image.tofile(combined_hex, format='hex')
