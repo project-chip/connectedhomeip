@@ -25,14 +25,13 @@
 
 #include "InteractionModelEngine.h"
 
-#include <cinttypes>
-
 #include <access/AccessRestrictionProvider.h>
 #include <access/Privilege.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/EventPathParams.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -52,6 +51,8 @@
 #include <lib/support/FibonacciUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <cinttypes>
 
 namespace chip {
 namespace app {
@@ -137,12 +138,41 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
     return false;
 }
 
+/// Checks if the given path/attributeId, entry are ACL-accessible
+/// for the given subject descriptor
+///
+/// `attributeId` may be kInvalidAttributeId to signify wildcard permission check
+/// on the underlying cluster
+bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const AttributeId attributeId,
+                           const Access::SubjectDescriptor & subjectDescriptor,
+                           const std::optional<DataModel::AttributeEntry> & entry)
+{
+    if (!entry.has_value() || !entry->GetReadPrivilege().has_value())
+    {
+        // Entry must be valid and be readable to begin with
+        return false;
+    }
+
+    // leave requestPath.entityId optional value unset to indicate wildcard
+    Access::RequestPath requestPath{ .cluster     = path.mClusterId,
+                                     .endpoint    = path.mEndpointId,
+                                     .requestType = Access::RequestType::kAttributeReadRequest };
+
+    if (attributeId != kInvalidAttributeId)
+    {
+        requestPath.entityId = attributeId;
+    }
+
+    return (Access::GetAccessControl().Check(subjectDescriptor, requestPath, *entry->GetReadPrivilege()) == CHIP_NO_ERROR);
+}
+
 } // namespace
 
 class AutoReleaseSubscriptionInfoIterator
 {
 public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) :
+        mIterator(iterator) {};
     ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
 
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
@@ -619,17 +649,8 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             // AttributePathExpandIterator. So we just need to check the ACL bits.
             while (pathIterator.Next(readPath, &entry))
             {
-                if (!entry.has_value() || !entry->GetReadPrivilege().has_value())
-                {
-                    // Entry must be valid and be readable to begin with
-                    continue;
-                }
-                // leave requestPath.entityId optional value unset to indicate wildcard
-                Access::RequestPath requestPath{ .cluster     = readPath.mClusterId,
-                                                 .endpoint    = readPath.mEndpointId,
-                                                 .requestType = Access::RequestType::kAttributeReadRequest };
-                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, *entry->GetReadPrivilege());
-                if (err == CHIP_NO_ERROR)
+                // use wildcard attribute ID for permission check...
+                if (IsAccessibleAttributeEntry(readPath, kInvalidAttributeId, aSubjectDescriptor, entry))
                 {
                     aHasValidAttributePath = true;
                     break;
@@ -643,18 +664,9 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 
             std::optional<DataModel::AttributeEntry> entry = FindAttributeEntry(concretePath);
 
-            if (entry.has_value() && entry->GetReadPrivilege().has_value())
+            if (IsAccessibleAttributeEntry(concretePath, paramsList.mValue.mAttributeId, aSubjectDescriptor, entry))
             {
-                Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
-                                                 .endpoint    = concretePath.mEndpointId,
-                                                 .requestType = Access::RequestType::kAttributeReadRequest,
-                                                 .entityId    = paramsList.mValue.mAttributeId };
-
-                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, *entry->GetReadPrivilege());
-                if (err == CHIP_NO_ERROR)
-                {
-                    aHasValidAttributePath = true;
-                }
+                aHasValidAttributePath = true;
             }
         }
 
