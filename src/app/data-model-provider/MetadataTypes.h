@@ -112,7 +112,7 @@ enum class AttributeQualityFlags : uint32_t
 
 struct EventEntry
 {
-    Access::Privilege readPrivilege; // Required read access to read this event
+    Access::Privilege readPrivilege; // Required access level to read this event
 };
 
 struct AttributeEntry
