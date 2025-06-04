@@ -60,7 +60,7 @@ Input Options:
   -g, --gn_args ARGS                                        Additional verbatim arguments to pass to the gn command.
                                                             May be specified multiple times.
   -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=true)
-  -p, --enable_wifi_paf     <true/false                     Enable Wi-Fi PAF discovery in the controller (default=true)
+  -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=true)
   -4, --enable_ipv4         <true/false>                    Enable IPv4 in the controller (default=false)
   -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
                                                             By default it is false.
