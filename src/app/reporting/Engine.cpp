@@ -266,18 +266,26 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
     err = provider->EventInfo(path, eventInfo);
     if (err != CHIP_NO_ERROR)
     {
-        outStatus = StatusIB(err);
-        return CHIP_NO_ERROR;
+        // cannot get event data to validate. Event is not supported.
+        // we still fall through into "ValidateClusterPath" to try to return a `better code`
+        // (i.e. say invalid endpoint or cluser), however if path seems ok we will
+        // return unsupported event as we failed to get event metadata.
+        outStatus = StatusIB(Status::UnsupportedEvent);
     }
-
-    requestPath.entityId = path.mEventId;
-
-    err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
-    if (IsTranslatableAclError(path, err, outStatus))
+    else
     {
-        return CHIP_NO_ERROR;
+        // set up the status as "OK" as long as validation below works
+        outStatus = StatusIB(Status::Success);
+
+        requestPath.entityId = path.mEventId;
+
+        err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
+        if (IsTranslatableAclError(path, err, outStatus))
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
     }
-    ReturnErrorOnFailure(err);
 
     Status status = DataModel::ValidateClusterPath(provider, path, Status::Success);
     if (status != Status::Success)
@@ -287,7 +295,7 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         return CHIP_NO_ERROR;
     }
 
-    outStatus = StatusIB(Status::Success);
+    // Status set above: could be success, but also UnsupportedEvent
     return CHIP_NO_ERROR;
 }
 
