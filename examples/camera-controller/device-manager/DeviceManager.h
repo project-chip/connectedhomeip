@@ -67,11 +67,19 @@ public:
 
     void StopVideoStreamProcess(uint16_t streamID);
 
+    /**
+     * @brief Callback invoked when WebRTC session is established
+     *
+     * @param streamId The video stream ID for which the session was established
+     */
+    void OnWebRTCSessionEstablished(uint16_t streamId);
+
 private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
     chip::NodeId mNodeId                                 = chip::kUndefinedNodeId;
     uint8_t mStreamUsage                                 = 0;
     std::map<uint16_t, pid_t> mVideoStreamProcesses; // Stream ID -> Process ID mapping
+    uint16_t mPendingVideoStreamId = 0;              // Track the stream ID we're setting up
 
     AVStreamManagement mAVStreamManagment;
 

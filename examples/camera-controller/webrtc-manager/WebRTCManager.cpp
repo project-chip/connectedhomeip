@@ -241,8 +241,18 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         ChipLogProgress(Camera, "%s", candidateStr.c_str());
     });
 
-    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
+    mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
         ChipLogProgress(Camera, "[PeerConnection State: %s]", GetPeerConnectionStateStr(state));
+
+        // Check if the session is now established (connected)
+        if (state == rtc::PeerConnection::State::Connected)
+        {
+            // Call the callback to notify DeviceManager
+            if (mSessionEstablishedCallback && mCurrentVideoStreamId != 0)
+            {
+                mSessionEstablishedCallback(mCurrentVideoStreamId);
+            }
+        }
     });
 
     mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
@@ -287,6 +297,13 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
     {
         ChipLogError(Camera, "No local SDP to send");
         return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Store the stream ID for the callback
+    if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
+    {
+        mCurrentVideoStreamId = videoStreamId.Value().Value();
+        ChipLogProgress(Camera, "Tracking stream ID %u for WebRTC session", mCurrentVideoStreamId);
     }
 
     CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage,

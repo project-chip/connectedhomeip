@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <functional>
 #include <platform/CHIPDeviceLayer.h>
 #include <rtc/rtc.hpp>
 #include <webrtc-manager/WebRTCProviderClient.h>
@@ -27,8 +28,9 @@
 class WebRTCManager
 {
 public:
-    using ICECandidateStruct = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-    using StreamUsageEnum    = chip::app::Clusters::Globals::StreamUsageEnum;
+    using ICECandidateStruct         = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using StreamUsageEnum            = chip::app::Clusters::Globals::StreamUsageEnum;
+    using SessionEstablishedCallback = std::function<void(uint16_t streamId)>;
 
     static WebRTCManager & Instance()
     {
@@ -37,6 +39,13 @@ public:
     }
 
     void Init();
+
+    /**
+     * @brief Set callback to be invoked when WebRTC session is established
+     *
+     * @param callback Function to call when session is established
+     */
+    void SetSessionEstablishedCallback(SessionEstablishedCallback callback) { mSessionEstablishedCallback = callback; }
 
     CHIP_ERROR HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args);
 
@@ -75,4 +84,10 @@ private:
     std::vector<std::string> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
+
+    // Callback to notify when session is established
+    SessionEstablishedCallback mSessionEstablishedCallback;
+
+    // Track the current video stream ID for the session
+    uint16_t mCurrentVideoStreamId = 0;
 };

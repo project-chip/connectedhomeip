@@ -65,6 +65,10 @@ CHIP_ERROR DeviceManager::Init(Controller::DeviceCommissioner * commissioner)
     mCommissioner = commissioner;
     mAVStreamManagment.Init(commissioner);
 
+    // Register callback for WebRTC session establishment
+    WebRTCManager::Instance().SetSessionEstablishedCallback(
+        [this](uint16_t streamId) { this->OnWebRTCSessionEstablished(streamId); });
+
     return CHIP_NO_ERROR;
 }
 
@@ -149,6 +153,9 @@ void DeviceManager::HandleVideoStreamAllocateResponse(TLV::TLVReader & data)
     ChipLogProgress(Camera, "DecodableType fields:");
     ChipLogProgress(Camera, "  videoStreamId: %u", value.videoStreamID);
 
+    // Store the stream ID we're setting up
+    mPendingVideoStreamId = value.videoStreamID;
+
     InitiateWebRTCSession(value.videoStreamID);
 }
 
@@ -177,6 +184,18 @@ void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to provide an offer. Error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void DeviceManager::OnWebRTCSessionEstablished(uint16_t streamId)
+{
+    ChipLogProgress(Camera, "WebRTC session established for stream ID: %u", streamId);
+
+    // Verify this matches our pending stream
+    if (streamId == mPendingVideoStreamId)
+    {
+        StartVideoStreamProcess(streamId);
+        mPendingVideoStreamId = 0;
     }
 }
 
