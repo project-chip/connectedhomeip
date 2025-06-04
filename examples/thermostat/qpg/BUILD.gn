@@ -76,6 +76,7 @@ qpg_executable("thermostat") {
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/qpg_sdk:qpg_thermostat_factorydata",
     "${chip_root}/third_party/qpg_sdk:qpg_thermostat_firmwaredata_lib",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-fault-listener",
   ]
 
   if (chip_openthread_ftd) {

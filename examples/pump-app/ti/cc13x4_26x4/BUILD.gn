@@ -88,7 +88,10 @@ ti_simplelink_executable("pump_app") {
     "${project_dir}/main/main.cpp",
   ]
 
-  public = [ "${chip_root}/src/platform/ti/cc13xx_26xx/DefaultTestEventTriggerDelegate.h" ]
+  public = [ 
+    "${chip_root}/src/platform/ti/cc13xx_26xx/DefaultTestEventTriggerDelegate.h",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-fault-listener",
+  ]
 
   deps = [
     ":sdk",

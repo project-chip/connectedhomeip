@@ -97,6 +97,7 @@ ti_simplelink_executable("pump_controller_app") {
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/openthread:openthread",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-fault-listener",
   ]
   defines = []
   if (custom_factory_data) {
