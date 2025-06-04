@@ -1972,7 +1972,6 @@ endpoint 1 {
     persist  attribute effectiveOperationMode default = 0;
     persist  attribute effectiveControlMode default = 0;
     ram      attribute capacity;
-    ram      attribute speed default = 1000;
     persist  attribute operationMode default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
