@@ -195,8 +195,6 @@ public:
 
 private:
     bool _IsWiFiInterfaceEnabled() CHIP_REQUIRES(mWpaSupplicantMutex);
-    void _ConnectWiFiNetworkAsyncDone(GObject * sourceObject, GAsyncResult * res);
-    CHIP_ERROR _ConnectWiFiNetworkAsyncImpl();
     CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
