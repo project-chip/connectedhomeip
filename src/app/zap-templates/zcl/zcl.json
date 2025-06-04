@@ -3,7 +3,10 @@
     "category": "matter",
     "version": 1,
     "requiredFeatureLevel": 102,
-    "xmlRoot": [".", "./data-model/chip"],
+    "xmlRoot": [
+        ".",
+        "./data-model/chip"
+    ],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -150,9 +153,15 @@
     "manufacturersXml": "./data-model/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
+            "defaultResponsePolicy": [
+                "Always",
+                "Conditional",
+                "Never"
+            ]
         },
-        "bool": ["commandDiscovery"]
+        "bool": [
+            "commandDiscovery"
+        ]
     },
     "defaults": {
         "text": {
@@ -199,9 +208,18 @@
             "SpecificationVersion",
             "MaxPathsPerInvoke"
         ],
-        "Bridged Device Basic Information": ["ProductAppearance"],
-        "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
+        "Bridged Device Basic Information": [
+            "ProductAppearance"
+        ],
+        "Chime": [
+            "SelectedChime",
+            "Enabled"
+        ],
+        "Closure Control": [
+            "CountdownTime",
+            "OverallState",
+            "OverallTarget"
+        ],
         "Closure Dimension": [
             "CurrentState",
             "Target",
@@ -222,7 +240,10 @@
             "CurrentDayEntry",
             "NextDayEntry"
         ],
-        "Descriptor": ["ClusterRevision", "FeatureMap"],
+        "Descriptor": [
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Device Energy Management": [
             "ESAType",
             "ESACanGenerate",
@@ -274,7 +295,11 @@
             "SessionEnergyDischarged",
             "FeatureMap"
         ],
-        "Energy EVSE Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Energy EVSE Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -321,7 +346,9 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Joint Fabric Datastore": ["Status"],
+        "Joint Fabric Datastore": [
+            "Status"
+        ],
         "Meter Identification": [
             "MeterType",
             "PointOfDelivery",
@@ -447,14 +474,21 @@
             "CurrentMaxRate",
             "OverrunCount"
         ],
-        "Channel": ["Lineup", "CurrentChannel"],
+        "Channel": [
+            "Lineup",
+            "CurrentChannel"
+        ],
         "Media Playback": [
             "SampledPosition",
             "ActiveAudioTrack",
             "ActiveTextTrack"
         ],
-        "Application Launcher": ["CurrentApp"],
-        "Application Basic": ["Application"],
+        "Application Launcher": [
+            "CurrentApp"
+        ],
+        "Application Basic": [
+            "Application"
+        ],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
@@ -466,9 +500,19 @@
             "TimeZoneListMaxSize",
             "DSTOffsetListMaxSize"
         ],
-        "Temperature Control": ["SupportedTemperatureLevels"],
-        "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Temperature Control": [
+            "SupportedTemperatureLevels"
+        ],
+        "Dishwasher Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
+        "Microwave Oven Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
         "Microwave Oven Control": [
             "CookTime",
             "MaxCookTime",
@@ -481,14 +525,26 @@
             "WattRating",
             "FeatureMap"
         ],
-        "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Laundry Washer Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
             "FeatureMap"
         ],
-        "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "RVC Clean Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
+        "RVC Run Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
         "Operational State": [
             "OperationalState",
             "OperationalError",
@@ -665,7 +721,10 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": ["AirQuality", "FeatureMap"],
+        "Air Quality": [
+            "AirQuality",
+            "FeatureMap"
+        ],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
@@ -703,9 +762,15 @@
             "NeutralCurrent",
             "FeatureMap"
         ],
-        "Power Topology": ["FeatureMap"],
-        "Valve Configuration and Control": ["RemainingDuration"],
-        "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Power Topology": [
+            "FeatureMap"
+        ],
+        "Valve Configuration and Control": [
+            "RemainingDuration"
+        ],
+        "Boolean State Configuration": [
+            "CurrentSensitivityLevel"
+        ],
         "Water Heater Management": [
             "HeaterTypes",
             "HeatDemand",
@@ -716,32 +781,83 @@
             "FeatureMap",
             "ClusterRevision"
         ],
-        "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
+        "Water Heater Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
+        "Wi-Fi Network Management": [
+            "SSID",
+            "PassphraseSurrogate"
+        ],
         "Thread Network Directory": [
             "PreferredExtendedPanID",
             "ThreadNetworks",
             "ThreadNetworkTableSize"
         ],
-        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
+        "Service Area": [
+            "CurrentArea",
+            "EstimatedEndTime",
+            "FeatureMap"
+        ],
         "Camera AV Stream Management": [
             "VideoSensorParams",
             "MinViewport",
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
-            "Viewport"
+            "Viewport",
+            "MaxConcurrentEncoders",
+            "MaxEncodedPixelRate",
+            "NightVisionUsesInfrared",
+            "MaxContentBufferSize",
+            "TwoWayTalkSupport",
+            "MaxNetworkBandwidth",
+            "CurrentFrameRate",
+            "HDRModeEnabled",
+            "SoftRecordingPrivacyModeEnabled",
+            "SoftLivestreamPrivacyModeEnabled",
+            "HardPrivacyModeOn",
+            "NightVision",
+            "NightVisionIllum",
+            "SpeakerMuted",
+            "SpeakerVolumeLevel",
+            "SpeakerMaxLevel",
+            "SpeakerMinLevel",
+            "MicrophoneMuted",
+            "MicrophoneVolumeLevel",
+            "MicrophoneMaxLevel",
+            "MicrophoneMinLevel",
+            "MicrophoneAGCEnabled",
+            "ImageRotation",
+            "ImageFlipHorizontal",
+            "ImageFlipVertical",
+            "LocalVideoRecordingEnabled",
+            "LocalSnapshotRecordingEnabled",
+            "StatusLightEnabled",
+            "StatusLightBrightness"
         ],
-        "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Camera AV Settings User Level Management": [
+            "MPTZPosition"
+        ],
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
             "SoilMoistureMeasuredValue",
             "ClusterRevision"
         ],
-        "Unit Localization": ["TemperatureUnit"]
+        "Unit Localization": [
+            "TemperatureUnit"
+        ]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
+    "ZCLDataTypes": [
+        "ARRAY",
+        "BITMAP",
+        "ENUM",
+        "NUMBER",
+        "STRING",
+        "STRUCT"
+    ],
     "fabricHandling": {
         "automaticallyCreateFields": true,
         "indexFieldId": 254,
