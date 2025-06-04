@@ -44,7 +44,7 @@ chip_enable_icd_dsls = true
 
 In addition, various ICD parameters such as idle/active mode duration, active
 mode threshold, and polling intervals can be configured in
-`src/platform//ti/cc13xx_26xx/cc13x4_26x4/CHIPPlatformConfig.h`
+`src/platform/ti/cc13xx_26xx/cc13x4_26x4/CHIPPlatformConfig.h`
 
 ```
 #define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 1000

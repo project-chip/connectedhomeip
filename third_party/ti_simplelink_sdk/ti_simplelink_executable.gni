@@ -333,6 +333,7 @@ template("ti_simplelink_executable") {
           "-T" + rebase_path(ldscript, root_build_dir),
         ]
 
+        # We do not want to modify third party code, so we are adding this flag to suppress the warnings coming from it
         cflags_c = [ "-Wno-incompatible-pointer-types" ]
       }
 
