@@ -51,8 +51,36 @@ public:
     class ScopedConfigurationVersionUpdater
     {
     public:
-        ScopedConfigurationVersionUpdater(ProviderMetadataTree * parentTree) { mParentTree = parentTree; }
-        ~ScopedConfigurationVersionUpdater() { mParentTree->Internal_BumpNodeDataModelConfigurationVersion(); };
+        explicit ScopedConfigurationVersionUpdater(ProviderMetadataTree * parentTree) : mParentTree(parentTree) {}
+
+        ~ScopedConfigurationVersionUpdater()
+        {
+            if (mParentTree)
+            {
+                mParentTree->Internal_BumpNodeDataModelConfigurationVersion();
+            }
+        };
+
+        // No copying for move-only.
+        ScopedConfigurationVersionUpdater(const ScopedConfigurationVersionUpdater &)             = delete;
+        ScopedConfigurationVersionUpdater & operator=(const ScopedConfigurationVersionUpdater &) = delete;
+
+        // Move constructor makes prior handle unusable.
+        ScopedConfigurationVersionUpdater(ScopedConfigurationVersionUpdater && other) noexcept : mParentTree(other.mParentTree)
+        {
+            other.mParentTree = nullptr;
+        }
+
+        // Move assignment.
+        ScopedConfigurationVersionUpdater & operator=(ScopedConfigurationVersionUpdater && other) noexcept
+        {
+            if (this != &other)
+            {
+                mParentTree       = other.mParentTree;
+                other.mParentTree = nullptr;
+            }
+            return *this;
+        }
 
     private:
         ProviderMetadataTree * mParentTree;
