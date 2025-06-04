@@ -44,7 +44,8 @@ struct EndpointProviderRegistration
      */
     constexpr EndpointProviderRegistration(EndpointProviderInterface & interface,
                                            EndpointProviderRegistration * next_item = nullptr) :
-        endpointProviderInterface(&interface), next(next_item)
+        endpointProviderInterface(&interface),
+        next(next_item)
     {}
     EndpointProviderRegistration(EndpointProviderRegistration && other) = default;
 

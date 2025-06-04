@@ -132,8 +132,8 @@ SpanEndpointProvider::SpanEndpointProvider(EndpointId id, DataModel::EndpointCom
                                            Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
                                            Span<const SemanticTag> semanticTags,
                                            Span<const DataModel::DeviceTypeEntry> deviceTypes) :
-    mEndpointEntry({ id, parentId, composition }), mDeviceTypes(deviceTypes), mSemanticTags(semanticTags),
-    mClientClusters(clientClusters), mServerClusters(serverClusters)
+    mEndpointEntry({ id, parentId, composition }),
+    mDeviceTypes(deviceTypes), mSemanticTags(semanticTags), mClientClusters(clientClusters), mServerClusters(serverClusters)
 {}
 
 } // namespace app
