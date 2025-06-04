@@ -174,7 +174,8 @@ private:
      *   - invalid paths (invalid endpoint/cluster id)
      *   - failure to validate ACL (cannot fetch ACL requirement or ACL failure)
      *
-     * Returns CHIP_NO_ERROR if encoding succeeds, returns error code on a fatal error (generally failure to encode EventStatusIB values).
+     * Returns CHIP_NO_ERROR if encoding succeeds, returns error code on a fatal error (generally failure to encode EventStatusIB
+     * values).
      */
     CHIP_ERROR CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & aHasEncodedData, ReadHandler * apReadHandler);
 
