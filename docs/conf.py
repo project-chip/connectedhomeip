@@ -58,6 +58,7 @@ myst_heading_anchors = 6
 suppress_warnings = [
     "myst.header",
     "myst.anchor",
+    "myst.xref_missing",
 ]
 myst_enable_extensions = ["html_image"]
 
