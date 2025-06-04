@@ -1,0 +1,281 @@
+#include <pw_unit_test/framework.h>
+
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <data-model-providers/endpoint/SpanEndpointProvider.h>
+
+using namespace chip;
+using namespace chip::app;
+using chip::app::DataModel::DeviceTypeEntry;
+using SemanticTag = chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+
+// Mock ServerClusterInterface for testing
+class MockServerCluster : public DefaultServerCluster
+{
+public:
+    MockServerCluster(ConcreteClusterPath path, DataVersion dataVersion, BitFlags<DataModel::ClusterQualityFlags> flags) :
+        DefaultServerCluster(path), mPath(path), mDataVersion(dataVersion), mFlags(flags)
+    {}
+    ~MockServerCluster() override = default; // NOLINT(modernize-use-override)
+
+    chip::Span<const ConcreteClusterPath> GetPaths() const override { return chip::Span<const ConcreteClusterPath>(&mPath, 1); }
+    chip::DataVersion GetDataVersion(const ConcreteClusterPath &) const override { return mDataVersion; }
+    BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override { return mFlags; }
+
+    // Implement the pure virtual functions from DefaultServerCluster
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        return DataModel::ActionReturnStatus(CHIP_ERROR_NOT_IMPLEMENTED);
+    }
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override
+    {
+        return DataModel::ActionReturnStatus(CHIP_ERROR_NOT_IMPLEMENTED);
+    }
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override
+    {
+        return std::nullopt;
+    }
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<chip::CommandId> & builder) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override
+    {
+        startupCalled = true;
+        return DefaultServerCluster::Startup(context);
+    }
+
+    void Shutdown() override
+    {
+        shutdownCalled = true;
+        DefaultServerCluster::Shutdown();
+    }
+
+    bool startupCalled  = false;
+    bool shutdownCalled = false;
+
+private:
+    ConcreteClusterPath mPath;
+    DataVersion mDataVersion;
+    BitFlags<DataModel::ClusterQualityFlags> mFlags;
+};
+
+using namespace chip::app;
+
+TEST(TestSpanEndpointProvider, InstantiateDefaultConstructor)
+{
+    // Test default constructor initializes to invalid/default values
+    auto pair = SpanEndpointProvider::Builder(kInvalidEndpointId).build();
+    // Building with kInvalidEndpointId should fail, provider is default constructed
+    ASSERT_NE(pair.second, CHIP_NO_ERROR);
+    const auto & entry = pair.first.GetEndpointEntry();
+    ASSERT_EQ(entry.id, kInvalidEndpointId); // Default constructor sets ID to kInvalidEndpointId
+    ASSERT_EQ(entry.parentId, kInvalidEndpointId);
+    ASSERT_EQ(entry.compositionPattern, DataModel::EndpointCompositionPattern::kFullFamily);
+}
+
+TEST(TestSpanEndpointProvider, InstantiateWithParameters)
+{
+    // Test constructor with parameters initializes correctly
+    EndpointId id                                     = 1;
+    DataModel::EndpointCompositionPattern composition = DataModel::EndpointCompositionPattern::kTree;
+    EndpointId parentId                               = 0;
+
+    auto pair = SpanEndpointProvider::Builder(id).SetComposition(composition).SetParentId(parentId).build();
+    ASSERT_EQ(pair.second, CHIP_NO_ERROR);
+
+    const auto & provider = pair.first;
+    const auto & entry    = provider.GetEndpointEntry();
+    ASSERT_EQ(entry.id, id);
+    ASSERT_EQ(entry.parentId, parentId); // parentId is 0
+    ASSERT_EQ(entry.compositionPattern, composition);
+}
+
+TEST(TestSpanEndpointProvider, InstantiateWithAllParameters)
+{
+    EndpointId id                                     = 1;
+    DataModel::EndpointCompositionPattern composition = DataModel::EndpointCompositionPattern::kTree;
+    EndpointId parentId                               = 0;
+
+    MockServerCluster serverCluster1({ 1, 10 }, 1, {});
+    MockServerCluster serverCluster2(ConcreteClusterPath(1, 20), 1, {});
+
+    ServerClusterInterface * serverClusters[] = { &serverCluster1, &serverCluster2 };
+    const chip::ClusterId clientClusters[]    = { 10, 20 };
+    const SemanticTag semanticTags[]          = { { .mfgCode = chip::VendorId::TestVendor1, .namespaceID = 1, .tag = 1 },
+                                                  { .mfgCode = chip::VendorId::TestVendor2, .namespaceID = 2, .tag = 2 } };
+    const DeviceTypeEntry deviceTypes[]       = { { .deviceTypeId = 100, .deviceTypeRevision = 1 },
+                                                  { .deviceTypeId = 200, .deviceTypeRevision = 2 } };
+
+    auto pair = SpanEndpointProvider::Builder(id)
+                    .SetComposition(composition)
+                    .SetParentId(parentId)
+                    .SetServerClusters(Span<chip::app::ServerClusterInterface *>(serverClusters))
+                    .SetClientClusters(Span<const chip::ClusterId>(clientClusters))
+                    .SetSemanticTags(Span<const SemanticTag>(semanticTags))
+                    .SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes))
+                    .build();
+    ASSERT_EQ(pair.second, CHIP_NO_ERROR);
+
+    const auto & provider = pair.first;
+    const auto & entry    = provider.GetEndpointEntry();
+    ASSERT_EQ(entry.id, id);
+    ASSERT_EQ(entry.parentId, parentId); // parentId is 0
+    ASSERT_EQ(entry.compositionPattern, composition);
+
+    ReadOnlyBufferBuilder<chip::app::ServerClusterInterface *> serverBuilder;
+    ASSERT_EQ(provider.ServerClusterInterfaces(serverBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(serverBuilder.Size(), std::size(serverClusters));
+
+    ReadOnlyBufferBuilder<chip::ClusterId> clientBuilder;
+    ASSERT_EQ(provider.ClientClusters(clientBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(clientBuilder.Size(), std::size(clientClusters));
+
+    ReadOnlyBufferBuilder<SemanticTag> tagBuilder;
+    ASSERT_EQ(provider.SemanticTags(tagBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(tagBuilder.Size(), std::size(semanticTags));
+
+    ReadOnlyBufferBuilder<DeviceTypeEntry> deviceTypeBuilder;
+    ASSERT_EQ(provider.DeviceTypes(deviceTypeBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(deviceTypeBuilder.Size(), std::size(deviceTypes));
+}
+
+TEST(TestSpanEndpointProvider, SetAndGetServerClusters)
+{
+    MockServerCluster serverCluster1(ConcreteClusterPath(1, 1), 1, {});
+    MockServerCluster serverCluster2(ConcreteClusterPath(1, 2), 1, {});
+
+    ServerClusterInterface * serverClusters[] = { &serverCluster1, &serverCluster2 };
+
+    auto pair = SpanEndpointProvider::Builder(1).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).build();
+    ASSERT_EQ(pair.second, CHIP_NO_ERROR);
+
+    const auto & provider = pair.first;
+    ReadOnlyBufferBuilder<ServerClusterInterface *> builder;
+    ASSERT_EQ(provider.ServerClusterInterfaces(builder), CHIP_NO_ERROR);
+    auto retrievedClusters = builder.TakeBuffer();
+    ASSERT_EQ(retrievedClusters.size(), std::size(serverClusters));
+    EXPECT_EQ(retrievedClusters[0], &serverCluster1);
+    EXPECT_EQ(retrievedClusters[1], &serverCluster2);
+
+    EXPECT_EQ(provider.GetServerCluster(1), &serverCluster1);
+    EXPECT_EQ(provider.GetServerCluster(2), &serverCluster2);
+    EXPECT_EQ(provider.GetServerCluster(3), nullptr); // Non-existent
+}
+
+TEST(TestSpanEndpointProvider, SetInvalidServerClusters)
+{
+    MockServerCluster serverCluster1(ConcreteClusterPath(1, 1), 1, {});
+
+    ServerClusterInterface * serverClustersWithNull[] = { &serverCluster1, nullptr };
+    auto pair = SpanEndpointProvider::Builder(1).SetServerClusters(Span<ServerClusterInterface *>(serverClustersWithNull)).build();
+    EXPECT_EQ(pair.second, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestSpanEndpointProvider, SetAndGetClientClusters)
+{
+    const chip::ClusterId clientClusters[] = { 10, 20, 30 };
+    auto pair = SpanEndpointProvider::Builder(1).SetClientClusters(Span<const chip::ClusterId>(clientClusters)).build();
+    ASSERT_EQ(pair.second, CHIP_NO_ERROR);
+
+    const auto & provider = pair.first;
+    ReadOnlyBufferBuilder<chip::ClusterId> builder;
+    ASSERT_EQ(provider.ClientClusters(builder), CHIP_NO_ERROR);
+    auto retrievedClusters = builder.TakeBuffer();
+    ASSERT_EQ(retrievedClusters.size(), std::size(clientClusters));
+    EXPECT_TRUE(retrievedClusters.data_equal(Span<const chip::ClusterId>(clientClusters, std::size(clientClusters))));
+}
+
+TEST(TestSpanEndpointProvider, SetAndGetSemanticTags)
+{
+    const SemanticTag semanticTags[] = { { .mfgCode = chip::VendorId::TestVendor1, .namespaceID = 1, .tag = 1 },
+                                         { .mfgCode = chip::VendorId::TestVendor2, .namespaceID = 2, .tag = 2 } };
+    auto pair = SpanEndpointProvider::Builder(1).SetSemanticTags(Span<const SemanticTag>(semanticTags)).build();
+    ASSERT_EQ(pair.second, CHIP_NO_ERROR);
+
+    const auto & provider = pair.first;
+    ReadOnlyBufferBuilder<SemanticTag> builder;
+    ASSERT_EQ(provider.SemanticTags(builder), CHIP_NO_ERROR);
+    auto retrievedTags = builder.TakeBuffer();
+    ASSERT_EQ(retrievedTags.size(), std::size(semanticTags));
+    // SemanticTagStruct does not have operator== by default, manual check or compare members if needed
+    EXPECT_EQ(retrievedTags[0].mfgCode, semanticTags[0].mfgCode);
+    EXPECT_EQ(retrievedTags[1].namespaceID, semanticTags[1].namespaceID);
+}
+
+TEST(TestSpanEndpointProvider, SetAndGetDeviceTypes)
+{
+    const DeviceTypeEntry deviceTypes[] = { { .deviceTypeId = 100, .deviceTypeRevision = 1 },
+                                            { .deviceTypeId = 200, .deviceTypeRevision = 2 } };
+    auto pair = SpanEndpointProvider::Builder(1).SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes)).build();
+    ASSERT_EQ(pair.second, CHIP_NO_ERROR);
+
+    const auto & provider = pair.first;
+    ReadOnlyBufferBuilder<DeviceTypeEntry> builder;
+    ASSERT_EQ(provider.DeviceTypes(builder), CHIP_NO_ERROR);
+    auto retrievedDeviceTypes = builder.TakeBuffer();
+    ASSERT_EQ(retrievedDeviceTypes.size(), std::size(deviceTypes));
+    EXPECT_EQ(retrievedDeviceTypes[0], deviceTypes[0]);
+    EXPECT_EQ(retrievedDeviceTypes[1], deviceTypes[1]);
+}
+
+TEST(TestSpanEndpointProvider, BuildWithSpecificEndpointEntry)
+{
+    DataModel::EndpointEntry newEntry = { .id                 = 10,
+                                          .parentId           = 1,
+                                          .compositionPattern = DataModel::EndpointCompositionPattern::kTree };
+
+    auto pair = SpanEndpointProvider::Builder(newEntry.id)
+                    .SetParentId(newEntry.parentId)
+                    .SetComposition(newEntry.compositionPattern)
+                    .build();
+    ASSERT_EQ(pair.second, CHIP_NO_ERROR);
+
+    const auto & provider       = pair.first;
+    const auto & retrievedEntry = provider.GetEndpointEntry();
+    ASSERT_EQ(retrievedEntry.id, newEntry.id);
+    ASSERT_EQ(retrievedEntry.parentId, newEntry.parentId);
+    ASSERT_EQ(retrievedEntry.compositionPattern, newEntry.compositionPattern);
+}
+
+TEST(TestSpanEndpointProvider, BuildWithEmptySpans)
+{
+    auto pair = SpanEndpointProvider::Builder(1)
+                    .SetServerClusters(Span<ServerClusterInterface *>())
+                    .SetClientClusters(Span<const chip::ClusterId>())
+                    .SetSemanticTags(Span<const SemanticTag>())
+                    .SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>())
+                    .build();
+    ASSERT_EQ(pair.second, CHIP_NO_ERROR);
+    const auto & provider = pair.first;
+
+    // Test SetServerClusters with an empty span
+    ReadOnlyBufferBuilder<ServerClusterInterface *> serverBuilder;
+    ASSERT_EQ(provider.ServerClusterInterfaces(serverBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(serverBuilder.Size(), 0u);
+    ASSERT_EQ(provider.GetServerCluster(123), nullptr); // Check GetServerCluster with no clusters
+
+    // Test SetClientClusters with an empty span
+    ReadOnlyBufferBuilder<chip::ClusterId> clientBuilder;
+    ASSERT_EQ(provider.ClientClusters(clientBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(clientBuilder.Size(), 0u);
+
+    // Test SetSemanticTags with an empty span
+    ReadOnlyBufferBuilder<SemanticTag> tagBuilder;
+    ASSERT_EQ(provider.SemanticTags(tagBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(tagBuilder.Size(), 0u);
+
+    // Test SetDeviceTypes with an empty span
+    ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> deviceTypeBuilder;
+    ASSERT_EQ(provider.DeviceTypes(deviceTypeBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(deviceTypeBuilder.Size(), 0u);
+}
