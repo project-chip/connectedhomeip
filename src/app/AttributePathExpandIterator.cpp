@@ -167,7 +167,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttribute(std::optio
                 return std::nullopt;
             }
 
-            // We get here if:
+            // We get here if all the the conditions below are true:
             //   - entry is NOT valid (this is not a valid attribute)
             //   - path is NOT a wildcard (i.e. we were asked to explicitly return it)
             // as a result, we have no way to generate a "REAL" attribute metadata.
