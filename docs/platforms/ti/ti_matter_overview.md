@@ -115,13 +115,13 @@ Below are several resources available for Matter development:
 Sample Matter applications are provided for the TI platform. These can be used
 as reference for your own application.
 
-| Example                           | Device Support                                                                |
-|-----------------------------------|:-----------------------------------------------------------------------------:|
-| lighting-app                      | [CC13x4_26x4](../../../examples/lighting-app/ti/cc13x4_26x4/README.md)        |
-| light-switch-app                  | [CC13x4_26x4](../../../examples/light-switch-app/ti/cc13x4_26x4/README.md)    |
-| lock-app                          | [CC13x4_26x4](../../../examples/lock-app/ti/cc13x4_26x4/README.md)            |
-| pump-app                          | [CC13x4_26x4](../../../examples/pump-app/ti/cc13x4_26x4/README.md)            |
-| pump-controller-app               | [CC13x4_26x4](../../../examples/pump-controller-app/ti/cc13x4_26x4/README.md) |
+| Example             |                                Device Support                                 |
+| ------------------- | :---------------------------------------------------------------------------: |
+| lighting-app        |    [CC13x4_26x4](../../../examples/lighting-app/ti/cc13x4_26x4/README.md)     |
+| light-switch-app    |  [CC13x4_26x4](../../../examples/light-switch-app/ti/cc13x4_26x4/README.md)   |
+| lock-app            |      [CC13x4_26x4](../../../examples/lock-app/ti/cc13x4_26x4/README.md)       |
+| pump-app            |      [CC13x4_26x4](../../../examples/pump-app/ti/cc13x4_26x4/README.md)       |
+| pump-controller-app | [CC13x4_26x4](../../../examples/pump-controller-app/ti/cc13x4_26x4/README.md) |
 
 <hr>
 

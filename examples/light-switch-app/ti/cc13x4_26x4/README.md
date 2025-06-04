@@ -42,16 +42,15 @@ the Texas Instruments devices.
 | Right Button (`BTN-2`) Press (less than 1000 ms) | Turns connected bulb on            |
 | Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable) |
 
-When the device has LIT ICD functionality and DSLS functionality enabled 
+When the device has LIT ICD functionality and DSLS functionality enabled
 (`chip_enable_icd_lit` and `chip_enable_icd_dsls` set to true in args.gni), the
-functionality of the short button presses changes as
-described below:
+functionality of the short button presses changes as described below:
 
-| Action                                                  | Functionality                                  |
-| ------------------------------------------------------- | ---------------------------------------------- |
-| Left Button (`BTN-1`) Press (less than 1000 ms)         | User Active Mode Trigger (part of LIT support) |
-| Left Button (`BTN-1`) Double Press (less than 1000 ms)  | Dynamic Short/Long Idle Time Support           |
-| Right Button (`BTN-2`) Press (less than 1000 ms)        | Connected bulb is toggled                      |
+| Action                                                 | Functionality                                  |
+| ------------------------------------------------------ | ---------------------------------------------- |
+| Left Button (`BTN-1`) Press (less than 1000 ms)        | User Active Mode Trigger (part of LIT support) |
+| Left Button (`BTN-1`) Double Press (less than 1000 ms) | Dynamic Short/Long Idle Time Support           |
+| Right Button (`BTN-2`) Press (less than 1000 ms)       | Connected bulb is toggled                      |
 
 ## Building
 
@@ -99,15 +98,21 @@ Ninja to build the executable.
 
     ```
 
--   If building for the CC2674P10 LaunchPad, the CC1354P10-1 LaunchPad, or the CC2674R10, in `args.gni` modify the field shown below.
+-   If building for the CC2674P10 LaunchPad, the CC1354P10-1 LaunchPad, or the
+    CC2674R10, in `args.gni` modify the field shown below.
+
     ```
     ti_simplelink_board = LP_EM_CC2674P10
     ```
+
     or
+
     ```
     ti_simplelink_board = LP_EM_CC1354P10_1
     ```
+
     or
+
     ```
     ti_simplelink_board = CC2674R10
     ```

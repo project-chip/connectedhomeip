@@ -45,15 +45,15 @@ Instruments devices.
 | Red & Green LED On State                         | Pump is started                        |
 | Red & Green LED Off State                        | Pump stopped                           |
 
-When the device has LIT ICD functionality and DSLS functionality enabled 
+When the device has LIT ICD functionality and DSLS functionality enabled
 (`chip_enable_icd_lit` and `chip_enable_icd_dsls` set to true in args.gni), the
-functionality of the right button presses changes as
-described below:
+functionality of the right button presses changes as described below:
 
-| Action                                                   | Functionality                                  |
-| -------------------------------------------------------- | ---------------------------------------------- |
-| Right Button (`BTN-1`) Press (more than 1000 ms)         | User Active Mode Trigger (part of LIT support) |
-| Right Button (`BTN-1`) Double Press (less than 1000 ms)  | Dynamic Short/Long Idle Time Support           |
+| Action                                                  | Functionality                                  |
+| ------------------------------------------------------- | ---------------------------------------------- |
+| Right Button (`BTN-1`) Press (more than 1000 ms)        | User Active Mode Trigger (part of LIT support) |
+| Right Button (`BTN-1`) Double Press (less than 1000 ms) | Dynamic Short/Long Idle Time Support           |
+
 ## Building
 
 ### Preparation
@@ -100,15 +100,21 @@ Ninja to build the executable.
 
     ```
 
--   If building for the CC2674P10 LaunchPad, the CC1354P10-1 LaunchPad, or the CC2674R10, in `args.gni` modify the field shown below.
+-   If building for the CC2674P10 LaunchPad, the CC1354P10-1 LaunchPad, or the
+    CC2674R10, in `args.gni` modify the field shown below.
+
     ```
     ti_simplelink_board = LP_EM_CC2674P10
     ```
+
     or
+
     ```
     ti_simplelink_board = LP_EM_CC1354P10_1
     ```
+
     or
+
     ```
     ti_simplelink_board = CC2674R10
     ```

@@ -17,8 +17,8 @@ and set the following parameter to true:
 chip_enable_icd_server = true
 ```
 
-To enable Long Idle Time (LIT) ICD behavior, Check In Protocol Support and User Active Mode
-Trigger Support, set the following parameter to true:
+To enable Long Idle Time (LIT) ICD behavior, Check In Protocol Support and User
+Active Mode Trigger Support, set the following parameter to true:
 
 ```
 chip_enable_icd_lit = true
@@ -67,7 +67,7 @@ To enable LIT ICD behavior, set the FeatureMap to 0x0007 to enable Check-In
 Protocol Support, User Active Mode Trigger Support, and Long Idle Time Support.
 In addition, enable the UserActiveModeTriggerHint,
 UserActiveModeTriggerInstruction, and MaximumCheckInBackOff attributes, and
-enable the RegisterClient, RegisterClientSupport, `UnregisterClient`, 
+enable the RegisterClient, RegisterClientSupport, `UnregisterClient`,
 StayActiveRequest and StayActiveResponse commands in the 'Commands' tab.
 
 To enable DSLS support, change the FeatureMap to 0x000F.
