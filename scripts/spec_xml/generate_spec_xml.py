@@ -299,7 +299,7 @@ def dump_json_ids(output_dir):
     device_types_output_dir = os.path.abspath(
         os.path.join(output_dir, 'device_types'))
     clusters_json_file = os.path.join(clusters_output_dir, 'cluster_ids.json')
-    device_type_json_file = os.path.join(clusters_output_dir, 'device_type_ids.json')
+    device_type_json_file = os.path.join(device_types_output_dir, 'device_type_ids.json')
 
     clusters, _ = build_xml_clusters(Path(clusters_output_dir))
     device_types, _ = build_xml_device_types(Path(device_types_output_dir))
