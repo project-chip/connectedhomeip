@@ -685,8 +685,12 @@ class ChipDeviceControllerBase():
         '''
         Connect to a BLE device via PASE using the given discriminator and setup pin code.
 
+        Parameters:
+            discriminator (int):
+            setupPinCode (int): 
+            nodeid (int):
         Returns:
-            Effective Node ID of the device (as defined by the assigned NOC)
+            int: Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.CheckIsActive()
 
