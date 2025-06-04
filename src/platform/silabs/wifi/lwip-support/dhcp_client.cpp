@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include "lwip/opt.h"
+
 #if LWIP_IPV4 && LWIP_DHCP
 
 #include <stdio.h>
