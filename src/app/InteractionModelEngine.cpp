@@ -166,7 +166,11 @@ bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const Attribut
         requestPath.entityId = attributeId;
     }
 
-    return (Access::GetAccessControl().Check(subjectDescriptor, requestPath, *entry->GetReadPrivilege()) == CHIP_NO_ERROR);
+    // We know entry has value and GetReadPrivilege has value according to the check above
+    // the assign below is safe.
+    const Access::Privilege privilege = *entry->GetReadPrivilege(); // NOLINT(bugprone-unchecked-optional-access)
+
+    return (Access::GetAccessControl().Check(subjectDescriptor, requestPath, privilege) == CHIP_NO_ERROR);
 }
 
 } // namespace
@@ -174,7 +178,8 @@ bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const Attribut
 class AutoReleaseSubscriptionInfoIterator
 {
 public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) :
+        mIterator(iterator) {};
     ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
 
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
