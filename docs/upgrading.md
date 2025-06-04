@@ -156,7 +156,7 @@ overflow when appending a single element, this function never allocates.
 
 If the changes above are too high friction for upgrading, we provide a shim that
 allow implementing these changes with a very minimal change. It adds a little
-extra codesize compared to the code above but should be decent for most cases.
+extra code size compared to the code above but should be decent for most cases.
 
 To use this shim just replace inheriting from CommandHandlerInterface with
 inheriting from CommandHandlerInterfaceShim<> with a list of the cluster IDs
