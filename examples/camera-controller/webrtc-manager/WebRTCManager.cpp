@@ -90,12 +90,7 @@ WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicE
 
 WebRTCManager::~WebRTCManager()
 {
-    // Close the peer connection if they exist
-    if (mPeerConnection)
-    {
-        mPeerConnection->close();
-        mPeerConnection.reset();
-    }
+    Disconnect();
 }
 
 void WebRTCManager::Init()
@@ -205,10 +200,47 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vec
     return CHIP_NO_ERROR;
 }
 
+void WebRTCManager::CloseRTPSocket()
+{
+    if (mRTPSocket != -1)
+    {
+        ChipLogProgress(Camera, "Closing RTP socket");
+        close(mRTPSocket);
+        mRTPSocket = -1;
+    }
+}
+
+void WebRTCManager::Disconnect()
+{
+    ChipLogProgress(Camera, "Disconnecting WebRTC session");
+
+    // Close the peer connection
+    if (mPeerConnection)
+    {
+        mPeerConnection->close();
+        mPeerConnection.reset();
+    }
+
+    // Close the RTP socket
+    CloseRTPSocket();
+
+    // Reset track
+    mTrack.reset();
+
+    // Clear state
+    mCurrentVideoStreamId = 0;
+    mPendingSessionId     = 0;
+    mLocalDescription.clear();
+    mLocalCandidates.clear();
+}
+
 CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)
 {
     ChipLogProgress(Camera, "Attempting to establish WebRTC connection to node 0x" ChipLogFormatX64 " on endpoint 0x%x",
                     ChipLogValueX64(nodeId), endpointId);
+
+    // Clean up any existing connection first
+    Disconnect();
 
     FabricIndex fabricIndex       = commissioner.GetFabricIndex();
     const FabricInfo * fabricInfo = commissioner.GetFabricTable()->FindFabricWithIndex(fabricIndex);
@@ -253,13 +285,26 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
                 mSessionEstablishedCallback(mCurrentVideoStreamId);
             }
         }
+        else if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
+                 state == rtc::PeerConnection::State::Closed)
+        {
+            // Clean up resources when connection is lost
+            CloseRTPSocket();
+        }
     });
 
     mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
         ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
     });
 
-    int sock             = socket(AF_INET, SOCK_DGRAM, 0);
+    // Create UDP socket for RTP forwarding
+    mRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (mRTPSocket == -1)
+    {
+        ChipLogError(Camera, "Failed to create RTP socket: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
+    }
+
     sockaddr_in addr     = {};
     addr.sin_family      = AF_INET;
     addr.sin_addr.s_addr = inet_addr(kStreamGstDestIp);
@@ -274,9 +319,9 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mTrack->setMediaHandler(session);
 
     mTrack->onMessage(
-        [session, sock, addr](rtc::binary message) {
+        [this, addr](rtc::binary message) {
             // This is an RTP packet
-            sendto(sock, reinterpret_cast<const char *>(message.data()), int(message.size()), 0,
+            sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), int(message.size()), 0,
                    reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
         },
         nullptr);

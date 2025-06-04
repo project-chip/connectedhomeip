@@ -65,6 +65,11 @@ public:
 
     CHIP_ERROR ProvideICECandidates(uint16_t sessionId);
 
+    /**
+     * @brief Close the WebRTC connection and clean up resources
+     */
+    void Disconnect();
+
 private:
     // Make the constructor private to enforce the singleton pattern
     WebRTCManager();
@@ -79,8 +84,8 @@ private:
 
     uint16_t mPendingSessionId = 0;
     std::string mLocalDescription;
-    // Local vector to store the ICE Candidate strings coming from the WebRTC
-    // stack
+
+    // Local vector to store the ICE Candidate strings coming from the WebRTC stack
     std::vector<std::string> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
@@ -90,4 +95,10 @@ private:
 
     // Track the current video stream ID for the session
     uint16_t mCurrentVideoStreamId = 0;
+
+    // UDP socket for RTP forwarding
+    int mRTPSocket = -1;
+
+    // Close and reset the RTP socket
+    void CloseRTPSocket();
 };

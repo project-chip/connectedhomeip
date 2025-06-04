@@ -80,6 +80,9 @@ void DeviceManager::Shutdown()
         StopVideoStreamProcess(pair.first);
     }
     mVideoStreamProcesses.clear();
+
+    // Disconnect WebRTC session
+    WebRTCManager::Instance().Disconnect();
 }
 
 CHIP_ERROR DeviceManager::AllocateVideoStream(NodeId nodeId, uint8_t streamUsage)
@@ -117,6 +120,12 @@ CHIP_ERROR DeviceManager::DeallocateVideoStream(NodeId nodeId, uint16_t videoStr
                      "). Error: %" CHIP_ERROR_FORMAT,
                      ChipLogValueX64(nodeId), error.Format());
     }
+    else
+    {
+        // Stop the video stream process and disconnect WebRTC
+        StopVideoStreamProcess(videoStreamId);
+        WebRTCManager::Instance().Disconnect();
+    }
 
     return error;
 }
@@ -134,6 +143,14 @@ void DeviceManager::HandleCommandResponse(const app::ConcreteCommandPath & path,
     {
         HandleVideoStreamAllocateResponse(data);
     }
+}
+
+void DeviceManager::StopVideoStream(uint16_t streamId)
+{
+    // Disconnect WebRTC session
+    WebRTCManager::Instance().Disconnect();
+
+    StopVideoStreamProcess(streamId);
 }
 
 void DeviceManager::HandleVideoStreamAllocateResponse(TLV::TLVReader & data)
@@ -178,7 +195,7 @@ void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
     // Provide the offer to establish the WebRTC session
     err = WebRTCManager::Instance().ProvideOffer(app::DataModel::NullNullable,                // session ID (null)
                                                  streamUsage,                                 // stream‑usage field
-                                                 videoStreamIdOptional,                       // videoStreamID you just built
+                                                 videoStreamIdOptional,                       // videoStreamId you just built
                                                  MakeOptional(app::DataModel::NullNullable)); // audioStreamID (null)
 
     if (err != CHIP_NO_ERROR)
@@ -199,12 +216,12 @@ void DeviceManager::OnWebRTCSessionEstablished(uint16_t streamId)
     }
 }
 
-void DeviceManager::StartVideoStreamProcess(uint16_t streamID)
+void DeviceManager::StartVideoStreamProcess(uint16_t streamId)
 {
-    ChipLogProgress(Camera, "Starting video stream process for stream ID: %u", streamID);
+    ChipLogProgress(Camera, "Starting video stream process for stream ID: %u", streamId);
 
     // Terminate any previous pipeline that was bound to this stream ID
-    StopVideoStreamProcess(streamID);
+    StopVideoStreamProcess(streamId);
 
     const uint16_t udpPort    = 5000;
     const std::string portStr = "port=" + std::to_string(udpPort);
@@ -246,7 +263,7 @@ void DeviceManager::StartVideoStreamProcess(uint16_t streamID)
     else if (pid > 0)
     {
         // Parent process - store PID for later cleanup
-        mVideoStreamProcesses[streamID] = pid; // Track the real gst‑launch PID
+        mVideoStreamProcesses[streamId] = pid; // Track the real gst‑launch PID
         ChipLogProgress(Camera, "Video stream process started with PID: %d", pid);
     }
     else
@@ -256,13 +273,13 @@ void DeviceManager::StartVideoStreamProcess(uint16_t streamID)
     }
 }
 
-void DeviceManager::StopVideoStreamProcess(uint16_t streamID)
+void DeviceManager::StopVideoStreamProcess(uint16_t streamId)
 {
-    auto it = mVideoStreamProcesses.find(streamID);
+    auto it = mVideoStreamProcesses.find(streamId);
     if (it != mVideoStreamProcesses.end())
     {
         pid_t pid = it->second;
-        ChipLogProgress(Camera, "Stopping video stream process (PID: %d) for stream ID: %u", pid, streamID);
+        ChipLogProgress(Camera, "Stopping video stream process (PID: %d) for stream ID: %u", pid, streamId);
 
         // Send SIGTERM first for graceful shutdown
         if (kill(pid, SIGTERM) == 0)

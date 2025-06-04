@@ -54,10 +54,10 @@ public:
      * @brief Sends a VideoStreamDeallocate command to the device.
      *
      * @param nodeId        The node ID of the remote camera device.
-     * @param videoStreamID The VideoStreamID for the stream to be deallocated.
+     * @param videoStreamId The VideoStreamID for the stream to be deallocated.
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or an appropriate error code on failure.
      */
-    CHIP_ERROR DeallocateVideoStream(chip::NodeId nodeId, uint16_t videoStreamID);
+    CHIP_ERROR DeallocateVideoStream(chip::NodeId nodeId, uint16_t videoStreamId);
 
     void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader & data);
 
@@ -65,7 +65,7 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
-    void StopVideoStreamProcess(uint16_t streamID);
+    void StopVideoStream(uint16_t streamId);
 
     /**
      * @brief Callback invoked when WebRTC session is established
@@ -84,10 +84,9 @@ private:
     AVStreamManagement mAVStreamManagment;
 
     void HandleVideoStreamAllocateResponse(chip::TLV::TLVReader & data);
-
     void InitiateWebRTCSession(uint16_t videoStreamId);
-
-    void StartVideoStreamProcess(uint16_t streamID);
+    void StartVideoStreamProcess(uint16_t streamId);
+    void StopVideoStreamProcess(uint16_t streamId);
 };
 
 } // namespace camera
