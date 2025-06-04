@@ -50,7 +50,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13xx_26xx,bouffalolab,esp32,infineon,qpg,cc32xx,realtek_bee
+	platforms = ameba,cc13xx_26xx,bouffalolab,esp32,infineon,qpg,cc32xx,realtek
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
@@ -345,10 +345,6 @@
 	path = third_party/googletest
 	url = https://github.com/google/googletest
 	platforms = linux,android,darwin,tizen
-[submodule "third_party/re2/src"]
-	path = third_party/re2/src
-	url = https://github.com/google/re2.git
-	platforms = linux,darwin
 [submodule "third_party/libdatachannel/repo"]
 	path = third_party/libdatachannel/repo
 	url = https://github.com/paullouisageneau/libdatachannel.git
@@ -357,4 +353,4 @@
 [submodule "third_party/openthread/ot-realtek"]
 	path = third_party/openthread/ot-realtek
 	url = https://github.com/rtkconnectivity/ot-realtek.git
-	platforms = realtek_bee
+	platforms = realtek
