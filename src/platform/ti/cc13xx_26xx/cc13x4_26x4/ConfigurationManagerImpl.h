@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <platform/ti/cc13xx_26xx/CC13XX_26XXConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <platform/ti/cc13xx_26xx/CC13XX_26XXConfig.h>
 
 namespace chip {
 namespace DeviceLayer {

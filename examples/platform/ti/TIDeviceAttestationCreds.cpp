@@ -231,8 +231,7 @@ CHIP_ERROR DeviceAttestationCredsTI::GetProductAttestationIntermediateCert(Mutab
     return CopySpanToMutableSpan(ByteSpan{ mFactoryData->pai_cert.data, mFactoryData->pai_cert.len }, out_buffer);
 }
 
-CHIP_ERROR DeviceAttestationCredsTI::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
-                                                                           MutableByteSpan & out_buffer)
+CHIP_ERROR DeviceAttestationCredsTI::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_buffer)
 {
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;

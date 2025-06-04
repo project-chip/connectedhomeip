@@ -27,8 +27,8 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
-#include <platform/ti/cc13xx_26xx/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/ti/cc13xx_26xx/DiagnosticDataProviderImpl.h>
 
 #include <lwip/tcpip.h>
 
