@@ -47,18 +47,73 @@ public:
 
     virtual ~ZoneManagementDelegate() = default;
 
+    /**
+     *    @brief Command Delegate for creation of TwoDCartesianZone with the provided parameters.
+     *
+     *   @param[in]  zone       Structure with parameters for defining a TwoDCartesian zone.
+     *
+     *   @param[out] outZoneID  Indicates the ID of the created zone.
+     *
+     *   @return Success if the creation is successful and a zoneID was
+     *   produced; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
+     */
     virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStruct & zone,
                                                                         uint16_t & outZoneID) = 0;
 
+    /**
+     *    @brief Command Delegate for updating of a TwoDCartesianZone with the provided parameters.
+     *
+     *   @param[in] zoneID  Indicates the ID of the zone to update.
+     *   @param[in]  zone    Structure with parameters for a TwoDCartesian zone.
+     *
+     *
+     *   @return Success if the update is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
     virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStruct & zone) = 0;
 
+    /**
+     *    @brief Command Delegate for retrieval of a TwoDCartesianZone for a given zoneID.
+     *
+     *   @param[in] zoneID    Indicates the ID of the zone to fetch.
+     *   @param[out]  outZones  TwoDCartesian zone being fetched.
+     *   Note: The whole list of zones is returned if zoneID is null.
+     *
+     *   @return Success if the retrieval is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
     virtual Protocols::InteractionModel::Status GetTwoDCartesianZone(const DataModel::Nullable<uint16_t> zoneID,
                                                                      const std::vector<TwoDCartesianZoneStruct> & outZones) = 0;
 
+    /**
+     *    @brief Command Delegate for the removal of a TwoDCartesianZone for a given zoneID.
+     *
+     *   @param[in] zoneID  Indicates the ID of the zone to remove.
+     *
+     *   @return Success if the removal is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
     virtual Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID) = 0;
 
+    /**
+     *    @brief Command Delegate for creation/update of a ZoneTrigger.
+     *
+     *   @param[in]  zoneTrigger    Structure with parameters for defining a ZoneTriggerControl.
+     *
+     *   @return Success if the creation/update is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
     virtual Protocols::InteractionModel::Status CreateOrUpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) = 0;
 
+    /**
+     *    @brief Command Delegate for the removal of a ZoneTrigger for a given zoneID.
+     *
+     *   @param[in] zoneID  Indicates the ID of the zone to remove the ZoneTrigger for.
+     *
+     *   @return Success if the removal is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
     virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
 
 private:
