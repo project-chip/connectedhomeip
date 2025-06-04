@@ -64,7 +64,8 @@ public:
     ///
     /// No explicit CHIP_ERROR values beyond CHIP_NO_ERROR (i.e. success) are defined. Returning failure
     /// from this method essentially means "This event is known as not supported by this provider" and
-    /// the caller is not required to make any more differentiation beyond that.
+    /// the caller is not required to make any more differentiation beyond that, nor is the implementation
+    /// required to return specific CHIP_ERROR values (like invalid endpoint/cluster/...)
     virtual CHIP_ERROR EventInfo(const ConcreteEventPath & path, EventEntry & eventInfo) = 0;
 
     /// Attribute lists contain all attributes. This MUST include all global
