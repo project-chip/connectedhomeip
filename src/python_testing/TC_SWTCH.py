@@ -23,7 +23,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_2_2_fifo
 #     script-args: >
 #       --test-case test_TC_SWTCH_2_2
 #       --endpoint 1
@@ -39,7 +39,7 @@
 #     quiet: true
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
 #     script-args: >
 #       --test-case test_TC_SWTCH_2_3
 #       --test-case test_TC_SWTCH_2_4
@@ -57,7 +57,7 @@
 #     quiet: true
 #   run3:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
 #     script-args: >
 #       --test-case test_TC_SWTCH_2_3
 #       --test-case test_TC_SWTCH_2_4

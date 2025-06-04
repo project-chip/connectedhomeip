@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcrunm_2_1_fifo
 #     script-args: >
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --storage-path admin_storage.json

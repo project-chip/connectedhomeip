@@ -24,7 +24,7 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/refalm_2_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
