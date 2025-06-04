@@ -228,7 +228,7 @@ bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const Concrete
 ///
 /// Returns true if the error could be translated and places the result into `outStatus`.
 /// `path` is used for logging.
-bool IsTranslatableAclError(const ConcreteEventPath &path, const CHIP_ERROR & err, StatusIB & outStatus)
+bool IsTranslatableAclError(const ConcreteEventPath & path, const CHIP_ERROR & err, StatusIB & outStatus)
 {
     if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
     {
