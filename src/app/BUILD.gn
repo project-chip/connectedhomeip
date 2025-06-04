@@ -265,6 +265,7 @@ static_library("interaction-model") {
     # is consistent instead
     sources += [
       "${chip_root}/src/app/util/ember-io-storage.cpp",
+      "${chip_root}/src/app/util/privilege-storage.cpp",
       "dynamic_server/DynamicDispatcher.cpp",
     ]
 
@@ -274,6 +275,7 @@ static_library("interaction-model") {
       "${chip_root}/src/access:provider-impl",
       "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/app/common:attribute-type",
+      "${chip_root}/src/app:required-privileges",
       "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
     ]
 
@@ -357,6 +359,13 @@ source_set("required-privileges") {
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/data-model-providers/codegen/*",
   ]
+
+  # We still have some strong coupling in this case
+  # Eventually dynamic server should be replaced with code-driven and not try
+  # to fake out ember codegen
+  if (chip_build_controller_dynamic_server) {
+    visibility += [ ":interaction-model" ]
+  }
 }
 
 source_set("status-response") {
