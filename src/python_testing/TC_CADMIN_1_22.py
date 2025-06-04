@@ -130,7 +130,10 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-        sleep(1)
+        window_status3 = await self.support.get_window_status(th=self.th1)
+        asserts.assert_equal(window_status3, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
+                             "Commissioning window is expected to be closed, but was found to be open")
+
 
         self.step(9)
         try:
@@ -146,8 +149,8 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
                                  "Expected to error as we provided failure value for opening commissioning window")
 
         self.step(10)
-        window_status3 = await self.support.get_window_status(th=self.th1)
-        asserts.assert_equal(window_status3, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
+        window_status4 = await self.support.get_window_status(th=self.th1)
+        asserts.assert_equal(window_status4, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 
 
