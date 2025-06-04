@@ -13187,8 +13187,8 @@ class ChipClusters:
         "clusterName": "WebRTCTransportProvider",
         "clusterId": 0x00000553,
         "commands": {
-            0x00000001: {
-                "commandId": 0x00000001,
+            0x00000000: {
+                "commandId": 0x00000000,
                 "commandName": "SolicitOffer",
                 "args": {
                     "streamUsage": "int",
@@ -13197,11 +13197,11 @@ class ChipClusters:
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
-                    "metadataOptions": "int",
+                    "metadataEnabled": "bool",
                 },
             },
-            0x00000003: {
-                "commandId": 0x00000003,
+            0x00000002: {
+                "commandId": 0x00000002,
                 "commandName": "ProvideOffer",
                 "args": {
                     "webRTCSessionID": "int",
@@ -13212,27 +13212,27 @@ class ChipClusters:
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
-                    "metadataOptions": "int",
+                    "metadataEnabled": "bool",
                 },
             },
-            0x00000005: {
-                "commandId": 0x00000005,
+            0x00000004: {
+                "commandId": 0x00000004,
                 "commandName": "ProvideAnswer",
                 "args": {
                     "webRTCSessionID": "int",
                     "sdp": "str",
                 },
             },
-            0x00000006: {
-                "commandId": 0x00000006,
+            0x00000005: {
+                "commandId": 0x00000005,
                 "commandName": "ProvideICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidates": "str",
+                    "ICECandidates": "ICECandidateStruct",
                 },
             },
-            0x00000007: {
-                "commandId": 0x00000007,
+            0x00000006: {
+                "commandId": 0x00000006,
                 "commandName": "EndSession",
                 "args": {
                     "webRTCSessionID": "int",
@@ -13283,8 +13283,8 @@ class ChipClusters:
         "clusterName": "WebRTCTransportRequestor",
         "clusterId": 0x00000554,
         "commands": {
-            0x00000001: {
-                "commandId": 0x00000001,
+            0x00000000: {
+                "commandId": 0x00000000,
                 "commandName": "Offer",
                 "args": {
                     "webRTCSessionID": "int",
@@ -13293,24 +13293,24 @@ class ChipClusters:
                     "ICETransportPolicy": "str",
                 },
             },
-            0x00000002: {
-                "commandId": 0x00000002,
+            0x00000001: {
+                "commandId": 0x00000001,
                 "commandName": "Answer",
                 "args": {
                     "webRTCSessionID": "int",
                     "sdp": "str",
                 },
             },
-            0x00000003: {
-                "commandId": 0x00000003,
+            0x00000002: {
+                "commandId": 0x00000002,
                 "commandName": "ICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidates": "str",
+                    "ICECandidates": "ICECandidateStruct",
                 },
             },
-            0x00000004: {
-                "commandId": 0x00000004,
+            0x00000003: {
+                "commandId": 0x00000003,
                 "commandName": "End",
                 "args": {
                     "webRTCSessionID": "int",
@@ -14703,6 +14703,12 @@ class ChipClusters:
                 "args": {
                     "field1": "TestGlobalStruct",
                     "field2": "int",
+                },
+            },
+            0x0000001A: {
+                "commandId": 0x0000001A,
+                "commandName": "TestCheckCommandFlags",
+                "args": {
                 },
             },
             0xFFF200AA: {

@@ -46,6 +46,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <lib/support/SafeInt.h>
 #include <tracing/metric_event.h>
 
 using namespace chip::Tracing::DarwinPlatform;
@@ -59,6 +60,7 @@ namespace DeviceLayer {
         : mWorkQueue(dispatch_queue_create("org.csa-iot.matter.workqueue",
             dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL,
                 QOS_CLASS_USER_INITIATED, QOS_MIN_RELATIVE_PRIORITY)))
+        , mSignalQueue(dispatch_queue_create("org.csa-iot.matter.signalqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL))
     {
         // Tag our queue for IsWorkQueueCurrentQueue()
         dispatch_queue_set_specific(mWorkQueue, this, this, nullptr);
@@ -74,7 +76,7 @@ namespace DeviceLayer {
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
         // Ensure there is a dispatch queue available
-        static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
+        static_cast<System::LayerDispatch &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 #endif
 
         // Call _InitChipStack() on the generic implementation base class
@@ -176,6 +178,47 @@ namespace DeviceLayer {
 #else
         return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CONFIG_NETWORK_LAYER_BLE
+    }
+
+    bool PlatformManagerImpl::RegisterSignalHandler(int sig, dispatch_block_t block)
+    {
+        VerifyOrReturnValue(CanCastTo<uintptr_t>(sig), false);
+        VerifyOrReturnValue(mSignalSources.find(sig) == mSignalSources.end(), false); // Already registered
+
+        signal(sig, SIG_IGN); // Ignore signal so GCD can catch it.
+
+        __auto_type source = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, static_cast<uintptr_t>(sig), 0, mSignalQueue);
+        dispatch_source_set_event_handler(source, ^{
+            dispatch_async(mWorkQueue, block);
+        });
+
+        mSignalSources[sig] = source;
+        dispatch_resume(source);
+
+        return true;
+    }
+
+    bool PlatformManagerImpl::UnregisterSignalHandler(int sig)
+    {
+        VerifyOrReturnValue(CanCastTo<uintptr_t>(sig), false);
+
+        __auto_type it = mSignalSources.find(sig);
+        VerifyOrReturnValue(it != mSignalSources.end(), false); // Not registered
+
+        dispatch_source_cancel(it->second);
+        mSignalSources.erase(it);
+        signal(sig, SIG_DFL);
+
+        return true;
+    }
+
+    void PlatformManagerImpl::UnregisterAllSignalHandlers()
+    {
+        for (auto & [sig, source] : mSignalSources) {
+            dispatch_source_cancel(source);
+            signal(sig, SIG_DFL);
+        }
+        mSignalSources.clear();
     }
 
 } // namespace DeviceLayer

@@ -18062,11 +18062,11 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            SolicitOffer(1L),
-            ProvideOffer(3L),
-            ProvideAnswer(5L),
-            ProvideICECandidates(6L),
-            EndSession(7L),;
+            SolicitOffer(0L),
+            ProvideOffer(2L),
+            ProvideAnswer(4L),
+            ProvideICECandidates(5L),
+            EndSession(6L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -18084,7 +18084,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataOptions(6),;
+        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),;
                     private final int id;
                     SolicitOfferCommandField(int id) {
                         this.id = id;
@@ -18101,7 +18101,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataOptions(8),;
+                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),;
                     private final int id;
                     ProvideOfferCommandField(int id) {
                         this.id = id;
@@ -18252,10 +18252,10 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            Offer(1L),
-            Answer(2L),
-            ICECandidates(3L),
-            End(4L),;
+            Offer(0L),
+            Answer(1L),
+            ICECandidates(2L),
+            End(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -20428,12 +20428,12 @@ public class ClusterIDMapping {
             WriteOnlyInt8u(16426L),
             NullableGlobalEnum(16435L),
             NullableGlobalStruct(16436L),
-            MeiInt8u(4294070017L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
             FeatureMap(65532L),
-            ClusterRevision(65533L),;
+            ClusterRevision(65533L),
+            MeiInt8u(4294070017L),;
             private final long id;
             Attribute(long id) {
                 this.id = id;
@@ -20503,6 +20503,7 @@ public class ClusterIDMapping {
             TestSecondBatchHelperRequest(23L),
             StringEchoRequest(24L),
             GlobalEchoRequest(25L),
+            TestCheckCommandFlags(26L),
             TestDifferentVendorMeiRequest(4294049962L),;
             private final long id;
             Command(long id) {

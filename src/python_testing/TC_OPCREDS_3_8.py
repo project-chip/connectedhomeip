@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -41,14 +42,15 @@ import inspect
 import logging
 import re
 import sys
-from binascii import unhexlify
+from binascii import hexlify, unhexlify
 from typing import Optional
 
 import chip.clusters as Clusters
 import nest_asyncio
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
-                                         TestStep, async_test_body, default_matter_test_main)
+                                         TestStep, default_matter_test_main, has_command, run_if_endpoint_matches)
+from chip.testing.pics import accepted_cmd_pics_str
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
@@ -58,18 +60,36 @@ from mobly import asserts
 nest_asyncio.apply()
 
 
+def to_octet_string(input: bytes) -> str:
+    """Takes `input` bytes and convert to a colon-separated hex octet string representation."""
+    return ":".join(["%02x" % b for b in input])
+
+
 class MatterCertParser:
     SUBJECT_TAG = 6
     SUBJECT_PUBLIC_KEY_TAG = 9
     SUBJECT_FABRIC_ID_TAG = 21
 
     def __init__(self, matter_cert_bytes: bytes):
-        self.parsed_tlv = TLVReader(matter_cert_bytes).get()["Any"]
+        try:
+            full_parsed_tlv = TLVReader(matter_cert_bytes).get()
+        except (ValueError, TypeError, KeyError, IndexError) as e:
+            raise ValueError(f"Failed to parse Matter TLV cert: {str(e)}. TLV cert bytes: {hexlify(matter_cert_bytes)}")
+
+        if (not isinstance(full_parsed_tlv, dict)) or ("Any" not in full_parsed_tlv) or (not isinstance(full_parsed_tlv['Any'], dict)):
+            raise ValueError(f"Failed to find top-level anonymous struct in Matter TLV cert: (TLV: {full_parsed_tlv}).")
+
+        self.parsed_tlv = full_parsed_tlv["Any"]
 
     def get_subject_names(self) -> dict[int, object]:
+        if self.SUBJECT_TAG not in self.parsed_tlv:
+            raise ValueError(f"Did not find Subject tag in Matter TLV certificate: {self.parsed_tlv}")
         return {tag: value for tag, value in self.parsed_tlv[self.SUBJECT_TAG]}
 
     def get_public_key_bytes(self) -> bytes:
+        if self.SUBJECT_PUBLIC_KEY_TAG not in self.parsed_tlv:
+            raise ValueError(f"Did not find Subject Public Key tag in Matter TLV certificate: {self.parsed_tlv}")
+
         public_key_bytes = self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
         return public_key_bytes
 
@@ -324,7 +344,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
         return updated_fabrics, updated_nocs
 
     def desc_TC_OPCREDS_3_8(self):
-        return "[DUTServer] Pre-release TC-OPCREDS-3.8 test case."
+        return "[DUTServer] TC-OPCREDS-3.8 test case."
 
     def steps_TC_OPCREDS_3_8(self) -> list[TestStep]:
         try:
@@ -338,7 +358,10 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
         self.current_step_id = 0
         return self.aggregated_steps
 
-    @async_test_body
+    def pics_TC_OPCREDS_3_8(self) -> list[str]:
+        return [accepted_cmd_pics_str('OPCREDS', Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id)]
+
+    @run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
     async def test_TC_OPCREDS_3_8(self):
         # TODO(test_plans#5046): actually make the test follow final test plan. For now
         # it functionally validates the VID Verification parts of Operational Credentials Cluster
@@ -368,14 +391,21 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             )
             asserts.assert_true(len(root_certs) == 1,
                                 f"Expecting exactly one root from TrustedRootCertificates (TH1's), got {len(root_certs)}")
-            th1_root_parser = MatterCertParser(root_certs[0])
-            th1_root_public_key = th1_root_parser.get_public_key_bytes()
+
+            logging.info("Parsing root certificate for TH1's fabric")
+            try:
+                th1_root_parser = MatterCertParser(root_certs[0])
+                th1_root_public_key = th1_root_parser.get_public_key_bytes()
+            except (ValueError, IndexError, KeyError, TypeError) as e:
+                asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
+            logging.info("Parsed TH1's RCAC successfully.")
+            logging.info(f"  -> Root public key bytes: {to_octet_string(th1_root_public_key)}")
 
         with test_step(1, description="Commission DUT in TH2's fabric. Cert chain must NOT include ICAC"):
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
             new_certificate_authority.alwaysOmitIcac = True
             th2_vid = 0xFFF2
-            th2_fabricId = 2222
+            th2_fabricId = 0x2222
             th2_new_fabric_admin = new_certificate_authority.NewFabricAdmin(
                 vendorId=th2_vid, fabricId=th2_fabricId)
             th2_nodeid = th1_dev_ctrl.nodeId + 1
@@ -392,12 +422,19 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             rcacResp = chain.rcacBytes
 
             th2_fabric_index = nocResp.fabricIndex
-            th2_rcac = MatterCertParser(rcacResp)
-            th2_root_public_key = th2_rcac.get_public_key_bytes()
+
+            logging.info("Parsing root certificate for TH2's fabric")
+            try:
+                th2_rcac = MatterCertParser(rcacResp)
+                th2_root_public_key = th2_rcac.get_public_key_bytes()
+            except (ValueError, IndexError, KeyError, TypeError) as e:
+                asserts.fail(f"Failed to parse root certificate for TH2's fabric: {str(e)}")
+            logging.info("Parsed TH2's RCAC successfully.")
+            logging.info(f"  -> Root public key bytes: {to_octet_string(th2_root_public_key)}")
 
         # Read NOCs and validate that both the entry for TH1 and TH2 are readable
         # and have the right expected fabricId
-        with test_step(2, description="Read DUT's NOCs attribute and validate both fabrics have expected values extractable from their NOC."):
+        with test_step(2, description="Read DUT's NOCs attribute and validate both fabrics have expected values extractable from their NOC. The NOCs attribute must show the NOC for every fabric."):
             nocs_list = await self.read_single_attribute_check_success(
                 dev_ctrl=th1_dev_ctrl,
                 node_id=th1_dut_node_id,
@@ -419,18 +456,36 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 "TH2": th2_fabricId
             }
 
+            found_fabric_indices = set()
+
             for controller_name, fabric_index in fabric_indices.items():
                 for noc_struct in nocs_list:
                     if noc_struct.fabricIndex != fabric_index:
                         continue
 
-                    noc_cert = MatterCertParser(noc_struct.noc)
-                    for tag, value in noc_cert.get_subject_names().items():
-                        if tag == noc_cert.SUBJECT_FABRIC_ID_TAG:
-                            fabric_ids_from_certs[controller_name] = value
-                    noc_public_keys_from_certs[controller_name] = noc_cert.get_public_key_bytes()
+                    found_fabric_indices.add(noc_struct.fabricIndex)
+                    asserts.assert_true(noc_struct.noc is not None and len(
+                        noc_struct.noc) > 0, "`noc` field in NOCs attribute entry not found for fabric index {fabric_index}! Ensure you are running a Matter stack for >= 1.4.2 where NOCStruct fields are not fabric-sensitive.")
+
+                    try:
+                        logging.info(f"Trying to parse NOC for fabric index {fabric_index}")
+                        noc_cert = MatterCertParser(noc_struct.noc)
+                        for tag, value in noc_cert.get_subject_names().items():
+                            if tag == noc_cert.SUBJECT_FABRIC_ID_TAG:
+                                fabric_ids_from_certs[controller_name] = value
+                        noc_public_keys_from_certs[controller_name] = noc_cert.get_public_key_bytes()
+                    except (ValueError, IndexError, KeyError, TypeError) as e:
+                        asserts.fail(f"Failed to parse NOC for fabric index {fabric_index}: {str(e)}")
+
+                    logging.info(f"Succeeded in parsing NOC for fabric index {fabric_index}.")
+                    logging.info(f"  -> NOC public key bytes: {to_octet_string(noc_public_keys_from_certs[controller_name])}")
 
             logging.info(f"Fabric IDs found: {fabric_ids_from_certs}")
+
+            asserts.assert_true(th1_fabric_index in found_fabric_indices,
+                                f"Expected to have seen entry for TH1's fabric (fabric Index {th1_fabric_index}) in NOCs attribute, but did not find it!")
+            asserts.assert_true(th2_fabric_index in found_fabric_indices,
+                                f"Expected to have seen entry for TH2's fabric (fabric Index {th2_fabric_index}) in NOCs attribute, but did not find it!")
 
             for controller_name, fabric_id in fabric_ids.items():
                 asserts.assert_in(controller_name, fabric_ids_from_certs.keys(),
@@ -707,8 +762,6 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_equal(exception_context.exception.status, Status.ConstraintError,
                                  "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with invalid VendorID 0xFFF5")
 
-        # TODO: Add coverage for UpdateNOC failsafe expiry.
-
         with test_step(20, description="Invoke SetVIDVerificationStatement with maximum-sized VVSC and VIDVerificationStatement present and setting VID to 0x6a01 on TH2's fabric, outside fail-safe. Expect success."):
             vvsc = b"\x5a" * 400
             VIDVerificationStatement = b"\x01" * VID_VERIFICATION_STATEMENT_SIZE_BYTES_V1
@@ -735,7 +788,131 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_true(verify_signature(public_key=noc_public_keys_from_certs["TH2"], message=vendor_id_verification_tbs,
                                 signature=sign_vid_verification_response.signature), "VID Verification Signature must validate using DUT's NOC public key")
 
-        with test_step(22, description="Remove TH2 and TH3's fabric"):
+        # Cover having done UpdateNOC in a Fail-safe, overriding the VVS and VVSC, and then expiring failsafe and seeing the prior values are returned.
+        with test_step(22, description="Start updating fabric under TH2's root with fabric ID 0x2222, node ID 0x22222222, by invoking ArmFailSafe(600s), CSRRequest and UpdateNOC. Do not disarm failsafe, do not execute commissioning complete."):
+            # fabricId is already 0x2222
+            new_th2_nodeId = 0x22222222
+            success = await CommissioningBuildingBlocks.UpdateNOC(
+                devCtrl=th2_dev_ctrl, existingNodeId=th2_dut_node_id, newNodeId=new_th2_nodeId,
+                omitCommissioningComplete=True, failSafeDurationSeconds=600
+            )
+
+            asserts.assert_true(success, "UpdateNOC into TH2's fabric must succeed.")
+
+        with test_step(23, description="Invoke SetVIDVerificationStatement with different VVSC and VIDVerificationStatement present and setting VID back to 0xFFF2 under TH2's fabric, inside fail-safe. Verify VIDVerificationStatement, VVSC and VID values match values set."):
+            new_vvsc = b"\xcc" * 400
+            new_VIDVerificationStatement = b"\x01" + (b"\x02" * (VID_VERIFICATION_STATEMENT_SIZE_BYTES_V1 - 1))
+            new_vendorID = 0xFFF2
+
+            attrib_listener.reset()
+            await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=new_th2_nodeId, cmd=opcreds.Commands.SetVIDVerificationStatement(VIDVerificationStatement=new_VIDVerificationStatement, vvsc=new_vvsc, vendorID=new_vendorID))
+            attrib_listener.await_all_expected_report_matches(expected_matchers=[make_vid_matcher(
+                th2_fabric_index, new_vendorID), make_vvs_matcher(th2_fabric_index, new_VIDVerificationStatement)], timeout_sec=30.0)
+
+            updated_fabrics, updated_nocs = await self.read_updated_fabrics(dev_ctrl=th2_dev_ctrl, node_id=new_th2_nodeId)
+
+            th2_fabrics_entry = get_entry_for_fabric(th2_fabric_index, updated_fabrics)
+            asserts.assert_is_not_none(
+                th2_fabrics_entry, f"Could not find Fabrics list entry for TH2's fabric index {th2_fabric_index}")
+
+            th2_nocs_entry = get_entry_for_fabric(th2_fabric_index, updated_nocs)
+            asserts.assert_is_not_none(th2_nocs_entry, f"Could not find NOCs list entry for TH2's fabric index {th2_fabric_index}")
+
+            asserts.assert_equal(th2_nocs_entry.vvsc, new_vvsc,
+                                 "Did not get the expected value set for VVSC field of NOCs list for TH2.")
+            asserts.assert_equal(th2_fabrics_entry.VIDVerificationStatement, new_VIDVerificationStatement,
+                                 "Did not get the expected value set for VIDVerificationStatement field of Fabrics list for TH2's fabric.")
+            asserts.assert_equal(th2_fabrics_entry.vendorID, new_vendorID,
+                                 "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
+
+        with test_step(24, description="Disarm failsafe with ArmFailSafe(0s) from TH2 client. Verify that fabric table has previous VIDVerificationStatement and VVSC due to the pending fabric update that was dropped."):
+            attrib_listener.reset()
+
+            await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=new_th2_nodeId, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=24))
+
+            updated_fabrics, updated_nocs = await self.read_updated_fabrics(dev_ctrl=th2_dev_ctrl, node_id=th2_dut_node_id)
+
+            attrib_listener.await_all_expected_report_matches(expected_matchers=[make_vid_matcher(
+                th2_fabric_index, th2_vid), make_vvs_matcher(th2_fabric_index, VIDVerificationStatement)], timeout_sec=30.0)
+
+            th2_fabrics_entry = get_entry_for_fabric(th2_fabric_index, updated_fabrics)
+            asserts.assert_is_not_none(
+                th2_fabrics_entry, f"Could not find Fabrics list entry for TH2's fabric index {th2_fabric_index}")
+
+            th2_nocs_entry = get_entry_for_fabric(th2_fabric_index, updated_nocs)
+            asserts.assert_is_not_none(th2_nocs_entry, f"Could not find NOCs list entry for TH2's fabric index {th2_fabric_index}")
+
+            asserts.assert_equal(th2_nocs_entry.vvsc, vvsc,
+                                 "Did not get the expected value set for VVSC field of NOCs list for TH2's fabric.")
+            asserts.assert_equal(th2_fabrics_entry.VIDVerificationStatement, VIDVerificationStatement,
+                                 "Did not get the expected value set for VIDVerificationStatement field of Fabrics list for TH2's fabric.")
+            asserts.assert_equal(th2_fabrics_entry.vendorID, th2_vid,
+                                 "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
+
+        # Cover having done UpdateNOC in a Fail-safe, overriding the VVS and VVSC, and then commissioning complete, and seeing the updated values are seen.
+        with test_step(25, description="Start updating fabric under TH2's root with fabric ID 0x2222, node ID 0x77777777, by invoking ArmFailSafe(600s), CSRRequest and UpdateNOC. Do not disarm failsafe, do not execute commissioning complete."):
+            # fabricId is already 0x2222
+            new_th2_nodeId = 0x77777777
+            success = await CommissioningBuildingBlocks.UpdateNOC(
+                devCtrl=th2_dev_ctrl, existingNodeId=th1_dut_node_id + 1, newNodeId=new_th2_nodeId,
+                omitCommissioningComplete=True, failSafeDurationSeconds=600
+            )
+
+            asserts.assert_true(success, "UpdateNOC into TH2's fabric must succeed.")
+
+        with test_step(26, description="Invoke SetVIDVerificationStatement with VVSC and VIDVerificationStatement present and setting VID to 0xFFF4 under TH2's fabric, inside fail-safe. Verify VIDVerificationStatement, VVSC and VID values match values set."):
+            vvsc = b"\xcd" * 400
+            VIDVerificationStatement = b"\x01" + (b"\x03" * (VID_VERIFICATION_STATEMENT_SIZE_BYTES_V1 - 1))
+            vendorID = 0xFFF4
+
+            attrib_listener.reset()
+            await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=new_th2_nodeId, cmd=opcreds.Commands.SetVIDVerificationStatement(VIDVerificationStatement=VIDVerificationStatement, vvsc=vvsc, vendorID=vendorID))
+            attrib_listener.await_all_expected_report_matches(expected_matchers=[make_vid_matcher(
+                th2_fabric_index, vendorID), make_vvs_matcher(th2_fabric_index, VIDVerificationStatement)], timeout_sec=30.0)
+
+            updated_fabrics, updated_nocs = await self.read_updated_fabrics(dev_ctrl=th2_dev_ctrl, node_id=new_th2_nodeId)
+
+            th2_fabrics_entry = get_entry_for_fabric(th2_fabric_index, updated_fabrics)
+            asserts.assert_is_not_none(
+                th2_fabrics_entry, f"Could not find Fabrics list entry for TH2's fabric index {th2_fabric_index}")
+
+            th2_nocs_entry = get_entry_for_fabric(th2_fabric_index, updated_nocs)
+            asserts.assert_is_not_none(th2_nocs_entry, f"Could not find NOCs list entry for TH2's fabric index {th2_fabric_index}")
+
+            asserts.assert_equal(th2_nocs_entry.vvsc, vvsc,
+                                 "Did not get the expected value set for VVSC field of NOCs list for TH2.")
+            asserts.assert_equal(th2_fabrics_entry.VIDVerificationStatement, VIDVerificationStatement,
+                                 "Did not get the expected value set for VIDVerificationStatement field of Fabrics list for TH2's fabric.")
+            asserts.assert_equal(th2_fabrics_entry.vendorID, vendorID,
+                                 "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
+
+        with test_step(27, description="Invoke CommissioningComplete on the pending fabric under TH2 root. Verify VIDVerificationStatement, VVSC and VID values match the values that were set inside the fail-safe period."):
+            resp = await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=new_th2_nodeId, cmd=Clusters.GeneralCommissioning.Commands.CommissioningComplete())
+            if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
+                # Expiring the failsafe timer in an attempt to clean up.
+                await self.send_single_cmd(dev_ctrl=th2_dev_ctrl, node_id=new_th2_nodeId, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=27))
+                asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                                     "Expected success of CommissioningComplete")
+
+            th2_dut_node_id = new_th2_nodeId
+
+            updated_fabrics, updated_nocs = await self.read_updated_fabrics(dev_ctrl=th2_dev_ctrl, node_id=th2_dut_node_id)
+
+            th2_fabrics_entry = get_entry_for_fabric(th2_fabric_index, updated_fabrics)
+            asserts.assert_is_not_none(
+                th2_fabrics_entry, f"Could not find Fabrics list entry for TH2's fabric index {th2_fabric_index}")
+
+            th2_nocs_entry = get_entry_for_fabric(th2_fabric_index, updated_nocs)
+            asserts.assert_is_not_none(th2_nocs_entry, f"Could not find NOCs list entry for TH2's fabric index {th2_fabric_index}")
+
+            asserts.assert_equal(th2_nocs_entry.vvsc, vvsc,
+                                 "Did not get the expected value set for VVSC field of NOCs list for TH2.")
+            asserts.assert_equal(th2_fabrics_entry.VIDVerificationStatement, VIDVerificationStatement,
+                                 "Did not get the expected value set for VIDVerificationStatement field of Fabrics list for TH2's fabric.")
+            asserts.assert_equal(th2_fabrics_entry.vendorID, vendorID,
+                                 "Did not get the expected value set for VendorID field of Fabrics list for TH2's fabric.")
+
+        with test_step(28, description="Remove TH2 and TH3's fabric"):
             cmd = opcreds.Commands.RemoveFabric(th2_fabric_index)
             resp = await self.send_single_cmd(cmd=cmd)
             asserts.assert_equal(
