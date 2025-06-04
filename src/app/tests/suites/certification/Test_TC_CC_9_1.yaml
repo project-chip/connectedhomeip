@@ -475,15 +475,6 @@ tests:
       response:
           value: enhancedMoveToHueValue0c
 
-    - label: "Wait for 30S"
-      PICS: CC.S.F02 && CC.S.F01
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 30000
-
     - label:
           "Saving value for comparision in step 8d read
           ColorLoopStartEnhancedHue attribute from DUT"
