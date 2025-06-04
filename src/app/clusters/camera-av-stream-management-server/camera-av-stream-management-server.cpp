@@ -38,7 +38,6 @@ using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvStreamManagement::Structs;
 using namespace chip::app::Clusters::CameraAvStreamManagement::Attributes;
 using namespace Protocols::InteractionModel;
-using StreamUsageEnum = chip::app::Clusters::Globals::StreamUsageEnum;
 
 namespace chip {
 namespace app {
@@ -53,7 +52,8 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
     const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
     const std::vector<Structs::SnapshotCapabilitiesStruct::Type> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
-    const std::vector<StreamUsageEnum> & aSupportedStreamUsages, const std::vector<StreamUsageEnum> & aRankedStreamPriorities) :
+    const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
+    const std::vector<Globals::StreamUsageEnum> & aRankedStreamPriorities) :
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
@@ -97,6 +97,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
             "CameraAVStreamMgmt[ep=%d]: Feature configuration error. At least one of Audio, Video, or Snapshot feature required",
             mEndpointId));
 
+    // Verify cross-feature dependencies
     if (HasFeature(Feature::kImageControl) || HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay) ||
         HasFeature(Feature::kHighDynamicRange))
     {
@@ -117,13 +118,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
     }
 
     // Ensure Optional attribute bits have been correctly passed and have supporting feature bits set.
-    if (SupportsOptAttr(OptionalAttribute::kNightVision) || SupportsOptAttr(OptionalAttribute::kNightVisionIllum))
+    if (SupportsOptAttr(OptionalAttribute::kNightVisionIllum))
     {
-        VerifyOrReturnError(HasFeature(Feature::kNightVision), CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if NIghtVision is enabled, then "
-                                         "NightVision feature required",
-                                         mEndpointId));
+        VerifyOrReturnError(
+            HasFeature(Feature::kNightVision), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl,
+                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if NIghtVisionIllum is enabled, then "
+                         "NightVision feature required",
+                         mEndpointId));
     }
 
     if (SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled))
@@ -135,6 +137,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                 mEndpointId));
     }
 
+    // If any of the image control attributes are present, we must have the feature.
+    // Conversely, if we have the feature, at least one of the attributes must be present
     if (SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal) || SupportsOptAttr(OptionalAttribute::kImageFlipVertical) ||
         SupportsOptAttr(OptionalAttribute::kImageRotation))
     {
@@ -143,6 +147,18 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
             ChipLogError(Zcl,
                          "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageFlip or Rotation enabled, then "
                          "ImageControl feature required",
+                         mEndpointId));
+    }
+
+    if (HasFeature(Feature::kImageControl))
+    {
+        VerifyOrReturnError(
+            SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal) || SupportsOptAttr(OptionalAttribute::kImageFlipVertical) ||
+                SupportsOptAttr(OptionalAttribute::kImageRotation),
+            CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl,
+                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl feature supported, then "
+                         "at least one of the ImageFlip or Rotation attributes shall be supported",
                          mEndpointId));
     }
 
@@ -240,7 +256,7 @@ CameraAVStreamMgmtServer::ReadAndEncodeStreamUsagePriorities(const AttributeValu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::SetStreamUsagePriorities(const std::vector<StreamUsageEnum> & newPriorities)
+CHIP_ERROR CameraAVStreamMgmtServer::SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities)
 {
     mStreamUsagePriorities = newPriorities;
     ReturnErrorOnFailure(StoreStreamUsagePriorities());
@@ -482,7 +498,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         break;
     case NightVisionIllum::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            SupportsOptAttr(OptionalAttribute::kNightVisionIllum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVisionIllumination, attribute is not supported",
                          mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionIllum));
@@ -551,20 +567,22 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         break;
     case ImageRotation::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kImageControl), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageRotation, feature is not supported", mEndpointId));
+            SupportsOptAttr(OptionalAttribute::kImageRotation), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageRotation, attribute is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageRotation));
         break;
     case ImageFlipHorizontal::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kImageControl), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, feature is not supported", mEndpointId));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, attribute is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipHorizontal));
         break;
     case ImageFlipVertical::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kImageControl), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, feature is not supported", mEndpointId));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kImageFlipVertical), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, attribute is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipVertical));
         break;
     case LocalVideoRecordingEnabled::Id:
@@ -582,15 +600,16 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mLocalSnapshotRecordingEnabled));
         break;
     case StatusLightEnabled::Id:
-        VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get StatusLightEnabled, feature is not supported", mEndpointId));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get StatusLightEnabled, attribute is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightEnabled));
         break;
     case StatusLightBrightness::Id:
         VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt[ep=%d]: can not get StatusLightBrightness, feature is not supported",
+                                         "CameraAVStreamMgmt[ep=%d]: can not get StatusLightBrightness, attribute is not supported",
                                          mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightBrightness));
         break;
@@ -636,7 +655,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     }
     case NightVision::Id: {
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set NightVision, feature is not supported", mEndpointId));
 
         TriStateAutoEnum nightVision;
@@ -657,7 +676,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         VerifyOrReturnError(
             HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set Viewport, feature is not supported", mEndpointId));
-        chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewPort;
+        Globals::Structs::ViewportStruct::Type viewPort;
         ReturnErrorOnFailure(aDecoder.Decode(viewPort));
         return SetViewport(viewPort);
     }
@@ -866,7 +885,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetNightVisionIllum(TriStateAutoEnum aNight
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & aViewport)
+CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const Globals::Structs::ViewportStruct::Type & aViewport)
 {
     // The following validation steps are required
     // 1. the new viewport is not larger than the sensor max
@@ -1140,7 +1159,7 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // Load Viewport
-    chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewport;
+    Globals::Structs::ViewportStruct::Type viewport;
     err = LoadViewport(viewport);
     if (err == CHIP_NO_ERROR)
     {
@@ -1346,7 +1365,7 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     mDelegate.PersistentAttributesLoadedCallback();
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport)
+CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const Globals::Structs::ViewportStruct::Type & viewport)
 {
     uint8_t buffer[kViewportStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -1361,7 +1380,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const chip::app::Clusters::Gl
     return GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan);
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport)
+CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(Globals::Structs::ViewportStruct::Type & viewport)
 {
     uint8_t buffer[kViewportStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -1416,7 +1435,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadStreamUsagePriorities()
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
     mStreamUsagePriorities.clear();
-    StreamUsageEnum streamUsage;
+    Globals::StreamUsageEnum streamUsage;
     CHIP_ERROR err;
     while ((err = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
@@ -1594,7 +1613,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
-    VerifyOrReturn(commandData.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
+    VerifyOrReturn(commandData.streamUsage != Globals::StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
@@ -1621,10 +1640,10 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
                        commandData.maxKeyFrameInterval <= kMaxKeyFrameIntervalMaxValue,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    bool streamUsageSupported =
-        std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(), [&commandData](const StreamUsageEnum & entry) {
-            return entry == commandData.streamUsage;
-        }) != mStreamUsagePriorities.end();
+    bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
+                                             [&commandData](const Globals::StreamUsageEnum & entry) {
+                                                 return entry == commandData.streamUsage;
+                                             }) != mStreamUsagePriorities.end();
 
     VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
@@ -1726,7 +1745,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     Commands::AudioStreamAllocateResponse::Type response;
     uint16_t audioStreamID = 0;
 
-    VerifyOrReturn(commandData.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
+    VerifyOrReturn(commandData.streamUsage != Globals::StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
@@ -1756,10 +1775,10 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    bool streamUsageSupported =
-        std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(), [&commandData](const StreamUsageEnum & entry) {
-            return entry == commandData.streamUsage;
-        }) != mStreamUsagePriorities.end();
+    bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
+                                             [&commandData](const Globals::StreamUsageEnum & entry) {
+                                                 return entry == commandData.streamUsage;
+                                             }) != mStreamUsagePriorities.end();
 
     VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
@@ -1934,13 +1953,13 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 {
 
     auto & streamPriorities = commandData.streamPriorities;
-    std::vector<StreamUsageEnum> rankedStreamPriorities;
+    std::vector<Globals::StreamUsageEnum> rankedStreamPriorities;
     auto iter = streamPriorities.begin();
 
     while (iter.Next())
     {
         auto & streamUsage = iter.GetValue();
-        if (streamUsage == StreamUsageEnum::kUnknownEnumValue)
+        if (streamUsage == Globals::StreamUsageEnum::kUnknownEnumValue)
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;

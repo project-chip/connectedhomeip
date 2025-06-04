@@ -233,7 +233,7 @@ Git: 0.7-summer-2025-ncr-446-g42ebbf725
         <feature name="SNP"/>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0012" side="server" name="StreamUsagePriorities" define="RANKED_VIDEO_STREAM_PRIORITIES_LIST" type="array" entryType="StreamUsageEnum"/>
+    <attribute code="0x0012" side="server" name="StreamUsagePriorities" define="STREAM_USAGE_PRIORITIES" type="array" entryType="StreamUsageEnum"/>
     <attribute code="0x0013" side="server" name="SoftRecordingPrivacyModeEnabled" define="SOFT_RECORDING_PRIVACY_MODE_ENABLED" type="boolean" default="0" writable="true">
       <mandatoryConform>
         <feature name="PRIV"/>

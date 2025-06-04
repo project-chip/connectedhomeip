@@ -348,6 +348,7 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     // Pure optional attributes that aren't covered by a feature flag, or are attested by the server given feature flag settings
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(OptionalAttribute::kHardPrivacyModeOn);
+    optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
     optionalAttrs.Set(OptionalAttribute::kMicrophoneAGCEnabled);
     optionalAttrs.Set(OptionalAttribute::kStatusLightEnabled);
     optionalAttrs.Set(OptionalAttribute::kStatusLightBrightness);

@@ -18603,6 +18603,7 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                 } else {
                     newElement_0.transportOptions = nil;
                 }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

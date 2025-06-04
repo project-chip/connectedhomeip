@@ -238,9 +238,9 @@ public:
         // This also sets the default priority of the stream usages.
         virtual std::vector<StreamUsageEnum> & GetSupportedStreamUsages() = 0;
 
-        // Get Ranked stream priorities as an ordered list. This is expected to
+        // Get stream usage priorities as an ordered list. This is expected to
         // be a subset of the SupportedStreamUsages.
-        virtual std::vector<StreamUsageEnum> & GetRankedStreamPriorities() = 0;
+        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities() = 0;
 
         // Get/Set soft recording privacy mode
         virtual CameraError SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode) = 0;
@@ -299,6 +299,16 @@ public:
         // Get the microphone max and min levels.
         virtual uint8_t GetMicrophoneMaxLevel() = 0;
         virtual uint8_t GetMicrophoneMinLevel() = 0;
+
+        // Get/Set image control attributes
+        virtual CameraError SetImageRotation(uint16_t imageRotation) = 0;
+        virtual uint16_t GetImageRotation()                          = 0;
+
+        virtual CameraError SetImageFlipHorizontal(bool imageFlipHorizontal) = 0;
+        virtual bool GetImageFlipHorizontal()                                = 0;
+
+        virtual CameraError SetImageFlipVertical(bool imageFlipVertical) = 0;
+        virtual bool GetImageFlipVertical()                              = 0;
 
         // Does camera have local storage
         virtual bool HasLocalStorage() = 0;

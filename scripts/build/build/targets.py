@@ -122,11 +122,11 @@ def BuildHostTarget():
         TargetPart('shell', app=HostApp.SHELL),
         TargetPart('ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False),
         TargetPart('ota-requestor', app=HostApp.OTA_REQUESTOR,
-                   enable_ble=False),
+                   enable_ble=False, enable_wifipaf=False),
         TargetPart('simulated-app1', app=HostApp.SIMULATED_APP1,
-                   enable_ble=False),
+                   enable_ble=False, enable_wifipaf=False),
         TargetPart('simulated-app2', app=HostApp.SIMULATED_APP2,
-                   enable_ble=False),
+                   enable_ble=False, enable_wifipaf=False),
         TargetPart('python-bindings', app=HostApp.PYTHON_BINDINGS),
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
@@ -173,6 +173,7 @@ def BuildHostTarget():
         'no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
     target.AppendModifier("ipv6only", enable_ipv4=False)
     target.AppendModifier("no-ble", enable_ble=False)
+    target.AppendModifier("no-wifipaf", enable_wifipaf=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
     target.AppendModifier('no-shell', disable_shell=True)
@@ -515,8 +516,6 @@ def BuildNxpTarget():
 
     # boards
     target.AppendFixedTargets([
-        TargetPart('k32w0', board=NxpBoard.K32W0),
-        TargetPart('k32w1', board=NxpBoard.K32W1),
         TargetPart('rt1060', board=NxpBoard.RT1060),
         TargetPart('rt1170', board=NxpBoard.RT1170),
         TargetPart('rw61x', board=NxpBoard.RW61X),
@@ -531,9 +530,9 @@ def BuildNxpTarget():
 
     # apps
     target.AppendFixedTargets([
-        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
-        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
-        TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('(k32w1|mcxw71)'),
+        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('mcxw71'),
+        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('mcxw71'),
+        TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('mcxw71'),
         TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rt1060|rt1170|rw61x'),
         TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rt1060|rt1170|rw61x'),
         TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x')
@@ -542,16 +541,15 @@ def BuildNxpTarget():
     target.AppendModifier(name="factory", enable_factory_data=True)
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
-    target.AppendModifier(name="fro32k", use_fro32k=True).OnlyIfRe('k32w0')
-    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('(k32w1|mcxw71)-freertos-lighting')
-    target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('(k32w0|rw61x)')
+    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('mcxw71-freertos-lighting')
+    target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('rw61x')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
     target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x')
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
-    target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
+    target.AppendModifier(name="matter-shell", enable_shell=True)
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71')
     target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).ExceptIfRe(

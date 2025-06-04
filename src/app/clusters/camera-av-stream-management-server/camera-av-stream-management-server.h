@@ -274,14 +274,13 @@ protected:
 enum class OptionalAttribute : uint32_t
 {
     kHardPrivacyModeOn     = 0x0001,
-    kNightVision           = 0x0002,
-    kNightVisionIllum      = 0x0004,
-    kMicrophoneAGCEnabled  = 0x0008,
-    kImageRotation         = 0x0010,
-    kImageFlipHorizontal   = 0x0020,
-    kImageFlipVertical     = 0x0040,
-    kStatusLightEnabled    = 0x0080,
-    kStatusLightBrightness = 0x0100,
+    kNightVisionIllum      = 0x0002,
+    kMicrophoneAGCEnabled  = 0x0004,
+    kImageRotation         = 0x0008,
+    kImageFlipHorizontal   = 0x0010,
+    kImageFlipVertical     = 0x0020,
+    kStatusLightEnabled    = 0x0040,
+    kStatusLightBrightness = 0x0080,
 };
 
 class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
@@ -367,7 +366,7 @@ public:
 
     CHIP_ERROR SetNightVisionIllum(TriStateAutoEnum aNightVisionIllum);
 
-    CHIP_ERROR SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & aViewport);
+    CHIP_ERROR SetViewport(const Globals::Structs::ViewportStruct::Type & aViewport);
 
     CHIP_ERROR SetSpeakerMuted(bool aSpeakerMuted);
 
@@ -453,7 +452,7 @@ public:
 
     TriStateAutoEnum GetNightVisionIllum() const { return mNightVisionIllum; }
 
-    const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & GetViewport() const { return mViewport; }
+    const Globals::Structs::ViewportStruct::Type & GetViewport() const { return mViewport; }
 
     bool GetSpeakerMuted() const { return mSpeakerMuted; }
 
@@ -525,29 +524,29 @@ private:
     const std::vector<SnapshotCapabilitiesStruct> mSnapshotCapabilitiesList;
     const uint32_t mMaxNetworkBandwidth;
 
-    uint16_t mCurrentFrameRate                                            = 0;
-    bool mHDRModeEnabled                                                  = false;
-    bool mSoftRecordingPrivacyModeEnabled                                 = false;
-    bool mSoftLivestreamPrivacyModeEnabled                                = false;
-    bool mHardPrivacyModeOn                                               = false;
-    TriStateAutoEnum mNightVision                                         = TriStateAutoEnum::kOn;
-    TriStateAutoEnum mNightVisionIllum                                    = TriStateAutoEnum::kOn;
-    chip::app::Clusters::Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 0, 0 };
-    bool mSpeakerMuted                                                    = false;
-    uint8_t mSpeakerVolumeLevel                                           = 0;
-    uint8_t mSpeakerMaxLevel                                              = kMaxSpeakerLevel;
-    uint8_t mSpeakerMinLevel                                              = 0;
-    bool mMicrophoneMuted                                                 = false;
-    uint8_t mMicrophoneVolumeLevel                                        = 0;
-    uint8_t mMicrophoneMaxLevel                                           = kMaxMicrophoneLevel;
-    uint8_t mMicrophoneMinLevel                                           = 0;
-    bool mMicrophoneAGCEnabled                                            = false;
-    uint16_t mImageRotation                                               = 0;
-    bool mImageFlipHorizontal                                             = false;
-    bool mImageFlipVertical                                               = false;
-    bool mLocalVideoRecordingEnabled                                      = false;
-    bool mLocalSnapshotRecordingEnabled                                   = false;
-    bool mStatusLightEnabled                                              = false;
+    uint16_t mCurrentFrameRate                       = 0;
+    bool mHDRModeEnabled                             = false;
+    bool mSoftRecordingPrivacyModeEnabled            = false;
+    bool mSoftLivestreamPrivacyModeEnabled           = false;
+    bool mHardPrivacyModeOn                          = false;
+    TriStateAutoEnum mNightVision                    = TriStateAutoEnum::kOn;
+    TriStateAutoEnum mNightVisionIllum               = TriStateAutoEnum::kOn;
+    Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 0, 0 };
+    bool mSpeakerMuted                               = false;
+    uint8_t mSpeakerVolumeLevel                      = 0;
+    uint8_t mSpeakerMaxLevel                         = kMaxSpeakerLevel;
+    uint8_t mSpeakerMinLevel                         = 0;
+    bool mMicrophoneMuted                            = false;
+    uint8_t mMicrophoneVolumeLevel                   = 0;
+    uint8_t mMicrophoneMaxLevel                      = kMaxMicrophoneLevel;
+    uint8_t mMicrophoneMinLevel                      = 0;
+    bool mMicrophoneAGCEnabled                       = false;
+    uint16_t mImageRotation                          = 0;
+    bool mImageFlipHorizontal                        = false;
+    bool mImageFlipVertical                          = false;
+    bool mLocalVideoRecordingEnabled                 = false;
+    bool mLocalSnapshotRecordingEnabled              = false;
+    bool mStatusLightEnabled                         = false;
 
     Globals::ThreeLevelAutoEnum mStatusLightBrightness = Globals::ThreeLevelAutoEnum::kMedium;
 
@@ -608,8 +607,8 @@ private:
 
     CHIP_ERROR ReadAndEncodeStreamUsagePriorities(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
-    CHIP_ERROR StoreViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport);
-    CHIP_ERROR LoadViewport(chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport);
+    CHIP_ERROR StoreViewport(const Globals::Structs::ViewportStruct::Type & viewport);
+    CHIP_ERROR LoadViewport(Globals::Structs::ViewportStruct::Type & viewport);
 
     CHIP_ERROR StoreStreamUsagePriorities();
     CHIP_ERROR LoadStreamUsagePriorities();

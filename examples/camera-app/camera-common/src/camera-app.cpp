@@ -89,6 +89,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
     {
         features.Set(CameraAvStreamManagement::Feature::kNightVision);
+        optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
@@ -124,15 +125,15 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     TwoWayTalkSupportTypeEnum twowayTalkSupport = TwoWayTalkSupportTypeEnum::kNotSupported;
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = mCameraDevice->GetCameraHALInterface().GetSnapshotCapabilities();
     uint32_t maxNetworkBandwidth                                 = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
-    std::vector<StreamUsageEnum> supportedStreamUsages  = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
-    std::vector<StreamUsageEnum> rankedStreamPriorities = mCameraDevice->GetCameraHALInterface().GetRankedStreamPriorities();
+    std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
+    std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
     mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
         mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
         maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
         micCapabilities, spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
-        rankedStreamPriorities);
+        streamUsagePriorities);
 
     // Fetch all initialization parameters for CameraAVSettingsUserLevelMgmt Server
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
@@ -219,6 +220,13 @@ void CameraApp::InitializeCameraAVStreamMgmt()
     if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
     {
         mAVStreamMgmtServerPtr->SetStatusLightEnabled(mCameraDevice->GetCameraHALInterface().GetStatusLightEnabled());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
+    {
+        mAVStreamMgmtServerPtr->SetImageRotation(mCameraDevice->GetCameraHALInterface().GetImageRotation());
+        mAVStreamMgmtServerPtr->SetImageFlipVertical(mCameraDevice->GetCameraHALInterface().GetImageFlipVertical());
+        mAVStreamMgmtServerPtr->SetImageFlipHorizontal(mCameraDevice->GetCameraHALInterface().GetImageFlipHorizontal());
     }
 
     mAVStreamMgmtServerPtr->Init();
