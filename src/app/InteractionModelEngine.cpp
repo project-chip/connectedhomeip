@@ -154,7 +154,9 @@ bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const Attribut
         return false;
     }
 
-    // leave requestPath.entityId optional value unset to indicate wildcard
+    // requestPath.entityId optional value starts up as unset to
+    // signify wildcard check. We then set it later if we have a valid
+    // attributeID to check.
     Access::RequestPath requestPath{ .cluster     = path.mClusterId,
                                      .endpoint    = path.mEndpointId,
                                      .requestType = Access::RequestType::kAttributeReadRequest };
@@ -172,7 +174,8 @@ bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const Attribut
 class AutoReleaseSubscriptionInfoIterator
 {
 public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) :
+        mIterator(iterator) {};
     ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
 
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
@@ -649,7 +652,15 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             // AttributePathExpandIterator. So we just need to check the ACL bits.
             while (pathIterator.Next(readPath, &entry))
             {
-                // use wildcard attribute ID for permission check...
+                // readPath is based on path expansion, so entire path is a `valid attribute path`.
+                //
+                // Here we check if the cluster is accessible at all for the given entry permissions.
+                // The check will validate cluster access and not try exact attribute matching.
+                //
+                // TODO: it is unclear why we are not using the actual path always since our goal seems
+                //       to just be "find a valid path that is readable". The reason the code looks like
+                //       this now is that this logic was originally written like this and the 'check' was
+                //       refactored to a common path.
                 if (IsAccessibleAttributeEntry(readPath, kInvalidAttributeId, aSubjectDescriptor, entry))
                 {
                     aHasValidAttributePath = true;
