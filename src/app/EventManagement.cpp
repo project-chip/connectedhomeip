@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include "app/data-model-provider/Provider.h"
 #include <access/AccessControl.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>

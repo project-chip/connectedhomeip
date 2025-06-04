@@ -17,7 +17,6 @@
  */
 #pragma once
 
-#include "access/Privilege.h"
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/MetadataTypes.h>

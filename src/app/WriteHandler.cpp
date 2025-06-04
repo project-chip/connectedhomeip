@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include "access/Privilege.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
