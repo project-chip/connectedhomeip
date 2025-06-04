@@ -52,7 +52,19 @@ public:
     virtual CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) = 0;
 #endif
 
-    // Fetch event metadata for a specific event
+    /// Fetch event metadata for a specific event
+    ///
+    /// This metadata is used for event validation, specifically ACL at this time. Method is generally
+    /// expected to return required access data for events.
+    ///
+    /// - Implementations MUST return valid event permission values for known events.
+    /// - Implementations MAY choose to default to return a default kView when events are unknown,
+    ///   in order to save on processing complexity and not deny event subscriptions
+    ///   (even if specific events may never be generated).
+    ///
+    /// No explicit CHIP_ERROR values beyond CHIP_NO_ERROR (i.e. success) are defined. Returning failure
+    /// from this method essentially means "This event is known as not supported by this provider" and
+    /// the caller is not required to make any more differentiation beyond that.
     virtual CHIP_ERROR EventInfo(const ConcreteEventPath & path, EventEntry & eventInfo) = 0;
 
     /// Attribute lists contain all attributes. This MUST include all global
