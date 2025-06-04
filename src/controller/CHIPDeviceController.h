@@ -838,7 +838,7 @@ protected:
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;
-    virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info) {return CHIP_NO_ERROR;};
+    virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info) {return CHIP_NO_ERROR;}
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     template <typename RequestObjectT>
