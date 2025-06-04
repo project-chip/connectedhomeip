@@ -2472,6 +2472,24 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return GlobalEchoResponse(field1_decoded, field2_decoded)
   }
 
+  suspend fun testCheckCommandFlags(timedInvokeTimeout: Duration) {
+    val commandId: UInt = 26u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
   suspend fun testDifferentVendorMeiRequest(
     arg1: UByte,
     timedInvokeTimeout: Duration? = null,
