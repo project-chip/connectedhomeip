@@ -160,7 +160,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttribute(std::optio
                 return mPosition.mAttributePath->mValue.mAttributeId;
             }
 
-            // if the entry is invalid and we are wildard-expanding, this is not a valid value so
+            // if the entry is invalid and we are wildcard-expanding, this is not a valid value so
             // return "not valid"
             if (mPosition.mAttributePath->mValue.IsWildcardPath())
             {
