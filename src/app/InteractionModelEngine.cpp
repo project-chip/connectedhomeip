@@ -88,7 +88,8 @@ bool MayHaveAccessibleEventPathForEndpointAndCluster(DataModel::Provider * aProv
                 },
                 eventInfo) != CHIP_NO_ERROR)
         {
-            // explicit path is not valid, treat errors as no access.
+            // Non-wildcard path is not valid, so the event represented by the path is not accessible
+            // (because it does not exist at all).
             return false;
         }
         requiredPrivilege = eventInfo.readPrivilege;
