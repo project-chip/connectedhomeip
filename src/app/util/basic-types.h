@@ -23,9 +23,5 @@
 
 #pragma once
 
-#include <cstdint>
-
 // Pull in core types
 #include <lib/core/DataModelTypes.h>
-
-namespace chip {} // namespace chip
