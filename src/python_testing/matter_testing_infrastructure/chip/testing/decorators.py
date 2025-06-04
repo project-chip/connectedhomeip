@@ -103,7 +103,9 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
     if cluster not in wildcard.attributes[endpoint]:
         return False
 
-    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
+    # Mypy can't verify that cluster subclasses have Attributes, because the Attribute subclass does not
+    # appear in the base class. However, cluster classes are generated code and all derived cluster classes
+    # are guaranteed to have attributes because the global attributes are included.
     if cluster.Attributes.AttributeList not in wildcard.attributes[endpoint][cluster]:  # type: ignore[attr-defined]
         return False
 
