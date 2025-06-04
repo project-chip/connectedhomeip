@@ -335,7 +335,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # it doesn't have access to
         # "INVALID_ACTION" status response expected
 
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
                 nodeid=self.dut_node_id,
                 # Attribute from a cluster controller 2 has no access to
@@ -344,11 +344,8 @@ class TC_IDM_4_2(MatterBaseTest):
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 autoResubscribe=False
             )
-            asserts.fail("Expected exception not thrown")
-        except ChipStackError as e:
-            # Verify that the DUT returns an "INVALID_ACTION" status response
-            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
-                                 "Incorrect error response for subscription to unallowed cluster")
+        asserts.assert_equal(cm.exception.err, INVALID_ACTION_ERROR_CODE,
+                             "Incorrect error response for subscription to unallowed cluster")
 
         # *** Step 4 ***
         # Setup CR2 such that it does not have access to all attributes on a specific cluster and
