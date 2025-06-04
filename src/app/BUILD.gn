@@ -265,7 +265,6 @@ static_library("interaction-model") {
     # is consistent instead
     sources += [
       "${chip_root}/src/app/util/ember-io-storage.cpp",
-      "${chip_root}/src/app/util/privilege-storage.cpp",
       "dynamic_server/DynamicDispatcher.cpp",
     ]
 
