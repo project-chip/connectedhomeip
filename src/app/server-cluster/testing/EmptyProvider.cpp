@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/server-cluster/testing/EmptyProvider.h>
 
 namespace chip {
@@ -30,26 +31,47 @@ CHIP_ERROR EmptyProvider::Shutdown()
 
 void EmptyProvider::SetNodeConfigurationListener(app::DataModel::NodeConfigurationListener * nodeConfigurationListener)
 {
-    return;
+    mNodeConfigurationListener = nodeConfigurationListener;
 }
 
 void EmptyProvider::NotifyNodeConfigurationListener()
 {
-    return;
+    if (mNodeConfigurationListener != nullptr)
+    {
+        // Notify the listener that the configuration version has been updated
+        mNodeConfigurationListener->OnConfigurationVersionChanged();
+    }
 }
 
 CHIP_ERROR EmptyProvider::GetNodeDataModelConfiguration(app::DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration)
 {
+    // Grab the related data and return the node data model configuration
+    nodeDataModelConfiguration.configurationVersion = mConfigurationVersion;
+    nodeDataModelConfiguration.dataModelVersion     = Revision::kDataModelRevision;
+    nodeDataModelConfiguration.specVersion          = Revision::kSpecificationVersion;
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EmptyProvider::Internal_BumpNodeDataModelConfigurationVersion()
 {
+    // Given this is an empty provider, only the local cache is bumped
+    mConfigurationVersion++;
+
+    // Nofity the registered listener
+    NotifyNodeConfigurationListener();
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EmptyProvider::ResetNodeDataModelConfigurationVersion()
 {
+    // Given this is an empty provider, only the local cache is reset
+    mConfigurationVersion = 1;
+
+    // Nofity the registered listener
+    NotifyNodeConfigurationListener();
+
     return CHIP_NO_ERROR;
 }
 

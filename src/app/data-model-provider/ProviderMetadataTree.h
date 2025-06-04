@@ -45,9 +45,12 @@ struct NodeDataModelConfiguration
 class ProviderMetadataTree
 {
 public:
-    // This updater class provides a scope where the configuration version get bumped.
-    // It is used to provide RAII for the ConfigurationVersion where the value is bumped when deconstructed
-    // and provides a stable interface for clients to perform the bump.
+    /// This updater class provides a scope where the configuration version get bumped.
+    /// It is used to provide RAII for the ConfigurationVersion where the value is bumped when deconstructed
+    /// and provides a stable interface for clients to perform the bump.
+    ///
+    /// This is provided as a stable interface for applications to bump the stored configuration version
+    /// in case the interface or implementation is moved in the future.
     class ScopedConfigurationVersionUpdater
     {
     public:
@@ -131,6 +134,16 @@ public:
     /// the attribute changes.
     virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 
+    /// Functions used to manage changes to ConfigurationVersion, the Basic Information cluster server implementation
+    /// registers a listener and is notified if the stored configuration version value is changed.
+    ///
+    /// The interface also includes a getter function to obtain the stored DataModelConfiguration version
+    /// e.g. in case of a read of the associated values in BAsic Information or if needed in other areas of the implementation.
+    ///
+    /// In case of a factory reset, the device is able to reset the stored configuration version to the initial value
+    /// by invoking the reset function.
+    ///
+    /// These this interface is not intended to be used directly by the application and may change location in the future.
     virtual void SetNodeConfigurationListener(NodeConfigurationListener * listener)                           = 0;
     virtual void NotifyNodeConfigurationListener()                                                            = 0;
     virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & nodeDataModelConfiguration) = 0;
@@ -147,6 +160,9 @@ public:
     ReadOnlyBuffer<AttributeEntry> AttributesIgnoreError(const ConcreteClusterPath & path);
 
 protected:
+    /// Internal function to bump the stored configuration version. This is intentionally marked as internal
+    /// to make it unavailable for the application, since this may be moved or changed in the future.
+    /// The stable interface for bumping the value if provided by ScopedConfigurationVersionUpdater.
     virtual CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() = 0;
 };
 

@@ -51,11 +51,15 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
+// Implementation of the listener for changes to the node configuration
+// this is registered to be notified if elements of the node configuration changes
+// currently, this only applies to changes to the configuration version
 class NodeConfigurationListenerImpl : public DataModel::NodeConfigurationListener
 {
 public:
     void OnConfigurationVersionChanged() override
     {
+        // Basic Information should only be present on EP0
         for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
         {
             // If Basic cluster is implemented on this endpoint

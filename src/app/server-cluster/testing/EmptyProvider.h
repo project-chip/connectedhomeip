@@ -36,6 +36,7 @@ public:
 
     CHIP_ERROR Shutdown() override;
 
+    /// Functions for managing the configuration version
     void SetNodeConfigurationListener(app::DataModel::NodeConfigurationListener * nodeConfigurationListener) override;
     void NotifyNodeConfigurationListener() override;
     CHIP_ERROR GetNodeDataModelConfiguration(app::DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
@@ -69,7 +70,15 @@ public:
                                                     chip::TLV::TLVReader & input_arguments, app::CommandHandler * handler) override;
 
 protected:
+    /// Function for managing the configuration version
     CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() override;
+
+private:
+    // The registered listener for changes to the data model configuration
+    DataModel::NodeConfigurationListener * mNodeConfigurationListener;
+
+    // The local cached configuration version value
+    uint32_t mConfigurationVersion = 1;
 };
 
 } // namespace Test

@@ -70,6 +70,7 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
+    /// Functions for managing the configuration version
     void SetNodeConfigurationListener(DataModel::NodeConfigurationListener * nodeConfigurationListener) override;
     void NotifyNodeConfigurationListener() override;
     CHIP_ERROR GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
@@ -97,8 +98,14 @@ protected:
     // It is expected to be removed or replaced with a proper implementation in the future.TODO:(#36837).
     virtual void InitDataModelForTesting();
 
+    /// Function for managing the configuration version
+    CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() override;
+
 private:
+    // The registered listener for changes to the data model configuration
     DataModel::NodeConfigurationListener * mNodeConfigurationListener;
+
+    // The local cached configuration version value
     uint32_t mConfigurationVersion = 1;
 
     // Iteration is often done in a tight loop going through all values.
@@ -136,9 +143,6 @@ private:
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
-
-protected:
-    CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() override;
 };
 
 } // namespace app
