@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import click
-from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types, ConformanceDecision, PrebuiltDataModelDirectory
+from chip.testing.spec_parsing import ConformanceDecision, PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 from paths import get_chip_root, get_cluster_documentation_file_path, get_data_model_path, get_device_types_documentation_file_path
 
 CURRENT_IN_PROGRESS_DEFINES = [

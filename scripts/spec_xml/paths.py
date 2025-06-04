@@ -16,6 +16,7 @@
 
 import os
 from enum import Enum
+
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory
 
 
