@@ -1830,9 +1830,15 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest,
                                                                               const DataModel::AcceptedCommandEntry & entry)
 {
-    const bool commandNeedsTimedInvoke = entry.HasFlags(DataModel::CommandQualityFlags::kTimed);
-    const bool commandIsFabricScoped   = entry.HasFlags(DataModel::CommandQualityFlags::kFabricScoped);
+    // Command that is marked as having a large payload must be sent over a
+    // session that supports it.
+    if (entry.HasFlags(DataModel::CommandQualityFlags::kLargeMessage) &&
+        !CurrentExchange()->GetSessionHandle()->AllowsLargePayload())
+    {
+        return Status::InvalidTransportType;
+    }
 
+    const bool commandIsFabricScoped = entry.HasFlags(DataModel::CommandQualityFlags::kFabricScoped);
     if (commandIsFabricScoped)
     {
         // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
@@ -1846,17 +1852,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
         }
     }
 
+    const bool commandNeedsTimedInvoke = entry.HasFlags(DataModel::CommandQualityFlags::kTimed);
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
     {
         return Status::NeedsTimedInteraction;
-    }
-
-    // Command that is marked as having a large payload must be sent over a
-    // session that supports it.
-    if (entry.HasFlags(DataModel::CommandQualityFlags::kLargeMessage) &&
-        !CurrentExchange()->GetSessionHandle()->AllowsLargePayload())
-    {
-        return Status::InvalidTransportType;
     }
 
     return Status::Success;
