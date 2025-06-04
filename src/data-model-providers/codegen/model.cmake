@@ -19,6 +19,8 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/CodegenDataModelProvider.h"
   "${BASE_DIR}/CodegenDataModelProvider_Read.cpp"
   "${BASE_DIR}/CodegenDataModelProvider_Write.cpp"
+  "${BASE_DIR}/CodegenServerCluster.h"
+  "${BASE_DIR}/CodegenServerCluster.cpp"
   "${BASE_DIR}/EmberAttributeDataBuffer.cpp"
   "${BASE_DIR}/EmberAttributeDataBuffer.h"
   "${BASE_DIR}/EmberMetadata.cpp"
@@ -35,4 +37,3 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.cpp"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.h"
 )
-
