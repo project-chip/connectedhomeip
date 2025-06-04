@@ -104,17 +104,25 @@ CHIP_ERROR SetUpCodePairer::Connect()
         if (ShouldDiscoverUsing(RendezvousInformationFlag::kBLE))
         {
             CHIP_ERROR err = StartDiscoveryOverBLE();
-            if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE))
+            if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
             {
-                ChipLogError(Controller, "Failed to start discovery over BLE: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogProgress(Controller, "Skipping commissionable node discovery over BLE since not supported by the controller!");
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Failed to start commissionable node discovery over BLE: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
         if (ShouldDiscoverUsing(RendezvousInformationFlag::kWiFiPAF))
         {
             CHIP_ERROR err = StartDiscoveryOverWiFiPAF();
-            if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE))
+            if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
             {
-                ChipLogError(Controller, "Failed to start discovery over WiFiPAF: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogProgress(Controller, "Skipping commissionable node discovery over Wi-Fi PAF since not supported by the controller!");
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Failed to start commissionable node discovery over Wi-Fi PAF: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
     }
