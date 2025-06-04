@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,27 +16,21 @@
  */
 
 /**
- *  Shared state for Network Framework implementations of TCPEndPoint and UDPEndPoint.
+ *    @file
+ *      This file defines default compile-time configuration constants
+ *      for the CHIP NfcLayer.
+ *
+ *
+ *  NOTE WELL: On some platforms, this header is included by C-language programs.
+ *
  */
 
 #pragma once
 
-#include <inet/EndPointBasis.h>
+#if CHIP_HAVE_CONFIG_H
+#include <platform/CHIPDeviceBuildConfig.h>
+#endif
 
-#include <inet/IPAddress.h>
+#include <system/SystemConfig.h>
 
-#include <Network/Network.h>
-
-namespace chip {
-namespace Inet {
-
-class DLL_EXPORT EndPointStateNetworkFramework
-{
-protected:
-    EndPointStateNetworkFramework() {}
-
-    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
-};
-
-} // namespace Inet
-} // namespace chip
+#include <lib/core/CHIPConfig.h>

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,28 +15,19 @@
  *    limitations under the License.
  */
 
-/**
- *  Shared state for Network Framework implementations of TCPEndPoint and UDPEndPoint.
- */
-
-#pragma once
-
-#include <inet/EndPointBasis.h>
-
-#include <inet/IPAddress.h>
-
 #include <Network/Network.h>
+
+#include <inet/IPPacketInfo.h>
 
 namespace chip {
 namespace Inet {
-
-class DLL_EXPORT EndPointStateNetworkFramework
-{
-protected:
-    EndPointStateNetworkFramework() {}
-
-    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
-};
-
+namespace Darwin {
+void DebugPrintListenerState(nw_listener_state_t state, nw_error_t error);
+void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_error_t error);
+void DebugPrintConnectionState(nw_connection_state_t state, nw_error_t error);
+void DebugPrintConnection(nw_connection_t connection);
+void DebugPrintEndPoint(nw_endpoint_t endpoint);
+void DebugPrintPacketInfo(IPPacketInfo & packetInfo);
+} // namespace Darwin
 } // namespace Inet
 } // namespace chip
