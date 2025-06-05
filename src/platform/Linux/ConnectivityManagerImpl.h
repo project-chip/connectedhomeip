@@ -235,7 +235,6 @@ private:
     bool _IsWiFiStationApplicationControlled();
     bool _IsWiFiStationProvisioned();
     void _ClearWiFiStationProvision();
-    bool _CanStartWiFiScan();
 
     WiFiAPMode _GetWiFiAPMode();
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
@@ -252,20 +251,23 @@ private:
     void _OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, const char * path);
     void _OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const char * path, GVariant * properties);
-    void _OnWpaPropertiesChanged(WpaSupplicant1Interface * proxy, GVariant * properties);
-    void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * proxy, gboolean success);
+    void _OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * properties);
+    void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
+    CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
-    WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
     uint16_t mApFreq;
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
+    bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
+    // The resource checking is needed right before sending data packets that they are initialized and connected.
+    bool mPafChannelAvailable = true;
 #endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);

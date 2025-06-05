@@ -65,7 +65,7 @@ void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoSt
     int sampleDurationUs = 1000 * 1000 / 30;
     rtc::FrameInfo frameInfo(mVideoSampleTimestamp);
     frameInfo.payloadType = kH264CodecPayloadType;
-    mVideoSampleTimestamp += sampleDurationUs;
+    mVideoSampleTimestamp += static_cast<uint32_t>(sampleDurationUs);
     mVideoTrack->sendFrame(sample, frameInfo);
 }
 
@@ -80,7 +80,7 @@ void WebrtcTransport::SendAudio(const char * data, size_t size, uint16_t audioSt
     int samplesPerFrame = (48000 * 20) / 1000;
     rtc::FrameInfo frameInfo(mAudioSampleTimestamp);
     frameInfo.payloadType = kOpusCodecPayloadType;
-    mAudioSampleTimestamp += samplesPerFrame;
+    mAudioSampleTimestamp += static_cast<uint32_t>(samplesPerFrame);
     mAudioTrack->sendFrame(sample, frameInfo);
 }
 
@@ -93,11 +93,11 @@ void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t vi
 // Implementation of CanSendVideo method
 bool WebrtcTransport::CanSendVideo()
 {
-    return mCanSendVideo;
+    return mVideoTrack != nullptr && mPeerConnection != nullptr;
 }
 
 // Implementation of CanSendAudio method
 bool WebrtcTransport::CanSendAudio()
 {
-    return mCanSendAudio;
+    return mAudioTrack != nullptr && mPeerConnection != nullptr;
 }
