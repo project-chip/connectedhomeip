@@ -13,8 +13,8 @@ The following checklist can be used to write a new cluster
 
 ## Cluster definitions
 
-Clusters are defined against the Matter specification. The code backing for them
-is code-generated based on XML definitions from
+Clusters are defined against the Matter specification. The underlying code for
+them is code-generated, based on XML definitions from
 [src/app/zap-templates/zcl/data-model/chip](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/data-model/chip)
 In order to define a new cluster, use
 [Alchemy](https://github.com/project-chip/alchemy) to parse the specification
@@ -32,7 +32,7 @@ mapping is done in
 [src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json)
 and this file will need your new cluster added.
 
-The mapping defines the folder that under which the cluster resides in
+The mapping defines the folder under which the cluster resides, inside
 [src/app/clusters](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters)
 
 ## Cluster layout
@@ -80,7 +80,7 @@ features and functionality: this should be part of unit testing.
 Consider if optimizing for flash/ram usage is required: common/large clusters
 may need this, other application clusters may be able to accept an overhead for
 maintainability. If compile-time flash/ram optimization is needed, use templates
-to select available features/attributes and enabling.
+to select available features/attributes and if they are enabled or not.
 
 Ensure that every attribute update will notify via the context
 `interactionContext->dataModelChangeListener`
@@ -102,7 +102,8 @@ a `PersistentStorageDelegate`.
 
 When using code generation for applications (i.e. a `*.zap` file), every
 application will have a source set that explicitly defines enabled items. To
-integrate with the following changes are needed:
+integrate with the codegen data model provider/generated code, following changes
+are needed:
 
 -   create a `CodegenIntegration.cpp` file intended to make use of this static
     application configuration.
@@ -113,7 +114,7 @@ integrate with the following changes are needed:
 
 #### Cluster-specific application configuration
 
-These are generated files available for include as
+These are generated files available for inclusion as
 `<app/static-cluster-config/<cluster-name>.h`. They are generated from
 [ServerClusterConfig.jinja](https://github.com/project-chip/connectedhomeip/blob/master/scripts/py_matter_idl/matter/idl/generators/cpp/application/ServerClusterConfig.jinja)
 and provide the following information:
@@ -121,6 +122,7 @@ and provide the following information:
 -   `chip::app::Clusters::<NAME>::kFixedClusterConfig` as an array of
     [ClusterConfiguration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/util/cluster-config.h).
     Both initialization and static asserts can be done based on these
+    configurations.
 
 -   `chip::app::Clusters::<NAME>::IsAttributeEnabledOnSomeEndpoint` and
     `chip::app::Clusters::<NAME>::IsCommandEnabledOnSomeEndpoint` are available
