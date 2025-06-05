@@ -50,6 +50,88 @@ namespace app {
  * - Change detection before updates
  * - Proper cleanup of complex types
  * - Thread-safe value access
+ * - The Tariff Data Update Flow 
+ * 
+ * @section update_flow Update Flow
+ * @defgroup tariff_update_flow Tariff Data Update Flow
+ * @brief State machine for managing tariff attribute updates
+ * 
+ * The update process follows a strict state sequence:
+ * 
+ * @dot
+ * digraph update_flow {
+ *   kIdle -> kInitiated [label="CreateNewValue()"];
+ *   kInitiated -> kAssigned [label="MarkAsAssigned()"];
+ *   kAssigned -> kValidated [label="UpdateBegin()"];
+ *   kValidated -> kUpdated  [label="UpdateCommit()"];
+ *   kUpdated -> kIdle  [label="UpdateEnd()"];
+ *   kInitiated -> kIdle [label="UpdateEnd()"];
+ *   kAssigned -> kIdle [label="UpdateEnd()"];
+ *   kValidated -> kIdle [label="UpdateEnd()"];
+ * }
+ * @enddot
+ * 
+ * ### Typical Update Sequence:
+ * 
+ * 1. **Initialization Phase**:
+ *    @code
+ *    /// Create new value container
+ *    err = dataObj.CreateNewValue(elementCount);
+ *    @endcode
+ *    - Allocates memory for list types
+ *    - Initializes default values
+ *    - State: kIdle → kInitiated
+ * 
+ * 2. **Modification Phase**:
+ *    @code
+ *    /// Get and modify the value
+ *    if (auto* newVal = dataObj.GetNewValue()) {
+ *        *newVal = configuredValue;
+ *        err = dataObj.MarkAsAssigned();
+ *    }
+ *    @endcode
+ *    - State: kInitiated → kAssigned
+ * 
+ * 3. **Validation Phase**:
+ *    @code
+ *    /// Validate and prepare for commit
+ *    err = dataObj.UpdateBegin(context, callback);
+ *    @endcode
+ *    - Runs custom validation
+ *    - State: kAssigned → kValidated
+ * 
+ * 4. **Commit Phase**:
+ *    @code
+ *    /// Finalize the update
+ *    if (CHIP_NO_ERROR == err) {
+ *        dataObj.UpdateCommit(); // Or UpdateEnd() on failure
+ *    }
+ *    @endcode
+ *    - Applies changes if validated
+ *    - Invokes callback on success ( to indicate attr changing)
+ *    - State: kValidated → kUpdated
+ * 
+ * ### Error Recovery:
+ * - At any point, UpdateEnd() can be called to:
+ *   - Discard pending changes
+ *   - Clean up allocated resources
+ *   - Reset to kIdle state
+ * 
+ * ### State Transition Rules:
+ * | Current State    | Valid Operations                     |
+ * |------------------|--------------------------------------|
+ * | kIdle            | CreateNewValue()                     |
+ * | kInitiated       | GetNewValue(), MarkAsAssigned(), UpdateEnd() |
+ * | kAssigned        | UpdateBegin(), UpdateEnd()         |
+ * | kValidated       | UpdateCommit(), UpdateEnd()        |
+ * | kUpdated         | UpdateEnd()        |
+ * 
+ * @see CreateNewValue()
+ * @see GetNewValue() 
+ * @see MarkAsAssigned()
+ * @see UpdateBegin()
+ * @see UpdateCommit()
+ * @see UpdateEnd()
  */
 template <typename T>
 class CTC_BaseDataClass
