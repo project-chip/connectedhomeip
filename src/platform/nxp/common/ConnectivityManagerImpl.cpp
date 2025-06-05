@@ -641,7 +641,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
     if (keyLen > 0)
     {
         pNetworkData->security.type = WLAN_SECURITY_WILDCARD;
-        if(keyLen <= sizeof(pNetworkData->security.psk))
+        if (keyLen <= sizeof(pNetworkData->security.psk))
         {
             /* Needed for WEP, WPA and WPA2 support */
             memcpy(pNetworkData->security.psk, key, keyLen);
