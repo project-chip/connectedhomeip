@@ -215,7 +215,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     rtc::Description::Video media("video", rtc::Description::Direction::SendOnly);
     media.addH264Codec(kVideoH264PayloadType);
     media.setBitrate(kVideoBitRate);
-    mTrack = mPeerConnection->addTrack(media);
+    mVideoTrack = mPeerConnection->addTrack(media);
 
     ChipLogProgress(Camera, "Generate and set the SDP");
     mPeerConnection->setLocalDescription();

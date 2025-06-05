@@ -126,7 +126,6 @@ jobs:
                      --known-failure platform/DeviceSafeQueue.h \
                      --known-failure platform/GLibTypeDeleter.h \
                      --known-failure platform/SingletonConfigurationManager.cpp \
-                     --known-failure system/SystemLayerImplDispatch.h \
                   "
                   # These ARE actually orphaned but due to dynamic-server we have code paths
                   # for them. Keeping them as a list as they still need review ...
