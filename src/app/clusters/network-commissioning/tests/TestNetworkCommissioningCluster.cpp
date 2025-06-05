@@ -60,15 +60,24 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
         ASSERT_EQ(expectedBuilder.AppendElements({
                       NetworkCommissioning::Attributes::MaxNetworks::kMetadataEntry,
                       NetworkCommissioning::Attributes::Networks::kMetadataEntry,
-                      NetworkCommissioning::Attributes::ScanMaxTimeSeconds::kMetadataEntry,
-                      NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::kMetadataEntry,
                       NetworkCommissioning::Attributes::InterfaceEnabled::kMetadataEntry,
                       NetworkCommissioning::Attributes::LastNetworkingStatus::kMetadataEntry,
                       NetworkCommissioning::Attributes::LastNetworkID::kMetadataEntry,
                       NetworkCommissioning::Attributes::LastConnectErrorValue::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+
+        // NOTE: this is AWKWARD: we pass in a wifi driver, yet attributes are still depending
+        //       on device enabling. Ideally we should not allow compiling odd things at all.
+        //       For now keep the logic as inherited from previous implementation.
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      NetworkCommissioning::Attributes::ScanMaxTimeSeconds::kMetadataEntry,
+                      NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::kMetadataEntry,
                       NetworkCommissioning::Attributes::SupportedWiFiBands::kMetadataEntry,
                   }),
                   CHIP_NO_ERROR);
+#endif
 
         ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
