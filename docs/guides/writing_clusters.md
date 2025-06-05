@@ -114,7 +114,7 @@ integrate with the following changes are needed:
 #### Cluster-specific application configuration
 
 These are generated files available for include as
-`<app/static-cluster-config/<cluster-name>.h`. They are generate from
+`<app/static-cluster-config/<cluster-name>.h`. They are generated from
 [ServerClusterConfig.jinja](https://github.com/project-chip/connectedhomeip/blob/master/scripts/py_matter_idl/matter/idl/generators/cpp/application/ServerClusterConfig.jinja)
 and provide the following information:
 
