@@ -22,6 +22,10 @@
 
 #include <clusters/MetadataQuery.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/SplitLambda.h>
+
+namespace chip {
+namespace app {
 
 /// class CommandHandlerInterfaceShim
 /// @brief Use this as a quick shim, but actual usage is NOT recommended
@@ -114,3 +118,5 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         return CHIP_NO_ERROR;
     }
 };
+} // namespace app
+} // namespace chip
