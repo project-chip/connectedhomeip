@@ -159,6 +159,11 @@ void WebRTCProviderManager::SetMediaController(MediaController * mediaController
     mMediaController = mediaController;
 }
 
+void WebRTCProviderManager::SetAVStreamMgmtServer(CameraAVStreamMgmtServer * cameraAVStreamMgmtServer)
+{
+    mCameraAVStreamMgmtServer = cameraAVStreamMgmtServer;
+}
+
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                                      bool & outDeferredOffer)
 {
@@ -438,6 +443,81 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
 {
     // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateVideoStreamID(uint16_t videoStreamId)
+{
+    if (mCameraAVStreamMgmtServer == nullptr)
+    {
+        ChipLogError(Camera, "AV Stream Management Server not available for video stream validation");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    const std::vector<VideoStreamStruct> & allocatedVideoStreams = mCameraAVStreamMgmtServer->GetAllocatedVideoStreams();
+
+    // Check if the videoStreamId exists in allocated streams
+    for (const auto & stream : allocatedVideoStreams)
+    {
+        if (stream.videoStreamID == videoStreamId)
+        {
+            ChipLogProgress(Camera, "Video stream ID %u is valid and allocated", videoStreamId);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    ChipLogError(Camera, "Video stream ID %u not found in allocated video streams", videoStreamId);
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
+{
+    if (mCameraAVStreamMgmtServer == nullptr)
+    {
+        ChipLogError(Camera, "AV Stream Management Server not available for audio stream validation");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    const std::vector<AudioStreamStruct> & allocatedAudioStreams = mCameraAVStreamMgmtServer->GetAllocatedAudioStreams();
+
+    // Check if the audioStreamId exists in allocated streams
+    for (const auto & stream : allocatedAudioStreams)
+    {
+        if (stream.audioStreamID == audioStreamId)
+        {
+            ChipLogProgress(Camera, "Audio stream ID %u is valid and allocated", audioStreamId);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    ChipLogError(Camera, "Audio stream ID %u not found in allocated audio streams", audioStreamId);
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+bool WebRTCProviderManager::IsPrivacyModeActive()
+{
+    if (mCameraAVStreamMgmtServer == nullptr)
+    {
+        ChipLogError(Camera, "AV Stream Management Server not available");
+        return false;
+    }
+
+    // Check privacy mode attributes
+    bool softRecordingPrivacyMode  = mCameraAVStreamMgmtServer->GetSoftRecordingPrivacyModeEnabled();
+    bool softLivestreamPrivacyMode = mCameraAVStreamMgmtServer->GetSoftLivestreamPrivacyModeEnabled();
+
+    return softRecordingPrivacyMode || softLivestreamPrivacyMode;
+}
+
+bool WebRTCProviderManager::HasAllocatedVideoStreams()
+{
+    const std::vector<VideoStreamStruct> & allocatedVideoStreams = mCameraAVStreamMgmtServer->GetAllocatedVideoStreams();
+    return !allocatedVideoStreams.empty();
+}
+
+bool WebRTCProviderManager::HasAllocatedAudioStreams()
+{
+    const std::vector<AudioStreamStruct> & allocatedAudioStreams = mCameraAVStreamMgmtServer->GetAllocatedAudioStreams();
+    return !allocatedAudioStreams.empty();
 }
 
 void WebRTCProviderManager::MoveToState(const State targetState)

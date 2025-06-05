@@ -134,6 +134,8 @@ void CameraApp::InitCameraDeviceClusters()
     mAVSettingsUserLevelMgmtServerPtr->Init();
 
     InitializeCameraAVStreamMgmt();
+
+    mCameraDevice->SetAVStreamMgmtServer(mAVStreamMgmtServerPtr.get());
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

@@ -35,6 +35,7 @@ using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSe
 using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+using CameraAVStreamMgmtServer = chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer;
 
 class WebRTCProviderManager : public chip::app::Clusters::WebRTCTransportProvider::Delegate
 {
@@ -50,6 +51,8 @@ public:
     void CloseConnection();
 
     void SetMediaController(MediaController * mediaController);
+
+    void SetAVStreamMgmtServer(CameraAVStreamMgmtServer * cameraAVStreamMgmtServer);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
@@ -68,6 +71,16 @@ public:
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
+
+    CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override;
+
+    CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    bool IsPrivacyModeActive() override;
+
+    bool HasAllocatedVideoStreams() override;
+
+    bool HasAllocatedAudioStreams() override;
 
 private:
     enum class CommandType : uint8_t
@@ -134,7 +147,8 @@ private:
     uint16_t mVideoStreamID;
     uint16_t mAudioStreamID;
 
-    MediaController * mMediaController = nullptr;
+    MediaController * mMediaController                   = nullptr;
+    CameraAVStreamMgmtServer * mCameraAVStreamMgmtServer = nullptr;
 };
 
 } // namespace Camera

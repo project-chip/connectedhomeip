@@ -79,6 +79,8 @@ public:
 
     MediaController & GetMediaController() override;
 
+    void SetAVStreamMgmtServer(CameraAVStreamMgmtServer * cameraAVStreamMgmtServer) override;
+
     CameraDevice();
     ~CameraDevice();
 

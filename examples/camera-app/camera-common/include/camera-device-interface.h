@@ -25,6 +25,7 @@
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
+using chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer;
 using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
 using chip::app::Clusters::CameraAvStreamManagement::RateDistortionTradeOffStruct;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotCapabilitiesStruct;
@@ -125,6 +126,9 @@ public:
 
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
+
+    // Setter for the Camera AV Stream Management Server
+    virtual void SetAVStreamMgmtServer(CameraAVStreamMgmtServer * cameraAVStreamMgmtServer) = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
