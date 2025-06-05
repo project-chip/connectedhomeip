@@ -53,9 +53,9 @@ You will generally have 2 major classes:
     encoders/decoders and a `ClusterLogic`
 
     -   This implements
-        [DefaultServerCluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/DefaultServerCluster.h#L36)
+        [DefaultServerCluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/DefaultServerCluster.h)
         or more generally the
-        [ServerClusterInterface](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterInterface.h#L41)
+        [ServerClusterInterface](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterInterface.h)
         interface.
 
 -   (optional) a `ClusterDriver` that provides callbacks to an application for
@@ -84,7 +84,7 @@ to select available features/attributes and enabling.
 
 Ensure that every attribute update will notify via the context
 `interactionContext->dataModelChangeListener`
-(<https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/Context.h#L35>).
+(https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/Context.h).
 This is required for subscriptions to work and should be unit tested.
 
 ### Persistent storage
@@ -95,7 +95,7 @@ This is required for subscriptions to work and should be unit tested.
 > fixed.
 
 For general storage, the cluster context
-[provides](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterContext.h#L38)
+[provides](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterContext.h)
 a `PersistentStorageDelegate`.
 
 ### Integration with application-specific code generation
@@ -104,8 +104,8 @@ When using code generation for applications (i.e. a `*.zap` file), every
 application will have a source set that explicitly defines enabled items. To
 integrate with the following changes are needed:
 
--   create a `CodegenIntegration.cpp` file intended to make use of this
-    static application configuration.
+-   create a `CodegenIntegration.cpp` file intended to make use of this static
+    application configuration.
 -   Add build system files: `app_config_dependent_sources.gni` and
     `app_config_dependent_sources.cmake` that contain this file and additional
     dependencies. See existing clusters for examples.
@@ -119,7 +119,7 @@ These are generated files available for include as
 and provide the following information:
 
 -   `chip::app::Clusters::<NAME>::kFixedClusterConfig` as an array of
-    [ClusterConfiguration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/util/cluster-config.h#L39).
+    [ClusterConfiguration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/util/cluster-config.h).
     Both initialization and static asserts can be done based on these
 
 -   `chip::app::Clusters::<NAME>::IsAttributeEnabledOnSomeEndpoint` and
