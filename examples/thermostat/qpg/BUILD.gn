@@ -69,6 +69,7 @@ qpg_executable("thermostat") {
     ":sdk",
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/examples/thermostat/qpg/zap/",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-fault-listener",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
@@ -76,7 +77,6 @@ qpg_executable("thermostat") {
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/qpg_sdk:qpg_thermostat_factorydata",
     "${chip_root}/third_party/qpg_sdk:qpg_thermostat_firmwaredata_lib",
-    "${chip_root}/src/app/clusters/general-diagnostics-server:general-fault-listener",
   ]
 
   if (chip_openthread_ftd) {
