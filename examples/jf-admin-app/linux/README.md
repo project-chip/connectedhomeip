@@ -30,7 +30,7 @@ Run the following command at the top level:
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/jf-admin-app/linux
+          $ cd examples/jf-admin-app/linux
           $ gn gen out/debug
           $ ninja -C out/debug
 
