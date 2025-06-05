@@ -6,6 +6,8 @@
 // based on {{input_name}}
 #pragma once
 
+#include <lib/core/DataModelTypes.h>
+
 {%- for cluster in clusters | sort(attribute='name') %}
 #include <clusters/{{cluster.name | name_for_id_usage}}/Ids.h>
 #include <clusters/{{cluster.name | name_for_id_usage}}/MetadataProvider.h>

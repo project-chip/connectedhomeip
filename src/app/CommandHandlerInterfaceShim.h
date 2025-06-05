@@ -21,6 +21,7 @@
 #include "CommandHandlerInterface.h"
 
 #include <clusters/MetadataQuery.h>
+#include <lib/core/DataModelTypes.h>
 
 /// class CommandHandlerInterfaceShim
 /// @brief Use this as a quick shim, but actual usage is NOT recommended

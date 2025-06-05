@@ -168,10 +168,6 @@ required for your implementation
 + class Instance : public CommandHandlerInterfaceShim<NetworkCommissioning::Id>
 ```
 
-```
-
-
-
 ### `CommandHandlerInterface` in `chip::app::InteractionModelEngine`
 
 Command handler lists were placed in a separate registry class that is
@@ -218,4 +214,7 @@ To use default attribute persistence, you need to pass in a
 `PersistentStorageDelegate` to `CodegenDataModelProviderInstance`. See example
 changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
 ).
+
+```
+
 ```

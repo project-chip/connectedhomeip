@@ -266,7 +266,7 @@ public:
 
 /// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
 /// testing of behaviors when command enumeration is done in the interace.
-class CustomUnitTestingCommandHandler : public CommandHandlerInterface
+class CustomListCommandHandler : public CommandHandlerInterface
 
 {
 public:
@@ -325,11 +325,11 @@ private:
 class ShimCommandHandler : public CommandHandlerInterfaceShim<Clusters::UnitTesting::Id>
 {
 public:
-    CustomListCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterface(endpointId, clusterId)
+    ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterface(endpointId, clusterId)
     {
         CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
     }
-    ~CustomListCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+    ~ShimCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
 
     void InvokeCommand(HandlerContext & handlerContext) override
     {
