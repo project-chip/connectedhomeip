@@ -73,8 +73,11 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
-            [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+        WiFiPAF::WiFiPAFSession PafSession = {
+            .role   = WiFiPAF::kWiFiPafRole_Subscriber,
+            .nodeId = event->CommissioningComplete.nodeId,
+        };
+        WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().CloseConnection(WiFiPAF::PafInfoAccess::kAccNodeId, PafSession);
 #endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)

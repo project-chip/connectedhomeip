@@ -194,7 +194,7 @@ public:
     CHIP_ERROR WiFiPAFCancelSubscribe(uint32_t SubscribeId);
     CHIP_ERROR WiFiPAFCancelIncompleteSubscribe();
     CHIP_ERROR WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msgBuf);
-    WiFiPAF::WiFiPAFLayer * GetWiFiPAF();
+    WiFiPAF::WiFiPAFLayer * GetWiFiPafLayer();
     void WiFiPafSetApFreq(const uint16_t freq);
     CHIP_ERROR WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
     bool WiFiPAFResourceAvailable();
@@ -538,7 +538,7 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-inline WiFiPAF::WiFiPAFLayer * ConnectivityManager::GetWiFiPAF()
+inline WiFiPAF::WiFiPAFLayer * ConnectivityManager::GetWiFiPafLayer()
 {
     return &WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
 }
