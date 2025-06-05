@@ -264,6 +264,13 @@ if (_chip_device_layer != "none" && chip_device_platform != "external") {
 declare_args() {
   # Enable jlink/segger_rtt support.
   chip_enable_segger_rtt = chip_device_platform != "qpg"
+
+  # Override chip_ble_platform_config_include to support specific BLE dependency.
+  chip_ble_platform_config_override = ""
+}
+
+if (chip_ble_platform_config_override != "") {
+  chip_ble_platform_config_include = chip_ble_platform_config_override
 }
 
 assert(
