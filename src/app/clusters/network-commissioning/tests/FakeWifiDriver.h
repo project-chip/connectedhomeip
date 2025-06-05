@@ -41,7 +41,7 @@ public:
     uint8_t GetScanNetworkTimeoutSeconds() override { return 2; }
     uint8_t GetConnectNetworkTimeoutSeconds() override { return 2; }
 
-    void SetAddOrUpdateNetworkResturn(NetworkCommissioningStatusEnum value) { mAddOrUpdateStatus = value; }
+    void SetAddOrUpdateNetworkReturn(NetworkCommissioningStatusEnum value) { mAddOrUpdateStatus = value; }
 
     NetworkCommissioningStatusEnum RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText,
                                                  uint8_t & outNetworkIndex) override

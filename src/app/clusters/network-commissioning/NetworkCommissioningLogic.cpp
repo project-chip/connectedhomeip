@@ -1,6 +1,5 @@
 /*
  *    Copyright (c) 2021-2025 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -807,7 +806,7 @@ void NetworkCommissioningLogic::OnResult(Status commissioningError, CharSpan deb
     auto commandHandle = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
-        // When the platform shutted down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
         // We may receive the callback after it and should make it noop.
         return;
     }
@@ -858,7 +857,7 @@ void NetworkCommissioningLogic::OnFinished(Status status, CharSpan debugText, Th
     auto commandHandle    = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
-        // When the platform shutted down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
         // We may receive the callback after it and should make it noop.
         return;
     }
@@ -884,7 +883,7 @@ void NetworkCommissioningLogic::OnFinished(Status status, CharSpan debugText, Wi
     auto commandHandle    = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
-        // When the platform shutted down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
         // We may receive the callback after it and should make it noop.
         return;
     }
