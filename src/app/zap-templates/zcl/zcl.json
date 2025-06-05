@@ -774,7 +774,10 @@
             "SoilMoistureMeasuredValue",
             "ClusterRevision"
         ],
-        "Unit Localization": ["TemperatureUnit"]
+        "Unit Localization": ["TemperatureUnit"],
+        "Zone Management": [
+            "TwoDCartesianMax"
+        ]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

@@ -8017,8 +8017,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster ZoneManagement attributes
-        case MTRAttributeIDTypeClusterZoneManagementAttributeSupportedZoneSourcesID:
-            result = @"SupportedZoneSources";
+        case MTRAttributeIDTypeClusterZoneManagementAttributeMaxUserDefinedZonesID:
+            result = @"MaxUserDefinedZones";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeMaxZonesID:
+            result = @"MaxZones";
             break;
 
         case MTRAttributeIDTypeClusterZoneManagementAttributeZonesID:
@@ -8029,8 +8033,16 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Triggers";
             break;
 
+        case MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityMaxID:
+            result = @"SensitivityMax";
+            break;
+
         case MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID:
             result = @"Sensitivity";
+            break;
+
+        case MTRAttributeIDTypeClusterZoneManagementAttributeTwoDCartesianMaxID:
+            result = @"TwoDCartesianMax";
             break;
 
         case MTRAttributeIDTypeClusterZoneManagementAttributeGeneratedCommandListID:
@@ -11678,6 +11690,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterZoneManagementCommandRemoveZoneID:
             result = @"RemoveZone";
+            break;
+
+        case MTRCommandIDTypeClusterZoneManagementCommandCreateOrUpdateTriggerID:
+            result = @"CreateOrUpdateTrigger";
+            break;
+
+        case MTRCommandIDTypeClusterZoneManagementCommandRemoveTriggerID:
+            result = @"RemoveTrigger";
             break;
 
         default:

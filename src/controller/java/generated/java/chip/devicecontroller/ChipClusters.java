@@ -56743,10 +56743,13 @@ public class ChipClusters {
   public static class ZoneManagementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1360L;
 
-    private static final long SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID = 0L;
-    private static final long ZONES_ATTRIBUTE_ID = 1L;
-    private static final long TRIGGERS_ATTRIBUTE_ID = 2L;
-    private static final long SENSITIVITY_ATTRIBUTE_ID = 3L;
+    private static final long MAX_USER_DEFINED_ZONES_ATTRIBUTE_ID = 0L;
+    private static final long MAX_ZONES_ATTRIBUTE_ID = 1L;
+    private static final long ZONES_ATTRIBUTE_ID = 2L;
+    private static final long TRIGGERS_ATTRIBUTE_ID = 3L;
+    private static final long SENSITIVITY_MAX_ATTRIBUTE_ID = 4L;
+    private static final long SENSITIVITY_ATTRIBUTE_ID = 5L;
+    private static final long TWO_D_CARTESIAN_MAX_ATTRIBUTE_ID = 6L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -56867,6 +56870,46 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void createOrUpdateTrigger(DefaultClusterCallback callback, ChipStructs.ZoneManagementClusterZoneTriggerControlStruct trigger) {
+      createOrUpdateTrigger(callback, trigger, 0);
+    }
+
+    public void createOrUpdateTrigger(DefaultClusterCallback callback, ChipStructs.ZoneManagementClusterZoneTriggerControlStruct trigger, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long triggerFieldID = 0L;
+      BaseTLVType triggertlvValue = trigger.encodeTlv();
+      elements.add(new StructElement(triggerFieldID, triggertlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void removeTrigger(DefaultClusterCallback callback, Integer zoneID) {
+      removeTrigger(callback, zoneID, 0);
+    }
+
+    public void removeTrigger(DefaultClusterCallback callback, Integer zoneID, int timedInvokeTimeoutMs) {
+      final long commandId = 7L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long zoneIDFieldID = 0L;
+      BaseTLVType zoneIDtlvValue = new UIntType(zoneID);
+      elements.add(new StructElement(zoneIDFieldID, zoneIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface CreateTwoDCartesianZoneResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer zoneID);
     }
@@ -56875,16 +56918,16 @@ public class ChipClusters {
       void onSuccess(ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones);
     }
 
-    public interface SupportedZoneSourcesAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<Integer> value);
-    }
-
     public interface ZonesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.ZoneManagementClusterZoneInformationStruct> value);
     }
 
     public interface TriggersAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> value);
+    }
+
+    public interface TwoDCartesianMaxAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -56899,30 +56942,56 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public void readSupportedZoneSourcesAttribute(
-        SupportedZoneSourcesAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID);
+    public void readMaxUserDefinedZonesAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_USER_DEFINED_ZONES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID, true);
+        }, MAX_USER_DEFINED_ZONES_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeSupportedZoneSourcesAttribute(
-        SupportedZoneSourcesAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID);
+    public void subscribeMaxUserDefinedZonesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_USER_DEFINED_ZONES_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SUPPORTED_ZONE_SOURCES_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MAX_USER_DEFINED_ZONES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxZonesAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ZONES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_ZONES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxZonesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ZONES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_ZONES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readZonesAttribute(
@@ -56964,15 +57033,6 @@ public class ChipClusters {
         }, TRIGGERS_ATTRIBUTE_ID, true);
     }
 
-    public void writeTriggersAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> value) {
-      writeTriggersAttribute(callback, value, 0);
-    }
-
-    public void writeTriggersAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
-      writeAttribute(new WriteAttributesCallbackImpl(callback), TRIGGERS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeTriggersAttribute(
         TriggersAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TRIGGERS_ATTRIBUTE_ID);
@@ -56984,6 +57044,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, TRIGGERS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSensitivityMaxAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SENSITIVITY_MAX_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SENSITIVITY_MAX_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSensitivityMaxAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SENSITIVITY_MAX_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SENSITIVITY_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSensitivityAttribute(
@@ -57019,6 +57105,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SENSITIVITY_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTwoDCartesianMaxAttribute(
+        TwoDCartesianMaxAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TWO_D_CARTESIAN_MAX_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TWO_D_CARTESIAN_MAX_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTwoDCartesianMaxAttribute(
+        TwoDCartesianMaxAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TWO_D_CARTESIAN_MAX_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, TWO_D_CARTESIAN_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

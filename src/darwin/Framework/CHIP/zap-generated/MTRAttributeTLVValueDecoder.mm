@@ -17267,30 +17267,26 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
 {
     using namespace Clusters::ZoneManagement;
     switch (aAttributeId) {
-    case Attributes::SupportedZoneSources::Id: {
-        using TypeInfo = Attributes::SupportedZoneSources::TypeInfo;
+    case Attributes::MaxUserDefinedZones::Id: {
+        using TypeInfo = Attributes::MaxUserDefinedZones::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSArray * _Nonnull value;
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                *aError = err;
-                return nil;
-            }
-            value = array_0;
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::MaxZones::Id: {
+        using TypeInfo = Attributes::MaxZones::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
         }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
     case Attributes::Zones::Id: {
@@ -17337,10 +17333,11 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
                 auto & entry_0 = iter_0.GetValue();
                 MTRZoneManagementClusterZoneTriggerControlStruct * newElement_0;
                 newElement_0 = [MTRZoneManagementClusterZoneTriggerControlStruct new];
-                newElement_0.initialDuration = [NSNumber numberWithUnsignedShort:entry_0.initialDuration];
-                newElement_0.augmentationDuration = [NSNumber numberWithUnsignedShort:entry_0.augmentationDuration];
+                newElement_0.zoneID = [NSNumber numberWithUnsignedShort:entry_0.zoneID];
+                newElement_0.initialDuration = [NSNumber numberWithUnsignedInt:entry_0.initialDuration];
+                newElement_0.augmentationDuration = [NSNumber numberWithUnsignedInt:entry_0.augmentationDuration];
                 newElement_0.maxDuration = [NSNumber numberWithUnsignedInt:entry_0.maxDuration];
-                newElement_0.blindDuration = [NSNumber numberWithUnsignedShort:entry_0.blindDuration];
+                newElement_0.blindDuration = [NSNumber numberWithUnsignedInt:entry_0.blindDuration];
                 if (entry_0.sensitivity.HasValue()) {
                     newElement_0.sensitivity = [NSNumber numberWithUnsignedChar:entry_0.sensitivity.Value()];
                 } else {
@@ -17357,6 +17354,17 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
         }
         return value;
     }
+    case Attributes::SensitivityMax::Id: {
+        using TypeInfo = Attributes::SensitivityMax::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
     case Attributes::Sensitivity::Id: {
         using TypeInfo = Attributes::Sensitivity::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -17366,6 +17374,19 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::TwoDCartesianMax::Id: {
+        using TypeInfo = Attributes::TwoDCartesianMax::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRZoneManagementClusterTwoDCartesianVertexStruct * _Nonnull value;
+        value = [MTRZoneManagementClusterTwoDCartesianVertexStruct new];
+        value.x = [NSNumber numberWithUnsignedShort:cppValue.x];
+        value.y = [NSNumber numberWithUnsignedShort:cppValue.y];
         return value;
     }
     default: {
