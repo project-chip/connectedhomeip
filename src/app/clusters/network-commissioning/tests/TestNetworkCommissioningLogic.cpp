@@ -49,4 +49,3 @@ TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 }
 
 } // namespace
-
