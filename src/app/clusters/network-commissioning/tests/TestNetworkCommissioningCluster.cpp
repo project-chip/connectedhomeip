@@ -19,9 +19,11 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
 #include <clusters/NetworkCommissioning/Ids.h>
+#include <clusters/NetworkCommissioning/Metadata.h>
 #include <clusters/NetworkCommissioning/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -55,8 +57,18 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 
         ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        // ASSERT_EQ(expectedBuilder.AppendElements({ SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry }),
-        //           CHIP_NO_ERROR);
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      NetworkCommissioning::Attributes::MaxNetworks::kMetadataEntry,
+                      NetworkCommissioning::Attributes::Networks::kMetadataEntry,
+                      NetworkCommissioning::Attributes::ScanMaxTimeSeconds::kMetadataEntry,
+                      NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::kMetadataEntry,
+                      NetworkCommissioning::Attributes::InterfaceEnabled::kMetadataEntry,
+                      NetworkCommissioning::Attributes::LastNetworkingStatus::kMetadataEntry,
+                      NetworkCommissioning::Attributes::LastNetworkID::kMetadataEntry,
+                      NetworkCommissioning::Attributes::LastConnectErrorValue::kMetadataEntry,
+                      NetworkCommissioning::Attributes::SupportedWiFiBands::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
