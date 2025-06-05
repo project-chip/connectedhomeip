@@ -104,8 +104,8 @@ When using code generation for applications (i.e. a `*.zap` file), every
 application will have a source set that explicitly defines enabled items. To
 integrate with the following changes are needed:
 
--   create a `CodegenIntegration.cpp` file intended to make use of these
-    application static configuration.
+-   create a `CodegenIntegration.cpp` file intended to make use of this
+    static application configuration.
 -   Add build system files: `app_config_dependent_sources.gni` and
     `app_config_dependent_sources.cmake` that contain this file and additional
     dependencies. See existing clusters for examples.
