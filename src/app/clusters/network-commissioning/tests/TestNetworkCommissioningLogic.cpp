@@ -50,14 +50,3 @@ TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 
 } // namespace
 
-// TODO: we have a dependency on GeneralCommissioning: setting a breadcrumb
-// via `GeneralCommissioning::SetBreadcrumb`. This should be decoupled when
-// GeneralCommissioning is turned into code-driven
-//
-// See https://github.com/project-chip/connectedhomeip/issues/39412
-namespace chip::app::Clusters::GeneralCommissioning {
-void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
-{
-    // NOTHING, this is a test
-}
-} // namespace chip::app::Clusters::GeneralCommissioning

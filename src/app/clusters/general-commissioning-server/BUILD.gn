@@ -27,5 +27,6 @@ group("general-commissioning-server") {
 # purposes only (and breadcrumb setting in this case is a noop)
 source_set("test-only-temporary-coupling") {
   sources = [ "TemporaryTestCoupling.cpp" ]
-  deps = [ "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning" ]
+  deps =
+      [ "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning" ]
 }
