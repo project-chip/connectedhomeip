@@ -107,8 +107,8 @@ integrate with the following changes are needed:
 -   create a `CodegenIntegration.cpp` file intended to make use of these
     application static configuration.
 -   Add build system files: `app_config_dependent_sources.gni` and
-    `app_config_dependent_sources.cmake` that contains this file and additional
-    dependencies. See existing clusters for content.
+    `app_config_dependent_sources.cmake` that contain this file and additional
+    dependencies. See existing clusters for examples.
 -   Make use of static configuration data as described below
 
 #### Cluster-specific application configuration
