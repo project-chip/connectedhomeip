@@ -950,7 +950,7 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
-        auto PeerAddr = device->GetPeerAddress();
+        auto peerAddr = device->GetPeerAddress();
         ChipLogError(Controller, "WiFi-PAF: Subscription Error, NodeId = %lu, err = %" CHIP_ERROR_FORMAT, PeerAddr.GetRemoteId(),
                      err.Format());
         self->CloseWiFiPAFConnection(PeerAddr.GetRemoteId());
