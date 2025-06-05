@@ -132,17 +132,15 @@ Changes for implementation:
 -   new
 
 ```cpp
-    using QF   = DataModel::CommandQualityFlags;
-    using Priv = Access::Privilege;
     ReturnErrorOnFailure(builder.AppendElements({
-        { Disable::Id,        QF::kTimed, Priv::kOperate },
-        { EnableCharging::Id, QF::kTimed, Priv::kOperate },
+        Disable::kMetadataEntry,
+        EnableCharging::kMetadataEntry,
     }));
     if (HasFeature(Feature::kV2x))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(
-            builder.Append({ EnableDischarging::Id, QF::kTimed, Priv::kOperate})
+            builder.Append(EnableDischarging::kMetadataEntry)
         );
     }
 ```
