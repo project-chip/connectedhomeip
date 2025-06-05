@@ -156,10 +156,11 @@ async def connect_host_wifi(ssid, password):
                 logger.error(
                     f" --- connect_host_wifi: Attempt {retry} failed. Return code: {conn.returncode} stderr: {stderr_msg}")
             else:
-                logger.error(f" --- connect_host_wifi: No result returned from connection attempt.")
+                logger.error(" --- connect_host_wifi: No result returned from connection attempt.")
 
         except subprocess.CalledProcessError as e:
-            logger.error(f" --- connect_host_wifi: Exception when trying to connect to {ssid} stderr: {conn.stderr.decode()}")
+            logger.error(
+                f" --- connect_host_wifi: Exception: {e} when trying to connect to {ssid} stderr: {conn.stderr.decode()}")
         finally:
             retry += 1
 
@@ -202,7 +203,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 logger.warning(f" --- change_networks: Error during network switch: {err}")
 
         except Exception as e:
-            logger.error(f" --- change_networks: Lost connection with the DUT.")
+            logger.error(f" --- change_networks: Lost connection with the DUT. Exception: {e}")
 
         # After telling the DUT to change networks, we must change TH to the second network, so it can find the DUT
         # But first wait a couple of seconds so the DUT finishes changing networks
@@ -351,6 +352,7 @@ class TC_CNET_4_11(MatterBaseTest):
             attribute=cnet.Attributes.Networks
         )
         num_networks = len(networks)
+        logger.info(f" --- Step 2: num_networks: {num_networks}")
 
         # TH finds the index of the Networks list entry with NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as 'userwifi_netidx'
         self.step(3)
