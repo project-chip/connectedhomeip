@@ -17,8 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 source_set("testing") {
-  sources = [ "AttributeTesting.h"
-]
+  sources = [ "AttributeTesting.h" ]
 
   public_deps = [
     "${chip_root}/src/app/data-model-provider:metadata",
