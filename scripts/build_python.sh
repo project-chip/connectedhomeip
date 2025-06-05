@@ -38,7 +38,7 @@ CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
 declare enable_ble=true
-declare enable_ipv4=false
+declare enable_ipv4=true
 declare enable_wifi_paf=true
 declare chip_detail_logging=false
 declare chip_mdns
@@ -164,7 +164,6 @@ while (($#)); do
             ;;
         --jupyter-lab | -j)
             install_jupyterlab=yes
-            shift
             ;;
         -*)
             help
