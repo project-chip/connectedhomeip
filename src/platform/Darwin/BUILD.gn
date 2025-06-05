@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
 
 assert(chip_device_platform == "darwin")
 
@@ -36,10 +37,7 @@ config("darwin_config") {
     ]
   }
 
-  cflags = [
-    "-fobjc-arc",
-    "-Wconversion",
-  ]
+  cflags = [ "-Wconversion" ]
 }
 
 static_library("Darwin") {
@@ -60,7 +58,7 @@ static_library("Darwin") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdContexts.cpp",
-    "DnssdHostNameRegistrar.cpp",
+    "DnssdHostNameRegistrar.mm",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "DnssdType.cpp",
@@ -68,8 +66,8 @@ static_library("Darwin") {
     "MdnsError.cpp",
     "MdnsError.h",
     "NetworkCommissioningDriver.h",
-    "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "PlatformManagerImpl.mm",
     "PlatformMetricKeys.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
@@ -77,7 +75,15 @@ static_library("Darwin") {
     "SystemTimeSupport.cpp",
     "UserDefaults.h",
     "UserDefaults.mm",
+    "inet/NetworkMonitor.h",
+    "inet/NetworkMonitor.mm",
+    "system/SystemLayerImplDispatch.h",
+    "system/SystemLayerImplDispatch.mm",
   ]
+
+  if (chip_system_config_use_sockets) {
+    sources += [ "system/SystemLayerImplDispatchSockets.mm" ]
+  }
 
   if (chip_enable_wifi) {
     sources += [
@@ -101,6 +107,7 @@ static_library("Darwin") {
     ":logging",
     ":tracing",
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
@@ -164,9 +171,6 @@ static_library("logging") {
   ]
 
   configs += [ "${chip_root}/src:includes" ]
-  cflags = [
-    "-fobjc-arc",
-    "-Wconversion",
-  ]
+  cflags = [ "-Wconversion" ]
   frameworks = [ "Foundation.framework" ]
 }

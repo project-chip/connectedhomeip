@@ -57,6 +57,7 @@ struct LinuxDeviceOptions
     bool wifiSupports5g        = false;
     bool mWiFi                 = false;
     bool mThread               = false;
+    bool cameraDeferredOffer   = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mWiFiPAF                = false;
     const char * mWiFiPAFExtCmds = nullptr;
@@ -103,6 +104,11 @@ struct LinuxDeviceOptions
     chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
     chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
 #endif
+    chip::Optional<std::string> vendorName;
+    chip::Optional<std::string> productName;
+    chip::Optional<std::string> hardwareVersionString;
+    chip::Optional<std::string> softwareVersionString;
+    chip::Optional<std::string> serialNumber;
     static LinuxDeviceOptions & GetInstance();
 };
 

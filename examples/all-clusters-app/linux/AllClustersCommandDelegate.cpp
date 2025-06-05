@@ -24,7 +24,7 @@
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -38,6 +38,7 @@
 #include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
+#include <soil-measurement-stub.h>
 
 #include <memory>
 #include <string>
@@ -555,6 +556,40 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         SetRefrigeratorDoorStatusHandler(self->mJsonValue);
     }
+    else if (name == "SimulateConfigurationVersionChange")
+    {
+        uint32_t configurationVersion = 0;
+        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        configurationVersion++;
+
+        if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
+        }
+    }
+    else if (name == "SetSimulatedSoilMoisture")
+    {
+        EndpointId endpoint          = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        Json::Value jsonSoilMoisture = self->mJsonValue["SoilMoistureValue"];
+        DataModel::Nullable<Percent> soilMoistureMeasuredValue;
+
+        if (endpoint != 1)
+        {
+            ChipLogError(NotSpecified, "Invalid EndpointId to set Soil Moisture value.");
+            return;
+        }
+
+        if (jsonSoilMoisture.isNull())
+        {
+            soilMoistureMeasuredValue.SetNull();
+        }
+        else
+        {
+            soilMoistureMeasuredValue.SetNonNull(static_cast<uint8_t>(self->mJsonValue["SoilMoistureValue"].asUInt()));
+        }
+
+        self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
@@ -666,7 +701,7 @@ void AllClustersAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
         softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
     }
 
-    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
 
 void AllClustersAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
@@ -915,6 +950,27 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
     {
         ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
     }
+}
+
+void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, DataModel::Nullable<Percent> soilMoisture)
+{
+    SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
+
+    if (soilMoisture.IsNull())
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
+    }
+    else if (soilMoisture.Value() > 100)
+    {
+        ChipLogDetail(NotSpecified, "Invalid SoilMoisture value");
+        return;
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
+    }
+
+    soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)

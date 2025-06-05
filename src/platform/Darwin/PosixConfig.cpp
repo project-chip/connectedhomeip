@@ -57,10 +57,11 @@ const PosixConfig::Key PosixConfig::kConfigKey_VendorId              = { kConfig
 const PosixConfig::Key PosixConfig::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
 
 // Keys stored in the Chip-config namespace
-const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability = { kConfigNamespace_ChipConfig, "location-capability" };
+const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed        = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation   = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const PosixConfig::Key PosixConfig::kConfigKey_CountryCode          = { kConfigNamespace_ChipConfig, "country-code" };
+const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability   = { kConfigNamespace_ChipConfig, "location-capability" };
+const PosixConfig::Key PosixConfig::kConfigKey_ConfigurationVersion = { kConfigNamespace_ChipConfig, "configuration-version" };
 
 // Keys stored in the Chip-counters namespace
 const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };

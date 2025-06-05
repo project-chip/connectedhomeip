@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/access/access.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("server_config") {
   defines = []
@@ -38,6 +39,18 @@ source_set("terms_and_conditions") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols",
+  ]
+}
+
+source_set("joint_fabric_datastore") {
+  sources = [
+    "JointFabricDatastore.cpp",
+    "JointFabricDatastore.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/zzz_generated/app-common/clusters/JointFabricDatastore",
   ]
 }
 
@@ -84,6 +97,10 @@ static_library("server") {
 
   if (chip_terms_and_conditions_required) {
     public_deps += [ ":terms_and_conditions" ]
+  }
+
+  if (chip_device_config_enable_joint_fabric) {
+    public_deps += [ ":joint_fabric_datastore" ]
   }
 
   # TODO: Server.cpp uses TestGroupData.h. Unsure why test code would be in such a central place
