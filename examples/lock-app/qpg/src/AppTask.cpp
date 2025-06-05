@@ -21,7 +21,6 @@
 #endif
 
 #include "powercycle_counting.h"
-#include "qvIO.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
@@ -43,6 +42,10 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include "ButtonHandler.h"
+#include "StatusLed.h"
+#include "qPinCfg.h"
+
 #include <inet/EndPointStateOpenThread.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -61,6 +64,7 @@ using namespace ::chip::DeviceLayer;
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define OTA_START_TRIGGER_TIMEOUT 1500
 
+#define APP_TASK_NAME "APP"
 #define APP_TASK_STACK_SIZE (3 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
@@ -75,7 +79,7 @@ TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
 bool sIsThreadProvisioned     = false;
-bool sIsThreadEnabled         = false;
+bool sIsThreadAttached        = false;
 bool sHaveBLEConnections      = false;
 bool sIsBLEAdvertisingEnabled = false;
 
@@ -91,6 +95,9 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+const uint8_t StatusLedGpios[] = QPINCFG_STATUS_LED;
+const ButtonConfig_t buttons[] = QPINCFG_BUTTONS;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -125,15 +132,15 @@ void OnTriggerIdentifyEffect(Identify * identify)
     {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "kBlink");
-        qvIO_LedBlink(LOCK_STATE_LED, 100, 100);
+        StatusLed_BlinkLed(LOCK_STATE_LED, 100, 100);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
         ChipLogProgress(Zcl, "kBreathe");
-        qvIO_LedBlink(LOCK_STATE_LED, 500, 500);
+        StatusLed_BlinkLed(LOCK_STATE_LED, 500, 500);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
         ChipLogProgress(Zcl, "kOkay");
-        qvIO_LedBlink(LOCK_STATE_LED, 1000, 1000);
+        StatusLed_BlinkLed(LOCK_STATE_LED, 1000, 1000);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         ChipLogProgress(Zcl, "kChannelChange");
@@ -155,7 +162,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
         SystemLayer().ScheduleLambda(
             [identify] { (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify); });
         sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-        qvIO_LedSet(LOCK_STATE_LED, false);
+        StatusLed_SetLed(LOCK_STATE_LED, false);
         break;
     default:
         ChipLogProgress(Zcl, "No identifier effect");
@@ -206,9 +213,6 @@ void AppTask::InitServer(intptr_t arg)
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
-    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
@@ -223,6 +227,9 @@ void AppTask::InitServer(intptr_t arg)
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     chip::Server::GetInstance().Init(initParams);
 
@@ -247,7 +254,15 @@ void AppTask::OpenCommissioning(intptr_t arg)
 
 CHIP_ERROR AppTask::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    const qResult_t res = qPinCfg_Init(NULL);
+
+    if (res != Q_OK)
+    {
+        ChipLogError(NotSpecified, "qPinCfg_Init failed: %d", res);
+    }
+
+    StatusLed_Init(StatusLedGpios, Q_ARRAY_SIZE(StatusLedGpios), true);
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
@@ -272,9 +287,9 @@ CHIP_ERROR AppTask::Init()
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Setup button handler
-    qvIO_SetBtnCallback(ButtonEventHandler);
+    ButtonHandler_Init(buttons, Q_ARRAY_SIZE(buttons), BUTTON_LOW, ButtonEventHandler);
 
-    qvIO_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
+    StatusLed_SetLed(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
 
     UpdateClusterState();
 
@@ -282,7 +297,7 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-    sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+    sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
     sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
     sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
     UpdateLEDs();
@@ -475,11 +490,11 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
-        qvIO_LedSet(SYSTEM_STATE_LED, false);
-        qvIO_LedSet(LOCK_STATE_LED, false);
+        StatusLed_SetLed(SYSTEM_STATE_LED, false);
+        StatusLed_SetLed(LOCK_STATE_LED, false);
 
-        qvIO_LedBlink(SYSTEM_STATE_LED, 500, 500);
-        qvIO_LedBlink(LOCK_STATE_LED, 500, 500);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 500, 500);
+        StatusLed_BlinkLed(LOCK_STATE_LED, 500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -562,7 +577,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
             // Set lock status LED back to show state of lock.
-            qvIO_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
+            StatusLed_SetLed(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
 
             sAppTask.CancelTimer();
 
@@ -624,7 +639,7 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         sAppTask.mNotifyState = true;
     }
 
-    qvIO_LedBlink(LOCK_STATE_LED, 50, 50);
+    StatusLed_BlinkLed(LOCK_STATE_LED, 50, 50);
 }
 
 void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
@@ -636,13 +651,13 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     {
         ChipLogProgress(NotSpecified, "Lock Action has been completed");
 
-        qvIO_LedSet(LOCK_STATE_LED, true);
+        StatusLed_SetLed(LOCK_STATE_LED, true);
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
         ChipLogProgress(NotSpecified, "Unlock Action has been completed");
 
-        qvIO_LedSet(LOCK_STATE_LED, false);
+        StatusLed_SetLed(LOCK_STATE_LED, false);
     }
 
     if (sAppTask.mSyncClusterToButtonAction || sAppTask.mNotifyState)
@@ -744,26 +759,26 @@ void AppTask::UpdateLEDs(void)
     // the LEDs at an even rate of 100ms.
     //
     // Otherwise, turn the LED OFF.
-    if (sIsThreadProvisioned && sIsThreadEnabled)
+    if (sIsThreadProvisioned && sIsThreadAttached)
     {
-        qvIO_LedSet(SYSTEM_STATE_LED, true);
+        StatusLed_SetLed(SYSTEM_STATE_LED, true);
     }
-    else if (sIsThreadProvisioned && !sIsThreadEnabled)
+    else if (sIsThreadProvisioned && !sIsThreadAttached)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 950, 50);
     }
     else if (sHaveBLEConnections)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 100, 100);
     }
     else if (sIsBLEAdvertisingEnabled)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 50, 50);
     }
     else
     {
         // not commisioned yet
-        qvIO_LedSet(SYSTEM_STATE_LED, false);
+        StatusLed_SetLed(SYSTEM_STATE_LED, false);
     }
 }
 
@@ -778,7 +793,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     }
 
     case DeviceEventType::kThreadConnectivityChange: {
-        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+        sIsThreadAttached = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
         UpdateLEDs();
         break;
     }
