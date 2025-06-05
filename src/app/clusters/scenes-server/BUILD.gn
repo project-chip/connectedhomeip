@@ -13,30 +13,33 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
-static_library("scenes") {
-  output_name = "libCHIPScenes"
-
-  sources = [
+source_set("scene-table") {
+  public = [
     "ExtensionFieldSets.h",
-    "ExtensionFieldSetsImpl.cpp",
     "ExtensionFieldSetsImpl.h",
-    "SceneHandlerImpl.cpp",
     "SceneHandlerImpl.h",
     "SceneTable.h",
-    "SceneTableImpl.cpp",
     "SceneTableImpl.h",
   ]
+  sources = [ "ExtensionFieldSetsImpl.cpp" ]
 
   deps = [ "${chip_root}/src/app" ]
 
   public_deps = [ "${chip_root}/src/app/storage:fabric-table" ]
+}
 
-  cflags = [
-    "-Wconversion",
-    "-Wshadow",
+source_set("scene-common") {
+  public = [ "scenes-server.h" ]
+
+  deps = [
+    ":scene-table",
+    "${chip_root}/src/app",
   ]
+
+  public_deps = [ "${chip_root}/src/app/storage:fabric-table" ]
 }
 
 # Empty default target, so that data_model.gni can properly depend on this
 group("scenes-server") {
+  deps = [ ":scene-common" ]
 }
