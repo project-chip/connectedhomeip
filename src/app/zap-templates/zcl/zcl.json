@@ -775,9 +775,7 @@
             "ClusterRevision"
         ],
         "Unit Localization": ["TemperatureUnit"],
-        "Zone Management": [
-            "TwoDCartesianMax"
-        ]
+        "Zone Management": ["TwoDCartesianMax"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
