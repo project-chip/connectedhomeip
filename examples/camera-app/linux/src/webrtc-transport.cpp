@@ -93,11 +93,11 @@ void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t vi
 // Implementation of CanSendVideo method
 bool WebrtcTransport::CanSendVideo()
 {
-    return mCanSendVideo;
+    return mVideoTrack != nullptr && mPeerConnection != nullptr;
 }
 
 // Implementation of CanSendAudio method
 bool WebrtcTransport::CanSendAudio()
 {
-    return mCanSendAudio;
+    return mAudioTrack != nullptr && mPeerConnection != nullptr;
 }

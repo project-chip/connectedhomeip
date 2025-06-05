@@ -5220,6 +5220,10 @@ NS_ASSUME_NONNULL_BEGIN
         _startSystime = nil;
 
         _endSystime = nil;
+
+        _apparentEnergy = nil;
+
+        _reactiveEnergy = nil;
     }
     return self;
 }
@@ -5233,13 +5237,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.endTimestamp = self.endTimestamp;
     other.startSystime = self.startSystime;
     other.endSystime = self.endSystime;
+    other.apparentEnergy = self.apparentEnergy;
+    other.reactiveEnergy = self.reactiveEnergy;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energy:%@; startTimestamp:%@; endTimestamp:%@; startSystime:%@; endSystime:%@; >", NSStringFromClass([self class]), _energy, _startTimestamp, _endTimestamp, _startSystime, _endSystime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energy:%@; startTimestamp:%@; endTimestamp:%@; startSystime:%@; endSystime:%@; apparentEnergy:%@; reactiveEnergy:%@; >", NSStringFromClass([self class]), _energy, _startTimestamp, _endTimestamp, _startSystime, _endSystime, _apparentEnergy, _reactiveEnergy];
     return descriptionString;
 }
 
@@ -9321,6 +9327,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
+        _zoneID = @(0);
+
         _initialDuration = @(0);
 
         _augmentationDuration = @(0);
@@ -9338,6 +9346,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRZoneManagementClusterZoneTriggerControlStruct alloc] init];
 
+    other.zoneID = self.zoneID;
     other.initialDuration = self.initialDuration;
     other.augmentationDuration = self.augmentationDuration;
     other.maxDuration = self.maxDuration;
@@ -9349,7 +9358,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; sensitivity:%@; >", NSStringFromClass([self class]), _initialDuration, _augmentationDuration, _maxDuration, _blindDuration, _sensitivity];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; sensitivity:%@; >", NSStringFromClass([self class]), _zoneID, _initialDuration, _augmentationDuration, _maxDuration, _blindDuration, _sensitivity];
     return descriptionString;
 }
 
@@ -9360,7 +9369,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _zones = [NSArray array];
+        _zone = @(0);
 
         _reason = @(0);
     }
@@ -9371,7 +9380,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRZoneManagementClusterZoneTriggeredEvent alloc] init];
 
-    other.zones = self.zones;
+    other.zone = self.zone;
     other.reason = self.reason;
 
     return other;
@@ -9379,7 +9388,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
     return descriptionString;
 }
 
@@ -9390,7 +9399,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _zones = [NSArray array];
+        _zone = @(0);
 
         _reason = @(0);
     }
@@ -9401,7 +9410,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRZoneManagementClusterZoneStoppedEvent alloc] init];
 
-    other.zones = self.zones;
+    other.zone = self.zone;
     other.reason = self.reason;
 
     return other;
@@ -9409,7 +9418,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
     return descriptionString;
 }
 
@@ -10160,6 +10169,8 @@ NS_ASSUME_NONNULL_BEGIN
         _transportStatus = @(0);
 
         _transportOptions = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -10171,13 +10182,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.connectionID = self.connectionID;
     other.transportStatus = self.transportStatus;
     other.transportOptions = self.transportOptions;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions, _fabricIndex];
     return descriptionString;
 }
 

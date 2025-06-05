@@ -6674,24 +6674,32 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
   public Optional<Long> endTimestamp;
   public Optional<Long> startSystime;
   public Optional<Long> endSystime;
+  public Optional<Long> apparentEnergy;
+  public Optional<Long> reactiveEnergy;
   private static final long ENERGY_ID = 0L;
   private static final long START_TIMESTAMP_ID = 1L;
   private static final long END_TIMESTAMP_ID = 2L;
   private static final long START_SYSTIME_ID = 3L;
   private static final long END_SYSTIME_ID = 4L;
+  private static final long APPARENT_ENERGY_ID = 5L;
+  private static final long REACTIVE_ENERGY_ID = 6L;
 
   public ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
     Long energy,
     Optional<Long> startTimestamp,
     Optional<Long> endTimestamp,
     Optional<Long> startSystime,
-    Optional<Long> endSystime
+    Optional<Long> endSystime,
+    Optional<Long> apparentEnergy,
+    Optional<Long> reactiveEnergy
   ) {
     this.energy = energy;
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
     this.startSystime = startSystime;
     this.endSystime = endSystime;
+    this.apparentEnergy = apparentEnergy;
+    this.reactiveEnergy = reactiveEnergy;
   }
 
   public StructType encodeTlv() {
@@ -6701,6 +6709,8 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
     values.add(new StructElement(END_TIMESTAMP_ID, endTimestamp.<BaseTLVType>map((nonOptionalendTimestamp) -> new UIntType(nonOptionalendTimestamp)).orElse(new EmptyType())));
     values.add(new StructElement(START_SYSTIME_ID, startSystime.<BaseTLVType>map((nonOptionalstartSystime) -> new UIntType(nonOptionalstartSystime)).orElse(new EmptyType())));
     values.add(new StructElement(END_SYSTIME_ID, endSystime.<BaseTLVType>map((nonOptionalendSystime) -> new UIntType(nonOptionalendSystime)).orElse(new EmptyType())));
+    values.add(new StructElement(APPARENT_ENERGY_ID, apparentEnergy.<BaseTLVType>map((nonOptionalapparentEnergy) -> new IntType(nonOptionalapparentEnergy)).orElse(new EmptyType())));
+    values.add(new StructElement(REACTIVE_ENERGY_ID, reactiveEnergy.<BaseTLVType>map((nonOptionalreactiveEnergy) -> new IntType(nonOptionalreactiveEnergy)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -6714,6 +6724,8 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
     Optional<Long> endTimestamp = Optional.empty();
     Optional<Long> startSystime = Optional.empty();
     Optional<Long> endSystime = Optional.empty();
+    Optional<Long> apparentEnergy = Optional.empty();
+    Optional<Long> reactiveEnergy = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ENERGY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
@@ -6740,6 +6752,16 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
           UIntType castingValue = element.value(UIntType.class);
           endSystime = Optional.of(castingValue.value(Long.class));
         }
+      } else if (element.contextTagNum() == APPARENT_ENERGY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          apparentEnergy = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == REACTIVE_ENERGY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          reactiveEnergy = Optional.of(castingValue.value(Long.class));
+        }
       }
     }
     return new ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
@@ -6747,7 +6769,9 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
       startTimestamp,
       endTimestamp,
       startSystime,
-      endSystime
+      endSystime,
+      apparentEnergy,
+      reactiveEnergy
     );
   }
 
@@ -6769,6 +6793,12 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
     output.append("\n");
     output.append("\tendSystime: ");
     output.append(endSystime);
+    output.append("\n");
+    output.append("\tapparentEnergy: ");
+    output.append(apparentEnergy);
+    output.append("\n");
+    output.append("\treactiveEnergy: ");
+    output.append(reactiveEnergy);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -13407,24 +13437,28 @@ public static class ZoneManagementClusterZoneInformationStruct {
   }
 }
 public static class ZoneManagementClusterZoneTriggerControlStruct {
-  public Integer initialDuration;
-  public Integer augmentationDuration;
+  public Integer zoneID;
+  public Long initialDuration;
+  public Long augmentationDuration;
   public Long maxDuration;
-  public Integer blindDuration;
+  public Long blindDuration;
   public Optional<Integer> sensitivity;
-  private static final long INITIAL_DURATION_ID = 0L;
-  private static final long AUGMENTATION_DURATION_ID = 1L;
-  private static final long MAX_DURATION_ID = 2L;
-  private static final long BLIND_DURATION_ID = 3L;
-  private static final long SENSITIVITY_ID = 4L;
+  private static final long ZONE_ID_ID = 0L;
+  private static final long INITIAL_DURATION_ID = 1L;
+  private static final long AUGMENTATION_DURATION_ID = 2L;
+  private static final long MAX_DURATION_ID = 3L;
+  private static final long BLIND_DURATION_ID = 4L;
+  private static final long SENSITIVITY_ID = 5L;
 
   public ZoneManagementClusterZoneTriggerControlStruct(
-    Integer initialDuration,
-    Integer augmentationDuration,
+    Integer zoneID,
+    Long initialDuration,
+    Long augmentationDuration,
     Long maxDuration,
-    Integer blindDuration,
+    Long blindDuration,
     Optional<Integer> sensitivity
   ) {
+    this.zoneID = zoneID;
     this.initialDuration = initialDuration;
     this.augmentationDuration = augmentationDuration;
     this.maxDuration = maxDuration;
@@ -13434,6 +13468,7 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ZONE_ID_ID, new UIntType(zoneID)));
     values.add(new StructElement(INITIAL_DURATION_ID, new UIntType(initialDuration)));
     values.add(new StructElement(AUGMENTATION_DURATION_ID, new UIntType(augmentationDuration)));
     values.add(new StructElement(MAX_DURATION_ID, new UIntType(maxDuration)));
@@ -13447,21 +13482,27 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer initialDuration = null;
-    Integer augmentationDuration = null;
+    Integer zoneID = null;
+    Long initialDuration = null;
+    Long augmentationDuration = null;
     Long maxDuration = null;
-    Integer blindDuration = null;
+    Long blindDuration = null;
     Optional<Integer> sensitivity = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == INITIAL_DURATION_ID) {
+      if (element.contextTagNum() == ZONE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          initialDuration = castingValue.value(Integer.class);
+          zoneID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == INITIAL_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          initialDuration = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == AUGMENTATION_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          augmentationDuration = castingValue.value(Integer.class);
+          augmentationDuration = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == MAX_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13471,7 +13512,7 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
       } else if (element.contextTagNum() == BLIND_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          blindDuration = castingValue.value(Integer.class);
+          blindDuration = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == SENSITIVITY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13481,6 +13522,7 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
       }
     }
     return new ZoneManagementClusterZoneTriggerControlStruct(
+      zoneID,
       initialDuration,
       augmentationDuration,
       maxDuration,
@@ -13493,6 +13535,9 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ZoneManagementClusterZoneTriggerControlStruct {\n");
+    output.append("\tzoneID: ");
+    output.append(zoneID);
+    output.append("\n");
     output.append("\tinitialDuration: ");
     output.append(initialDuration);
     output.append("\n");
@@ -16136,18 +16181,22 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
   public Integer connectionID;
   public Integer transportStatus;
   public Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions;
+  public Integer fabricIndex;
   private static final long CONNECTION_ID_ID = 0L;
   private static final long TRANSPORT_STATUS_ID = 1L;
   private static final long TRANSPORT_OPTIONS_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public PushAvStreamTransportClusterTransportConfigurationStruct(
     Integer connectionID,
     Integer transportStatus,
-    Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions
+    Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions,
+    Integer fabricIndex
   ) {
     this.connectionID = connectionID;
     this.transportStatus = transportStatus;
     this.transportOptions = transportOptions;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -16155,6 +16204,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
     values.add(new StructElement(TRANSPORT_STATUS_ID, new UIntType(transportStatus)));
     values.add(new StructElement(TRANSPORT_OPTIONS_ID, transportOptions.<BaseTLVType>map((nonOptionaltransportOptions) -> nonOptionaltransportOptions.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -16166,6 +16216,7 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     Integer connectionID = null;
     Integer transportStatus = null;
     Optional<ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct> transportOptions = Optional.empty();
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONNECTION_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16182,12 +16233,18 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
           StructType castingValue = element.value(StructType.class);
           transportOptions = Optional.of(ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct.decodeTlv(castingValue));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new PushAvStreamTransportClusterTransportConfigurationStruct(
       connectionID,
       transportStatus,
-      transportOptions
+      transportOptions,
+      fabricIndex
     );
   }
 
@@ -16203,6 +16260,9 @@ public static class PushAvStreamTransportClusterTransportConfigurationStruct {
     output.append("\n");
     output.append("\ttransportOptions: ");
     output.append(transportOptions);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();

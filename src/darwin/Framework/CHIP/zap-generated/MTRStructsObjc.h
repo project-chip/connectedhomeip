@@ -1285,6 +1285,8 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @property (nonatomic, copy) NSNumber * _Nullable endTimestamp MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 @property (nonatomic, copy) NSNumber * _Nullable startSystime MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 @property (nonatomic, copy) NSNumber * _Nullable endSystime MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nullable apparentEnergy MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable reactiveEnergy MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -2234,6 +2236,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRZoneManagementClusterZoneTriggerControlStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull zoneID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull initialDuration MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull augmentationDuration MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull maxDuration MTR_PROVISIONALLY_AVAILABLE;
@@ -2243,13 +2246,13 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRZoneManagementClusterZoneTriggeredEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nonnull zones MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull zone MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull reason MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRZoneManagementClusterZoneStoppedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nonnull zones MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull zone MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull reason MTR_PROVISIONALLY_AVAILABLE;
 @end
 
@@ -2427,6 +2430,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull connectionID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull transportStatus MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRPushAVStreamTransportClusterTransportOptionsStruct * _Nullable transportOptions MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

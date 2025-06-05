@@ -843,6 +843,31 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
                                         MarkAttributeDirty markDirty);
 } // namespace TCUpdateDeadline
 
+namespace RecoveryIdentifier {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
+} // namespace RecoveryIdentifier
+
+namespace NetworkRecoveryReason {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum> & value); // NetworkRecoveryReasonEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum> & value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum> & value,
+    MarkAttributeDirty markDirty);
+} // namespace NetworkRecoveryReason
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
@@ -5041,28 +5066,11 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 namespace SoilMeasurement {
 namespace Attributes {
 
-namespace SoilMoistureMeasuredValue {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace SoilMoistureMeasuredValue
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace FeatureMap
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
 
 } // namespace Attributes
 } // namespace SoilMeasurement
@@ -5542,6 +5550,24 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 namespace ZoneManagement {
 namespace Attributes {
+
+namespace MaxUserDefinedZones {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MaxUserDefinedZones
+
+namespace MaxZones {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MaxZones
+
+namespace SensitivityMax {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace SensitivityMax
 
 namespace Sensitivity {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
