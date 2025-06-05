@@ -641,8 +641,15 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
     if (keyLen > 0)
     {
         pNetworkData->security.type = WLAN_SECURITY_WILDCARD;
-        memcpy(pNetworkData->security.psk, key, keyLen);
-        pNetworkData->security.psk_len = keyLen;
+        if(keyLen <= sizeof(pNetworkData->security.psk))
+        {
+            /* Needed for WEP, WPA and WPA2 support */
+            memcpy(pNetworkData->security.psk, key, keyLen);
+            pNetworkData->security.psk_len = keyLen;
+        }
+        /* Needed for WPA3 SAE support as the max length of SAE password is larger than max length of WPA-PSK */
+        memcpy(pNetworkData->security.password, key, keyLen);
+        pNetworkData->security.password_len = keyLen;
     }
 
     ConnectNetworkTimerHandler(NULL, (void *) pNetworkData);
