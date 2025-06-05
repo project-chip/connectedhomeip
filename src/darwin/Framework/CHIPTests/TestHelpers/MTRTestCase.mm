@@ -28,29 +28,34 @@
 // Tasks that are not scoped to a specific test, but rather to a specific test suite.
 static NSMutableSet<NSTask *> * sRunningCrossTestTasks;
 
+static void TerminateTask(NSTask * task)
+{
+    NSLog(@"Terminating task %@", task);
+
+    [task terminate]; // Sends SIGTERM
+
+    // Wait up to 10 seconds for graceful shutdown
+    BOOL terminated = NO;
+    for (int i = 0; i < 100; i++) {
+        if (![task isRunning]) {
+            terminated = YES;
+            break;
+        }
+        [NSThread sleepForTimeInterval:0.1];
+    }
+
+    if (!terminated) {
+        NSLog(@"Force killing unresponsive task %@", task);
+        kill(task.processIdentifier, SIGKILL);
+    }
+
+    [task waitUntilExit];
+}
+
 static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 {
     for (NSTask * task in tasks) {
-        NSLog(@"Terminating task %@", task);
-
-        [task terminate]; // Sends SIGTERM
-
-        // Wait up to 10 seconds for graceful shutdown
-        BOOL terminated = NO;
-        for (int i = 0; i < 100; i++) {
-            if (![task isRunning]) {
-                terminated = YES;
-                break;
-            }
-            [NSThread sleepForTimeInterval:0.1];
-        }
-
-        if (!terminated) {
-            NSLog(@"Force killing unresponsive task %@", task);
-            kill(task.processIdentifier, SIGKILL);
-        }
-
-        [task waitUntilExit];
+        TerminateTask(task);
     }
     tasks = nil;
 }
@@ -265,6 +270,26 @@ static MTRMockCB * sMockCB;
 
     [sRunningCrossTestTasks addObject:task];
 }
+
+- (NSTask *)relaunchTask:(NSTask *)task additionalArguments:(NSArray<NSString *> *)additionalArguments
+{
+    TerminateTask(task);
+    [_runningTasks removeObject:task];
+
+    NSTask * newTask = [[NSTask alloc] init];
+    [newTask setExecutableURL:task.executableURL];
+    NSMutableArray<NSString *> * arguments = [task.arguments mutableCopy];
+    if (additionalArguments != nil) {
+        [arguments addObjectsFromArray:additionalArguments];
+    }
+    [newTask setArguments:arguments];
+    newTask.standardOutput = task.standardOutput;
+    newTask.standardError = task.standardError;
+
+    [self launchTask:newTask];
+    return newTask;
+}
+
 #endif // HAVE_NSTASK
 
 - (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
