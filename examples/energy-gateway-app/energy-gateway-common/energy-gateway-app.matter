@@ -1622,6 +1622,32 @@ provisional cluster ElectricalGridConditions = 160 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This Meter Identification Cluster provides attributes for determining advanced information about utility metering device. */
+provisional cluster MeterIdentification = 2822 {
+  revision 1;
+
+  enum MeterTypeEnum : enum8 {
+    kUtility = 0;
+    kPrivate = 1;
+    kGeneric = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPowerThreshold = 0x1;
+  }
+
+  readonly attribute nullable MeterTypeEnum meterType = 0;
+  readonly attribute nullable char_string<64> pointOfDelivery = 1;
+  readonly attribute nullable char_string<64> meterSerialNumber = 2;
+  readonly attribute optional nullable char_string<64> protocolVersion = 3;
+  readonly attribute optional nullable PowerThresholdStruct powerThreshold = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 3;
   device type ma_otarequestor = 18, version 1;
@@ -1880,6 +1906,19 @@ endpoint 1 {
     callback attribute localGenerationAvailable;
     callback attribute currentConditions;
     callback attribute forecastConditions;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster MeterIdentification {
+    callback attribute meterType;
+    callback attribute pointOfDelivery;
+    callback attribute meterSerialNumber;
+    callback attribute protocolVersion;
+    callback attribute powerThreshold;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
