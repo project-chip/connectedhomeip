@@ -35,12 +35,12 @@ from mobly.test_runner import TestRunner
 try:
     from matter_yamltests.hooks import TestRunnerHooks
 except ImportError:
-    class TestRunnerHooks:
+    class TestRunnerHooks:  # type: ignore[no-redef]
         pass
 try:
     from chip.tracing import TracingContext
 except ImportError:
-    class TracingContext:
+    class TracingContext:  # type: ignore[no-redef]
         def __enter__(self):
             return self
 
@@ -480,14 +480,19 @@ class MockTestRunner():
     mocking the controller's Read method and other interactions.
     """
 
-    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
-                 pics: dict[str, bool] = None, paa_trust_store_path=None):
+    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
+                 pics: Optional[dict[str, bool]] = None, paa_trust_store_path=None):
 
         from chip.testing.matter_testing import MatterStackState, MatterTestConfig
 
         self.kvs_storage = 'kvs_admin.json'
+        # Convert pics from dict[str, bool] to dict[bool, str] if provided
+        converted_pics = None
+        if pics is not None:
+            converted_pics = {v: k for k, v in pics.items()}
+
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
-                                       pics=pics, storage_path=self.kvs_storage)
+                                       pics=converted_pics or {}, storage_path=Path(self.kvs_storage))
         self.set_test(abs_filename, classname, test)
 
         self.set_test_config(self.config)
@@ -512,14 +517,14 @@ class MockTestRunner():
 
         self.test_class = getattr(module, classname)
 
-    def set_test_config(self, test_config: 'MatterTestConfig' = None):
+    def set_test_config(self, test_config: Optional['MatterTestConfig'] = None):
         from chip.testing.matter_testing import MatterTestConfig
         if test_config is None:
             test_config = MatterTestConfig()
 
         self.config = test_config
         self.config.tests = [self.test]
-        self.config.storage_path = self.kvs_storage
+        self.config.storage_path = Path(self.kvs_storage)
         if not self.config.dut_node_ids:
             self.config.dut_node_ids = [1]
 
