@@ -67,6 +67,15 @@ TEST_F(CommissioneeDeviceProxyTest, SuccessfullyGetsInitialized)
 
 TEST_F(CommissioneeDeviceProxyTest, UpdatesPeerDeviceData)
 {
+    ControllerDeviceInitParams params;
+
+    params.sessionManager = chip::Platform::New<chip::SessionManager>();
+    params.exchangeMgr    = chip::Platform::New<chip::Messaging::ExchangeManager>();
+    NodeId deviceId       = 12345;
+    char ipAddress[10]    = "127.0.0.1";
+
+    Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(ipAddress, 5540);
+    commissioneeDeviceProxy.Init(params, deviceId, peerAddress);
 
     char newIpAddress[39]                 = "2001:db8:1234:5678:90ab:cdef:1234:5678";
     Transport::PeerAddress newPeerAddress = Transport::PeerAddress::UDP(newIpAddress, 5540);
@@ -84,6 +93,16 @@ TEST_F(CommissioneeDeviceProxyTest, UpdatesPeerDeviceData)
 
 TEST_F(CommissioneeDeviceProxyTest, SetsPeerIdFromCertificates)
 {
+    ControllerDeviceInitParams params;
+
+    params.sessionManager = chip::Platform::New<chip::SessionManager>();
+    params.exchangeMgr    = chip::Platform::New<chip::Messaging::ExchangeManager>();
+    NodeId deviceId       = 12345;
+    char ipAddress[10]    = "127.0.0.1";
+
+    Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(ipAddress, 5540);
+    commissioneeDeviceProxy.Init(params, deviceId, peerAddress);
+
     Credentials::TestOnlyLocalCertificateAuthority fabric11CertAuthority;
 
     EXPECT_TRUE(fabric11CertAuthority.Init().IsSuccess());
