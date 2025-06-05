@@ -1837,7 +1837,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace TestCheckCommandFlags
 namespace TestDifferentVendorMeiRequest {
