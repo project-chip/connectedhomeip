@@ -18,7 +18,7 @@ is code-generated based on XML definitions from
 [src/app/zap-templates/zcl/data-model/chip](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/data-model/chip)
 In order to define a new cluster, use
 [Alchemy](https://github.com/project-chip/alchemy) to parse the specification
-`asciidoc`` and generate/update the relevant XML files. Manual editing is
+`asciidoc` and generate/update the relevant XML files. Manual editing is
 discouraged as we have found that mistakes are easy to make and hard to spot.
 
 Once you have a new or updated XML, run
@@ -171,4 +171,5 @@ and
 [src/app/zap-templates/zcl/zcl-with-test-extensions.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap-templates/zcl/zcl-with-test-extensions.json)
 to mark all attributes of the cluster as
 `attribute access interface attributes`, so that ember does not reserve RAM for
-them (`ClusterLogic` should contain this RAM now)
+them (`ClusterLogic` should contain this RAM now). List-typed attributes do not
+need to be added in these lists.
