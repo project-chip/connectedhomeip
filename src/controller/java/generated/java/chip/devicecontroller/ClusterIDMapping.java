@@ -17287,10 +17287,13 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            SupportedZoneSources(0L),
-            Zones(1L),
-            Triggers(2L),
-            Sensitivity(3L),
+            MaxUserDefinedZones(0L),
+            MaxZones(1L),
+            Zones(2L),
+            Triggers(3L),
+            SensitivityMax(4L),
+            Sensitivity(5L),
+            TwoDCartesianMax(6L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -17341,7 +17344,9 @@ public class ClusterIDMapping {
             CreateTwoDCartesianZone(0L),
             UpdateTwoDCartesianZone(2L),
             GetTwoDCartesianZone(3L),
-            RemoveZone(5L),;
+            RemoveZone(5L),
+            CreateOrUpdateTrigger(6L),
+            RemoveTrigger(7L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -17421,6 +17426,40 @@ public class ClusterIDMapping {
                     }
                     public static RemoveZoneCommandField value(int id) throws NoSuchFieldError {
                         for (RemoveZoneCommandField field : RemoveZoneCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum CreateOrUpdateTriggerCommandField {Trigger(0),;
+                    private final int id;
+                    CreateOrUpdateTriggerCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static CreateOrUpdateTriggerCommandField value(int id) throws NoSuchFieldError {
+                        for (CreateOrUpdateTriggerCommandField field : CreateOrUpdateTriggerCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveTriggerCommandField {ZoneID(0),;
+                    private final int id;
+                    RemoveTriggerCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveTriggerCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveTriggerCommandField field : RemoveTriggerCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
