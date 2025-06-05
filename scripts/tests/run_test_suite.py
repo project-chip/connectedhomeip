@@ -237,7 +237,7 @@ def cmd_list(context):
     '--all-clusters-app',
     help='what all clusters app to use')
 @click.option(
-    '--energy-gtw-app',
+    '--energy-gateway-app',
     help='what energy gateway app to use')
 @click.option(
     '--lock-app',
