@@ -91,7 +91,6 @@ ti_simplelink_executable("pump_app") {
   public = [ 
     "${chip_root}/src/platform/ti/cc13xx_26xx/DefaultTestEventTriggerDelegate.h",
     "${chip_root}/src/app/clusters/general-diagnostics-server:general-fault-listener",
-    "${chip_root}/src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h",
   ]
 
   deps = [
@@ -102,6 +101,7 @@ ti_simplelink_executable("pump_app") {
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/openthread:openthread",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-fault-listener",
   ]
   defines = []
   if (custom_factory_data) {
