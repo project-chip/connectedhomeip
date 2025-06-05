@@ -21,7 +21,6 @@
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/util/MatterCallbacks.h>

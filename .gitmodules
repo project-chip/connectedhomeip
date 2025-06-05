@@ -43,8 +43,8 @@
 	branch  = master
 [submodule "qpg_sdk"]
 	path = third_party/qpg_sdk/repo
-	url = https://github.com/Qorvo/QMatter
-	branch  = vlatest-libs
+	url = https://gitlab.com/qorvo_sdk/public/stacks/matter-support-qorvo.git
+	branch  = main
 	platforms = qpg
 [submodule "freertos"]
 	path = third_party/freertos/repo

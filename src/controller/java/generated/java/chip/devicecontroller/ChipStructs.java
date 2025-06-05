@@ -13437,24 +13437,28 @@ public static class ZoneManagementClusterZoneInformationStruct {
   }
 }
 public static class ZoneManagementClusterZoneTriggerControlStruct {
-  public Integer initialDuration;
-  public Integer augmentationDuration;
+  public Integer zoneID;
+  public Long initialDuration;
+  public Long augmentationDuration;
   public Long maxDuration;
-  public Integer blindDuration;
+  public Long blindDuration;
   public Optional<Integer> sensitivity;
-  private static final long INITIAL_DURATION_ID = 0L;
-  private static final long AUGMENTATION_DURATION_ID = 1L;
-  private static final long MAX_DURATION_ID = 2L;
-  private static final long BLIND_DURATION_ID = 3L;
-  private static final long SENSITIVITY_ID = 4L;
+  private static final long ZONE_ID_ID = 0L;
+  private static final long INITIAL_DURATION_ID = 1L;
+  private static final long AUGMENTATION_DURATION_ID = 2L;
+  private static final long MAX_DURATION_ID = 3L;
+  private static final long BLIND_DURATION_ID = 4L;
+  private static final long SENSITIVITY_ID = 5L;
 
   public ZoneManagementClusterZoneTriggerControlStruct(
-    Integer initialDuration,
-    Integer augmentationDuration,
+    Integer zoneID,
+    Long initialDuration,
+    Long augmentationDuration,
     Long maxDuration,
-    Integer blindDuration,
+    Long blindDuration,
     Optional<Integer> sensitivity
   ) {
+    this.zoneID = zoneID;
     this.initialDuration = initialDuration;
     this.augmentationDuration = augmentationDuration;
     this.maxDuration = maxDuration;
@@ -13464,6 +13468,7 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ZONE_ID_ID, new UIntType(zoneID)));
     values.add(new StructElement(INITIAL_DURATION_ID, new UIntType(initialDuration)));
     values.add(new StructElement(AUGMENTATION_DURATION_ID, new UIntType(augmentationDuration)));
     values.add(new StructElement(MAX_DURATION_ID, new UIntType(maxDuration)));
@@ -13477,21 +13482,27 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer initialDuration = null;
-    Integer augmentationDuration = null;
+    Integer zoneID = null;
+    Long initialDuration = null;
+    Long augmentationDuration = null;
     Long maxDuration = null;
-    Integer blindDuration = null;
+    Long blindDuration = null;
     Optional<Integer> sensitivity = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == INITIAL_DURATION_ID) {
+      if (element.contextTagNum() == ZONE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          initialDuration = castingValue.value(Integer.class);
+          zoneID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == INITIAL_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          initialDuration = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == AUGMENTATION_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          augmentationDuration = castingValue.value(Integer.class);
+          augmentationDuration = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == MAX_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13501,7 +13512,7 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
       } else if (element.contextTagNum() == BLIND_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          blindDuration = castingValue.value(Integer.class);
+          blindDuration = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == SENSITIVITY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13511,6 +13522,7 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
       }
     }
     return new ZoneManagementClusterZoneTriggerControlStruct(
+      zoneID,
       initialDuration,
       augmentationDuration,
       maxDuration,
@@ -13523,6 +13535,9 @@ public static class ZoneManagementClusterZoneTriggerControlStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ZoneManagementClusterZoneTriggerControlStruct {\n");
+    output.append("\tzoneID: ");
+    output.append(zoneID);
+    output.append("\n");
     output.append("\tinitialDuration: ");
     output.append(initialDuration);
     output.append("\n");
