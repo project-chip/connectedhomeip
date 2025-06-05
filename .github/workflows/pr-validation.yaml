@@ -47,7 +47,7 @@ jobs:
       - name: Fail if PR instructions were not deleted
         if: (steps.check-instructions.outcome == 'failure') && (github.event.pull_request.user.login != 'dependabot[bot]')
         run: |
-          python -c 'import sys; print("PR instructions were not replaced"); sys.exit(1)'
+          python -c 'import sys; print("The string \"Please replace this HTML comment\" is found in the PR description."); sys.exit(1)'
 
       # - name: Add comment (missing testing)
       #   if: steps.check-testing.outcome == 'failure'
