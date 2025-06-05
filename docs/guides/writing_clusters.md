@@ -83,7 +83,7 @@ maintainability. If compile-time flash/ram optimization is needed, use templates
 to select available features/attributes and enabling.
 
 Ensure that every attribute update will notify via the context
-`inteactionContext->dataModelChangeListener`
+`interactionContext->dataModelChangeListener`
 (<https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/Context.h#L35>).
 This is required for subscriptions to work and should be unit tested.
 
