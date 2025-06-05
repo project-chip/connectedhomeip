@@ -59,7 +59,7 @@ You will generally have 2 major classes:
         interface.
 
 -   (optional) a `ClusterDriver` that provides callbacks to an application for
-    cluster interactions. Within the sdk the name `Delegate` is often used,
+    cluster interactions. Within the SDK the name `Delegate` is often used,
     however since the delegate term is often overloaded, we suggest using the
     term `Driver` for this.
 
