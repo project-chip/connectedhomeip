@@ -337,6 +337,8 @@ namespace Inet {
 
         void UDPEndPointImplNetworkFrameworkListenerGroup::StopListeners(InterfaceGroup * group)
         {
+            VerifyOrReturn(nullptr != mInterfaceGroups);
+
             if (nullptr == group) {
                 CFDictionaryApplyFunction(
                     mInterfaceGroups, [](const void * /*key*/, const void * value, void * context) {
@@ -347,7 +349,6 @@ namespace Inet {
                 return;
             }
 
-            VerifyOrReturn(nullptr != group);
             VerifyOrReturn(nullptr != group->connectionGroup);
             LogErrorOnFailure(WaitForConnectionGroupCancelledState(group));
             group->connectionGroup = nullptr;
