@@ -181,7 +181,9 @@ JNI_METHOD(void, validateAttestationInfo)
         chip::ByteSpan certificationDeclarationPayload;
 
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        chip::Credentials::DeviceAttestationVerifier * dacVertifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+        chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+        VerifyOrDie(dacVerifier != nullptr);)
+        dacVerifier->EnableVerboseLogs(true);
 
         err = chip::Credentials::DeconstructAttestationElements(attestationElementsBytes.byteSpan(), certificationDeclarationSpan,
                                                                 attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan,
@@ -191,7 +193,7 @@ JNI_METHOD(void, validateAttestationInfo)
                      attestationError = chip::Credentials::AttestationVerificationResult::kAttestationElementsMalformed);
 
         attestationError =
-            dacVertifier->ValidateCertificationDeclarationSignature(certificationDeclarationSpan, certificationDeclarationPayload);
+            dacVerifier->ValidateCertificationDeclarationSignature(certificationDeclarationSpan, certificationDeclarationPayload);
         VerifyOrExit(attestationError == chip::Credentials::AttestationVerificationResult::kSuccess, err = CHIP_ERROR_INTERNAL);
     }
 

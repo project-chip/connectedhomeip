@@ -212,6 +212,16 @@ TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_AttestationInfoV
     ASSERT_NE(example_dac_verifier, nullptr);
     EXPECT_NE(default_verifier, example_dac_verifier);
 
+    example_dac_verifier->EnableCdTestKeySupport(false);
+    EXPECT_FALSE(example_dac_verifier->AreVerboseLogsEnabled());
+    EXPECT_FALSE(example_dac_verifier->IsCdTestKeySupported());
+
+    example_dac_verifier->EnableCdTestKeySupport(true);
+    EXPECT_TRUE(example_dac_verifier->IsCdTestKeySupported());
+
+    example_dac_verifier->EnableVerboseLogs(true);
+    EXPECT_TRUE(example_dac_verifier->AreVerboseLogsEnabled());
+
     SetDeviceAttestationVerifier(example_dac_verifier);
     default_verifier = GetDeviceAttestationVerifier();
     EXPECT_EQ(default_verifier, example_dac_verifier);
@@ -627,4 +637,11 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+}
+
+TEST(DeviceAttestationVerifier, GetAttestationResultDescriptionWorks)
+{
+    ASSERT_STREQ(GetAttestationResultDescription(AttestationVerificationResult::kSuccess), "Success");
+    ASSERT_STREQ(GetAttestationResultDescription(AttestationVerificationResult::kPaiAndDacRevoked), "Both PAI and DAC are revoked");
+    ASSERT_STREQ(GetAttestationResultDescription(static_cast<AttestationVerificationResult>(UINT16_MAX)), "<AttestationVerificationResult does not have a description!>");
 }

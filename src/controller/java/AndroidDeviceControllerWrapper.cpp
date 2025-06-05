@@ -635,6 +635,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(job
 
     deviceAttestationVerifier = new Credentials::DefaultDACVerifier(attestationTrustStoreBridge);
     VerifyOrExit(deviceAttestationVerifier != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    deviceAttestationVerifier->EnableVerboseLogs(true);
 
     if (mAttestationTrustStoreBridge != nullptr)
     {
