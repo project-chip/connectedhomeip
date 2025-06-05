@@ -293,7 +293,7 @@ def target_for_name(name: str):
     if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
         return TestTarget.NETWORK_MANAGER
     if name.startswith("Test_TC_MTRID_"):
-        return TestTarget.ENERGY_GTW
+        return TestTarget.ENERGY_GATEWAY
     return TestTarget.ALL_CLUSTERS
 
 

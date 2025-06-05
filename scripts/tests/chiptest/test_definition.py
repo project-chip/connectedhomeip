@@ -175,7 +175,7 @@ class App:
 
 class TestTarget(Enum):
     ALL_CLUSTERS = auto()
-    ENERGY_GTW = auto()
+    ENERGY_GATEWAY = auto()
     TV = auto()
     LOCK = auto()
     OTA = auto()
@@ -191,7 +191,7 @@ class TestTarget(Enum):
 class ApplicationPaths:
     chip_tool: typing.List[str]
     all_clusters_app: typing.List[str]
-    energy_gtw_app: typing.List[str]
+    energy_gateway_app: typing.List[str]
     lock_app: typing.List[str]
     fabric_bridge_app: typing.List[str]
     ota_provider_app: typing.List[str]
@@ -206,7 +206,7 @@ class ApplicationPaths:
     network_manager_app: typing.List[str]
 
     def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.energy_gtw_app, self.lock_app,
+        return [self.chip_tool, self.all_clusters_app, self.energy_gateway_app, self.lock_app,
                 self.fabric_bridge_app, self.ota_provider_app, self.ota_requestor_app,
                 self.tv_app, self.bridge_app, self.lit_icd_app,
                 self.microwave_oven_app, self.chip_repl_yaml_tester_cmd,
@@ -224,7 +224,7 @@ class ApplicationPaths:
         return [
             (self.chip_tool, "chip-tool"),
             (self.all_clusters_app, "chip-all-clusters-app"),
-            (self.energy_gtw_app, "chip-energy-gateway-app"),
+            (self.energy_gateway_app, "chip-energy-gateway-app"),
             (self.lock_app, "chip-lock-app"),
             (self.fabric_bridge_app, "fabric-bridge-app"),
             (self.ota_provider_app, "chip-ota-provider-app"),
@@ -340,8 +340,8 @@ class TestDefinition:
         try:
             if self.target == TestTarget.ALL_CLUSTERS:
                 target_app = paths.all_clusters_app
-            elif self.target == TestTarget.ENERGY_GTW:
-                target_app = paths.energy_gtw_app
+            elif self.target == TestTarget.ENERGY_GATEWAY:
+                target_app = paths.energy_gateway_app
             elif self.target == TestTarget.TV:
                 target_app = paths.tv_app
             elif self.target == TestTarget.LOCK:

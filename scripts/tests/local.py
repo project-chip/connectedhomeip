@@ -1189,7 +1189,7 @@ def chip_tool_tests(
         ("--lit-icd-app", "LIT_ICD_APP"),
         ("--microwave-oven-app", "CHIP_MICROWAVE_OVEN_APP"),
         ("--rvc-app", "CHIP_RVC_APP"),
-        ("--energy-gtw-app", "ENERGY_GATEWAY_APP"),
+        ("--energy-gateway-app", "ENERGY_GATEWAY_APP"),
     ]
 
     for flag, path_key in target_flags:
