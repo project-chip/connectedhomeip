@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 #include "NetworkCommissioningCluster.h"
-#include "clusters/NetworkCommissioning/Commands.h"
 
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
 #include <clusters/NetworkCommissioning/CommandIds.h>
+#include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
 #include <clusters/NetworkCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
