@@ -27,7 +27,7 @@
 #include <functional>
 #include <platform/CHIPDeviceError.h>
 
-#ifndef SL_TOKEN_MANAGER_CONFIG_H
+#ifndef SL_COMMON_TOKEN_MANAGER_ENABLE_DYNAMIC_TOKENS
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
 #else
@@ -61,7 +61,7 @@ namespace Internal {
  * the template class (e.g. the ReadConfigValue() method).
  */
 
-#ifndef SL_TOKEN_MANAGER_CONFIG_H
+#ifndef SL_COMMON_TOKEN_MANAGER_ENABLE_DYNAMIC_TOKENS
 // Silabs NVM3 objects use a 20-bit number,
 // NVM3 Key 19:16 Stack region
 // NVM3 Key 15:0 Available NVM3 keys 0x0000 -> 0xFFFF.
@@ -81,7 +81,10 @@ constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
 
 inline constexpr uint32_t kUserNvm3KeyDomainLoLimit = SL_TOKEN_NVM3_REGION_USER;
 inline constexpr uint32_t kUserNvm3KeyDomainHiLimit = SL_TOKEN_NVM3_REGION_ZIGBEE - 1;
-inline constexpr uint32_t kMatterNvm3KeyDomain      = SL_TOKEN_NVM3_REGION_COMMON | 0x007000U; // Matter specific NVM3 range
+
+// Only keep the MSBs of the Matter Region. The LSB of the region is determined by the keyBaseOffset.
+// with SilabsConfigKey Helper function.
+inline constexpr uint32_t kMatterNvm3KeyDomain = (SL_TOKEN_NVM3_REGION_MATTER & 0xFFFF000);
 
 constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
 {
