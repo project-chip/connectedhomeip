@@ -22,7 +22,7 @@
 namespace chip {
 namespace Testing {
 
-// Comparse two attribute entries as "sets of attributes" and ensures that the content is identical
+// Compare two attribute entries as "sets of attributes" and ensures that the content is identical
 bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const app::DataModel::AttributeEntry> b)
 {
 

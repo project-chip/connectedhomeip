@@ -16,5 +16,5 @@
  */
 #pragma once
 
-// This is a backwards comatobility shim only. Consider not using this include
+// This is a backwards compatibility shim only. Consider not using this include
 #include "CodegenInstance.h"

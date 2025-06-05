@@ -50,7 +50,7 @@ TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 
 } // namespace
 
-// TODO: we have a dependency on GeneralCommissioning: setting a break crumb
+// TODO: we have a dependency on GeneralCommissioning: setting a breadcrumb
 // via `GeneralCommissioning::SetBreadcrumb`. This should be decoupled when
 // GeneralCommissioning is turned into code-driven
 //
