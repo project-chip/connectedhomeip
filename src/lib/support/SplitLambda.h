@@ -11,7 +11,6 @@ struct SplitLambdaCallerImpl;
 template <class TReturn, class TLambda, class... TArgs>
 struct SplitLambdaCallerImpl<TReturn (TLambda::*)(TArgs...) const>
 {
-    using CallSignature = TReturn(TArgs... args, void * context);
     static TReturn Call(TArgs... args, void * context) { return (*static_cast<TLambda *>(context))(std::forward<TArgs>(args)...); }
 };
 
