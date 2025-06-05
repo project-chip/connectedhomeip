@@ -26,7 +26,6 @@ from typing import Optional
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest
 from mdns_discovery import mdns_discovery
