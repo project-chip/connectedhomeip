@@ -153,6 +153,9 @@ static int OnWebSocketCallback(lws * wsi, lws_callback_reasons reason, void * us
     }
     else if (LWS_CALLBACK_WSI_DESTROY == reason)
     {
+        std::lock_guard<std::mutex> lock(gMutex);
+        gMessageQueue.clear();
+
         gWebSocketInstance = nullptr;
     }
     else if (LWS_CALLBACK_PROTOCOL_INIT == reason)
