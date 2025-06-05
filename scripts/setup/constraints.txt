@@ -126,7 +126,7 @@ mobly==1.12.1
     # via -r requirements.all.txt
 msgpack==1.0.4
     # via cachecontrol
-mypy==1.10.1
+mypy==1.16.0
     # via -r requirements.all.txt
 mypy-extensions==1.0.0
     # via mypy

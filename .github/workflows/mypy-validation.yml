@@ -52,8 +52,6 @@ jobs:
           
           # TODO: Expand this list to include more files once they are mypy-compatible
           # Eventually we should just check all files in the chip/testing directory
-
-          ./scripts/run_in_python_env.sh out/venv "pip install types-PyYAML" 
           
           ./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini \
             src/python_testing/matter_testing_infrastructure/chip/testing/apps.py \
