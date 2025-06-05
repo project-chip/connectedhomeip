@@ -85,7 +85,13 @@ to select available features/attributes and if they are enabled or not.
 Ensure that every attribute update will notify via the context
 `interactionContext->dataModelChangeListener`
 (https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/Context.h).
-This is required for subscriptions to work and should be unit tested.
+This is required for subscriptions to work and should be unit tested:
+
+-   `CHIP_ERROR ClusterServerInterface::Startup(ServerClusterContext & context)`
+    will receive the context needed to communicate with the outside world
+-   the `context` contains the
+    [InteractionModelContext](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterContext.h)
+    to use
 
 ### Persistent storage
 
