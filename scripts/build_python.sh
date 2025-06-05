@@ -164,7 +164,6 @@ while (($#)); do
             ;;
         --jupyter-lab | -j)
             install_jupyterlab=yes
-            shift
             ;;
         -*)
             help
