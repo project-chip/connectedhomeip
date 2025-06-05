@@ -392,6 +392,7 @@ if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
 endif()
 
+
 # When using the pregenerated files, there is a edge case where an error appears for
 # undeclared argument chip_code_pre_generated_directory. To get around with it we are
 # disabling the --fail-on-unused-args flag.
