@@ -13,7 +13,7 @@ The following checklist can be used to write a new cluster
 
 ## Cluster definitions
 
-Clusters are defined against the matter specification. The code backing for them
+Clusters are defined against the Matter specification. The code backing for them
 is code-generated based on XML definitions from
 [src/app/zap-templates/data-model/chip](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/data-model/chip)
 In order to define a new cluster, use
