@@ -734,7 +734,7 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     /**
      * @brief
-     *   Close the WiFiPAF connection with a specific node which has been requested to connect in PairDevice()
+     *   Close the WiFiPAF connection with a specific device id which has been requested to connect in PairDevice()
      */
     void CloseWiFiPAFConnection(NodeId remoteDeviceId);
 #endif
