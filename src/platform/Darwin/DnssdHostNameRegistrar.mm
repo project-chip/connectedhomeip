@@ -34,20 +34,10 @@
 #include <platform/CHIPDeviceLayer.h>
 
 constexpr DNSServiceFlags kRegisterRecordFlags = kDNSServiceFlagsShared;
+constexpr uint16_t kRegisterRecordTimeoutInSeconds = 30;
 
 namespace chip {
 namespace Dnssd {
-
-    namespace {
-        static void OnRegisterRecord(DNSServiceRef sdRef, DNSRecordRef recordRef, DNSServiceFlags flags, DNSServiceErrorType err,
-            void * context)
-        {
-            ChipLogProgress(Discovery, "Mdns: %s flags: %d", __func__, flags);
-            if (kDNSServiceErr_NoError != err) {
-                ChipLogError(Discovery, "%s (%s)", __func__, Error::ToString(err));
-            }
-        }
-    } // namespace
 
     HostNameRegistrar::~HostNameRegistrar()
     {
@@ -65,8 +55,27 @@ namespace Dnssd {
         return kDNSServiceErr_NoError;
     }
 
-    CHIP_ERROR HostNameRegistrar::Register()
+    CHIP_ERROR HostNameRegistrar::Register(OnRegisterRecordCallback callback)
     {
+        VerifyOrReturnError(nullptr != callback, CHIP_ERROR_INVALID_ARGUMENT);
+
+        __auto_type & systemLayer = static_cast<System::LayerDispatch &>(chip::DeviceLayer::SystemLayer());
+
+        // Wrap the callback block in a “call-once” block so that
+        // either the first success or the timeout fires, but never both.
+        __block BOOL called = NO;
+        __auto_type wrapper = ^(DNSServiceErrorType err) {
+            if (!called) {
+                called = YES;
+                callback(err);
+                mOnRegisterRecordCallback = nil;
+            }
+        };
+
+        mOnRegisterRecordCallback = wrapper;
+
+        CHIP_ERROR error = CHIP_NO_ERROR;
+
         // If the target interface is kDNSServiceInterfaceIndexLocalOnly, just
         // register the loopback addresses.
         if (IsLocalOnly()) {
@@ -77,22 +86,27 @@ namespace Dnssd {
             auto loopbackIPAddress = Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6);
             in6_addr loopbackAddr = loopbackIPAddress.ToIPv6();
 
-            return RegisterInterface(kDNSServiceInterfaceIndexLocalOnly, loopbackAddr, kDNSServiceType_AAAA);
+            error = RegisterInterface(kDNSServiceInterfaceIndexLocalOnly, loopbackAddr, kDNSServiceType_AAAA);
+        } else {
+            error = StartMonitorInterfaces(
+                ^(Inet::Darwin::InetInterfacesVector inetInterfaces, Inet::Darwin::Inet6InterfacesVector inet6Interfaces) {
+                    ReturnOnFailure(ResetSharedConnection());
+                    RegisterInterfaces(inetInterfaces, kDNSServiceType_A);
+                    RegisterInterfaces(inet6Interfaces, kDNSServiceType_AAAA);
+                });
         }
+        ReturnErrorOnFailure(error);
 
-        return StartMonitorInterfaces(
-            ^(Inet::Darwin::InetInterfacesVector inetInterfaces, Inet::Darwin::Inet6InterfacesVector inet6Interfaces) {
-                ReturnOnFailure(ResetSharedConnection());
-                RegisterInterfaces(inetInterfaces, kDNSServiceType_A);
-                RegisterInterfaces(inet6Interfaces, kDNSServiceType_AAAA);
-            });
+        __auto_type onTimeout = ^{ wrapper(kDNSServiceErr_Timeout); };
+        __auto_type delay = System::Clock::Seconds16(kRegisterRecordTimeoutInSeconds);
+        return systemLayer.StartTimerWithBlock(onTimeout, delay);
     }
 
     CHIP_ERROR HostNameRegistrar::RegisterInterface(uint32_t interfaceId, uint16_t rtype, const void * rdata, uint16_t rdlen)
     {
         DNSRecordRef dnsRecordRef;
         auto err = DNSServiceRegisterRecord(mServiceRef, &dnsRecordRef, kRegisterRecordFlags, interfaceId, mHostname.c_str(), rtype,
-            kDNSServiceClass_IN, rdlen, rdata, 0, OnRegisterRecord, nullptr);
+            kDNSServiceClass_IN, rdlen, rdata, 0, OnRegisterRecord, this);
         return Error::ToChipError(err);
     }
 
@@ -102,6 +116,7 @@ namespace Dnssd {
             NetworkMonitor::Stop();
         }
         StopSharedConnection();
+        mOnRegisterRecordCallback = nil;
     }
 
     CHIP_ERROR HostNameRegistrar::StartSharedConnection()
@@ -133,6 +148,23 @@ namespace Dnssd {
         StopSharedConnection();
         ReturnLogErrorOnFailure(StartSharedConnection());
         return CHIP_NO_ERROR;
+    }
+
+    void HostNameRegistrar::OnRegisterRecord(DNSServiceRef sdRef, DNSRecordRef recordRef, DNSServiceFlags flags, DNSServiceErrorType err,
+        void * context)
+    {
+        ChipLogProgress(Discovery, "Mdns: %s flags: %d", __func__, flags);
+
+        auto * self = static_cast<HostNameRegistrar *>(context);
+        if (kDNSServiceErr_NoError != err) {
+            ChipLogError(Discovery, "%s (%s)", __func__, Error::ToString(err));
+            return;
+        }
+
+        VerifyOrReturn(nullptr != self->mOnRegisterRecordCallback);
+
+        // This calls our wrapper block exactly once—and the first call will prevent the timeout timer from doing anything.
+        self->mOnRegisterRecordCallback(err);
     }
 
 } // namespace Dnssd
