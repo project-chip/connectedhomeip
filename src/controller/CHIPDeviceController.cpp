@@ -629,12 +629,12 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
         (device->IsSecureConnected() == true))
     {
         auto peerAddress = device->GetPeerAddress();
-        ChipLogProgress(Discovery, "Closing WiFiPAF connections, nodeId: %lu", PeerAddress.GetRemoteId());
+        ChipLogProgress(Discovery, "Closing WiFiPAF connections, nodeId: %lu", peerAddress.GetRemoteId());
         WiFiPAF::WiFiPAFSession pafSession = {
             .role   = WiFiPAF::kWiFiPafRole_Subscriber,
-            .nodeId = PeerAddress.GetRemoteId(),
+            .nodeId = peerAddress.GetRemoteId(),
         };
-        mSystemState->WiFiPafLayer()->CloseConnection(WiFiPAF::PafInfoAccess::kAccNodeId, PafSession);
+        mSystemState->WiFiPafLayer()->CloseConnection(WiFiPAF::PafInfoAccess::kAccNodeId, pafSession);
     }
 #endif
     // Make sure that there will be no dangling pointer
@@ -951,9 +951,9 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
         auto peerAddr = device->GetPeerAddress();
-        ChipLogError(Controller, "WiFi-PAF: Subscription Error, NodeId = %lu, err = %" CHIP_ERROR_FORMAT, PeerAddr.GetRemoteId(),
+        ChipLogError(Controller, "WiFi-PAF: Subscription Error, NodeId = %lu, err = %" CHIP_ERROR_FORMAT, peerAddr.GetRemoteId(),
                      err.Format());
-        self->CloseWiFiPAFConnection(PeerAddr.GetRemoteId());
+        self->CloseWiFiPAFConnection(peerAddr.GetRemoteId());
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         if (self->mPairingDelegate != nullptr)
