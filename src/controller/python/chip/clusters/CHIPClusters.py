@@ -1777,6 +1777,18 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000000A: {
+                "attributeName": "RecoveryIdentifier",
+                "attributeId": 0x0000000A,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "NetworkRecoveryReason",
+                "attributeId": 0x0000000B,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -14703,6 +14715,12 @@ class ChipClusters:
                 "args": {
                     "field1": "TestGlobalStruct",
                     "field2": "int",
+                },
+            },
+            0x0000001A: {
+                "commandId": 0x0000001A,
+                "commandName": "TestCheckCommandFlags",
+                "args": {
                 },
             },
             0xFFF200AA: {
