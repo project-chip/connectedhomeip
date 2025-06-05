@@ -628,7 +628,7 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
     if ((mSystemState->WiFiPafLayer() != nullptr) && (device->GetDeviceTransportType() == Transport::Type::kWiFiPAF) &&
         (device->IsSecureConnected() == true))
     {
-        auto PeerAddress = device->GetPeerAddress();
+        auto peerAddress = device->GetPeerAddress();
         ChipLogProgress(Discovery, "Closing WiFiPAF connections, nodeId: %lu", PeerAddress.GetRemoteId());
         WiFiPAF::WiFiPAFSession PafSession = {
             .role   = WiFiPAF::kWiFiPafRole_Subscriber,
