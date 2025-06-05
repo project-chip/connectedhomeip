@@ -20,7 +20,7 @@
 
 #include "CommandHandlerInterface.h"
 
-#include <clusters/ClusterMetadataQuery.h>
+#include <clusters/MetadataQuery.h>
 
 /// class CommandHandlerInterfaceShim
 /// @brief Use this as a quick shim, but actual usage is NOT recommended

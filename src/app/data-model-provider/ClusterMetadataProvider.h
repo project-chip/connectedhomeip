@@ -30,7 +30,7 @@ struct ClusterMetadataProvider
 {
     static_assert(!std::is_same_v<TypeInfo, TypeInfo>,
                   "Metadata provider for this TypeInfo and Cluster is not implemented, try importing "
-                  "<clusters/MetadataBridge.h>");
+                  "<clusters/<cluster>/MetadataProvider.h>");
 };
 
 } // namespace DataModel
