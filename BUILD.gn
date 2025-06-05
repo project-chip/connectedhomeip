@@ -87,12 +87,15 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Packages available to import within GN's build venv.
     # Matter's in-tree pw_python_package or pw_python_distribution targets.
+    #
+    # NOTE: Don't add "$dir_pw_env_setup:core_pigweed_python_packages"  here since it
+    # pulls in a large number of dependencies that we are not using;  instead add dependencies
+    # on the relevant pigweed modules via python_deps where they are needed.
     source_packages = [
       "//examples/chef",
       "//examples/common/pigweed/rpc_console/py:chip_rpc",
       "//integrations/mobly:chip_mobly",
       "//src/python_testing/matter_testing_infrastructure:chip-testing",
-      "$dir_pw_env_setup:core_pigweed_python_packages",
     ]
   }
 
