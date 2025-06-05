@@ -118,8 +118,8 @@ class SdkGenerator(CodeGenerator):
         )
 
         self.internal_render_one_output(
-            template_path="AllMetadataBridge.h.jinja",
-            output_file_name="AllMetadataBridge.h",
+            template_path="ClusterMetadataQuery.h.jinja",
+            output_file_name="ClusterMetadataQuery.h",
             vars={
                 "clusters": self.idl.clusters,
                 "input_name": self.idl.parse_file_name,

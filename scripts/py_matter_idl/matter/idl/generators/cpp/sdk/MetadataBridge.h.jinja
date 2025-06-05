@@ -16,9 +16,9 @@ namespace DataModel {
 template<>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::{{cluster.name | upfirst}}::Id>
 {
-  static constexpr DataModel::AttributeEntry EntryFor(AttributeId commandId) {
+  static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId) {
     using namespace Clusters::{{cluster.name | upfirst}}::Attributes;
-    switch(commandId) {
+    switch(attributeId) {
     {% for attribute in cluster.attributes | reject("global_attribute") -%}
       case {{attribute.definition.name | upfirst}}::Id: return {{attribute.definition.name | upfirst}}::kMetadataEntry;
     {% endfor -%}

@@ -20,8 +20,16 @@
 
 #include "CommandHandlerInterface.h"
 
-#include <clusters/AllMetadataBridge.h>
+#include <clusters/ClusterMetadataQuery.h>
 
+/// class CommandHandlerInterfaceShim
+/// @brief Use this as a quick shim, but actual usage is NOT recommended
+///        This class provides a convenience conversion for updating into the new CHI interface, its a drop-in replacement for the
+///        old interface.
+//         However we DON'T expect people to use this very long term
+///
+/// @tparam  TClusterIds A list of the IDs the shim will search the metadata of, leave empty to search for the metadata in all
+///          clusters
 template <ClusterId... TClusterIds>
 class CommandHandlerInterfaceShim : public CommandHandlerInterface
 {
@@ -90,7 +98,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
             return Loop::Continue;
         });
 
-        ReturnErrorOnFailure(this->EnumerateGeneratedCommands(cluster, counter.Caller(), counter.Context()));
+        ReturnErrorOnFailure(EnumerateGeneratedCommands(cluster, counter.Caller(), counter.Context()));
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
 
         auto appender = SplitLambda([&](CommandId commandId) {
@@ -98,7 +106,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
             return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
         });
 
-        ReturnErrorOnFailure(this->EnumerateGeneratedCommands(cluster, appender.Caller(), appender.Context()));
+        ReturnErrorOnFailure(EnumerateGeneratedCommands(cluster, appender.Caller(), appender.Context()));
         ReturnErrorOnFailure(err);
         // the two invocations MUST return the same sizes
         VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
