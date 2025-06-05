@@ -182,9 +182,10 @@ private:
      */
     enum class UpdateState : uint8_t {
         kIdle,                         // mNewValue not active, mValue has default/null state
-        kInitiated,                             // mNewValue activated (memory allocated), mValue holds data
-        kAssigned,                              // mNewValue holds new data, mValue holds old data
-        kValidated,                             // mNewValue data validated, mValue holds old data
+        kInitiated,                    // mNewValue activated (memory allocated)
+        kAssigned,                     // mNewValue holds new data
+        kValidated,                    // mNewValue data validated
+        kUpdated,                      // mValue replaced to mNewValue 
     };
 
 
@@ -400,7 +401,7 @@ public:
      *         - Not in kInitiated state
      * 
      * @pre Must be in kInitiated state (after CreateNewValue())
-     * @warning Pointer becomes invalid after UpdateCommit()/UpdateAbort()
+     * @warning Pointer becomes invalid after UpdateCommit()/UpdateEnd()
      * @see MarkAsAssigned()
      */
     ValueType* GetNewValue()
@@ -498,9 +499,11 @@ public:
             if (mAuxCb) {
                 mAuxCb(mAttrId, mAuxData);
             }
+
+            mUpdateState = UpdateState::kUpdated;
         }
 
-        mUpdateState = UpdateState::kIdle;
+        UpdateEnd();
     }
 
     /**
@@ -513,9 +516,15 @@ public:
     * 
     * @post Always transitions to kIdle state
     */
-    void UpdateAbort()
+    void UpdateEnd()
     {
-        if (mUpdateState != UpdateState::kIdle)
+        /* Skip if the attribute object has no new attached data */
+        if (mUpdateState == UpdateState::kIdle)
+        {
+            return;
+        }
+        /* In cases if new data was initialized/activated but has not assigned to Value storage */
+        if (mUpdateState != UpdateState::kUpdated)
         {
             CleanupValue(mNewValue);
             mNewValue = mValue;

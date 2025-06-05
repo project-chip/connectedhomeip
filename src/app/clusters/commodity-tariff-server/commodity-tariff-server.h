@@ -319,7 +319,7 @@ private:
 
     void TariffDataUpd_Abort()
     {
-#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateAbort();
+#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateEnd();
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
     }
