@@ -50,14 +50,14 @@ namespace app {
  * - Change detection before updates
  * - Proper cleanup of complex types
  * - Thread-safe value access
- * - The Tariff Data Update Flow 
- * 
+ * - The Tariff Data Update Flow
+ *
  * @section update_flow Update Flow
  * @defgroup tariff_update_flow Tariff Data Update Flow
  * @brief State machine for managing tariff attribute updates
- * 
+ *
  * The update process follows a strict state sequence:
- * 
+ *
  * @dot
  * digraph update_flow {
  *   kIdle -> kInitiated [label="CreateNewValue()"];
@@ -70,9 +70,9 @@ namespace app {
  *   kValidated -> kIdle [label="UpdateEnd()"];
  * }
  * @enddot
- * 
+ *
  * ### Typical Update Sequence:
- * 
+ *
  * 1. **Initialization Phase**:
  *    @code
  *    /// Create new value container
@@ -81,7 +81,7 @@ namespace app {
  *    - Allocates memory for list types
  *    - Initializes default values
  *    - State: kIdle → kInitiated
- * 
+ *
  * 2. **Modification Phase**:
  *    @code
  *    /// Get and modify the value
@@ -91,7 +91,7 @@ namespace app {
  *    }
  *    @endcode
  *    - State: kInitiated → kAssigned
- * 
+ *
  * 3. **Validation Phase**:
  *    @code
  *    /// Validate and prepare for commit
@@ -99,7 +99,7 @@ namespace app {
  *    @endcode
  *    - Runs custom validation
  *    - State: kAssigned → kValidated
- * 
+ *
  * 4. **Commit Phase**:
  *    @code
  *    /// Finalize the update
@@ -110,13 +110,13 @@ namespace app {
  *    - Applies changes if validated
  *    - Invokes callback on success ( to indicate attr changing)
  *    - State: kValidated → kUpdated
- * 
+ *
  * ### Error Recovery:
  * - At any point, UpdateEnd() can be called to:
  *   - Discard pending changes
  *   - Clean up allocated resources
  *   - Reset to kIdle state
- * 
+ *
  * ### State Transition Rules:
  * | Current State    | Valid Operations                     |
  * |------------------|--------------------------------------|
@@ -125,9 +125,9 @@ namespace app {
  * | kAssigned        | UpdateBegin(), UpdateEnd()         |
  * | kValidated       | UpdateCommit(), UpdateEnd()        |
  * | kUpdated         | UpdateEnd()        |
- * 
+ *
  * @see CreateNewValue()
- * @see GetNewValue() 
+ * @see GetNewValue()
  * @see MarkAsAssigned()
  * @see UpdateBegin()
  * @see UpdateCommit()
