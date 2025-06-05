@@ -40,8 +40,9 @@ declare_args() {
 
 config("app-main-config") {
   include_dirs = [
-  "../",
-  "../../../linux" ]
+    "../",
+    "../../../linux",
+  ]
 }
 
 source_set("ota-test-event-trigger") {
@@ -101,7 +102,6 @@ source_set("app-main") {
   ]
 
   sources = [
-    "AppMain.cpp",
     "../../../linux/AppMain.h",
     "../../../linux/CommissionableInit.cpp",
     "../../../linux/CommissionableInit.h",
@@ -116,6 +116,7 @@ source_set("app-main") {
     "../../../linux/testing/CustomCSRResponseOperationalKeyStore.cpp",
     "../../../linux/testing/CustomCSRResponseOperationalKeyStore.h",
     "../DeviceAttestationSe05xCredsExample.cpp",
+    "AppMain.cpp",
   ]
 
   public_deps = [

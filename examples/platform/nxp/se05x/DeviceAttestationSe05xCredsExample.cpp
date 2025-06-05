@@ -16,12 +16,12 @@
  */
 #include "DeviceAttestationSe05xCredsExample.h"
 
-#include <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h>
 
 /* Device attestation key ids */
 #define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000

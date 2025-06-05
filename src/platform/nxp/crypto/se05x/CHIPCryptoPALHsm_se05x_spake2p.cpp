@@ -257,20 +257,23 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
     ReturnErrorOnFailure(FEWrite(w0, w0in_mod, w0in_mod_len));
     ReturnErrorOnFailure(create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER, &hsm_pake_context));
 
-    smstatus = Se05x_API_PAKEConfigDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
+    smstatus = Se05x_API_PAKEConfigDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                          static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
                                           SE05x_SPAKE2PLUS_DEVICE_TYPE_B);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
     ReturnErrorOnFailure(se05x_set_key_for_spake(w0in_id_v, w0in_mod, w0in_mod_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
     ReturnErrorOnFailure(se05x_set_key_for_spake(Lin_id_v, Lin, Lin_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
 
-    smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
+    smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                        static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
                                         (uint8_t *) hsm_pake_context.spake_context, hsm_pake_context.spake_context_len,
                                         (uint8_t *) peer_identity, peer_identity_len, (uint8_t *) my_identity, my_identity_len);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
-    smstatus = Se05x_API_PAKEInitCredentials(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
-                                             static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId), w0in_id_v, 0, Lin_id_v);
+    smstatus =
+        Se05x_API_PAKEInitCredentials(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                      static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId), w0in_id_v, 0, Lin_id_v);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
     state = CHIP_SPAKE2P_STATE::STARTED;
@@ -317,20 +320,23 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
     ReturnErrorOnFailure(FEWrite(w1, w1in_mod, w1in_mod_len));
     ReturnErrorOnFailure(create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER, &hsm_pake_context));
 
-    smstatus = Se05x_API_PAKEConfigDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
+    smstatus = Se05x_API_PAKEConfigDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                          static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
                                           SE05x_SPAKE2PLUS_DEVICE_TYPE_A);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
     ReturnErrorOnFailure(se05x_set_key_for_spake(w0in_id_p, w0in_mod, w0in_mod_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
     ReturnErrorOnFailure(se05x_set_key_for_spake(w1in_id_p, w1in_mod, w1in_mod_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
 
-    smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
+    smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                        static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
                                         (uint8_t *) hsm_pake_context.spake_context, hsm_pake_context.spake_context_len,
                                         (uint8_t *) my_identity, my_identity_len, (uint8_t *) peer_identity, peer_identity_len);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
-    smstatus = Se05x_API_PAKEInitCredentials(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
-                                             static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId), w0in_id_p, w1in_id_p, 0);
+    smstatus =
+        Se05x_API_PAKEInitCredentials(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                      static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId), w0in_id_p, w1in_id_p, 0);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
     state = CHIP_SPAKE2P_STATE::STARTED;

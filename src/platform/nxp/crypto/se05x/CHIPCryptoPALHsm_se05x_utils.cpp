@@ -123,7 +123,8 @@ CHIP_ERROR se05x_close_session(void)
     {
         ChipLogDetail(Crypto, "se05x info: session not open");
     }
-    else {
+    else
+    {
         ex_sss_session_close(&gex_sss_chip_ctx);
         memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
         is_session_open = 0;
@@ -135,7 +136,6 @@ CHIP_ERROR se05x_close_session(void)
 
     return CHIP_NO_ERROR;
 }
-
 
 /* Check if key exists in se05x */
 CHIP_ERROR Se05xCheckObjectExists(uint32_t keyid)
@@ -149,21 +149,22 @@ CHIP_ERROR Se05xCheckObjectExists(uint32_t keyid)
         return CHIP_ERROR_INTERNAL;
     }
 
-    if(gex_sss_chip_ctx.ks.session != NULL)
+    if (gex_sss_chip_ctx.ks.session != NULL)
     {
         smstatus = Se05x_API_CheckObjectExists(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, &exists);
-        if(smstatus != SM_OK) {
+        if (smstatus != SM_OK)
+        {
             ChipLogError(Crypto, "se05x error: Error in Se05x_API_CheckObjectExists");
             return CHIP_ERROR_INTERNAL;
         }
-        if(exists == kSE05x_Result_FAILURE) {
+        if (exists == kSE05x_Result_FAILURE)
+        {
             ChipLogError(Crypto, "se05x warn: Key doesnot exists");
             return CHIP_ERROR_INTERNAL;
         }
     }
 
     return CHIP_NO_ERROR;
-
 }
 
 /* Delete key in se05x */
@@ -321,7 +322,7 @@ CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t bufle
 CHIP_ERROR se05xSetBinaryData(uint32_t keyId, const uint8_t * buf, size_t buflen)
 {
     sss_object_t keyObject = { 0 };
-    sss_status_t status = kStatus_SSS_Fail;
+    sss_status_t status    = kStatus_SSS_Fail;
 
     status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
@@ -334,7 +335,6 @@ CHIP_ERROR se05xSetBinaryData(uint32_t keyId, const uint8_t * buf, size_t buflen
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
-
 }
 
 /* Perform internal sign in se05x (only on SE051H) */

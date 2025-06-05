@@ -17,18 +17,20 @@ Refer the below image to connect SE05x to i.MX 8M using I2C pins.
 
 Following crypto operations can be offloaded to SE05x secure element,
 
-	1. Random number generation
-	2. EC Key Generate
-	3. ECDSA Sign
-	4. ECDSA Verify
-	5. HKDF
-	6. HMAC
-	7. Spake(Disabled by default)
+    1. Random number generation
+    2. EC Key Generate
+    3. ECDSA Sign
+    4. ECDSA Verify
+    5. HKDF
+    6. HMAC
+    7. Spake(Disabled by default)
 
 
 Other crypto operations are done on host (using mbed-TLS)
 
-Use the config file `src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h` to enable / disable offloading required crypto operation on SE05x.
+Use the config file
+`src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h` to enable /
+disable offloading required crypto operation on SE05x.
 
 ```
 /*
@@ -72,7 +74,9 @@ Use the config file `src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config
 
 # SE05x Type Configuration
 
-Ensure to update the SE05x feature file `third_party/simw-top-mini/repo/fsl_sss_ftr.h` with correct product variant. SE050E is enabled by default.
+Ensure to update the SE05x feature file
+`third_party/simw-top-mini/repo/fsl_sss_ftr.h` with correct product variant.
+SE050E is enabled by default.
 
 ```
 /** Compiling without any Applet Support */
@@ -102,9 +106,13 @@ Ensure to update the SE05x feature file `third_party/simw-top-mini/repo/fsl_sss_
 
 To use SE05x for device attestation,
 
-1. Enable  `ENABLE_SE05X_DEVICE_ATTESTATION` in CHIPCryptoPALHsm_se05x_config.h config file
+1. Enable `ENABLE_SE05X_DEVICE_ATTESTATION` in CHIPCryptoPALHsm_se05x_config.h
+   config file
 
-2. Run the provision example (one time) `third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/` to provision the device attestation key at id - 0x7D300000 and device attestation certificate at id - 0x7D300001.
+2. Run the provision example (one time)
+   `third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/` to
+   provision the device attestation key at id - 0x7D300000 and device
+   attestation certificate at id - 0x7D300001.
 
 ```
 cd third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/linux

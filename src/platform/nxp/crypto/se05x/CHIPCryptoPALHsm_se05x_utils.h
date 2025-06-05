@@ -71,7 +71,6 @@ extern int spake_objects_created;
 extern "C" {
 #endif
 
-
 /* Open session to se05x */
 CHIP_ERROR se05x_sessionOpen(void);
 
@@ -93,7 +92,6 @@ CHIP_ERROR se05xSetBinaryData(uint32_t keyId, const uint8_t * buf, size_t buflen
 
 /* Perform internal sign in se05x (only on SE051H) */
 CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t * sigBuf, size_t * sigBufLen);
-
 
 #if ENABLE_REENTRANCY
 

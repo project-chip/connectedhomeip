@@ -57,9 +57,7 @@ namespace Crypto {
         0xA1, 0x44, 0x03, 0x42, 0x00,                                                                                              \
     }
 
-
 #define SE05X_MAX_NODE_OP_KEYS 5
-
 
 extern CHIP_ERROR Initialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256KeypairContext * mKeypair);
 extern CHIP_ERROR ECDSA_sign_msg_H(P256KeypairContext * mKeypair, const uint8_t * msg, const size_t msg_length,
@@ -134,7 +132,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     else
     {
         size_t i = 0;
-        while(i < SE05X_MAX_NODE_OP_KEYS)
+        while (i < SE05X_MAX_NODE_OP_KEYS)
         {
             if (Se05xCheckObjectExists(kKeyId_node_op_keyid_start + i) != CHIP_NO_ERROR)
             {

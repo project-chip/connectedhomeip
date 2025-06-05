@@ -41,9 +41,9 @@
 #include <mbedtls/x509_crt.h>
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/oid.h>
+#include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
-#include <mbedtls/version.h>
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
@@ -911,8 +911,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
 
         if (OID_CMP(sOID_Extension_BasicConstraints, extOID))
         {
-            int isCA                 = 0;
-            int pathLen              = -1;
+            int isCA    = 0;
+            int pathLen = -1;
             unsigned char * seqStart;
 
             VerifyOrExit(extCritical, error = CHIP_ERROR_INTERNAL);
@@ -923,7 +923,7 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
             if (len > 0)
             {
                 seqStart = p;
-                result = mbedtls_asn1_get_bool(&p, end, &isCA);
+                result   = mbedtls_asn1_get_bool(&p, end, &isCA);
                 VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
 
                 if (p != seqStart + len)
