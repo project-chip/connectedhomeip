@@ -43,7 +43,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
 
     DataModel::AcceptedCommandEntry GetEntry(const ConcreteClusterPath & cluster, CommandId command)
     {
-        DataModel::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
+        return DataModel::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
     }
 
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
