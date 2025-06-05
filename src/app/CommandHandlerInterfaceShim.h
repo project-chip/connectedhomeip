@@ -40,17 +40,10 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
 {
 
     using CommandHandlerInterface::CommandHandlerInterface;
+
     DataModel::AcceptedCommandEntry GetEntry(const ConcreteClusterPath & cluster, CommandId command)
     {
-        if constexpr (sizeof...(TClusterIds) == 1)
-        {
-            using Entry = DataModel::AcceptedCommandEntry;
-            return ClusterMetadataProvider<Entry, TClusterIds...>::EntryFor(command);
-        }
-        else
-        {
-            return DataModel::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
-        }
+        DataModel::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
     }
 
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,

@@ -325,7 +325,7 @@ private:
 class ShimCommandHandler : public CommandHandlerInterfaceShim<Clusters::UnitTesting::Id>
 {
 public:
-    ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterface(endpointId, clusterId)
+    ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceShim(endpointId, clusterId)
     {
         CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
     }
