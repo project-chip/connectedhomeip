@@ -1,15 +1,3 @@
-```{toctree}
-:glob:
-:maxdepth: 1
-:hidden:
-
-matter-syscfg/getting-started.md
-matter-syscfg/sysconfig-board.md
-matter-users-guide/ti_openthread_library_usage.md
-matter-users-guide/ti_factory_data_user_guide.md
-matter-users-guide/enabling_icd_on_ti_devices.md
-```
-
 # Texas Instruments platform overview
 
 The Texas Instruments Matter platform is based on the TI SimpleLink™ SDK.
