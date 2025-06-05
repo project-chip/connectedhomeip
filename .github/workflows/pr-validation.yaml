@@ -26,7 +26,7 @@ jobs:
           ${{ github.event.pull_request.body }}
           EndMarkerForPrSummary
 
-          python -c 'import sys; pr_summary = open("/tmp/pr-summary.txt", "rt").read(); sys.exit(1 if "<!--" in pr_summary or "-->" in pr_summary else 0)'
+          python -c 'import sys; pr_summary = open("/tmp/pr-summary.txt", "rt").read(); sys.exit(1 if "Please replace this HTML comment" in pr_summary else 0)'
 
       # NOTE: comments disabled for now as separate permissions are required
       #       failing CI step may be sufficient to start (although it contains less information about why it failed)
