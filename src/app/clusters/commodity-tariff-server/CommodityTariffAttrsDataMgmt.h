@@ -171,22 +171,24 @@ private:
      * @enum StorageStates
      * @brief Tracks the progress of value updates
      */
-    enum class StorageState : uint8_t {
-        kEmpty,              // A value not initiated (default state)
-        kHold,               // mValue holds some valid data
+    enum class StorageState : uint8_t
+    {
+        kEmpty, // A value not initiated (default state)
+        kHold,  // mValue holds some valid data
     };
 
     /**
      * @enum UpdateState
      * @brief Tracks the progress of value updates
      */
-    enum class UpdateState : uint8_t {
-        kIdle,                         // mNewValue not active, mValue has default/null state
-        kInitiated,                             // mNewValue activated (memory allocated), mValue holds data
-        kAssigned,                              // mNewValue holds new data, mValue holds old data
-        kValidated,                             // mNewValue data validated, mValue holds old data
+    enum class UpdateState : uint8_t
+    {
+        kIdle,      // mNewValue not active, mValue has default/null state
+        kInitiated, // mNewValue activated (memory allocated)
+        kAssigned,  // mNewValue holds new data
+        kValidated, // mNewValue data validated
+        kUpdated,   // mValue replaced to mNewValue
     };
-
 
     using valueType   = T;
     using wrappedType = ExtractWrappedType_t<valueType>;
@@ -199,7 +201,7 @@ private:
     CHIP_ERROR ValidateValue()
     {
         CHIP_ERROR err = Validate(mNewValue);
-        if ( err == CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
             mUpdateState = UpdateState::kValidated;
         }
@@ -274,10 +276,8 @@ private:
      *
      * @note Derived classes should override for complex list items
      */
-    void CleanupStruct(payloadType & aValue)
-    {
-        CleanupStructValue(aValue);
-    }
+    void CleanupStruct(payloadType & aValue) { CleanupStructValue(aValue); }
+
 public:
     using ValueType   = valueType;
     using WrappedType = wrappedType;
@@ -303,7 +303,7 @@ public:
             mValue = valueType();
         }
 
-        mHoldState = StorageState::kEmpty;
+        mHoldState   = StorageState::kEmpty;
         mUpdateState = UpdateState::kIdle;
     }
 
@@ -322,14 +322,11 @@ public:
      */
     const T & GetValue() const { return mValue; };
 
-    WrappedType GetPayload() const { return unwrapValue(mValue); }
-
     /**
      * @brief Indicates that the newValue has changed against current mValue
      * @return true if value has changed
      */
     bool IsValid() { return (mUpdateState == UpdateState::kValidated); }
-
 
     /**
      * @brief Prepares a new value for modification before committing
@@ -338,7 +335,7 @@ public:
      *         - CHIP_ERROR_NO_MEMORY if allocation fails
      *         - CHIP_ERROR_INVALID_LIST_LENGTH if size < 1 for list types
      *         - CHIP_ERROR_INCORRECT_STATE if called during active update
-     * 
+     *
      * @note For list types:
      *       - Allocates memory for specified number of elements
      *       - Initializes list storage
@@ -346,12 +343,17 @@ public:
      * @note For non-list types:
      *       - Creates default-initialized value
      *       - Ignores size parameter
-     * 
+     *
      * @pre Must be called in kIdle state
      * @post On success, transitions to kInitiated state
      */
     CHIP_ERROR CreateNewValue(uint16_t size)
     {
+        if (mUpdateState != UpdateState::kIdle)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
         if constexpr (IsValueList() || IsList<wrappedType>::value)
         {
             if (size < 1)
@@ -359,11 +361,10 @@ public:
                 return CHIP_ERROR_INVALID_LIST_LENGTH;
             }
 
-            auto* buffer = static_cast<PayloadType*>(
-                    chip::Platform::MemoryCalloc(size, sizeof(PayloadType))
-                );
+            auto * buffer = static_cast<PayloadType *>(chip::Platform::MemoryCalloc(size, sizeof(PayloadType)));
 
-            if (!buffer) {
+            if (!buffer)
+            {
                 return CHIP_ERROR_NO_MEMORY;
             }
 
@@ -371,24 +372,24 @@ public:
             {
                 mNewValue.SetNoNull(DataModel::List<PayloadType>(buffer, size));
             }
-            else {
+            else
+            {
                 mNewValue = DataModel::List<PayloadType>(buffer, size);
             }
         }
-        else if constexpr(IsValueNullable())
+        else if constexpr (IsValueNullable())
         {
             if constexpr (IsPayloadStruct())
             {
-                mNewValue = ValueType({0});
+                mNewValue = ValueType({ 0 });
             }
             else
             {
                 mNewValue = ValueType(0);
-            }            
+            }
         }
 
-       mUpdateState = UpdateState::kInitiated;
-
+        mUpdateState = UpdateState::kInitiated;
         return CHIP_NO_ERROR;
     }
 
@@ -397,28 +398,29 @@ public:
      * @return Pointer to modifiable value if available
      * @retval nullptr if:
      *         - Not in kInitiated state
-     * 
+     *
      * @pre Must be in kInitiated state (after CreateNewValue())
-     * @warning Pointer becomes invalid after UpdateCommit()/UpdateAbort()
+     * @warning Pointer becomes invalid after UpdateCommit()/UpdateEnd()
      * @see MarkAsAssigned()
      */
-    ValueType* GetNewValue()
+    ValueType * GetNewValue()
     {
-        if (mUpdateState != UpdateState::kInitiated) {
+        if (mUpdateState != UpdateState::kInitiated)
+        {
             return nullptr;
         }
         return &mNewValue;
     }
 
     /**
-    * @brief Signals completion of new value modifications
-    * @return CHIP_NO_ERROR on success
-    * @retval CHIP_ERROR_INCORRECT_STATE if not in kInitiated state
-    * 
-    * @pre Must be in kInitiated state (after GetNewValue() modifications)
-    * @post On success, transitions to kAssigned state
-    * @see UpdateBegin()
-    */
+     * @brief Signals completion of new value modifications
+     * @return CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INCORRECT_STATE if not in kInitiated state
+     *
+     * @pre Must be in kInitiated state (after GetNewValue() modifications)
+     * @post On success, transitions to kAssigned state
+     * @see UpdateBegin()
+     */
     CHIP_ERROR MarkAsAssigned()
     {
         if (mUpdateState != UpdateState::kInitiated)
@@ -430,17 +432,17 @@ public:
     }
 
     /**
-    * @brief Validates and prepares the new value for commit
-    * @param aUpdCtx Context pointer for callback
-    * @param aUpdCb Callback to invoke on successful commit
-    * @return CHIP_NO_ERROR if validation succeeds
-    * @retval CHIP_ERROR_INCORRECT_STATE if not in kAssigned state
-    * @retval Other validation errors from ValidateValue()
-    * 
-    * @pre Must be in kAssigned state (after MarkAsAssigned())
-    * @post On success, transitions to kValidated state
-    */
-    CHIP_ERROR UpdateBegin(void* aUpdCtx, void (*aUpdCb)(uint16_t, void*))
+     * @brief Validates and prepares the new value for commit
+     * @param aUpdCtx Context pointer for callback
+     * @param aUpdCb Callback to invoke on successful commit
+     * @return CHIP_NO_ERROR if validation succeeds
+     * @retval CHIP_ERROR_INCORRECT_STATE if not in kAssigned state
+     * @retval Other validation errors from ValidateValue()
+     *
+     * @pre Must be in kAssigned state (after MarkAsAssigned())
+     * @post On success, transitions to kValidated state
+     */
+    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(uint16_t, void *))
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
@@ -448,34 +450,36 @@ public:
             return CHIP_NO_ERROR;
         }
 
-       if (mUpdateState != UpdateState::kAssigned) {
-           return CHIP_ERROR_INCORRECT_STATE;
-       }
+        if (mUpdateState != UpdateState::kAssigned)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
 
-       assert(aUpdCtx != nullptr && aUpdCb != nullptr);
-       mAuxData = aUpdCtx;
-       mAuxCb = aUpdCb;
+        assert(aUpdCtx != nullptr && aUpdCb != nullptr);
+        mAuxData = aUpdCtx;
+        mAuxCb   = aUpdCb;
 
-       CHIP_ERROR err = ValidateValue();
-       if (err == CHIP_NO_ERROR) {
-           mUpdateState = UpdateState::kValidated;
-       }
-       return err;
+        CHIP_ERROR err = ValidateValue();
+        if (err == CHIP_NO_ERROR)
+        {
+            mUpdateState = UpdateState::kValidated;
+        }
+        return err;
     }
 
     /**
-    * @brief Commits the validated new value
-    * 
-    * @note Performs the following actions:
-    *       1. Checks if value actually changed
-    *       2. Cleans up old value if needed
-    *       3. Updates stored value
-    *       4. Invokes callback if provided
-    *       5. Resets to kIdle state
-    * 
-    * @pre Must be in kValidated state (after UpdateBegin())
-    * @post Always transitions to kIdle state
-    */
+     * @brief Commits the validated new value
+     *
+     * @note Performs the following actions:
+     *       1. Checks if value actually changed
+     *       2. Cleans up old value if needed
+     *       3. Updates stored value
+     *       4. Invokes callback if provided
+     *       5. Resets to kIdle state
+     *
+     * @pre Must be in kValidated state (after UpdateBegin())
+     * @post Always transitions to kIdle state
+     */
     void UpdateCommit()
     {
         /* Skip if the attribute object has no new attached data */
@@ -486,49 +490,61 @@ public:
 
         assert(mUpdateState == UpdateState::kValidated);
 
-        if (HasChanged()) {
-            if (mHoldState == StorageState::kHold) {
+        if (HasChanged())
+        {
+            if (mHoldState == StorageState::kHold)
+            {
                 CleanupValue(mValue);
             }
 
-            mValue = mNewValue;
+            mValue     = mNewValue;
             mHoldState = StorageState::kHold;
 
-            if (mAuxCb) {
+            if (mAuxCb)
+            {
                 mAuxCb(mAttrId, mAuxData);
             }
+
+            mUpdateState = UpdateState::kUpdated;
         }
 
-        mUpdateState = UpdateState::kIdle;
+        UpdateEnd();
     }
 
     /**
-    * @brief Aborts the current update process
-    * 
-    * @note Performs the following actions:
-    *       1. Discards pending new value
-    *       2. Cleans up if needed
-    *       3. Resets to kIdle state
-    * 
-    * @post Always transitions to kIdle state
-    */
-    void UpdateAbort()
+     * @brief Aborts the current update process
+     *
+     * @note Performs the following actions:
+     *       1. Discards pending new value
+     *       2. Cleans up if needed
+     *       3. Resets to kIdle state
+     *
+     * @post Always transitions to kIdle state
+     */
+    void UpdateEnd()
     {
-        if (mUpdateState != UpdateState::kIdle)
+        /* Skip if the attribute object has no new attached data */
+        if (mUpdateState == UpdateState::kIdle)
+        {
+            return;
+        }
+        /* In cases if new data was initialized/activated but has not assigned to Value storage */
+        if (mUpdateState != UpdateState::kUpdated)
         {
             CleanupValue(mNewValue);
-            mNewValue = mValue;
-            mUpdateState = UpdateState::kIdle;            
+            mNewValue    = mValue;
+            mUpdateState = UpdateState::kIdle;
         }
     }
+
 protected:
     T & mValue;             // Reference to the applied value storage
     T & mNewValue = mValue; // Reference to a value for updating
     void * mAuxData;        // Pointer to an auxiliary data which can be used in some method implementations
     const uint16_t mAttrId;
-    void (* mAuxCb)(uint16_t, void *);
+    void (*mAuxCb)(uint16_t, void *);
 
-    StorageState mHoldState = StorageState::kEmpty;
+    StorageState mHoldState  = StorageState::kEmpty;
     UpdateState mUpdateState = UpdateState::kIdle;
 
     bool is_changed = false;

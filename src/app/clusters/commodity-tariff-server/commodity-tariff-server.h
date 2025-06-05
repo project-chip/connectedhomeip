@@ -129,7 +129,7 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
     class attrName##DataClass : public CTC_BaseDataClass<attrType>                                                                 \
     {                                                                                                                              \
     public:                                                                                                                        \
-        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}                              \
+        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}    \
         ~attrName##DataClass() override = default;                                                                                 \
                                                                                                                                    \
     protected:                                                                                                                     \
@@ -142,7 +142,7 @@ COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
     class attrName##DataClass : public CTC_BaseDataClass<attrType>                                                                 \
     {                                                                                                                              \
     public:                                                                                                                        \
-        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}                              \
+        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}    \
         ~attrName##DataClass() override = default;                                                                                 \
                                                                                                                                    \
     protected:                                                                                                                     \
@@ -158,19 +158,19 @@ COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 struct TariffUpdateCtx
 {
     /* DayEntryIDs */
-    std::unordered_set<uint32_t> DE_KeyIDs; /* Master - IDs of all given DayEntry items */
+    std::unordered_set<uint32_t> DayEntryKeyIDs; /* Master - IDs of all given DayEntry items */
 
-    std::unordered_set<uint32_t> DP_DE_IDs; /* IDs mentioned in DayPattern items */
-    std::unordered_set<uint32_t> TP_DE_IDs; /* IDs mentioned in TariffPeriod items */
-    std::unordered_set<uint32_t> ID_DE_IDs; /* IDs mentioned in IndividualDays items */
+    std::unordered_set<uint32_t> DayPatternsDayEntryIDs;    /* IDs mentioned in DayPattern items */
+    std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs;  /* IDs mentioned in TariffPeriod items */
+    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs; /* IDs mentioned in IndividualDays items */
 
     /* TariffComponentIDs */
-    std::unordered_set<uint32_t> TC_KeyIDs; /* Master - IDs of all given TariffComponent items */
-    std::unordered_set<uint32_t> TP_TC_IDs; /* IDs mentioned in TariffPeriods items */
+    std::unordered_set<uint32_t> TariffComponentKeyIDs;           /* Master - IDs of all given TariffComponent items */
+    std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs; /* IDs mentioned in TariffPeriods items */
 
     /* DayPatternsIDs */
-    std::unordered_set<uint32_t> DP_KeyIDs; /* Master - IDs of all given DayPattern items */
-    std::unordered_set<uint32_t> CP_DP_IDs; /* IDs mentioned in CalendarPeriods items */
+    std::unordered_set<uint32_t> DayPatternKeyIDs;             /* Master - IDs of all given DayPattern items */
+    std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs; /* IDs mentioned in CalendarPeriods items */
 
     BitMask<Feature> mFeature;
     EndpointId aEndpoint;
@@ -242,7 +242,7 @@ public:
     void TariffDataUpdate()
     {
         TariffUpdateCtx UpdCtx = { .mFeature = this->mFeature };
-        
+
         if (!TariffDataUpd_Init(UpdCtx))
         {
             ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
@@ -287,7 +287,7 @@ private:
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
-    static void TariffDataUpd_AttrChangeCb( uint16_t aAttrId , void * CbCtx )
+    static void TariffDataUpd_AttrChangeCb(uint16_t aAttrId, void * CbCtx)
     {
         TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
         ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
@@ -299,7 +299,7 @@ private:
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 #define X(attrName, attrType) err = m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb);
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
         if (err != CHIP_NO_ERROR)
         {
@@ -313,13 +313,13 @@ private:
     void TariffDataUpd_Commit()
     {
 #define X(attrName, attrType) m##attrName##_MgmtObj.UpdateCommit();
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
     }
 
     void TariffDataUpd_Abort()
     {
-#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateAbort();
+#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateEnd();
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
     }

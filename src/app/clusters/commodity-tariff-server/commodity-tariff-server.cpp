@@ -64,25 +64,25 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(TariffUpdateCtx &
         return false;
     }
 
-    assert(!UpdCtx.DE_KeyIDs.empty());
-    assert(!UpdCtx.TC_KeyIDs.empty());
+    assert(!UpdCtx.DayEntryKeyIDs.empty());
+    assert(!UpdCtx.TariffComponentKeyIDs.empty());
 
-    assert(!UpdCtx.TP_DE_IDs.empty()); // Something went wrong if TariffPeriods has no DayEntries IDs
-    assert(!UpdCtx.TP_TC_IDs.empty()); // Something went wrong if TariffPeriods has no TariffComponents IDs
+    assert(!UpdCtx.TariffPeriodsDayEntryIDs.empty());        // Something went wrong if TariffPeriods has no DayEntries IDs
+    assert(!UpdCtx.TariffPeriodsTariffComponentIDs.empty()); // Something went wrong if TariffPeriods has no TariffComponents IDs
 
     // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
-    for (const auto & item : UpdCtx.TP_DE_IDs)
+    for (const auto & item : UpdCtx.TariffPeriodsDayEntryIDs)
     {
-        if (!UpdCtx.DE_KeyIDs.count(item))
+        if (!UpdCtx.DayEntryKeyIDs.count(item))
         {
             return false; // The item not found in original list
         }
     }
 
     // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
-    for (const auto & item : UpdCtx.TP_TC_IDs)
+    for (const auto & item : UpdCtx.TariffPeriodsTariffComponentIDs)
     {
-        if (!UpdCtx.TC_KeyIDs.count(item))
+        if (!UpdCtx.TariffComponentKeyIDs.count(item))
         {
             return false; // The item not found in original list
         }
@@ -90,13 +90,13 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(TariffUpdateCtx &
 
     if (mDayPatterns_MgmtObj.IsValid())
     {
-        assert(!UpdCtx.DP_KeyIDs.empty());
-        assert(!UpdCtx.DP_DE_IDs.empty()); // Something went wrong if DP has no DE IDs
+        assert(!UpdCtx.DayPatternKeyIDs.empty());
+        assert(!UpdCtx.DayPatternsDayEntryIDs.empty()); // Something went wrong if DP has no DE IDs
 
         // Checks that all DP_DEs are in main DE list:
-        for (const auto & item : UpdCtx.DP_DE_IDs)
+        for (const auto & item : UpdCtx.DayPatternsDayEntryIDs)
         {
-            if (!UpdCtx.DE_KeyIDs.count(item))
+            if (!UpdCtx.DayEntryKeyIDs.count(item))
             {
                 return false; // The item not found in original list
             }
@@ -105,17 +105,17 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(TariffUpdateCtx &
 
     if (mIndividualDays_MgmtObj.IsValid())
     {
-        assert(!UpdCtx.ID_DE_IDs.empty()); // Something went wrong if IndividualDays has no DE IDs
+        assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
 
         // Checks that all ID_DE_IDs are in main DE list:
-        for (const auto & item : UpdCtx.ID_DE_IDs)
+        for (const auto & item : UpdCtx.IndividualDaysDayEntryIDs)
         {
-            if (!UpdCtx.DE_KeyIDs.count(item))
+            if (!UpdCtx.DayEntryKeyIDs.count(item))
             {
                 return false; // The item not found in original list
             }
 
-            if (UpdCtx.DP_DE_IDs.count(item))
+            if (UpdCtx.DayPatternsDayEntryIDs.count(item))
             {
                 return false; // If same item from ID list has found in DP list
             }
@@ -125,12 +125,12 @@ bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(TariffUpdateCtx &
     //
     if (mCalendarPeriods_MgmtObj.IsValid())
     {
-        assert(!UpdCtx.CP_DP_IDs.empty()); // Something went wrong if CP has no DP IDs
+        assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
 
         // Checks that all ID_DE_IDs are in main DE list:
-        for (const auto & item : UpdCtx.CP_DP_IDs)
+        for (const auto & item : UpdCtx.CalendarPeriodsDayPatternIDs)
         {
-            if (!UpdCtx.DP_KeyIDs.count(item))
+            if (!UpdCtx.DayPatternKeyIDs.count(item))
             {
                 return false; // The item not found in original list
             }
