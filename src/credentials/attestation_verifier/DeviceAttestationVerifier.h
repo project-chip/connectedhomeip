@@ -31,11 +31,11 @@ enum class AttestationVerificationResult : uint16_t
 {
     kSuccess = 0,
 
-    kPaaUntrusted        = 100,  // NOTE: Was not used due to kPaaNotFound being the main case.
+    kPaaUntrusted        = 100, // NOTE: Was not used due to kPaaNotFound being the main case.
     kPaaNotFound         = 101,
     kPaaExpired          = 102,
     kPaaSignatureInvalid = 103,
-    kPaaRevoked          = 104,  // NOTE: Likely not used in most cases due to kPaaNotFound being the main case.
+    kPaaRevoked          = 104, // NOTE: Likely not used in most cases due to kPaaNotFound being the main case.
     kPaaFormatInvalid    = 105,
     kPaaArgumentInvalid  = 106,
 
@@ -74,10 +74,10 @@ enum class AttestationVerificationResult : uint16_t
     kCertificationDeclarationInvalidProductId   = 605,
     kCertificationDeclarationInvalidPAA         = 606,
 
-    kNoMemory = 700,
+    kNoMemory        = 700,
     kInvalidArgument = 701,
-    kInternalError = 702,
-    kNotImplemented = 703,
+    kInternalError   = 702,
+    kNotImplemented  = 703,
 
     // TODO: Add more attestation verification errors
 };
@@ -443,7 +443,7 @@ protected:
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;
-    bool mEnableVerboseLogs = false;
+    bool mEnableVerboseLogs      = false;
 };
 
 /**
@@ -474,7 +474,7 @@ public:
  * @param resultCode - The result code to describe
  * @return a pointer to a static null-terminated string describing the error.
  */
-const char* GetAttestationResultDescription(AttestationVerificationResult resultCode);
+const char * GetAttestationResultDescription(AttestationVerificationResult resultCode);
 
 /**
  * Instance getter for the global DeviceAttestationVerifier.

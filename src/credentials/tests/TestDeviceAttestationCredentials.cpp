@@ -643,5 +643,6 @@ TEST(DeviceAttestationVerifier, GetAttestationResultDescriptionWorks)
 {
     ASSERT_STREQ(GetAttestationResultDescription(AttestationVerificationResult::kSuccess), "Success");
     ASSERT_STREQ(GetAttestationResultDescription(AttestationVerificationResult::kPaiAndDacRevoked), "Both PAI and DAC are revoked");
-    ASSERT_STREQ(GetAttestationResultDescription(static_cast<AttestationVerificationResult>(UINT16_MAX)), "<AttestationVerificationResult does not have a description!>");
+    ASSERT_STREQ(GetAttestationResultDescription(static_cast<AttestationVerificationResult>(UINT16_MAX)),
+                 "<AttestationVerificationResult does not have a description!>");
 }

@@ -312,74 +312,78 @@ AttestationVerificationResult MapError(CertificateChainValidationResult certific
 }
 
 // CertificateType class doesn't work since it doesn't encode PAA>
-enum AttestationChainElement : uint8_t {
+enum AttestationChainElement : uint8_t
+{
     kPAA = 0,
     kPAI = 1,
     kDAC = 2
 };
 
-enum KeyIdType : uint8_t {
+enum KeyIdType : uint8_t
+{
     kAuthorityKeyId = 0,
-    kSubjectKeyId = 1,
+    kSubjectKeyId   = 1,
 };
 
-const char* CertTypeAsString(AttestationChainElement certType)
+const char * CertTypeAsString(AttestationChainElement certType)
 {
     switch (certType)
     {
-        case AttestationChainElement::kPAA:
-            return "PAA";
-            break;
-        case AttestationChainElement::kPAI:
-            return "PAI";
-            break;
-        case AttestationChainElement::kDAC:
-            return "DAC";
-        default:
-            break;
+    case AttestationChainElement::kPAA:
+        return "PAA";
+        break;
+    case AttestationChainElement::kPAI:
+        return "PAI";
+        break;
+    case AttestationChainElement::kDAC:
+        return "DAC";
+    default:
+        break;
     }
     return "<UNKNOWN>";
 }
 
 void LogOneKeyId(KeyIdType keyIdType, AttestationChainElement certType, ByteSpan derBuffer)
 {
-    const char *certTypeName = CertTypeAsString(certType);
+    const char * certTypeName = CertTypeAsString(certType);
 
     uint8_t keyIdBuf[Crypto::kAuthorityKeyIdentifierLength]; // Big enough for SKID/AKID.
-    MutableByteSpan keyIdSpan{keyIdBuf};
+    MutableByteSpan keyIdSpan{ keyIdBuf };
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    const char* keyIdTypeString = "<UNKNOWN>";
+    const char * keyIdTypeString = "<UNKNOWN>";
     switch (keyIdType)
     {
-        case KeyIdType::kAuthorityKeyId:
-            err = ExtractAKIDFromX509Cert(derBuffer, keyIdSpan);
-            keyIdTypeString = "AKID";
-            break;
-        case KeyIdType::kSubjectKeyId:
-            err = ExtractSKIDFromX509Cert(derBuffer, keyIdSpan);
-            keyIdTypeString = "SKID";
-            break;
-        default:
-            err = CHIP_ERROR_INTERNAL;
-            break;
+    case KeyIdType::kAuthorityKeyId:
+        err             = ExtractAKIDFromX509Cert(derBuffer, keyIdSpan);
+        keyIdTypeString = "AKID";
+        break;
+    case KeyIdType::kSubjectKeyId:
+        err             = ExtractSKIDFromX509Cert(derBuffer, keyIdSpan);
+        keyIdTypeString = "SKID";
+        break;
+    default:
+        err = CHIP_ERROR_INTERNAL;
+        break;
     }
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to extract %s from %s: %" CHIP_ERROR_FORMAT, keyIdTypeString, certTypeName, err.Format());
+        ChipLogError(NotSpecified, "Failed to extract %s from %s: %" CHIP_ERROR_FORMAT, keyIdTypeString, certTypeName,
+                     err.Format());
         return;
     }
 
     KeyIdStringifier KeyIdStringifier;
-    const char *keyIdString = KeyIdStringifier.KeyIdToHex(keyIdSpan);
+    const char * keyIdString = KeyIdStringifier.KeyIdToHex(keyIdSpan);
 
     ChipLogProgress(NotSpecified, "--> %s certificate %s: %s", certTypeName, keyIdTypeString, keyIdString);
 }
 
 void LogCertificateAsPem(AttestationChainElement element, ByteSpan derBuffer)
 {
-    ChipLogProgress(NotSpecified, "==== %s certificate considered (%u bytes) ====", CertTypeAsString(element), static_cast<unsigned>(derBuffer.size()));
+    ChipLogProgress(NotSpecified, "==== %s certificate considered (%u bytes) ====", CertTypeAsString(element),
+                    static_cast<unsigned>(derBuffer.size()));
     PemEncoder encoder("CERTIFICATE", derBuffer);
     for (const char * pemLine = encoder.NextLine(); pemLine != nullptr; pemLine = encoder.NextLine())
     {
@@ -439,7 +443,8 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     if (AreVerboseLogsEnabled())
     {
         ChipLogProgress(NotSpecified, "Device candidate DAC chain details:");
-        ChipLogProgress(NotSpecified, "--> DAC's VID: 0x%04X, PID: 0x%04X", dacVidPid.mVendorId.Value(), dacVidPid.mProductId.Value());
+        ChipLogProgress(NotSpecified, "--> DAC's VID: 0x%04X, PID: 0x%04X", dacVidPid.mVendorId.Value(),
+                        dacVidPid.mProductId.Value());
 
         LogCertificateAsPem(AttestationChainElement::kDAC, info.dacDerBuffer);
         LogOneKeyId(KeyIdType::kSubjectKeyId, AttestationChainElement::kDAC, info.dacDerBuffer);
