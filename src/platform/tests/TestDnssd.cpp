@@ -36,6 +36,10 @@
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/support/CHIPMem.h>
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#include <dns_sd.h>
+#endif
+
 using chip::Dnssd::DnssdService;
 using chip::Dnssd::DnssdServiceProtocol;
 using chip::Dnssd::TextEntry;
@@ -263,7 +267,13 @@ static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR
     DnssdService service{};
     TextEntry entry{ "key", reinterpret_cast<const uint8_t *>("val"), 3 };
 
-    service.mInterface = chip::Inet::InterfaceId::Null();
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    constexpr chip::Inet::InterfaceId kInterfaceId = chip::Inet::InterfaceId(kDNSServiceInterfaceIndexLocalOnly);
+#else
+    constexpr chip::Inet::InterfaceId kInterfaceId = chip::Inet::InterfaceId::Null();
+#endif
+
+    service.mInterface = kInterfaceId;
     service.mPort      = 80;
     strcpy(service.mHostName, "MatterTest");
     strcpy(service.mName, "test");
@@ -277,8 +287,8 @@ static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR
 
     EXPECT_EQ(ChipDnssdPublishService(&service, HandlePublish, nullptr), CHIP_NO_ERROR);
 
-    EXPECT_EQ(ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
-                              chip::Inet::InterfaceId::Null(), HandleBrowse, context, &ctx->mBrowseIdentifier),
+    EXPECT_EQ(ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny, kInterfaceId,
+                              HandleBrowse, context, &ctx->mBrowseIdentifier),
               CHIP_NO_ERROR);
 }
 

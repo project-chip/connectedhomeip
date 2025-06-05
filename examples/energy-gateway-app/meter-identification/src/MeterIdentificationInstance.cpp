@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
+#include <MeterIdentificationInstance.h>
 #include <app/util/af-types.h>
-#include <meter-identification-instance.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MeterIdentification;
@@ -30,18 +30,20 @@ Instance * MeterIdentification::GetInstance()
     return gMeterIdentificationCluster.get();
 }
 
-void MeterIdentification::Shutdown()
-{
-    VerifyOrDie(gMeterIdentificationCluster);
-    gMeterIdentificationCluster->Shutdown();
-    gMeterIdentificationCluster.reset(nullptr);
-}
-
 void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpointId)
 {
-    ChipLogProgress(Zcl, "emberAfMeterIdentificationClusterInitCallback %d", static_cast<int>(endpointId));
-    VerifyOrDie(1 == endpointId); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(!gMeterIdentificationCluster);
-    gMeterIdentificationCluster = std::make_unique<Instance>(1, chip::BitMask<Feature, uint32_t>(Feature::kPowerThreshold));
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gMeterIdentificationCluster == nullptr);
+    gMeterIdentificationCluster =
+        std::make_unique<Instance>(endpointId, chip::BitMask<Feature, uint32_t>(Feature::kPowerThreshold));
     gMeterIdentificationCluster->Init();
+}
+
+void emberAfMeterIdentificationClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gMeterIdentificationCluster)
+    {
+        gMeterIdentificationCluster->Shutdown();
+        gMeterIdentificationCluster.reset(nullptr);
+    }
 }
