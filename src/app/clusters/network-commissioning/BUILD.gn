@@ -64,4 +64,10 @@ source_set("network-commissioning") {
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/credentials",
   ]
+
+  # TODO: we have a dependency on GeneralCommissioning: setting a breadcrumb
+  # via `GeneralCommissioning::SetBreadcrumb`. This should be decoupled when
+  # GeneralCommissioning is turned into code-driven
+  #
+  # See https://github.com/project-chip/connectedhomeip/issues/39412
 }

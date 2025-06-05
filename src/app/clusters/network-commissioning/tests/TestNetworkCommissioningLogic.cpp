@@ -17,6 +17,7 @@
 
 #include <app/clusters/network-commissioning/NetworkCommissioningLogic.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
 #include <clusters/NetworkCommissioning/Ids.h>
@@ -48,3 +49,15 @@ TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 }
 
 } // namespace
+
+// TODO: we have a dependency on GeneralCommissioning: setting a break crumb
+// via `GeneralCommissioning::SetBreadcrumb`. This should be decoupled when
+// GeneralCommissioning is turned into code-driven
+//
+// See https://github.com/project-chip/connectedhomeip/issues/39412
+namespace chip::app::Clusters::GeneralCommissioning {
+void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
+{
+    // NOTHING, this is a test
+}
+} // namespace chip::app::Clusters::GeneralCommissioning
