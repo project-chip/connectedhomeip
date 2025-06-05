@@ -87,7 +87,7 @@ bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const
             return false;
         }
     }
-    // set sizes are the same and all entreisA have a corresponding entriesB, so sets should match
+    // set sizes are the same and all entriesA have a corresponding entriesB, so sets should match
     return true;
 }
 

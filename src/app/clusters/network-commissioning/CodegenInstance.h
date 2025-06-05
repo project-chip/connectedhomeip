@@ -26,7 +26,7 @@ namespace Clusters {
 namespace NetworkCommissioning {
 
 /// Automates integration of a NetworkCommissioningCluster
-/// with the CodgenDatamodelInterface.
+/// with the CodegenDataModelInterface.
 ///
 /// This class exists as a compatibility layer with the original
 /// network-commissioning class, however it only exposes Init/Shutdown and
