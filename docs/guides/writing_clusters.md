@@ -15,7 +15,7 @@ The following checklist can be used to write a new cluster
 
 Clusters are defined against the Matter specification. The code backing for them
 is code-generated based on XML definitions from
-[src/app/zap-templates/data-model/chip](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/data-model/chip)
+[src/app/zap-templates/zcl/data-model/chip](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/data-model/chip)
 In order to define a new cluster, use
 [Alchemy](https://github.com/project-chip/alchemy) to parse the specification
 `asciidoc`` and generate/update the relevant XML files. Manual editing is
