@@ -630,7 +630,7 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
     {
         auto peerAddress = device->GetPeerAddress();
         ChipLogProgress(Discovery, "Closing WiFiPAF connections, nodeId: %lu", PeerAddress.GetRemoteId());
-        WiFiPAF::WiFiPAFSession PafSession = {
+        WiFiPAF::WiFiPAFSession pafSession = {
             .role   = WiFiPAF::kWiFiPafRole_Subscriber,
             .nodeId = PeerAddress.GetRemoteId(),
         };
