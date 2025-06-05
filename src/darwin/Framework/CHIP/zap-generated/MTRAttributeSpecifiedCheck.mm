@@ -5821,7 +5821,10 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
 {
     using namespace Clusters::ZoneManagement;
     switch (aAttributeId) {
-    case Attributes::SupportedZoneSources::Id: {
+    case Attributes::MaxUserDefinedZones::Id: {
+        return YES;
+    }
+    case Attributes::MaxZones::Id: {
         return YES;
     }
     case Attributes::Zones::Id: {
@@ -5830,7 +5833,13 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
     case Attributes::Triggers::Id: {
         return YES;
     }
+    case Attributes::SensitivityMax::Id: {
+        return YES;
+    }
     case Attributes::Sensitivity::Id: {
+        return YES;
+    }
+    case Attributes::TwoDCartesianMax::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
