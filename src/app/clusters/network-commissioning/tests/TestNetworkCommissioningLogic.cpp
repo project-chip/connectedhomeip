@@ -42,9 +42,9 @@ struct TestNetworkCommissioningLogic : public ::testing::Test
 
 TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 {
-        Testing::FakeWiFiDriver fakeWifiDriver;
-        NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver);
-        ASSERT_EQ(logic.Features(), BitFlags<NetworkCommissioning::Feature>(NetworkCommissioning::Feature::kWiFiNetworkInterface));
+    Testing::FakeWiFiDriver fakeWifiDriver;
+    NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver);
+    ASSERT_EQ(logic.Features(), BitFlags<NetworkCommissioning::Feature>(NetworkCommissioning::Feature::kWiFiNetworkInterface));
 }
 
 } // namespace

@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#include <lib/support/Span.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/support/Span.h>
 
 #include <map>
 
