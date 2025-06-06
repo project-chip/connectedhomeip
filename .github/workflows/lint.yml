@@ -325,6 +325,12 @@ jobs:
               if: always()
               run: |
                   ruff check
+                
+            # Run ChipStackError linter
+            - name: Check for errors using ruff Python linter
+              if: always()
+              run: |
+                  python3 scripts/check_chipstack.py
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
