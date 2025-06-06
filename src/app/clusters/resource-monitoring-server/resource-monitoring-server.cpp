@@ -187,10 +187,10 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 }
 
 // List the commands supported by this instance.
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
+    ChipLogDetail(Zcl, "resourcemonitoring: RetrieveAcceptedCommands");
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     if (mResetConditionCommandSupported)
     {

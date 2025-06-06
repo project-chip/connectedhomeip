@@ -292,14 +292,14 @@ public:
 
     void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
         VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
         return builder.AppendElements(Span<const AcceptedCommandEntry>(mAccepted.data(), mAccepted.size()));
     }
 
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
+    CHIP_ERROR RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
     {
         VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
         return builder.AppendElements(Span<const CommandId>(mGenerated.data(), mGenerated.size()));
@@ -1476,8 +1476,8 @@ TEST_F(TestCodegenModelViaMocks, ShimCommandHandlerInterfaceCommandHandling)
     using namespace Clusters::UnitTesting;
     static const MockNodeConfig kNodeConfig({
         MockEndpointConfig(kMockEndpoint1, {
-            MockClusterConfig(Clusters::UnitTesting::Id, {
-                ClusterRevision::Id, FeatureMap::Id,
+            MockClusterConfig(Clusters::UnitTesting::Id, { 
+                ClusterRevision::Id, FeatureMap::Id,                
             }),
             MockClusterConfig(MockClusterId(2), {
                 ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),

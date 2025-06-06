@@ -109,8 +109,8 @@ private:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     void HandleGetDetailedPriceRequest(HandlerContext & ctx, const Commands::GetDetailedPriceRequest::DecodableType & commandData);
     void HandleGetDetailedForecastRequest(HandlerContext & ctx,

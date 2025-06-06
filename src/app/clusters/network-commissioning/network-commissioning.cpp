@@ -1361,8 +1361,8 @@ void Instance::OnFailSafeTimerExpired()
     }
 }
 
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(6));
@@ -1396,7 +1396,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
+CHIP_ERROR Instance::RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     using namespace Clusters::NetworkCommissioning::Commands;
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(4));

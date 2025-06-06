@@ -69,8 +69,8 @@ public:
 
 private:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) final;
+    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) final;
 
     bool mOverrideAcceptedCommands = false;
     bool mClaimNoCommands          = false;
@@ -105,8 +105,8 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
         });
 }
 
-CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR TestClusterCommandHandler::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (!mOverrideAcceptedCommands)
     {

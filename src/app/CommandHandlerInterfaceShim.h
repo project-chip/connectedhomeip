@@ -46,8 +46,8 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         return DataModel::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
     }
 
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
         size_t commandCount = 0;
         CHIP_ERROR err      = CHIP_NO_ERROR;
@@ -86,7 +86,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
+    CHIP_ERROR RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
     {
         size_t commandCount = 0;
         CHIP_ERROR err      = CHIP_NO_ERROR;

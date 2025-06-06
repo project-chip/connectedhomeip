@@ -126,8 +126,8 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+    virtual CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -151,7 +151,7 @@ public:
      * This is used by callbacks that just look for a particular value in the
      * list.
      */
-    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
+    virtual CHIP_ERROR RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

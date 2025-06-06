@@ -67,20 +67,20 @@ CommandHandler Interface was coupled with Ember data in ways that caused bugs if
 not setup correctly, updates were made for decoupling, now this data is provided
 
 With this the interfaces
-[`CommandHandlerInterface::EnumerateGeneratedCommands`](#enumerategeneratedcommands),
-[`CommandHandlerInterface::EnumerateAcceptedCommands`](#enumerateacceptedcommands)
+[`CommandHandlerInterface::RetrieveGeneratedCommands`](#RetrieveGeneratedCommands),
+[`CommandHandlerInterface::RetrieveAcceptedCommands`](#retrieveacceptedcommands)
 go through some changes, a shim is provided to make the transition simpler
 
 #### Full Changes
 
-##### EnumerateGeneratedCommands
+##### EnumerateGeneratedCommands to RetrieveGeneratedCommands
 
 Changed the old callback based iteration into a ListBuilder based approach for
 the Enumeration of Generated Commands
 
 `CommandHandlerInterface::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
 becomes
-`CommandHandlerInterface::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, ListBuilder<CommandId> & builder)`
+`CommandHandlerInterface::RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ListBuilder<CommandId> & builder)`
 
 Changes for implementation
 
@@ -101,14 +101,15 @@ Changes for implementation
    )
 ```
 
-##### EnumerateAcceptedCommands
+##### EnumerateAcceptedCommands to RetrieveAcceptedCommands
 
-Expanded `EnumerateAcceptedCommands` Interface to provide the Access Information
-(Attributes and Qualities) using a ListBuilder
+Changed the old callback based iteration into a ListBuilder based approach for
+the Enumeration of Accepted Commands The new Interface allows for the
+fullmetadata lookup
 
 `CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
 becomes
-`CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, ListBuilder<AcceptedCommandEntry> & builder)`
+`CommandHandlerInterface::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster, ListBuilder<AcceptedCommandEntry> & builder)`
 
 Changes for implementation:
 
