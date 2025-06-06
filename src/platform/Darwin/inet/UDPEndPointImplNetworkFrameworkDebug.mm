@@ -23,7 +23,7 @@
 
 #include <lib/support/CodeUtils.h>
 
-#define NETWORK_FRAMEWORK_DEBUG 1
+#define NETWORK_FRAMEWORK_DEBUG 0
 
 namespace chip {
 namespace Inet {
@@ -263,7 +263,7 @@ namespace Inet {
         void DebugPrintConnectionState(nw_connection_state_t state, nw_error_t error) {};
         void DebugPrintConnection(const nw_connection_t connection) {};
         void DebugPrintEndPoint(nw_endpoint_t endpoint) {};
-        void DebugPrintPacketInfo(IPPacketInfo & packetInfo);
+        void DebugPrintPacketInfo(IPPacketInfo & packetInfo) {};
 #endif
     } // namespace Darwin
 } // namespace Inet
