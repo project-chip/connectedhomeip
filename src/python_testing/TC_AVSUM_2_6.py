@@ -109,14 +109,13 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
                 if mptzpreset.presetID == presetID:
                     notFound = False
                     break
-
             asserts.assert_true(notFound, "Preset not removed despite invocation of MPTZRemovePreset")
 
             # Repeat removal of already removed value, verify Not Found
             self.step(7)
             await self.send_remove_preset_command(endpoint, presetID, expected_status=Status.NotFound)
 
-            self.skip_all_remaining_steps(8)
+            self.mark_all_remaining_steps_skipped(8)
             return
 
         self.skip_step(5)
