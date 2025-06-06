@@ -5440,14 +5440,13 @@
               "isEnabled": 1
             },
             {
-              "name": "RemovTrigger",
+              "name": "RemoveTrigger",
               "code": 7,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
               "isEnabled": 1
-            },
-
+            }
           ],
           "attributes": [
             {
