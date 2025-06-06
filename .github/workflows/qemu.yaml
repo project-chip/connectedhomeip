@@ -99,3 +99,4 @@ jobs:
                         --target tizen-arm-tests-no-ble-no-thread \
                         build
                     "
+                || { ./scripts/helpers/tizen-crashlog.sh; exit 1; }
