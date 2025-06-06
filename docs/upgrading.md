@@ -104,8 +104,8 @@ Changes for implementation
 ##### EnumerateAcceptedCommands to RetrieveAcceptedCommands
 
 Changed the old callback based iteration into a ListBuilder based approach for
-the Enumeration of Accepted Commands The new Interface allows for the
-fullmetadata lookup
+the Enumeration of Accepted Commands The new Interface allows for the full
+metadata lookup
 
 `CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
 becomes
