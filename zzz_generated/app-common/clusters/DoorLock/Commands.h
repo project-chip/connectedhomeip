@@ -62,6 +62,46 @@ struct Type;
 struct DecodableType;
 } // namespace UnlockWithTimeout
 
+namespace SetPINCode {
+struct Type;
+struct DecodableType;
+} // namespace SetPINCode
+
+namespace GetPINCode {
+struct Type;
+struct DecodableType;
+} // namespace GetPINCode
+
+namespace GetPINCodeResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetPINCodeResponse
+
+namespace ClearPINCode {
+struct Type;
+struct DecodableType;
+} // namespace ClearPINCode
+
+namespace ClearAllPINCodes {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllPINCodes
+
+namespace SetUserStatus {
+struct Type;
+struct DecodableType;
+} // namespace SetUserStatus
+
+namespace GetUserStatus {
+struct Type;
+struct DecodableType;
+} // namespace GetUserStatus
+
+namespace GetUserStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetUserStatusResponse
+
 namespace SetWeekDaySchedule {
 struct Type;
 struct DecodableType;
@@ -121,6 +161,46 @@ namespace ClearHolidaySchedule {
 struct Type;
 struct DecodableType;
 } // namespace ClearHolidaySchedule
+
+namespace SetUserType {
+struct Type;
+struct DecodableType;
+} // namespace SetUserType
+
+namespace GetUserType {
+struct Type;
+struct DecodableType;
+} // namespace GetUserType
+
+namespace GetUserTypeResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetUserTypeResponse
+
+namespace SetRFIDCode {
+struct Type;
+struct DecodableType;
+} // namespace SetRFIDCode
+
+namespace GetRFIDCode {
+struct Type;
+struct DecodableType;
+} // namespace GetRFIDCode
+
+namespace GetRFIDCodeResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetRFIDCodeResponse
+
+namespace ClearRFIDCode {
+struct Type;
+struct DecodableType;
+} // namespace ClearRFIDCode
+
+namespace ClearAllRFIDCodes {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllRFIDCodes
 
 namespace SetUser {
 struct Type;
@@ -290,6 +370,305 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnlockWithTimeout
+namespace SetPINCode {
+enum class Fields : uint8_t
+{
+    kUserID     = 0,
+    kUserStatus = 1,
+    kUserType   = 2,
+    kPin        = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetPINCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+    DataModel::Nullable<UserStatusEnum> userStatus;
+    DataModel::Nullable<UserTypeEnum> userType;
+    chip::ByteSpan pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetPINCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+    DataModel::Nullable<UserStatusEnum> userStatus;
+    DataModel::Nullable<UserTypeEnum> userType;
+    chip::ByteSpan pin;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetPINCode
+namespace GetPINCode {
+enum class Fields : uint8_t
+{
+    kUserID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetPINCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetPINCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPINCode
+namespace GetPINCodeResponse {
+enum class Fields : uint8_t
+{
+    kUserID     = 0,
+    kUserStatus = 1,
+    kUserType   = 2,
+    kPINCode    = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetPINCodeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+    DataModel::Nullable<UserStatusEnum> userStatus;
+    DataModel::Nullable<UserTypeEnum> userType;
+    DataModel::Nullable<chip::ByteSpan> PINCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetPINCodeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+    DataModel::Nullable<UserStatusEnum> userStatus;
+    DataModel::Nullable<UserTypeEnum> userType;
+    DataModel::Nullable<chip::ByteSpan> PINCode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPINCodeResponse
+namespace ClearPINCode {
+enum class Fields : uint8_t
+{
+    kPINSlotIndex = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ClearPINCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t PINSlotIndex = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ClearPINCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t PINSlotIndex = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearPINCode
+namespace ClearAllPINCodes {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllPINCodes::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllPINCodes::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearAllPINCodes
+namespace SetUserStatus {
+enum class Fields : uint8_t
+{
+    kUserID     = 0,
+    kUserStatus = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID           = static_cast<uint16_t>(0);
+    UserStatusEnum userStatus = static_cast<UserStatusEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID           = static_cast<uint16_t>(0);
+    UserStatusEnum userStatus = static_cast<UserStatusEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetUserStatus
+namespace GetUserStatus {
+enum class Fields : uint8_t
+{
+    kUserID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUserStatus
+namespace GetUserStatusResponse {
+enum class Fields : uint8_t
+{
+    kUserID     = 0,
+    kUserStatus = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID           = static_cast<uint16_t>(0);
+    UserStatusEnum userStatus = static_cast<UserStatusEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID           = static_cast<uint16_t>(0);
+    UserStatusEnum userStatus = static_cast<UserStatusEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUserStatusResponse
 namespace SetWeekDaySchedule {
 enum class Fields : uint8_t
 {
@@ -788,6 +1167,305 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearHolidaySchedule
+namespace SetUserType {
+enum class Fields : uint8_t
+{
+    kUserID   = 0,
+    kUserType = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID       = static_cast<uint16_t>(0);
+    UserTypeEnum userType = static_cast<UserTypeEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID       = static_cast<uint16_t>(0);
+    UserTypeEnum userType = static_cast<UserTypeEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetUserType
+namespace GetUserType {
+enum class Fields : uint8_t
+{
+    kUserID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUserType
+namespace GetUserTypeResponse {
+enum class Fields : uint8_t
+{
+    kUserID   = 0,
+    kUserType = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID       = static_cast<uint16_t>(0);
+    UserTypeEnum userType = static_cast<UserTypeEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID       = static_cast<uint16_t>(0);
+    UserTypeEnum userType = static_cast<UserTypeEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUserTypeResponse
+namespace SetRFIDCode {
+enum class Fields : uint8_t
+{
+    kUserID     = 0,
+    kUserStatus = 1,
+    kUserType   = 2,
+    kRFIDCode   = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetRFIDCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+    DataModel::Nullable<UserStatusEnum> userStatus;
+    DataModel::Nullable<UserTypeEnum> userType;
+    chip::ByteSpan RFIDCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetRFIDCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+    DataModel::Nullable<UserStatusEnum> userStatus;
+    DataModel::Nullable<UserTypeEnum> userType;
+    chip::ByteSpan RFIDCode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetRFIDCode
+namespace GetRFIDCode {
+enum class Fields : uint8_t
+{
+    kUserID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetRFIDCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetRFIDCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetRFIDCode
+namespace GetRFIDCodeResponse {
+enum class Fields : uint8_t
+{
+    kUserID     = 0,
+    kUserStatus = 1,
+    kUserType   = 2,
+    kRFIDCode   = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetRFIDCodeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+    DataModel::Nullable<UserStatusEnum> userStatus;
+    DataModel::Nullable<UserTypeEnum> userType;
+    DataModel::Nullable<chip::ByteSpan> RFIDCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetRFIDCodeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t userID = static_cast<uint16_t>(0);
+    DataModel::Nullable<UserStatusEnum> userStatus;
+    DataModel::Nullable<UserTypeEnum> userType;
+    DataModel::Nullable<chip::ByteSpan> RFIDCode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetRFIDCodeResponse
+namespace ClearRFIDCode {
+enum class Fields : uint8_t
+{
+    kRFIDSlotIndex = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ClearRFIDCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t RFIDSlotIndex = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ClearRFIDCode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t RFIDSlotIndex = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearRFIDCode
+namespace ClearAllRFIDCodes {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllRFIDCodes::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllRFIDCodes::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearAllRFIDCodes
 namespace SetUser {
 enum class Fields : uint8_t
 {

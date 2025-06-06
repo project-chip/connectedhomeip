@@ -246,6 +246,19 @@ enum class DoorStateEnum : uint8_t
     kUnknownEnumValue = 6,
 };
 
+// Enum for LEDSettingEnum
+enum class LEDSettingEnum : uint8_t
+{
+    kNoLEDSignal              = 0x00,
+    kNoLEDSignalAccessAllowed = 0x01,
+    kLEDSignalAll             = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Enum for LockDataTypeEnum
 enum class LockDataTypeEnum : uint8_t
 {
@@ -334,6 +347,32 @@ enum class OperationSourceEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 11,
+};
+
+// Enum for SoundVolumeEnum
+enum class SoundVolumeEnum : uint8_t
+{
+    kSilent = 0x00,
+    kLow    = 0x01,
+    kHigh   = 0x02,
+    kMedium = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kDuplicate = 0x02,
+    kOccupied  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
 };
 
 // Enum for UserStatusEnum

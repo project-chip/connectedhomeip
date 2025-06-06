@@ -47,6 +47,15 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class DoorLockCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class GetPINCodeResponse(
+    val userID: UShort,
+    val userStatus: UByte?,
+    val userType: UByte?,
+    val PINCode: ByteArray?,
+  )
+
+  class GetUserStatusResponse(val userID: UShort, val userStatus: UByte)
+
   class GetWeekDayScheduleResponse(
     val weekDayIndex: UByte,
     val userIndex: UShort,
@@ -72,6 +81,15 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val localStartTime: UInt?,
     val localEndTime: UInt?,
     val operatingMode: UByte?,
+  )
+
+  class GetUserTypeResponse(val userID: UShort, val userType: UByte)
+
+  class GetRFIDCodeResponse(
+    val userID: UShort,
+    val userStatus: UByte?,
+    val userType: UByte?,
+    val RFIDCode: ByteArray?,
   )
 
   class GetUserResponse(
@@ -280,6 +298,265 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun setPINCode(
+    userID: UShort,
+    userStatus: UByte?,
+    userType: UByte?,
+    pin: ByteArray,
+    timedInvokeTimeout: Duration,
+  ) {
+    val commandId: UInt = 5u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_USER_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_USER_ID_REQ), userID)
+
+    val TAG_USER_STATUS_REQ: Int = 1
+    userStatus?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_STATUS_REQ), userStatus) }
+
+    val TAG_USER_TYPE_REQ: Int = 2
+    userType?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_TYPE_REQ), userType) }
+
+    val TAG_PIN_REQ: Int = 3
+    tlvWriter.put(ContextSpecificTag(TAG_PIN_REQ), pin)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun getPINCode(userID: UShort, timedInvokeTimeout: Duration? = null): GetPINCodeResponse {
+    val commandId: UInt = 6u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_USER_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_USER_ID_REQ), userID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_USER_ID: Int = 0
+    var userID_decoded: UShort? = null
+
+    val TAG_USER_STATUS: Int = 1
+    var userStatus_decoded: UByte? = null
+
+    val TAG_USER_TYPE: Int = 2
+    var userType_decoded: UByte? = null
+
+    val TAG_PIN_CODE: Int = 3
+    var PINCode_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_USER_ID)) {
+        userID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_STATUS)) {
+        userStatus_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_TYPE)) {
+        userType_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_PIN_CODE)) {
+        PINCode_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getByteArray(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (userID_decoded == null) {
+      throw IllegalStateException("userID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return GetPINCodeResponse(userID_decoded, userStatus_decoded, userType_decoded, PINCode_decoded)
+  }
+
+  suspend fun clearPINCode(PINSlotIndex: UShort, timedInvokeTimeout: Duration) {
+    val commandId: UInt = 7u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_PIN_SLOT_INDEX_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_PIN_SLOT_INDEX_REQ), PINSlotIndex)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun clearAllPINCodes(timedInvokeTimeout: Duration) {
+    val commandId: UInt = 8u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun setUserStatus(
+    userID: UShort,
+    userStatus: UByte,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 9u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_USER_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_USER_ID_REQ), userID)
+
+    val TAG_USER_STATUS_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_USER_STATUS_REQ), userStatus)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun getUserStatus(
+    userID: UShort,
+    timedInvokeTimeout: Duration? = null,
+  ): GetUserStatusResponse {
+    val commandId: UInt = 10u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_USER_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_USER_ID_REQ), userID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_USER_ID: Int = 0
+    var userID_decoded: UShort? = null
+
+    val TAG_USER_STATUS: Int = 1
+    var userStatus_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_USER_ID)) {
+        userID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_STATUS)) {
+        userStatus_decoded = tlvReader.getUByte(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (userID_decoded == null) {
+      throw IllegalStateException("userID not found in TLV")
+    }
+
+    if (userStatus_decoded == null) {
+      throw IllegalStateException("userStatus not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return GetUserStatusResponse(userID_decoded, userStatus_decoded)
   }
 
   suspend fun setWeekDaySchedule(
@@ -861,6 +1138,269 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     val TAG_HOLIDAY_INDEX_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_HOLIDAY_INDEX_REQ), holidayIndex)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun setUserType(userID: UShort, userType: UByte, timedInvokeTimeout: Duration? = null) {
+    val commandId: UInt = 20u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_USER_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_USER_ID_REQ), userID)
+
+    val TAG_USER_TYPE_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_USER_TYPE_REQ), userType)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun getUserType(
+    userID: UShort,
+    timedInvokeTimeout: Duration? = null,
+  ): GetUserTypeResponse {
+    val commandId: UInt = 21u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_USER_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_USER_ID_REQ), userID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_USER_ID: Int = 0
+    var userID_decoded: UShort? = null
+
+    val TAG_USER_TYPE: Int = 1
+    var userType_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_USER_ID)) {
+        userID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_TYPE)) {
+        userType_decoded = tlvReader.getUByte(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (userID_decoded == null) {
+      throw IllegalStateException("userID not found in TLV")
+    }
+
+    if (userType_decoded == null) {
+      throw IllegalStateException("userType not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return GetUserTypeResponse(userID_decoded, userType_decoded)
+  }
+
+  suspend fun setRFIDCode(
+    userID: UShort,
+    userStatus: UByte?,
+    userType: UByte?,
+    RFIDCode: ByteArray,
+    timedInvokeTimeout: Duration,
+  ) {
+    val commandId: UInt = 22u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_USER_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_USER_ID_REQ), userID)
+
+    val TAG_USER_STATUS_REQ: Int = 1
+    userStatus?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_STATUS_REQ), userStatus) }
+
+    val TAG_USER_TYPE_REQ: Int = 2
+    userType?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_TYPE_REQ), userType) }
+
+    val TAG_RFID_CODE_REQ: Int = 3
+    tlvWriter.put(ContextSpecificTag(TAG_RFID_CODE_REQ), RFIDCode)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun getRFIDCode(
+    userID: UShort,
+    timedInvokeTimeout: Duration? = null,
+  ): GetRFIDCodeResponse {
+    val commandId: UInt = 23u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_USER_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_USER_ID_REQ), userID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_USER_ID: Int = 0
+    var userID_decoded: UShort? = null
+
+    val TAG_USER_STATUS: Int = 1
+    var userStatus_decoded: UByte? = null
+
+    val TAG_USER_TYPE: Int = 2
+    var userType_decoded: UByte? = null
+
+    val TAG_RFID_CODE: Int = 3
+    var RFIDCode_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_USER_ID)) {
+        userID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_STATUS)) {
+        userStatus_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_TYPE)) {
+        userType_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_RFID_CODE)) {
+        RFIDCode_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getByteArray(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (userID_decoded == null) {
+      throw IllegalStateException("userID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return GetRFIDCodeResponse(
+      userID_decoded,
+      userStatus_decoded,
+      userType_decoded,
+      RFIDCode_decoded,
+    )
+  }
+
+  suspend fun clearRFIDCode(RFIDSlotIndex: UShort, timedInvokeTimeout: Duration) {
+    val commandId: UInt = 24u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_RFID_SLOT_INDEX_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_RFID_SLOT_INDEX_REQ), RFIDSlotIndex)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun clearAllRFIDCodes(timedInvokeTimeout: Duration) {
+    val commandId: UInt = 25u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
