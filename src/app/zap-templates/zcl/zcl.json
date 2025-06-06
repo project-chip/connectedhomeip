@@ -792,7 +792,7 @@
         "Unit Localization": ["TemperatureUnit"],
         "Zone Management": [
             "MaxUserDefinedZones",
-            "Maxzones",
+            "MaxZones",
             "SensitivityMax",
             "Sensitivity",
             "TwoDCartesianMax"
