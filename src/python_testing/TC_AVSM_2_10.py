@@ -129,8 +129,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         self.step(3)
         try:
             captureSnapshotResponse = await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.CaptureSnapshot(snapshotStreamID=(aStreamID), requestedResolution=aResolution)
-            )
+                cmd=commands.CaptureSnapshot(snapshotStreamID=aStreamID, requestedResolution=aResolution), endpoint=endpoint)
             logger.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
             asserts.assert_greater(len(captureSnapshotResponse.data), 0, "Image data returned by CaptureSnapshotResponse is empty")
             asserts.assert_equal(
@@ -151,8 +150,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         self.step(4)
         try:
             await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.CaptureSnapshot(snapshotStreamID=(aStreamID + 1), requestedResolution=aResolution)
-            )
+                cmd=commands.CaptureSnapshot(snapshotStreamID=aStreamID + 1, requestedResolution=aResolution), endpoint=endpoint)
             asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND due to snapshotStreamID set to aStreamID + 1")
         except InteractionModelError as e:
             asserts.assert_equal(
@@ -165,8 +163,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         self.step(5)
         try:
             captureSnapshotResponse = await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.CaptureSnapshot(requestedResolution=aResolution)
-            )
+                cmd=commands.CaptureSnapshot(requestedResolution=aResolution), endpoint=endpoint)
             logger.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
             asserts.assert_greater(len(captureSnapshotResponse.data), 0, "Image data returned by CaptureSnapshotResponse is empty")
             asserts.assert_equal(
@@ -201,8 +198,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         self.step(8)
         try:
             captureSnapshotResponse = await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.CaptureSnapshot(requestedResolution=aResolution)
-            )
+                cmd=commands.CaptureSnapshot(requestedResolution=aResolution), endpoint=endpoint)
             asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND due to 0 allocated snapshot streams")
         except InteractionModelError as e:
             asserts.assert_equal(

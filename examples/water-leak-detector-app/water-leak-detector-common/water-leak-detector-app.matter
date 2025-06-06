@@ -329,6 +329,13 @@ struct TestGlobalStruct {
   optional nullable TestGlobalEnum myEnum = 2;
 }
 
+struct ViewportStruct {
+  int16u x1 = 0;
+  int16u y1 = 1;
+  int16u x2 = 2;
+  int16u y2 = 3;
+}
+
 fabric_scoped struct WebRTCSessionStruct {
   int16u id = 0;
   node_id peerNodeID = 1;

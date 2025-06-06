@@ -38,6 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
@@ -226,8 +227,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             logger.info(f"Rx'd Viewport: {viewport}")
 
             self.step(15)
-            viewportToWrite = Clusters.CameraAvStreamManagement.Structs.ViewportStruct(viewport.x1+1, viewport.y1+1,
-                                                                                       viewport.x2+1, viewport.y2+1)
+            viewportToWrite = Globals.Structs.ViewportStruct(viewport.x1+1, viewport.y1+1, viewport.x2+1, viewport.y2+1)
             result = await self.write_single_attribute(attr.Viewport(viewportToWrite),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write viewportToWrite")

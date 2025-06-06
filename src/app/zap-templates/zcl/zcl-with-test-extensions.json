@@ -749,18 +749,11 @@
             "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
             "NightVisionUsesInfrared",
-            "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
-            "SnapshotCapabilities",
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",
-            "SupportedStreamUsages",
-            "AllocatedVideoStreams",
-            "AllocatedAudioStreams",
-            "AllocatedSnapshotStreams",
-            "RankedVideoStreamPrioritiesList",
             "SoftRecordingPrivacyModeEnabled",
             "SoftLivestreamPrivacyModeEnabled",
             "HardPrivacyModeOn",
@@ -781,8 +774,7 @@
             "LocalVideoRecordingEnabled",
             "LocalSnapshotRecordingEnabled",
             "StatusLightEnabled",
-            "StatusLightBrightness",
-            "FeatureMap"
+            "StatusLightBrightness"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
         "Soil Measurement": [

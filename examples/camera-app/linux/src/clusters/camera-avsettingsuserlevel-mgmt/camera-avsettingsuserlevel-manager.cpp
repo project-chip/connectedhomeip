@@ -42,7 +42,7 @@ bool CameraAVSettingsUserLevelManager::CanChangeMPTZ()
 
 void CameraAVSettingsUserLevelManager::VideoStreamAllocated(uint16_t aStreamID)
 {
-    ViewportStruct viewport = mCameraDeviceHAL->GetCameraHALInterface().GetViewport();
+    Globals::Structs::ViewportStruct::Type viewport = mCameraDeviceHAL->GetCameraHALInterface().GetViewport();
     this->GetServer()->AddMoveCapableVideoStream(aStreamID, viewport);
 }
 
@@ -51,7 +51,7 @@ void CameraAVSettingsUserLevelManager::VideoStreamDeallocated(uint16_t aStreamID
     this->GetServer()->RemoveMoveCapableVideoStream(aStreamID);
 }
 
-void CameraAVSettingsUserLevelManager::DefaultViewportUpdated(Structs::ViewportStruct::Type aViewport)
+void CameraAVSettingsUserLevelManager::DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport)
 {
     this->GetServer()->UpdateMoveCapableVideoStreams(aViewport);
 }
@@ -144,7 +144,7 @@ Status CameraAVSettingsUserLevelManager::MPTZRemovePreset(uint8_t aPreset)
     return Status::Success;
 }
 
-Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport)
+Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with HAL to access the stream, validate the viewport
@@ -197,7 +197,7 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
 
 Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                           Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                          Structs::ViewportStruct::Type & aViewport)
+                                                          Globals::Structs::ViewportStruct::Type & aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
@@ -207,9 +207,9 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
     {
         if (stream.videoStreamParams.videoStreamID == aVideoStreamID && stream.isAllocated)
         {
-            ViewportStruct viewport             = stream.viewport;
-            VideoResolutionStruct minResolution = mCameraDeviceHAL->GetCameraHALInterface().GetMinViewport();
-            VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetCameraHALInterface().GetVideoSensorParams();
+            Globals::Structs::ViewportStruct::Type viewport = stream.viewport;
+            VideoResolutionStruct minResolution             = mCameraDeviceHAL->GetCameraHALInterface().GetMinViewport();
+            VideoSensorParamsStruct sensorParms             = mCameraDeviceHAL->GetCameraHALInterface().GetVideoSensorParams();
 
             if (aDeltaX.HasValue())
             {

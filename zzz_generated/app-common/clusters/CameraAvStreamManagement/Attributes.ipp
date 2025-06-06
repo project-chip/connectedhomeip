@@ -68,8 +68,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, allocatedAudioStreams);
     case Attributes::AllocatedSnapshotStreams::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, allocatedSnapshotStreams);
-    case Attributes::RankedVideoStreamPrioritiesList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rankedVideoStreamPrioritiesList);
+    case Attributes::StreamUsagePriorities::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, streamUsagePriorities);
     case Attributes::SoftRecordingPrivacyModeEnabled::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, softRecordingPrivacyModeEnabled);
     case Attributes::SoftLivestreamPrivacyModeEnabled::TypeInfo::GetAttributeId():

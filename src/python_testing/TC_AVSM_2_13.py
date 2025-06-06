@@ -65,8 +65,8 @@ class TC_AVSM_2_13(MatterBaseTest):
             ),
             TestStep(
                 3,
-                "TH reads RankedVideoStreamPrioritiesList attribute from CameraAVStreamManagement Cluster on DUT.",
-                "Store this value in aRankedStreamPriorities.",
+                "TH reads StreamUsagePriorities attribute from CameraAVStreamManagement Cluster on DUT.",
+                "Store this value in aStreamUsagePriorities.",
             ),
             TestStep(
                 4,
@@ -90,7 +90,7 @@ class TC_AVSM_2_13(MatterBaseTest):
             ),
             TestStep(
                 8,
-                "TH sets StreamUsage from aRankedStreamPriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the MinFragmentLen and MaxFragmentLen = 4000. TH sends the VideoStreamAllocate command with these arguments.",
+                "TH sets StreamUsage from aStreamUsagePriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the MinFragmentLen and MaxFragmentLen = 4000. TH sends the VideoStreamAllocate command with these arguments.",
                 "DUT responds with VideoStreamAllocateResponse command with a valid VideoStreamID.",
                 "Store as `aVideoStreamID`",
             ),
@@ -135,11 +135,11 @@ class TC_AVSM_2_13(MatterBaseTest):
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
 
         self.step(3)
-        aRankedStreamPriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
-        logger.info(f"Rx'd RankedVideoStreamPrioritiesList: {aRankedStreamPriorities}")
+        asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+        logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
 
         self.step(4)
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
@@ -180,7 +180,7 @@ class TC_AVSM_2_13(MatterBaseTest):
             osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
 
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
@@ -190,8 +190,8 @@ class TC_AVSM_2_13(MatterBaseTest):
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )
@@ -215,7 +215,7 @@ class TC_AVSM_2_13(MatterBaseTest):
         self.step(10)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
@@ -225,8 +225,8 @@ class TC_AVSM_2_13(MatterBaseTest):
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )

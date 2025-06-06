@@ -56,7 +56,7 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) override;
 
-    void OnRankedStreamPrioritiesChanged() override;
+    void OnStreamUsagePrioritiesChanged() override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
 

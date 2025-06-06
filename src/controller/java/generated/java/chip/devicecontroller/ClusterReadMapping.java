@@ -17476,17 +17476,17 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementAllocatedSnapshotStreamsCommandParams
         );
         result.put("readAllocatedSnapshotStreamsAttribute", readCameraAvStreamManagementAllocatedSnapshotStreamsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCameraAvStreamManagementRankedVideoStreamPrioritiesListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCameraAvStreamManagementRankedVideoStreamPrioritiesListAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readCameraAvStreamManagementStreamUsagePrioritiesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvStreamManagementStreamUsagePrioritiesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readRankedVideoStreamPrioritiesListAttribute(
-              (ChipClusters.CameraAvStreamManagementCluster.RankedVideoStreamPrioritiesListAttributeCallback) callback
+            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readStreamUsagePrioritiesAttribute(
+              (ChipClusters.CameraAvStreamManagementCluster.StreamUsagePrioritiesAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedCameraAvStreamManagementClusterRankedVideoStreamPrioritiesListAttributeCallback(),
-          readCameraAvStreamManagementRankedVideoStreamPrioritiesListCommandParams
+          () -> new ClusterInfoMapping.DelegatedCameraAvStreamManagementClusterStreamUsagePrioritiesAttributeCallback(),
+          readCameraAvStreamManagementStreamUsagePrioritiesCommandParams
         );
-        result.put("readRankedVideoStreamPrioritiesListAttribute", readCameraAvStreamManagementRankedVideoStreamPrioritiesListAttributeInteractionInfo);
+        result.put("readStreamUsagePrioritiesAttribute", readCameraAvStreamManagementStreamUsagePrioritiesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementSoftRecordingPrivacyModeEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementSoftRecordingPrivacyModeEnabledAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
