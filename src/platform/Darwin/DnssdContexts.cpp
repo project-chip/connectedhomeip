@@ -259,6 +259,36 @@ CHIP_ERROR MdnsContexts::Has(GenericContext * context)
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
+#if MDNS_DEBUG
+void MdnsContexts::Print() const
+{
+    ChipLogDetail(Discovery, "MdnsContexts:");
+    std::vector<GenericContext *>::const_iterator iter = mContexts.cbegin();
+    while (iter != mContexts.cend())
+    {
+        const char * contextType = "Unknown";
+        switch ((*iter)->type)
+        {
+        case ContextType::Register:
+            contextType = "Register";
+            break;
+        case ContextType::Browse:
+            contextType = "Browse";
+            break;
+        case ContextType::BrowseWithDelegate:
+            contextType = "BrowseWithDelegate";
+            break;
+        case ContextType::Resolve:
+            contextType = "Resolve";
+            break;
+        }
+
+        ChipLogDetail(Discovery, "\t%p: %s", *iter, contextType);
+        iter++;
+    }
+}
+#endif // DEBUG
+
 CHIP_ERROR MdnsContexts::GetRegisterContextOfTypeAndName(const char * type, const char * name, RegisterContext ** context)
 {
     bool found = false;

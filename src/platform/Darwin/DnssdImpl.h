@@ -80,6 +80,9 @@ public:
     CHIP_ERROR Remove(GenericContext * context);
     CHIP_ERROR RemoveAllOfType(ContextType type);
     CHIP_ERROR Has(GenericContext * context);
+#if MDNS_DEBUG
+    void Print() const;
+#endif
 
     /**
      * @brief
