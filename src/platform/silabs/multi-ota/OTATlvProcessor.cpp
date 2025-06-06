@@ -20,20 +20,19 @@
 #include <lib/support/BufferReader.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <headers/ProvisionManager.h>
+#include <headers/ProvisionStorage.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-#include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace chip {
 
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
-#endif
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 {
     CHIP_ERROR status     = CHIP_NO_ERROR;
@@ -108,12 +107,24 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    uint8_t keyBuffer[kOTAEncryptionKeyLength] = { 0 };
+    // Read the key from the provisioning storage
+    MutableByteSpan keySpan = MutableByteSpan(keyBuffer);
+    chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKey(keySpan);
+
+    VerifyOrReturnError(keySpan.size() == kOTAEncryptionKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key;
+    key.Decrypt((const ByteSpan) keySpan, block, mIVOffset);
+#else  // MBEDTLS_USE_PSA_CRYPTO
     uint32_t keyId;
-    SilabsConfig::ReadConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, keyId);
+    Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKey(keyId);
     chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key(keyId);
     key.Decrypt(block, mIVOffset);
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 
     return CHIP_NO_ERROR;
 }
-#endif
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 } // namespace chip
