@@ -29,6 +29,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
   val caid: UShort,
   val ccdid: UShort?,
   val status: UByte,
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("TlsClientManagementClusterTLSEndpointStruct {\n")
@@ -38,6 +39,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
     append("\tcaid : $caid\n")
     append("\tccdid : $ccdid\n")
     append("\tstatus : $status\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -54,6 +56,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
         putNull(ContextSpecificTag(TAG_CCDID))
       }
       put(ContextSpecificTag(TAG_STATUS), status)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -65,6 +68,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
     private const val TAG_CAID = 3
     private const val TAG_CCDID = 4
     private const val TAG_STATUS = 5
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TlsClientManagementClusterTLSEndpointStruct {
       tlvReader.enterStructure(tlvTag)
@@ -80,6 +84,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
           null
         }
       val status = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -90,6 +95,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
         caid,
         ccdid,
         status,
+        fabricIndex,
       )
     }
   }

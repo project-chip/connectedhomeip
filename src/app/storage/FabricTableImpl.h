@@ -106,7 +106,18 @@ public:
 
     // Data
     CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity);
-    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data);
+
+    /**
+     * @brief Writes the entry to persistent storage.
+     * @param fabric_index the fabric to write the entry to
+     * @param entry_id the unique entry identifier
+     * @param data the source data
+     * @param writeBuffer the buffer that will be used to write the data before being persisted; PersistentStorageDelegate does not
+     * offer a way to stream bytes to be written
+     */
+    template <size_t kEntryMaxBytes>
+    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data,
+                             PersistentStore<kEntryMaxBytes> & writeBuffer);
 
     /**
      * @brief Loads the entry from persistent storage.

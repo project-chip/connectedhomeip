@@ -25,6 +25,20 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(TlsClientManagement::StatusCodeEnum val)
+{
+    using EnumType = TlsClientManagement::StatusCodeEnum;
+    switch (val)
+    {
+    case EnumType::kEndpointAlreadyInstalled:
+    case EnumType::kRootCertificateNotFound:
+    case EnumType::kClientCertificateNotFound:
+    case EnumType::kEndpointInUse:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(TlsClientManagement::TLSEndpointStatusEnum val)
 {
     using EnumType = TlsClientManagement::TLSEndpointStatusEnum;

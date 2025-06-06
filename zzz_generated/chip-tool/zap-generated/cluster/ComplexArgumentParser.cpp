@@ -8801,6 +8801,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.status, value["status"]));
     valueCopy.removeMember("status");
 
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8812,6 +8819,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TlsClientManagement::S
     ComplexArgumentParser::Finalize(request.caid);
     ComplexArgumentParser::Finalize(request.ccdid);
     ComplexArgumentParser::Finalize(request.status);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

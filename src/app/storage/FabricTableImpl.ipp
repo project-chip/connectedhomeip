@@ -275,7 +275,6 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         CHIP_ERROR err;
         deleted_entries_count = 0;
 
-        Store persistentStore;
         while ((err = reader.Next(TLV::AnonymousTag())) == CHIP_NO_ERROR)
         {
             TLV::TLVType entryIdContainer;
@@ -352,7 +351,8 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    CHIP_ERROR SaveEntry(PersistentStorageDelegate & storage, const StorageId & id, const StorageData & data)
+    CHIP_ERROR SaveEntry(PersistentStorageDelegate & storage, const StorageId & id, const StorageData & data,
+                         Store & persistentStore)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         // Look for empty storage space
@@ -360,7 +360,6 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         EntryIndex index;
         err = this->Find(id, index);
 
-        Store persistentStore;
         // C++ doesn't have const constructors; variable is declared const
         const TypedTableEntryData entry(endpoint_id, fabric_index, const_cast<StorageId &>(id), const_cast<StorageData &>(data),
                                         index);
@@ -605,8 +604,10 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetRemainingC
 }
 
 template <class StorageId, class StorageData, size_t kIteratorsMax>
+template <size_t kEntryMaxBytes>
 CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetTableEntry(FabricIndex fabric_index, const StorageId & id,
-                                                                                 const StorageData & data)
+                                                                                 const StorageData & data,
+                                                                                 PersistentStore<kEntryMaxBytes> & writeBuffer)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -619,7 +620,7 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetTableEntry
     CHIP_ERROR err = fabric.Load(mStorage);
     VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
-    err = fabric.SaveEntry(*mStorage, id, data);
+    err = fabric.SaveEntry(*mStorage, id, data, writeBuffer);
     return err;
 }
 
