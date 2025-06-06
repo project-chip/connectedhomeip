@@ -5,13 +5,11 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 [README document](../../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md)
 for details.
 
-
 # Connecting SE05x to i.MX 8M
 
 Refer the below image to connect SE05x to i.MX 8M using I2C pins.
 
 ![SE05x-i.MX8M-Mini](../../../platform/nxp/se05x/linux/doc/images/imx8evk_se05x.jpg)
-
 
 # SE05x Integration Configuration
 
@@ -24,7 +22,6 @@ Following crypto operations can be offloaded to SE05x secure element,
     5. HKDF
     6. HMAC
     7. Spake(Disabled by default)
-
 
 Other crypto operations are done on host (using mbed-TLS)
 
@@ -71,7 +68,6 @@ disable offloading required crypto operation on SE05x.
 #define ENABLE_SE05X_DEVICE_ATTESTATION 0
 ```
 
-
 # SE05x Type Configuration
 
 Ensure to update the SE05x feature file
@@ -101,7 +97,6 @@ SE050E is enabled by default.
 #define SSS_HAVE_APPLET_SE050_E 1
 ```
 
-
 # Device attestation
 
 To use SE05x for device attestation,
@@ -124,6 +119,7 @@ ninja -C out se05x_dev_attest_key_prov
 # SCP03
 
 To enable SCP03 authentication with SE05x, build the example with option
+
 ```
 gn gen out --args="chip_se05x_auth=\"scp03\""
 ```
