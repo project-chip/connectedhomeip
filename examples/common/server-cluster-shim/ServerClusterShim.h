@@ -45,11 +45,11 @@ namespace app {
  * DataModel::Provider, typically on the Matter event loop. Internal state modifications (like data version) are handled by Ember's
  * mechanisms, which are generally expected to be called from the Matter event loop.
  */
-class CodegenServerCluster : public ServerClusterInterface
+class ServerClusterShim : public ServerClusterInterface
 {
 public:
-    CodegenServerCluster(std::initializer_list<ConcreteClusterPath> paths) : mPaths(paths) {}
-    ~CodegenServerCluster() override;
+    ServerClusterShim(std::initializer_list<ConcreteClusterPath> paths) : mPaths(paths) {}
+    ~ServerClusterShim() override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;

@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <data-model-providers/codegen/CodegenServerCluster.h>
+#include "ServerClusterShim.h"
 
 #include <access/Privilege.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -167,20 +167,20 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
 
 } // namespace
 
-CodegenServerCluster::~CodegenServerCluster() {}
+ServerClusterShim::~ServerClusterShim() {}
 
-CHIP_ERROR CodegenServerCluster::Startup(ServerClusterContext & context)
+CHIP_ERROR ServerClusterShim::Startup(ServerClusterContext & context)
 {
     mContext = &context;
     return CHIP_NO_ERROR;
 }
 
-void CodegenServerCluster::Shutdown()
+void ServerClusterShim::Shutdown()
 {
     mContext = nullptr;
 }
 
-DataVersion CodegenServerCluster::GetDataVersion(const ConcreteClusterPath & path) const
+DataVersion ServerClusterShim::GetDataVersion(const ConcreteClusterPath & path) const
 {
     DataVersion * versionPtr = emberAfDataVersionStorage(path);
     if (versionPtr != nullptr)
@@ -190,7 +190,7 @@ DataVersion CodegenServerCluster::GetDataVersion(const ConcreteClusterPath & pat
     return 0;
 }
 
-CHIP_ERROR CodegenServerCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder)
+CHIP_ERROR ServerClusterShim::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder)
 {
     const EmberAfCluster * cluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
 
@@ -233,8 +233,8 @@ CHIP_ERROR CodegenServerCluster::Attributes(const ConcreteClusterPath & path, Re
     return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus CodegenServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                  AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                               AttributeValueEncoder & encoder)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
@@ -288,7 +288,7 @@ DataModel::ActionReturnStatus CodegenServerCluster::ReadAttribute(const DataMode
     return encoder.Encode(emberData);
 }
 
-ActionReturnStatus CodegenServerCluster::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
     // The path might exist in ember storage but not added by the user to the ServerCluster instance
     if (!ContainsClusterPath({ request.path.mEndpointId, request.path.mClusterId }))
@@ -407,8 +407,8 @@ ActionReturnStatus CodegenServerCluster::WriteAttribute(const WriteAttributeRequ
     return CHIP_NO_ERROR;
 }
 
-std::optional<ActionReturnStatus>
-CodegenServerCluster::InvokeCommand(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<ActionReturnStatus> ServerClusterShim::InvokeCommand(const InvokeRequest & request,
+                                                                   chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     // If path is not added by the user to the ServerCluster instance
     if (!ContainsClusterPath({ request.path.mEndpointId, request.path.mClusterId }))
@@ -423,7 +423,7 @@ CodegenServerCluster::InvokeCommand(const InvokeRequest & request, chip::TLV::TL
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
-    if (handler_interface && ContainsClusterPath({ request.path.mEndpointId, request.path.mClusterId }))
+    if (handler_interface)
     {
         CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
         handler_interface->InvokeCommand(context);
@@ -440,8 +440,8 @@ CodegenServerCluster::InvokeCommand(const InvokeRequest & request, chip::TLV::TL
     return std::nullopt;
 }
 
-CHIP_ERROR CodegenServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                                  ReadOnlyBufferBuilder<AcceptedCommandEntry> & builder)
+CHIP_ERROR ServerClusterShim::AcceptedCommands(const ConcreteClusterPath & path,
+                                               ReadOnlyBufferBuilder<AcceptedCommandEntry> & builder)
 {
 
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
@@ -531,7 +531,7 @@ CHIP_ERROR CodegenServerCluster::AcceptedCommands(const ConcreteClusterPath & pa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CodegenServerCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
+CHIP_ERROR ServerClusterShim::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
     // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
@@ -606,7 +606,7 @@ CHIP_ERROR CodegenServerCluster::GeneratedCommands(const ConcreteClusterPath & p
     return builder.ReferenceExisting({ serverCluster->generatedCommandList, commandCount });
 }
 
-void CodegenServerCluster::ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType)
+void ServerClusterShim::ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType)
 {
     AttributeAccessInterface * aai = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
 
@@ -627,7 +627,7 @@ void CodegenServerCluster::ListAttributeWriteNotification(const ConcreteAttribut
     }
 }
 
-bool CodegenServerCluster::ContainsClusterPath(const ConcreteClusterPath & path) const
+bool ServerClusterShim::ContainsClusterPath(const ConcreteClusterPath & path) const
 {
     if (std::find(mPaths.begin(), mPaths.end(), path) == mPaths.end())
     {
