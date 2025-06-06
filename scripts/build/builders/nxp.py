@@ -49,19 +49,13 @@ class NxpBuildSystem(Enum):
 
 
 class NxpBoard(Enum):
-    K32W0 = auto()
-    K32W1 = auto()
     RT1060 = auto()
     RT1170 = auto()
     RW61X = auto()
     MCXW71 = auto()
 
     def Name(self, os_env):
-        if self == NxpBoard.K32W0:
-            return 'k32w0x'
-        elif self == NxpBoard.K32W1:
-            return 'k32w1'
-        elif self == NxpBoard.RT1060:
+        if self == NxpBoard.RT1060:
             return 'rt1060'
         elif self == NxpBoard.RT1170:
             return 'rt1170'
@@ -76,11 +70,7 @@ class NxpBoard(Enum):
             raise Exception('Unknown board type: %r' % self)
 
     def FolderName(self, os_env):
-        if self == NxpBoard.K32W0:
-            return 'k32w0'
-        elif self == NxpBoard.K32W1:
-            return 'k32w1'
-        elif self == NxpBoard.RT1060:
+        if self == NxpBoard.RT1060:
             return 'rt/rt1060'
         elif self == NxpBoard.RT1170:
             return 'rt/rt1170'
@@ -162,7 +152,7 @@ class NxpBuilder(GnBuilder):
                  root,
                  runner,
                  app: NxpApp = NxpApp.LIGHTING,
-                 board: NxpBoard = NxpBoard.K32W0,
+                 board: NxpBoard = NxpBoard.MCXW71,
                  board_variant: NxpBoardVariant = None,
                  os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
                  build_system: NxpBuildSystem = NxpBuildSystem.GN,
@@ -170,7 +160,6 @@ class NxpBuilder(GnBuilder):
                  smu2: bool = False,
                  enable_factory_data: bool = False,
                  convert_dac_pk: bool = False,
-                 use_fro32k: bool = False,
                  enable_lit: bool = False,
                  enable_rotating_id: bool = False,
                  has_sw_version_2: bool = False,
@@ -203,7 +192,6 @@ class NxpBuilder(GnBuilder):
         self.smu2 = smu2
         self.enable_factory_data = enable_factory_data
         self.convert_dac_pk = convert_dac_pk
-        self.use_fro32k = use_fro32k
         self.enable_lit = enable_lit
         self.enable_rotating_id = enable_rotating_id
         self.has_sw_version_2 = has_sw_version_2
@@ -240,10 +228,6 @@ class NxpBuilder(GnBuilder):
                     return "evkbmimxrt1060"
             case NxpBoard.RT1170:
                 return "evkbmimxrt1170"
-            case NxpBoard.K32W0:
-                return "k32w0"
-            case NxpBoard.K32W1:
-                return "k32w148evk"
             case NxpBoard.MCXW71:
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw71"
@@ -258,8 +242,6 @@ class NxpBuilder(GnBuilder):
 
         if self.low_power:
             args.append('nxp_use_low_power=true')
-            if self.board == NxpBoard.K32W0:
-                args.append('chip_pw_tokenizer_logging=false chip_with_OM15082=0')
 
         if self.smu2:
             args.append('nxp_use_smu2_static=true nxp_use_smu2_dynamic=true')
@@ -269,9 +251,6 @@ class NxpBuilder(GnBuilder):
 
         if self.convert_dac_pk:
             args.append('nxp_convert_dac_private_key=true')
-
-        if self.use_fro32k:
-            args.append('use_fro_32k=1')
 
         if self.enable_lit:
             args.append('chip_enable_icd_lit=true')
@@ -433,9 +412,7 @@ class NxpBuilder(GnBuilder):
                 spec.loader.exec_module(module)
 
                 for p in module.ALL_PLATFORM_SDK:
-                    if p.sdk_name == 'k32w0':
-                        cmd += 'export NXP_K32W0_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
-                    elif p.sdk_name == 'common':
+                    if p.sdk_name == 'common':
                         cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
                         cmd += 'export McuxSDK_DIR=$NXP_SDK_ROOT' + ' \n '
                         cmd += 'source $NXP_SDK_ROOT/mcux-env.sh' + ' \n '

@@ -170,19 +170,6 @@ public:
     }
 };
 
-// NetworkDriver for the devices that don't have / don't need a real network driver.
-class NullNetworkDriver : public DeviceLayer::NetworkCommissioning::EthernetDriver
-{
-public:
-    uint8_t GetMaxNetworks() override;
-
-    DeviceLayer::NetworkCommissioning::NetworkIterator * GetNetworks() override;
-
-    bool GetEnabled() override;
-
-    virtual ~NullNetworkDriver() = default;
-};
-
 } // namespace NetworkCommissioning
 } // namespace Clusters
 } // namespace app
