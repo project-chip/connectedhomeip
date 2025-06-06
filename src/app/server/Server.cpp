@@ -645,6 +645,9 @@ void Server::ScheduleFactoryReset()
     PostFactoryResetEvent();
 
     PlatformMgr().ScheduleWork([](intptr_t) {
+        // Reset the ConfigurationVersion to 1
+        app::InteractionModelEngine::GetInstance()->GetDataModelProvider()->ResetNodeDataModelConfigurationVersion();
+
         // Delete all fabrics and emit Leave event.
         GetInstance().GetFabricTable().DeleteAllFabrics();
         PlatformMgr().HandleServerShuttingDown();
