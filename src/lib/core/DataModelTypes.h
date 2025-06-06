@@ -51,6 +51,18 @@ typedef uint8_t InteractionModelRevision;
 typedef uint32_t SubscriptionId;
 typedef uint8_t SceneId;
 
+typedef uint8_t Percent;
+typedef uint16_t Percent100ths;
+typedef int64_t Energy_mWh;
+typedef int64_t Energy_mVAh;
+typedef int64_t Energy_mVARh;
+typedef int64_t Amperage_mA;
+typedef int64_t Power_mW;
+typedef int64_t Power_mVA;
+typedef int64_t Power_mVAR;
+typedef int64_t Voltage_mV;
+typedef int64_t Money;
+
 inline constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
 inline constexpr FabricId kUndefinedFabricId                     = 0ULL;
 

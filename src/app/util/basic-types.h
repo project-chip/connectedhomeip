@@ -23,23 +23,5 @@
 
 #pragma once
 
-#include <cstdint>
-
 // Pull in core types
 #include <lib/core/DataModelTypes.h>
-
-namespace chip {
-
-typedef uint8_t Percent;
-typedef uint16_t Percent100ths;
-typedef int64_t Energy_mWh;
-typedef int64_t Energy_mVAh;
-typedef int64_t Energy_mVARh;
-typedef int64_t Amperage_mA;
-typedef int64_t Power_mW;
-typedef int64_t Power_mVA;
-typedef int64_t Power_mVAR;
-typedef int64_t Voltage_mV;
-typedef int64_t Money;
-
-} // namespace chip
