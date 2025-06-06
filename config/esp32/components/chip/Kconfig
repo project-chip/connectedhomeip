@@ -1214,36 +1214,6 @@ menu "CHIP Device Layer"
             help
                 The endpoint id for the generic Thread network commissioning driver.
 
-        config WIFI_NETWORK_COMMISSIONING_DRIVER
-            bool "Use ESP Wi-Fi network commissioning driver"
-            depends on (ENABLE_WIFI_STATION || ENABLE_WIFI_AP)
-            default y
-            help
-                Option to enable/disable the use of ESP Wi-Fi network commissioning driver.
-
-        config WIFI_NETWORK_ENDPOINT_ID
-            int "Endpoint Id for Wi-Fi network"
-            depends on WIFI_NETWORK_COMMISSIONING_DRIVER
-            range 0 65534
-            default 0
-            help
-                The endpoint id for the ESP Wi-Fi network commissioning driver.
-
-        config ETHERNET_NETWORK_COMMISSIONING_DRIVER
-            bool "Use ESP Ethernet network commissioning driver"
-            depends on ENABLE_ETHERNET_TELEMETRY
-            default y
-            help
-                Option to enable/disable the use of ESP Ethernet network commissioning driver.
-
-        config ETHERNET_NETWORK_ENDPOINT_ID
-            int "Endpoint Id for Ethernet network"
-            depends on ETHERNET_NETWORK_COMMISSIONING_DRIVER
-            range 0 65534
-            default 0
-            help
-                The endpoint id for the ESP Ethernet network commissioning driver.
-
     endmenu
 
     menu "Cluster Configuration Options"
