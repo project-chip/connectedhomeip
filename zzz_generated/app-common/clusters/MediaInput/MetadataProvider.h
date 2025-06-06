@@ -51,7 +51,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::MediaI
             return RenameInput::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

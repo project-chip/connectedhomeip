@@ -71,7 +71,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Operat
             return SignVIDVerificationRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

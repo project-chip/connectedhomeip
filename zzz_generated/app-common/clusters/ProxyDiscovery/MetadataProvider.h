@@ -39,7 +39,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ProxyD
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

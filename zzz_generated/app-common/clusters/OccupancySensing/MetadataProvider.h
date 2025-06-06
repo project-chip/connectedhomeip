@@ -67,7 +67,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Occupa
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

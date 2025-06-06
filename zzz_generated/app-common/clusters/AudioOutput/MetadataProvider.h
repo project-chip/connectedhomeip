@@ -47,7 +47,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::AudioO
             return RenameOutput::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

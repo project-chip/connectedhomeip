@@ -53,7 +53,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::JointF
             return AnnounceJointFabricAdministrator::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

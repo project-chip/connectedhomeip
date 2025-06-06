@@ -61,7 +61,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::OnOff:
             return OnWithTimedOff::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

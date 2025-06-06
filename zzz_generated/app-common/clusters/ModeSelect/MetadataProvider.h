@@ -53,7 +53,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ModeSe
             return ChangeToMode::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

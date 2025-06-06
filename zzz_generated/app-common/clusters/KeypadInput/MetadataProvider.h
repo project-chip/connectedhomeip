@@ -41,7 +41,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Keypad
             return SendKey::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

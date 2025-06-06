@@ -41,7 +41,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Boolea
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

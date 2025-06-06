@@ -85,7 +85,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::LevelC
             return MoveToClosestFrequency::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

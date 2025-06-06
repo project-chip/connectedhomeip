@@ -55,7 +55,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::OvenCa
             return Start::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

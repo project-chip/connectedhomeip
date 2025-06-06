@@ -49,7 +49,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Energy
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

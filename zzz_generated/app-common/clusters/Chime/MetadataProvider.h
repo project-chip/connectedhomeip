@@ -47,7 +47,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Chime:
             return PlayChimeSound::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

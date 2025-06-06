@@ -67,7 +67,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::SmokeC
             return SelfTestRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

@@ -81,7 +81,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Commod
             return GetDayEntry::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

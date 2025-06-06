@@ -39,7 +39,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::PulseW
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

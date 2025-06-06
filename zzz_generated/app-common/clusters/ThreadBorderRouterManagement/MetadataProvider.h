@@ -59,7 +59,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Thread
             return SetPendingDatasetRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

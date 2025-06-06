@@ -55,7 +55,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Access
             return ReviewFabricRestrictions::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

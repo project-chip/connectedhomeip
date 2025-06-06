@@ -61,7 +61,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::OzoneC
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

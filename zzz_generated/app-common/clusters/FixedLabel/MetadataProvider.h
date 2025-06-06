@@ -41,7 +41,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::FixedL
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

@@ -57,7 +57,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::RvcOpe
             return GoHome::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

@@ -61,7 +61,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Microw
             return AddMoreTime::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

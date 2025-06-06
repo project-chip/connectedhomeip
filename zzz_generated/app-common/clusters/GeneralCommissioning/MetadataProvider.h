@@ -67,7 +67,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Genera
             return SetTCAcknowledgements::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

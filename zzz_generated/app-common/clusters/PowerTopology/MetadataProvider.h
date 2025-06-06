@@ -43,7 +43,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::PowerT
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

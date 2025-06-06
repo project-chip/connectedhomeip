@@ -75,7 +75,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Networ
             return QueryIdentity::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

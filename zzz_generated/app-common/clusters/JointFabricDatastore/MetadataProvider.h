@@ -107,7 +107,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::JointF
             return RemoveACLFromNode::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

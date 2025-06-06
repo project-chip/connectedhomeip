@@ -53,7 +53,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Timer:
             return ReduceTime::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

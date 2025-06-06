@@ -61,7 +61,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Pm1Con
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

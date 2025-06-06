@@ -65,7 +65,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::FanCon
             return Step::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

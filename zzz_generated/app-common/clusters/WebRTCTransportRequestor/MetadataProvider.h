@@ -49,7 +49,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::WebRTC
             return End::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

@@ -181,7 +181,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ColorC
             return StepColorTemperature::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

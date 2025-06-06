@@ -75,7 +75,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::TimeSy
             return SetDefaultNTP::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

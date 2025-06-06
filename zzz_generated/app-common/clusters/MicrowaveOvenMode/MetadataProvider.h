@@ -43,7 +43,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Microw
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

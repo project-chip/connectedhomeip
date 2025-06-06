@@ -77,7 +77,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Bridge
             return KeepActive::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

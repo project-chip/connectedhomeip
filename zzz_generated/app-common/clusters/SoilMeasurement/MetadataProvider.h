@@ -43,7 +43,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::SoilMe
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

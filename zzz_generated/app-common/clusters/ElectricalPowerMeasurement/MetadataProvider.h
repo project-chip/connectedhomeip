@@ -77,7 +77,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Electr
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

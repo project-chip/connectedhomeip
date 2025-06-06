@@ -43,7 +43,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Ecosys
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

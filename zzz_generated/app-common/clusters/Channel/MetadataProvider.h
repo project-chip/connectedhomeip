@@ -57,7 +57,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Channe
             return CancelRecordProgram::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

@@ -85,7 +85,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::PumpCo
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

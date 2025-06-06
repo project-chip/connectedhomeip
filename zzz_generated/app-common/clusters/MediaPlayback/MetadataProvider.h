@@ -89,7 +89,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::MediaP
             return DeactivateTextTrack::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

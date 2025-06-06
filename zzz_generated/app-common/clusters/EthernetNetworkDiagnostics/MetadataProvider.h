@@ -59,7 +59,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Ethern
             return ResetCounts::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

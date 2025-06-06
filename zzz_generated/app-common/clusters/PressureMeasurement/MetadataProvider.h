@@ -57,7 +57,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Pressu
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

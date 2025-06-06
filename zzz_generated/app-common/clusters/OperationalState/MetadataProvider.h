@@ -59,7 +59,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Operat
             return Resume::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

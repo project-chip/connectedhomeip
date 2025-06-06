@@ -173,7 +173,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Thermo
             return AtomicRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

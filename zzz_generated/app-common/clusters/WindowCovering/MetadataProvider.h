@@ -97,7 +97,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Window
             return GoToTiltPercentage::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

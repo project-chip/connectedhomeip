@@ -43,7 +43,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Laundr
         {
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

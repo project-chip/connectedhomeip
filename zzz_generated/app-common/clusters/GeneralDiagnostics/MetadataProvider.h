@@ -63,7 +63,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Genera
             return PayloadTestRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

@@ -89,7 +89,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::BasicI
             return MfgSpecificPing::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

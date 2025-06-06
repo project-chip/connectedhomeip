@@ -99,7 +99,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Energy
             return ClearTargets::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

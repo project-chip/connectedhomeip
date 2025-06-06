@@ -141,7 +141,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Camera
             return CaptureSnapshot::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

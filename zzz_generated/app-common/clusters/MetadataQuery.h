@@ -5,6 +5,7 @@
 //
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
+
 #include <clusters/AccessControl/Ids.h>
 #include <clusters/AccessControl/MetadataProvider.h>
 #include <clusters/AccountLogin/Ids.h>
@@ -285,6 +286,7 @@
 #include <clusters/WindowCovering/MetadataProvider.h>
 #include <clusters/ZoneManagement/Ids.h>
 #include <clusters/ZoneManagement/MetadataProvider.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {

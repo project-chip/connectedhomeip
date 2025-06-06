@@ -171,7 +171,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::DoorLo
             return ClearAliroReaderConfig::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

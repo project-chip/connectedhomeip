@@ -271,7 +271,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::UnitTe
             return TestDifferentVendorMeiRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

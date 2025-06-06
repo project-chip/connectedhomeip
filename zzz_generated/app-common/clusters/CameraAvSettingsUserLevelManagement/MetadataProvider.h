@@ -71,7 +71,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Camera
             return DPTZRelativeMove::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

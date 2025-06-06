@@ -75,7 +75,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Conten
             return SetScheduledContentRatingThreshold::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

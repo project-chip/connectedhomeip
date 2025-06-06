@@ -71,7 +71,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Device
             return CancelRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

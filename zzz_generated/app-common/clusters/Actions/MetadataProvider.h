@@ -69,7 +69,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Action
             return DisableActionWithDuration::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };

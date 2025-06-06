@@ -171,7 +171,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Thread
             return ResetCounts::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry{};
+            return AcceptedCommandEntry();
         }
     }
 };
