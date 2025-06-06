@@ -796,7 +796,7 @@
         "Thermostat": ["CurrentThermostatSuggestion"],
         "Zone Management": [
             "MaxUserDefinedZones",
-            "Maxzones",
+            "MaxZones",
             "SensitivityMax",
             "Sensitivity",
             "TwoDCartesianMax",
