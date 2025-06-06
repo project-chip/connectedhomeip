@@ -63,6 +63,7 @@ private:
     static void IcdUatEventHandler(const AppEvent & event);
     static void UpdateLedStateEventHandler(const AppEvent & event);
 
+    static void MsgQConsume(intptr_t);
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged);
     static void LEDStateUpdateHandler(LEDWidget & ledWidget);

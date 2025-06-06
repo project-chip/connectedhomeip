@@ -24,7 +24,6 @@
 #include <DeviceInfoProviderImpl.h>
 
 #include <app/server/Server.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
@@ -65,7 +64,6 @@ Identify sIdentify = { kIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTa
 
 LEDWidget sStatusLED;
 LEDWidget sIdentifyLED;
-FactoryResetLEDsWrapper<2> sFactoryResetLEDs{ { FACTORY_RESET_SIGNAL_LED, FACTORY_RESET_SIGNAL_LED1 } };
 
 bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
@@ -98,17 +96,24 @@ constexpr uint32_t kOff_ms{ 950 };
 
 extern void ApplicationInit();
 
-void AppTask::InitServer(intptr_t)
+void AppTask::MsgQConsume(intptr_t)
 {
-    ApplicationInit();
-
     AppEvent event{};
 
-    while (true)
-    {
-        k_msgq_get(&sAppEventQueue, &event, K_FOREVER);
+    while (true) {
+ChipLogProgress(AppServer, "%s, %d", __func__, __LINE__);
+        if (k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT) != 0) {
+            break;
+        }
         DispatchEvent(event);
     }
+}
+void AppTask::InitServer(intptr_t)
+{
+
+ChipLogProgress(AppServer, "%s, %d", __func__, __LINE__);
+    ApplicationInit();
+
 }
 
 CHIP_ERROR AppTask::Init()
@@ -142,6 +147,7 @@ CHIP_ERROR AppTask::Init()
 #ifdef CONFIG_OPENTHREAD_MTD_SED
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
+#error "MTD only"
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
     if (err != CHIP_NO_ERROR)
@@ -257,6 +263,7 @@ void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
 
     if (BLE_ADVERTISEMENT_START_BUTTON_MASK & buttonState & hasChanged)
     {
+        ChipLogProgress(AppServer, "BLE_ADVERTISEMENT_START_BUTTON pushed, buttonState=%u", buttonState);
         button_event.ButtonEvent.PinNo  = BLE_ADVERTISEMENT_START_BUTTON;
         button_event.ButtonEvent.Action = static_cast<uint8_t>(AppEventType::ButtonPushed);
         button_event.Handler            = StartBLEAdvertisementHandler;
@@ -265,6 +272,7 @@ void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
 
     if (FUNCTION_BUTTON_MASK & hasChanged)
     {
+        ChipLogProgress(AppServer, "ICD_FUNCTION_BUTTON pushed, buttonState=%u", buttonState);
         button_event.ButtonEvent.PinNo = FUNCTION_BUTTON;
         button_event.ButtonEvent.Action =
             static_cast<uint8_t>((FUNCTION_BUTTON_MASK & buttonState) ? AppEventType::ButtonPushed : AppEventType::ButtonReleased);
@@ -275,6 +283,7 @@ void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
 #ifdef CONFIG_CHIP_ICD_DSLS_SUPPORT
     if (ICD_DSLS_BUTTON_MASK & buttonState & hasChanged)
     {
+        ChipLogProgress(AppServer, "ICD_DSLS_BUTTON pushed, buttonState=%u", buttonState);
         button_event.ButtonEvent.PinNo  = ICD_DSLS_BUTTON;
         button_event.ButtonEvent.Action = static_cast<uint8_t>(AppEventType::ButtonPushed);
         button_event.Handler            = IcdDslsEventHandler;
@@ -284,6 +293,7 @@ void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
 
     if (ICD_UAT_BUTTON_MASK & hasChanged)
     {
+        ChipLogProgress(AppServer, "ICD_UAT_BUTTON pushed, buttonState=%u", buttonState);
         button_event.ButtonEvent.PinNo  = ICD_UAT_BUTTON;
         button_event.ButtonEvent.Action = static_cast<uint8_t>(AppEventType::ButtonPushed);
         button_event.Handler            = IcdUatEventHandler;
@@ -296,11 +306,13 @@ void AppTask::IcdDslsEventHandler(const AppEvent &)
 {
     if (sIsSitModeRequested)
     {
+        ChipLogProgress(AppServer, "IcdDslsEventHandler: NotifySITModeRequestWithdrawal");
         PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
         sIsSitModeRequested = false;
     }
     else
     {
+        ChipLogProgress(AppServer, "IcdDslsEventHandler: NotifySITModeRequestNotification");
         PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); },
                                    0);
         sIsSitModeRequested = true;
@@ -349,27 +361,26 @@ void AppTask::FunctionHandler(const AppEvent & event)
     if (event.ButtonEvent.PinNo != FUNCTION_BUTTON)
         return;
 
-    // event.ButtonEvent.Action
-    LOG_INF("Factory Reset has been Canceled");
+    // FunctionHandler not used 
 }
 
 void AppTask::StartBLEAdvertisementHandler(const AppEvent &)
 {
     if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
     {
-        LOG_INF("Matter service BLE advertising not started - device is already commissioned");
+        ChipLogProgress(AppServer, "Matter service BLE advertising not started - device is already commissioned");
         return;
     }
 
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
-        LOG_INF("BLE advertising is already enabled");
+        ChipLogProgress(AppServer, "BLE advertising is already enabled");
         return;
     }
 
     if (Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
-        LOG_ERR("OpenBasicCommissioningWindow() failed");
+        ChipLogError(AppServer, "OpenBasicCommissioningWindow() failed");
     }
 }
 
@@ -452,8 +463,10 @@ void AppTask::PostEvent(const AppEvent & event)
 {
     if (k_msgq_put(&sAppEventQueue, &event, K_NO_WAIT) != 0)
     {
-        LOG_INF("Failed to post event to app task event queue");
+        ChipLogProgress(AppServer, "Failed to post event to app task event queue");
+        return;
     }
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::MsgQConsume);
 }
 
 void AppTask::DispatchEvent(const AppEvent & event)
@@ -464,6 +477,6 @@ void AppTask::DispatchEvent(const AppEvent & event)
     }
     else
     {
-        LOG_INF("Event received with no handler. Dropping event.");
+        ChipLogProgress(AppServer, "Event received with no handler. Dropping event.");
     }
 }
