@@ -1471,48 +1471,70 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
 //////
 TEST_F(TestCodegenModelViaMocks, ShimCommandHandlerInterfaceCommandHandling)
 {
+    // This node configuration needs to partially match a cluster tree, using Clusters::Unittesting as a base
+    // clang-format off
+    using namespace Clusters::UnitTesting;
+    static const MockNodeConfig kNodeConfig({
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(Clusters::UnitTesting::Id, { 
+                ClusterRevision::Id, FeatureMap::Id,                
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        })
+    });
+    // clang-format on
 
-    UseMockNodeConfig config(gTestNodeConfig);
+    UseMockNodeConfig config(kNodeConfig);
+
     CodegenDataModelProviderWithContext model;
 
     // Command handler interface is capable to override accepted and generated commands.
     // Validate that these work
-    ShimCommandHandler handler(MakeOptional(kMockEndpoint1), MockClusterId(1));
+    ShimCommandHandler handler(MakeOptional(kMockEndpoint1), Clusters::UnitTesting::Id);
 
     ReadOnlyBufferBuilder<CommandId> generatedBuilder;
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
 
+    std::cout << "Print UnitTestingID" << Clusters::UnitTesting::Id << std::endl;
     // At this point, without overrides, there should be no accepted/generated commands
-    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), generatedBuilder),
+              CHIP_NO_ERROR);
     ASSERT_TRUE(generatedBuilder.IsEmpty());
-    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), acceptedBuilder),
+              CHIP_NO_ERROR);
     ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     handler.SetOverrideAccepted(true);
     handler.SetOverrideGenerated(true);
 
-    using namespace Clusters::UnitTesting;
     // with overrides, the list is still empty ...
-    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), generatedBuilder),
+              CHIP_NO_ERROR);
     ASSERT_TRUE(generatedBuilder.IsEmpty());
-    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), acceptedBuilder),
+              CHIP_NO_ERROR);
     ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     // set some overrides
     handler.AcceptedVec().push_back(Commands::Test::Id);
     handler.AcceptedVec().push_back(Commands::TestNotHandled::Id);
+
     handler.GeneratedVec().push_back(Commands::TestSpecific::Id);
 
-    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), acceptedBuilder),
+              CHIP_NO_ERROR);
     auto acceptedCommands = acceptedBuilder.TakeBuffer();
 
     ASSERT_EQ(acceptedCommands.size(), 2u);
     ASSERT_EQ(acceptedCommands[0].commandId, Commands::Test::Id);
     ASSERT_EQ(acceptedCommands[1].commandId, Commands::TestNotHandled::Id);
 
-    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), generatedBuilder),
+              CHIP_NO_ERROR);
     auto generatedCommands = generatedBuilder.TakeBuffer();
-    ASSERT_EQ(generatedCommands.size(), std::size_t{ 1 });
+    ASSERT_EQ(generatedCommands.size(), 1u);
 
     const CommandId expectedGeneratedCommands[] = { Commands::TestSpecific::Id };
     ASSERT_TRUE(generatedCommands.data_equal(Span<const CommandId>(expectedGeneratedCommands)));
