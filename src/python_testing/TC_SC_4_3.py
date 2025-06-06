@@ -398,7 +398,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(10)
         service_types = await mdns.get_service_types(log_output=True)
         op_sub_type = self.get_operational_subtype()
-        asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}' wsa found.")
+        asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}' was found.")
 
         # # *** STEP 11 ***
         # TH performs a DNS-SD browse for _matter._tcp.local

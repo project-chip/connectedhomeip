@@ -133,6 +133,8 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         const chip::Credentials::AttestationTrustStore * testingRootStore =
             GetTestFileAttestationTrustStore("./credentials/development/paa-root-certs");
         chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+        VerifyOrDie(dacVerifier != nullptr);
+        dacVerifier->EnableVerboseLogs(true);
         chip::Credentials::SetDeviceAttestationVerifier(dacVerifier);
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
