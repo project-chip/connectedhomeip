@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTACustomProcessor.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
@@ -41,23 +40,6 @@ uint8_t OTACustomProcessor::mSlotId                                             
 uint32_t OTACustomProcessor::mWriteOffset                                            = 0;
 uint16_t OTACustomProcessor::writeBufOffset                                          = 0;
 uint8_t OTACustomProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
-
-CHIP_ERROR OTACustomProcessor::Init()
-{
-    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(sizeof(Descriptor));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTACustomProcessor::Clear()
-{
-    OTATlvProcessor::ClearInternal();
-    mAccumulator.Clear();
-    mDescriptorProcessed = false;
-
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR OTACustomProcessor::ProcessInternal(ByteSpan & block)
 {
