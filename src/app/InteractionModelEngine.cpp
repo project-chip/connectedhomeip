@@ -141,11 +141,7 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
 
 /// Checks if the given path/attributeId, entry are ACL-accessible
 /// for the given subject descriptor
-///
-/// `attributeId` may be kInvalidAttributeId to signify wildcard permission check
-/// on the underlying cluster
-bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const AttributeId attributeId,
-                                const Access::SubjectDescriptor & subjectDescriptor,
+bool IsAccessibleAttributeEntry(const ConcreteAttributePath & path, const Access::SubjectDescriptor & subjectDescriptor,
                                 const std::optional<DataModel::AttributeEntry> & entry)
 {
     if (!entry.has_value() || !entry->GetReadPrivilege().has_value())
@@ -154,17 +150,10 @@ bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const Attribut
         return false;
     }
 
-    // requestPath.entityId optional value starts up as unset to
-    // signify wildcard check. We then set it later if we have a valid
-    // attributeID to check.
     Access::RequestPath requestPath{ .cluster     = path.mClusterId,
                                      .endpoint    = path.mEndpointId,
-                                     .requestType = Access::RequestType::kAttributeReadRequest };
-
-    if (attributeId != kInvalidAttributeId)
-    {
-        requestPath.entityId = attributeId;
-    }
+                                     .requestType = Access::RequestType::kAttributeReadRequest,
+                                     .entityId    = path.mAttributeId };
 
     // We know entry has value and GetReadPrivilege has value according to the check above
     // the assign below is safe.
@@ -657,14 +646,9 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             {
                 // readPath is based on path expansion, so entire path is a `valid attribute path`.
                 //
-                // Here we check if the cluster is accessible at all for the given entry permissions.
-                // The check will validate cluster access and not try exact attribute matching.
-                //
-                // TODO: it is unclear why we are not using the actual path always since our goal seems
-                //       to just be "find a valid path that is readable". The reason the code looks like
-                //       this now is that this logic was originally written like this and the 'check' was
-                //       refactored to a common path.
-                if (IsAccessibleAttributeEntry(readPath, kInvalidAttributeId, aSubjectDescriptor, entry))
+                // Here we check if the cluster is accessible at all (at least one attribute) for the
+                // given entry permissions.
+                if (IsAccessibleAttributeEntry(readPath, aSubjectDescriptor, entry))
                 {
                     aHasValidAttributePath = true;
                     break;
@@ -678,7 +662,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 
             std::optional<DataModel::AttributeEntry> entry = FindAttributeEntry(concretePath);
 
-            if (IsAccessibleAttributeEntry(concretePath, paramsList.mValue.mAttributeId, aSubjectDescriptor, entry))
+            if (IsAccessibleAttributeEntry(concretePath, aSubjectDescriptor, entry))
             {
                 aHasValidAttributePath = true;
             }
