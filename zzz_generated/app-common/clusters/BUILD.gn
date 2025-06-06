@@ -162,5 +162,5 @@ declare_all_items_target("all-metadata") { target = ":metadata" }
 
 source_set("metadata-query") {
   sources = [ "MetadataQuery.h" ]
-  public_deps = [ "all-metadata" ]
+  public_deps = [ ":all-metadata" ]
 }
