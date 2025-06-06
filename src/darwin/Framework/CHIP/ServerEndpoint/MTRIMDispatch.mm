@@ -73,6 +73,14 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // clusters dont use it.
 }
 
+void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
+{
+    assertChipStackLockedByCurrentThread();
+
+    // No-op: Descriptor and OTA do not need this, and our client-defined
+    // clusters dont use it.
+}
+
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
     const EmberAfWriteDataInput & input)
 {

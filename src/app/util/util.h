@@ -25,6 +25,7 @@
 
 void emberAfInit();
 
+void emberAfShutdown();
 /**
  * Retrieves the difference between the two passed values.
  * This function assumes that the two values have the same endianness.
