@@ -36,6 +36,11 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         for id, d in self.xml_device_types.items():
             print(str(d))
 
+    def teardown_test(self):
+        super().teardown_test
+        if self.problems:
+            print(self.problems)
+
     def setup_class(self):
         # Latest fully qualified release
         self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
@@ -64,16 +69,45 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                     {% for k,v in clusters.items() %}
                                     <cluster id="{{ k }}" name="{{ v }}" side="server">
                                     <mandatoryConform/>
+                                    {% if features and k in features.keys() %}
+                                    <features>
+                                    {% for fname in features[k] %}
+                                    <feature name="{{ fname }}">
+                                    <mandatoryConform/>
+                                    </feature>
+                                    {% endfor %}
+                                    </features>
+                                    {% endif %}
+                                    {% if attributes and k in attributes.keys() %}
+                                    <attributes>
+                                    {% for name in attributes[k] %}
+                                    <attribute name="{{ name }}">
+                                    <mandatoryConform/>
+                                    </attribute>
+                                    {% endfor %}
+                                    </attributes>
+                                    {% endif %}
+                                    {% if commands and k in commands.keys() %}
+                                    <commands>
+                                    {% for name in commands[k] %}
+                                    <command name="{{ name }}">
+                                    <mandatoryConform/>
+                                    </command>
+                                    {% endfor %}
+                                    </commands>
+                                    {% endif %}
                                     </cluster>
                                     {% endfor %}
                                     </clusters>
                                     </deviceType>""")
+        # We're going to use the real cluster stuff so I don't need to write new XML. Device type uses Identify and Groups.
+        super().setup_class
 
     def test_device_type_clusters(self):
         xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
                                    classification_scope=self.classification_scope, clusters=self.clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing device type conformance")
         asserts.assert_equal(len(device_type.keys()), 1, "Unexpected number of device types returned")
         asserts.assert_true(self.device_type_id in device_type.keys(), "device type id not found in returned data")
@@ -90,7 +124,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
                                    classification_scope=self.classification_scope, clusters=clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing device type conformance")
         asserts.assert_equal(len(device_type.keys()), 1, "Unexpected number of device types returned")
         asserts.assert_true(self.device_type_id in device_type.keys(), "device type id not found in returned data")
@@ -101,22 +135,182 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         xml = self.template.render(device_type_id="", revision=self.revision, classification_class=self.classification_class,
                                    classification_scope=self.classification_scope, clusters=self.clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 1, "Device with blank ID did not generate a problem notice")
 
     def test_bad_class(self):
         xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class="",
                                    classification_scope=self.classification_scope, clusters=self.clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 1, "Device with no class did not generate a problem notice")
 
     def test_bad_scope(self):
         xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
                                    classification_scope="", clusters=self.clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 1, "Device with no scope did not generate a problem notice")
+
+    def test_feature_overrides_good(self):
+        # Groups cluster with GroupNames feature
+        groups_id = Clusters.Groups.id
+        group_name_mask = Clusters.Groups.Bitmaps.Feature.kGroupNames
+        features = {groups_id: ['GroupNames']}
+        xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
+                                   classification_scope=self.classification_scope, clusters=self.clusters, features=features)
+        et = ElementTree.fromstring(xml)
+
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
+        asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
+                          "Groups Cluster not found in device type parse")
+        asserts.assert_in(Clusters.Identify.id,
+                          device_type[self.device_type_id].server_clusters, "Identify Cluster not found in device type parse")
+        asserts.assert_in(
+            group_name_mask, device_type[self.device_type_id].server_clusters[groups_id].feature_overrides, "GroupName override not found in groups cluster")
+        asserts.assert_equal(str(
+            device_type[self.device_type_id].server_clusters[groups_id].feature_overrides[group_name_mask]), "M", "Improper conformance override for GroupName feature")
+        asserts.assert_equal(len(self.problems), 0, "Found problems when parsing good feature override")
+
+    def test_feature_overrides_bad(self):
+        # Identify cluster with GroupNames feature (does not exist on that cluster)
+        groups_id = Clusters.Groups.id
+        identify_id = Clusters.Identify.id
+        group_name_mask = Clusters.Groups.Bitmaps.Feature.kGroupNames
+        features = {identify_id: ['GroupNames']}
+        xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
+                                   classification_scope=self.classification_scope, clusters=self.clusters, features=features)
+        et = ElementTree.fromstring(xml)
+
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
+        # The two clusters should still appear there
+        asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
+                          "Groups Cluster not found in device type parse")
+        asserts.assert_in(identify_id,
+                          device_type[self.device_type_id].server_clusters, "Identify Cluster not found in device type parse")
+        asserts.assert_not_in(
+            group_name_mask, device_type[self.device_type_id].server_clusters[groups_id].feature_overrides, "GroupName override found in groups cluster")
+        asserts.assert_not_in(
+            group_name_mask, device_type[self.device_type_id].server_clusters[identify_id].feature_overrides, "GroupName override found in identify cluster")
+        asserts.assert_equal(len(self.problems), 1, "Unexpected number of problems parsing bad feature conformance")
+        # If we get here, the problems are as expected, don't need to report the problems on teardown
+        self.problems = []
+
+    def test_attribute_overrides_good(self):
+        # Groups cluster with GroupNames feature
+        groups_id = Clusters.Groups.id
+        name_support_attr = Clusters.Groups.Attributes.NameSupport.attribute_id
+        attributes = {groups_id: ['NameSupport']}
+        xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
+                                   classification_scope=self.classification_scope, clusters=self.clusters, attributes=attributes)
+        et = ElementTree.fromstring(xml)
+
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
+        asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
+                          "Groups Cluster not found in device type parse")
+        asserts.assert_in(Clusters.Identify.id,
+                          device_type[self.device_type_id].server_clusters, "Identify Cluster not found in device type parse")
+        asserts.assert_in(
+            name_support_attr, device_type[self.device_type_id].server_clusters[groups_id].attribute_overrides, "NameSupport override not found in groups cluster")
+        asserts.assert_equal(str(
+            device_type[self.device_type_id].server_clusters[groups_id].attribute_overrides[name_support_attr]), "M", "Improper conformance override")
+        asserts.assert_equal(len(self.problems), 0, "Found problems when parsing good attribute override")
+
+    def test_attribute_overrides_bad(self):
+        # Identify cluster with NameSupport Attribute (does not exist on that cluster)
+        groups_id = Clusters.Groups.id
+        identify_id = Clusters.Identify.id
+        name_support_attr = Clusters.Groups.Attributes.NameSupport.attribute_id
+        attributes = {identify_id: ['NameSupport']}
+        xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
+                                   classification_scope=self.classification_scope, clusters=self.clusters, attributes=attributes)
+        et = ElementTree.fromstring(xml)
+
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
+        # The two clusters should still appear there
+        asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
+                          "Groups Cluster not found in device type parse")
+        asserts.assert_in(identify_id,
+                          device_type[self.device_type_id].server_clusters, "Identify Cluster not found in device type parse")
+        asserts.assert_not_in(
+            name_support_attr, device_type[self.device_type_id].server_clusters[groups_id].attribute_overrides, "NameSupport override found in groups cluster")
+        asserts.assert_not_in(
+            name_support_attr, device_type[self.device_type_id].server_clusters[identify_id].attribute_overrides, "NameSupport override not found in identify cluster")
+        asserts.assert_equal(len(self.problems), 1, "Unexpected number of problems parsing bad attribute conformance")
+        # If we get here, the problems are as expected, don't need to report the problems on teardown
+        self.problems = []
+
+    def test_command_overrides_good(self):
+        # Groups cluster with GroupNames feature
+        groups_id = Clusters.Groups.id
+        add_group_cmd = Clusters.Groups.Commands.AddGroup.command_id
+        commands = {groups_id: ['AddGroup']}
+        xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
+                                   classification_scope=self.classification_scope, clusters=self.clusters, commands=commands)
+        et = ElementTree.fromstring(xml)
+
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
+        asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
+                          "Groups Cluster not found in device type parse")
+        asserts.assert_in(Clusters.Identify.id,
+                          device_type[self.device_type_id].server_clusters, "Identify Cluster not found in device type parse")
+        asserts.assert_in(
+            add_group_cmd, device_type[self.device_type_id].server_clusters[groups_id].command_overrides, "AddGroup override not found in groups cluster")
+        asserts.assert_equal(str(
+            device_type[self.device_type_id].server_clusters[groups_id].command_overrides[add_group_cmd]), "M", "Improper conformance override")
+        asserts.assert_equal(len(self.problems), 0, "Found problems when parsing good attribute override")
+
+    def test_command_overrides_bad(self):
+        # Identify cluster with AddGroup Command (does not exist on that cluster)
+        groups_id = Clusters.Groups.id
+        identify_id = Clusters.Identify.id
+        add_group_cmd = Clusters.Groups.Commands.AddGroup.command_id
+        commands = {identify_id: ['AddGroup']}
+        xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
+                                   classification_scope=self.classification_scope, clusters=self.clusters, commands=commands)
+        et = ElementTree.fromstring(xml)
+
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
+        # The two clusters should still appear there
+        asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
+                          "Groups Cluster not found in device type parse")
+        asserts.assert_in(identify_id,
+                          device_type[self.device_type_id].server_clusters, "Identify Cluster not found in device type parse")
+        asserts.assert_not_in(
+            add_group_cmd, device_type[self.device_type_id].server_clusters[groups_id].command_overrides, "NameSupport override found in groups cluster")
+        asserts.assert_not_in(
+            add_group_cmd, device_type[self.device_type_id].server_clusters[identify_id].command_overrides, "NameSupport override not found in identify cluster")
+        asserts.assert_equal(len(self.problems), 1, "Unexpected number of problems parsing bad command conformance")
+        # If we get here, the problems are as expected, don't need to report the problems on teardown
+        self.problems = []
+
+    def test_overrides_real(self):
+        # Check that some known overrides are present
+        # Onoff light has element requirements with conformance for commands and features, and attribute requirements for constraints, which should be ignored for now.
+        on_off_light_device_type = 0x0100
+        identify = Clusters.Identify.id
+        trigger_effect = Clusters.Identify.Commands.TriggerEffect.command_id
+        asserts.assert_in(trigger_effect, self.xml_device_types[on_off_light_device_type].server_clusters[identify].command_overrides.keys(
+        ), "Did not find expected command override for TriggerEffect")
+        asserts.assert_equal(str(self.xml_device_types[on_off_light_device_type].server_clusters[identify].command_overrides[trigger_effect]),
+                             "M", "Unexpected command override for TriggerEffect")
+        onoff = Clusters.OnOff.id
+        lighting = Clusters.OnOff.Bitmaps.Feature.kLighting
+        asserts.assert_in(lighting, self.xml_device_types[on_off_light_device_type].server_clusters[onoff].feature_overrides.keys(
+        ), "Did not find expected feature override for Lighting")
+        asserts.assert_equal(str(self.xml_device_types[on_off_light_device_type].server_clusters[onoff].feature_overrides[lighting]),
+                             "M", "Unexpected feature override for Lighting")
+        asserts.assert_equal(len(self.xml_device_types[on_off_light_device_type].server_clusters[onoff]
+                             .attribute_overrides), 0, "Unexpected attribute override in on off device type")
+
+        # Color temperature light DOES have an attribute override
+        color_temp_device_type = 0x010C
+        color_control = Clusters.ColorControl.id
+        remaining_time = Clusters.ColorControl.Attributes.RemainingTime.attribute_id
+        asserts.assert_in(remaining_time, self.xml_device_types[color_temp_device_type].server_clusters[color_control].attribute_overrides.keys(
+        ), "Did not find expected attribute override for RemainingTime")
+        asserts.assert_equal(str(self.xml_device_types[color_temp_device_type].server_clusters[color_control].attribute_overrides[remaining_time]),
+                             "M", "Unexpected attribute override for RemainingTime")
 
     # All these tests are based on the temp sensor device type because it is very simple
     # it requires temperature measurement, identify and the base devices.
@@ -128,22 +322,24 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         self.test.xml_device_types = self.xml_device_types
         self.test.xml_clusters = self.xml_clusters
 
-        if bad_device_id:
-            known_ids = list(self.test.xml_device_types.keys())
-            device_type_id = [a for a in range(min(known_ids), max(known_ids)) if a not in known_ids][0]
-        else:
-            device_type_id = 0x0302
-
-        resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
         if no_descriptor:
-            resp.attributes = {1: {}}
+            self.test.endpoints = {1: {}}
+            self.test.endpoints_tlv = {1: {}}
         else:
-            desc = Clusters.Descriptor
-            server_list_attr = Clusters.Descriptor.Attributes.ServerList
-            device_type_list_attr = Clusters.Descriptor.Attributes.DeviceTypeList
-            device_type_list = [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type_id, revision=2)]
-            resp.attributes = {1: {desc: {device_type_list_attr: device_type_list, server_list_attr: server_list}}}
-        self.test.endpoints = resp.attributes
+            # build the temperature sensor device type
+            attrs = create_minimal_dt(xml_device_types=self.xml_device_types, xml_clusters=self.xml_clusters,
+                                      device_type_id=0x302, is_tlv_endpoint=False)
+            attrs_tlv = create_minimal_dt(
+                xml_device_types=self.xml_device_types, xml_clusters=self.xml_clusters, device_type_id=0x302, is_tlv_endpoint=True)
+            # override with the desired device type id
+            if bad_device_id:
+                known_ids = list(self.test.xml_device_types.keys())
+                device_type_id = [a for a in range(min(known_ids), max(known_ids)) if a not in known_ids][0]
+                device_type_list = [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type_id, revision=2)]
+                attrs[Clusters.Descriptor][Clusters.Descriptor.deviceTypeList] = device_type_list
+                # note - not populating the TLV for this since it's not used.
+            self.test.endpoints = {1: attrs}
+            self.test.endpoints_tlv = {1: attrs_tlv}
 
     def create_good_device(self, device_type_id: int) -> DeviceConformanceTests:
         self.test = DeviceConformanceTests()
