@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021,2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  */
 #include "DeviceAttestationSe05xCredsExample.h"
 
-#include <CHIPCryptoPAL_se05x.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h>
 
 /* Device attestation key ids */
 #define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000
