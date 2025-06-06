@@ -242,10 +242,6 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
 }
 
-// Function called when NFC-based commissioning has been started.
-// Advertizing can be stopped.
-// FailSafe timer is started
-// PASE session can be expired
 void CommissioningWindowManager::OnNfcBasedCommissioningStarting()
 {
     ChipLogProgress(AppServer, "OnNfcBasedCommissioningStarting");
