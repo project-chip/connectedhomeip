@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/storage/TableEntry.h>
+#include <functional>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/TypeTraits.h>
