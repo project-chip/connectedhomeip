@@ -488,7 +488,6 @@ source_set("generic-test-event-trigger-handler") {
   public_deps = [
     ":test-event-trigger",
     "${chip_root}/src/app/clusters/general-diagnostics-server:general-fault-listener",
-    "${chip_root}/src/platform",
   ]
 }
 
