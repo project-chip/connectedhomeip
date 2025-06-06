@@ -481,18 +481,14 @@ class MockTestRunner():
     """
 
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
-                 pics: Optional[dict[str, bool]] = None, paa_trust_store_path=None):
+                 pics: Optional[dict[bool, str]] = None, paa_trust_store_path=None):
 
         from chip.testing.matter_testing import MatterStackState, MatterTestConfig
 
         self.kvs_storage = 'kvs_admin.json'
-        # Convert pics from dict[str, bool] to dict[bool, str] if provided
-        converted_pics = None
-        if pics is not None:
-            converted_pics = {v: k for k, v in pics.items()}
 
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
-                                       pics=converted_pics or {}, storage_path=Path(self.kvs_storage))
+                                       pics=pics or {}, storage_path=Path(self.kvs_storage))
         self.set_test(abs_filename, classname, test)
 
         self.set_test_config(self.config)
