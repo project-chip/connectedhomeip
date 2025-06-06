@@ -3143,10 +3143,10 @@ endpoint 1 {
     persist  attribute currentHue default = 0x00;
     persist  attribute currentSaturation default = 0x00;
     ram      attribute remainingTime default = 0x0000;
-    ram      attribute currentX default = 0x616B;
-    ram      attribute currentY default = 0x607D;
-    ram      attribute colorTemperatureMireds default = 0x00FA;
-    ram      attribute colorMode default = 0x01;
+    persist  attribute currentX default = 0x616B;
+    persist  attribute currentY default = 0x607D;
+    persist  attribute colorTemperatureMireds default = 0x00FA;
+    persist  attribute colorMode default = 0x02;
     ram      attribute options default = 0x00;
     ram      attribute numberOfPrimaries;
     ram      attribute primary1X;
@@ -3168,7 +3168,7 @@ endpoint 1 {
     ram      attribute primary6Y;
     ram      attribute primary6Intensity;
     ram      attribute enhancedCurrentHue default = 0x0000;
-    ram      attribute enhancedColorMode default = 0x01;
+    ram      attribute enhancedColorMode default = 0x02;
     ram      attribute colorLoopActive default = 0x00;
     ram      attribute colorLoopDirection default = 0x00;
     ram      attribute colorLoopTime default = 0x0019;
@@ -3178,7 +3178,7 @@ endpoint 1 {
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
-    ram      attribute startUpColorTemperatureMireds default = 0x00FA;
+    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
