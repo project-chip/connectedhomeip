@@ -238,8 +238,6 @@ struct InterfaceInfo
 
 struct InterfaceKey
 {
-    InterfaceKey()  = default;
-    ~InterfaceKey() = default;
     inline bool operator<(const InterfaceKey & other) const
     {
         return (this->interfaceId < other.interfaceId) ||
@@ -260,9 +258,6 @@ struct InterfaceKey
 
 struct ResolveContextWithType
 {
-    ResolveContextWithType()  = delete;
-    ~ResolveContextWithType() = default;
-
     ResolveContext * const context;
     const bool isSRPResolve;
 };
