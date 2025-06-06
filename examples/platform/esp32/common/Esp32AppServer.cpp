@@ -60,11 +60,52 @@ using namespace chip::DeviceLayer;
 
 static constexpr char TAG[] = "ESP32Appserver";
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+// NOTE:
+//   this is a hackish workaround for https://github.com/project-chip/connectedhomeip/issues/39441
+//   OpenaThread platform has a layering inversion and tries to pull in network commissioning. For
+//   ESP32 this translates into a link error due to NetworkCommissioning vtable not being defined.
+//
+//   We pull in the vtable here via a function that will never get called (otherwise it would
+//   actually crash ..)
+void do_not_call_workaround_only()
+{
+    static app::Clusters::NetworkCommissioning::Instance sInvalidInstance(
+        CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */,
+        (DeviceLayer::NetworkCommissioning::ThreadDriver *) nullptr);
+}
+#endif
+
 namespace {
 #if CONFIG_TEST_EVENT_TRIGGER_ENABLED
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(CONFIG_WIFI_NETWORK_ENDPOINT_ID /* Endpoint Id */,
+                                      &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET && CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
+app::Clusters::NetworkCommissioning::Instance
+    sEthernetNetworkCommissioningInstance(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID /* Endpoint Id */,
+                                          &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
+#endif
+
+#if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID)
+static_assert(CONFIG_WIFI_NETWORK_ENDPOINT_ID != CONFIG_THREAD_NETWORK_ENDPOINT_ID,
+              "Wi-Fi network endpoint id and Thread network endpoint id should not be the same.");
+#endif
+#if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID)
+static_assert(CONFIG_WIFI_NETWORK_ENDPOINT_ID != CONFIG_ETHERNET_NETWORK_ENDPOINT_ID,
+              "Wi-Fi network endpoint id and Ethernet network endpoint id should not be the same.");
+#endif
+#if defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID) && defined(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID)
+static_assert(CONFIG_THREAD_NETWORK_ENDPOINT_ID != CONFIG_ETHERNET_NETWORK_ENDPOINT_ID,
+              "Thread network endpoint id and Ethernet network endpoint id should not be the same.");
 #endif
 } // namespace
 
@@ -181,6 +222,13 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     chip::Shell::SetWiFiDriver(&(chip::DeviceLayer::NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 #endif
 #endif
+
+#if CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
+    sWiFiNetworkCommissioningInstance.Init();
+#endif // CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
+#if CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
+    sEthernetNetworkCommissioningInstance.Init();
+#endif // CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&

@@ -27,45 +27,48 @@
 namespace chip {
 namespace Dnssd {
 
-class HostNameRegistrar : public Inet::Darwin::NetworkMonitor
-{
-public:
-    ~HostNameRegistrar();
+    typedef void (^OnRegisterRecordCallback)(DNSServiceErrorType error);
 
-    DNSServiceErrorType Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId);
+    class HostNameRegistrar : public Inet::Darwin::NetworkMonitor {
+    public:
+        ~HostNameRegistrar();
 
-    CHIP_ERROR Register();
-    void Unregister();
+        DNSServiceErrorType Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId);
 
-private:
-    template <typename T>
-    void RegisterInterfaces(std::vector<std::pair<nw_interface_t, T>> interfaces, uint16_t type)
-    {
-        for (auto & interface : interfaces)
+        CHIP_ERROR Register(OnRegisterRecordCallback callback);
+        void Unregister();
+
+    private:
+        template <typename T>
+        void RegisterInterfaces(std::vector<std::pair<nw_interface_t, T>> interfaces, uint16_t type)
         {
-            auto interfaceId = nw_interface_get_index(interface.first);
+            for (auto & interface : interfaces) {
+                auto interfaceId = nw_interface_get_index(interface.first);
 
-            LogErrorOnFailure(RegisterInterface(interfaceId, interface.second, type));
+                LogErrorOnFailure(RegisterInterface(interfaceId, interface.second, type));
+            }
         }
-    }
 
-    template <typename T>
-    CHIP_ERROR RegisterInterface(uint32_t interfaceId, const T & interfaceAddress, uint16_t type)
-    {
-        auto interfaceAddressLen = sizeof(interfaceAddress);
+        template <typename T>
+        CHIP_ERROR RegisterInterface(uint32_t interfaceId, const T & interfaceAddress, uint16_t type)
+        {
+            auto interfaceAddressLen = sizeof(interfaceAddress);
 
-        return RegisterInterface(interfaceId, type, &interfaceAddress, static_cast<uint16_t>(interfaceAddressLen));
-    }
+            return RegisterInterface(interfaceId, type, &interfaceAddress, static_cast<uint16_t>(interfaceAddressLen));
+        }
 
-    CHIP_ERROR RegisterInterface(uint32_t interfaceId, uint16_t rtype, const void * rdata, uint16_t rdlen);
+        CHIP_ERROR RegisterInterface(uint32_t interfaceId, uint16_t rtype, const void * rdata, uint16_t rdlen);
 
-    CHIP_ERROR StartSharedConnection();
-    void StopSharedConnection();
-    CHIP_ERROR ResetSharedConnection();
+        CHIP_ERROR StartSharedConnection();
+        void StopSharedConnection();
+        CHIP_ERROR ResetSharedConnection();
 
-    DNSServiceRef mServiceRef = nullptr;
-    std::string mHostname;
-};
+        DNSServiceRef mServiceRef = nullptr;
+        std::string mHostname;
+
+        static void OnRegisterRecord(DNSServiceRef sdRef, DNSRecordRef recordRef, DNSServiceFlags flags, DNSServiceErrorType err, void * context);
+        OnRegisterRecordCallback mOnRegisterRecordCallback = nullptr;
+    };
 
 } // namespace Dnssd
 } // namespace chip

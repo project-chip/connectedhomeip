@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0110" name="Mounted Dimmable Load Control" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0110" name="Mounted Dimmable Load Control" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="Add superset classification and usage guidance for both device types"/>
   </revisionHistory>
   <classification superset="Dimmable Plug-In Unit" class="simple" scope="endpoint"/>
   <clusters>
