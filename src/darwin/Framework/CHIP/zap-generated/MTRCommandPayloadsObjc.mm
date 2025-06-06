@@ -32469,6 +32469,172 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRZoneManagementClusterCreateOrUpdateTriggerParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _trigger = [MTRZoneManagementClusterZoneTriggerControlStruct new];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRZoneManagementClusterCreateOrUpdateTriggerParams alloc] init];
+
+    other.trigger = self.trigger;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: trigger:%@; >", NSStringFromClass([self class]), _trigger];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterCreateOrUpdateTriggerParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.trigger.zoneID = self.trigger.zoneID.unsignedShortValue;
+        encodableStruct.trigger.initialDuration = self.trigger.initialDuration.unsignedIntValue;
+        encodableStruct.trigger.augmentationDuration = self.trigger.augmentationDuration.unsignedIntValue;
+        encodableStruct.trigger.maxDuration = self.trigger.maxDuration.unsignedIntValue;
+        encodableStruct.trigger.blindDuration = self.trigger.blindDuration.unsignedIntValue;
+        if (self.trigger.sensitivity != nil) {
+            auto & definedValue_1 = encodableStruct.trigger.sensitivity.Emplace();
+            definedValue_1 = self.trigger.sensitivity.unsignedCharValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRZoneManagementClusterRemoveTriggerParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _zoneID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRZoneManagementClusterRemoveTriggerParams alloc] init];
+
+    other.zoneID = self.zoneID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; >", NSStringFromClass([self class]), _zoneID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRZoneManagementClusterRemoveTriggerParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.zoneID = self.zoneID.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRCameraAVStreamManagementClusterAudioStreamAllocateParams
 - (instancetype)init
 {

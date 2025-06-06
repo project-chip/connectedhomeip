@@ -175,7 +175,7 @@ NSString * kControllerIdPrefixStr = @(kControllerIdPrefix);
     return home.matterControllerID;
 }
 
-- (NSXPCConnection * (^)(void) )connectBlockFor:(NSString *)controllerID;
+- (NSXPCConnection * (^)(void) )connectBlockFor:(NSString *)controllerID
 {
     __auto_type * home = [self homeFor:controllerID];
     ChipLogProgress(chipTool, "Controller '%s' will be associated with home '%s'.", [controllerID UTF8String], [home.matterControllerID UTF8String]);

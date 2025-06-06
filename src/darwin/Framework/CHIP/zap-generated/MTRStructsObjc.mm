@@ -9327,6 +9327,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
+        _zoneID = @(0);
+
         _initialDuration = @(0);
 
         _augmentationDuration = @(0);
@@ -9344,6 +9346,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRZoneManagementClusterZoneTriggerControlStruct alloc] init];
 
+    other.zoneID = self.zoneID;
     other.initialDuration = self.initialDuration;
     other.augmentationDuration = self.augmentationDuration;
     other.maxDuration = self.maxDuration;
@@ -9355,7 +9358,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; sensitivity:%@; >", NSStringFromClass([self class]), _initialDuration, _augmentationDuration, _maxDuration, _blindDuration, _sensitivity];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; sensitivity:%@; >", NSStringFromClass([self class]), _zoneID, _initialDuration, _augmentationDuration, _maxDuration, _blindDuration, _sensitivity];
     return descriptionString;
 }
 
@@ -9366,7 +9369,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _zones = [NSArray array];
+        _zone = @(0);
 
         _reason = @(0);
     }
@@ -9377,7 +9380,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRZoneManagementClusterZoneTriggeredEvent alloc] init];
 
-    other.zones = self.zones;
+    other.zone = self.zone;
     other.reason = self.reason;
 
     return other;
@@ -9385,7 +9388,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
     return descriptionString;
 }
 
@@ -9396,7 +9399,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _zones = [NSArray array];
+        _zone = @(0);
 
         _reason = @(0);
     }
@@ -9407,7 +9410,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRZoneManagementClusterZoneStoppedEvent alloc] init];
 
-    other.zones = self.zones;
+    other.zone = self.zone;
     other.reason = self.reason;
 
     return other;
@@ -9415,7 +9418,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
     return descriptionString;
 }
 

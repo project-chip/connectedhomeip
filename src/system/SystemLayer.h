@@ -372,7 +372,8 @@ public:
      *
      * @note This method is thread-safe and can be called from any dispatch queue.
      */
-    virtual CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) = 0;
+    virtual CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block)                     = 0;
+    virtual CHIP_ERROR StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) = 0;
 };
 #endif
 

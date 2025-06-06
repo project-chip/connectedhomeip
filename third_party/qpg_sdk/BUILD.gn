@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/freertos.gni")
 import("//build_overrides/qpg_sdk.gni")
-import("${freertos_root}/freertos.gni")
 import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
 declare_args() {
@@ -25,10 +23,7 @@ declare_args() {
 assert(qpg_sdk_target != "", "qpg_sdk_target must be specified")
 
 group("qpg_sdk") {
-  public_deps = [
-    ":freertos",
-    qpg_sdk_target,
-  ]
+  public_deps = [ qpg_sdk_target ]
   public_configs = [ ":qpg_include_paths_config" ]
 }
 
@@ -36,30 +31,28 @@ config("qpg_include_paths_config") {
   include_dirs = [
     "${qpg_sdk_root}/Components/Qorvo/BaseUtils/gpNvm/inc",
     "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/inc",
+    "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB",
+    "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
+    "${qpg_sdk_root}/Components/Qorvo/Matter/qvIO/inc",
+    "${qpg_sdk_root}/Components/Qorvo/OS/gpAssert/inc",
     "${qpg_sdk_root}/Components/Qorvo/OS/gpLog/inc",
     "${qpg_sdk_root}/Components/Qorvo/OS/gpReset/inc",
     "${qpg_sdk_root}/Components/Qorvo/OS/gpSched/inc",
-    "${qpg_sdk_root}/Components/Qorvo/OS/gpAssert/inc",
-    "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB",
-    "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
   ]
 }
 
 config("qpg_freertos_config") {
   include_dirs = [
+    "${freertos_root}/repo/include",
     "${qpg_sdk_root}/Applications/Matter/shared/config/inc",
     "${qpg_sdk_root}/Components/ThirdParty/Lwip",
-    "${freertos_root}/repo/portable/GCC/ARM_CM3",
-  ]
-}
-
-freertos_target("freertos") {
-  sources = [
-    "${freertos_root}/repo/portable/GCC/ARM_CM3/port.c",
-    "${freertos_root}/repo/portable/MemMang/heap_3.c",
   ]
 
-  public_configs = [ ":qpg_freertos_config" ]
+  if (qpg_target_ic == "qpg6200") {
+    include_dirs += [ "${freertos_root}/repo/portable/GCC/ARM_CM4F" ]
+  } else {
+    include_dirs += [ "${freertos_root}/repo/portable/GCC/ARM_CM3" ]
+  }
 }
 
 template("qpg_make_build") {
@@ -84,30 +77,35 @@ template("qpg_make_build") {
 }
 
 qpg_make_build("qpg_mbedtls_alt") {
-  make_sources = [ "${qpg_sdk_root}/Components/ThirdParty/Silex" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a" ]
-  make_args = [
-    "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) +
-        "/Libraries/Qorvo/mbedtls_alt/Makefile.mbedtls_alt_${qpg_target_ic}",
-    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}",
-  ]
+  if (qpg_target_ic == "qpg6200") {
+    make_sources =
+        [ "${qpg_sdk_root}/Components/ThirdParty/secure_element/software" ]
+    make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a" ]
+    make_args = [
+      "-f",
+      rebase_path(qpg_sdk_root, root_build_dir) +
+          "/Libraries/Qorvo/mbedtls_alt/Makefile.mbedtls_alt_${qpg_target_ic}",
+      "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+          "/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}",
+    ]
+  }
 }
 
 static_library("qpg_mbedtls_alt_lib") {
-  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_mbedtls_alt" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a" ]
+  if (qpg_target_ic == "qpg6200") {
+    deps = [ "${chip_root}/third_party/qpg_sdk:qpg_mbedtls_alt" ]
+    libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a" ]
+  }
 }
 
 qpg_make_build("qpg_stack") {
   make_sources = [ "${qpg_sdk_root}/Components/Qorvo" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}${qpg_flavour}.a" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}.a" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_${qpg_target_ic}${qpg_flavour}",
-    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
-        "/third_party/freertos/repo",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_${qpg_target_ic}",
+    "FREERTOS_REPO_DIR=" + rebase_path("${freertos_root}/repo", root_build_dir),
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
         "/${qpg_sdk_lib_dir}/QorvoStack",
   ]
@@ -115,25 +113,30 @@ qpg_make_build("qpg_stack") {
 
 static_library("qpg_stack_lib") {
   deps = [ "${chip_root}/third_party/qpg_sdk:qpg_stack" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}${qpg_flavour}.a" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}.a" ]
 }
 
 qpg_make_build("qpg_glue") {
   make_sources = [ "${qpg_sdk_root}/Components/Qorvo/Matter" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}${qpg_flavour}_libbuild.a" ]
-  make_args = [
-    "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_${qpg_target_ic}${qpg_flavour}_libbuild",
-    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
-        "/third_party/freertos/repo",
-    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/MatterQorvoGlue",
-  ]
+
+  if (qpg_target_ic == "qpg6200") {
+    make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a" ]
+    make_args = [
+      "-f",
+      rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_${qpg_target_ic}_libbuild",
+      "FREERTOS_REPO_DIR=" +
+          rebase_path("${freertos_root}/repo", root_build_dir),
+      "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+          "/${qpg_sdk_lib_dir}/MatterQorvoGlue",
+    ]
+  } else {
+    assert(false, "QPG target not specified")
+  }
 }
 static_library("qpg_glue_lib") {
   deps = [ "${chip_root}/third_party/qpg_sdk:qpg_glue" ]
-  if (qpg_target_ic == "qpg6105") {
-    libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}${qpg_flavour}_libbuild.a" ]
+  if (qpg_target_ic == "qpg6200") {
+    libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a" ]
   } else {
     assert(false, "QPG target not specified")
   }
@@ -142,32 +145,49 @@ static_library("qpg_glue_lib") {
 # openthread toevoegen
 # bootloader build
 #
-qpg_make_build("qpg_bootloader") {
-  make_sources = [ "${qpg_sdk_root}/Libraries/Qorvo/Bootloader" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr_secure/libBootloaderSections_${qpg_target_ic}_compr_secure.a" ]
-  make_args = [
-    "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/Bootloader/Makefile.BootloaderSections_${qpg_target_ic}_compr_secure",
-    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
-        "/third_party/freertos/repo",
-    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr_secure",
-    "UMB_WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/Bootloader_QPG6105DK_B01_nrt_flash_compr_secure",
-  ]
+qpg_make_build("qpg_bootloader_hex") {
+  make_sources = [ "${qpg_sdk_root}/Applications/Bootloader" ]
+
+  if (qpg_target_ic == "qpg6200") {
+    make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr/Bootloader_${qpg_target_ic}_compr.hex" ]
+    make_args = [
+      "-f",
+      rebase_path(qpg_sdk_root, root_build_dir) +
+          "/Applications/Bootloader/Makefile.Bootloader_${qpg_target_ic}_compr",
+      "FREERTOS_REPO_DIR=" +
+          rebase_path("${freertos_root}/repo", root_build_dir),
+      "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+          "/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr",
+      "UMB_WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+          "/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr",
+    ]
+  } else {
+    assert(false, "QPG board not specified")
+  }
 }
 config("qpg_retain_bootloader") {
-  ldflags = [
-    "-Wl,-u_binary_bl_userlicense_bin_start",
-    "-Wl,-u_binary_bootloader_bin_start",
-    "-Wl,--no-warn-rwx-segment",
-  ]
+  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
 static_library("qpg_bootloader_lib") {
-  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_bootloader" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr_secure/libBootloaderSections_${qpg_target_ic}_compr_secure.a" ]
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_bootloader_hex" ]
+  if (qpg_target_ic == "qpg6200") {
+    libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr/libBootloaderSections_${qpg_target_ic}_compr.a" ]
+  } else {
+    assert(false, "QPG Board not selected")
+  }
+
   public_configs = [ ":qpg_retain_bootloader" ]
+}
+
+copy("qpg_bootloader") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+  sources = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/Bootloader${fd_suffix}_compr/Bootloader${fd_suffix}_compr.hex" ]
+  outputs = [ "${root_build_dir}/bootloader${fd_suffix}.hex" ]
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_bootloader_hex" ]
 }
 
 qpg_make_build("qpg_openthread_glue") {
@@ -176,8 +196,7 @@ qpg_make_build("qpg_openthread_glue") {
   make_args = [
     "-f",
     rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_${qpg_target_ic}_ftd",
-    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
-        "/third_party/freertos/repo",
+    "FREERTOS_REPO_DIR=" + rebase_path("${freertos_root}/repo", root_build_dir),
     "OPENTHREAD_REPO_DIR =" + rebase_path(chip_root, root_build_dir) +
         "/third_party/openthread/repo",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
@@ -189,84 +208,165 @@ static_library("qpg_openthread_glue_lib") {
   libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/OpenThreadQorvoGlue_${qpg_target_ic}_ftd/libOpenThreadQorvoGlue_${qpg_target_ic}_ftd.a" ]
 }
 
-qpg_make_build("qpg_light_factorydata") {
-  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_light_static_pake/libFactoryData_light_static_pake.a" ]
+qpg_make_build("qpg_light_factorydata_hex") {
+  # factory data suffix
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_light_static_pake${fd_suffix}/FactoryData_light_static_pake${fd_suffix}.hex" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) +
-        "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_light_static_pake",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_light_static_pake${fd_suffix}",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/FactoryData_light_static_pake",
+        "/${qpg_sdk_lib_dir}/FactoryData_light_static_pake${fd_suffix}",
   ]
 }
-static_library("qpg_light_factorydata_lib") {
-  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_light_factorydata" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_light_static_pake/libFactoryData_light_static_pake.a" ]
-  public_configs = [ ":qpg_retain_factorydata" ]
+copy("qpg_light_factorydata") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+  sources = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_light_static_pake${fd_suffix}/FactoryData_light_static_pake${fd_suffix}.hex" ]
+  outputs = [
+    "${root_build_dir}/chip-${qpg_target_ic}-lighting-example.factorydata.hex",
+  ]
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_light_factorydata_hex" ]
 }
 
-qpg_make_build("qpg_lock_factorydata") {
-  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_lock_static_pake/libFactoryData_lock_static_pake.a" ]
+qpg_make_build("qpg_lock_factorydata_hex") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_lock_static_pake${fd_suffix}/FactoryData_lock_static_pake${fd_suffix}.hex" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) +
-        "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_lock_static_pake",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_lock_static_pake${fd_suffix}",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/FactoryData_lock_static_pake",
+        "/${qpg_sdk_lib_dir}/FactoryData_lock_static_pake${fd_suffix}",
   ]
 }
-static_library("qpg_lock_factorydata_lib") {
-  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_lock_factorydata" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_lock_static_pake/libFactoryData_lock_static_pake.a" ]
-  public_configs = [ ":qpg_retain_factorydata" ]
+copy("qpg_lock_factorydata") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+  sources = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_lock_static_pake${fd_suffix}/FactoryData_lock_static_pake${fd_suffix}.hex" ]
+  outputs =
+      [ "${root_build_dir}/chip-${qpg_target_ic}-lock-example.factorydata.hex" ]
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_lock_factorydata_hex" ]
 }
 
-qpg_make_build("qpg_switch_factorydata") {
-  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_switch_static_pake/libFactoryData_switch_static_pake.a" ]
+qpg_make_build("qpg_switch_factorydata_hex") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_switch_static_pake${fd_suffix}/FactoryData_switch_static_pake${fd_suffix}.hex" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) +
-        "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_switch_static_pake",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_switch_static_pake${fd_suffix}",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/FactoryData_switch_static_pake",
+        "/${qpg_sdk_lib_dir}/FactoryData_switch_static_pake${fd_suffix}",
   ]
 }
 
-static_library("qpg_switch_factorydata_lib") {
-  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_switch_factorydata" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_switch_static_pake/libFactoryData_switch_static_pake.a" ]
-  public_configs = [ ":qpg_retain_factorydata" ]
+copy("qpg_switch_factorydata") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+  sources = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_switch_static_pake${fd_suffix}/FactoryData_switch_static_pake${fd_suffix}.hex" ]
+  outputs = [ "${root_build_dir}/chip-${qpg_target_ic}-light-switch-example.factorydata.hex" ]
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_switch_factorydata_hex" ]
 }
 
-qpg_make_build("qpg_thermostat_factorydata") {
-  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake/libFactoryData_thermostaticRadiatorValve_static_pake.a" ]
+qpg_make_build("qpg_thermostat_factorydata_hex") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake${fd_suffix}/FactoryData_thermostaticRadiatorValve_static_pake${fd_suffix}.hex" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_thermostaticRadiatorValve_static_pake",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_thermostaticRadiatorValve_static_pake${fd_suffix}",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) + "/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake${fd_suffix}",
+  ]
+}
+
+copy("qpg_thermostat_factorydata") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+  sources = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake${fd_suffix}/FactoryData_thermostaticRadiatorValve_static_pake${fd_suffix}.hex" ]
+  outputs = [ "${root_build_dir}/chip-${qpg_target_ic}-thermostat-example.factorydata.hex" ]
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_thermostat_factorydata_hex" ]
+}
+
+qpg_make_build("qpg_doorwindow_factorydata_hex") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_doorWindow_static_pake${fd_suffix}/FactoryData_doorWindow_static_pake${fd_suffix}.hex" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_doorWindow_static_pake${fd_suffix}",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake",
+        "/${qpg_sdk_lib_dir}/FactoryData_doorWindow_static_pake${fd_suffix}",
   ]
 }
 
-static_library("qpg_thermostat_factorydata_lib") {
-  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_thermostat_factorydata" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake/libFactoryData_thermostaticRadiatorValve_static_pake.a" ]
-  public_configs = [ ":qpg_retain_factorydata" ]
+copy("qpg_doorwindow_factorydata") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+  sources = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_doorWindow_static_pake${fd_suffix}/FactoryData_doorWindow_static_pake${fd_suffix}.hex" ]
+  outputs = [ "${root_build_dir}/chip-${qpg_target_ic}-contact-sensor-example.factorydata.hex" ]
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_doorwindow_factorydata_hex" ]
 }
 
-config("qpg_retain_factorydata") {
-  ldflags = [
-    "-Wl,-u_binary_factory_data_bin_start",
-    "-Wl,-u_binary_factory_data_start",
+qpg_make_build("qpg_motionsensor_factorydata_hex") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_motionSensor_static_pake${fd_suffix}/FactoryData_motionSensor_static_pake${fd_suffix}.hex" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_motionSensor_static_pake${fd_suffix}",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FactoryData_motionSensor_static_pake${fd_suffix}",
   ]
+}
+
+copy("qpg_motionsensor_factorydata") {
+  fd_suffix = ""
+  if (qpg_target_ic == "qpg6200") {
+    fd_suffix = "_qpg6200"
+  }
+  sources = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_motionSensor_static_pake${fd_suffix}/FactoryData_motionSensor_static_pake${fd_suffix}.hex" ]
+  outputs = [ "${root_build_dir}/chip-${qpg_target_ic}-occupancy-sensor-example.factorydata.hex" ]
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_motionsensor_factorydata_hex" ]
 }
 
 qpg_make_build("qpg_light_firmwaredata") {
-  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
   make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_light/libFirmwareData_light.a" ]
   make_args = [
     "-f",
@@ -282,7 +382,7 @@ static_library("qpg_light_firmwaredata_lib") {
 }
 
 qpg_make_build("qpg_lock_firmwaredata") {
-  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
   make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_lock/libFirmwareData_lock.a" ]
   make_args = [
     "-f",
@@ -298,7 +398,7 @@ static_library("qpg_lock_firmwaredata_lib") {
 }
 
 qpg_make_build("qpg_switch_firmwaredata") {
-  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
   make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_switch/libFirmwareData_switch.a" ]
   make_args = [
     "-f",
@@ -314,7 +414,7 @@ static_library("qpg_switch_firmwaredata_lib") {
 }
 
 qpg_make_build("qpg_thermostat_firmwaredata") {
-  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
   make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_thermostaticRadiatorValve/libFirmwareData_thermostaticRadiatorValve.a" ]
   make_args = [
     "-f",
@@ -326,4 +426,36 @@ qpg_make_build("qpg_thermostat_firmwaredata") {
 static_library("qpg_thermostat_firmwaredata_lib") {
   deps = [ "${chip_root}/third_party/qpg_sdk:qpg_thermostat_firmwaredata" ]
   libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_thermostaticRadiatorValve/libFirmwareData_thermostaticRadiatorValve.a" ]
+}
+
+qpg_make_build("qpg_doorwindow_firmwaredata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_doorWindow/libFirmwareData_doorWindow.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/FactoryData/Makefile.FirmwareData_doorWindow",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FirmwareData_doorWindow",
+  ]
+}
+static_library("qpg_doorwindow_firmwaredata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_doorwindow_firmwaredata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_doorWindow/libFirmwareData_doorWindow.a" ]
+}
+
+qpg_make_build("qpg_motionsensor_firmwaredata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/QorvoPlatformTools/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_motionSensor/libFirmwareData_motionSensor.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/FactoryData/Makefile.FirmwareData_motionSensor",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FirmwareData_motionSensor",
+  ]
+}
+static_library("qpg_motionsensor_firmwaredata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_motionsensor_firmwaredata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_motionSensor/libFirmwareData_motionSensor.a" ]
 }

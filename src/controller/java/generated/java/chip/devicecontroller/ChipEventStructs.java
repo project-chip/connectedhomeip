@@ -6280,22 +6280,22 @@ public static class ContentControlClusterRemainingScreenTimeExpiredEvent {
   }
 }
 public static class ZoneManagementClusterZoneTriggeredEvent {
-  public ArrayList<Integer> zones;
+  public Integer zone;
   public Integer reason;
-  private static final long ZONES_ID = 0L;
+  private static final long ZONE_ID = 0L;
   private static final long REASON_ID = 1L;
 
   public ZoneManagementClusterZoneTriggeredEvent(
-    ArrayList<Integer> zones,
+    Integer zone,
     Integer reason
   ) {
-    this.zones = zones;
+    this.zone = zone;
     this.reason = reason;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(ZONES_ID, ArrayType.generateArrayType(zones, (elementzones) -> new UIntType(elementzones))));
+    values.add(new StructElement(ZONE_ID, new UIntType(zone)));
     values.add(new StructElement(REASON_ID, new UIntType(reason)));
 
     return new StructType(values);
@@ -6305,13 +6305,13 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ArrayList<Integer> zones = null;
+    Integer zone = null;
     Integer reason = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == ZONES_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
-          ArrayType castingValue = element.value(ArrayType.class);
-          zones = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+      if (element.contextTagNum() == ZONE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          zone = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == REASON_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6321,7 +6321,7 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
       }
     }
     return new ZoneManagementClusterZoneTriggeredEvent(
-      zones,
+      zone,
       reason
     );
   }
@@ -6330,8 +6330,8 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ZoneManagementClusterZoneTriggeredEvent {\n");
-    output.append("\tzones: ");
-    output.append(zones);
+    output.append("\tzone: ");
+    output.append(zone);
     output.append("\n");
     output.append("\treason: ");
     output.append(reason);
@@ -6341,22 +6341,22 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
   }
 }
 public static class ZoneManagementClusterZoneStoppedEvent {
-  public ArrayList<Integer> zones;
+  public Integer zone;
   public Integer reason;
-  private static final long ZONES_ID = 0L;
+  private static final long ZONE_ID = 0L;
   private static final long REASON_ID = 1L;
 
   public ZoneManagementClusterZoneStoppedEvent(
-    ArrayList<Integer> zones,
+    Integer zone,
     Integer reason
   ) {
-    this.zones = zones;
+    this.zone = zone;
     this.reason = reason;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(ZONES_ID, ArrayType.generateArrayType(zones, (elementzones) -> new UIntType(elementzones))));
+    values.add(new StructElement(ZONE_ID, new UIntType(zone)));
     values.add(new StructElement(REASON_ID, new UIntType(reason)));
 
     return new StructType(values);
@@ -6366,13 +6366,13 @@ public static class ZoneManagementClusterZoneStoppedEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ArrayList<Integer> zones = null;
+    Integer zone = null;
     Integer reason = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == ZONES_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
-          ArrayType castingValue = element.value(ArrayType.class);
-          zones = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+      if (element.contextTagNum() == ZONE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          zone = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == REASON_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6382,7 +6382,7 @@ public static class ZoneManagementClusterZoneStoppedEvent {
       }
     }
     return new ZoneManagementClusterZoneStoppedEvent(
-      zones,
+      zone,
       reason
     );
   }
@@ -6391,8 +6391,8 @@ public static class ZoneManagementClusterZoneStoppedEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ZoneManagementClusterZoneStoppedEvent {\n");
-    output.append("\tzones: ");
-    output.append(zones);
+    output.append("\tzone: ");
+    output.append(zone);
     output.append("\n");
     output.append("\treason: ");
     output.append(reason);

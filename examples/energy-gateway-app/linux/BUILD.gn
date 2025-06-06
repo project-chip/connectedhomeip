@@ -41,6 +41,8 @@ executable("chip-energy-gateway-app") {
     "${chip_root}/examples/energy-gateway-app/electrical-grid-conditions/src/ElectricalGridConditionsDelegate.cpp",
     "${chip_root}/examples/energy-gateway-app/electrical-grid-conditions/src/ElectricalGridConditionsEventTriggers.cpp",
     "${chip_root}/examples/energy-gateway-app/electrical-grid-conditions/src/ElectricalGridConditionsMain.cpp",
+    "${chip_root}/examples/energy-gateway-app/meter-identification/src/MeterIdentificationEventTriggers.cpp",
+    "${chip_root}/examples/energy-gateway-app/meter-identification/src/MeterIdentificationInstance.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -66,6 +68,7 @@ executable("chip-energy-gateway-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
     "${chip_root}/examples/energy-gateway-app/commodity-price/include",
     "${chip_root}/examples/energy-gateway-app/electrical-grid-conditions/include",
+    "${chip_root}/examples/energy-gateway-app/meter-identification/include",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 

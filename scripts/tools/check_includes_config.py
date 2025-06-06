@@ -31,6 +31,7 @@ IGNORE: Set[str] = {
     '/mock/',
     '/python/',
     '/Test',
+    '/testing/',
     '/tests/',
     '/tools/',
 

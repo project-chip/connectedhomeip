@@ -98,4 +98,9 @@
 // NB: This file gets included during the build of OpenThread.  Hence
 // it cannot use "openthread" in the path to the included file.
 //
+
+#ifdef QPG6200
+#include "openthread-core-qpg6200-config.h"
+#else
 #include "openthread-core-qpg6105-config.h"
+#endif

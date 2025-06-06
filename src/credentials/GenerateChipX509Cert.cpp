@@ -219,6 +219,13 @@ CHIP_ERROR EncodeNOCSpecificExtensions(ASN1Writer & writer)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR EncodeVendorIdVerificationSignerSpecificExtensions(ASN1Writer & writer)
+{
+    ReturnErrorOnFailure(EncodeIsCAExtension(kNotCACert, writer));
+    ReturnErrorOnFailure(EncodeKeyUsageExtension(KeyUsageFlags::kDigitalSignature, writer));
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR EncodeFutureExtension(const Optional<FutureExtension> & futureExt, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -242,7 +249,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR EncodeExtensions(bool isCA, const Crypto::P256PublicKey & SKI, const Crypto::P256PublicKey & AKI,
+CHIP_ERROR EncodeExtensions(CertType certType, const Crypto::P256PublicKey & SKI, const Crypto::P256PublicKey & AKI,
                             const Optional<FutureExtension> & futureExt, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -251,15 +258,31 @@ CHIP_ERROR EncodeExtensions(bool isCA, const Crypto::P256PublicKey & SKI, const 
     {
         ASN1_START_SEQUENCE
         {
-            if (isCA)
+            switch (certType)
             {
+            case CertType::kICA:
+            case CertType::kRoot: {
                 ReturnErrorOnFailure(EncodeCASpecificExtensions(writer));
+                break;
             }
-            else
-            {
+            case CertType::kNode: {
                 ReturnErrorOnFailure(EncodeNOCSpecificExtensions(writer));
+                break;
             }
-
+            case CertType::kVidVerificationSigner: {
+                ReturnErrorOnFailure(EncodeVendorIdVerificationSignerSpecificExtensions(writer));
+                break;
+            }
+            case CertType::kFirmwareSigning:
+            case CertType::kNetworkIdentity: {
+                // Nothing to encode extra for those.
+                break;
+            }
+            default: {
+                // Unknown/invalid certificate type should not happen.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            }
             ReturnErrorOnFailure(EncodeSubjectKeyIdentifierExtension(SKI, writer));
 
             ReturnErrorOnFailure(EncodeAuthorityKeyIdentifierExtension(AKI, writer));
@@ -314,14 +337,12 @@ CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Cryp
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CertType certType;
-    bool isCA;
 
     VerifyOrReturnError(requestParams.SerialNumber >= 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(requestParams.ValidityEnd == kNullCertTime || requestParams.ValidityEnd >= requestParams.ValidityStart,
                         CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(requestParams.SubjectDN.GetCertType(certType));
-    isCA = (certType == CertType::kICA || certType == CertType::kRoot);
 
     ASN1_START_SEQUENCE
     {
@@ -353,7 +374,7 @@ CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Cryp
         ReturnErrorOnFailure(EncodeSubjectPublicKeyInfo(subjectPubkey, writer));
 
         // certificate extensions
-        ReturnErrorOnFailure(EncodeExtensions(isCA, subjectPubkey, issuerPubkey, requestParams.FutureExt, writer));
+        ReturnErrorOnFailure(EncodeExtensions(certType, subjectPubkey, issuerPubkey, requestParams.FutureExt, writer));
     }
     ASN1_END_SEQUENCE;
 
@@ -472,6 +493,21 @@ DLL_EXPORT CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams
 
     ReturnErrorOnFailure(requestParams.IssuerDN.GetCertType(certType));
     VerifyOrReturnError(certType == CertType::kRoot, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return NewChipX509Cert(requestParams, subjectPubkey, issuerKeypair, x509Cert);
+}
+
+CHIP_ERROR NewVidVerificationSignerX509Cert(const X509CertRequestParams & requestParams,
+                                            const Crypto::P256PublicKey & subjectPubkey, const Crypto::P256Keypair & issuerKeypair,
+                                            MutableByteSpan & x509Cert)
+{
+    CertType certType;
+
+    ReturnErrorOnFailure(requestParams.SubjectDN.GetCertType(certType));
+    VerifyOrReturnError(certType == CertType::kVidVerificationSigner, CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(requestParams.IssuerDN.GetCertType(certType));
+    VerifyOrReturnError((certType == CertType::kICA) || (certType == CertType::kRoot), CHIP_ERROR_INVALID_ARGUMENT);
 
     return NewChipX509Cert(requestParams, subjectPubkey, issuerKeypair, x509Cert);
 }

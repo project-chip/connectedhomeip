@@ -50,7 +50,6 @@
 namespace chip {
 namespace System {
     namespace {
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         struct TimerCompleteBlockCallbackContext {
             dispatch_block_t block;
         };
@@ -63,7 +62,17 @@ namespace System {
             }
             delete ctx;
         }
-#endif
+
+        void MaybeCancelTimerCompleteBlockCallbackContext(TimerList::Node * timer)
+        {
+            VerifyOrReturn(nullptr != timer);
+
+            __auto_type & cb = timer->GetCallback();
+            VerifyOrReturn(cb.GetOnComplete() == TimerCompleteBlockCallback);
+
+            __auto_type * ctx = static_cast<TimerCompleteBlockCallbackContext *>(cb.GetAppState());
+            delete ctx;
+        }
     }
 
     void LayerImplDispatch::EnableTimer(const char * source, TimerList::Node * timer)
@@ -112,6 +121,7 @@ namespace System {
 
         TimerList::Node * timer;
         while ((timer = mTimerList.PopEarliest()) != nullptr) {
+            MaybeCancelTimerCompleteBlockCallbackContext(timer);
             DisableTimer(__func__, timer);
         }
         mTimerPool.ReleaseAll();
@@ -152,6 +162,18 @@ namespace System {
         ChipLogError(Inet, "%s (onComplete: %p - appState: %p)", __func__, onComplete, appState);
 #endif
         return StartTimer(System::Clock::kZero, onComplete, appState, false /* shouldCancel */);
+    }
+
+    CHIP_ERROR LayerImplDispatch::StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay)
+    {
+        assertChipStackLockedByCurrentThread();
+
+        VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * ctx = new TimerCompleteBlockCallbackContext { block };
+        VerifyOrReturnError(nullptr != ctx, CHIP_ERROR_NO_MEMORY);
+
+        return StartTimer(delay, TimerCompleteBlockCallback, ctx);
     }
 
     CHIP_ERROR LayerImplDispatch::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
@@ -264,7 +286,9 @@ namespace System {
         }
         VerifyOrReturn(timer != nullptr);
 
+        MaybeCancelTimerCompleteBlockCallbackContext(timer);
         DisableTimer(__func__, timer);
+
         mTimerPool.Release(timer);
     }
 

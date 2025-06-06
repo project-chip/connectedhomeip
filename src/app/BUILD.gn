@@ -272,6 +272,7 @@ static_library("interaction-model") {
       ":global-attributes",
       "${chip_root}/src/access",
       "${chip_root}/src/access:provider-impl",
+      "${chip_root}/src/app:required-privileges",
       "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/app/common:attribute-type",
     ]
@@ -341,6 +342,25 @@ source_set("required-privileges") {
 
     public_configs = [ ":config-controller-dynamic-server" ]
   }
+
+  # These files are for CODE GENERATION ONLY, so technically
+  # CodegenDataModelProvider should be the only one using this. Since CodegenDataModelProvider
+  # is part of application code, the visibility is broad. However generally DO NOT USE THIS
+  # unless you are creating a new CodegenDataModelProvider based item
+  visibility = [
+    "//:*",  # Top-level apps (e.g. //:bouffalolab-lighting does this)
+    "${chip_root}/examples/*",
+    "${chip_root}/src/app/util/*",
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/data-model-providers/codegen/*",
+  ]
+
+  # We still have some strong coupling in this case
+  # Eventually dynamic server should be replaced with code-driven and not try
+  # to fake out ember codegen
+  if (chip_build_controller_dynamic_server) {
+    visibility += [ ":interaction-model" ]
+  }
 }
 
 source_set("status-response") {
@@ -403,7 +423,6 @@ source_set("command-handler-impl") {
   public_deps = [
     ":command-handler-interface",
     ":paths",
-    ":required-privileges",
     ":status-response",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
