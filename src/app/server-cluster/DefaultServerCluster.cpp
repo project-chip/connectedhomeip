@@ -74,9 +74,6 @@ Span<const DataModel::AttributeEntry> DefaultServerCluster::GlobalAttributes()
 
 DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path)
 {
-    // SPEC - 7.10.3. Cluster Data Version
-    //   A cluster data version SHALL be initialized randomly when it is first published.
-    mDataVersion = Crypto::GetRandU32();
 }
 
 CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder)
@@ -88,7 +85,13 @@ CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, Re
 CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext & context)
 {
     VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
+
     mContext = &context;
+
+    // SPEC - 7.10.3. Cluster Data Version
+    //   A cluster data version SHALL be initialized randomly when it is first published.
+    mDataVersion = Crypto::GetRandU32();
+
     return CHIP_NO_ERROR;
 }
 
