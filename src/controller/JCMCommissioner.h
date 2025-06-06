@@ -38,6 +38,8 @@ namespace chip {
 
 namespace Controller {
 
+namespace JCM {
+
 /*
  * JCMDeviceCommissioner is a class that handles the Joint Commissioning Management (JCM) process
  * for commissioning Joint Fabric Administrator devices in a CHIP network. It extends the DeviceCommissioner class and
@@ -50,7 +52,7 @@ public:
     JCMDeviceCommissioner(){}
     ~JCMDeviceCommissioner(){}
 
-    void RegisterTrustVerificationDelegate(std::shared_ptr<JCMTrustVerificationDelegate> trustVerificationDelegate)
+    void RegisterTrustVerificationDelegate(JCMTrustVerificationDelegate * trustVerificationDelegate)
     {
         ChipLogProgress(Controller, "JCM: Setting trust verification delegate");
         mTrustVerificationDelegate = trustVerificationDelegate;
@@ -61,10 +63,9 @@ public:
      * It is called by the commissioning client to start the trust verification process.
      * The method will return an error if the device proxy is null or if the trust verification process fails.
      * 
-     * @param proxy The DeviceProxy for the device being commissioned.
      * @return CHIP_ERROR indicating success or failure of the operation.
      */
-    CHIP_ERROR StartJCMTrustVerification(DeviceProxy * proxy) override;
+    CHIP_ERROR StartJCMTrustVerification() override;
     
     /*
      * ContinueAfterUserConsent is a method that continues the JCM trust verification process after the user has
@@ -75,6 +76,14 @@ public:
      */
     void ContinueAfterUserConsent(bool consent);
 
+    /*
+     * ContinueAfterVendorIDVerification is a method that continues the JCM trust verification process after the
+     * vendor ID verification step. It will call the trust verification delegate to continue the process.
+     * 
+     * @param verified A boolean indicating whether the vendor ID verification was successful (true) or not (false).
+     */
+    void ContinueAfterVendorIDVerification(bool verified);
+   
 protected:
     // Override ParseExtraCommissioningInfo to parse JCM administrator info
     CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info) override;
@@ -87,14 +96,14 @@ private:
     CHIP_ERROR ParseOperationalCredentials(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTrustedRoot(ReadCommissioningInfo & info);
 
-    // Move to next JCM commissioning step
-    void AdvanceTrustVerificationStage(JCMTrustVerificationResult result);
-
     // JCM commissioning trust verification steps
-    void VerifyAdministratorEndpointAndFabricIndex();
-    void VerifyNOCContainsAdministratorCAT();
-    void PerformVendorIDVerificationProcedure();
-    void AskUserForConsent();
+    JCMTrustVerificationError VerifyAdministratorInformation();
+    JCMTrustVerificationError PerformVendorIDVerificationProcedure();
+    JCMTrustVerificationError AskUserForConsent();
+
+    JCMTrustVerificationStage GetNextTrustVerificationStage(JCMTrustVerificationStage currentStage);
+    void PerformTrustVerificationStage(JCMTrustVerificationStage nextStage);
+    void TrustVerificationStageFinished(JCMTrustVerificationStage completedStage, JCMTrustVerificationError error);
 
     /*
      * OnTrustVerificationComplete is a callback method that is called when the JCM trust verification process is complete.
@@ -102,16 +111,10 @@ private:
      * 
      * @param result The result of the JCM trust verification process.
      */
-    void OnTrustVerificationComplete(JCMTrustVerificationResult result);
-
-    // Initial stage
-    JCMTrustVerificationStage mNextStage = JCMTrustVerificationStage::kIdle;
+    virtual void OnTrustVerificationComplete(JCMTrustVerificationError error);
 
     // Trust verification delegate for the commissioning client
-    std::shared_ptr<JCMTrustVerificationDelegate> mTrustVerificationDelegate = nullptr;
-
-    // Device proxy for the device being commissioned
-    DeviceProxy * mDeviceProxy = nullptr;
+    JCMTrustVerificationDelegate * mTrustVerificationDelegate = nullptr;
 
     // JCM trust verification info
     // This structure contains the information needed for JCM trust verification
@@ -150,5 +153,6 @@ private:
     std::vector<app::AttributePathParams> mTempReadPaths;
 };
 
+} // namespace JCM
 } // namespace Controller
 } // namespace chip

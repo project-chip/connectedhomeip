@@ -20,7 +20,6 @@
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
-#include <lib/support/AllocatorUtils.h>
 #include <lib/support/SafeInt.h>
 
 #include <cstring>
@@ -801,14 +800,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kSendPAICertificateRequest: {
             auto reportPAISpan = report.Get<RequestedCertificate>().certificate;
 
-            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mPAI, reportPAISpan));
+            mPAI.CopyFromSpan(reportPAISpan);
             mParams.SetPAI(mPAI.Span());
             break;
         }
         case CommissioningStage::kSendDACCertificateRequest: {
             auto reportDACSpan = report.Get<RequestedCertificate>().certificate;
 
-            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mDAC, reportDACSpan));
+            mDAC.CopyFromSpan(reportDACSpan);
             mParams.SetDAC(ByteSpan(mDAC.Span()));
             break;
         }

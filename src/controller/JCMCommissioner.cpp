@@ -16,15 +16,14 @@
  */
 
 #include "JCMCommissioner.h"
-
 #include "JCMTrustVerification.h"
 #include <controller/CommissioningDelegate.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
+#include <credentials/CHIPCert.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/AllocatorUtils.h>
 #include <controller/JCMCommissioner.h>
 #include <credentials/CHIPCert.h>
 
@@ -34,56 +33,49 @@ using namespace chip::app::Clusters;
 
 namespace chip {
 namespace Controller {
+namespace JCM {
 
 /*
  * JCMDeviceCommissioner public interface and override implementation    
  */
-CHIP_ERROR JCMDeviceCommissioner::StartJCMTrustVerification(DeviceProxy * proxy)
+CHIP_ERROR JCMDeviceCommissioner::StartJCMTrustVerification()
 {
+    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+
     ChipLogProgress(Controller, "JCM: Starting Trust Verification");
-
-    VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    mNextStage = JCMTrustVerificationStage::kStarted;
-    mDeviceProxy = proxy;
-
-    AdvanceTrustVerificationStage(JCMTrustVerificationResult::kSuccess);
+    
+    TrustVerificationStageFinished(JCMTrustVerificationStage::kIdle, error);
+    if (error != JCMTrustVerificationError::kSuccess)
+    {
+        ChipLogError(Controller, "JCM: Failed to start Trust Verification: %s", enumToString(error).c_str());
+        return CHIP_ERROR_INTERNAL;
+    }
     
     return CHIP_NO_ERROR;  
 }
 
-void JCMDeviceCommissioner::OnTrustVerificationComplete(JCMTrustVerificationResult result)
-{
-    if (result == JCMTrustVerificationResult::kSuccess)
-    {
-        ChipLogProgress(Controller, "JCM: Administrator Device passed JCM Trust Verification");
-
-        CommissioningStageComplete(CHIP_NO_ERROR);
-    }
-    else
-    {
-        ChipLogError(Controller, "JCM: Failed in verifying 'JCM Trust Verification': err %hu",
-                     static_cast<uint16_t>(result));
-
-        CommissioningDelegate::CommissioningReport report;
-        report.Set<JCMTrustVerificationError>(result);
-
-        CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
-    }
-}
-
 void JCMDeviceCommissioner::ContinueAfterUserConsent(bool consent)
 {
-    if (consent)
+    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+
+    if (!consent)
     {
-        ChipLogProgress(Controller, "JCM: User consent granted");
-        AdvanceTrustVerificationStage(JCMTrustVerificationResult::kSuccess);
+        error = JCMTrustVerificationError::kUserDeniedConsent;
     }
-    else
+
+    TrustVerificationStageFinished(JCMTrustVerificationStage::kAskingUserForConsent, error);
+}
+
+void JCMDeviceCommissioner::ContinueAfterVendorIDVerification(bool verified)
+{
+    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+
+    if (!verified)
     {
-        ChipLogError(Controller, "JCM: User denied consent");
-        AdvanceTrustVerificationStage(JCMTrustVerificationResult::KUserDeniedConsent);
+        error = JCMTrustVerificationError::kVendorIdVerificationFailed;
     }
+
+    TrustVerificationStageFinished(JCMTrustVerificationStage::kPerformingVendorIDVerification, error);
 }
 
 CHIP_ERROR JCMDeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommissioningInfo & info)
@@ -112,7 +104,27 @@ CHIP_ERROR JCMDeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommiss
         return CHIP_NO_ERROR;
     });
 
-    return err;
+    if( err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "JCM: Failed to parse Administrator Fabric Index: %s", err.AsString());
+        return err;
+    }
+
+    if (mInfo.adminFabricIndex == kUndefinedFabricIndex)
+    {
+        ChipLogError(Controller, "JCM: Invalid Fabric Index");
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    if(mInfo.adminEndpointId == kInvalidEndpointId)
+    {
+        ChipLogError(Controller, "JCM: Invalid Endpoint ID");
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    ChipLogProgress(Controller, "JCM: Successfully parsed the Administrator Fabric Index and Endpoint ID");
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningInfo & info)
@@ -127,12 +139,18 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
             case Fabrics::Id: {
                 Fabrics::TypeInfo::DecodableType fabrics;
                 ReturnErrorOnFailure(attributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
-                bool foundMatchingFabricIndex = false;
 
                 auto iter = fabrics.begin();
                 while (iter.Next())
                 {
                     auto & fabricDescriptor = iter.GetValue();
+
+                    if (fabricDescriptor.VIDVerificationStatement.HasValue())
+                    {
+                        ChipLogError(Controller, "JCM: Per-home RCAC are not supported by JF for now!");
+                        return CHIP_ERROR_CANCELLED;
+                    }
+
                     if (fabricDescriptor.fabricIndex != kUndefinedFabricIndex)
                     {
                         if (fabricDescriptor.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
@@ -141,26 +159,15 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
                             return CHIP_ERROR_KEY_NOT_FOUND;
                         }
 
-                        mInfo.rootKeySpan = fabricDescriptor.rootPublicKey;
+                        mInfo.rootPublicKey = fabricDescriptor.rootPublicKey;
                         mInfo.adminVendorId = fabricDescriptor.vendorID;
                         mInfo.adminFabricId = fabricDescriptor.fabricID;
 
-                        if (fabricDescriptor.VIDVerificationStatement.HasValue())
-                        {
-                            ChipLogError(Controller, "JCM: Per-home RCAC are not supported by JF for now!");
-                            return CHIP_ERROR_CANCELLED;
-                        }
-
-                        foundMatchingFabricIndex = true;
                         ChipLogProgress(Controller, "JCM: Successfully parsed the Administrator Fabric Table");
                         break;
                     }
                 }
 
-                if (!foundMatchingFabricIndex)
-                {
-                    return CHIP_ERROR_NOT_FOUND;
-                }
                 return CHIP_NO_ERROR;
             }
             case NOCs::Id: {
@@ -174,12 +181,12 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
 
                     if (nocStruct.fabricIndex == mInfo.adminFabricIndex)
                     {
-                        ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mInfo.adminNOC, nocStruct.noc));
+                        mInfo.adminNOC.CopyFromSpan(nocStruct.noc);
 
                         if (!nocStruct.icac.IsNull())
                         {
                             auto icac = nocStruct.icac.Value();
-                            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mInfo.adminICAC, icac));
+                            mInfo.adminICAC.CopyFromSpan(icac);
                         }
                         else
                         {
@@ -199,7 +206,33 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
         return CHIP_NO_ERROR;
     });
 
-    return err;
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "JCM: Failed to parse Operational Credentials: %s", err.AsString());
+        return err;
+    }
+
+    if (mInfo.rootPublicKey.empty())
+    {
+        ChipLogError(Controller, "JCM: Root key span is empty!");
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
+
+    if (mInfo.adminNOC.AllocatedSize() == 0)
+    {
+        ChipLogError(Controller, "JCM: Administrator NOC is empty!");
+        return CHIP_ERROR_CERT_NOT_FOUND;
+    }
+
+    if (mInfo.adminICAC.AllocatedSize() == 0)
+    {
+        ChipLogError(Controller, "JCM: Administrator ICAC is empty!");
+        return CHIP_ERROR_CERT_NOT_FOUND;
+    }
+
+    ChipLogProgress(Controller, "JCM: Successfully parsed the Operational Credentials");
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
@@ -208,55 +241,65 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
 
     CHIP_ERROR err = attributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &attributeCache](const ConcreteAttributePath & path) {
         using namespace chip::app::Clusters::OperationalCredentials::Attributes;
-        bool foundMatchingRcac = false;
 
         switch (path.mAttributeId)
         {
             case TrustedRootCertificates::Id: {
+                bool foundMatchingRcac = false;
                 TrustedRootCertificates::TypeInfo::DecodableType trustedCAs;
                 ReturnErrorOnFailure(attributeCache->Get<TrustedRootCertificates::TypeInfo>(path, trustedCAs));
 
-                   auto iter = trustedCAs.begin();
-                   while (iter.Next())
-                   {
-                       auto & trustedCA = iter.GetValue();
-                       Credentials::P256PublicKeySpan trustedCAPublicKeySpan;
+                auto iter = trustedCAs.begin();
+                while (iter.Next())
+                {
+                    auto & trustedCA = iter.GetValue();
+                    Credentials::P256PublicKeySpan trustedCAPublicKeySpan;
 
-                       ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(trustedCA, trustedCAPublicKeySpan));
-                       Crypto::P256PublicKey trustedCAPublicKey{ trustedCAPublicKeySpan };
+                    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(trustedCA, trustedCAPublicKeySpan));
+                    Crypto::P256PublicKey trustedCAPublicKey{ trustedCAPublicKeySpan };
 
-                       if (mInfo.rootKeySpan.size() != Crypto::kP256_PublicKey_Length)
-                       {
-                           ChipLogError(Controller, "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
-                           return CHIP_ERROR_KEY_NOT_FOUND;
-                       }
+                    if (mInfo.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
+                    {
+                        ChipLogError(Controller, "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
+                        return CHIP_ERROR_KEY_NOT_FOUND;
+                    }
 
-                       Credentials::P256PublicKeySpan rootPubKeySpan(mInfo.rootKeySpan.data());
-                       Crypto::P256PublicKey fabricTableRootPublicKey{ rootPubKeySpan };
+                    Credentials::P256PublicKeySpan rootPubKeySpan(mInfo.rootPublicKey.data());
+                    Crypto::P256PublicKey fabricTableRootPublicKey{ rootPubKeySpan };
 
-                       if (trustedCAPublicKey.Matches(fabricTableRootPublicKey) && trustedCA.size())
-                       {
-                            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mInfo.adminRCAC, trustedCA));
-                           
-                            foundMatchingRcac = true;
-                            break;
-                       }
-                   }
+                    if (trustedCAPublicKey.Matches(fabricTableRootPublicKey) && trustedCA.size())
+                    {
+                        mInfo.adminRCAC.CopyFromSpan(trustedCA);
 
-                   if (!foundMatchingRcac)
-                   {
-                       ChipLogError(Controller, "JCM: Cannot find a matching RCAC!");
-                       return CHIP_ERROR_CERT_NOT_FOUND;
-                   }
-                   return CHIP_NO_ERROR;
-               }
-               default:
-                   return CHIP_NO_ERROR;
+                        foundMatchingRcac = true;
+                        break;
+                    }
+                }
+                if (!foundMatchingRcac)
+                {
+                    return CHIP_ERROR_CERT_NOT_FOUND;
+                }
+                return CHIP_NO_ERROR;
+            }
+            default:
+                return CHIP_NO_ERROR;
            }
            return CHIP_NO_ERROR;
     });
 
-    return err;
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "JCM: Failed to parse Trusted Root Certificates: %s", err.AsString());
+        return err;
+    }
+
+    if (mInfo.adminRCAC.AllocatedSize() == 0)
+    {
+        ChipLogError(Controller, "JCM: Did not find a matching RCAC!");
+        return CHIP_ERROR_CERT_NOT_FOUND;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningInfo & info)
@@ -282,28 +325,36 @@ CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningI
     err = ParseTrustedRoot(info);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "JCM: Failed to find Operational Credentials");
+        ChipLogError(Controller, "JCM: Failed to find Trusted Root Certificate");
         return err;
     }
 
     return err;
 }
 
-void JCMDeviceCommissioner::VerifyAdministratorEndpointAndFabricIndex()
+JCMTrustVerificationError JCMDeviceCommissioner::VerifyAdministratorInformation()
 {
     ChipLogProgress(Controller, "JCM: Verify joint fabric administrator endpoint and fabric index");
 
     if (mInfo.adminEndpointId == kInvalidEndpointId)
     {
         ChipLogError(Controller, "JCM: Administrator endpoint ID not found!");
-        AdvanceTrustVerificationStage(JCMTrustVerificationResult::kJoineeNotAnAdministrator);
-        return;
+        return JCMTrustVerificationError::kInvalidAdministratorEndpointId;
     }
+
     if (mInfo.adminFabricIndex == kUndefinedFabricIndex)
     {
         ChipLogError(Controller, "JCM: Administrator fabric index not found!");
-        AdvanceTrustVerificationStage(JCMTrustVerificationResult::kJoineeNotAnAdministrator);
-        return;
+        return JCMTrustVerificationError::kInvalidAdministratorFabricIndex;
+    }
+
+    CATValues cats;
+    auto nocSpan = mInfo.adminNOC.GetSpan();
+    Credentials::ExtractCATsFromOpCert(nocSpan, cats);
+
+    if (!cats.ContainsIdentifier(kAdminCATIdentifier))
+    {
+        return JCMTrustVerificationError::kInvalidAdministratorCAT;
     }
 
     ChipLogProgress(Controller, "JCM: Administrator endpoint ID: %d", mInfo.adminEndpointId);
@@ -311,87 +362,150 @@ void JCMDeviceCommissioner::VerifyAdministratorEndpointAndFabricIndex()
     ChipLogProgress(Controller, "JCM: Administrator vendor ID: %d", mInfo.adminVendorId);
     ChipLogProgress(Controller, "JCM: Administrator fabric ID: %ld", mInfo.adminFabricId);
 
-    AdvanceTrustVerificationStage(JCMTrustVerificationResult::kSuccess);
+    return JCMTrustVerificationError::kSuccess;
 }
 
-void JCMDeviceCommissioner::PerformVendorIDVerificationProcedure()
+JCMTrustVerificationError JCMDeviceCommissioner::PerformVendorIDVerificationProcedure()
 {
     ChipLogProgress(Controller, "Performing Vendor ID Verification Procedure");
 
-    // TODO: Implement the Vendor ID verification procedure
+    if (mTrustVerificationDelegate == nullptr)
+    {
+        ChipLogError(Controller, "JCM: TrustVerificationDelegate is not set");
+        return JCMTrustVerificationError::kTrustVerificationDelegateNotSet; // Indicate that the delegate is not set
+    }
 
-    AdvanceTrustVerificationStage(JCMTrustVerificationResult::kSuccess);
+    mTrustVerificationDelegate->OnVerifyVendorId(*this, mInfo);
+    return JCMTrustVerificationError::kAsync; // Indicate that this is an async operation
 }
 
-void JCMDeviceCommissioner::VerifyNOCContainsAdministratorCAT()
-{
-    ChipLogProgress(Controller, "JCM: Verifying NOC contains Administrator CAT");
 
-    // TODO: Implement the verification of NOC containing Administrator CAT
-
-    AdvanceTrustVerificationStage(JCMTrustVerificationResult::kSuccess);
-}
-
-void JCMDeviceCommissioner::AskUserForConsent()
+JCMTrustVerificationError JCMDeviceCommissioner::AskUserForConsent()
 {
     ChipLogProgress(Controller, "JCM: Asking user for consent");
-    if (mTrustVerificationDelegate != nullptr)
+    if (mTrustVerificationDelegate == nullptr)
     {
-        VendorId vendorId = static_cast<VendorId>(mInfo.adminVendorId);
-        mTrustVerificationDelegate->OnAskUserForConsent(*this, vendorId);
-    } else {
         ChipLogError(Controller, "JCM: TrustVerificationDelegate is not set");
-        AdvanceTrustVerificationStage(JCMTrustVerificationResult::kTrustVerificationDelegateNotSet);
+        return JCMTrustVerificationError::kTrustVerificationDelegateNotSet; // Indicate that the delegate is not set
+    }
+
+    mTrustVerificationDelegate->OnAskUserForConsent(*this, mInfo);
+    return JCMTrustVerificationError::kAsync; // Indicate that this is an async operation
+}
+
+void JCMDeviceCommissioner::PerformTrustVerificationStage(JCMTrustVerificationStage nextStage)
+{
+    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+
+    switch (nextStage)
+    {
+        case JCMTrustVerificationStage::kVerifyingAdministratorInformation:
+            error = VerifyAdministratorInformation();
+            break;
+        case JCMTrustVerificationStage::kPerformingVendorIDVerification:
+            error = PerformVendorIDVerificationProcedure();
+            break;
+        case JCMTrustVerificationStage::kAskingUserForConsent:
+            error = AskUserForConsent();
+            break;
+        case JCMTrustVerificationStage::kComplete:
+            error = JCMTrustVerificationError::kSuccess;
+            break;
+        case JCMTrustVerificationStage::kError:
+            error = JCMTrustVerificationError::kInternalError;
+            break;
+        default:
+            ChipLogError(Controller, "JCM: Invalid stage: %d", static_cast<int>(nextStage));
+            error = JCMTrustVerificationError::kInternalError;
+            break;
+    }
+
+    if (error != JCMTrustVerificationError::kAsync)
+    {
+        TrustVerificationStageFinished(nextStage, error);
     }
 }
 
-void JCMDeviceCommissioner::AdvanceTrustVerificationStage(JCMTrustVerificationResult result)
+void JCMDeviceCommissioner::TrustVerificationStageFinished(JCMTrustVerificationStage completedStage, JCMTrustVerificationError error)
 {
+    ChipLogProgress(Controller, "JCM: Trust Verification Stage Finished: %s", enumToString(completedStage).c_str());
+
     if (mTrustVerificationDelegate != nullptr)
     {
-        mTrustVerificationDelegate->OnProgressUpdate(*this, mNextStage, result);
+        mTrustVerificationDelegate->OnProgressUpdate(*this, completedStage, error);
     }
-    
-    if (result != JCMTrustVerificationResult::kSuccess)
+
+    if (error != JCMTrustVerificationError::kSuccess)
     {
-        // Handle error
-        ChipLogError(Controller, "JCM: Error in Trust Verification: %d", static_cast<int>(result));
-        OnTrustVerificationComplete(result);
+        OnTrustVerificationComplete(error);
         return;
     }
 
-    switch (mNextStage)
+    if (completedStage == JCMTrustVerificationStage::kComplete || completedStage == JCMTrustVerificationStage::kError)
     {
-        case chip::Controller::JCMTrustVerificationStage::kStarted:
-            mNextStage = JCMTrustVerificationStage::kVerifyingAdministratorEndpointAndFabricIndex;
-            VerifyAdministratorEndpointAndFabricIndex();
+        ChipLogProgress(Controller, "JCM: Trust Verification already complete or error");
+        OnTrustVerificationComplete(error);
+        return;
+    }
+
+    auto nextStage = GetNextTrustVerificationStage(completedStage);
+    if (nextStage == JCMTrustVerificationStage::kError)
+    {
+        OnTrustVerificationComplete(JCMTrustVerificationError::kInternalError);
+        return;
+    }
+
+    PerformTrustVerificationStage(nextStage);
+}
+
+JCMTrustVerificationStage JCMDeviceCommissioner::GetNextTrustVerificationStage(JCMTrustVerificationStage currentStage)
+{
+    JCMTrustVerificationStage nextStage = JCMTrustVerificationStage::kIdle;
+
+    switch (currentStage)
+    {
+        case JCMTrustVerificationStage::kIdle:
+            nextStage = JCMTrustVerificationStage::kVerifyingAdministratorInformation;
             break;
-        case JCMTrustVerificationStage::kVerifyingAdministratorEndpointAndFabricIndex:
-            mNextStage = JCMTrustVerificationStage::kPerformingVendorIDVerificationProcedure;
-            PerformVendorIDVerificationProcedure();
+        case JCMTrustVerificationStage::kVerifyingAdministratorInformation:
+            nextStage = JCMTrustVerificationStage::kPerformingVendorIDVerification;
             break;
-        case JCMTrustVerificationStage::kPerformingVendorIDVerificationProcedure:
-            mNextStage = JCMTrustVerificationStage::kVerifyingNOCContainsAdministratorCAT;
-            VerifyNOCContainsAdministratorCAT();
-            break;
-        case JCMTrustVerificationStage::kVerifyingNOCContainsAdministratorCAT:
-            mNextStage = JCMTrustVerificationStage::kAskingUserForConsent;
-            AskUserForConsent();
+        case JCMTrustVerificationStage::kPerformingVendorIDVerification:
+            nextStage = JCMTrustVerificationStage::kAskingUserForConsent;
             break;
         case JCMTrustVerificationStage::kAskingUserForConsent:
-            mNextStage = JCMTrustVerificationStage::kIdle;
-            OnTrustVerificationComplete(result);
+            nextStage = JCMTrustVerificationStage::kComplete;
             break;
         default:
-            ChipLogError(Controller, "JCM: Invalid stage: %d", static_cast<int>(mNextStage));
-            OnTrustVerificationComplete(JCMTrustVerificationResult::kInternalError);
+            ChipLogError(Controller, "JCM: Invalid stage: %d", static_cast<int>(currentStage));
+            nextStage = JCMTrustVerificationStage::kError;
             break;
+    }
+
+    return nextStage;
+}
+
+void JCMDeviceCommissioner::OnTrustVerificationComplete(JCMTrustVerificationError error)
+{
+    if (error == JCMTrustVerificationError::kSuccess)
+    {
+        ChipLogProgress(Controller, "JCM: Administrator Device passed JCM Trust Verification");
+
+        CommissioningStageComplete(CHIP_NO_ERROR);
+    }
+    else
+    {
+        ChipLogError(Controller, "JCM: Failed in verifying JCM Trust Verification: err %s", enumToString(error).c_str());
+
+        CommissioningDelegate::CommissioningReport report;
+        report.Set<JCMTrustVerificationError>(error);
+
+        CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
     }
 }
 
 void JCMDeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
-    mNextStage = JCMTrustVerificationStage::kIdle;
     mInfo.Cleanup();
 
     DeviceCommissioner::CleanupCommissioning(proxy, nodeId, completionStatus);
@@ -426,5 +540,6 @@ void JCMAutoCommissioner::CleanupCommissioning()
     AutoCommissioner::CleanupCommissioning();
 }
 
+} // namespace JCM
 } // namespace Controller
 } // namespace chip

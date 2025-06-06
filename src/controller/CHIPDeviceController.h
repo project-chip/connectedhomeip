@@ -862,7 +862,7 @@ protected:
 
     /* This function start the JCM verification steps
      */
-    virtual CHIP_ERROR StartJCMTrustVerification(DeviceProxy * device) { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR StartJCMTrustVerification() { return CHIP_NO_ERROR; };
 
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;

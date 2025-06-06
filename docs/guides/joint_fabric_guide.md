@@ -1,9 +1,12 @@
 # Joint Fabric Guide
 
--   [Joint Fabric Guide](#joint-fabric-guide)
-    -   [Joint Fabric Example Applications](#joint-fabric-example-applications)
-        -   [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
-        -   [Run Joint Fabric Demo](#run-joint-fabric-demo)
+- [Joint Fabric Guide](#joint-fabric-guide)
+  - [Joint Fabric Example Applications](#joint-fabric-example-applications)
+    - [Building the Example Application](#building-the-example-application)
+  - [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
+    - [Initialize Ecosystem A (Vendor ID = 0xFFF1)](#initialize-ecosystem-a-vendor-id--0xfff1)
+    - [Initialize Ecosystem B (Vendor ID = 0xFFF2)](#initialize-ecosystem-b-vendor-id--0xfff2)
+  - [Manually Testing JCM (Joint Commissioning Method)](#manually-testing-jcm-joint-commissioning-method)
 
 ## Joint Fabric Example Applications
 
@@ -178,7 +181,7 @@ $ ./jfc-app --rpc-server-port 33055 --storage-directory jfc_b_storage_directory 
 Check for the following logs on the jf-control-app side:
 
 ```
->>> [JF] Anchor Administrator commissioned with sucess
+>>> [JF] Anchor Administrator commissioned with success
 ```
 
 Make sure that the NOC issued to jf-admin-app contains an Anchor CAT and an
@@ -250,11 +253,11 @@ jf-admin-app has been installed:
 A `Subjects` field equal to `18446744065119551489` (`FFFFFFFDFFFF0001` in hex)
 should be found.
 
-## Manually Testing JCM Commissioning
+## Manually Testing JCM (Joint Commissioning Method)
 
 Execute all the initialization steps for Ecosystem A and Ecosystem B above.
 
-On JFC B
+On the Ecosystem B Joint Fabric Controller application
 
 TODO: Update the follow command to open the joint commissioning window
 
@@ -264,7 +267,7 @@ pairing open-commissioning-window 11 1 400 1000 1261
 
 Note: Capture the [manual pairing code]
 
-On JFC A
+On the Ecosystem A Joint Fabric Controller application
 
 ```
 pairing code 10 [manual pairing code] --jcm true

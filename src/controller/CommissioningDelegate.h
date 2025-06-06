@@ -876,7 +876,7 @@ public:
             RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
             AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-            ,JCMTrustVerificationError
+            ,JCM::JCMTrustVerificationError
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         >
     {
