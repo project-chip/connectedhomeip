@@ -43,6 +43,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GeneralCommi
             return TCAcknowledgementsRequired::kMetadataEntry;
         case TCUpdateDeadline::Id:
             return TCUpdateDeadline::kMetadataEntry;
+        case RecoveryIdentifier::Id:
+            return RecoveryIdentifier::kMetadataEntry;
+        case NetworkRecoveryReason::Id:
+            return NetworkRecoveryReason::kMetadataEntry;
         default:
             return AttributeEntry({}, {}, std::nullopt, std::nullopt);
         }

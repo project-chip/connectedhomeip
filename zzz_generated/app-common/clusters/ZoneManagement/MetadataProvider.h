@@ -23,14 +23,20 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ZoneManageme
         using namespace Clusters::ZoneManagement::Attributes;
         switch (attributeId)
         {
-        case SupportedZoneSources::Id:
-            return SupportedZoneSources::kMetadataEntry;
+        case MaxUserDefinedZones::Id:
+            return MaxUserDefinedZones::kMetadataEntry;
+        case MaxZones::Id:
+            return MaxZones::kMetadataEntry;
         case Zones::Id:
             return Zones::kMetadataEntry;
         case Triggers::Id:
             return Triggers::kMetadataEntry;
+        case SensitivityMax::Id:
+            return SensitivityMax::kMetadataEntry;
         case Sensitivity::Id:
             return Sensitivity::kMetadataEntry;
+        case TwoDCartesianMax::Id:
+            return TwoDCartesianMax::kMetadataEntry;
         default:
             return AttributeEntry({}, {}, std::nullopt, std::nullopt);
         }
@@ -53,6 +59,10 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ZoneMa
             return GetTwoDCartesianZone::kMetadataEntry;
         case RemoveZone::Id:
             return RemoveZone::kMetadataEntry;
+        case CreateOrUpdateTrigger::Id:
+            return CreateOrUpdateTrigger::kMetadataEntry;
+        case RemoveTrigger::Id:
+            return RemoveTrigger::kMetadataEntry;
 
         default:
             return AcceptedCommandEntry();

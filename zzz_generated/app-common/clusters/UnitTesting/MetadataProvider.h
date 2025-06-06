@@ -267,6 +267,8 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::UnitTe
             return StringEchoRequest::kMetadataEntry;
         case GlobalEchoRequest::Id:
             return GlobalEchoRequest::kMetadataEntry;
+        case TestCheckCommandFlags::Id:
+            return TestCheckCommandFlags::kMetadataEntry;
         case TestDifferentVendorMeiRequest::Id:
             return TestDifferentVendorMeiRequest::kMetadataEntry;
 
