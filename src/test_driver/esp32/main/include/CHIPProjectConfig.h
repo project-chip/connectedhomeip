@@ -30,4 +30,7 @@
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
 
+// LWIP is initialized during the platform init, not the network init.
+#define CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT 1
+
 #endif // CHIP_PROJECT_CONFIG_H
