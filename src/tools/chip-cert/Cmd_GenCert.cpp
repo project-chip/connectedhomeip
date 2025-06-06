@@ -1212,7 +1212,7 @@ bool Cmd_GenCert(int argc, char * argv[])
     if (IsChipCertFormat(gOutCertFormat) && (gCertConfig.IsErrorTestCaseEnabled() || gCertType == CertType::kNetworkIdentity))
     {
         uint32_t chipCertBufLen = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
-        auto chipCertBuf = std::make_unique<uint8_t[]>(chipCertBufLen);
+        auto chipCertBuf        = std::make_unique<uint8_t[]>(chipCertBufLen);
         chip::MutableByteSpan chipCert(chipCertBuf.get(), chipCertBufLen);
         err = MakeCertTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
                           gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);
