@@ -101,6 +101,14 @@ static_library("controller") {
     }
   }
 
+  if (chip_device_config_enable_joint_fabric) {
+    sources += [
+      "JCMCommissioner.cpp",
+      "JCMCommissioner.h",
+      "JCMTrustVerification.h",
+    ]
+  }
+
   public_deps = [
     ":interactions",
     "${chip_root}/src/app",
