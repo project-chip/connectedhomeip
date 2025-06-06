@@ -14,9 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "DnssdError.h"
 #include "DnssdImpl.h"
 #include "DnssdType.h"
-#include "MdnsError.h"
 
 #include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
