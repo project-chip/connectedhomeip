@@ -32,6 +32,6 @@ for target in out/*; do
         tar -xf "$path"/*.tar -C "$path"
 
         echo "----------------------------------------------------------------------------------------------------"
-        gdb-multiarch --batch -ex "set auto-load safe-basepath /" -ex "set sysroot ${TIZEN_SDK_SYSROOT}" -ex "bt full" "$target/$binary" "$coredump"
+        gdb-multiarch --batch -ex "set auto-load safe-basepath /" -ex "set sysroot $TIZEN_SDK_SYSROOT" -ex "bt full" "$target/$binary" "$coredump"
     done
 done
