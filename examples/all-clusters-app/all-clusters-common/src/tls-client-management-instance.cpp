@@ -23,6 +23,8 @@
 #include <tls-client-management-instance.h>
 #include <vector>
 
+static constexpr uint8_t kMaxProvisioned = 254;
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
@@ -32,18 +34,18 @@ using namespace chip::app::Clusters::TlsClientManagement;
 using namespace Protocols::InteractionModel;
 
 CHIP_ERROR TlsClientManagementCommandDelegate::GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                             size_t index, EndpointStructType & endpoint)
+                                                                             size_t index, EndpointStructType & endpoint) const
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_ERROR_INTERNAL);
 
     size_t fabricI = 0;
-    for (auto i = mProvisioned.begin(); i != mProvisioned.end(); i++)
+    for (const auto & item : mProvisioned)
     {
-        if (i->fabric == fabric)
+        if (item.fabric == fabric)
         {
             if (fabricI++ == index)
             {
-                endpoint = i->payload;
+                endpoint = item.payload;
                 return CHIP_NO_ERROR;
             }
         }
@@ -52,63 +54,69 @@ CHIP_ERROR TlsClientManagementCommandDelegate::GetProvisionedEndpointByIndex(End
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-Status TlsClientManagementCommandDelegate::ProvisionEndpoint(
+ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     EndpointId matterEndpoint, FabricIndex fabric,
     const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), Status::ConstraintError);
+    VerifyOrReturnError(matterEndpoint == EndpointId(1), ClusterStatusCode(Status::ConstraintError));
 
     if (mCertificateTable.HasRootCertificateEntry(fabric, provisionReq.caid) != CHIP_NO_ERROR)
     {
-        return Status::ConstraintError;
+        return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRootCertificateNotFound);
     }
     if (!provisionReq.ccdid.IsNull() &&
         mCertificateTable.HasClientCertificateEntry(fabric, provisionReq.ccdid.Value()) != CHIP_NO_ERROR)
     {
-        return Status::ConstraintError;
+        return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kClientCertificateNotFound);
     }
-    Provisioned * provisioned;
-    if (!provisionReq.endpointID.IsNull())
+
+    // Find existing value to update & check for port/name collisions
+    Provisioned * provisioned = nullptr;
+    for (auto & item : mProvisioned)
     {
-        // Updating existing value
-        auto i = mProvisioned.begin();
-        for (; i != mProvisioned.end(); i++)
+        const auto & endpointStruct = item.payload;
+        if (!provisionReq.endpointID.IsNull() && endpointStruct.endpointID == provisionReq.endpointID.Value())
         {
-            if (i->payload.endpointID == provisionReq.endpointID.Value())
-            {
-                break;
-            }
+            provisioned = &item;
+            continue;
         }
-        if (i == mProvisioned.end())
+        if (endpointStruct.hostname.data_equal(provisionReq.hostname) || (endpointStruct.port == provisionReq.port))
         {
-            return Status::NotFound;
-        }
-        provisioned = &*i;
-        if (provisioned->fabric != fabric)
-        {
-            return Status::ConstraintError;
+            return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kEndpointAlreadyInstalled);
         }
     }
-    else
+
+    if (provisionReq.endpointID.IsNull())
     {
+        VerifyOrReturnError(mProvisioned.size() < mTlsClientManagementServer->GetMaxProvisioned(),
+                            ClusterStatusCode(Status::ResourceExhausted));
+
         provisioned           = &mProvisioned.emplace_back();
         auto & endpointStruct = provisioned->payload;
 
         endpointStruct.endpointID = mNextId++;
+        provisioned->fabric       = fabric;
     }
-    provisioned->fabric   = fabric;
-    auto & endpointStruct = provisioned->payload;
+    // Updating existing value
+    else if (provisioned == nullptr || provisioned->fabric != fabric)
+    {
+        return ClusterStatusCode(Status::NotFound);
+    }
 
-    endpointStruct.hostname = provisionReq.hostname;
+    auto & endpointStruct = provisioned->payload;
+    MutableByteSpan hostname(provisioned->hostname);
+    CopySpanToMutableSpan(provisionReq.hostname, hostname);
+    endpointStruct.hostname = hostname;
     endpointStruct.port     = provisionReq.port;
     endpointStruct.caid     = provisionReq.caid;
     endpointStruct.ccdid    = provisionReq.ccdid;
 
-    return Status::Success;
+    return ClusterStatusCode(Status::Success);
 }
 
 Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                       uint16_t endpointID, EndpointStructType & endpoint)
+                                                                       uint16_t endpointID, EndpointStructType & endpoint,
+                                                                       MutableByteSpan & hostname) const
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), Status::ConstraintError);
 
@@ -116,7 +124,9 @@ Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointI
     {
         if (i->payload.endpointID == endpointID && i->fabric == fabric)
         {
-            endpoint = i->payload;
+            CopySpanToMutableSpan(i->payload.hostname, hostname);
+            endpoint          = i->payload;
+            endpoint.hostname = hostname;
             return Status::Success;
         }
     }
@@ -148,8 +158,8 @@ Status TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(Endpoin
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance(gCertificateTableInstance);
-static TlsClientManagementServer gTlsClientManagementClusterServerInstance =
-    TlsClientManagementServer(EndpointId(1), TlsClientManagementCommandDelegate::getInstance(), gCertificateTableInstance);
+static TlsClientManagementServer gTlsClientManagementClusterServerInstance = TlsClientManagementServer(
+    EndpointId(1), TlsClientManagementCommandDelegate::getInstance(), gCertificateTableInstance, kMaxProvisioned);
 
 void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 {

@@ -43,10 +43,11 @@ public:
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
      * @param certificateTable A reference to the certificate table for looking up certiciates
+     * @param maxProvisioned The maximum number of endpoints which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate,
-                              Tls::CertificateTable & certificateTable);
+                              Tls::CertificateTable & certificateTable, uint8_t maxProvisioned);
     ~TlsClientManagementServer();
 
     /**
@@ -60,14 +61,6 @@ public:
      * @return Returns an error if the destruction fails.
      */
     CHIP_ERROR Finish();
-
-    // Attribute Setters
-
-    /**
-     * Sets the MaxProvisioned attribute. Note, this also handles writing the new value into non-volatile storage.
-     * @param maxProvisioned The value to which maxProvisioned is to be set.
-     */
-    Protocols::InteractionModel::Status SetMaxProvisioned(uint8_t maxProvisioned);
 
     // Attribute Getters
 
@@ -90,17 +83,12 @@ private:
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
     void HandleProvisionEndpoint(HandlerContext & ctx, const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & req);
     void HandleFindEndpoint(HandlerContext & ctx, const TlsClientManagement::Commands::FindEndpoint::DecodableType & req);
     void HandleRemoveEndpoint(HandlerContext & ctx, const TlsClientManagement::Commands::RemoveEndpoint::DecodableType & req);
-
-    // Helpers
-    // Loads all the persistent attributes from the KVS.
-    void LoadPersistentAttributes();
 
     // Encodes all provisioned endpoints
     CHIP_ERROR EncodeProvisionedEndpoints(EndpointId matterEndpoint, FabricIndex fabric,
@@ -128,7 +116,7 @@ public:
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the preset types list.
      */
     virtual CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
-                                                     EndpointStructType & endpoint) = 0;
+                                                     EndpointStructType & endpoint) const = 0;
 
     /**
      * @brief Finds the TLSEndpointStruct with the given EndpointID
@@ -136,10 +124,12 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] endpointID The EndpoitnID to find.
      * @param[out] endpoint The endpoint at the given index in the list.
+     * @param[out] hostname The memory holder for the hostname field
      * @return NOT_FOUND if no mapping is found.
      */
     virtual Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                            uint16_t endpointID, EndpointStructType & endpoint) = 0;
+                                                                            uint16_t endpointID, EndpointStructType & endpoint,
+                                                                            MutableByteSpan & hostname) const = 0;
 
     /**
      * @brief Appends a TLSEndpointStruct to the provisioned endpoints list maintained by the delegate.
@@ -154,7 +144,7 @@ public:
      * @return CHIP_NO_ERROR if the endpoint was appended to the list successfully.
      * @return CHIP_ERROR if there was an error adding the endpoint to the list.
      */
-    virtual Protocols::InteractionModel::Status
+    virtual Protocols::InteractionModel::ClusterStatusCode
     ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
                       const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq,
                       uint16_t & endpointID) = 0;

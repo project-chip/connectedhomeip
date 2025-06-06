@@ -41,12 +41,16 @@ using namespace chip::app::Clusters::TlsClientManagement::Structs;
 using namespace chip::app::Clusters::TlsClientManagement::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
+static constexpr uint16_t kSpecMaxHostname = 253;
+
 TlsClientManagementServer::TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate,
-                                                     CertificateTable & certificateTable) :
+                                                     CertificateTable & certificateTable, uint8_t maxProvisioned) :
     AttributeAccessInterface(MakeOptional(endpointId), TlsClientManagement::Id),
     CommandHandlerInterface(MakeOptional(endpointId), TlsClientManagement::Id), mDelegate(delegate),
-    mCertificateTable(certificateTable), mMaxProvisioned(0)
+    mCertificateTable(certificateTable), mMaxProvisioned(maxProvisioned)
 {
+    VerifyOrDieWithMsg(mMaxProvisioned >= 5, NotSpecified, "Spec requires MaxProvisioned be >= 5");
+    VerifyOrDieWithMsg(mMaxProvisioned <= 254, NotSpecified, "Spec requires MaxProvisioned be <= 254");
     mDelegate.SetTlsClientManagementServer(this);
 }
 
@@ -64,8 +68,6 @@ CHIP_ERROR TlsClientManagementServer::Init()
 {
     mCertificateTable.Init(Server::GetInstance().GetPersistentStorage());
 
-    LoadPersistentAttributes();
-
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
@@ -76,24 +78,6 @@ CHIP_ERROR TlsClientManagementServer::Finish()
 {
     mCertificateTable.Finish();
     return CHIP_NO_ERROR;
-}
-
-void TlsClientManagementServer::LoadPersistentAttributes()
-{
-    // Load MaxProvisioned
-    uint8_t storedMaxProvisioned = 5;
-    CHIP_ERROR err               = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(GetEndpointId(), TlsClientManagement::Id, MaxProvisioned::Id), storedMaxProvisioned);
-    if (err != CHIP_NO_ERROR)
-    {
-        mMaxProvisioned = storedMaxProvisioned;
-    }
-    else
-    {
-        // otherwise defaults
-        ChipLogDetail(Zcl, "TlsClientManagement: Unable to load the MaxProvisioned attribute from the KVS. Defaulting to %u",
-                      mMaxProvisioned);
-    }
 }
 
 // AttributeAccessInterface
@@ -145,45 +129,6 @@ TlsClientManagementServer::EncodeProvisionedEndpoints(EndpointId matterEndpoint,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TlsClientManagementServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    VerifyOrDie(aPath.mClusterId == TlsClientManagement::Id);
-    Status status;
-
-    switch (aPath.mAttributeId)
-    {
-    case MaxProvisioned::Id: {
-        uint8_t newValue;
-        ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        status = SetMaxProvisioned(newValue);
-        return StatusIB(status).ToChipError();
-    }
-    default:
-        // Unknown attribute
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-}
-
-Status TlsClientManagementServer::SetMaxProvisioned(uint8_t maxProvisioned)
-{
-    bool enableChanged = mMaxProvisioned != maxProvisioned;
-
-    if (enableChanged)
-    {
-        mMaxProvisioned = maxProvisioned;
-
-        // Write new value to persistent storage.
-        auto endpointId            = GetEndpointId();
-        ConcreteAttributePath path = ConcreteAttributePath(endpointId, TlsClientManagement::Id, MaxProvisioned::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mMaxProvisioned);
-
-        // and mark as dirty
-        MatterReportingAttributeChangeCallback(path);
-    }
-
-    return Protocols::InteractionModel::Status::Success;
-}
-
 void TlsClientManagementServer::InvokeCommand(HandlerContext & ctx)
 {
     switch (ctx.mRequestPath.mCommandId)
@@ -208,11 +153,14 @@ void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx,
 {
     ChipLogDetail(Zcl, "TlsClientManagement: ProvisionEndpoint");
 
-    Commands::ProvisionEndpointResponse::Type response;
-    Status status = mDelegate.ProvisionEndpoint(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req,
-                                                response.endpointID);
+    VerifyOrReturn(req.hostname.size() >= 4 && req.hostname.size() <= kSpecMaxHostname,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    if (status == Protocols::InteractionModel::Status::Success)
+    Commands::ProvisionEndpointResponse::Type response;
+    auto status = mDelegate.ProvisionEndpoint(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req,
+                                              response.endpointID);
+
+    if (status.IsSuccess())
     {
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     }
@@ -227,7 +175,10 @@ void TlsClientManagementServer::HandleFindEndpoint(HandlerContext & ctx, const C
     ChipLogDetail(Zcl, "TlsClientManagement: FindEndpoint");
 
     Commands::FindEndpointResponse::Type response;
-    Status status = mDelegate.FindProvisionedEndpointByID(ctx.mRequestPath.mEndpointId, req.endpointID, response.endpoint);
+    std::array<uint8_t, 253> hostnameMem;
+    MutableByteSpan hostname(hostnameMem);
+    Status status = mDelegate.FindProvisionedEndpointByID(
+        ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID, response.endpoint, hostname);
 
     if (status == Protocols::InteractionModel::Status::Success)
     {

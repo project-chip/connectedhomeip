@@ -35,6 +35,7 @@ class TlsClientManagementCommandDelegate : public TlsClientManagementDelegate
     {
         FabricIndex fabric;
         EndpointStructType payload;
+        std::array<uint8_t, 253> hostname;
     };
 
     static TlsClientManagementCommandDelegate instance;
@@ -47,15 +48,16 @@ public:
     ~TlsClientManagementCommandDelegate() = default;
 
     CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
-                                             EndpointStructType & endpoint) override;
+                                             EndpointStructType & endpoint) const override;
 
-    Protocols::InteractionModel::Status
+    Protocols::InteractionModel::ClusterStatusCode
     ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
                       const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq,
                       uint16_t & endpointID) override;
 
     Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                    uint16_t endpointID, EndpointStructType & endpoint) override;
+                                                                    uint16_t endpointID, EndpointStructType & endpoint,
+                                                                    MutableByteSpan & hostname) const override;
 
     Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
                                                                       uint16_t endpointID) override;
