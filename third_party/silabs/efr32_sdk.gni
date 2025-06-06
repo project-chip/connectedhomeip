@@ -602,29 +602,6 @@ template("efr32_sdk") {
 
       if (use_wf200 || use_rs9116 || use_SiWx917) {
         import("${chip_root}/src/platform/silabs/wifi/args.gni")
-
-        defines += [ "LWIP_NETIF_API=1" ]
-        if (chip_enable_wifi_ipv4) {
-          defines += [
-            "LWIP_IPV4=1",
-
-            # adds following options to provide
-            # them to .cpp source files
-            # flags ported from lwipopts file
-            # TODO: move lwipopts to one location
-            "LWIP_ARP=1",
-            "LWIP_ICMP=1",
-            "LWIP_IGMP=1",
-            "LWIP_DHCP=1",
-          ]
-        } else {
-          defines += [ "LWIP_IPV4=0" ]
-        }
-        if (lwip_ipv6) {
-          defines += [ "LWIP_IPV6=1" ]
-        } else {
-          defines += [ "LWIP_IPV6=0" ]
-        }
       }
     }
 
