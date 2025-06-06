@@ -182,7 +182,7 @@ JNI_METHOD(void, validateAttestationInfo)
 
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
-        VerifyOrDie(dacVerifier != nullptr);)
+        VerifyOrDie(dacVerifier != nullptr);
         dacVerifier->EnableVerboseLogs(true);
 
         err = chip::Credentials::DeconstructAttestationElements(attestationElementsBytes.byteSpan(), certificationDeclarationSpan,
