@@ -30,6 +30,9 @@ using chip::app::DataModel::Nullable;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+
+
+#if CONFIG_ENABLE_PW_RPC
 using namespace chip::rpc;
 
 static std::map<ClusterId, ActionsDelegate *> gActionsDelegateMap{};
@@ -158,3 +161,4 @@ ChefRpcActionsWorker & ChefRpcActionsWorker::Instance()
 {
     return instance;
 }
+#endif // CONFIG_ENABLE_PW_RPC

@@ -25,6 +25,7 @@
 #include <utility>
 #include <vector>
 
+#ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
 
 namespace chip {
@@ -77,3 +78,4 @@ private:
 
 } // namespace app
 } // namespace chip
+#endif // CONFIG_CHIP_PW_RPC
