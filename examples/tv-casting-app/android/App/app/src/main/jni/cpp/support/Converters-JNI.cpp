@@ -79,7 +79,7 @@ jobject convertMatterErrorFromCppToJava(CHIP_ERROR inErr)
         return nullptr;
     }
 
-    return env->NewObject(jMatterErrorClass, jMatterErrorConstructor, inErr.AsInteger(), nullptr);
+    return env->NewObject(jMatterErrorClass, jMatterErrorConstructor, (jlong)(inErr.AsInteger()), nullptr);
 }
 
 jobject convertEndpointFromCppToJava(matter::casting::memory::Strong<core::Endpoint> endpoint)
