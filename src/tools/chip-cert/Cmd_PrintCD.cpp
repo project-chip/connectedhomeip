@@ -245,7 +245,7 @@ bool PrintCD(ByteSpan cd)
     VerifyOrReturnError(CMS_ExtractCDContent(cd, cdContent) == CHIP_NO_ERROR, false);
 
     signerKeyIdHexLen = 2 * static_cast<uint32_t>(signerKeyId.size()) + 1;
-    signerKeyIdHex    = std::unique_ptr<char[]>(new char[signerKeyIdHexLen]);
+    signerKeyIdHex    = std::make_unique<char[]>(signerKeyIdHexLen);
     VerifyOrReturnError(Encoding::BytesToUppercaseHexString(signerKeyId.data(), signerKeyId.size(), signerKeyIdHex.get(),
                                                             signerKeyIdHexLen) == CHIP_NO_ERROR,
                         false);

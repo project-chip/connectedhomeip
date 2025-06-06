@@ -676,7 +676,7 @@ bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)
             VerifyTrueOrExit(res);
         }
 
-        std::unique_ptr<uint8_t[]> x509CertBuf(new uint8_t[kMaxDERCertLength]);
+        auto x509CertBuf = std::make_unique<uint8_t[]>(kMaxDERCertLength);
         MutableByteSpan x509Cert(x509CertBuf.get(), kMaxDERCertLength);
 
         CHIP_ERROR err = ConvertChipCertToX509Cert(ByteSpan(certBuf.get(), certLen), x509Cert);

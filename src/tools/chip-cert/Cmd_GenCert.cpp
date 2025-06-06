@@ -1211,8 +1211,8 @@ bool Cmd_GenCert(int argc, char * argv[])
     // Network (Client) Identities in CHIP format so that we can write it in the compact-pdc-identity format.
     if (IsChipCertFormat(gOutCertFormat) && (gCertConfig.IsErrorTestCaseEnabled() || gCertType == CertType::kNetworkIdentity))
     {
-        uint32_t chipCertBufLen                = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
-        std::unique_ptr<uint8_t[]> chipCertBuf = std::make_unique<uint8_t[]>(chipCertBufLen);
+        uint32_t chipCertBufLen = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
+        auto chipCertBuf = std::make_unique<uint8_t[]>(chipCertBufLen);
         chip::MutableByteSpan chipCert(chipCertBuf.get(), chipCertBufLen);
         err = MakeCertTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
                           gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);
