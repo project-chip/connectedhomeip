@@ -250,6 +250,7 @@
         "TestFanControl",
         "TestAccessControlConstraints",
         "TestLevelControlWithOnOffDependency",
+        "TestLevelControlWithOnOffTransition",
         "TestCommissioningWindow",
         "TestCommissionerNodeId",
         "TestTimeSynchronization",
