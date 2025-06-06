@@ -47,7 +47,7 @@ declare_args() {
   enable_leak_checking = !is_asan && target_os == "mac"
 
   # Use Network.framework instead of POSIX sockets
-  use_network_framework = false
+  use_network_framework = true
 }
 
 sdk = "macosx"
