@@ -7861,6 +7861,7 @@ bool emberAfContentAppObserverClusterContentAppMessageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::DecodableType & commandData);
 /**
+<<<<<<< HEAD
  * @brief Zone Management Cluster CreateTwoDCartesianZone Command callback (from client)
  */
 bool emberAfZoneManagementClusterCreateTwoDCartesianZoneCallback(
@@ -7891,6 +7892,8 @@ bool emberAfZoneManagementClusterRemoveTriggerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::DecodableType & commandData);
 /**
+=======
+>>>>>>> eb72ccd97b (Run zap regen to include zone management cluster into camera-app.matter.)
  * @brief Push AV Stream Transport Cluster AllocatePushTransport Command callback (from client)
  */
 bool emberAfPushAvStreamTransportClusterAllocatePushTransportCallback(
