@@ -64,6 +64,10 @@ struct EndpointEntry
     // for endpoints other than endpoint 0).
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
+    bool operator==(const EndpointEntry & rhs) const
+    {
+        return id == rhs.id && parentId == rhs.parentId && compositionPattern == rhs.compositionPattern;
+    }
 };
 
 enum class ClusterQualityFlags : uint32_t

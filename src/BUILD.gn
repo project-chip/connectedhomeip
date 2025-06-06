@@ -59,6 +59,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/icd/server/tests",
       "${chip_root}/src/crypto/tests",
+      "${chip_root}/src/data-model-providers/endpoint/tests",
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/app/server-cluster/tests",
