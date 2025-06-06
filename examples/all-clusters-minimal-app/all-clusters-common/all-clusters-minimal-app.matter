@@ -6811,8 +6811,6 @@ endpoint 1 {
     ram      attribute standardNamespace default = 0;
     callback attribute supportedModes;
     persist  attribute currentMode default = 0;
-    ram      attribute startUpMode default = 0;
-    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
