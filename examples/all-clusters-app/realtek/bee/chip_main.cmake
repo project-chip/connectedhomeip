@@ -157,8 +157,6 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
@@ -174,16 +172,6 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp
-
-    ${chip_dir}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp
 
     ${chip_dir}/examples/all-clusters-app/realtek/bee/main/AppTask.cpp
     ${chip_dir}/examples/all-clusters-app/realtek/bee/main/LightingManager.cpp
@@ -233,10 +221,6 @@ target_include_directories(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/microwave-oven-app/microwave-oven-common
     ${chip_dir}/examples/microwave-oven-app/microwave-oven-common/include
-    ${chip_dir}/examples/energy-management-app/energy-management-common/common/include
-    ${chip_dir}/examples/energy-management-app/energy-management-common/device-energy-management/include
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/include
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-reporting/include
     ${chip_dir}/examples/platform/realtek/bee
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include

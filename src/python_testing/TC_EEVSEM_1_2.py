@@ -18,7 +18,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ENERGY_MANAGEMENT_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1

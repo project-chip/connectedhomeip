@@ -20,7 +20,6 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(OPEN_IOT_SDK_CONFIG ${CHIP_ROOT}/config/openiotsdk REALPATH)
 get_filename_component(OPEN_IOT_SDK_EXAMPLE_COMMON ${CHIP_ROOT}/examples/platform/openiotsdk REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
-get_filename_component(ENERGY_MANAGEMENT_COMMON ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
 
 list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
 
@@ -48,10 +47,6 @@ target_include_directories(${APP_TARGET}
     PRIVATE
         main/include
         ${ALL_CLUSTERS_COMMON}/include
-        ${ENERGY_MANAGEMENT_COMMON}/common/include
-        ${ENERGY_MANAGEMENT_COMMON}/device-energy-management/include
-        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/include
-        ${ENERGY_MANAGEMENT_COMMON}/energy-reporting/include
 )
 
 target_sources(${APP_TARGET}
@@ -64,20 +59,9 @@ target_sources(${APP_TARGET}
         ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
         ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/oven-modes.cpp
-        ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp
-        ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
         ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
         ${ALL_CLUSTERS_COMMON}/src/binding-handler.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/common/src/EnergyTimeUtils.cpp        
-        ${ENERGY_MANAGEMENT_COMMON}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/device-energy-management/src/DeviceEnergyManagementManager.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/ChargingTargetsMemMgr.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EVSEManufacturerImpl.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EnergyEvseDelegateImpl.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EnergyEvseManager.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/energy-evse/src/EnergyEvseTargetsStore.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp
 )
 
 target_link_libraries(${APP_TARGET}
