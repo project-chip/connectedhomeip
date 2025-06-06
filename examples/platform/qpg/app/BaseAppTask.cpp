@@ -28,9 +28,9 @@
 #endif // GP_UPGRADE_DIVERSITY_DUAL_BOOT
 
 #include <app/server/Dnssd.h>
-#include <data-model-providers/codegen/Instance.h>
 #include <app/server/Server.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <app/TestEventTriggerDelegate.h>
 
@@ -179,7 +179,8 @@ CHIP_ERROR BaseAppTask::StartAppTask()
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, MATTER_ARRAY_SIZE(appStack), nullptr, 1, appStack, &appTaskStruct);
+    sAppTaskHandle =
+        xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, MATTER_ARRAY_SIZE(appStack), nullptr, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -368,7 +369,7 @@ void BaseAppTask::InitServer(intptr_t arg)
 
     if (arg != 0)
     {
-        DefaultAttributePersistenceProvider gSimpleAttributePersistence = *(DefaultAttributePersistenceProvider *)arg;
+        DefaultAttributePersistenceProvider gSimpleAttributePersistence = *(DefaultAttributePersistenceProvider *) arg;
         VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
     }
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);

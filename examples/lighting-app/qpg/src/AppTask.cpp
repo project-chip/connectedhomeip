@@ -153,7 +153,7 @@ CHIP_ERROR AppTask::Init()
 
 void AppTask::InitServer(intptr_t arg)
 {
-    BaseAppTask::InitServer((intptr_t)&gSimpleAttributePersistence);
+    BaseAppTask::InitServer((intptr_t) &gSimpleAttributePersistence);
 
     app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
 
