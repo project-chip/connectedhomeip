@@ -17,6 +17,7 @@
 #include "EmberReadWriteOverride.h"
 
 #include <app/AttributePathParams.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -121,6 +122,13 @@ Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
 
     memcpy(gEmberIoBuffer, input.dataPtr, len);
     gEmberIoBufferFill = len;
+
+    // Increase cluster data version
+    auto * version = emberAfDataVersionStorage(chip::app::ConcreteClusterPath(path.mEndpointId, path.mClusterId));
+    if (version != nullptr)
+    {
+        (*(version))++;
+    }
 
     if (input.changeListener != nullptr)
     {
