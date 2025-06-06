@@ -22,6 +22,7 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
@@ -66,6 +67,8 @@ public:
         };
 
         AppContext::SetUp();
+        chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(
+            chip::app::CodegenDataModelProviderInstance(nullptr));
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
