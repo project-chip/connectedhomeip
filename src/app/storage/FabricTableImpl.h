@@ -106,7 +106,18 @@ public:
 
     // Data
     CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity);
-    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data);
+
+    /**
+     * @brief Writes the entry to persistent storage.
+     * @param fabric_index the fabric to write the entry to
+     * @param entry_id the unique entry identifier
+     * @param data the source data
+     * @param writeBuffer the buffer that will be used to write the data before being persisted; PersistentStorageDelegate does not
+     * offer a way to stream bytes to be written
+     */
+    template <size_t kEntryMaxBytes>
+    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data,
+                             PersistentStore<kEntryMaxBytes> & writeBuffer);
 
     /**
      * @brief Loads the entry from persistent storage.
@@ -152,17 +163,19 @@ protected:
      * If you would like to expose iterators in your subclass of FabricTableImpl, use this class
      * in an ObjectPool<EntryIteratorImpl> field to allow callers to obtain an iterator.
      */
+    template <size_t kEntryMaxBytes>
     class EntryIteratorImpl : public EntryIterator
     {
     public:
         EntryIteratorImpl(FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxEntriesPerFabric,
-                          uint16_t maxEntriesPerEndpoint);
+                          uint16_t maxEntriesPerEndpoint, PersistentStore<kEntryMaxBytes> & store);
         size_t Count() override;
         bool Next(TableEntry & output) override;
         void Release() override;
 
     protected:
         FabricTableImpl & mProvider;
+        PersistentStore<kEntryMaxBytes> & mStore;
         FabricIndex mFabric  = kUndefinedFabricIndex;
         EndpointId mEndpoint = kInvalidEndpointId;
         EntryIndex mNextEntryIdx;
