@@ -110,6 +110,7 @@ private:
 
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
     std::shared_ptr<rtc::Track> mVideoTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
 
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mOriginatingEndpointId;
