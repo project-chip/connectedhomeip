@@ -96,7 +96,7 @@ namespace Inet {
             }
         }
 
-        void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_error_t error)
+        void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_interface_t interface, nw_error_t error)
         {
             const char * str = nullptr;
 
@@ -120,11 +120,12 @@ namespace Inet {
                 chipDie();
             }
 
+            const char * interfaceName = nw_interface_get_name(interface);
             if (error) {
                 CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                ChipLogDetail(Inet, "%s - Error: %s", str, chip::ErrorStr(err));
+                ChipLogDetail(Inet, "%s (%s) - Error: %s", str, interfaceName, chip::ErrorStr(err));
             } else {
-                ChipLogDetail(Inet, "%s", str);
+                ChipLogDetail(Inet, "%s (%s)", str, interfaceName);
             }
         }
 
@@ -258,7 +259,7 @@ namespace Inet {
         }
 #else
         void DebugPrintListenerState(nw_listener_state_t state, nw_error_t error) {};
-        void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_error_t error) {};
+        void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_interface_t interface, nw_error_t error) {};
         void DebugPrintConnectionState(nw_connection_state_t state, nw_error_t error) {};
         void DebugPrintConnection(const nw_connection_t connection) {};
         void DebugPrintEndPoint(nw_endpoint_t endpoint) {};

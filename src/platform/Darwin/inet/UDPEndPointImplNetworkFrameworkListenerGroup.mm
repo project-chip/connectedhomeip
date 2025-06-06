@@ -363,9 +363,10 @@ namespace Inet {
             VerifyOrReturnError(nullptr != cancelSemaphore, CHIP_ERROR_NO_MEMORY);
             group->cancelSemaphore = cancelSemaphore;
 
+            __auto_type interface = group->interface;
             __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
             nw_connection_group_set_state_changed_handler(connectionGroup, ^(nw_connection_group_state_t state, nw_error_t error) {
-                DebugPrintConnectionGroupState(state, error);
+                DebugPrintConnectionGroupState(state, interface, error);
 
                 switch (state) {
                 case nw_connection_group_state_waiting:
