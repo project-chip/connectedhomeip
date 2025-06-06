@@ -29,9 +29,14 @@
 #include <lib/support/Variant.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace Dnssd {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+enum class JointFabricMode : uint8_t; // fw decl
+#endif
 
 enum class DiscoveryFilterType : uint8_t
 {
@@ -234,6 +239,9 @@ struct CommissionNodeData : public CommonResolutionData
     char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
     char deviceName[kMaxDeviceNameLen + 1]                    = {};
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    BitFlags<JointFabricMode> jointFabricMode;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     CommissionNodeData() {}
 
@@ -292,6 +300,9 @@ struct CommissionNodeData : public CommonResolutionData
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
         ChipLogDetail(Discovery, "\tSupports Commissioner Generated Passcode: %s",
                       supportsCommissionerGeneratedPasscode ? "true" : "false");
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        ChipLogDetail(Discovery, "\tJoint Fabric Mode: %u", jointFabricMode.Raw());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     }
 };
 
