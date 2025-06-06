@@ -117,6 +117,15 @@ class SdkGenerator(CodeGenerator):
             },
         )
 
+        self.internal_render_one_output(
+            template_path="MetadataQuery.h.jinja",
+            output_file_name="MetadataQuery.h",
+            vars={
+                "clusters": self.idl.clusters,
+                "input_name": self.idl.parse_file_name,
+            },
+        )
+
         for cluster in self.idl.clusters:
 
             build_targets = {
@@ -124,6 +133,7 @@ class SdkGenerator(CodeGenerator):
 
                 # contains `*Entry` items for attributes and commands
                 "Metadata.h.jinja": "Metadata.h",
+                "MetadataProvider.h.jinja": "MetadataProvider.h",
 
                 # contains id definitions
                 "AttributeIds.h.jinja": "AttributeIds.h",
