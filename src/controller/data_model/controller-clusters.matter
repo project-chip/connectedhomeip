@@ -11164,13 +11164,14 @@ provisional cluster TlsClientManagement = 2050 {
     kInUse = 1;
   }
 
-  struct TLSEndpointStruct {
+  fabric_scoped struct TLSEndpointStruct {
     int16u endpointID = 0;
     octet_string<253> hostname = 1;
     int16u port = 2;
     int16u caid = 3;
     nullable int16u ccdid = 4;
     TLSEndpointStatusEnum status = 5;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute int8u maxProvisioned = 0;

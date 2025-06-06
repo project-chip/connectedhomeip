@@ -64729,6 +64729,11 @@ public class ChipClusters {
 
     public void readProvisionedEndpointsAttribute(
         ProvisionedEndpointsAttributeCallback callback) {
+      readProvisionedEndpointsAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readProvisionedEndpointsAttributeWithFabricFilter(
+        ProvisionedEndpointsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_ENDPOINTS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -64737,7 +64742,7 @@ public class ChipClusters {
             List<ChipStructs.TlsClientManagementClusterTLSEndpointStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PROVISIONED_ENDPOINTS_ATTRIBUTE_ID, true);
+        }, PROVISIONED_ENDPOINTS_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeProvisionedEndpointsAttribute(
