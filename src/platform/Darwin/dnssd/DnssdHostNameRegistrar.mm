@@ -20,8 +20,8 @@
 #endif
 
 #include "DnssdHostNameRegistrar.h"
+#include "DnssdError.h"
 #include "DnssdImpl.h"
-#include "MdnsError.h"
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
