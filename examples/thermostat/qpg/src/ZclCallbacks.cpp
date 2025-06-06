@@ -56,7 +56,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
-    
+
     // Temp. code for testing purpose, need to be updated
     const auto logOnFailure = [](Protocols::InteractionModel::Status status, const char * attributeName) {
         if (status != Protocols::InteractionModel::Status::Success)
