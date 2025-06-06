@@ -165,6 +165,11 @@
 #define CHIP_DEVICE_CONFIG_THREAD_FTD 0
 #endif
 
+// Enable `Extension` attribute of ACL Cluster as required by door locks
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+#endif
+
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 
 #ifndef CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE
