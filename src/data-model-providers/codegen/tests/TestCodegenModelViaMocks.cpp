@@ -1476,8 +1476,8 @@ TEST_F(TestCodegenModelViaMocks, ShimCommandHandlerInterfaceCommandHandling)
     using namespace Clusters::UnitTesting;
     static const MockNodeConfig kNodeConfig({
         MockEndpointConfig(kMockEndpoint1, {
-            MockClusterConfig(Clusters::UnitTesting::Id, { 
-                ClusterRevision::Id, FeatureMap::Id,                
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
             }),
             MockClusterConfig(MockClusterId(2), {
                 ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
