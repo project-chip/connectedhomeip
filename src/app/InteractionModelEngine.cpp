@@ -1812,17 +1812,18 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
-    Status status = CheckCommandExistence(request.path, acceptedCommandEntry);
+    Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
 
-    if (status != Status::Success)
+    Status accessStatus = CheckCommandAccess(request, acceptedCommandEntry);
+    VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
+
+    // We only communicate on Existence failures if we are sure access is granted
+    if (existenceStatus != Status::Success)
     {
         ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint %u",
                       ChipLogValueMEI(request.path.mCommandId), ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId);
-        return status;
+        return existenceStatus;
     }
-
-    status = CheckCommandAccess(request, acceptedCommandEntry);
-    VerifyOrReturnValue(status == Status::Success, status);
 
     return CheckCommandFlags(request, acceptedCommandEntry);
 }
