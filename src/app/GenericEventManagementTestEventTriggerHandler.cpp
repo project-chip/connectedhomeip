@@ -19,6 +19,7 @@
 #include "GenericEventManagementTestEventTriggerHandler.h"
 
 #include <app/clusters/general-diagnostics-server/general-fault-listener.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/GeneralFaults.h>
 
 namespace chip {
