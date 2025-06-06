@@ -72,9 +72,7 @@ Span<const DataModel::AttributeEntry> DefaultServerCluster::GlobalAttributes()
     return { kGlobalAttributeEntries.data(), kGlobalAttributeEntries.size() };
 }
 
-DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path)
-{
-}
+DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
 
 CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder)
 {
