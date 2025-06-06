@@ -37,9 +37,6 @@
 #include <controller/CurrentFabricRemover.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/WriteInteraction.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-#include <controller/JCMCommissioner.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
