@@ -23,6 +23,8 @@
 #include <tls-client-management-instance.h>
 #include <vector>
 
+static constexpr uint8_t kMaxProvisioned = 254;
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
@@ -32,7 +34,7 @@ using namespace chip::app::Clusters::TlsClientManagement;
 using namespace Protocols::InteractionModel;
 
 CHIP_ERROR TlsClientManagementCommandDelegate::GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                             size_t index, EndpointStructType & endpoint)
+                                                                             size_t index, EndpointStructType & endpoint) const
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_ERROR_INTERNAL);
 
@@ -91,6 +93,8 @@ Status TlsClientManagementCommandDelegate::ProvisionEndpoint(
     }
     else
     {
+        VerifyOrReturnError(mProvisioned.size() < mTlsClientManagementServer->GetMaxProvisioned(), Status::ConstraintError);
+
         provisioned           = &mProvisioned.emplace_back();
         auto & endpointStruct = provisioned->payload;
 
@@ -98,8 +102,9 @@ Status TlsClientManagementCommandDelegate::ProvisionEndpoint(
     }
     provisioned->fabric   = fabric;
     auto & endpointStruct = provisioned->payload;
-
-    endpointStruct.hostname = provisionReq.hostname;
+    MutableByteSpan hostname(provisioned->hostname);
+    CopySpanToMutableSpan(provisionReq.hostname, hostname);
+    endpointStruct.hostname = hostname;
     endpointStruct.port     = provisionReq.port;
     endpointStruct.caid     = provisionReq.caid;
     endpointStruct.ccdid    = provisionReq.ccdid;
@@ -108,7 +113,8 @@ Status TlsClientManagementCommandDelegate::ProvisionEndpoint(
 }
 
 Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                       uint16_t endpointID, EndpointStructType & endpoint)
+                                                                       uint16_t endpointID, EndpointStructType & endpoint,
+                                                                       MutableByteSpan & hostname) const
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), Status::ConstraintError);
 
@@ -116,7 +122,9 @@ Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointI
     {
         if (i->payload.endpointID == endpointID && i->fabric == fabric)
         {
-            endpoint = i->payload;
+            CopySpanToMutableSpan(i->payload.hostname, hostname);
+            endpoint          = i->payload;
+            endpoint.hostname = hostname;
             return Status::Success;
         }
     }
@@ -148,8 +156,8 @@ Status TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(Endpoin
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance(gCertificateTableInstance);
-static TlsClientManagementServer gTlsClientManagementClusterServerInstance =
-    TlsClientManagementServer(EndpointId(1), TlsClientManagementCommandDelegate::getInstance(), gCertificateTableInstance);
+static TlsClientManagementServer gTlsClientManagementClusterServerInstance = TlsClientManagementServer(
+    EndpointId(1), TlsClientManagementCommandDelegate::getInstance(), gCertificateTableInstance, kMaxProvisioned);
 
 void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 {
