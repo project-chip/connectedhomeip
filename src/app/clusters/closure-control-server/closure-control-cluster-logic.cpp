@@ -405,6 +405,20 @@ CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEn
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ClusterLogic::GetFeatureMap(BitFlags<Feature> & featureMap)
+{
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    featureMap = mConformance.FeatureMap();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
+{
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    clusterRevision = kClusterRevision;
+    return CHIP_NO_ERROR;
+}
+
 Protocols::InteractionModel::Status ClusterLogic::HandleStop()
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "Stop Command called before Initialization of closure");
