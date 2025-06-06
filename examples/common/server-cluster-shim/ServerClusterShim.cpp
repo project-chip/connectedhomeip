@@ -636,5 +636,11 @@ bool ServerClusterShim::ContainsClusterPath(const ConcreteClusterPath & path) co
     return true;
 }
 
+CHIP_ERROR ServerClusterShim::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
+{
+    eventInfo.readPrivilege = RequiredPrivilege::ForReadEvent(path);
+    return CHIP_NO_ERROR;
+}
+
 } // namespace app
 } // namespace chip

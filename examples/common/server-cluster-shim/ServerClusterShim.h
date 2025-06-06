@@ -83,8 +83,9 @@ public:
 
     void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType) override;
 
-private:
-    bool ContainsClusterPath(const ConcreteClusterPath & path) const;
+CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
+
+    private : bool ContainsClusterPath(const ConcreteClusterPath & path) const;
 
     ServerClusterContext * mContext = nullptr;
     const std::vector<ConcreteClusterPath> mPaths;
