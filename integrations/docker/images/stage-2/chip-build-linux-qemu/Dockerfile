@@ -124,7 +124,7 @@ RUN mkdir -p /tmp/workdir/linux \
 	# Download Ubuntu image for QEMU
 	&& curl https://cloud-images.ubuntu.com/minimal/releases/noble/release/ubuntu-24.04-minimal-cloudimg-amd64.img \
 	-o /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img
-	# Prepare ubuntu image
+# Prepare ubuntu image
 RUN qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
 	&& virt-resize --expand /dev/sda1 /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img $UBUNTU_QEMU_IMG \
 	&& guestfish -a $UBUNTU_QEMU_IMG \
@@ -170,7 +170,7 @@ RUN qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
 	"	libavahi-client-dev " \
 	"	libcairo2-dev " \
 	"	libdbus-1-dev " \
-	"	libgirepository1.0-dev " \
+	"	libgirepository-2.0-dev " \
 	"	libglib2.0-dev " \
 	"	libreadline-dev " \
 	"	libssl-dev " \
@@ -209,8 +209,8 @@ RUN qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
 	-append 'console=ttyS0 root=/dev/vda4' \
 	-netdev user,id=network0 \
 	-device e1000,netdev=network0,mac=52:54:00:12:34:56 \
-    -virtfs "local,path=/tmp,mount_tag=host0,security_model=passthrough,id=host0" \
-# tmp folder is mounted only to preserve error during boot
+	-virtfs "local,path=/tmp,mount_tag=host0,security_model=passthrough,id=host0" \
+	# tmp folder is mounted only to preserve error during boot
 	&& mkdir -p /chip \
 	&& rm -rf /opt/ubuntu-qemu/rootfs \
 	&& echo -n \
@@ -248,7 +248,7 @@ RUN set -x \
 	&& apt-get update \
 	&& DEBIAN_FRONTEND=noninteractive apt-get install -fy \
 	cpu-checker \
-	libgirepository-1.0-1 \
+	libgirepository-2.0 \
 	qemu-system-x86 \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
