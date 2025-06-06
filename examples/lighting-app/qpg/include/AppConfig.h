@@ -19,6 +19,6 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
-// ---- Lighting Example App Config ----
+// Mapping of Functional buttons
 
 #endif // APP_CONFIG_H

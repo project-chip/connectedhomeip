@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include <lib/support/logging/CHIPLogging.h>
-
 #include "AppTask.h"
 #include "LightingManager.h"
 
@@ -29,8 +27,12 @@
 #include <assert.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h"
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+
 using namespace ::chip;
 using namespace chip::app::Clusters;
+using namespace ::chip::app::Clusters::DiagnosticLogs;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -186,4 +188,12 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     assert(status == Protocols::InteractionModel::Status::Success);
     ChipLogProgress(Zcl, "restore HSV color: %u|%u", hsv.h, hsv.s);
     LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(hsv), (uint8_t *) &hsv);
+}
+
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
+{
+    ChipLogProgress(NotSpecified, "Setting log provider.");
+
+    auto & logProvider = LogProvider::GetInstance();
+    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
