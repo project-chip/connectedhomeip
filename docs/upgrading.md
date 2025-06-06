@@ -61,14 +61,14 @@ commandHandler->AddResponse(path, kReplyCommandId, replyEncoder);
 
 ```
 
-### Decoupling of `CommandHandlerInterface` from Ember Metadata
+### Decoupling of `CommandHandlerInterface` from EmberTestCodegenModelViaMocks.cpp:1513:77 Metadata
 
 CommandHandler Interface was coupled with Ember data in ways that caused bugs if
 not setup correctly, updates were made for decoupling, now this data is provided
 
 With this the interfaces
-[`CommandHandlerInterface::RetrieveGeneratedCommands`](#RetrieveGeneratedCommands),
-[`CommandHandlerInterface::RetrieveAcceptedCommands`](#retrieveacceptedcommands)
+[`CommandHandlerInterface::RetrieveGeneratedCommands`](#enumerateacceptedcommands-to-retrieveacceptedcommands),
+[`CommandHandlerInterface::RetrieveAcceptedCommands`](#enumerategeneratedcommands-to-retrievegeneratedcommands)
 go through some changes, a shim is provided to make the transition simpler
 
 #### Full Changes

@@ -43,6 +43,7 @@ source_set("ids") {
   public_deps = [
     "${chip_root}/zzz_generated/app-common/clusters:all-ids",
     "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
+    "${chip_root}/zzz_generated/app-common/clusters:metadata-query",
   ]
 
   public_configs = [ ":includes" ]

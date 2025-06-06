@@ -1497,7 +1497,6 @@ TEST_F(TestCodegenModelViaMocks, ShimCommandHandlerInterfaceCommandHandling)
     ReadOnlyBufferBuilder<CommandId> generatedBuilder;
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
 
-    std::cout << "Print UnitTestingID" << Clusters::UnitTesting::Id << std::endl;
     // At this point, without overrides, there should be no accepted/generated commands
     ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), generatedBuilder),
               CHIP_NO_ERROR);
