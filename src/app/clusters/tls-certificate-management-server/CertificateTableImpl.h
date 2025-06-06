@@ -31,13 +31,13 @@ namespace Tls {
 #if defined(TLS_CLIENT_CERTIFICATE_SIZE_PER_FABRIC) && TLS_CLIENT_CERTIFICATE_SIZE_PER_FABRIC
 static constexpr uint16_t kMaxClientCertificatesPerFabric = TLS_CLIENT_CERTIFICATE_SIZE_PER_FABRIC;
 #else
-static constexpr uint16_t kMaxClientCertificatesPerFabric = 5;
+static constexpr uint16_t kMaxClientCertificatesPerFabric = CHIP_CONFIG_MAX_CLIENT_CERTS_TABLE_SIZE;
 #endif
 
 #if defined(TLS_ROOT_CERTIFICATE_SIZE_PER_FABRIC) && TLS_ROOT_CERTIFICATE_SIZE_PER_FABRIC
 static constexpr uint16_t kMaxRootCertificatesPerFabric = TLS_ROOT_CERTIFICATE_SIZE_PER_FABRIC;
 #else
-static constexpr uint16_t kMaxRootCertificatesPerFabric   = 5;
+static constexpr uint16_t kMaxRootCertificatesPerFabric   = CHIP_CONFIG_MAX_ROOT_CERTS_TABLE_SIZE;
 #endif
 
 inline constexpr uint16_t kUndefinedCertificateId = 0xffff;
@@ -48,7 +48,7 @@ static_assert(kMaxClientCertificatesPerFabric <= 254, "Per spec, kMaxClientCerti
 static_assert(kMaxRootCertificatesPerFabric <= 254, "Per spec, kMaxRootCertificatesPerFabric must be at most 254");
 
 // Limit is set per-fabric
-static constexpr uint16_t kMaxCertificatesPerEndpoint = MAX_INT16U_VALUE;
+static constexpr uint16_t kMaxCertificatesPerEndpoint = UINT16_MAX;
 
 /// @brief struct used to identify a certificate ID
 struct CertificateId

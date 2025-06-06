@@ -1965,5 +1965,22 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
 
 /**
+ * @def CHIP_CONFIG_MAX_CLIENT_CERTS_TABLE_SIZE
+ *
+ * @brief The maximum number of client certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_MAX_CLIENT_CERTS_TABLE_SIZE
+#define CHIP_CONFIG_MAX_CLIENT_CERTS_TABLE_SIZE 5
+#endif // CHIP_CONFIG_MAX_CLIENT_CERTS_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_MAX_ROOT_CERTS_TABLE_SIZE
+ *
+ * @brief The maximum number of root certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_MAX_ROOT_CERTS_TABLE_SIZE
+#define CHIP_CONFIG_MAX_ROOT_CERTS_TABLE_SIZE 5
+#endif // CHIP_CONFIG_MAX_ROOT_CERTS_TABLE_SIZE
+/**
  * @}
  */
