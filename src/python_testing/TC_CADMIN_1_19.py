@@ -34,7 +34,8 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
+                                         async_test_body, default_matter_test_main)
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
@@ -73,6 +74,9 @@ class TC_CADMIN_1_19(MatterBaseTest):
                      "{resDutSuccess}"),
             TestStep(10, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
                      "Verify this is equal to initial_number_of_fabrics."),
+            TestStep(11, "TH subscribes to the window status attribute", "Success"),
+            TestStep(12, "TH sends the RevokeCommissioning command", "Success"),
+            TestStep(13, "TH waits to receive an attribute report that indicates the window status is closed", "Report is received"),
         ]
 
     def pics_TC_CADMIN_1_19(self) -> list[str]:
@@ -160,6 +164,20 @@ class TC_CADMIN_1_19(MatterBaseTest):
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.
         current_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CommissionedFabrics)
         asserts.assert_equal(current_fabrics, initial_number_of_fabrics, "Expected number of fabrics not correct")
+
+        self.step(11)
+        attribute_reports = ClusterAttributeChangeAccumulator(
+            expected_cluster=Clusters.AdministratorCommissioning, expected_attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus)
+        await attribute_reports.start(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=0)
+
+        self.step(12)
+        revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        await self.send_single_cmd(cmd=revokeCmd, dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=0, timedRequestTimeoutMs=6000)
+
+        self.step(13)
+        val = AttributeValue(endpoint_id=0, attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus,
+                             value=Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen)
+        attribute_reports.await_all_final_values_reported([val], timeout_sec=5)
 
 
 if __name__ == "__main__":
