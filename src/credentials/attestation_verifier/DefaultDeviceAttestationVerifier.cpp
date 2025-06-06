@@ -345,13 +345,13 @@ const char * CertTypeAsString(AttestationChainElement certType)
 
 void LogOneKeyId(KeyIdType keyIdType, AttestationChainElement certType, ByteSpan derBuffer)
 {
-    const char * certTypeName = CertTypeAsString(certType);
+    [[maybe_unused]] const char * certTypeName = CertTypeAsString(certType);
 
     uint8_t keyIdBuf[Crypto::kAuthorityKeyIdentifierLength]; // Big enough for SKID/AKID.
     MutableByteSpan keyIdSpan{ keyIdBuf };
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    const char * keyIdTypeString = "<UNKNOWN>";
+    [[maybe_unused]] const char * keyIdTypeString = "<UNKNOWN>";
     switch (keyIdType)
     {
     case KeyIdType::kAuthorityKeyId:
@@ -375,7 +375,7 @@ void LogOneKeyId(KeyIdType keyIdType, AttestationChainElement certType, ByteSpan
     }
 
     KeyIdStringifier KeyIdStringifier;
-    const char * keyIdString = KeyIdStringifier.KeyIdToHex(keyIdSpan);
+    [[maybe_unused]] const char * keyIdString = KeyIdStringifier.KeyIdToHex(keyIdSpan);
 
     ChipLogProgress(NotSpecified, "--> %s certificate %s: %s", certTypeName, keyIdTypeString, keyIdString);
 }
@@ -495,7 +495,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         {
             attestationError = AttestationVerificationResult::kPaaNotFound;
             KeyIdStringifier paiAkidWriter;
-            const char * paiAkidHexString = paiAkidWriter.KeyIdToHex(paiAkid);
+            [[maybe_unused]] const char * paiAkidHexString = paiAkidWriter.KeyIdToHex(paiAkid);
 
             ChipLogError(NotSpecified, "Unable to find PAA, err: %" CHIP_ERROR_FORMAT ", PAI's AKID: %s", err.Format(),
                          paiAkidHexString);
