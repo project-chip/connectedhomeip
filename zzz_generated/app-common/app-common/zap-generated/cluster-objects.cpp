@@ -1370,8 +1370,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
             return true;
-        case Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id:
-            return true;
         case Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
@@ -1381,8 +1379,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
-            return true;
-        case Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
             return true;
