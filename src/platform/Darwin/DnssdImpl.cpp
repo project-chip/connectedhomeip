@@ -165,7 +165,15 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
                     Error::ToString(err));
 
     auto sdCtx = reinterpret_cast<RegisterContext *>(context);
-    sdCtx->Finalize(err);
+    VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+
+    // Once a service has been properly published it is normally unreachable because the hostname has not yet been
+    // registered against the dns daemon. Register the records mapping the hostname to our IP.
+    auto error = sdCtx->mHostNameRegistrar.Register(^(DNSServiceErrorType registerRecordError) {
+        ReturnOnFailure(MdnsContexts::GetInstance().Has(sdCtx));
+        sdCtx->Finalize(registerRecordError);
+    });
+    VerifyOrReturn(CHIP_NO_ERROR == error, sdCtx->Finalize(error));
 };
 
 CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
