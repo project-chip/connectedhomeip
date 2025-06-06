@@ -767,6 +767,53 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
+void Instance::OnThreadCredentialsAvailable(chip::ByteSpan *     pOperationalDataset,
+                                            Optional<uint64_t> * pAddOrUpdateThreadNetworkBreadcrumb,
+                                            chip::ByteSpan *     pNetworkID,
+                                            Optional<uint64_t> * pConnectNetworkBreadcrumb)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        // AddThreadNetwork
+        NetworkCommissioningStatusEnum networkingStatus;
+        DebugTextStorage debugTextBuffer;
+        MutableCharSpan debugText(debugTextBuffer);
+        uint8_t outNetworkIndex = 0;
+
+        networkingStatus = mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(*pOperationalDataset, debugText, outNetworkIndex);
+        if (networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
+        {
+            ReportNetworksListChanged();
+            UpdateBreadcrumb(*pAddOrUpdateThreadNetworkBreadcrumb);
+        } else {
+            ChipLogError(NetworkProvisioning, "AddOrUpdateNetwork failed with status 0x%x", (uint16_t)networkingStatus);
+            return;
+        }
+
+        // ConnectNetwork
+        if (pNetworkID->size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
+        {
+            ChipLogError(NetworkProvisioning, "Error! Invalid networkID.size() : %d", pNetworkID->size());
+            return;
+        }
+
+        mConnectingNetworkIDLen = static_cast<uint8_t>(pNetworkID->size());
+        memcpy(mConnectingNetworkID, pNetworkID->data(), mConnectingNetworkIDLen);
+        mCurrentOperationBreadcrumb = *pConnectNetworkBreadcrumb;
+
+        // Per spec, lingering connections on any other interfaces need to be disconnected at this point.
+        for (auto & node : sInstances)
+        {
+            Instance * instance = static_cast<Instance *>(&node);
+            if (instance != this)
+            {
+                instance->DisconnectLingeringConnection();
+            }
+        }
+
+        mpWirelessDriver->ConnectNetwork(*pNetworkID, this);
+#endif
+}
+
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -1133,6 +1180,15 @@ void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event
         // In Non-Concurrent mode connect the operational channel, as BLE has been stopped
         this_->HandleNonConcurrentConnectNetwork();
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    else if (event->Type == DeviceLayer::DeviceEventType::kOnThreadCredentialsAvailable)
+    {
+        this_->OnThreadCredentialsAvailable(event->OnThreadCredentialsAvailable.pOperationalDataset,
+                                            event->OnThreadCredentialsAvailable.pAddOrUpdateThreadNetworkBreadcrumb,
+                                            event->OnThreadCredentialsAvailable.pNetworkID,
+                                            event->OnThreadCredentialsAvailable.pConnectNetworkBreadcrumb);
+    }
+#endif
 }
 
 void Instance::OnCommissioningComplete()

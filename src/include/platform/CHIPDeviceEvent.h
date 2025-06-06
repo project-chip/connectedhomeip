@@ -260,6 +260,12 @@ enum PublicEventTypes
      * Signals that factory reset has started.
      */
     kFactoryReset,
+
+    /**
+     * Signals that Thread Credentials are available.
+     * The SDK will add this Thread network and try to join it.
+     */
+    kOnThreadCredentialsAvailable,
 };
 
 /**
@@ -561,6 +567,18 @@ struct ChipDeviceEvent final
             // TODO(cecille): This should just specify wifi or thread since we assume at most 1.
             int network;
         } OperationalNetwork;
+
+        struct
+        {
+            // Data from AddOrUpdateThreadNetwork DecodableType
+            chip::ByteSpan *     pOperationalDataset;
+            Optional<uint64_t> * pAddOrUpdateThreadNetworkBreadcrumb;
+
+            // Data from ConnectNetwork DecodableType
+            chip::ByteSpan *     pNetworkID;
+            Optional<uint64_t> * pConnectNetworkBreadcrumb;
+
+        } OnThreadCredentialsAvailable;
 
         struct
         {

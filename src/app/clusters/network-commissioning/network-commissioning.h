@@ -154,6 +154,13 @@ private:
     void HandleNonConcurrentConnectNetwork(void);
     void HandleQueryIdentity(HandlerContext & ctx, const Commands::QueryIdentity::DecodableType & req);
 
+    // Function called when Thread credentials are available
+    // The SDK will add this Thread network and try to join it.
+    void OnThreadCredentialsAvailable(chip::ByteSpan *     pOperationalDataset,
+                                      Optional<uint64_t> * pAddOrUpdateThreadNetworkBreadcrumb,
+                                      chip::ByteSpan *     pNetworkID,
+                                      Optional<uint64_t> * pConnectNetworkBreadcrumb);
+
 public:
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * apDelegate);
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * apDelegate);
