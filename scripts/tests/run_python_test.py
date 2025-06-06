@@ -191,7 +191,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     app_stdin_forwarding_thread = None
     app_stdin_forwarding_stop_event = threading.Event()
     app_exit_code = 0
-    app_pid = 0
 
     stream_output = sys.stdout.buffer
     if quiet:
@@ -215,14 +214,12 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             app_stdin_forwarding_thread.start()
         else:
             app_process.p.stdin.close()
-        app_pid = app_process.p.pid
 
     script_command = [
         script,
         "--fail-on-skipped",
         "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
         "--log-format", '%(message)s',
-        "--app-pid", str(app_pid),
     ] + shlex.split(script_args)
 
     if script_gdb:

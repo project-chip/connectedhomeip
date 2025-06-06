@@ -68,7 +68,6 @@ std::vector<Action *> gActions;
 
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_bridge_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 BridgeCommandDelegate sBridgeCommandDelegate;
 
@@ -1052,9 +1051,9 @@ void ApplicationInit()
         }
     }
 
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    if (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR)
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();

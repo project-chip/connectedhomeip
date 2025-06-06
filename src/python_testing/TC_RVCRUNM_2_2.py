@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcrunm_2_2_fifo
 #     script-args: >
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --storage-path admin_storage.json
@@ -30,7 +30,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --app-pipe_prefix /tmp/chip_rvc_fifo_
+#       --app-pipe /tmp/rvcrunm_2_2_fifo
 #       --int-arg PIXIT.RVCRUNM.MODE_A:1
 #       --int-arg PIXIT.RVCRUNM.MODE_B:2
 #       --trace-to json:${TRACE_TEST_JSON}.json
