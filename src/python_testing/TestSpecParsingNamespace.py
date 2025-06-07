@@ -118,19 +118,15 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
         # Check version relationships
         asserts.assert_greater(len(set(one_four_two.keys()) - set(one_three.keys())),
-                               0, "1.4.2 dir contains more namespaces than 1.3")
+                               0, "1.4.2 dir contains less namespaces than 1.3")
         asserts.assert_greater(len(set(one_four_two.keys()) - set(one_four.keys())),
-                               0, "1.4.2 dir contains more namespaces than 1.4")
+                               0, "1.4.2 dir contains less namespaces than 1.4")
         asserts.assert_greater(len(set(one_four_two.keys()) - set(one_four_one.keys())),
-                               0, "1.4.2 dir contains more namespaces than 1.4.1")
+                               0, "1.4.2 dir contains less namespaces than 1.4.1")
         asserts.assert_greater(len(set(one_four.keys()) - set(one_three.keys())),
-                               0, "1.4 dir contains more namespaces than 1.3")
+                               0, "1.4 dir contains less namespaces than 1.3")
 
-        # Check version consistency
-        asserts.assert_equal(set(one_four_one.keys()) - set(one_four.keys()),
-                             set(), "There are some 1.4.1 namespaces that are unexpectedly not included in the 1.4 files")
-
-        # Complete namespace version checks for 1.3, 1.4, 1.4.1, 1.4.2, known differences:
+        # Complete namespace version checks for 1.3, 1.4, 1.4.1, 1.4.2, known differences and relationships:
         # 1.3: has Common Position and Common Closure
         # 1.4/1.4.1: removed Common Position, kept Common Closure, added Common Area/Landmark/Relative Position
         # 1.4.2: removed Common Closure, added back Common Position, kept new ones from 1.4/1.4.1
