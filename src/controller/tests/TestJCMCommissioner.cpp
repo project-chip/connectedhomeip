@@ -303,7 +303,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestTrustVerificationStageFinishedProgr
     // Register the mock trust verification delegate
     commissioner.RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
     // Set up the mock ReadCommissioningInfo
-    commissioner.ParseExtraCommissioningInfo(mInfo);
+    commissioner.ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
 
     JCMTrustVerificationStage stage = JCMTrustVerificationStage::kIdle;
     JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
@@ -416,7 +416,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseTrustedRoot) {
 TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseExtraCommissioningInfo)
 {
     // Call the method directly to test it
-    EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo));
+    EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams));
     
     // Verify the ParseExtraCommissioningInfo results
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, 1);
