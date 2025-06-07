@@ -86,7 +86,7 @@ public:
    
 protected:
     // Override ParseExtraCommissioningInfo to parse JCM administrator info
-    CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info) override;
+    CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params) override;
     // Override CleanupCommissioning to clean up JCM trust verification state
     void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus) override;
 

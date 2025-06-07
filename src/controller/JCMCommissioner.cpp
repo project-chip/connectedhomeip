@@ -302,11 +302,16 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningInfo & info)
+CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)
 {
     using namespace OperationalCredentials::Attributes;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (!params.UseJCM().ValueOr(false))
+    {
+        return DeviceCommissioner::ParseExtraCommissioningInfo(info, params);
+    }
 
     err = ParseAdminFabricIndexAndEndpointId(info);
     if (err != CHIP_NO_ERROR)

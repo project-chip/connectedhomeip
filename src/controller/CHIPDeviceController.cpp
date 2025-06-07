@@ -2267,7 +2267,7 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
     static constexpr auto kReadProgressNoFurtherAttributes = std::numeric_limits<decltype(mReadCommissioningInfoProgress)>::max();
     if (mReadCommissioningInfoProgress == kReadProgressNoFurtherAttributes)
     {
-        FinishReadingCommissioningInfo();
+        FinishReadingCommissioningInfo(params);
         return;
     }
 
@@ -2367,7 +2367,7 @@ void AccumulateErrors(CHIP_ERROR & acc, CHIP_ERROR err)
 }
 } // namespace
 
-void DeviceCommissioner::FinishReadingCommissioningInfo()
+void DeviceCommissioner::FinishReadingCommissioningInfo(const CommissioningParameters & params)
 {
     // We want to parse as much information as possible, even if we eventually end
     // up returning an error (e.g. because some mandatory information was missing).
@@ -2380,7 +2380,7 @@ void DeviceCommissioner::FinishReadingCommissioningInfo()
     AccumulateErrors(err, ParseTimeSyncInfo(info));
     AccumulateErrors(err, ParseFabrics(info));
     AccumulateErrors(err, ParseICDInfo(info));
-    AccumulateErrors(err, ParseExtraCommissioningInfo(info));
+    AccumulateErrors(err, ParseExtraCommissioningInfo(info, params));
 
     if (mPairingDelegate != nullptr && err == CHIP_NO_ERROR)
     {

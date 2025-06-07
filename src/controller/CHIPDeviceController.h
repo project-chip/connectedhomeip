@@ -838,7 +838,7 @@ protected:
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;
-    virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info) {return CHIP_NO_ERROR;}
+    virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params) {return CHIP_NO_ERROR;}
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     template <typename RequestObjectT>
@@ -1077,7 +1077,7 @@ private:
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     void ContinueReadingCommissioningInfo(const CommissioningParameters & params);
-    void FinishReadingCommissioningInfo();
+    void FinishReadingCommissioningInfo(const CommissioningParameters & params);
     CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
