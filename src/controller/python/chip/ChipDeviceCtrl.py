@@ -685,8 +685,12 @@ class ChipDeviceControllerBase():
         '''
         Connect to a BLE device via PASE using the given discriminator and setup pin code.
 
+        Parameters:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            setupPinCode (int): The setup pin code of the device.
+            nodeid (int): Node id of the device.
         Returns:
-            Effective Node ID of the device (as defined by the assigned NOC)
+            int: Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.CheckIsActive()
 
