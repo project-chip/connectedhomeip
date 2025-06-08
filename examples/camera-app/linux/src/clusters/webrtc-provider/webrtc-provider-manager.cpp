@@ -90,6 +90,11 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
 
 } // namespace
 
+void WebRTCProviderManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
+{
+    mCameraDevice = aCameraDevice;
+}
+
 void WebRTCProviderManager::Init()
 {
     rtc::Configuration config;
@@ -179,6 +184,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
         else
         {
             outSession.videoStreamID = args.videoStreamId.Value();
+            mVideoStreamID           = args.videoStreamId.Value().Value();
         }
     }
     else
@@ -197,6 +203,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
         else
         {
             outSession.audioStreamID = args.audioStreamId.Value();
+            mAudioStreamID           = args.audioStreamId.Value().Value();
         }
     }
     else
@@ -209,6 +216,10 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     mCurrentSessionId      = args.sessionId;
 
     outDeferredOffer = LinuxDeviceOptions::GetInstance().cameraDeferredOffer;
+
+    // Acquire the Video and Audio Streams from the CameraAVStreamManagement
+    // cluster and update the reference counts.
+    AcquireAudioVideoStreams();
 
     MoveToState(State::SendingOffer);
 
@@ -327,6 +338,10 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
             ChipLogProgress(Camera, "Audio track updated from remote peer");
         }
     });
+
+    // Acquire the Video and Audio Streams from the CameraAVStreamManagement
+    // cluster and update the reference counts.
+    AcquireAudioVideoStreams();
 
     MoveToState(State::SendingAnswer);
     rtc::Description remoteOffer(args.sdp, rtc::Description::Type::Offer);
@@ -640,4 +655,12 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
 
     // Now invoke the command using the found session handle
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);
+}
+
+CHIP_ERROR WebRTCProviderManager::AcquireAudioVideoStreams()
+{
+
+    mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportAcquireAudioVideoStreams(mAudioStreamID, mVideoStreamID);
+
+    return CHIP_NO_ERROR;
 }

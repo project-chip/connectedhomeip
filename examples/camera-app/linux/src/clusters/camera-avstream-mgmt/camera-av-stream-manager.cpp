@@ -379,3 +379,59 @@ CameraAVStreamManager::PersistentAttributesLoadedCallback()
 
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR
+CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID)
+{
+    // Update the available audio stream in the HAL
+    for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
+    {
+        if (stream.audioStreamParams.audioStreamID == audioStreamID && stream.isAllocated)
+        {
+            stream.audioStreamParams.referenceCount++;
+        }
+    }
+
+    // Update the available video stream in the HAL
+    for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
+    {
+        if (stream.videoStreamParams.videoStreamID == videoStreamID && stream.isAllocated)
+        {
+            stream.videoStreamParams.referenceCount++;
+        }
+    }
+
+    // Update the counts in the SDK allocated stream attributes
+    GetCameraAVStreamMgmtServer()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ true);
+    GetCameraAVStreamMgmtServer()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ true);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID)
+{
+    // Update the available audio stream in the HAL
+    for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
+    {
+        if (stream.audioStreamParams.audioStreamID == audioStreamID && stream.isAllocated)
+        {
+            stream.audioStreamParams.referenceCount--;
+        }
+    }
+
+    // Update the available video stream in the HAL
+    for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
+    {
+        if (stream.videoStreamParams.videoStreamID == videoStreamID && stream.isAllocated)
+        {
+            stream.videoStreamParams.referenceCount--;
+        }
+    }
+
+    // Update the counts in the SDK allocated stream attributes
+    GetCameraAVStreamMgmtServer()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ false);
+    GetCameraAVStreamMgmtServer()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ false);
+
+    return CHIP_NO_ERROR;
+}
