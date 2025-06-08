@@ -1,28 +1,28 @@
 /*
-*
-*    Copyright (c) 2021 Project CHIP Authors
-*    All rights reserved.
-*
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*        http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
-*/
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 /**
-*    @file
-*      Implementation of SetUp Code Pairer, a class that parses a given
-*      setup code and uses the extracted informations to discover and
-*      filter commissionables nodes, before initiating the pairing process.
-*
-*/
+ *    @file
+ *      Implementation of SetUp Code Pairer, a class that parses a given
+ *      setup code and uses the extracted informations to discover and
+ *      filter commissionables nodes, before initiating the pairing process.
+ *
+ */
 
 #include <controller/SetUpCodePairer.h>
 
@@ -42,252 +42,252 @@ namespace chip {
 namespace Controller {
 
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
-			       DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
+                                       DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
 {
-VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, remoteId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, remoteId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
 
-std::vector<SetupPayload> payloads;
-ReturnErrorOnFailure(SetupPayload::FromStringRepresentation(setUpCode, payloads));
+    std::vector<SetupPayload> payloads;
+    ReturnErrorOnFailure(SetupPayload::FromStringRepresentation(setUpCode, payloads));
 
-// If the caller has provided a specific single resolution data, and we were
-// only looking for one commissionee, and the caller says that the provided
-// data matches that one commissionee, just go ahead and use the provided data.
-//
-// If we were looking for more than one device (i.e. if either of the
-// payload arrays involved does not have length 1), we can't make use of the
-// incoming resolution data, since it does not contain the long
-// discriminator of the thing that was discovered, and therefore we can't
-// tell which setup passcode to use for it.
-if (resolutionData.HasValue() && payloads.size() == 1 && mSetupPayloads.size() == 1)
-{
-VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, discoveryType != DiscoveryType::kAll,
-			      CHIP_ERROR_INVALID_ARGUMENT);
-if (mRemoteId == remoteId && mSetupPayloads[0].setUpPINCode == payloads[0].setUpPINCode && mConnectionType == commission &&
-    mDiscoveryType == discoveryType)
-{
-    // Not passing a discriminator is ok, since we have only one payload.
-    NotifyCommissionableDeviceDiscovered(resolutionData.Value(), /* matchedLongDiscriminator = */ std::nullopt);
-    return CHIP_NO_ERROR;
-}
-}
+    // If the caller has provided a specific single resolution data, and we were
+    // only looking for one commissionee, and the caller says that the provided
+    // data matches that one commissionee, just go ahead and use the provided data.
+    //
+    // If we were looking for more than one device (i.e. if either of the
+    // payload arrays involved does not have length 1), we can't make use of the
+    // incoming resolution data, since it does not contain the long
+    // discriminator of the thing that was discovered, and therefore we can't
+    // tell which setup passcode to use for it.
+    if (resolutionData.HasValue() && payloads.size() == 1 && mSetupPayloads.size() == 1)
+    {
+        VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, discoveryType != DiscoveryType::kAll,
+                                      CHIP_ERROR_INVALID_ARGUMENT);
+        if (mRemoteId == remoteId && mSetupPayloads[0].setUpPINCode == payloads[0].setUpPINCode && mConnectionType == commission &&
+            mDiscoveryType == discoveryType)
+        {
+            // Not passing a discriminator is ok, since we have only one payload.
+            NotifyCommissionableDeviceDiscovered(resolutionData.Value(), /* matchedLongDiscriminator = */ std::nullopt);
+            return CHIP_NO_ERROR;
+        }
+    }
 
-ResetDiscoveryState();
+    ResetDiscoveryState();
 
-mConnectionType = commission;
-mDiscoveryType  = discoveryType;
-mRemoteId       = remoteId;
-mSetupPayloads  = std::move(payloads);
+    mConnectionType = commission;
+    mDiscoveryType  = discoveryType;
+    mRemoteId       = remoteId;
+    mSetupPayloads  = std::move(payloads);
 
-if (resolutionData.HasValue() && mSetupPayloads.size() == 1)
-{
-// No need to pass in a discriminator if we have only one payload, which
-// is good because we don't have a full discriminator here anyway.
-NotifyCommissionableDeviceDiscovered(resolutionData.Value(), /* matchedLongDiscriminator = */ std::nullopt);
-return CHIP_NO_ERROR;
-}
+    if (resolutionData.HasValue() && mSetupPayloads.size() == 1)
+    {
+        // No need to pass in a discriminator if we have only one payload, which
+        // is good because we don't have a full discriminator here anyway.
+        NotifyCommissionableDeviceDiscovered(resolutionData.Value(), /* matchedLongDiscriminator = */ std::nullopt);
+        return CHIP_NO_ERROR;
+    }
 
-ReturnErrorOnFailureWithMetric(kMetricSetupCodePairerPairDevice, Connect());
-auto errorCode =
-mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback, this);
-if (CHIP_NO_ERROR == errorCode)
-{
-MATTER_LOG_METRIC_BEGIN(kMetricSetupCodePairerPairDevice);
-}
-return errorCode;
+    ReturnErrorOnFailureWithMetric(kMetricSetupCodePairerPairDevice, Connect());
+    auto errorCode =
+        mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback, this);
+    if (CHIP_NO_ERROR == errorCode)
+    {
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupCodePairerPairDevice);
+    }
+    return errorCode;
 }
 
 CHIP_ERROR SetUpCodePairer::Connect()
 {
-if (mDiscoveryType == DiscoveryType::kAll)
-{
-if (ShouldDiscoverUsing(RendezvousInformationFlag::kBLE))
-{
-    CHIP_ERROR err = StartDiscoveryOverBLE();
-    if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
+    if (mDiscoveryType == DiscoveryType::kAll)
     {
-	ChipLogProgress(Controller,
-			"Skipping commissionable node discovery over BLE since not supported by the controller!");
+        if (ShouldDiscoverUsing(RendezvousInformationFlag::kBLE))
+        {
+            CHIP_ERROR err = StartDiscoveryOverBLE();
+            if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
+            {
+                ChipLogProgress(Controller,
+                                "Skipping commissionable node discovery over BLE since not supported by the controller!");
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Failed to start commissionable node discovery over BLE: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        }
+        if (ShouldDiscoverUsing(RendezvousInformationFlag::kWiFiPAF))
+        {
+            CHIP_ERROR err = StartDiscoveryOverWiFiPAF();
+            if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
+            {
+                ChipLogProgress(Controller,
+                                "Skipping commissionable node discovery over Wi-Fi PAF since not supported by the controller!");
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Failed to start commissionable node discovery over Wi-Fi PAF: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        }
     }
-    else if (err != CHIP_NO_ERROR)
-    {
-	ChipLogError(Controller, "Failed to start commissionable node discovery over BLE: %" CHIP_ERROR_FORMAT,
-		     err.Format());
-    }
-}
-if (ShouldDiscoverUsing(RendezvousInformationFlag::kWiFiPAF))
-{
-    CHIP_ERROR err = StartDiscoveryOverWiFiPAF();
-    if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
-    {
-	ChipLogProgress(Controller,
-			"Skipping commissionable node discovery over Wi-Fi PAF since not supported by the controller!");
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-	ChipLogError(Controller, "Failed to start commissionable node discovery over Wi-Fi PAF: %" CHIP_ERROR_FORMAT,
-		     err.Format());
-    }
-}
-}
 
-// We always want to search on network because any node that has already been commissioned will use on-network regardless of the
-// QR code flag.
-CHIP_ERROR err = StartDiscoveryOverDNSSD();
-if (err != CHIP_NO_ERROR)
-{
-ChipLogError(Controller, "Failed to start discovery over DNS-SD: %" CHIP_ERROR_FORMAT, err.Format());
-}
-return err;
+    // We always want to search on network because any node that has already been commissioned will use on-network regardless of the
+    // QR code flag.
+    CHIP_ERROR err = StartDiscoveryOverDNSSD();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to start discovery over DNS-SD: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
 }
 
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverBLE()
 {
 #if CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
-mCommissioner->ConnectBleTransportToSelf();
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mCommissioner->ConnectBleTransportToSelf();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-ChipLogProgress(Controller, "Starting commissioning discovery over BLE");
+    ChipLogProgress(Controller, "Starting commissioning discovery over BLE");
 
-// Handle possibly-sync callbacks.
-mWaitingForDiscovery[kBLETransport] = true;
-CHIP_ERROR err;
-// Not all BLE backends support the new NewBleConnectionByDiscriminators
-// API, so use the old one when we can (i.e. when we only have one setup
-// payload), to avoid breaking existing API consumers.
-if (mSetupPayloads.size() == 1)
-{
-err = mBleLayer->NewBleConnectionByDiscriminator(mSetupPayloads[0].discriminator, this, OnDiscoveredDeviceOverBleSuccess,
-						 OnDiscoveredDeviceOverBleError);
-}
-else
-{
-std::vector<SetupDiscriminator> discriminators;
-discriminators.reserve(mSetupPayloads.size());
-for (auto & payload : mSetupPayloads)
-{
-    discriminators.emplace_back(payload.discriminator);
-}
-err = mBleLayer->NewBleConnectionByDiscriminators(Span(discriminators.data(), discriminators.size()), this,
-						  OnDiscoveredDeviceWithDiscriminatorOverBleSuccess,
-						  OnDiscoveredDeviceOverBleError);
-}
-if (err != CHIP_NO_ERROR)
-{
-mWaitingForDiscovery[kBLETransport] = false;
-}
-return err;
+    // Handle possibly-sync callbacks.
+    mWaitingForDiscovery[kBLETransport] = true;
+    CHIP_ERROR err;
+    // Not all BLE backends support the new NewBleConnectionByDiscriminators
+    // API, so use the old one when we can (i.e. when we only have one setup
+    // payload), to avoid breaking existing API consumers.
+    if (mSetupPayloads.size() == 1)
+    {
+        err = mBleLayer->NewBleConnectionByDiscriminator(mSetupPayloads[0].discriminator, this, OnDiscoveredDeviceOverBleSuccess,
+                                                         OnDiscoveredDeviceOverBleError);
+    }
+    else
+    {
+        std::vector<SetupDiscriminator> discriminators;
+        discriminators.reserve(mSetupPayloads.size());
+        for (auto & payload : mSetupPayloads)
+        {
+            discriminators.emplace_back(payload.discriminator);
+        }
+        err = mBleLayer->NewBleConnectionByDiscriminators(Span(discriminators.data(), discriminators.size()), this,
+                                                          OnDiscoveredDeviceWithDiscriminatorOverBleSuccess,
+                                                          OnDiscoveredDeviceOverBleError);
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        mWaitingForDiscovery[kBLETransport] = false;
+    }
+    return err;
 #else
-return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CONFIG_NETWORK_LAYER_BLE
 }
 
 CHIP_ERROR SetUpCodePairer::StopDiscoveryOverBLE()
 {
-// Make sure to not call CancelBleIncompleteConnection unless we are in fact
-// waiting on BLE discovery.  It will cancel connections that are in fact
-// completed. In particular, if we just established PASE over BLE calling
-// CancelBleIncompleteConnection here unconditionally would cancel the BLE
-// connection underlying the PASE session.  So make sure to only call
-// CancelBleIncompleteConnection if we're still waiting to hear back on the
-// BLE discovery bits.
-if (!mWaitingForDiscovery[kBLETransport])
-{
-return CHIP_NO_ERROR;
-}
+    // Make sure to not call CancelBleIncompleteConnection unless we are in fact
+    // waiting on BLE discovery.  It will cancel connections that are in fact
+    // completed. In particular, if we just established PASE over BLE calling
+    // CancelBleIncompleteConnection here unconditionally would cancel the BLE
+    // connection underlying the PASE session.  So make sure to only call
+    // CancelBleIncompleteConnection if we're still waiting to hear back on the
+    // BLE discovery bits.
+    if (!mWaitingForDiscovery[kBLETransport])
+    {
+        return CHIP_NO_ERROR;
+    }
 
-mWaitingForDiscovery[kBLETransport] = false;
+    mWaitingForDiscovery[kBLETransport] = false;
 #if CONFIG_NETWORK_LAYER_BLE
-VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-ChipLogDetail(Controller, "Stopping commissioning discovery over BLE");
-return mBleLayer->CancelBleIncompleteConnection();
+    VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    ChipLogDetail(Controller, "Stopping commissioning discovery over BLE");
+    return mBleLayer->CancelBleIncompleteConnection();
 #else
-return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 #endif // CONFIG_NETWORK_LAYER_BLE
 }
 
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverDNSSD()
 {
-ChipLogProgress(Controller, "Starting commissioning discovery over DNS-SD");
+    ChipLogProgress(Controller, "Starting commissioning discovery over DNS-SD");
 
-Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone);
-if (mSetupPayloads.size() == 1)
-{
-auto & discriminator = mSetupPayloads[0].discriminator;
-if (discriminator.IsShortDiscriminator())
-{
-    filter.type = Dnssd::DiscoveryFilterType::kShortDiscriminator;
-    filter.code = discriminator.GetShortValue();
-}
-else
-{
-    filter.type = Dnssd::DiscoveryFilterType::kLongDiscriminator;
-    filter.code = discriminator.GetLongValue();
-}
-}
+    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone);
+    if (mSetupPayloads.size() == 1)
+    {
+        auto & discriminator = mSetupPayloads[0].discriminator;
+        if (discriminator.IsShortDiscriminator())
+        {
+            filter.type = Dnssd::DiscoveryFilterType::kShortDiscriminator;
+            filter.code = discriminator.GetShortValue();
+        }
+        else
+        {
+            filter.type = Dnssd::DiscoveryFilterType::kLongDiscriminator;
+            filter.code = discriminator.GetLongValue();
+        }
+    }
 
-// In theory we could try to filter on the vendor ID if it's the same across all the setup
-// payloads, but DNS-SD advertisements are not required to include the Vendor ID subtype, so in
-// practice that's not doable.
+    // In theory we could try to filter on the vendor ID if it's the same across all the setup
+    // payloads, but DNS-SD advertisements are not required to include the Vendor ID subtype, so in
+    // practice that's not doable.
 
-// Handle possibly-sync callbacks.
-mWaitingForDiscovery[kIPTransport] = true;
-CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(filter);
-if (err != CHIP_NO_ERROR)
-{
-mWaitingForDiscovery[kIPTransport] = false;
-}
-return err;
+    // Handle possibly-sync callbacks.
+    mWaitingForDiscovery[kIPTransport] = true;
+    CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(filter);
+    if (err != CHIP_NO_ERROR)
+    {
+        mWaitingForDiscovery[kIPTransport] = false;
+    }
+    return err;
 }
 
 CHIP_ERROR SetUpCodePairer::StopDiscoveryOverDNSSD()
 {
-ChipLogDetail(Controller, "Stopping commissioning discovery over DNS-SD");
+    ChipLogDetail(Controller, "Stopping commissioning discovery over DNS-SD");
 
-mWaitingForDiscovery[kIPTransport] = false;
+    mWaitingForDiscovery[kIPTransport] = false;
 
-mCommissioner->StopCommissionableDiscovery();
-return CHIP_NO_ERROR;
+    mCommissioner->StopCommissionableDiscovery();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-if (mSetupPayloads.size() != 1)
-{
-ChipLogError(Controller, "WiFiPAF commissioning does not support concatenated QR codes yet.");
-return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
+    if (mSetupPayloads.size() != 1)
+    {
+        ChipLogError(Controller, "WiFiPAF commissioning does not support concatenated QR codes yet.");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
 
-auto & payload = mSetupPayloads[0];
+    auto & payload = mSetupPayloads[0];
 
-ChipLogProgress(Controller, "Starting commissioning discovery over WiFiPAF");
-VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(Controller, "Starting commissioning discovery over WiFiPAF");
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-const SetupDiscriminator connDiscriminator(payload.discriminator);
-VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
-		ChipLogError(Controller, "Error, Long discriminator is required"));
-uint16_t discriminator              = connDiscriminator.GetLongValue();
-WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
-				    .nodeId        = mRemoteId,
-				    .discriminator = discriminator };
-ReturnErrorOnFailure(
-DeviceLayer::ConnectivityMgr().GetWiFiPafLayer()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+    const SetupDiscriminator connDiscriminator(payload.discriminator);
+    VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Controller, "Error, Long discriminator is required"));
+    uint16_t discriminator              = connDiscriminator.GetLongValue();
+    WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
+                                            .nodeId        = mRemoteId,
+                                            .discriminator = discriminator };
+    ReturnErrorOnFailure(
+        DeviceLayer::ConnectivityMgr().GetWiFiPafLayer()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
 
-mWaitingForDiscovery[kWiFiPAFTransport] = true;
-CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
-							     OnWiFiPAFSubscribeError);
-if (err != CHIP_NO_ERROR)
-{
-ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
-mWaitingForDiscovery[kWiFiPAFTransport] = false;
-}
-return err;
+    mWaitingForDiscovery[kWiFiPAFTransport] = true;
+    CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
+                                                                     OnWiFiPAFSubscribeError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
+        mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    }
+    return err;
 #else
-return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }
 
