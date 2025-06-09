@@ -26,6 +26,8 @@ from datetime import datetime
 from enum import Enum, auto
 
 TEST_NODE_ID = '0x12344321'
+TEST_DISCRIMINATOR = '3840'
+TEST_PASSCODE = '20202021'
 
 
 class App:
@@ -327,8 +329,8 @@ class TestDefinition:
     def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str,
             timeout_seconds: typing.Optional[int], dry_run=False,
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
-            ble_adapter_app: typing.Optional[int] = None,
-            ble_adapter_tool: typing.Optional[int] = None):
+            ble_controller_app: typing.Optional[int] = None,
+            ble_controller_tool: typing.Optional[int] = None):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -381,8 +383,8 @@ class TestDefinition:
                         key = 'default'
                     else:
                         key = os.path.basename(command[-1])
-                    if ble_adapter_app is not None:
-                        command += ["--ble-controller", str(ble_adapter_app), "--wifi"]
+                    if ble_controller_app is not None:
+                        command += ["--ble-controller", str(ble_controller_app), "--wifi"]
                     app = App(runner, command)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
@@ -426,14 +428,14 @@ class TestDefinition:
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
                 pairing_server_args = []
-                if ble_adapter_tool is not None:
+                if ble_controller_tool is not None:
                     # Explicitly use ble-wifi pairing to force the use of BLE
                     # exchange and AP association. The code-wifi pairing skips
                     # BLE commissioning if devices can be commissioned over IP
                     # network.
                     pairing_cmd = paths.chip_tool_with_python_cmd + [
-                        "pairing", "ble-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", "20202021", "3840"]
-                    pairing_server_args = ["--ble-controller", str(ble_adapter_tool)]
+                        "pairing", "ble-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_PASSCODE, TEST_DISCRIMINATOR]
+                    pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
                 else:
                     pairing_cmd = paths.chip_tool_with_python_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]
                 if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:

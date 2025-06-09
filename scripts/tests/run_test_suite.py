@@ -373,8 +373,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
 
-    ble_adapter_app = None
-    ble_adapter_tool = None
+    ble_controller_app = None
+    ble_controller_tool = None
 
     if sys.platform == 'linux':
         chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
@@ -383,8 +383,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             bluetooth = chiptest.linux.BluetoothMock()
             wifi = chiptest.linux.WpaSupplicantMock()
             time.sleep(0.5)  # Give the mock servers time to start
-            ble_adapter_app = 0   # Bind app to the first BLE adapter
-            ble_adapter_tool = 1  # Bind tool to the second BLE adapter
+            ble_controller_app = 0   # Bind app to the first BLE controller
+            ble_controller_tool = 1  # Bind tool to the second BLE controller
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
     logging.info("Each test will be executed %d times" % iterations)
@@ -424,8 +424,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
                     test_runtime=context.obj.runtime,
-                    ble_adapter_app=ble_adapter_app,
-                    ble_adapter_tool=ble_adapter_tool,
+                    ble_controller_app=ble_controller_app,
+                    ble_controller_tool=ble_controller_tool,
                 )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()

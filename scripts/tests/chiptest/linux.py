@@ -23,8 +23,8 @@ import logging
 import os
 import pathlib
 import subprocess
-import threading
 import sys
+import threading
 import time
 
 import sdbus
@@ -181,11 +181,11 @@ class DBusTestSystemBus(subprocess.Popen):
     ADDRESS = f"unix:path={SOCKET}"
 
     def __init__(self):
-        super().__init__(["dbus-daemon", "--session", "--address", self.ADDRESS],
-                         stderr=subprocess.DEVNULL)
+        super().__init__(["dbus-daemon", "--session", "--print-address", "--address", self.ADDRESS],
+                         stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = self.ADDRESS
-        # Wait for the bus to start.
-        time.sleep(0.5)
+        # Wait for the bus to start (it will print the address to stdout).
+        self.stdout.readline()
 
     def terminate(self):
         super().terminate()
@@ -302,6 +302,7 @@ class WpaSupplicantMock(threading.Thread):
             self.enabled = value
 
     async def startup(self):
+        # Attach to the system bus which in fact is our mock bus.
         bus = sdbus.sd_bus_open_system()
         sdbus.set_default_bus(bus)
         # Acquire name on the system bus.
