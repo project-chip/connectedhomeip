@@ -64,6 +64,8 @@ case "$OS_TYPE" in
         ;;
 esac
 
+chip_support_webrtc_python_bindings=$chip_support_webrtc_python_bindings
+
 help() {
 
     echo "Usage: $file_name [ options ... ]"
