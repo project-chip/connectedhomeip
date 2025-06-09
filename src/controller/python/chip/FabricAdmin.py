@@ -110,7 +110,7 @@ class FabricAdmin:
             catTags=catTags,
             keypair=keypair)
 
-        if dacRevocationSetPath and len(dacRevocationSetPath) > 0 and dacRevocationSetPath != "None":
+        if dacRevocationSetPath and len(dacRevocationSetPath) > 0:
             controller.SetDACRevocationSetPath(dacRevocationSetPath)
 
         self._activeControllers.append(controller)

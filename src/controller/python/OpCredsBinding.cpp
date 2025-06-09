@@ -65,7 +65,11 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
 
 Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationDelegate(const char * dacRevocationSetPath)
 {
-    VerifyOrReturnValue(dacRevocationSetPath != nullptr, nullptr);
+    if (dacRevocationSetPath == nullptr)
+    {
+        ChipLogError(Controller, "Received a nullptr dacRevocationSetPath. Using empty string so that attestation checks don't fail!");
+        dacRevocationSetPath = "";
+    }
 
     static Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
     testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
