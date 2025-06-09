@@ -89,27 +89,32 @@ class TC_AVSM_2_2(MatterBaseTest):
             ),
             TestStep(
                 8,
-                "TH sends the SnapshotStreamAllocate command with values from step 6 except with MaxFrameRate set to 0(outside of valid range).",
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with MaxFrameRate set to 0 (outside of valid range).",
                 "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 9,
-                "TH sends the SnapshotStreamAllocate command with values from step 6 except with Quality set to 101(outside of valid range).",
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with Quality set to 0 (below valid range).",
                 "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 10,
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with Quality set to 101 (above valid range).",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                11,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with ImageCodec set to 10(outside of valid range).",
                 "DUT responds with a DYANMIC_CONSTRAINT_ERROR status code.",
             ),
             TestStep(
-                11,
+                12,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with MinResolution set to {0,0} (outside of valid range).",
                 "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code."
             ),
             TestStep(
-                12,
-                "TH sends the SnapshotStreamAllocate command with values from step 6 except with Quality set to {0,0} (outside of valid range).",
+                13,
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with MaxResolution set to {0,0} (outside of valid range).",
                 "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
         ]
@@ -210,13 +215,36 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
+                quality=0,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            asserts.assert_true(
+                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 0 (below valid range)"
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.DynamicConstraintError,
+                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 0 (below valid range)",
+            )
+            pass
+
+        self.step(10)
+        try:
+            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
+                imageCodec=aSnapshotCapabilities[0].imageCodec,
+                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
+                minResolution=aSnapshotCapabilities[0].resolution,
+                maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=101,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 101(outside of valid range)"
+                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 101 (above valid range)"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
@@ -226,14 +254,14 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
             pass
         
-        self.step(10)
+        self.step(11)
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=10,
                 maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
-                quality=101,
+                quality=90,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )
@@ -249,14 +277,14 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
             pass
 
-        self.step(11)
+        self.step(12)
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=aSnapshotCapabilities[0].imageCodec,
                 maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
                 minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=0, height=0),
                 maxResolution=aSnapshotCapabilities[0].resolution,
-                quality=101,
+                quality=90,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )
@@ -272,14 +300,14 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
             pass
 
-        self.step(12)
+        self.step(13)
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=aSnapshotCapabilities[0].imageCodec,
                 maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=0, height=0),
-                quality=101,
+                quality=90,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )

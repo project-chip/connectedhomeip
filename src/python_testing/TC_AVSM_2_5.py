@@ -205,7 +205,7 @@ class TC_AVSM_2_5(MatterBaseTest):
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
                 streamUsage=notSupportedStreamUsage,
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
-                channelCount=16,
+                channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
                 bitRate=aBitRate,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
@@ -217,7 +217,7 @@ class TC_AVSM_2_5(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.ConstraintError,
+                Status.InvalidInState,
                 "Unexpected status returned when expecting INVALID_IN_STATE due to unsupported StreamUsage",
             )
             pass

@@ -1746,7 +1746,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
 
     VerifyOrReturn(commandData.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
     });
 
     VerifyOrReturn(commandData.audioCodec != AudioCodecEnum::kUnknownEnumValue, {
