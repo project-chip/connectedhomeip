@@ -52,6 +52,14 @@
             "cwd": "${workspaceFolder}"
         },
         {
+            "name": "Run application Energy-Gtw-Sample (Darwin x64)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/chip-energy-gateway-app/chip-energy-gateway-app",
+            "args": ["--enable-key", "00112233445566778899aabbccddeeff"],
+            "cwd": "${workspaceFolder}/examples/energy-gateway-app/commodity-tariff"
+        },
+        {
             "name": "Run application (Linux x64)",
             "type": "cppdbg",
             "request": "launch",

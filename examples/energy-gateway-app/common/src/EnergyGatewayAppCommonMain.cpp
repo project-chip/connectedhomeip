@@ -18,6 +18,7 @@
 
 #include "EnergyGatewayAppCommonMain.h"
 #include "CommodityPriceMain.h"
+#include "CommodityTariffMain.h"
 #include "ElectricalGridConditionsMain.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -70,6 +71,7 @@ void ElectricalEnergyTariffInit()
     EndpointId kElectricalEnergyTariffEndpointId = 1;
 
     VerifyOrDie(CommodityPriceInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
+    VerifyOrDie(CommodityTariffInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
     VerifyOrDie(ElectricalGridConditionsInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
 
     // set the descriptor TagList to include "ElectricalEnergy" and "Current" (to indicate the ActiveTariff)
