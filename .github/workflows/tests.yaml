@@ -413,8 +413,8 @@ jobs:
                         --target darwin-x64-microwave-oven-${BUILD_VARIANT} \
                         --target darwin-x64-rvc-${BUILD_VARIANT} \
                         --target darwin-x64-network-manager-${BUILD_VARIANT} \
-                        --target darwin-x64-energy-gateway-${BUILD_VARIANT} \                        
-                        --target darwin-x64-energy-management-${BUILD_VARIANT} \                        
+                        --target darwin-x64-energy-gateway-${BUILD_VARIANT} \
+                        --target darwin-x64-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -440,7 +440,7 @@ jobs:
                      --rvc-app ./out/darwin-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/darwin-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --energy-gateway-app ./out/darwin-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./out/darwin-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \                   
+                     --energy-management-app ./out/darwin-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
