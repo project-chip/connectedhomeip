@@ -329,7 +329,7 @@ exit:
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
-    NetworkCommissioning::SlWiFiDriver::GetInstance().OnConnectWiFiNetwork();
+    NetworkCommissioning::SlWiFiDriver::GetInstance()->OnConnectWiFiNetwork();
 
     UpdateInternetConnectivityState();
     // Alert other components of the new state.
@@ -362,7 +362,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
-        NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
+        NetworkCommissioning::SlWiFiDriver::GetInstance()->UpdateNetworkingStatus();
     }
 }
 

@@ -122,11 +122,6 @@ osMessageQueueId_t sAppEventQueue;
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
-#ifdef SL_WIFI
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
-#endif /* SL_WIFI */
-
 bool sIsEnabled  = false;
 bool sIsAttached = false;
 
@@ -303,12 +298,6 @@ CHIP_ERROR BaseApplication::BaseInit()
         osDelay(pdMS_TO_TICKS(10));
     }
     ChipLogProgress(AppServer, "APP: Done WiFi Init");
-    /* We will init server when we get IP */
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    sWiFiNetworkCommissioningInstance.Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
 #endif
 
     // Create cmsis os sw timer for Function Selection.
