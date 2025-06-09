@@ -510,8 +510,14 @@ bool WebRTCProviderManager::IsPrivacyModeActive()
 
 bool WebRTCProviderManager::HasAllocatedVideoStreams()
 {
+    if (mCameraAVStreamMgmtServer == nullptr)
+    {
+        ChipLogError(Camera, "AV Stream Management Server not available for HasAllocatedVideoStreams check");
+        return false; // Or handle as an error if appropriate
+    }
     const std::vector<VideoStreamStruct> & allocatedVideoStreams = mCameraAVStreamMgmtServer->GetAllocatedVideoStreams();
     return !allocatedVideoStreams.empty();
+}
 }
 
 bool WebRTCProviderManager::HasAllocatedAudioStreams()
