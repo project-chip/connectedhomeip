@@ -18,13 +18,7 @@
 #include "WebRTC.h"
 #include "Callbacks.h"
 
-#include <fstream>
-#include <iostream>
-#include <map>
 #include <memory>
-#include <queue>
-#include <sstream>
-#include <string>
 #include <thread>
 #include <unistd.h>
 
