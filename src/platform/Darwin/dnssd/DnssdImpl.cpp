@@ -15,9 +15,8 @@
  *    limitations under the License.
  */
 #include "DnssdImpl.h"
+#include "DnssdError.h"
 #include "DnssdType.h"
-#include "MdnsError.h"
-#include "UserDefaults.h"
 
 #include <cstdio>
 
@@ -25,6 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Darwin/UserDefaults.h>
 
 #include <string>
 
