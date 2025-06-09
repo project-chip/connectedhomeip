@@ -35,12 +35,12 @@ from mobly.test_runner import TestRunner
 try:
     from matter_yamltests.hooks import TestRunnerHooks
 except ImportError:
-    class TestRunnerHooks:  # type: ignore[no-redef]
+    class TestRunnerHooks:  # type: ignore[no-redef] # Conditional fallback, not a true redefinition
         pass
 try:
     from chip.tracing import TracingContext
 except ImportError:
-    class TracingContext:  # type: ignore[no-redef]
+    class TracingContext:  # type: ignore[no-redef] # Conditional fallback, not a true redefinition
         def __enter__(self):
             return self
 
@@ -481,7 +481,7 @@ class MockTestRunner():
     """
 
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
-                 pics: Optional[dict[bool, str]] = None, paa_trust_store_path=None):
+                 pics: Optional[dict[str, bool]] = None, paa_trust_store_path=None):
 
         from chip.testing.matter_testing import MatterStackState, MatterTestConfig
 
