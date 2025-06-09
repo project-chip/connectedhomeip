@@ -23,12 +23,20 @@
 
 #pragma once
 
-#include <inet/EndPointStateNetworkFramework.h>
+#include "EndPointStateNetworkFramework.h"
+#include "UDPEndPointImplNetworkFrameworkConnection.h"
+#include "UDPEndPointImplNetworkFrameworkListener.h"
+#include "UDPEndPointImplNetworkFrameworkListenerGroup.h"
+#include <inet/UDPEndPoint.h>
 
 namespace chip {
 namespace Inet {
 
-class UDPEndPointImplNetworkFramework : public UDPEndPoint, public EndPointStateNetworkFramework
+class UDPEndPointImplNetworkFramework : public UDPEndPoint,
+                                        public EndPointStateNetworkFramework,
+                                        public Darwin::UDPEndPointImplNetworkFrameworkConnection,
+                                        public Darwin::UDPEndPointImplNetworkFrameworkListener,
+                                        public Darwin::UDPEndPointImplNetworkFrameworkListenerGroup
 {
 public:
     UDPEndPointImplNetworkFramework(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager) {}
@@ -36,7 +44,7 @@ public:
     // UDPEndPoint overrides.
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     InterfaceId GetBoundInterface() const override;
-    uint16_t GetBoundPort() const override;
+    uint16_t GetBoundPort() const override { return UDPEndPointImplNetworkFrameworkListener::GetBoundPort(); }
     void Free() override;
 
 private:
@@ -51,25 +59,25 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    nw_listener_t mListener;
-    dispatch_semaphore_t mListenerSemaphore;
-    dispatch_queue_t mListenerQueue;
-    nw_connection_t mConnection;
-    dispatch_semaphore_t mConnectionSemaphore;
-    dispatch_queue_t mConnectionQueue;
-    dispatch_semaphore_t mSendSemaphore;
-    dispatch_queue_t mSystemQueue;
+    class WorkFlag
+    {
+    public:
+        void MarkDead() { mAlive = false; }
+        bool IsAlive() const { return mAlive; }
+
+    private:
+        std::atomic<bool> mAlive{ true };
+    };
+
+    Platform::WeakPtr<WorkFlag> mWorkFlagWeak;
+    Platform::SharedPtr<WorkFlag> mWorkFlagStrong;
 
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
-    CHIP_ERROR StartListener();
-    CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
     nw_endpoint_t GetEndPoint(const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
-                              InterfaceId interfaceIndex = InterfaceId::Null());
-    CHIP_ERROR StartConnection(nw_connection_t aConnection);
-    void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
-    void HandleDataReceived(const nw_connection_t & aConnection);
-    CHIP_ERROR ReleaseListener();
-    CHIP_ERROR ReleaseConnection();
+                              InterfaceId interfaceIndex = InterfaceId::Null()) override;
+    CHIP_ERROR GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
+    void HandleDataReceived(nw_connection_t aConnection);
+    void StartConnectionFromListener(nw_connection_t connection) override;
     void ReleaseAll();
 };
 

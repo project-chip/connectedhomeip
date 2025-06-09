@@ -19,6 +19,7 @@
 #include "EnergyGatewayAppCommonMain.h"
 #include "CommodityPriceMain.h"
 #include "ElectricalGridConditionsMain.h"
+#include "MeterIdentificationInstance.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
