@@ -42,11 +42,11 @@ using namespace Camera;
 
 namespace {
 
-// Context structure to pass both CameraDevice and streamID to the callback
+// Context structure to pass both CameraDevice and videoStreamID to the callback
 struct AppSinkContext
 {
     CameraDevice * device;
-    uint16_t streamID;
+    uint16_t videoStreamID;
 };
 
 // Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
@@ -61,7 +61,7 @@ GstFlowReturn OnNewSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
 {
     AppSinkContext * context = static_cast<AppSinkContext *>(user_data);
     CameraDevice * self      = context->device;
-    uint16_t streamID        = context->streamID;
+    uint16_t videoStreamID   = context->videoStreamID;
 
     GstSample * sample = gst_app_sink_pull_sample(appsink);
     if (sample == nullptr)
@@ -79,8 +79,8 @@ GstFlowReturn OnNewSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
-        // Forward H.264 RTP data to media controller with the correct streamID
-        self->GetMediaController().DistributeVideo(reinterpret_cast<const char *>(map.data), map.size, streamID);
+        // Forward H.264 RTP data to media controller with the correct videoStreamID
+        self->GetMediaController().DistributeVideo(reinterpret_cast<const char *>(map.data), map.size, videoStreamID);
         gst_buffer_unmap(buffer, &map);
     }
 
