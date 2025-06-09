@@ -142,7 +142,7 @@ void CommodityTariffServer::HandleGetTariffComponent(HandlerContext & ctx,
     Commands::GetTariffComponentResponse::Type response;
 
     Status status = mProvider->GetTariffComponentInfoById(commandData.tariffComponentID, response.label, response.dayEntryIDs,
-                                                         response.tariffComponent);
+                                                          response.tariffComponent);
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);

@@ -189,7 +189,7 @@ struct TariffUpdateCtx
 class CommodityTariffDataProvider
 {
 public:
-    CommodityTariffDataProvider(EndpointId ep) : mEndpointId(ep) {};
+    CommodityTariffDataProvider(EndpointId ep) : mEndpointId(ep){};
     virtual ~CommodityTariffDataProvider() = default;
 
     /**
@@ -236,9 +236,9 @@ public:
             TariffDataUpd_Commit();
             ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
 
-            if(mTariffDataUpdatedCb != nullptr)
+            if (mTariffDataUpdatedCb != nullptr)
             {
-                mTariffDataUpdatedCb();                
+                mTariffDataUpdatedCb();
             }
 
             return;
@@ -256,18 +256,18 @@ public:
 
 private:
     // Primary attribute storage and management
-#define X(attrName, attrType)  \
-    attrType m##attrName; \
+#define X(attrName, attrType)                                                                                                      \
+    attrType m##attrName;                                                                                                          \
     attrName##DataClass m##attrName##_MgmtObj{ m##attrName };
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
-/*
-    void CleanupCurrentAttrs()
-    {
-#define X(attrName, attrType) m##attrName = attrType##(0);
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-    }*/
+    /*
+        void CleanupCurrentAttrs()
+        {
+    #define X(attrName, attrType) m##attrName = attrType##(0);
+        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+    #undef X
+        }*/
 
     static void TariffDataUpd_AttrChangeCb(uint16_t aAttrId, void * CbCtx)
     {
@@ -305,6 +305,7 @@ private:
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
     }
+
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
     BitMask<Feature> mFeature;
@@ -330,7 +331,9 @@ public:
      * @param aFeature Bitmask of supported features
      */
     CommodityTariffServer(EndpointId aEndpointId, BitMask<Feature> aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id), mFeature(aFeature) {}
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+        mFeature(aFeature)
+    {}
 
     ~CommodityTariffServer() { Shutdown(); }
 
@@ -344,15 +347,14 @@ public:
      */
     bool HasFeature(Feature aFeature) const;
 
-    void AttachTariffProvider(CommodityTariffDataProvider * aProvider) {
-        mProvider = aProvider;
-    }
+    void AttachTariffProvider(CommodityTariffDataProvider * aProvider) { mProvider = aProvider; }
 
 private:
     CommodityTariffDataProvider * mProvider;
     BitMask<Feature> mFeature;
     // Current attribute storage
-#define X(attrName, attrType) attrType m##attrName; \
+#define X(attrName, attrType)                                                                                                      \
+    attrType m##attrName;                                                                                                          \
     attrType & Get##attrName() { return m##attrName; }
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
 #undef X

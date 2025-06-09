@@ -619,10 +619,7 @@ public:
         }
     }
 
-    void Cleanup()
-    {
-        CleanupValue(mValue);
-    }
+    void Cleanup() { CleanupValue(mValue); }
 
 protected:
     T & mValue;             // Reference to the applied value storage
