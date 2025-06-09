@@ -94,7 +94,7 @@ class TC_AVSM_2_5(MatterBaseTest):
             TestStep(
                 8,
                 "TH sends the AudioStreamAllocate command with values from step 6 except with StreamUsage set to a value not in aStreamUsagePriorities",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
+                "DUT responds with a INVALID_IN_STATE status code.",
             ),
             TestStep(
                 9,
@@ -161,7 +161,7 @@ class TC_AVSM_2_5(MatterBaseTest):
             case Clusters.CameraAvStreamManagement.Enums.AudioCodecEnum.kOpus:
                 aBitRate = 30000
 
-            case Clusters.CameraAvStreamUserLevelManagement.Enums.AudioCodecEnum.kAacLc:
+            case Clusters.CameraAvStreamManagement.Enums.AudioCodecEnum.kAacLc:
                 aBitRate = 40000
 
         self.step(5)

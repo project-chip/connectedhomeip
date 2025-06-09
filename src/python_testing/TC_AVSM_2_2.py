@@ -105,7 +105,7 @@ class TC_AVSM_2_2(MatterBaseTest):
             TestStep(
                 11,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with ImageCodec set to 10(outside of valid range).",
-                "DUT responds with a DYANMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 12,
