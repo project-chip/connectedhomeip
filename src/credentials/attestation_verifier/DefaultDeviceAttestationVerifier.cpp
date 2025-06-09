@@ -312,14 +312,14 @@ AttestationVerificationResult MapError(CertificateChainValidationResult certific
 }
 
 // CertificateType class doesn't work since it doesn't encode PAA>
-enum AttestationChainElement : uint8_t
+enum class AttestationChainElement : uint8_t
 {
     kPAA = 0,
     kPAI = 1,
     kDAC = 2
 };
 
-enum KeyIdType : uint8_t
+enum class KeyIdType : uint8_t
 {
     kAuthorityKeyId = 0,
     kSubjectKeyId   = 1,
@@ -331,10 +331,8 @@ const char * CertTypeAsString(AttestationChainElement certType)
     {
     case AttestationChainElement::kPAA:
         return "PAA";
-        break;
     case AttestationChainElement::kPAI:
         return "PAI";
-        break;
     case AttestationChainElement::kDAC:
         return "DAC";
     default:
@@ -345,13 +343,14 @@ const char * CertTypeAsString(AttestationChainElement certType)
 
 void LogOneKeyId(KeyIdType keyIdType, AttestationChainElement certType, ByteSpan derBuffer)
 {
-    [[maybe_unused]] const char * certTypeName = CertTypeAsString(certType);
+#if CHIP_PROGRESS_LOGGING
+    const char * certTypeName = CertTypeAsString(certType);
 
     uint8_t keyIdBuf[Crypto::kAuthorityKeyIdentifierLength]; // Big enough for SKID/AKID.
     MutableByteSpan keyIdSpan{ keyIdBuf };
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    [[maybe_unused]] const char * keyIdTypeString = "<UNKNOWN>";
+    const char * keyIdTypeString = "<UNKNOWN>";
     switch (keyIdType)
     {
     case KeyIdType::kAuthorityKeyId:
@@ -375,13 +374,19 @@ void LogOneKeyId(KeyIdType keyIdType, AttestationChainElement certType, ByteSpan
     }
 
     KeyIdStringifier KeyIdStringifier;
-    [[maybe_unused]] const char * keyIdString = KeyIdStringifier.KeyIdToHex(keyIdSpan);
+    const char * keyIdString = KeyIdStringifier.KeyIdToHex(keyIdSpan);
 
     ChipLogProgress(NotSpecified, "--> %s certificate %s: %s", certTypeName, keyIdTypeString, keyIdString);
+#else
+    IgnoreUnusedVariable(keyIdType);
+    IgnoreUnusedVariable(certType);
+    IgnoreUnusedVariable(derBuffer);
+#endif // CHIP_PROGRESS_LOGGING
 }
 
 void LogCertificateAsPem(AttestationChainElement element, ByteSpan derBuffer)
 {
+#if CHIP_PROGRESS_LOGGING
     ChipLogProgress(NotSpecified, "==== %s certificate considered (%u bytes) ====", CertTypeAsString(element),
                     static_cast<unsigned>(derBuffer.size()));
     PemEncoder encoder("CERTIFICATE", derBuffer);
@@ -389,6 +394,10 @@ void LogCertificateAsPem(AttestationChainElement element, ByteSpan derBuffer)
     {
         ChipLogProgress(NotSpecified, "%s", pemLine);
     }
+#else
+    IgnoreUnusedVariable(element);
+    IgnoreUnusedVariable(derBuffer);
+#endif // CHIP_PROGRESS_LOGGING
 }
 
 } // namespace
@@ -494,12 +503,13 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         if (err != CHIP_NO_ERROR)
         {
             attestationError = AttestationVerificationResult::kPaaNotFound;
+#if CHIP_ERROR_LOGGING
             KeyIdStringifier paiAkidWriter;
             [[maybe_unused]] const char * paiAkidHexString = paiAkidWriter.KeyIdToHex(paiAkid);
 
             ChipLogError(NotSpecified, "Unable to find PAA, err: %" CHIP_ERROR_FORMAT ", PAI's AKID: %s", err.Format(),
                          paiAkidHexString);
-
+#endif // CHIP_ERROR_LOGGING
             ExitNow();
         }
 

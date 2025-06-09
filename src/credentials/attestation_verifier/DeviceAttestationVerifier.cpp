@@ -87,93 +87,100 @@ DeviceAttestationVerifier * gDacVerifier = &gDefaultDACVerifier;
 
 } // namespace
 
-struct AttestationVerificationResultDescription
-{
-    AttestationVerificationResultDescription(AttestationVerificationResult theResultCode, const char * theDescription) :
-        resultCode(theResultCode), description(theDescription)
-    {}
-
-    AttestationVerificationResult resultCode;
-    const char * description;
-};
-
 const char * GetAttestationResultDescription(AttestationVerificationResult resultCode)
 {
-    static const AttestationVerificationResultDescription kAttestationVerificationResultDescriptions[] = {
-        { AttestationVerificationResult::kSuccess, "Success" },
-
-        { AttestationVerificationResult::kPaaUntrusted, "PAA is untrusted (OBSOLETE: consider using a different error)" },
-        { AttestationVerificationResult::kPaaNotFound, "PAA not found in DCL and/or local PAA trust store" },
-        { AttestationVerificationResult::kPaaExpired, "PAA is expired" },
-        { AttestationVerificationResult::kPaaSignatureInvalid, "PAA signature is invalid" },
-        { AttestationVerificationResult::kPaaRevoked, "PAA is revoked (consider removing from DCL or PAA trust store!)" },
-        { AttestationVerificationResult::kPaaFormatInvalid, "PAA format is invalid" },
-        { AttestationVerificationResult::kPaaArgumentInvalid, "PAA argument is invalid in some way according to X.509 backend" },
-
-        { AttestationVerificationResult::kPaiExpired, "PAI is expired" },
-        { AttestationVerificationResult::kPaiSignatureInvalid, "PAI signature is invalid" },
-        { AttestationVerificationResult::kPaiRevoked, "PAI is revoked" },
-        { AttestationVerificationResult::kPaiFormatInvalid, "PAI format is invalid" },
-        { AttestationVerificationResult::kPaiArgumentInvalid, "PAI argument is invalid in some way according to X.509 backend" },
-        { AttestationVerificationResult::kPaiVendorIdMismatch, "PAI vendor ID mismatch (did not match VID present in PAA)" },
-        { AttestationVerificationResult::kPaiAuthorityNotFound,
-          "PAI authority not found (OBSOLETE: consider using a different error)" },
-        { AttestationVerificationResult::kPaiMissing, "PAI is missing/empty from attestation information data" },
-        { AttestationVerificationResult::kPaiAndDacRevoked, "Both PAI and DAC are revoked" },
-
-        { AttestationVerificationResult::kDacExpired, "DAC is expired" },
-        { AttestationVerificationResult::kDacSignatureInvalid, "DAC signature is invalid" },
-        { AttestationVerificationResult::kDacRevoked, "DAC is revoked" },
-        { AttestationVerificationResult::kDacFormatInvalid, "DAC format is invalid" },
-        { AttestationVerificationResult::kDacArgumentInvalid, "DAC  is invalid in some way according to X.509 backend" },
-        { AttestationVerificationResult::kDacVendorIdMismatch,
-          "DAC vendor ID mismatch (either between DAC and PAI, or between DAC and Basic Information cluster)" },
-        { AttestationVerificationResult::kDacProductIdMismatch,
-          "DAC product ID mismatch (either between DAC and PAI, or between DAC and Basic Information cluster)" },
-        { AttestationVerificationResult::kDacAuthorityNotFound,
-          "DAC authority not found (OBSOLETE: consider using a different error)" },
-
-        { AttestationVerificationResult::kFirmwareInformationMismatch, "Firmware information mismatch" },
-        { AttestationVerificationResult::kFirmwareInformationMissing, "Firmware information missing" },
-
-        { AttestationVerificationResult::kAttestationSignatureInvalid,
-          "Attestation signature failed to validate against DAC subject public key" },
-        { AttestationVerificationResult::kAttestationElementsMalformed, "Attestation elements payload is malformed" },
-        { AttestationVerificationResult::kAttestationNonceMismatch, "Attestation nonce mismatches one from Attestation Request" },
-        { AttestationVerificationResult::kAttestationSignatureInvalidFormat,
-          "Attestation signature format is invalid (likely wrong signature algorithm in certificate)" },
-
-        { AttestationVerificationResult::kCertificationDeclarationNoKeyId,
-          "Certification declaration missing the required key ID in CMS envelope" },
-        { AttestationVerificationResult::kCertificationDeclarationNoCertificateFound,
-          "Could not find matching trusted verification certificate for the certification declaration's key ID" },
-        { AttestationVerificationResult::kCertificationDeclarationInvalidSignature,
-          "Certification declaration signature failed to validate against the verification certificate" },
-        { AttestationVerificationResult::kCertificationDeclarationInvalidFormat, "Certification declaration format is invalid" },
-        { AttestationVerificationResult::kCertificationDeclarationInvalidVendorId,
-          "Certification declaration vendor ID failed to cross-reference with DAC and/or PAI and/or Basic Information cluster" },
-        { AttestationVerificationResult::kCertificationDeclarationInvalidProductId,
-          "Certification declaration product ID failed to cross-reference with DAC and/or PAI and/or Basic Information cluster" },
-        { AttestationVerificationResult::kCertificationDeclarationInvalidPAA,
-          "Certification declaration required a fixed allowed PAA which mismatches the final PAA found" },
-
-        { AttestationVerificationResult::kNoMemory, "Failed to allocate memory to process attestation verification" },
-        { AttestationVerificationResult::kInvalidArgument,
-          "Some unexpected invalid argument was provided internally to the device attestation procedure (likely malformed input "
-          "data from candidate device)" },
-        { AttestationVerificationResult::kInternalError,
-          "An internal error error arose in the device attestation procedure (likely malformed input data from candidate device)" },
-        { AttestationVerificationResult::kNotImplemented,
-          "Reached a critical-but-unimplemented part of the device attestation procedure!" }
-    };
-
-    for (const auto & desc : kAttestationVerificationResultDescriptions)
+    switch (resultCode)
     {
-        if (desc.resultCode == resultCode)
-        {
-            return desc.description;
-        }
+    case AttestationVerificationResult::kSuccess:
+        return "Success";
+    case AttestationVerificationResult::kPaaUntrusted:
+        return "PAA is untrusted (OBSOLETE: consider using a different error)";
+    case AttestationVerificationResult::kPaaNotFound:
+        return "PAA not found in DCL and/or local PAA trust store";
+    case AttestationVerificationResult::kPaaExpired:
+        return "PAA is expired";
+    case AttestationVerificationResult::kPaaSignatureInvalid:
+        return "PAA signature is invalid";
+    case AttestationVerificationResult::kPaaRevoked:
+        return "PAA is revoked (consider removing from DCL or PAA trust store!)";
+    case AttestationVerificationResult::kPaaFormatInvalid:
+        return "PAA format is invalid";
+    case AttestationVerificationResult::kPaaArgumentInvalid:
+        return "PAA argument is invalid in some way according to X.509 backend";
+    case AttestationVerificationResult::kPaiExpired:
+        return "PAI is expired";
+    case AttestationVerificationResult::kPaiSignatureInvalid:
+        return "PAI signature is invalid";
+    case AttestationVerificationResult::kPaiRevoked:
+        return "PAI is revoked";
+    case AttestationVerificationResult::kPaiFormatInvalid:
+        return "PAI format is invalid";
+    case AttestationVerificationResult::kPaiArgumentInvalid:
+        return "PAI argument is invalid in some way according to X.509 backend";
+    case AttestationVerificationResult::kPaiVendorIdMismatch:
+        return "PAI vendor ID mismatch (did not match VID present in PAA)";
+    case AttestationVerificationResult::kPaiAuthorityNotFound:
+        return "PAI authority not found (OBSOLETE: consider using a different error)";
+    case AttestationVerificationResult::kPaiMissing:
+        return "PAI is missing/empty from attestation information data";
+    case AttestationVerificationResult::kPaiAndDacRevoked:
+        return "Both PAI and DAC are revoked";
+    case AttestationVerificationResult::kDacExpired:
+        return "DAC is expired";
+    case AttestationVerificationResult::kDacSignatureInvalid:
+        return "DAC signature is invalid";
+    case AttestationVerificationResult::kDacRevoked:
+        return "DAC is revoked";
+    case AttestationVerificationResult::kDacFormatInvalid:
+        return "DAC format is invalid";
+    case AttestationVerificationResult::kDacArgumentInvalid:
+        return "DAC is invalid in some way according to X.509 backend";
+    case AttestationVerificationResult::kDacVendorIdMismatch:
+        return "DAC vendor ID mismatch (either between DAC and PAI, or between DAC and Basic Information cluster)";
+    case AttestationVerificationResult::kDacProductIdMismatch:
+        return "DAC product ID mismatch (either between DAC and PAI, or between DAC and Basic Information cluster)";
+    case AttestationVerificationResult::kDacAuthorityNotFound:
+        return "DAC authority not found (OBSOLETE: consider using a different error)";
+    case AttestationVerificationResult::kFirmwareInformationMismatch:
+        return "Firmware information mismatch";
+    case AttestationVerificationResult::kFirmwareInformationMissing:
+        return "Firmware information missing";
+    case AttestationVerificationResult::kAttestationSignatureInvalid:
+        return "Attestation signature failed to validate against DAC subject public key";
+    case AttestationVerificationResult::kAttestationElementsMalformed:
+        return "Attestation elements payload is malformed";
+    case AttestationVerificationResult::kAttestationNonceMismatch:
+        return "Attestation nonce mismatches one from Attestation Request";
+    case AttestationVerificationResult::kAttestationSignatureInvalidFormat:
+        return "Attestation signature format is invalid (likely wrong signature algorithm in certificate)";
+    case AttestationVerificationResult::kCertificationDeclarationNoKeyId:
+        return "Certification declaration missing the required key ID in CMS envelope";
+    case AttestationVerificationResult::kCertificationDeclarationNoCertificateFound:
+        return "Could not find matching trusted verification certificate for the certification declaration's key ID";
+    case AttestationVerificationResult::kCertificationDeclarationInvalidSignature:
+        return "Certification declaration signature failed to validate against the verification certificate";
+    case AttestationVerificationResult::kCertificationDeclarationInvalidFormat:
+        return "Certification declaration format is invalid";
+    case AttestationVerificationResult::kCertificationDeclarationInvalidVendorId:
+        return "Certification declaration vendor ID failed to cross-reference with DAC and/or PAI and/or Basic Information cluster";
+    case AttestationVerificationResult::kCertificationDeclarationInvalidProductId:
+        return "Certification declaration product ID failed to cross-reference with DAC and/or PAI and/or Basic Information cluster";
+    case AttestationVerificationResult::kCertificationDeclarationInvalidPAA:
+        return "Certification declaration required a fixed allowed PAA which mismatches the final PAA found";
+    case AttestationVerificationResult::kNoMemory:
+        return "Failed to allocate memory to process attestation verification";
+    case AttestationVerificationResult::kInvalidArgument:
+        return "Some unexpected invalid argument was provided internally to the device attestation procedure (likely malformed "
+               "input data from candidate device)";
+    case AttestationVerificationResult::kInternalError:
+        return "An internal error error arose in the device attestation procedure (likely malformed input data from candidate "
+               "device)";
+    case AttestationVerificationResult::kNotImplemented:
+        return "Reached a critical-but-unimplemented part of the device attestation procedure!";
+    default:
+        break;
     }
+
     return "<AttestationVerificationResult does not have a description!>";
 }
 
