@@ -94,7 +94,7 @@ class TC_CNET_4_16(MatterBaseTest):
                                  cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
                                  f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")
         else:
-            asserts.fail(f"NetworkList is Empty")
+            asserts.fail("NetworkList is Empty")
 
         # TH sends ConnectNetwork Command to the DUT with NetworkID
         # value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,
