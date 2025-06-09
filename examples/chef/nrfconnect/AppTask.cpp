@@ -181,9 +181,6 @@ CHIP_ERROR AppTask::Init()
     k_timer_init(&sFunctionTimer, &AppTask::FunctionTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
-    // Initialize CHIP server
-    // SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
-
     // Device Attestation & Onboarding codes
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -198,10 +195,6 @@ CHIP_ERROR AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
-    // AppFabricTableDelegate::Init();
-
-    // gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    // chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     ConfigurationMgr().LogDeviceConfig();
     // When SoftAP support becomes available, it should be added here.
