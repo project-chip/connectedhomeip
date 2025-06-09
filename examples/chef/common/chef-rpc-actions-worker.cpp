@@ -31,7 +31,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-#if CONFIG_ENABLE_PW_RPC
+#ifdef CONFIG_CHIP_PW_RPC
 using namespace chip::rpc;
 
 static std::map<ClusterId, ActionsDelegate *> gActionsDelegateMap{};
@@ -149,9 +149,7 @@ void ChefRpcActionsWorker::RegisterRpcActionsDelegate(ClusterId clusterId, Actio
 
 ChefRpcActionsWorker::ChefRpcActionsWorker()
 {
-#if CONFIG_ENABLE_PW_RPC
     chip::rpc::SubscribeActions(ChefRpcActionsCallback);
-#endif
 }
 
 static ChefRpcActionsWorker instance;
@@ -160,4 +158,4 @@ ChefRpcActionsWorker & ChefRpcActionsWorker::Instance()
 {
     return instance;
 }
-#endif // CONFIG_ENABLE_PW_RPC
+#endif // CONFIG_CHIP_PW_RPC
