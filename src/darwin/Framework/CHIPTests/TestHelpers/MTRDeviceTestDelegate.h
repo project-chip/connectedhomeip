@@ -20,6 +20,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
+typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 
 @interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
 @property (nonatomic, nullable) dispatch_block_t onReachable;
@@ -40,6 +41,9 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @property (nonatomic, nullable) dispatch_block_t onSubscriptionCallbackDelete;
 @property (nonatomic, nullable) dispatch_block_t onSubscriptionReset;
 @property (nonatomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
+@property (nonatomic, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
+@property (nonatomic) BOOL forceTimeUpdateShortDelayToZero;
+@property (nonatomic) BOOL forceTimeSynchronizationLossDetectionCadenceToZero;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate
