@@ -164,7 +164,8 @@ const char * GetAttestationResultDescription(AttestationVerificationResult resul
     case AttestationVerificationResult::kCertificationDeclarationInvalidVendorId:
         return "Certification declaration vendor ID failed to cross-reference with DAC and/or PAI and/or Basic Information cluster";
     case AttestationVerificationResult::kCertificationDeclarationInvalidProductId:
-        return "Certification declaration product ID failed to cross-reference with DAC and/or PAI and/or Basic Information cluster";
+        return "Certification declaration product ID failed to cross-reference with DAC and/or PAI and/or Basic Information "
+               "cluster";
     case AttestationVerificationResult::kCertificationDeclarationInvalidPAA:
         return "Certification declaration required a fixed allowed PAA which mismatches the final PAA found";
     case AttestationVerificationResult::kNoMemory:
