@@ -31,7 +31,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-
 #if CONFIG_ENABLE_PW_RPC
 using namespace chip::rpc;
 

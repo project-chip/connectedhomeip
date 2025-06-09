@@ -52,8 +52,8 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-constexpr size_t kAppEventQueueSize                 = 10;
-constexpr EndpointId kIdentifyEndpointId            = 1;
+constexpr size_t kAppEventQueueSize      = 10;
+constexpr EndpointId kIdentifyEndpointId = 1;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFunctionTimer;
@@ -101,8 +101,10 @@ void AppTask::MsgQConsume(intptr_t)
 {
     AppEvent event{};
 
-    while (true) {
-        if (k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT) != 0) {
+    while (true)
+    {
+        if (k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT) != 0)
+        {
             break;
         }
         ChipLogProgress(AppServer, "MsgQ get event.Type = %u", chip::to_underlying(event.Type));
@@ -112,9 +114,7 @@ void AppTask::MsgQConsume(intptr_t)
 void AppTask::InitServer(intptr_t)
 {
 
-ChipLogProgress(AppServer, "%s, %d", __func__, __LINE__);
     ApplicationInit();
-
 }
 
 CHIP_ERROR AppTask::Init()
@@ -184,7 +184,7 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     // SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
-    
+
     // Device Attestation & Onboarding codes
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -197,7 +197,7 @@ CHIP_ERROR AppTask::Init()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     // AppFabricTableDelegate::Init();
 
