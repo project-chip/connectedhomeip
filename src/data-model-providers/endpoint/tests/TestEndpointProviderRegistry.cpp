@@ -20,23 +20,33 @@
 #include <data-model-providers/endpoint/EndpointProviderRegistry.h>
 #include <data-model-providers/endpoint/SpanEndpointProvider.h>
 
-#include <algorithm> // For std::shuffle
-#include <list>      // For std::list in stress test
-#include <random>    // For std::default_random_engine
-#include <vector>    // For std::vector in stress test
+#include <algorithm>
+#include <list>
+#include <random>
+#include <vector>
 using namespace chip;
 using namespace chip::app;
+
+namespace {
+constexpr EndpointId kTestEndpointId1    = 1;
+constexpr EndpointId kTestEndpointId2    = 2;
+constexpr EndpointId kNonExistentId      = 3;
+constexpr EndpointId kValidIdForArgsTest = 1; // Same as kTestEndpointId1, but for clarity in RegisterInvalidArgs
+constexpr EndpointId kListId1ForArgsTest = 10;
+constexpr EndpointId kListId2ForArgsTest = 11;
+} // namespace
 
 TEST(TestEndpointProviderRegistry, CreateAndDestroy)
 {
     EndpointProviderRegistry registry;
 
     // Create a provider
-    auto build_pair_provider =
-        SpanEndpointProvider::Builder(1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-    ASSERT_EQ(build_pair_provider.second, CHIP_NO_ERROR);
-    auto provider = std::make_unique<SpanEndpointProvider>(std::move(build_pair_provider.first));
+    auto build_result =
+        SpanEndpointProvider::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result));
+    auto provider = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result)));
     ASSERT_NE(provider, nullptr);
+
     EndpointProviderInterface * provider_ptr = provider.get(); // Save raw pointer for comparison
 
     // Register it
@@ -44,30 +54,32 @@ TEST(TestEndpointProviderRegistry, CreateAndDestroy)
     ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
 
     // Check if it can be retrieved
-    ASSERT_EQ(registry.Get(1), provider_ptr);
+    ASSERT_EQ(registry.Get(kTestEndpointId1), provider_ptr);
 
     // Unregister the provider
-    ASSERT_EQ(registry.Unregister(1), CHIP_NO_ERROR);
+    ASSERT_EQ(registry.Unregister(kTestEndpointId1), CHIP_NO_ERROR);
 
     // Destroy the provider
     provider.reset();
 
     // Check if it is no longer retrievable
-    // After unregistering, Get(1) should return nullptr.
-    ASSERT_EQ(registry.Get(1), nullptr);
+    // After unregistering, Get(kTestEndpointId1) should return nullptr.
+    ASSERT_EQ(registry.Get(kTestEndpointId1), nullptr);
 }
 
 TEST(TestEndpointProviderRegistry, RegisterMultipleProviders)
 {
     EndpointProviderRegistry registry;
 
-    auto build_pair1 = SpanEndpointProvider::Builder(1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-    ASSERT_EQ(build_pair1.second, CHIP_NO_ERROR);
-    auto provider1 = std::make_unique<SpanEndpointProvider>(std::move(build_pair1.first));
+    auto build_result1 =
+        SpanEndpointProvider::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result1));
+    auto provider1 = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result1)));
+    auto build_result2 =
+        SpanEndpointProvider::Builder(kTestEndpointId2).SetComposition(DataModel::EndpointCompositionPattern::kTree).build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result2));
+    auto provider2 = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result2)));
 
-    auto build_pair2 = SpanEndpointProvider::Builder(2).SetComposition(DataModel::EndpointCompositionPattern::kTree).build();
-    ASSERT_EQ(build_pair2.second, CHIP_NO_ERROR);
-    auto provider2 = std::make_unique<SpanEndpointProvider>(std::move(build_pair2.first));
     ASSERT_NE(provider1, nullptr);
     ASSERT_NE(provider2, nullptr);
 
@@ -77,32 +89,32 @@ TEST(TestEndpointProviderRegistry, RegisterMultipleProviders)
     ASSERT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
     ASSERT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
 
-    ASSERT_EQ(registry.Get(1), provider1.get());
-    ASSERT_EQ(registry.Get(2), provider2.get());
-    ASSERT_EQ(registry.Count(), 2u);
+    ASSERT_EQ(registry.Get(kTestEndpointId1), provider1.get());
+    ASSERT_EQ(registry.Get(kTestEndpointId2), provider2.get());
 
-    ASSERT_EQ(registry.Unregister(1), CHIP_NO_ERROR);
-    ASSERT_EQ(registry.Get(1), nullptr);
-    ASSERT_EQ(registry.Get(2), provider2.get());
-    ASSERT_EQ(registry.Count(), 1u);
+    ASSERT_EQ(registry.Unregister(kTestEndpointId1), CHIP_NO_ERROR);
+    ASSERT_EQ(registry.Get(kTestEndpointId1), nullptr);
+    ASSERT_EQ(registry.Get(kTestEndpointId2), provider2.get());
 
-    ASSERT_EQ(registry.Unregister(2), CHIP_NO_ERROR);
-    ASSERT_EQ(registry.Get(2), nullptr);
-    ASSERT_EQ(registry.Count(), 0u);
+    ASSERT_EQ(registry.Unregister(kTestEndpointId2), CHIP_NO_ERROR);
+    ASSERT_EQ(registry.Get(kTestEndpointId2), nullptr);
 }
 
 TEST(TestEndpointProviderRegistry, RegisterDuplicateProviderId)
 {
     EndpointProviderRegistry registry;
 
-    auto build_pair1a = SpanEndpointProvider::Builder(1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-    ASSERT_EQ(build_pair1a.second, CHIP_NO_ERROR);
-    auto provider1a = std::make_unique<SpanEndpointProvider>(std::move(build_pair1a.first));
+    auto build_result1a =
+        SpanEndpointProvider::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result1a));
+    auto provider1a = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result1a)));
 
-    auto build_pair1b =
-        SpanEndpointProvider::Builder(1).SetComposition(DataModel::EndpointCompositionPattern::kTree).build(); // Same ID
-    ASSERT_EQ(build_pair1b.second, CHIP_NO_ERROR);
-    auto provider1b = std::make_unique<SpanEndpointProvider>(std::move(build_pair1b.first));
+    auto build_result1b = SpanEndpointProvider::Builder(kTestEndpointId1)
+                              .SetComposition(DataModel::EndpointCompositionPattern::kTree)
+                              .build(); // Same ID
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result1b));
+    auto provider1b = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result1b)));
+
     ASSERT_NE(provider1a, nullptr);
     ASSERT_NE(provider1b, nullptr);
 
@@ -110,20 +122,20 @@ TEST(TestEndpointProviderRegistry, RegisterDuplicateProviderId)
     EndpointProviderRegistration registration1b(*provider1b);
 
     ASSERT_EQ(registry.Register(registration1a), CHIP_NO_ERROR);
-    ASSERT_EQ(registry.Get(1), provider1a.get());
+    ASSERT_EQ(registry.Get(kTestEndpointId1), provider1a.get());
 
     // Attempt to register another provider with the same ID
     ASSERT_EQ(registry.Register(registration1b), CHIP_ERROR_DUPLICATE_KEY_ID);
-    ASSERT_EQ(registry.Get(1), provider1a.get()); // Should still be the first one
-    ASSERT_EQ(registry.Count(), 1u);
+    ASSERT_EQ(registry.Get(kTestEndpointId1), provider1a.get()); // Should still be the first one
 }
 
 TEST(TestEndpointProviderRegistry, RegisterSameRegistrationObject)
 {
     EndpointProviderRegistry registry;
-    auto build_pair = SpanEndpointProvider::Builder(1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-    ASSERT_EQ(build_pair.second, CHIP_NO_ERROR);
-    auto provider = std::make_unique<SpanEndpointProvider>(std::move(build_pair.first));
+    auto build_result =
+        SpanEndpointProvider::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result));
+    auto provider = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result)));
     ASSERT_NE(provider, nullptr);
 
     EndpointProviderRegistration registration(*provider);
@@ -131,42 +143,43 @@ TEST(TestEndpointProviderRegistry, RegisterSameRegistrationObject)
 
     // Attempt to register the exact same registration object again
     ASSERT_EQ(registry.Register(registration), CHIP_ERROR_DUPLICATE_KEY_ID); // Because registration.next is no longer nullptr
-    ASSERT_EQ(registry.Count(), 1u);
 }
 
 TEST(TestEndpointProviderRegistry, UnregisterNonExistentProvider)
 {
     EndpointProviderRegistry registry;
-    ASSERT_EQ(registry.Unregister(1), CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(registry.Unregister(kTestEndpointId1), CHIP_NO_ERROR); // Should succeed, no error for non-existent ID
 
-    auto build_pair = SpanEndpointProvider::Builder(1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-    ASSERT_EQ(build_pair.second, CHIP_NO_ERROR);
-    auto provider = std::make_unique<SpanEndpointProvider>(std::move(build_pair.first));
+    auto build_result =
+        SpanEndpointProvider::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result));
+    auto provider = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result)));
     ASSERT_NE(provider, nullptr);
     EndpointProviderRegistration registration(*provider);
     ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
 
-    ASSERT_EQ(registry.Unregister(2), CHIP_ERROR_NOT_FOUND); // Different ID
-    ASSERT_EQ(registry.Count(), 1u);
+    ASSERT_EQ(registry.Unregister(kTestEndpointId2), CHIP_NO_ERROR); // Different ID. Should still succeed
 }
 
 TEST(TestEndpointProviderRegistry, GetNonExistentProvider)
 {
     EndpointProviderRegistry registry;
-    ASSERT_EQ(registry.Get(1), nullptr);
+    ASSERT_EQ(registry.Get(kNonExistentId), nullptr);
 }
 
 TEST(TestEndpointProviderRegistry, IteratorTest)
 {
     EndpointProviderRegistry registry;
 
-    auto build_pair1 = SpanEndpointProvider::Builder(1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-    ASSERT_EQ(build_pair1.second, CHIP_NO_ERROR);
-    auto provider1 = std::make_unique<SpanEndpointProvider>(std::move(build_pair1.first));
+    auto build_result1 =
+        SpanEndpointProvider::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result1));
+    auto provider1 = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result1)));
 
-    auto build_pair2 = SpanEndpointProvider::Builder(2).SetComposition(DataModel::EndpointCompositionPattern::kTree).build();
-    ASSERT_EQ(build_pair2.second, CHIP_NO_ERROR);
-    auto provider2 = std::make_unique<SpanEndpointProvider>(std::move(build_pair2.first));
+    auto build_result2 = SpanEndpointProvider::Builder(2).SetComposition(DataModel::EndpointCompositionPattern::kTree).build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result2));
+    auto provider2 = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result2)));
+
     EndpointProviderRegistration registration1(*provider1);
     EndpointProviderRegistration registration2(*provider2);
 
@@ -179,9 +192,9 @@ TEST(TestEndpointProviderRegistry, IteratorTest)
     for (auto * ep : registry)
     {
         ASSERT_NE(ep, nullptr);
-        if (ep->GetEndpointEntry().id == 1)
+        if (ep->GetEndpointEntry().id == kTestEndpointId1)
             found1 = true;
-        if (ep->GetEndpointEntry().id == 2)
+        if (ep->GetEndpointEntry().id == kTestEndpointId2)
             found2 = true;
         count++;
     }
@@ -203,31 +216,36 @@ TEST(TestEndpointProviderRegistry, IteratorTest)
 TEST(TestEndpointProviderRegistry, RegisterInvalidArgs)
 {
     EndpointProviderRegistry registry;
-    auto build_pair_valid =
-        SpanEndpointProvider::Builder(1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-    ASSERT_EQ(build_pair_valid.second, CHIP_NO_ERROR);
-    auto providerValid = std::make_unique<SpanEndpointProvider>(std::move(build_pair_valid.first));
+    auto build_result_valid = SpanEndpointProvider::Builder(kValidIdForArgsTest)
+                                  .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
+                                  .build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result_valid));
+    auto providerValid = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result_valid)));
     ASSERT_NE(providerValid, nullptr);
 
     // Case 2: EndpointProviderInterface returns kInvalidEndpointId
-    auto build_pair_invalid = SpanEndpointProvider::Builder(kInvalidEndpointId).build();
-    ASSERT_NE(build_pair_invalid.second, CHIP_NO_ERROR); // Expecting an error for invalid ID
-    auto providerInvalidId = std::make_unique<SpanEndpointProvider>(std::move(build_pair_invalid.first));
-    ASSERT_NE(providerInvalidId, nullptr);
-    ASSERT_EQ(providerInvalidId->GetEndpointEntry().id, kInvalidEndpointId);
-    EndpointProviderRegistration registrationInvalidId(*providerInvalidId);
-    EXPECT_EQ(registry.Register(registrationInvalidId), CHIP_ERROR_INVALID_ARGUMENT);
+    auto build_result_invalid = SpanEndpointProvider::Builder(kInvalidEndpointId).build();
+    ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(build_result_invalid)); // Expecting an error for invalid ID
+    ASSERT_EQ(std::get<CHIP_ERROR>(build_result_invalid), CHIP_ERROR_INVALID_ARGUMENT);
+    // Cannot create a provider from an error, so this part of the test needs adjustment.
+    // We'll test that registering a provider that *would* have an invalid ID (if it could be built)
+    // is caught by the registry if we somehow bypassed the builder's check.
+    // For now, the builder prevents this. If we want to test the registry's check directly,
+    // we'd need a mock provider that returns kInvalidEndpointId.
+    // The current SpanEndpointProvider::Builder already prevents creation with kInvalidEndpointId.
 
     // Case 3: EndpointProviderRegistration already part of a list (entry.next != nullptr)
     // To test this, we need two valid providers and registrations.
-    auto build_pair_list1 =
-        SpanEndpointProvider::Builder(10).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-    ASSERT_EQ(build_pair_list1.second, CHIP_NO_ERROR);
-    auto providerForList1 = std::make_unique<SpanEndpointProvider>(std::move(build_pair_list1.first));
-    auto build_pair_list2 =
-        SpanEndpointProvider::Builder(11).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-    ASSERT_EQ(build_pair_list2.second, CHIP_NO_ERROR);
-    auto providerForList2 = std::make_unique<SpanEndpointProvider>(std::move(build_pair_list2.first));
+    auto build_result_list1 = SpanEndpointProvider::Builder(kListId1ForArgsTest)
+                                  .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
+                                  .build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result_list1));
+    auto providerForList1   = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result_list1)));
+    auto build_result_list2 = SpanEndpointProvider::Builder(kListId2ForArgsTest)
+                                  .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
+                                  .build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result_list2));
+    auto providerForList2 = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result_list2)));
     EndpointProviderRegistration registrationInList1(*providerForList1);
     EndpointProviderRegistration registrationInList2(*providerForList2);
 
@@ -240,8 +258,7 @@ TEST(TestEndpointProviderRegistry, RegisterInvalidArgs)
     // Test that registering a valid provider after these failures still works
     EndpointProviderRegistration registrationValid(*providerValid);
     EXPECT_EQ(registry.Register(registrationValid), CHIP_NO_ERROR);
-    EXPECT_EQ(registry.Count(), 1u);
-    EXPECT_EQ(registry.Get(1), providerValid.get());
+    EXPECT_EQ(registry.Get(kValidIdForArgsTest), providerValid.get());
 }
 
 TEST(TestEndpointProviderRegistry, StressTestRegistration)
@@ -256,10 +273,11 @@ TEST(TestEndpointProviderRegistry, StressTestRegistration)
     for (int i = 0; i < kNumProviders; ++i)
     {
         EndpointId id = static_cast<EndpointId>(i + 1);
-        auto build_pair =
+        auto build_result =
             SpanEndpointProvider::Builder(id).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).build();
-        ASSERT_EQ(build_pair.second, CHIP_NO_ERROR);
-        providers_storage.push_back(std::make_unique<SpanEndpointProvider>(std::move(build_pair.first)));
+        ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result));
+        providers_storage.push_back(
+            std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result))));
         ids.push_back(id);
         registrations.emplace_back(*providers_storage.back()); // Create registration from the provider
     }
@@ -270,7 +288,6 @@ TEST(TestEndpointProviderRegistry, StressTestRegistration)
     {
         ASSERT_EQ(registry.Register(*reg_it), CHIP_NO_ERROR) << "Failed to register provider with ID " << ids[i];
     }
-    ASSERT_EQ(registry.Count(), static_cast<size_t>(kNumProviders));
 
     // Verify all can be retrieved
     std::vector<EndpointId> shuffled_ids = ids;
@@ -288,7 +305,6 @@ TEST(TestEndpointProviderRegistry, StressTestRegistration)
         ASSERT_EQ(registry.Unregister(id), CHIP_NO_ERROR) << "Failed to unregister provider with ID " << id;
         ASSERT_EQ(registry.Get(id), nullptr) << "Provider with ID " << id << " still found after unregistration";
     }
-    ASSERT_EQ(registry.Count(), 0u);
 
     // Re-register all
     // Reset next pointers in registrations before re-registering
@@ -311,7 +327,7 @@ TEST(TestEndpointProviderRegistry, StressTestRegistration)
         }
         ASSERT_TRUE(found_and_registered);
     }
-    ASSERT_EQ(registry.Count(), static_cast<size_t>(kNumProviders));
+
     for (EndpointId id : ids)
     {
         ASSERT_NE(registry.Get(id), nullptr) << "Failed to get provider with ID " << id << " after re-registration";

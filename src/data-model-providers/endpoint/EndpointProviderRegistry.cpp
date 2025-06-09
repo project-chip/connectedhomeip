@@ -20,35 +20,17 @@
 namespace chip {
 namespace app {
 
-EndpointProviderRegistry::~EndpointProviderRegistry()
-{
-    // The registry does not own the EndpointProviderInterface instances,
-    // nor the EndpointProviderRegistration nodes. It just clears its list.
-    mRegistrations    = nullptr;
-    mCachedInterface  = nullptr;
-    mCachedEndpointId = kInvalidEndpointId;
-}
-
 CHIP_ERROR EndpointProviderRegistry::Register(EndpointProviderRegistration & entry)
 {
     VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT); // Should not be part of another list
-    VerifyOrReturnError(entry.endpointProviderInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(entry.endpointProviderInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT); // Should not be null
 
-    EndpointId newEndpointId = entry.endpointProviderInterface->GetEndpointEntry().id;
+    auto newEndpointId = entry.endpointProviderInterface->GetEndpointEntry().id;
     VerifyOrReturnError(newEndpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Check for duplicates
-    if (Get(newEndpointId) != nullptr)
-    {
-        return CHIP_ERROR_DUPLICATE_KEY_ID;
-    }
+    VerifyOrReturnError(Get(newEndpointId) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID); // Check for duplicates
 
     entry.next     = mRegistrations;
     mRegistrations = &entry;
-
-    // Invalidate cache as the list structure changed
-    mCachedInterface  = nullptr;
-    mCachedEndpointId = kInvalidEndpointId;
 
     return CHIP_NO_ERROR;
 }
@@ -84,7 +66,7 @@ CHIP_ERROR EndpointProviderRegistry::Unregister(EndpointId endpointId)
         prev    = current;
         current = current->next;
     }
-    return CHIP_ERROR_NOT_FOUND;
+    return CHIP_NO_ERROR;
 }
 
 EndpointProviderInterface * EndpointProviderRegistry::Get(EndpointId endpointId)
@@ -99,8 +81,7 @@ EndpointProviderInterface * EndpointProviderRegistry::Get(EndpointId endpointId)
 
     while (current != nullptr)
     {
-        if (current->endpointProviderInterface != nullptr &&
-            current->endpointProviderInterface->GetEndpointEntry().id == endpointId)
+        if (current->endpointProviderInterface->GetEndpointEntry().id == endpointId)
         {
             mCachedInterface  = current->endpointProviderInterface;
             mCachedEndpointId = endpointId;
@@ -109,18 +90,8 @@ EndpointProviderInterface * EndpointProviderRegistry::Get(EndpointId endpointId)
         current = current->next;
     }
 
-    // not found
+    // Not found
     return nullptr;
-}
-
-size_t EndpointProviderRegistry::Count() const
-{
-    size_t count = 0;
-    for (auto * current = mRegistrations; current != nullptr; current = current->next)
-    {
-        count++;
-    }
-    return count;
 }
 
 } // namespace app

@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <clusters/Descriptor/Structs.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
@@ -41,40 +41,17 @@ public:
 
     using SemanticTag = chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
-    /**
-     * @brief Retrieves the basic information about the endpoint.
-     *
-     * @return A constant reference to the DataModel::EndpointEntry struct containing
-     *         the endpoint ID, parent endpoint ID, and composition pattern.
-     */
     virtual const DataModel::EndpointEntry & GetEndpointEntry() const = 0;
 
-    /**
-     * @brief Populates the provided ReadOnlyBufferBuilder with the semantic tags for this endpoint.
-     *
-     * @param[out] out The ReadOnlyBufferBuilder to fill with SemanticTagStruct instances.
-     * @return CHIP_NO_ERROR on success, or an error code if the operation fails (e.g., buffer too small).
-     */
     virtual CHIP_ERROR SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const = 0;
 
-    /**
-     * @brief Populates the provided ReadOnlyBufferBuilder with the device types for this endpoint.
-     *
-     * @param[out] out The ReadOnlyBufferBuilder to fill with DataModel::DeviceTypeEntry instances.
-     * @return CHIP_NO_ERROR on success, or an error code if the operation fails (e.g., buffer too small).
-     */
     virtual CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const = 0;
 
-    /**
-     * @brief Populates the provided ReadOnlyBufferBuilder with the client cluster IDs for this endpoint.
-     *
-     * @param[out] out The ReadOnlyBufferBuilder to fill with ClusterId instances.
-     * @return CHIP_NO_ERROR on success, or an error code if the operation fails (e.g., buffer too small).
-     */
     virtual CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const = 0;
 
     /**
      * @brief Retrieves a pointer to the ServerClusterInterface for the given cluster ID.
+     * The returned pointer shall be valid as long as the EndpointProviderInterface instance is valid.
      *
      * @param clusterId The ID of the server cluster to retrieve.
      * @return A pointer to the ServerClusterInterface if found, otherwise nullptr.
@@ -82,11 +59,12 @@ public:
     virtual ServerClusterInterface * GetServerCluster(ClusterId clusterId) const = 0;
 
     /**
-     * @brief Populates the provided ReadOnlyBufferBuilder with pointers to all ServerClusterInterface instances
-     *        hosted on this endpoint.
+     * @brief Populates the provided buffer with pointers to all ServerClusterInterface instances
+     *        hosted on this endpoint. The returned pointers shall be valid as long as the
+     *        EndpointProviderInterface instance is valid.
      *
-     * @param[out] out The ReadOnlyBufferBuilder to fill with ServerClusterInterface pointers.
-     * @return CHIP_NO_ERROR on success, or an error code if the operation fails (e.g., buffer too small).
+     * @param[out] out The buffer to fill with ServerClusterInterface pointers.
+     * @return CHIP_NO_ERROR on success or CHIP_ERROR_NO_MEMORY if the buffer is too small.
      */
     virtual CHIP_ERROR ServerClusterInterfaces(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const = 0;
 };

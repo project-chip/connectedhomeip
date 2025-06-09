@@ -38,14 +38,10 @@ struct EndpointProviderRegistration
 {
     EndpointProviderInterface * const endpointProviderInterface;
     EndpointProviderRegistration * next;
-    /**
-     * @param interface The EndpointProviderInterface to be registered.
-     * @param next_item Pointer to the next registration in a list, defaults to nullptr.
-     */
+
     constexpr EndpointProviderRegistration(EndpointProviderInterface & interface,
                                            EndpointProviderRegistration * next_item = nullptr) :
-        endpointProviderInterface(&interface),
-        next(next_item)
+        endpointProviderInterface(&interface), next(next_item)
     {}
     EndpointProviderRegistration(EndpointProviderRegistration && other) = default;
 
@@ -95,12 +91,6 @@ public:
     };
 
     /**
-     * @brief Destructor. Clears the internal list of registrations but does not
-     *        deallocate the EndpointProviderInterface or EndpointProviderRegistration objects themselves.
-     */
-    ~EndpointProviderRegistry();
-
-    /**
      * @brief Registers an endpoint provider.
      *
      * The provided `entry` (EndpointProviderRegistration) must not already be part of another list
@@ -130,7 +120,6 @@ public:
     EndpointProviderInterface * Get(EndpointId endpointId);
     Iterator begin() { return Iterator(mRegistrations); }
     Iterator end() { return Iterator(nullptr); }
-    size_t Count() const;
 
 private:
     EndpointProviderRegistration * mRegistrations = nullptr;

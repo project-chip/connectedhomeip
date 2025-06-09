@@ -64,11 +64,11 @@ SpanEndpointProvider::Builder & SpanEndpointProvider::Builder::SetDeviceTypes(Sp
     return *this;
 }
 
-std::pair<SpanEndpointProvider, CHIP_ERROR> SpanEndpointProvider::Builder::build()
+std::variant<SpanEndpointProvider, CHIP_ERROR> SpanEndpointProvider::Builder::build()
 {
     if (mEndpointId == kInvalidEndpointId)
     {
-        return { SpanEndpointProvider(), CHIP_ERROR_INVALID_ARGUMENT };
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     for (auto * cluster : mServerClusters)
@@ -76,13 +76,12 @@ std::pair<SpanEndpointProvider, CHIP_ERROR> SpanEndpointProvider::Builder::build
         if (cluster == nullptr || cluster->GetPaths().empty())
         {
             ChipLogError(DataManagement, "Builder: Attempted to build with an invalid server cluster entry.");
-            return { SpanEndpointProvider(), CHIP_ERROR_INVALID_ARGUMENT };
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
 
-    return { SpanEndpointProvider(mEndpointId, mComposition, mParentId, mServerClusters, mClientClusters, mSemanticTags,
-                                  mDeviceTypes),
-             CHIP_NO_ERROR };
+    return SpanEndpointProvider(mEndpointId, mComposition, mParentId, mServerClusters, mClientClusters, mSemanticTags,
+                                mDeviceTypes);
 }
 
 // SpanEndpointProvider implementation
@@ -112,9 +111,9 @@ ServerClusterInterface * SpanEndpointProvider::GetServerCluster(ClusterId cluste
 {
     for (auto * serverCluster : mServerClusters)
     {
-        // Check serverCluster is not null before dereferencing
-        if (serverCluster != nullptr && !serverCluster->GetPaths().empty() &&
-            serverCluster->GetPaths().front().mClusterId == clusterId)
+        // Don't check for serverCluster != nullptr as it's checked in Register()
+        // Don't check for serverCluster->GetPaths().empty() as it's guaranteed by the interface contract
+        if (serverCluster->GetPaths().front().mClusterId == clusterId)
         {
             return serverCluster;
         }
@@ -132,8 +131,8 @@ SpanEndpointProvider::SpanEndpointProvider(EndpointId id, DataModel::EndpointCom
                                            Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
                                            Span<const SemanticTag> semanticTags,
                                            Span<const DataModel::DeviceTypeEntry> deviceTypes) :
-    mEndpointEntry({ id, parentId, composition }),
-    mDeviceTypes(deviceTypes), mSemanticTags(semanticTags), mClientClusters(clientClusters), mServerClusters(serverClusters)
+    mEndpointEntry({ id, parentId, composition }), mDeviceTypes(deviceTypes), mSemanticTags(semanticTags),
+    mClientClusters(clientClusters), mServerClusters(serverClusters)
 {}
 
 } // namespace app

@@ -22,11 +22,30 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 
-#include <utility> // For std::pair
+#include <variant>
 
 namespace chip {
 namespace app {
 
+/**
+ * @brief An implementation of EndpointProviderInterface that uses `chip::Span` to refer to its data.
+ *
+ * This provider is constructed using its `Builder` class. It stores `chip::Span` members that
+ * point to externally managed arrays for its configuration (device types, server/client clusters,
+ * semantic tags, etc.).
+ *
+ * @warning Lifetime of Span-Referenced Data:
+ * `SpanEndpointProvider` does NOT take ownership of the data arrays referenced by its
+ * internal `chip::Span` members. The caller who provides these Spans (usually via the
+ * `Builder`) MUST ensure that the underlying data remains valid for the entire lifetime
+ * of the `SpanEndpointProvider` instance.
+ *   - For `Span<T>` (e.g., `Span<const ClusterId>`, `Span<const DeviceTypeEntry>`), the
+ *     array of `T` elements must outlive the `SpanEndpointProvider`.
+ *   - For `Span<T*>` (e.g., `Span<ServerClusterInterface *>`), both the array of pointers
+ *     (`T*`) and the objects (`T`) pointed to by those pointers must outlive the
+ *     `SpanEndpointProvider`.
+ * Failure to adhere to these lifetime requirements will lead to undefined behavior.
+ */
 class SpanEndpointProvider : public EndpointProviderInterface
 {
 public:
@@ -43,10 +62,10 @@ public:
         Builder & SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
         // Builds the SpanEndpointProvider.
-        // Returns a pair containing the provider and a CHIP_ERROR status.
-        // If an error occurs during build (e.g. invalid arguments), the error status will be set,
-        // and the returned provider will be in a default/invalid state.
-        std::pair<SpanEndpointProvider, CHIP_ERROR> build();
+        // Returns a std::variant containing either the successfully built SpanEndpointProvider
+        // or a CHIP_ERROR if the build failed (e.g., due to invalid arguments).
+        // Callers should check the variant's active alternative before use.
+        std::variant<SpanEndpointProvider, CHIP_ERROR> build();
 
     private:
         EndpointId mEndpointId;
