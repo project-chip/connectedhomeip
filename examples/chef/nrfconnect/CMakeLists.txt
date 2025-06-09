@@ -256,6 +256,7 @@ target_compile_options(app PRIVATE
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
+                       "-DCONFIG_ENABLE_PW_RPC=y"
 )
 
 target_link_libraries(app PRIVATE

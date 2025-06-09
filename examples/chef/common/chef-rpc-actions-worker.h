@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-#ifdef CONFIG_CHIP_PW_RPC
+#ifdef CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
 
 namespace chip {

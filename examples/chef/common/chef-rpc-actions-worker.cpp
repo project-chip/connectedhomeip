@@ -31,9 +31,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-#ifdef CONFIG_CHIP_PW_RPC
+#ifdef CONFIG_ENABLE_PW_RPC
 using namespace chip::rpc;
-
 static std::map<ClusterId, ActionsDelegate *> gActionsDelegateMap{};
 
 ActionsDelegate * RpcFindActionsDelegate(ClusterId clusterId)
