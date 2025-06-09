@@ -49,7 +49,7 @@ declare install_pytest_requirements=yes
 declare install_jupyterlab=no
 declare -a extra_packages
 declare -a extra_gn_args
-
+chip_support_webrtc_python_bindings=$chip_support_webrtc_python_bindings
 help() {
 
     echo "Usage: $file_name [ options ... ]"
