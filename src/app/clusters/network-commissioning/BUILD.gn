@@ -51,6 +51,7 @@ source_set("network-commissioning") {
   sources = [
     "NetworkCommissioningCluster.cpp",
     "NetworkCommissioningCluster.h",
+    "NetworkCommissioningDriverDelegate.h",
     "NetworkCommissioningLogic.cpp",
     "NetworkCommissioningLogic.h",
   ]
