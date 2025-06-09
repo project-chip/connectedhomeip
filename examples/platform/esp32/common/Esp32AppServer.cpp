@@ -60,22 +60,6 @@ using namespace chip::DeviceLayer;
 
 static constexpr char TAG[] = "ESP32Appserver";
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-// NOTE:
-//   this is a hackish workaround for https://github.com/project-chip/connectedhomeip/issues/39441
-//   OpenaThread platform has a layering inversion and tries to pull in network commissioning. For
-//   ESP32 this translates into a link error due to NetworkCommissioning vtable not being defined.
-//
-//   We pull in the vtable here via a function that will never get called (otherwise it would
-//   actually crash ..)
-void do_not_call_workaround_only()
-{
-    static app::Clusters::NetworkCommissioning::Instance sInvalidInstance(
-        CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */,
-        (DeviceLayer::NetworkCommissioning::ThreadDriver *) nullptr);
-}
-#endif
-
 namespace {
 #if CONFIG_TEST_EVENT_TRIGGER_ENABLED
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
