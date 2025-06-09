@@ -777,27 +777,27 @@ def main() -> int:
             nrf_build_cmds.append(
                 f"-DCONFIG_CHEF_DEVICE_TYPE='\"{options.sample_device_type_name}\"'")
             nrf_build_cmds.append(
-                f"-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
+                "-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
             if options.enable_lit_icd:
                 nrf_build_cmds.append(
-                    f"-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=y")
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=y")
                 nrf_build_cmds.append(
-                    f"-DCONFIG_CHIP_ENABLE_READ_CLIENT=y")
+                    "-DCONFIG_CHIP_ENABLE_READ_CLIENT=y")
                 nrf_build_cmds.append(
-                    f"-DCONFIG_CHIP_ICD_LIT_SUPPORT=y")
+                    "-DCONFIG_CHIP_ICD_LIT_SUPPORT=y")
                 nrf_build_cmds.append(
-                    f"-DCONFIG_CHIP_ICD_CHECK_IN_SUPPORT=y")
+                    "-DCONFIG_CHIP_ICD_CHECK_IN_SUPPORT=y")
                 nrf_build_cmds.append(
-                    f"-DCONFIG_CHIP_ICD_UAT_SUPPORT=y")
+                    "-DCONFIG_CHIP_ICD_UAT_SUPPORT=y")
                 nrf_build_cmds.append(
-                    f"-DCONFIG_CHIP_ICD_DSLS_SUPPORT=y")
+                    "-DCONFIG_CHIP_ICD_DSLS_SUPPORT=y")
                 nrf_build_cmds.append(
-                    f"-DCONFIG_CHIP_ICD_REPORT_ON_ACTIVE_MODE=y")
+                    "-DCONFIG_CHIP_ICD_REPORT_ON_ACTIVE_MODE=y")
                 nrf_build_cmds.append(
-                    f"-DCONFIG_CHIP_ICD_SIT_SLOW_POLL_LIMIT=5000")
+                    "-DCONFIG_CHIP_ICD_SIT_SLOW_POLL_LIMIT=5000")
             else:
                 nrf_build_cmds.append(
-                    f"-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=n")
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=n")
             nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
 
