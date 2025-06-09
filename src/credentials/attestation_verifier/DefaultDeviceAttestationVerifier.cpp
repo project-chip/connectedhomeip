@@ -321,10 +321,11 @@ enum class AttestationChainElement : uint8_t
 
 enum class KeyIdType : uint8_t
 {
-    kAuthorityKeyId = 0,
-    kSubjectKeyId   = 1,
+  kAuthorityKeyId = 0,
+  kSubjectKeyId   = 1,
 };
 
+#if CHIP_PROGRESS_LOGGING
 const char * CertTypeAsString(AttestationChainElement certType)
 {
     switch (certType)
@@ -340,6 +341,7 @@ const char * CertTypeAsString(AttestationChainElement certType)
     }
     return "<UNKNOWN>";
 }
+#endif // CHIP_PROGRESS_LOGGING
 
 void LogOneKeyId(KeyIdType keyIdType, AttestationChainElement certType, ByteSpan derBuffer)
 {
