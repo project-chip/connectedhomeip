@@ -22,6 +22,7 @@
 #include "LEDUtil.h"
 
 #include <DeviceInfoProviderImpl.h>
+#include <lib/support/CodeUtils.h> // For chip::to_underlying
 
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -101,10 +102,10 @@ void AppTask::MsgQConsume(intptr_t)
     AppEvent event{};
 
     while (true) {
-ChipLogProgress(AppServer, "%s, %d", __func__, __LINE__);
         if (k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT) != 0) {
             break;
         }
+        ChipLogProgress(AppServer, "MsgQ get event.Type = %u", chip::to_underlying(event.Type));
         DispatchEvent(event);
     }
 }
@@ -348,12 +349,7 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
     {
         return;
     }
-
-    if (Instance().mFunction == FunctionEvent::AdvertisingStart)
-    {
-        // The button was held past kAdvertisingTriggerTimeout, start BLE advertisement if we have 2 buttons UI
-        StartBLEAdvertisementHandler(event);
-    }
+    // Leave FunctionHandler for future usage
 }
 
 void AppTask::FunctionHandler(const AppEvent & event)
@@ -361,7 +357,7 @@ void AppTask::FunctionHandler(const AppEvent & event)
     if (event.ButtonEvent.PinNo != FUNCTION_BUTTON)
         return;
 
-    // FunctionHandler not used 
+    // Leave FunctionHandler for future usage
 }
 
 void AppTask::StartBLEAdvertisementHandler(const AppEvent &)
@@ -403,7 +399,6 @@ void AppTask::LEDStateUpdateHandler(LEDWidget & ledWidget)
 
 void AppTask::UpdateStatusLED()
 {
-#ifdef CONFIG_STATE_LEDS
     // Update the status LED.
     //
     // If IPv6 network and service provisioned, keep the LED On constantly.
@@ -424,7 +419,6 @@ void AppTask::UpdateStatusLED()
     {
         sStatusLED.Blink(LedConsts::StatusLed::Provisioned::kOn_ms, LedConsts::StatusLed::Provisioned::kOff_ms);
     }
-#endif
 }
 
 void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
@@ -466,6 +460,7 @@ void AppTask::PostEvent(const AppEvent & event)
         ChipLogProgress(AppServer, "Failed to post event to app task event queue");
         return;
     }
+    ChipLogProgress(AppServer, "MsgQ set event.Type = %u", chip::to_underlying(event.Type));
     chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::MsgQConsume);
 }
 
