@@ -23,6 +23,8 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 using namespace chip;
 using namespace chip::app;
@@ -36,109 +38,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityTariff {
-
-void LockThreadTask(void) {}
-
-void UnlockThreadTask(void) {}
-
-bool CommodityTariffDataProvider::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
-{
-    if (!mTariffInfo_MgmtObj.IsValid())
-    {
-        ChipLogError(NotSpecified, "TariffInfo not present!");
-        return false;
-    }
-    else if (mDayEntries_MgmtObj.IsValid())
-    {
-        ChipLogError(NotSpecified, "DayEntries not present!");
-        return false;
-    }
-    else if (mTariffComponents_MgmtObj.IsValid())
-    {
-        ChipLogError(NotSpecified, "TariffComponents not present!");
-        return false;
-    }
-    else if (mTariffPeriods_MgmtObj.IsValid())
-    {
-        ChipLogError(NotSpecified, "TariffPeriods not present!");
-        return false;
-    }
-
-    assert(!UpdCtx.DayEntryKeyIDs.empty());
-    assert(!UpdCtx.TariffComponentKeyIDs.empty());
-
-    assert(!UpdCtx.TariffPeriodsDayEntryIDs.empty());        // Something went wrong if TariffPeriods has no DayEntries IDs
-    assert(!UpdCtx.TariffPeriodsTariffComponentIDs.empty()); // Something went wrong if TariffPeriods has no TariffComponents IDs
-
-    // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
-    for (const auto & item : UpdCtx.TariffPeriodsDayEntryIDs)
-    {
-        if (!UpdCtx.DayEntryKeyIDs.count(item))
-        {
-            return false; // The item not found in original list
-        }
-    }
-
-    // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
-    for (const auto & item : UpdCtx.TariffPeriodsTariffComponentIDs)
-    {
-        if (!UpdCtx.TariffComponentKeyIDs.count(item))
-        {
-            return false; // The item not found in original list
-        }
-    }
-
-    if (mDayPatterns_MgmtObj.IsValid())
-    {
-        assert(!UpdCtx.DayPatternKeyIDs.empty());
-        assert(!UpdCtx.DayPatternsDayEntryIDs.empty()); // Something went wrong if DP has no DE IDs
-
-        // Checks that all DP_DEs are in main DE list:
-        for (const auto & item : UpdCtx.DayPatternsDayEntryIDs)
-        {
-            if (!UpdCtx.DayEntryKeyIDs.count(item))
-            {
-                return false; // The item not found in original list
-            }
-        }
-    }
-
-    if (mIndividualDays_MgmtObj.IsValid())
-    {
-        assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
-
-        // Checks that all ID_DE_IDs are in main DE list:
-        for (const auto & item : UpdCtx.IndividualDaysDayEntryIDs)
-        {
-            if (!UpdCtx.DayEntryKeyIDs.count(item))
-            {
-                return false; // The item not found in original list
-            }
-
-            if (UpdCtx.DayPatternsDayEntryIDs.count(item))
-            {
-                return false; // If same item from ID list has found in DP list
-            }
-        }
-    }
-
-    //
-    if (mCalendarPeriods_MgmtObj.IsValid())
-    {
-        assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
-
-        // Checks that all ID_DE_IDs are in main DE list:
-        for (const auto & item : UpdCtx.CalendarPeriodsDayPatternIDs)
-        {
-            if (!UpdCtx.DayPatternKeyIDs.count(item))
-            {
-                return false; // The item not found in original list
-            }
-        }
-    }
-
-    return true;
-}
 
 CHIP_ERROR CommodityTariffServer::Init()
 {
@@ -165,51 +64,51 @@ CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, 
     switch (aPath.mAttributeId)
     {
     case TariffInfo::Id:
-        return aEncoder.Encode(mProvider.GetTariffInfo());
+        return aEncoder.Encode(mProvider->GetTariffInfo());
     case TariffUnit::Id:
-        return aEncoder.Encode(mProvider.GetTariffUnit());
+        return aEncoder.Encode(mProvider->GetTariffUnit());
     case StartDate::Id:
-        return aEncoder.Encode(mProvider.GetStartDate());
+        return aEncoder.Encode(mProvider->GetStartDate());
     case DayEntries::Id:
-        return aEncoder.Encode(mProvider.GetDayEntries());
+        return aEncoder.Encode(mProvider->GetDayEntries());
     case DayPatterns::Id:
-        return aEncoder.Encode(mProvider.GetDayPatterns());
+        return aEncoder.Encode(mProvider->GetDayPatterns());
     case CalendarPeriods::Id:
-        return aEncoder.Encode(mProvider.GetCalendarPeriods());
+        return aEncoder.Encode(mProvider->GetCalendarPeriods());
     case IndividualDays::Id:
-        return aEncoder.Encode(mProvider.GetIndividualDays());
-    case CurrentDay::Id:
-        return aEncoder.Encode(mProvider.GetCurrentDay());
-    case NextDay::Id:
-        return aEncoder.Encode(mProvider.GetNextDay());
-    case CurrentDayEntry::Id:
-        return aEncoder.Encode(mProvider.GetCurrentDayEntry());
-    case CurrentDayEntryDate::Id:
-        return aEncoder.Encode(mProvider.GetCurrentDayEntryDate());
-    case NextDayEntry::Id:
-        return aEncoder.Encode(mProvider.GetNextDayEntry());
-    case NextDayEntryDate::Id:
-        return aEncoder.Encode(mProvider.GetNextDayEntryDate());
+        return aEncoder.Encode(mProvider->GetIndividualDays());
     case TariffComponents::Id:
-        return aEncoder.Encode(mProvider.GetTariffComponents());
+        return aEncoder.Encode(mProvider->GetTariffComponents());
     case TariffPeriods::Id:
-        return aEncoder.Encode(mProvider.GetTariffPeriods());
+        return aEncoder.Encode(mProvider->GetTariffPeriods());
+    case CurrentDay::Id:
+        return aEncoder.Encode(GetCurrentDay());
+    case NextDay::Id:
+        return aEncoder.Encode(GetNextDay());
+    case CurrentDayEntry::Id:
+        return aEncoder.Encode(GetCurrentDayEntry());
+    case CurrentDayEntryDate::Id:
+        return aEncoder.Encode(GetCurrentDayEntryDate());
+    case NextDayEntry::Id:
+        return aEncoder.Encode(GetNextDayEntry());
+    case NextDayEntryDate::Id:
+        return aEncoder.Encode(GetNextDayEntryDate());
     case CurrentTariffComponents::Id:
-        return aEncoder.Encode(mProvider.GetCurrentTariffComponents());
+        return aEncoder.Encode(GetCurrentTariffComponents());
     case NextTariffComponents::Id:
-        return aEncoder.Encode(mProvider.GetNextTariffComponents());
+        return aEncoder.Encode(GetNextTariffComponents());
     case DefaultRandomizationOffset::Id:
         if (!HasFeature(Feature::kRandomization))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mProvider.GetDefaultRandomizationOffset());
+        return aEncoder.Encode(mProvider->GetDefaultRandomizationOffset());
     case DefaultRandomizationType::Id:
         if (!HasFeature(Feature::kRandomization))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mProvider.GetDefaultRandomizationType());
+        return aEncoder.Encode(mProvider->GetDefaultRandomizationType());
 
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
@@ -242,7 +141,7 @@ void CommodityTariffServer::HandleGetTariffComponent(HandlerContext & ctx,
 {
     Commands::GetTariffComponentResponse::Type response;
 
-    Status status = mProvider.GetTariffComponentInfoById(commandData.tariffComponentID, response.label, response.dayEntryIDs,
+    Status status = mProvider->GetTariffComponentInfoById(commandData.tariffComponentID, response.label, response.dayEntryIDs,
                                                          response.tariffComponent);
     if (status != Status::Success)
     {
@@ -257,7 +156,7 @@ void CommodityTariffServer::HandleGetDayEntry(HandlerContext & ctx, const Comman
 {
     Commands::GetDayEntryResponse::Type response;
 
-    Status status = mProvider.GetDayEntryById(commandData.dayEntryID, response.dayEntry);
+    Status status = mProvider->GetDayEntryById(commandData.dayEntryID, response.dayEntry);
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);

@@ -177,22 +177,6 @@ struct TariffUpdateCtx
 };
 
 /**
- * @class CommodityTariffPrimaryData
- * @brief Container for primary tariff attribute storage
- *
- * This class holds the storage for all primary tariff attributes that define
- * the tariff configuration. It serves as the data backbone for tariff operations.
- */
-class CommodityTariffPrimaryData
-{
-public:
-    // Primary attribute storage
-#define X(attrName, attrType) attrType m##attrName;
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-};
-
-/**
  * @class CommodityTariffDataProvider
  * @brief Core tariff data management and processing class
  *
@@ -205,14 +189,8 @@ public:
 class CommodityTariffDataProvider
 {
 public:
-    CommodityTariffDataProvider()          = default;
+    CommodityTariffDataProvider(EndpointId ep) : mEndpointId(ep) {};
     virtual ~CommodityTariffDataProvider() = default;
-
-    /**
-     * @brief Set the endpoint ID for this tariff instance
-     * @param aEndpoint The Matter endpoint identifier
-     */
-    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
     /**
      * @brief Set the current feature map for this tariff instance
@@ -221,6 +199,8 @@ public:
     void SetFeatures(BitMask<Feature> aFeature) { mFeature = aFeature; }
 
     bool HasFeature(Feature aFeature) { return mFeature.Has(aFeature); }
+
+    void SetTariffUpdCb(std::function<void()> cb) { mTariffDataUpdatedCb = cb; }
 
     // Pure virtual interface methods
     virtual Protocols::InteractionModel::Status GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId,
@@ -241,7 +221,7 @@ public:
      */
     void TariffDataUpdate()
     {
-        TariffUpdateCtx UpdCtx = { .mFeature = this->mFeature };
+        TariffUpdateCtx UpdCtx = { .mFeature = mFeature };
 
         if (!TariffDataUpd_Init(UpdCtx))
         {
@@ -255,6 +235,12 @@ public:
         {
             TariffDataUpd_Commit();
             ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+
+            if(mTariffDataUpdatedCb != nullptr)
+            {
+                mTariffDataUpdatedCb();                
+            }
+
             return;
         }
 
@@ -268,24 +254,20 @@ public:
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
-#define X(attrName, attrType)                                                                                                      \
-    attrType & Get##attrName() { return m##attrName; }
-    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
-#undef X
-
 private:
-    // Current attribute storage
-#define X(attrName, attrType) attrType m##attrName;
-    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
-#undef X
-
     // Primary attribute storage and management
-    CommodityTariffPrimaryData mTariffData;
-
-    // Attribute management objects
-#define X(attrName, attrType) attrName##DataClass m##attrName##_MgmtObj{ mTariffData.m##attrName };
+#define X(attrName, attrType)  \
+    attrType m##attrName; \
+    attrName##DataClass m##attrName##_MgmtObj{ m##attrName };
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
+/*
+    void CleanupCurrentAttrs()
+    {
+#define X(attrName, attrType) m##attrName = attrType##(0);
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+    }*/
 
     static void TariffDataUpd_AttrChangeCb(uint16_t aAttrId, void * CbCtx)
     {
@@ -323,14 +305,10 @@ private:
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
     }
-
-    // Current attrs (time depended) update methods
-    void UpdateCurrentAttrs();
-    static void MidnightTimerCallback(chip::System::Layer *, void * callbackContext);
-
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
     BitMask<Feature> mFeature;
+    std::function<void()> mTariffDataUpdatedCb;
 };
 
 /**
@@ -351,7 +329,8 @@ public:
      * @param aProvider The data provider delegate
      * @param aFeature Bitmask of supported features
      */
-    CommodityTariffServer(EndpointId aEndpointId, CommodityTariffDataProvider & aProvider, BitMask<Feature> aFeature);
+    CommodityTariffServer(EndpointId aEndpointId, BitMask<Feature> aFeature) :
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id), mFeature(aFeature) {}
 
     ~CommodityTariffServer() { Shutdown(); }
 
@@ -365,9 +344,18 @@ public:
      */
     bool HasFeature(Feature aFeature) const;
 
+    void AttachTariffProvider(CommodityTariffDataProvider * aProvider) {
+        mProvider = aProvider;
+    }
+
 private:
-    CommodityTariffDataProvider & mProvider;
+    CommodityTariffDataProvider * mProvider;
     BitMask<Feature> mFeature;
+    // Current attribute storage
+#define X(attrName, attrType) attrType m##attrName; \
+    attrType & Get##attrName() { return m##attrName; }
+    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+#undef X
 
     // AttributeAccessInterface implementation
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -378,6 +366,9 @@ private:
     // Command handlers
     void HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData);
     void HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData);
+
+    // Current attrs (time depended) update methods
+    void UpdateCurrentAttrs();
 };
 
 } // namespace CommodityTariff
