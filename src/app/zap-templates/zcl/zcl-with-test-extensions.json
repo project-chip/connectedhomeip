@@ -331,6 +331,21 @@
             "PowerThreshold",
             "FeatureMap"
         ],
+        "Network Commissioning": [
+            "ClusterRevision",
+            "ConnectMaxTimeSeconds",
+            "FeatureMap",
+            "InterfaceEnabled",
+            "LastConnectErrorValue",
+            "LastNetworkID",
+            "LastNetworkingStatus",
+            "MaxNetworks",
+            "Networks",
+            "ScanMaxTimeSeconds",
+            "SupportedThreadFeatures",
+            "SupportedWiFiBands",
+            "ThreadVersion"
+        ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",
@@ -775,7 +790,8 @@
             "SoilMoistureMeasuredValue",
             "ClusterRevision"
         ],
-        "Unit Localization": ["TemperatureUnit"]
+        "Unit Localization": ["TemperatureUnit"],
+        "Zone Management": ["TwoDCartesianMax"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
