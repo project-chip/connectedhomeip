@@ -23,7 +23,7 @@
 #include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -221,6 +221,82 @@ bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const Concrete
     auto info = serverClusterFinder.Find(path);
 
     return info.has_value() && (info->dataVersion == dataVersion);
+}
+
+/// Check if the given `err` is a known ACL error that can be translated into
+/// a StatusIB (UnsupportedAccess/AccessRestricted)
+///
+/// Returns true if the error could be translated and places the result into `outStatus`.
+/// `path` is used for logging.
+bool IsTranslatableAclError(const ConcreteEventPath & path, const CHIP_ERROR & err, StatusIB & outStatus)
+{
+    if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
+    {
+        return false;
+    }
+
+    ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by %s",
+                  path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mEventId),
+                  err == CHIP_ERROR_ACCESS_DENIED ? "ACL" : "ARL");
+
+    outStatus = err == CHIP_ERROR_ACCESS_DENIED ? StatusIB(Status::UnsupportedAccess) : StatusIB(Status::AccessRestricted);
+    return true;
+}
+
+CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescriptor & subjectDescriptor,
+                              DataModel::Provider * provider, StatusIB & outStatus)
+{
+    // We validate ACL before Path, however this means we do not want the real ACL check
+    // to be blocked by a `Invalid endpoint id` error when checking event info.
+    // As a result, we check for VIEW privilege on the cluster first (most permissive)
+    // and will do a 2nd check for the actual required privilege as a followup.
+    RequestPath requestPath{
+        .cluster     = path.mClusterId,
+        .endpoint    = path.mEndpointId,
+        .requestType = RequestType::kEventReadRequest,
+    };
+    CHIP_ERROR err = GetAccessControl().Check(subjectDescriptor, requestPath, Access::Privilege::kView);
+    if (IsTranslatableAclError(path, err, outStatus))
+    {
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    DataModel::EventEntry eventInfo;
+    err = provider->EventInfo(path, eventInfo);
+    if (err != CHIP_NO_ERROR)
+    {
+        // cannot get event data to validate. Event is not supported.
+        // we still fall through into "ValidateClusterPath" to try to return a `better code`
+        // (i.e. say invalid endpoint or cluser), however if path seems ok we will
+        // return unsupported event as we failed to get event metadata.
+        outStatus = StatusIB(Status::UnsupportedEvent);
+    }
+    else
+    {
+        // set up the status as "OK" as long as validation below works
+        outStatus = StatusIB(Status::Success);
+
+        requestPath.entityId = path.mEventId;
+
+        err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
+        if (IsTranslatableAclError(path, err, outStatus))
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+    }
+
+    Status status = DataModel::ValidateClusterPath(provider, path, Status::Success);
+    if (status != Status::Success)
+    {
+        // a valid status available: failure
+        outStatus = StatusIB(status);
+        return CHIP_NO_ERROR;
+    }
+
+    // Status set above: could be success, but also UnsupportedEvent
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -517,13 +593,15 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
 
-        // A event path is valid only if the cluster is valid
-        Status status = DataModel::ValidateClusterPath(mpImEngine->GetDataModelProvider(), path, Status::Success);
+        StatusIB statusIB;
 
-        if (status != Status::Success)
+        ReturnErrorOnFailure(
+            CheckEventValidity(path, apReadHandler->GetSubjectDescriptor(), mpImEngine->GetDataModelProvider(), statusIB));
+
+        if (statusIB.IsFailure())
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(status));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, statusIB);
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
@@ -532,34 +610,6 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
             aHasEncodedData = true;
         }
 
-        RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
-                                 .endpoint    = current->mValue.mEndpointId,
-                                 .requestType = RequestType::kEventReadRequest,
-                                 .entityId    = current->mValue.mEventId };
-        Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
-
-        err = GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
-        if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
-        {
-            ReturnErrorOnFailure(err);
-        }
-        else
-        {
-            TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
-                                                        err == CHIP_ERROR_ACCESS_DENIED ? StatusIB(Status::UnsupportedAccess)
-                                                                                                              : StatusIB(Status::AccessRestricted));
-
-            if (err != CHIP_NO_ERROR)
-            {
-                aWriter = checkpoint;
-                break;
-            }
-            aHasEncodedData = true;
-            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by %s",
-                          current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
-                          ChipLogValueMEI(current->mValue.mEventId), err == CHIP_ERROR_ACCESS_DENIED ? "ACL" : "ARL");
-        }
         current = current->mpNext;
     }
 
