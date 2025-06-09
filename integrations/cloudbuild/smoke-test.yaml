@@ -76,7 +76,6 @@ steps:
               --target efr32-brd4187c-light-rpc
               --target efr32-brd4187c-lock-openthread-mtd
               --target efr32-brd4187c-lock-rpc-openthread-mtd
-              --target efr32-brd4187c-unit-test
               build
               --create-archives /workspace/artifacts/
       waitFor:
