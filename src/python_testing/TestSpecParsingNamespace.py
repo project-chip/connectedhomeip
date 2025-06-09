@@ -130,63 +130,63 @@ class TestSpecParsingNamespace(MatterBaseTest):
         # 1.3: has Common Position and Common Closure
         # 1.4/1.4.1: removed Common Position, kept Common Closure, added Common Area/Landmark/Relative Position
         # 1.4.2: removed Common Closure, added back Common Position, kept new ones from 1.4/1.4.1
-        
+
         # Check changes from 1.3 to 1.4
         removed_1_3_to_1_4 = set(one_three.keys()) - set(one_four.keys())
         removed_names_1_3_to_1_4 = {one_three[id].name for id in removed_1_3_to_1_4}
         expected_removed_1_3_to_1_4 = {"Common Position"}
         asserts.assert_equal(removed_names_1_3_to_1_4, expected_removed_1_3_to_1_4,
-                            f"Expected only 'Common Position' to be removed from 1.3 to 1.4, but got: {removed_names_1_3_to_1_4}")
-        
+                             f"Expected only 'Common Position' to be removed from 1.3 to 1.4, but got: {removed_names_1_3_to_1_4}")
+
         added_1_3_to_1_4 = set(one_four.keys()) - set(one_three.keys())
         added_names_1_3_to_1_4 = {one_four[id].name for id in added_1_3_to_1_4}
         expected_added_1_3_to_1_4 = {"Common Area", "Common Landmark", "Common Relative Position"}
         asserts.assert_equal(added_names_1_3_to_1_4, expected_added_1_3_to_1_4,
-                            f"Expected 'Common Area', 'Common Landmark', 'Common Relative Position' to be added from 1.3 to 1.4, but got: {added_names_1_3_to_1_4}")
+                             f"Expected 'Common Area', 'Common Landmark', 'Common Relative Position' to be added from 1.3 to 1.4, but got: {added_names_1_3_to_1_4}")
 
         # Check 1.4 to 1.4.1 (should be identical)
         diff_1_4_to_1_4_1 = set(one_four.keys()) ^ set(one_four_one.keys())
         asserts.assert_equal(len(diff_1_4_to_1_4_1), 0, "1.4 and 1.4.1 should have identical namespaces")
-        
-        # Comprehensive checks: Compare 1.4.2 (latest) against all previous versions        
+
+        # Comprehensive checks: Compare 1.4.2 (latest) against all previous versions
         # 1.4.2 vs 1.3 comparison
         removed_1_4_2_vs_1_3 = set(one_three.keys()) - set(one_four_two.keys())
         removed_names_1_4_2_vs_1_3 = {one_three[id].name for id in removed_1_4_2_vs_1_3}
         expected_removed_1_4_2_vs_1_3 = {"Common Closure"}
         asserts.assert_equal(removed_names_1_4_2_vs_1_3, expected_removed_1_4_2_vs_1_3,
-                            f"Expected only 'Common Closure' to be removed from 1.3 to 1.4.2, but got: {removed_names_1_4_2_vs_1_3}")
-        
+                             f"Expected only 'Common Closure' to be removed from 1.3 to 1.4.2, but got: {removed_names_1_4_2_vs_1_3}")
+
         added_1_4_2_vs_1_3 = set(one_four_two.keys()) - set(one_three.keys())
         added_names_1_4_2_vs_1_3 = {one_four_two[id].name for id in added_1_4_2_vs_1_3}
         expected_added_1_4_2_vs_1_3 = {"Common Area", "Common Landmark", "Common Relative Position"}
         asserts.assert_equal(added_names_1_4_2_vs_1_3, expected_added_1_4_2_vs_1_3,
-                            f"Expected 'Common Area', 'Common Landmark', 'Common Relative Position' to be added from 1.3 to 1.4.2, but got: {added_names_1_4_2_vs_1_3}")
+                             f"Expected 'Common Area', 'Common Landmark', 'Common Relative Position' to be added from 1.3 to 1.4.2, but got: {added_names_1_4_2_vs_1_3}")
 
         # 1.4.2 vs 1.4 comparison
         removed_1_4_2_vs_1_4 = set(one_four.keys()) - set(one_four_two.keys())
         removed_names_1_4_2_vs_1_4 = {one_four[id].name for id in removed_1_4_2_vs_1_4}
         expected_removed_1_4_2_vs_1_4 = {"Common Closure"}
         asserts.assert_equal(removed_names_1_4_2_vs_1_4, expected_removed_1_4_2_vs_1_4,
-                            f"Expected only 'Common Closure' to be removed from 1.4 to 1.4.2, but got: {removed_names_1_4_2_vs_1_4}")
-        
+                             f"Expected only 'Common Closure' to be removed from 1.4 to 1.4.2, but got: {removed_names_1_4_2_vs_1_4}")
+
         added_1_4_2_vs_1_4 = set(one_four_two.keys()) - set(one_four.keys())
         added_names_1_4_2_vs_1_4 = {one_four_two[id].name for id in added_1_4_2_vs_1_4}
         expected_added_1_4_2_vs_1_4 = {"Common Position"}
         asserts.assert_equal(added_names_1_4_2_vs_1_4, expected_added_1_4_2_vs_1_4,
-                            f"Expected only 'Common Position' to be added from 1.4 to 1.4.2, but got: {added_names_1_4_2_vs_1_4}")
+                             f"Expected only 'Common Position' to be added from 1.4 to 1.4.2, but got: {added_names_1_4_2_vs_1_4}")
 
-        # Check changes from 1.4.1 to 1.4.2  
+        # Check changes from 1.4.1 to 1.4.2
         removed_1_4_1_to_1_4_2 = set(one_four_one.keys()) - set(one_four_two.keys())
         removed_names_1_4_1_to_1_4_2 = {one_four_one[id].name for id in removed_1_4_1_to_1_4_2}
         expected_removed_1_4_1_to_1_4_2 = {"Common Closure"}
         asserts.assert_equal(removed_names_1_4_1_to_1_4_2, expected_removed_1_4_1_to_1_4_2,
-                            f"Expected only 'Common Closure' to be removed from 1.4.1 to 1.4.2, but got: {removed_names_1_4_1_to_1_4_2}")
+                             f"Expected only 'Common Closure' to be removed from 1.4.1 to 1.4.2, but got: {removed_names_1_4_1_to_1_4_2}")
 
         added_1_4_2_vs_1_4_1 = set(one_four_two.keys()) - set(one_four_one.keys())
         added_names_1_4_2_vs_1_4_1 = {one_four_two[id].name for id in added_1_4_2_vs_1_4_1}
         expected_added_1_4_2_vs_1_4_1 = {"Common Position"}
         asserts.assert_equal(added_names_1_4_2_vs_1_4_1, expected_added_1_4_2_vs_1_4_1,
-                            f"Expected only 'Common Position' to be added from 1.4.1 to 1.4.2, but got: {added_names_1_4_2_vs_1_4_1}")
+                             f"Expected only 'Common Position' to be added from 1.4.1 to 1.4.2, but got: {added_names_1_4_2_vs_1_4_1}")
 
     def validate_namespace_xml(self, xml_file: Traversable) -> list[ProblemNotice]:
         """Validate namespace XML file"""
