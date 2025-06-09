@@ -406,6 +406,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, static_cast<uint8_t>(depth + 1), &caCert);
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(SecureChannel, "Failed to find valid cert during chain traversal: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow(err = CHIP_ERROR_CA_CERT_NOT_FOUND);
     }
 
@@ -632,6 +633,12 @@ CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
 
             lCertType = CertType::kICA;
         }
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterVidVerificationSignerId)
+        {
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+
+            lCertType = CertType::kVidVerificationSigner;
+        }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterNodeId)
         {
             VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
@@ -668,6 +675,12 @@ CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
         VerifyOrReturnError(!catsPresent, CHIP_ERROR_WRONG_CERT_DN);
     }
 
+    if (lCertType == CertType::kVidVerificationSigner)
+    {
+        VerifyOrReturnError(!fabricIdPresent, CHIP_ERROR_WRONG_CERT_DN);
+        // Lack of NodeID already checked since presence of NodeID will be detected as CertType::kNode.
+    }
+
     certType = lCertType;
 
     return CHIP_NO_ERROR;
@@ -688,6 +701,7 @@ CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
         case kOID_AttributeType_MatterICACId:
         case kOID_AttributeType_MatterNodeId:
         case kOID_AttributeType_MatterFirmwareSigningId:
+        case kOID_AttributeType_MatterVidVerificationSignerId:
             VerifyOrReturnError(!foundId, CHIP_ERROR_WRONG_CERT_DN);
 
             chipId  = rdn[i].mChipVal;

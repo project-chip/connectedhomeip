@@ -9,9 +9,6 @@
     See guidelines: https://project-chip.github.io/connectedhomeip-doc/pull_request_guidelines.html#pr-summary-description
     See title formatting: https://project-chip.github.io/connectedhomeip-doc/pull_request_guidelines.html#title-formatting
 
-    Examples:
-       [TODO] – find an example of a good PR description
-
     Please replace this HTML comment with the actual PR summary.
 -->
 

@@ -24,6 +24,9 @@
  *
  */
 
+#include <memory>
+#include <utility>
+
 #include "chip-cert.h"
 
 namespace {
@@ -42,6 +45,7 @@ OptionDef gCmdOptionDefs[] =
 {
     { "type",                kArgumentRequired, 't' },
     { "subject-chip-id",     kArgumentRequired, 'i' },
+    { "subject-matter-id",   kArgumentRequired, 'i' }, //< Same as --subject-chip-id, as a legal alias.
     { "subject-fab-id",      kArgumentRequired, 'f' },
     { "subject-cat",         kArgumentRequired, 'a' },
     { "subject-cn-u",        kArgumentRequired, 'c' },
@@ -102,14 +106,16 @@ const char * const gCmdOptionHelp =
     "           n - node certificate\n"
     "           f - firmware signing certificate\n"
     "           p - Wi-Fi PDC identity\n"
+    "           v - VendorID Verification signer certificate\n"
     "\n"
-    "   -i, --subject-chip-id <hex-digits>\n"
+    "   -i, --subject-chip-id <hex-digits>, --subject-mater-id <hex-digits>\n"
     "\n"
-    "       Subject DN CHIP Id attribute in hexadecimal format with upto 8 octets with or without '0x' prefix.\n"
-    "          - for Root certificate it is ChipRootId\n"
-    "          - for intermediate CA certificate it is ChipICAId\n"
-    "          - for Node certificate it is ChipNodeId. The value should be in a range [1, 0xFFFFFFEFFFFFFFFF]\n"
-    "          - for Firmware Signing certificate it is ChipFirmwareSigningId\n"
+    "       Subject DN Matter Id attribute in hexadecimal format with up to 8 octets with or without '0x' prefix.\n"
+    "          - for Root certificate it is MatterRootId\n"
+    "          - for intermediate CA certificate it is MatterICAId\n"
+    "          - for Node certificate it is MatterNodeId. The value should be in a range [1, 0xFFFFFFEFFFFFFFFF]\n"
+    "          - for Firmware Signing certificate it is MatterFirmwareSignerId\n"
+    "          - for VendorIdVerification Signing certificate it is MatterVendorIdVerificationSignerId\n"
     "\n"
     "   -f, --subject-fab-id <hex-digits>\n"
     "\n"
@@ -118,7 +124,7 @@ const char * const gCmdOptionHelp =
     "\n"
     "   -a, --subject-cat <hex-digits>\n"
     "\n"
-    "       Subject DN CHIP CASE Authentication Tag in hexadecimal format with upto 4 octets with or without '0x' prefix.\n"
+    "       Subject DN Matter CASE Authentication Tag in hexadecimal format with upto 4 octets with or without '0x' prefix.\n"
     "       The version subfield (lower 16 bits) should be different from 0.\n"
     "\n"
     "   Variety of DN attributes are also supported and can be added to the subject DN of the certificate.\n"
@@ -352,6 +358,10 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
                 // Not After Dec 31 23:59:59 9999 GMT
                 gValidDays = kCertValidDays_NoWellDefinedExpiration;
             }
+            else if (*arg == 'v')
+            {
+                gCertType = CertType::kVidVerificationSigner;
+            }
         }
 
         if (gCertType == CertType::kNotSpecified)
@@ -402,6 +412,16 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
                 if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectMatterIdRepeatsTwice())
                 {
                     err = gSubjectDN.AddAttribute_MatterICACId(chip64bitAttr + 1);
+                }
+            }
+            break;
+        case CertType::kVidVerificationSigner:
+            if (gCertConfig.IsSubjectMatterIdPresent())
+            {
+                err = gSubjectDN.AddAttribute_MatterVidVerificationSignerId(chip64bitAttr);
+                if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectMatterIdRepeatsTwice())
+                {
+                    err = gSubjectDN.AddAttribute_MatterVidVerificationSignerId(chip64bitAttr + 1);
                 }
             }
             break;
@@ -1191,8 +1211,8 @@ bool Cmd_GenCert(int argc, char * argv[])
     // Network (Client) Identities in CHIP format so that we can write it in the compact-pdc-identity format.
     if (IsChipCertFormat(gOutCertFormat) && (gCertConfig.IsErrorTestCaseEnabled() || gCertType == CertType::kNetworkIdentity))
     {
-        uint32_t chipCertBufLen                = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
-        std::unique_ptr<uint8_t[]> chipCertBuf = std::unique_ptr<uint8_t[]>(new uint8_t[chipCertBufLen]);
+        uint32_t chipCertBufLen = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
+        auto chipCertBuf        = std::make_unique<uint8_t[]>(chipCertBufLen);
         chip::MutableByteSpan chipCert(chipCertBuf.get(), chipCertBufLen);
         err = MakeCertTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
                           gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);

@@ -50,6 +50,15 @@ namespace Inet {
 
             InterfaceId GetInterfaceId() const { return InterfaceId(static_cast<InterfaceId::PlatformType>(mInterfaceId)); };
 
+            bool IsIPv6() const { return mAddressType == IPAddressType::kIPv6; }
+
+#if INET_CONFIG_ENABLE_IPV4
+            bool IsIPv4() const
+            {
+                return mAddressType == IPAddressType::kIPv4;
+            }
+#endif
+
             CHIP_ERROR StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock);
             CHIP_ERROR StartMonitorPaths(OnPathChange pathChangeBlock);
             void Stop();

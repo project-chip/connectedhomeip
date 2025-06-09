@@ -21,12 +21,12 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 namespace PreferredExtendedPanID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PreferredExtendedPanID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kManage, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace PreferredExtendedPanID
 namespace ThreadNetworks {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ThreadNetworks::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
-                   Access::Privilege::kOperate, std::nullopt);
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ThreadNetworks
 namespace ThreadNetworkTableSize {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ThreadNetworkTableSize::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -48,7 +48,7 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RemoveNetwork
 namespace GetOperationalDataset {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(GetOperationalDataset::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
+    kMetadataEntry(GetOperationalDataset::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace GetOperationalDataset
 
 } // namespace Commands
