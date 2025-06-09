@@ -164,6 +164,8 @@ class TelinkBuilder(Builder):
                  compress_lzma_config: bool = False,
                  thread_analyzer_config: bool = False,
                  precompiled_ot_config: bool = False,
+                 tflm_config: bool = False,
+                 newlib_libc_config: bool = False,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -180,6 +182,8 @@ class TelinkBuilder(Builder):
         self.compress_lzma_config = compress_lzma_config
         self.thread_analyzer_config = thread_analyzer_config
         self.precompiled_ot_config = precompiled_ot_config
+        self.tflm_config = tflm_config
+        self.newlib_libc_config = newlib_libc_config
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -235,6 +239,12 @@ class TelinkBuilder(Builder):
 
         if self.precompiled_ot_config:
             flags.append("-DCONFIG_OPENTHREAD_TELINK_LIBRARY=y -DCONFIG_LOG_MODE_DEFERRED=y")
+
+        if self.tflm_config:
+            flags.append("-DCONFIG_TFLM_FEATURE=y")
+
+        if self.newlib_libc_config:
+            flags.append("-DCONFIG_NEWLIB_LIBC=y")
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")

@@ -32,12 +32,61 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+
 using namespace Camera;
 
 namespace {
 
 // Constants
 constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
+constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
+constexpr int kVideoBitRate         = 3000;
+
+const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
+{
+    switch (state)
+    {
+    case rtc::PeerConnection::State::New:
+        return "New";
+
+    case rtc::PeerConnection::State::Connecting:
+        return "Connecting";
+
+    case rtc::PeerConnection::State::Connected:
+        return "Connected";
+
+    case rtc::PeerConnection::State::Disconnected:
+        return "Disconnected";
+
+    case rtc::PeerConnection::State::Failed:
+        return "Failed";
+
+    case rtc::PeerConnection::State::Closed:
+        return "Closed";
+    }
+    return "N/A";
+}
+
+const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
+{
+    switch (state)
+    {
+    case rtc::PeerConnection::GatheringState::New:
+        return "New";
+
+    case rtc::PeerConnection::GatheringState::InProgress:
+        return "InProgress";
+
+    case rtc::PeerConnection::GatheringState::Complete:
+        return "Complete";
+    }
+    return "N/A";
+}
 
 } // namespace
 
@@ -80,7 +129,7 @@ void WebRTCProviderManager::Init()
 
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
         // Convert the enum to an integer or string as needed
-        ChipLogProgress(Camera, "[State: %u]", static_cast<unsigned>(state));
+        ChipLogProgress(Camera, "[PeerConnection State: %s]", GetPeerConnectionStateStr(state));
         if (state == rtc::PeerConnection::State::Connected)
         {
             RegisterWebrtcTransport(mCurrentSessionId);
@@ -88,21 +137,7 @@ void WebRTCProviderManager::Init()
     });
 
     mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
-        ChipLogProgress(Camera, "[Gathering State: %u]", static_cast<unsigned>(state));
-    });
-
-    mPeerConnection->onDataChannel([&](std::shared_ptr<rtc::DataChannel> _dc) {
-        ChipLogProgress(Camera, "[Got a DataChannel with label: %s]", _dc->label().c_str());
-        mDataChannel = _dc;
-
-        mDataChannel->onClosed([&]() { ChipLogProgress(Camera, "[DataChannel closed: %s]", mDataChannel->label().c_str()); });
-
-        mDataChannel->onMessage([](auto data) {
-            if (std::holds_alternative<std::string>(data))
-            {
-                ChipLogProgress(Camera, "[Received message: %s]", std::get<std::string>(data).c_str());
-            }
-        });
+        ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
     });
 }
 
@@ -111,13 +146,7 @@ void WebRTCProviderManager::CloseConnection()
     // Clean up all the Webrtc Transports
     mWebrtcTransportMap.clear();
 
-    // Close the data channel and peer connection if they exist
-    if (mDataChannel)
-    {
-        mDataChannel->close();
-        mDataChannel.reset();
-    }
-
+    // Close the peer connection if they exist
     if (mPeerConnection)
     {
         mPeerConnection->close();
@@ -138,9 +167,6 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     outSession.peerNodeID  = args.peerNodeId;
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
-
-    // By spec, MetadataOptions SHALL be set to 0 and reserved for future use
-    outSession.metadataOptions.ClearAll();
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
@@ -186,12 +212,13 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
     MoveToState(State::SendingOffer);
 
-    if (!mDataChannel)
-    {
-        mDataChannel = mPeerConnection->createDataChannel(kWebRTCDataChannelName);
-    }
+    rtc::Description::Video media("video", rtc::Description::Direction::SendOnly);
+    media.addH264Codec(kVideoH264PayloadType);
+    media.setBitrate(kVideoBitRate);
+    mVideoTrack = mPeerConnection->addTrack(media);
 
-    mPeerConnection->createOffer();
+    ChipLogProgress(Camera, "Generate and set the SDP");
+    mPeerConnection->setLocalDescription();
 
     return CHIP_NO_ERROR;
 }
@@ -220,9 +247,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     outSession.peerNodeID  = args.peerNodeId;
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
-
-    // By spec, MetadataOptions SHALL be set to 0 and reserved for future use
-    outSession.metadataOptions.ClearAll();
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
@@ -312,7 +336,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)
+CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates)
 {
     ChipLogProgress(Camera, "HandleProvideICECandidates called with sessionId: %u", sessionId);
 
@@ -337,8 +361,19 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
 
     for (const auto & candidate : candidates)
     {
-        ChipLogProgress(Camera, "Applying candidate: %s", candidate.c_str());
-        mPeerConnection->addRemoteCandidate(candidate);
+        ChipLogProgress(Camera, "Applying candidate: %s",
+                        std::string(candidate.candidate.begin(), candidate.candidate.end()).c_str());
+        if (candidate.SDPMid.IsNull())
+        {
+            mPeerConnection->addRemoteCandidate(
+                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end())));
+        }
+        else
+        {
+            mPeerConnection->addRemoteCandidate(
+                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end()),
+                               std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end())));
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -562,18 +597,15 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Convert mLocalCandidates (std::vector<std::string>) into a list of CharSpans.
-    std::vector<chip::CharSpan> candidateSpans;
-    candidateSpans.reserve(mLocalCandidates.size());
+    std::vector<ICECandidateStruct> iceCandidateStructList;
     for (const auto & candidate : mLocalCandidates)
     {
-        candidateSpans.push_back(chip::CharSpan(candidate.c_str(), static_cast<uint16_t>(candidate.size())));
+        ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidate.c_str()) };
+        iceCandidateStructList.push_back(iceCandidate);
     }
 
-    auto ICECandidates = chip::app::DataModel::List<const chip::CharSpan>(candidateSpans.data(), candidateSpans.size());
-
     command.webRTCSessionID = mCurrentSessionId;
-    command.ICECandidates   = ICECandidates;
+    command.ICECandidates = DataModel::List<const ICECandidateStruct>(iceCandidateStructList.data(), iceCandidateStructList.size());
 
     // Now invoke the command using the found session handle
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);

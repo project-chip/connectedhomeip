@@ -122,6 +122,19 @@ include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
+pw_proto_library(actions_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/actions_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/actions_service.options
+  PREFIX
+  actions_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
 pw_proto_library(attributes_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.proto
@@ -195,6 +208,7 @@ pw_proto_library(wifi_service
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC
+  actions_service.nanopb_rpc
   attributes_service.nanopb_rpc
   boolean_state_service.nanopb_rpc
   button_service.nanopb_rpc
@@ -220,6 +234,7 @@ target_link_options(${COMPONENT_LIB}
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE
+                       "-DPW_RPC_ACTIONS_SERVICE=1"
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BOOLEAN_STATE_SERVICE=1"
                        "-DPW_RPC_BUTTON_SERVICE=1"

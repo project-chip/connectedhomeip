@@ -33,7 +33,6 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
-#include <app/server/JointFabricDatastore.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -72,6 +71,9 @@
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <transport/raw/UDP.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <transport/raw/NFC.h>
+#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -81,6 +83,10 @@
 #include <app/icd/server/ICDCheckInBackOffStrategy.h>        // nogncheck
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#include <app/server/JointFabricDatastore.h> //nogncheck
+#endif                                       // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 namespace chip {
 
@@ -112,6 +118,10 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                               ,
                                               chip::Transport::WiFiPAFBase
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                                              ,
+                                              chip::Transport::NFC
 #endif
                                               >;
 
@@ -419,7 +429,9 @@ public:
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     app::JointFabricDatastore & GetJointFabricDatastore() { return mJointFabricDatastore; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
@@ -700,7 +712,9 @@ private:
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     app::JointFabricDatastore mJointFabricDatastore;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;

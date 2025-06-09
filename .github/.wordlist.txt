@@ -270,6 +270,7 @@ CodeGenerator
 CodeLab
 codelabs
 ColorControl
+Combinators
 Comcast
 Commandline
 CommandHandlerInterface
@@ -1298,6 +1299,7 @@ semver
 SendButton
 SendNewInputEvent
 sendto
+SEPR
 seqdiag
 SERIALDEVICE
 serialno

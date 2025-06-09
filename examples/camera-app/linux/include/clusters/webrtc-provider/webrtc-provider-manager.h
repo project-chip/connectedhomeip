@@ -30,6 +30,12 @@
 
 namespace Camera {
 
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+
 class WebRTCProviderManager : public chip::app::Clusters::WebRTCTransportProvider::Delegate
 {
 public:
@@ -45,23 +51,21 @@ public:
 
     void SetMediaController(MediaController * mediaController);
 
-    CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args,
-                                  chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession,
+    CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
 
     CHIP_ERROR
-    HandleProvideOffer(const ProvideOfferRequestArgs & args,
-                       chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession) override;
+    HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) override;
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
-    CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) override;
+    CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) override;
 
-    CHIP_ERROR HandleEndSession(uint16_t sessionId, chip::app::Clusters::WebRTCTransportProvider::WebRTCEndReasonEnum reasonCode,
+    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
                                 chip::app::DataModel::Nullable<uint16_t> videoStreamID,
                                 chip::app::DataModel::Nullable<uint16_t> audioStreamID) override;
 
-    CHIP_ERROR ValidateStreamUsage(chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage,
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
@@ -105,7 +109,7 @@ private:
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
-    std::shared_ptr<rtc::DataChannel> mDataChannel;
+    std::shared_ptr<rtc::Track> mVideoTrack;
 
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mOriginatingEndpointId;
