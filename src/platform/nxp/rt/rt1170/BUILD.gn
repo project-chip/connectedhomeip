@@ -60,12 +60,6 @@ config("nxp_platform_config") {
       "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA=1",
     ]
   }
-
-  # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
-  if (chip_enable_wifi && chip_enable_openthread &&
-      !chip_enable_secondary_nwk_if) {
-    defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
-  }
 }
 
 static_library("nxp_platform") {
