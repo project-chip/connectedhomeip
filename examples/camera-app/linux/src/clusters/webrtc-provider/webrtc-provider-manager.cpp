@@ -518,10 +518,14 @@ bool WebRTCProviderManager::HasAllocatedVideoStreams()
     const std::vector<VideoStreamStruct> & allocatedVideoStreams = mCameraAVStreamMgmtServer->GetAllocatedVideoStreams();
     return !allocatedVideoStreams.empty();
 }
-}
 
 bool WebRTCProviderManager::HasAllocatedAudioStreams()
 {
+    if (mCameraAVStreamMgmtServer == nullptr)
+    {
+        ChipLogError(Camera, "AV Stream Management Server not available for HasAllocatedAudioStreams check");
+        return false; // Or handle as an error if appropriate
+    }
     const std::vector<AudioStreamStruct> & allocatedAudioStreams = mCameraAVStreamMgmtServer->GetAllocatedAudioStreams();
     return !allocatedAudioStreams.empty();
 }
