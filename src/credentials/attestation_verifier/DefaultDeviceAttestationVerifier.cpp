@@ -321,8 +321,8 @@ enum class AttestationChainElement : uint8_t
 
 enum class KeyIdType : uint8_t
 {
-  kAuthorityKeyId = 0,
-  kSubjectKeyId   = 1,
+    kAuthorityKeyId = 0,
+    kSubjectKeyId   = 1,
 };
 
 #if CHIP_PROGRESS_LOGGING
