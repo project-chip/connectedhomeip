@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "inet/NetworkMonitor.h"
+#include <platform/Darwin/inet/NetworkMonitor.h>
 
 namespace chip {
 namespace Dnssd {
