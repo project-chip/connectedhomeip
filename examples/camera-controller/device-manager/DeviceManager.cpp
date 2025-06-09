@@ -226,7 +226,6 @@ void DeviceManager::StartVideoStreamProcess(uint16_t streamId)
     const uint16_t udpPort    = 5000;
     const std::string portStr = "port=" + std::to_string(udpPort);
     const char * const argv[] = { "gst-launch-1.0",
-                                  "-v",
                                   "udpsrc",
                                   portStr.c_str(),
                                   "!",
@@ -252,6 +251,10 @@ void DeviceManager::StartVideoStreamProcess(uint16_t streamId)
         // Child process - execute GStreamer command
         // Put the pipeline in its own process group so we can kill it safely if needed.
         setpgid(0, 0);
+
+        // Redirect stdout and stderr to /dev/null to suppress output
+        freopen("/dev/null", "w", stdout);
+        freopen("/dev/null", "w", stderr);
 
         // Replace the child with gst‑launch‑1.0 (only returns on error)
         execvp(argv[0], const_cast<char * const *>(argv));
