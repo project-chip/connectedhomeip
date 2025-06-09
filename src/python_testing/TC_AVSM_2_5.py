@@ -68,7 +68,7 @@ class TC_AVSM_2_5(MatterBaseTest):
                 3,
                 "TH reads MicrophoneCapabilities attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
                 "Store this value in aMicrophoneCapabilities.",
-            ),            
+            ),
             TestStep(
                 4,
                 "TH selects a value for BitRate based on the codec in aMicrophoneCapabilities.supportedCodes.",
@@ -156,11 +156,11 @@ class TC_AVSM_2_5(MatterBaseTest):
 
         self.step(4)
         aBitRate = 0
-        match aMicrophoneCapabilities.supportedCodecs[0]: 
+        match aMicrophoneCapabilities.supportedCodecs[0]:
 
             case Clusters.CameraAvStreamManagement.Enums.AudioCodecEnum.kOpus:
                 aBitRate = 30000
-            
+
             case Clusters.CameraAvStreamUserLevelManagement.Enums.AudioCodecEnum.kAacLc:
                 aBitRate = 40000
 
@@ -198,7 +198,7 @@ class TC_AVSM_2_5(MatterBaseTest):
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1.")
 
         notSupportedStreamUsage = next((e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities),
-                Globals.Enums.StreamUsageEnum.kUnknownEnumValue,)
+                                       Globals.Enums.StreamUsageEnum.kUnknownEnumValue,)
 
         self.step(8)
         try:
@@ -309,7 +309,7 @@ class TC_AVSM_2_5(MatterBaseTest):
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to BitRate set to 0(outside of valid range)",
             )
             pass
-            
+
         self.step(13)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
@@ -331,6 +331,7 @@ class TC_AVSM_2_5(MatterBaseTest):
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to AudioCodec set to 10(outside of valid range)",
             )
             pass
+
 
 if __name__ == "__main__":
     default_matter_test_main()

@@ -68,14 +68,14 @@ class TC_AVSM_2_2(MatterBaseTest):
                 "TH reads SnapshotCapabilities attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
                 "Store this value in aSnapshotCapabilities.",
             ),
-             TestStep(
+            TestStep(
                 4,
                 "If the watermark feature is supported, set aWatermark to True, otherwise set this to Null.",
-            ),            
+            ),
             TestStep(
                 5,
                 "If the OSD feature is supported, set aOSD to True, otherwise set this to Null.",
-            ),           
+            ),
             TestStep(
                 6,
                 "TH sends the SnapshotStreamAllocate command with valid values of ImageCodec, MaxFrameRate, MinResolution=MaxResolution=Resolution from aSnapshotCapabilities,",
@@ -253,7 +253,7 @@ class TC_AVSM_2_2(MatterBaseTest):
                 "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 101(outside of valid range)",
             )
             pass
-        
+
         self.step(11)
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
