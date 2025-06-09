@@ -776,6 +776,8 @@ def main() -> int:
                 f"-DCONFIG_CHIP_DEVICE_PRODUCT_NAME='\"{options.pname}\"'")
             nrf_build_cmds.append(
                 f"-DCONFIG_CHEF_DEVICE_TYPE='\"{options.sample_device_type_name}\"'")
+            nrf_build_cmds.append(
+                f"-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
             if options.enable_lit_icd:
                 nrf_build_cmds.append(
                     f"-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=y")
@@ -793,13 +795,9 @@ def main() -> int:
                     f"-DCONFIG_CHIP_ICD_REPORT_ON_ACTIVE_MODE=y")
                 nrf_build_cmds.append(
                     f"-DCONFIG_CHIP_ICD_SIT_SLOW_POLL_LIMIT=5000")
-                nrf_build_cmds.append(
-                    f"-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
             else:
                 nrf_build_cmds.append(
                     f"-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=n")
-                nrf_build_cmds.append(
-                    f"-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_FTD=y")
             nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
 

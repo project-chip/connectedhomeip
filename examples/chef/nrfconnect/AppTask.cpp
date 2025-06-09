@@ -148,7 +148,6 @@ CHIP_ERROR AppTask::Init()
 #ifdef CONFIG_OPENTHREAD_MTD_SED
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
-#error "MTD only"
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
     if (err != CHIP_NO_ERROR)
@@ -323,8 +322,10 @@ void AppTask::IcdDslsEventHandler(const AppEvent &)
 
 void AppTask::IcdUatEventHandler(const AppEvent &)
 {
+#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
     // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
     PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+#endif
 }
 
 void AppTask::FunctionTimerTimeoutCallback(k_timer * timer)
