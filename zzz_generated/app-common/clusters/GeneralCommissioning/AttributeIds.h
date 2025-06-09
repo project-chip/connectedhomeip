@@ -52,6 +52,14 @@ namespace TCUpdateDeadline {
 inline constexpr AttributeId Id = 0x00000009;
 } // namespace TCUpdateDeadline
 
+namespace RecoveryIdentifier {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace RecoveryIdentifier
+
+namespace NetworkRecoveryReason {
+inline constexpr AttributeId Id = 0x0000000B;
+} // namespace NetworkRecoveryReason
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
