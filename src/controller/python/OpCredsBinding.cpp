@@ -67,7 +67,8 @@ Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationD
 {
     if (dacRevocationSetPath == nullptr)
     {
-        ChipLogError(Controller, "Received a nullptr dacRevocationSetPath. Using empty string so that attestation checks don't fail!");
+        ChipLogError(Controller,
+                     "Received a nullptr dacRevocationSetPath. Using empty string so that attestation checks don't fail!");
         dacRevocationSetPath = "";
     }
 
