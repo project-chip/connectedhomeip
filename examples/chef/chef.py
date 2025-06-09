@@ -780,6 +780,8 @@ def main() -> int:
                 nrf_build_cmds.append(
                     f"-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=y")
                 nrf_build_cmds.append(
+                    f"-DCONFIG_CHIP_ENABLE_READ_CLIENT=y")
+                nrf_build_cmds.append(
                     f"-DCONFIG_CHIP_ICD_LIT_SUPPORT=y")
                 nrf_build_cmds.append(
                     f"-DCONFIG_CHIP_ICD_CHECK_IN_SUPPORT=y")
