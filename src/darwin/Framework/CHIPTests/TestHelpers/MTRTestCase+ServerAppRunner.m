@@ -29,7 +29,15 @@ static const uint16_t kMinDiscriminator = 1111;
 
 #if HAVE_NSTASK
 static const uint16_t kBasePort = 5542 - kMinDiscriminator;
+
+@interface MTRTestCaseServerApp ()
+@property (nonatomic, readwrite, strong) NSTask * task;
+@end
+
 #endif // HAVE_NSTASK
+
+@implementation MTRTestCaseServerApp
+@end
 
 @implementation MTRTestCase (ServerAppRunner)
 
@@ -110,13 +118,9 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif // HAVE_NSTASK
 }
 
-+ (MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload nodeID:(NSNumber *)nodeID
++ (void)commissionAppWithController:(MTRDeviceController *)controller payload:(NSString *)payload
+                             nodeID:(NSNumber *)nodeID
 {
-    BOOL started = [self startAppWithName:name arguments:arguments payload:payload];
-    XCTAssertTrue(started);
-
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
-
     XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"Wait for commissioning to complete"];
 
     MTRTestControllerDelegate * delegate = [[MTRTestControllerDelegate alloc] initWithExpectation:expectation newNodeID:nodeID];
@@ -132,6 +136,34 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     XCTAssertNil(error);
 
     XCTAssertEqual([XCTWaiter waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds], XCTWaiterResultCompleted);
+}
+
+- (nullable MTRTestCaseServerApp *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments controller:(MTRDeviceController *)controller payload:(NSString *)payload
+                                                         nodeID:(NSNumber *)nodeID
+{
+#if !HAVE_NSTASK
+    XCTFail("Unable to start server app when we do not have NSTask");
+    return nil;
+#else
+    NSTask * task = [self.class doStartAppWithName:name arguments:arguments payload:payload];
+    [self launchTask:task];
+
+    [self.class commissionAppWithController:controller payload:payload nodeID:nodeID];
+
+    MTRTestCaseServerApp * app = [[MTRTestCaseServerApp alloc] init];
+    app.task = task;
+    return app;
+#endif // HAVE_NSTASK
+}
+
++ (MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload nodeID:(NSNumber *)nodeID
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+
+    BOOL started = [self startAppWithName:name arguments:arguments payload:payload];
+    XCTAssertTrue(started);
+
+    [self commissionAppWithController:controller payload:payload nodeID:nodeID];
 
     return controller;
 }
@@ -164,6 +196,17 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     XCTAssertNotNil(payloadString);
 
     return [self startCommissionedAppWithName:name arguments:arguments payload:payloadString nodeID:nodeID];
+}
+
+- (BOOL)restartApp:(MTRTestCaseServerApp *)app additionalArguments:(NSArray<NSString *> *)additionalArguments
+{
+#if !HAVE_NSTASK
+    XCTFail("Unable to restart server app when we do not have NSTask");
+    return NO;
+#else
+    app.task = [self relaunchTask:app.task additionalArguments:additionalArguments];
+    return YES;
+#endif // HAVE_NSTASK
 }
 
 + (unsigned)nextUniqueIndex

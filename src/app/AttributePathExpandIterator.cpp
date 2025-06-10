@@ -34,7 +34,7 @@ AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * d
     mDataModelProvider(dataModel), mPosition(position)
 {}
 
-bool AttributePathExpandIterator::AdvanceOutputPath()
+bool AttributePathExpandIterator::AdvanceOutputPath(std::optional<DataModel::AttributeEntry> * entry)
 {
     /// Output path invariants
     ///    - kInvalid* constants are used to define "no value available (yet)" and
@@ -54,7 +54,7 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
     {
         if (mPosition.mOutputPath.mClusterId != kInvalidClusterId)
         {
-            std::optional<AttributeId> nextAttribute = NextAttributeId();
+            std::optional<AttributeId> nextAttribute = NextAttribute(entry);
             if (nextAttribute.has_value())
             {
                 mPosition.mOutputPath.mAttributeId = *nextAttribute;
@@ -93,11 +93,11 @@ bool AttributePathExpandIterator::AdvanceOutputPath()
     }
 }
 
-bool AttributePathExpandIterator::Next(ConcreteAttributePath & path)
+bool AttributePathExpandIterator::Next(ConcreteAttributePath & path, std::optional<DataModel::AttributeEntry> * entry)
 {
     while (mPosition.mAttributePath != nullptr)
     {
-        if (AdvanceOutputPath())
+        if (AdvanceOutputPath(entry))
         {
             path = mPosition.mOutputPath;
             return true;
@@ -109,25 +109,7 @@ bool AttributePathExpandIterator::Next(ConcreteAttributePath & path)
     return false;
 }
 
-bool AttributePathExpandIterator::IsValidAttributeId(AttributeId attributeId)
-{
-    switch (attributeId)
-    {
-    case Clusters::Globals::Attributes::GeneratedCommandList::Id:
-    case Clusters::Globals::Attributes::AcceptedCommandList::Id:
-    case Clusters::Globals::Attributes::AttributeList::Id:
-        return true;
-    default:
-        break;
-    }
-
-    DataModel::AttributeFinder finder(mDataModelProvider);
-
-    const ConcreteAttributePath attributePath(mPosition.mOutputPath.mEndpointId, mPosition.mOutputPath.mClusterId, attributeId);
-    return finder.Find(attributePath).has_value();
-}
-
-std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
+std::optional<AttributeId> AttributePathExpandIterator::NextAttribute(std::optional<DataModel::AttributeEntry> * entry)
 {
     if (mPosition.mOutputPath.mAttributeId == kInvalidAttributeId)
     {
@@ -162,13 +144,39 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
             //
             // For wildcard expansion, we validate that this is a valid attribute for the given
             // cluster on the given endpoint. If not a wildcard expansion, return it as-is.
+            DataModel::AttributeFinder finder(mDataModelProvider);
+
+            const ConcreteAttributePath attributePath(mPosition.mOutputPath.mEndpointId, mPosition.mOutputPath.mClusterId,
+                                                      mPosition.mAttributePath->mValue.mAttributeId);
+            std::optional<DataModel::AttributeEntry> foundEntry = finder.Find(attributePath);
+
+            // if the entry is valid, we can just return it
+            if (foundEntry.has_value())
+            {
+                if (entry)
+                {
+                    entry->emplace(*foundEntry);
+                }
+                return mPosition.mAttributePath->mValue.mAttributeId;
+            }
+
+            // if the entry is invalid and we are wildcard-expanding, this is not a valid value so
+            // return "not valid"
             if (mPosition.mAttributePath->mValue.IsWildcardPath())
             {
-                if (!IsValidAttributeId(mPosition.mAttributePath->mValue.mAttributeId))
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
+
+            // We get here if all the the conditions below are true:
+            //   - entry is NOT valid (this is not a valid attribute)
+            //   - path is NOT a wildcard (i.e. we were asked to explicitly return it)
+            // as a result, we have no way to generate a "REAL" attribute metadata.
+            // So even though we return a valid attribute id, entry will be empty
+            if (entry)
+            {
+                entry->reset();
+            }
+            // forced ID (even if invalid)
             return mPosition.mAttributePath->mValue.mAttributeId;
         }
         mAttributeIndex = 0;
@@ -181,33 +189,16 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
     // Advance the existing attribute id if it can be advanced.
     VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardAttributeId(), std::nullopt);
 
-    // Ensure (including ordering) that GlobalAttributesNotInMetadata is reported as needed
-    for (unsigned i = 0; i < MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata); i++)
-    {
-        if (GlobalAttributesNotInMetadata[i] != mPosition.mOutputPath.mAttributeId)
-        {
-            continue;
-        }
-
-        unsigned nextAttributeIndex = i + 1;
-        if (nextAttributeIndex < MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata))
-        {
-            return GlobalAttributesNotInMetadata[nextAttributeIndex];
-        }
-
-        // Reached the end of global attributes. Since global attributes are
-        // reported last, finishing global attributes means everything completed.
-        return std::nullopt;
-    }
-
     if (mAttributeIndex < mAttributes.size())
     {
+        if (entry != nullptr)
+        {
+            entry->emplace(mAttributes[mAttributeIndex]);
+        }
         return mAttributes[mAttributeIndex].attributeId;
     }
 
-    // Finished the data model, start with global attributes
-    static_assert(MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata) > 0);
-    return GlobalAttributesNotInMetadata[0];
+    return std::nullopt;
 }
 
 std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
