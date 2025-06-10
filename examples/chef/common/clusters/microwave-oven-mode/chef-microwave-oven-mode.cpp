@@ -130,4 +130,4 @@ CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeTagsByIndex(uint8_t modeIndex
     return CHIP_NO_ERROR;
 }
 
-#endif // MATTER_DM_PLUGIN_Microwave_OVEN_MODE_SERVER
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
