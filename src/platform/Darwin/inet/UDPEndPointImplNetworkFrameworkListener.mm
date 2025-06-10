@@ -94,6 +94,11 @@ namespace Inet {
 
         CHIP_ERROR UDPEndPointImplNetworkFrameworkListener::ListenLoopback()
         {
+#if INET_CONFIG_ENABLE_IPV4
+            if (IsIPv4()) {
+                return ListenAddress(IPAddress::Loopback(IPAddressType::kIPv4));
+            }
+#endif
             return ListenAddress(IPAddress::Loopback(IPAddressType::kIPv6));
         }
 

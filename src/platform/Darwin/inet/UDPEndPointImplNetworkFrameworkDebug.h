@@ -23,7 +23,7 @@ namespace chip {
 namespace Inet {
 namespace Darwin {
 void DebugPrintListenerState(nw_listener_state_t state, nw_error_t error);
-void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_error_t error);
+void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_interface_t interface, nw_error_t error);
 void DebugPrintConnectionState(nw_connection_state_t state, nw_error_t error);
 void DebugPrintConnection(nw_connection_t connection);
 void DebugPrintEndPoint(nw_endpoint_t endpoint);

@@ -342,7 +342,7 @@ fabric_scoped struct WebRTCSessionStruct {
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 4;
+  revision 5;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -383,9 +383,9 @@ cluster Identify = 3 {
     EffectVariantEnum effectVariant = 1;
   }
 
-  /** Command description for Identify */
+  /** This command starts or stops the receiving device identifying itself. */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-  /** Command description for TriggerEffect */
+  /** This command allows the support of feedback to the user, such as a certain light effect. */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
@@ -7446,32 +7446,6 @@ provisional cluster Chime = 1366 {
   command PlayChimeSound(): DefaultSuccess = 0;
 }
 
-/** This Meter Identification Cluster provides attributes for determining advanced information about utility metering device. */
-provisional cluster MeterIdentification = 2822 {
-  revision 1;
-
-  enum MeterTypeEnum : enum8 {
-    kUtility = 0;
-    kPrivate = 1;
-    kGeneric = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kPowerThreshold = 0x1;
-  }
-
-  readonly attribute nullable MeterTypeEnum meterType = 0;
-  readonly attribute nullable char_string<64> pointOfDelivery = 1;
-  readonly attribute nullable char_string<64> meterSerialNumber = 2;
-  readonly attribute optional nullable char_string<64> protocolVersion = 3;
-  readonly attribute optional nullable PowerThresholdStruct powerThreshold = 4;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** The Test Cluster is meant to validate the generated code */
 internal cluster UnitTesting = 4294048773 {
   revision 1; // NOTE: Default/not specifically set
@@ -8208,22 +8182,22 @@ endpoint 0 {
   }
 
   server cluster NetworkCommissioning {
-    ram      attribute maxNetworks;
+    callback attribute maxNetworks;
     callback attribute networks;
-    ram      attribute scanMaxTimeSeconds;
-    ram      attribute connectMaxTimeSeconds;
-    ram      attribute interfaceEnabled;
-    ram      attribute lastNetworkingStatus;
-    ram      attribute lastNetworkID;
-    ram      attribute lastConnectErrorValue;
+    callback attribute scanMaxTimeSeconds;
+    callback attribute connectMaxTimeSeconds;
+    callback attribute interfaceEnabled;
+    callback attribute lastNetworkingStatus;
+    callback attribute lastNetworkID;
+    callback attribute lastConnectErrorValue;
     callback attribute supportedWiFiBands;
     callback attribute supportedThreadFeatures;
     callback attribute threadVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -9816,19 +9790,6 @@ endpoint 1 {
     handle command PlayChimeSound;
   }
 
-  server cluster MeterIdentification {
-    callback attribute meterType;
-    callback attribute pointOfDelivery;
-    callback attribute meterSerialNumber;
-    callback attribute protocolVersion;
-    callback attribute powerThreshold;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster UnitTesting {
     emits event TestEvent;
     emits event TestFabricScopedEvent;
@@ -10189,8 +10150,8 @@ endpoint 65534 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
