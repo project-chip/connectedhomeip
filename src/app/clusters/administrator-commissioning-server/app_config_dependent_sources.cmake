@@ -23,8 +23,8 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/AdministratorComimssioningCluster.cpp"
-    "${CLUSTER_DIR}/AdministratorComimssioningCluster.h"
-    "${CLUSTER_DIR}/AdministratorComimssioningLogic.cpp"
-    "${CLUSTER_DIR}/AdministratorComimssioningLogic.h"
+    "${CLUSTER_DIR}/AdministratorCommimssioningCluster.cpp"
+    "${CLUSTER_DIR}/AdministratorCommimssioningCluster.h"
+    "${CLUSTER_DIR}/AdministratorCommimssioningLogic.cpp"
+    "${CLUSTER_DIR}/AdministratorCommimssioningLogic.h"
 )

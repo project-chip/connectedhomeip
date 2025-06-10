@@ -16,7 +16,8 @@
  */
 #pragma once
 
-#include <app/clusters/administrator-commissioning-server/AdministratorComimssioningLogic.h>
+#include <app/clusters/administrator-commissioning-server/AdministratorCommimssioningLogic.h>
+
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/AdministratorCommissioning/ClusterId.h>
 

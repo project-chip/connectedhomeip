@@ -13,10 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "gtest/gtest.h"
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/administrator-commissioning-server/AdministratorComimssioningCluster.h>
+#include <app/clusters/administrator-commissioning-server/AdministratorCommimssioningCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -33,8 +32,8 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
 
-using chip::app::DataModel::AttributeEntry;
 using chip::app::DataModel::AcceptedCommandEntry;
+using chip::app::DataModel::AttributeEntry;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestAdministratorCommissioningCluster : public ::testing::Test
@@ -102,8 +101,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
     }
 
     {
-        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId,
-                                                                              BitFlags<Feature>{ });
+        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId, BitFlags<Feature>{});
 
         ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
         ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);

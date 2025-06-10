@@ -13,12 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "AdministratorComimssioningLogic.h"
-#include "lib/core/DataModelTypes.h"
-#include "protocols/interaction_model/StatusCode.h"
+#include "AdministratorCommimssioningLogic.h"
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/DataModelTypes.h>
 #include <platform/CommissionableDataProvider.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
 
 using namespace chip::Crypto;

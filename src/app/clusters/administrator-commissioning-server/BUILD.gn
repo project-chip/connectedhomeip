@@ -16,10 +16,10 @@ import("//build_overrides/chip.gni")
 
 source_set("administrator-commissioning-server") {
   sources = [
-    "AdministratorComimssioningCluster.cpp",
-    "AdministratorComimssioningCluster.h",
-    "AdministratorComimssioningLogic.cpp",
-    "AdministratorComimssioningLogic.h",
+    "AdministratorCommimssioningCluster.cpp",
+    "AdministratorCommimssioningCluster.h",
+    "AdministratorCommimssioningLogic.cpp",
+    "AdministratorCommimssioningLogic.h",
   ]
 
   public_deps = [
