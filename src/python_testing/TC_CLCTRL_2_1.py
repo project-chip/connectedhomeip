@@ -49,14 +49,14 @@ class TC_CLCTRL_2_1(MatterBaseTest):
     def steps_TC_CLCTRL_2_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read the AttributeList attribute to determine supported attributes"),
-            TestStep(3, "Read the FeatureMap attribute to determine supported features"),
-            TestStep(4, "Read the CountdownTime attribute, if it is supported"),
-            TestStep(5, "Read the MainState attribute"),
-            TestStep(6, "Read the CurrentErrorList attribute"),
-            TestStep(7, "Read the OverallState attribute"),
-            TestStep(8, "Read the OverallTarget attribute"),
-            TestStep(9, "Read the LatchControlModes attribute, if LT is supported")
+            TestStep(2, "Read the AttributeList attribute to determine supported attributes", "AttributeList of the ClosureControl cluster is returned by the DUT"),
+            TestStep(3, "Read the FeatureMap attribute to determine supported features", "FeatureMap of the ClosureControl cluster is returned by the DUT"),
+            TestStep(4, "Read the CountdownTime attribute", "CountdownTime is returned by the DUT if it is supported, otherwise skip"),
+            TestStep(5, "Read the MainState attribute", "MainState of the ClosureControl cluster is returned by the DUT"),
+            TestStep(6, "Read the CurrentErrorList attribute", "CurrentErrorList of the ClosureControl cluster is returned by the DUT"),
+            TestStep(7, "Read the OverallState attribute", "OverallState of the ClosureControl cluster is returned by the DUT"),
+            TestStep(8, "Read the OverallTarget attribute", "OverallTarget of the ClosureControl cluster is returned by the DUT"),
+            TestStep(9, "Read the LatchControlModes attribute", "LatchControlModes of the ClosureControl cluster is returned by the DUT if the LT feature is supported, otherwise skip"),
         ]
         return steps
 
