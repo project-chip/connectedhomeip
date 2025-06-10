@@ -23,25 +23,25 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 
 @interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
-@property (atomic, nullable) dispatch_block_t onReachable;
-@property (atomic, nullable) dispatch_block_t onNotReachable;
-@property (atomic, nullable) dispatch_block_t onInternalStateChanged;
-@property (atomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
-@property (atomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
-@property (atomic, nullable) dispatch_block_t onReportBegin;
-@property (atomic, nullable) dispatch_block_t onReportEnd;
-@property (atomic, nullable) dispatch_block_t onDeviceCachePrimed;
+@property (atomic, copy, nullable) dispatch_block_t onReachable;
+@property (atomic, copy, nullable) dispatch_block_t onNotReachable;
+@property (atomic, copy, nullable) dispatch_block_t onInternalStateChanged;
+@property (atomic, copy, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
+@property (atomic, copy, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
+@property (atomic, copy, nullable) dispatch_block_t onReportBegin;
+@property (atomic, copy, nullable) dispatch_block_t onReportEnd;
+@property (atomic, copy, nullable) dispatch_block_t onDeviceCachePrimed;
 @property (atomic) BOOL skipExpectedValuesForWrite;
 @property (atomic) BOOL forceAttributeReportsIfMatchingCache;
-@property (atomic, nullable) dispatch_block_t onDeviceConfigurationChanged;
+@property (atomic, copy, nullable) dispatch_block_t onDeviceConfigurationChanged;
 @property (atomic) BOOL pretendThreadEnabled;
-@property (atomic, nullable) dispatch_block_t onSubscriptionPoolDequeue;
-@property (atomic, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
-@property (atomic, nullable) dispatch_block_t onClusterDataPersisted;
-@property (atomic, nullable) dispatch_block_t onSubscriptionCallbackDelete;
-@property (atomic, nullable) dispatch_block_t onSubscriptionReset;
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolDequeue;
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
+@property (atomic, copy, nullable) dispatch_block_t onClusterDataPersisted;
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionCallbackDelete;
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionReset;
 @property (atomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
-@property (atomic, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
+@property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic) BOOL forceTimeUpdateShortDelayToZero;
 @property (atomic) BOOL forceTimeSynchronizationLossDetectionCadenceToZero;
 @end
