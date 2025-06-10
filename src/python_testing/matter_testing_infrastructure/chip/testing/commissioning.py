@@ -291,6 +291,10 @@ class CommissionDeviceTest(base_test.BaseTestClass):
             global_stash.unstash_globally(test_config.user_params['matter_test_config']))
 
     def test_run_commissioning(self):
+        """This method is the test called by mobly, which try to commission the device until is complete or raises an error.
+        Raises:
+            signals.TestAbortAll: Failed to commission node(s)
+        """
         if not self.event_loop.run_until_complete(commission_devices(
             dev_ctrl=self.default_controller,
             dut_node_ids=self.dut_node_ids,
