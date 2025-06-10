@@ -32,7 +32,6 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #endif
 
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
@@ -86,7 +85,7 @@ app::Clusters::NetworkCommissioning::Instance
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
-app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> ThreadNetworkDriver(CONFIG_THREAD_NETWORK_ENDPOINT_ID);
+app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(CONFIG_THREAD_NETWORK_ENDPOINT_ID);
 #endif
 
 #if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID)
@@ -226,7 +225,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #ifdef CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
-    ThreadNetworkDriver.Init();
+    threadNetworkDriver.Init();
 #endif // CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
