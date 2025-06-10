@@ -21,6 +21,7 @@
 #include <fcntl.h> // For file descriptor operations
 #include <filesystem>
 #include <fstream>
+#include <gst/app/gstappsink.h>
 #include <gst/gst.h>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
@@ -41,12 +42,58 @@ using namespace Camera;
 
 namespace {
 
+// Context structure to pass both CameraDevice and videoStreamID to the callback
+struct AppSinkContext
+{
+    CameraDevice * device;
+    uint16_t videoStreamID;
+};
+
 // Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
 // Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
 
 #ifdef AV_STREAM_GST_USE_TEST_SRC
 const int kBallAnimationPattern = 18;
 #endif
+
+// Callback function for GStreamer app sink
+GstFlowReturn OnNewSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
+{
+    AppSinkContext * context = static_cast<AppSinkContext *>(user_data);
+    CameraDevice * self      = context->device;
+    uint16_t videoStreamID   = context->videoStreamID;
+
+    GstSample * sample = gst_app_sink_pull_sample(appsink);
+    if (sample == nullptr)
+    {
+        return GST_FLOW_ERROR;
+    }
+
+    GstBuffer * buffer = gst_sample_get_buffer(sample);
+    if (buffer == nullptr)
+    {
+        gst_sample_unref(sample);
+        return GST_FLOW_ERROR;
+    }
+
+    GstMapInfo map;
+    if (gst_buffer_map(buffer, &map, GST_MAP_READ))
+    {
+        // Forward H.264 RTP data to media controller with the correct videoStreamID
+        self->GetMediaController().DistributeVideo(reinterpret_cast<const char *>(map.data), map.size, videoStreamID);
+        gst_buffer_unmap(buffer, &map);
+    }
+
+    gst_sample_unref(sample);
+    return GST_FLOW_OK;
+}
+
+// Cleanup function for the context
+void DestroyAppSinkContext(gpointer user_data)
+{
+    AppSinkContext * context = static_cast<AppSinkContext *>(user_data);
+    delete context;
+}
 
 } // namespace
 
@@ -365,7 +412,7 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
 }
 
 // Helper function to create a GStreamer pipeline that ingests MJPEG frames coming
-// from the camera, converted to H.264, and sent out on UDP port over RTP/UDP.
+// from the camera, converted to H.264, and sent to media controller via app sink.
 GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int width, int height, int framerate,
                                                CameraError & error)
 {
@@ -375,7 +422,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     GstElement * videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
     GstElement * x264enc      = gst_element_factory_make("x264enc", "encoder");
     GstElement * rtph264pay   = gst_element_factory_make("rtph264pay", "rtph264");
-    GstElement * udpsink      = gst_element_factory_make("udpsink", "udpsink");
+    GstElement * appsink      = gst_element_factory_make("appsink", "appsink");
     GstElement * source       = nullptr;
 
 #ifdef AV_STREAM_GST_USE_TEST_SRC
@@ -395,7 +442,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
         { videoconvert, "videoconvert" }, //
         { x264enc, "encoder" },           //
         { rtph264pay, "rtph264" },        //
-        { udpsink, "udpsink" }            //
+        { appsink, "appsink" }            //
     };
     const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
 
@@ -404,7 +451,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     {
         ChipLogError(Camera, "Not all elements could be created.");
         // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, udpsink);
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, appsink);
 
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
@@ -418,13 +465,15 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 
     // Configure encoder for low‑latency
     gst_util_set_object_arg(G_OBJECT(x264enc), "tune", "zerolatency");
-    g_object_set(udpsink, "host", STREAM_GST_DEST_IP, "port", VIDEO_STREAM_GST_DEST_PORT, "sync", FALSE, "async", FALSE, nullptr);
 
-    // Build pipeline: v4l2src → capsfilter → jpegdec → videoconvert → x264enc → rtph264pay → udpsink
-    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, udpsink, nullptr);
+    // Configure appsink for receiving H.264 RTP data
+    g_object_set(appsink, "emit-signals", TRUE, "sync", FALSE, "async", FALSE, nullptr);
+
+    // Build pipeline: v4l2src → capsfilter → jpegdec → videoconvert → x264enc → rtph264pay → appsink
+    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, appsink, nullptr);
 
     // Link the elements
-    if (!gst_element_link_many(source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, udpsink, nullptr))
+    if (!gst_element_link_many(source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, appsink, nullptr))
     {
         ChipLogError(Camera, "CreateVideoPipeline: link failed");
 
@@ -589,6 +638,16 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
         ChipLogError(Camera, "Failed to create video pipeline.");
         it->videoContext = nullptr;
         return error;
+    }
+
+    // Get the appsink and set up callback
+    GstElement * appsink = gst_bin_get_by_name(GST_BIN(videoPipeline), "appsink");
+    if (appsink)
+    {
+        AppSinkContext * context      = new AppSinkContext{ this, streamID };
+        GstAppSinkCallbacks callbacks = { nullptr, nullptr, OnNewSampleFromAppSink };
+        gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &callbacks, context, DestroyAppSinkContext);
+        gst_object_unref(appsink);
     }
 
     ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, it->videoStreamParams.minResolution.width,
