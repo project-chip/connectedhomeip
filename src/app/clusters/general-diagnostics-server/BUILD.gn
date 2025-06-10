@@ -13,6 +13,27 @@
 # limitations under the License.
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/platform/device.gni")
+
+declare_args() {
+  enable_general_diagnostics_on_device_reboot = true
+  enable_general_diagnostics_on_hardware_faults_detect = false
+  enable_general_diagnostics_on_radio_faults_detect = false
+  enable_general_diagnostics_on_network_faults_detect = false
+}
+
+buildconfig_header("general_fault_listener_buildconfig"){
+  header = "GeneralFaultListenerConfig.h"
+  header_dir = "clusters"
+
+  defines = [
+    "ENABLE_GENERAL_DIAGNOSTICS_ON_DEVICE_REBOOT=${enable_general_diagnostics_on_device_reboot}",
+    "ENABLE_GENERAL_DIAGNOSTICS_ON_HARDWARE_FAULTS_DETECT=${enable_general_diagnostics_on_hardware_faults_detect}",
+    "ENABLE_GENERAL_DIAGNOSTICS_ON_RADIO_FAULTS_DETECT=${enable_general_diagnostics_on_radio_faults_detect}",
+    "ENABLE_GENERAL_DIAGNOSTICS_ON_NETWORK_FAULTS_DETECT=${enable_general_diagnostics_on_network_faults_detect}",
+  ]
+}
 
 source_set("general-fault-listener") {
   sources = [
@@ -23,11 +44,15 @@ source_set("general-fault-listener") {
   public_deps = [
     "${chip_root}/src/platform:platform",
     "${chip_root}/zzz_generated/app-common/clusters/GeneralDiagnostics",
+    ":general_fault_listener_buildconfig",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
 group("general-diagnostics-server") {
-  public_deps = [ ":general-fault-listener" ]
+  public_deps = [ 
+    ":general-fault-listener",
+    ":general_fault_listener_buildconfig",
+  ]
 }

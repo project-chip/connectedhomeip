@@ -19,6 +19,7 @@
 #pragma once
 
 #include <clusters/GeneralDiagnostics/Events.h>
+#include <clusters/GeneralFaultListenerConfig.h>
 #include <platform/GeneralFaults.h>
 
 namespace chip {
@@ -35,12 +36,23 @@ public:
     GeneralFaultListener()          = default;
     virtual ~GeneralFaultListener() = default;
 
+#if ENABLE_GENERAL_DIAGNOSTICS_ON_DEVICE_REBOOT
     /**
-     * @brief
-     *   Called after the current device is rebooted.
-     */
+    * @brief
+    *   Called after the current device is rebooted.
+    */
     virtual void OnDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason) = 0;
 
+    static void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason)
+    {
+        if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
+        {
+            listener->OnDeviceReboot(bootReason);
+        }
+    }
+#endif
+
+#if ENABLE_GENERAL_DIAGNOSTICS_ON_HARDWARE_FAULTS_DETECT
     /**
      * @brief
      *   Called when the Node detects a hardware fault has been raised.
@@ -48,6 +60,17 @@ public:
     virtual void OnHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
                                         const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current) = 0;
 
+    static void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
+                                                 const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current)
+    {
+        if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
+        {
+            listener->OnHardwareFaultsDetect(previous, current);
+        }
+    }
+#endif
+
+#if ENABLE_GENERAL_DIAGNOSTICS_ON_RADIO_FAULTS_DETECT
     /**
      * @brief
      *   Called when the Node detects a radio fault has been raised.
@@ -55,12 +78,33 @@ public:
     virtual void OnRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current) = 0;
 
+    static void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
+                                              const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current)
+    {
+        if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
+        {
+            listener->OnRadioFaultsDetect(previous, current);
+        }
+    }
+#endif
+
+#if ENABLE_GENERAL_DIAGNOSTICS_ON_NETWORK_FAULTS_DETECT
     /**
      * @brief
      *   Called when the Node detects a network fault has been raised.
      */
     virtual void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                        const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current) = 0;
+
+    static void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
+                                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current)
+    {
+        if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
+        {
+            listener->OnNetworkFaultsDetect(previous, current);
+        }
+    }
+#endif
 
     /**
      * @brief
@@ -73,41 +117,6 @@ public:
      *   Sets the global general fault listener.
      */
     static void SetGlobalListener(GeneralFaultListener * newValue);
-
-    static void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason)
-    {
-        if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
-        {
-            listener->OnDeviceReboot(bootReason);
-        }
-    }
-
-    static void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                                 const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current)
-    {
-        if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
-        {
-            listener->OnHardwareFaultsDetect(previous, current);
-        }
-    }
-
-    static void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                                              const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current)
-    {
-        if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
-        {
-            listener->OnRadioFaultsDetect(previous, current);
-        }
-    }
-
-    static void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current)
-    {
-        if (GeneralFaultListener * listener = GetGlobalListener(); listener != nullptr)
-        {
-            listener->OnNetworkFaultsDetect(previous, current);
-        }
-    }
 };
 
 } // namespace GeneralDiagnostics

@@ -32,6 +32,7 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <clusters/GeneralDiagnostics/Events.h>
+#include <clusters/GeneralFaultListenerConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/ConnectivityManager.h>
@@ -392,6 +393,8 @@ GeneralDiagnosticsGlobalInstance gGeneralDiagnosticsInstance;
 class GeneralFaultListenerImpl : public GeneralDiagnostics::GeneralFaultListener
 {
 public:
+
+#if ENABLE_GENERAL_DIAGNOSTICS_ON_DEVICE_REBOOT
     // Gets called when the device has been rebooted.
     void OnDeviceReboot(BootReasonEnum bootReason) override
     {
@@ -412,7 +415,9 @@ public:
             }
         }
     }
+#endif
 
+#if ENABLE_GENERAL_DIAGNOSTICS_ON_HARDWARE_FAULTS_DETECT
     // Get called when the Node detects a hardware fault has been raised.
     void OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
                                 const GeneralFaults<kMaxHardwareFaults> & current) override
@@ -439,7 +444,9 @@ public:
             }
         }
     }
+#endif
 
+#if ENABLE_GENERAL_DIAGNOSTICS_ON_RADIO_FAULTS_DETECT
     // Get called when the Node detects a radio fault has been raised.
     void OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
                              const GeneralFaults<kMaxRadioFaults> & current) override
@@ -466,7 +473,9 @@ public:
             }
         }
     }
+#endif
 
+#if ENABLE_GENERAL_DIAGNOSTICS_ON_NETWORK_FAULTS_DETECT
     // Get called when the Node detects a network fault has been raised.
     void OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
                                const GeneralFaults<kMaxNetworkFaults> & current) override
@@ -493,6 +502,7 @@ public:
             }
         }
     }
+#endif
 
     static GeneralFaultListener & Instance()
     {
