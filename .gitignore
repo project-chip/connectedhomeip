@@ -14,6 +14,8 @@ out/
 /src/test_driver/nrfconnect/build/
 /src/darwin/Framework/build/
 /src/python_testing/matter_testing_infrastructure/build/
+/scripts/py_matter_idl/build/
+/scripts/py_matter_yamltests/build/
 
 # Pigweed Environment
 .environment*/
