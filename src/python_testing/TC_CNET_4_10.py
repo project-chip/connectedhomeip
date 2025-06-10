@@ -16,6 +16,7 @@
 #
 
 import logging
+import sys
 
 import chip.clusters as Clusters
 import test_plan_support
@@ -23,6 +24,59 @@ from chip.clusters.Types import NullValue
 from chip.testing.decorators import has_feature, run_if_endpoint_matches
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+
+
+# Thread TLV Type mapping for operational dataset parsing
+THREAD_TLV_TYPE_MAP = {
+    0x00: "Channel",
+    0x01: "PanId",
+    0x02: "ExtendedPanId",
+    0x03: "NetworkName",
+    0x04: "PSKc",
+    0x05: "NetworkKey",
+    0x07: "MeshLocalPrefix",
+    0x0c: "SecurityPolicy",
+    0x0e: "ActiveTimestamp",
+    0x35: "ChannelMask",
+    0x4a: "WakeupChannel"
+}
+
+
+def parse_openthread_dataset_stream(dataset_hex: str) -> dict[str, str] | None:
+    """
+    Parses a flat stream of OpenThread TLVs from a hex string into a dictionary.
+    Handles the simple [Type][Length][Value] format.
+    """
+    tlvs = {}
+    i = 0
+    while i < len(dataset_hex):
+        try:
+            # Read Type (1 byte)
+            tlv_type = int(dataset_hex[i:i+2], 16)
+            i += 2
+
+            # Read Length (1 byte)
+            tlv_length = int(dataset_hex[i:i+2], 16)
+            i += 2
+
+            # Read Value ('tlv_length' bytes)
+            value_end = i + (tlv_length * 2)
+            if value_end > len(dataset_hex):
+                logging.error(f"Error: TLV (type 0x{tlv_type:02x}) length is out of bounds.")
+                return None
+
+            value_hex = dataset_hex[i:value_end]
+            i = value_end
+
+            # Get the name from the map or use a default for unknown types
+            key_name = THREAD_TLV_TYPE_MAP.get(tlv_type, f"Unknown_Type_0x{tlv_type:02x}")
+            tlvs[key_name] = value_hex
+
+        except (ValueError, IndexError) as e:
+            logging.error(f"Error parsing OpenThread stream at index {i}: {e}")
+            return None
+
+    return tlvs
 
 
 class TC_CNET_4_10(MatterBaseTest):
@@ -36,22 +90,19 @@ class TC_CNET_4_10(MatterBaseTest):
         3. DUT is commissioned on the operational network specified
            in the --thread-dataset-hex command-line argument.
         4. TH can communicate with the DUT on the commissioned network.
-        5. PIXIT.CNET.THREAD_1ST_EXTPANID is a valid 8-byte Thread Extended PAN ID
-           (hex string) of the operational network provided via the --hex-arg command-line argument.
 
     Example usage: 
         To run the test case, use the following command:
 
         ```bash
         python src/python_testing/TC_CNET_4_10.py --commissioning-method ble-thread --discriminator 3840 --passcode 20202021 \ 
-        --endpoint <endpoint_value> --thread-dataset-hex <dataset_value> --hex-arg PIXIT.CNET.THREAD_1ST_EXTPANID:<extpanid_value>
+        --endpoint <endpoint_value> --thread-dataset-hex <dataset_value>
         ```
 
         Where `<endpoint_value>` should be replaced with the actual endpoint number 
-        for the Network Commissioning cluster on the DUT,
-        `dataset_value` should be replaced with the operational dataset of the DUT in hexadecimal format, and 
-        `<extpanid_value>`should be replaced with the 8-byte Thread Extended PAN ID of the operational network 
-        in hexadecimal format.
+        for the Network Commissioning cluster on the DUT, and
+        `dataset_value` should be replaced with the operational dataset of the DUT in hexadecimal format. 
+        The Extended PAN ID will be automatically extracted from the provided dataset.
     """
 
     def desc_TC_CNET_4_10(self):
@@ -74,9 +125,9 @@ class TC_CNET_4_10(MatterBaseTest):
                      "Verify that DUT sends ArmFailSafeResponse command to the TH"),
             TestStep(5, "TH reads Networks attribute from the DUT and save the number of entries as 'NumNetworks'",
                      "Verify that the Networks attribute list has an entry with the following values: "
-                     "1. NetworkID field value set as the PIXIT.CNET.THREAD_1ST_EXTPANID"
+                     "1. NetworkID field value set as the Extended PAN ID from the operational dataset "
                      "2. Connected field value is of type boolean and has the value True"),
-            TestStep(6, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_EXTPANID and Breadcrumb field set to 1",
+            TestStep(6, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to the Extended PAN ID from the operational dataset and Breadcrumb field set to 1",
                      "Verify that DUT sends NetworkConfigResponse to command with the following fields: "
                      "1. NetworkingStatus is success "
                      "2. NetworkIndex is 'Userth_netidx'"),
@@ -85,10 +136,10 @@ class TC_CNET_4_10(MatterBaseTest):
             TestStep(8, "TH reads LastNetworkingStatus attribute from the DUT",
                      "Verify that DUT sends LastNetworkingStatus as Success which is 0 or null if 'NumNetworks' - 1 == 0 entries."),
             TestStep(9, "TH reads LastNetworkID attribute from the DUT",
-                     "Verify that DUT sends LastNetworkID as PIXIT.CNET.THREAD_1ST_EXTPANID or null if 'NumNetworks' - 1 == 0 entries."),
+                     "Verify that DUT sends LastNetworkID as the Extended PAN ID from the operational dataset or null if 'NumNetworks' - 1 == 0 entries."),
             TestStep(10, "TH reads Breadcrumb attribute from the General Commissioning cluster",
                      "Verify that the breadcrumb value is set to 1"),
-            TestStep(11, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.THREAD_1ST_EXTPANID and Breadcrumb set to 2",
+            TestStep(11, "TH sends ConnectNetwork command to the DUT with NetworkID field set to the Extended PAN ID from the operational dataset and Breadcrumb set to 2",
                      "Verify that the DUT sends a ConnectNetworkResponse to the command with the NetworkingStatus field set to NetworkIdNotFound"),
             TestStep(12, "TH reads Breadcrumb attribute from the General Commissioning cluster",
                      "Verify that the breadcrumb value is set to 1"),
@@ -96,11 +147,11 @@ class TC_CNET_4_10(MatterBaseTest):
                      "Verify that the DUT sends ArmFailSafeResponse command to the TH"),
             TestStep(14, "TH reads Networks attribute from the DUT",
                      "Verify that the Networks attribute list contains 'NumNetworks' entries and has an entry with the following values:"
-                     "1. NetworkID field value set as the PIXIT.CNET.THREAD_1ST_EXTPANID"
+                     "1. NetworkID field value set as the Extended PAN ID from the operational dataset "
                      "2. Connected field value is of type boolean and has the value True"),
             TestStep(15, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900 and Breadcrumb set to 0",
                      "Verify that the DUT sends ArmFailSafeResponse command to the TH"),
-            TestStep(16, "TH sends RemoveNetwork Command to the DUT with NetworkID set to PIXIT.CNET.THREAD_1ST_EXTPANID and Breadcrumb set to 1",
+            TestStep(16, "TH sends RemoveNetwork Command to the DUT with NetworkID set to the Extended PAN ID from the operational dataset and Breadcrumb set to 1",
                      "Verify that the DUT sends NetworkConfigResponse to command with the following fields: "
                      "1. NetworkingStatus is success "
                      "2. NetworkIndex is 'Userth_netidx'"),
@@ -109,7 +160,7 @@ class TC_CNET_4_10(MatterBaseTest):
             TestStep(18, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0 and Breadcrumb set to 0",
                      "Verify that the DUT sends ArmFailSafeResponse command to the TH"),
             TestStep(19, "TH reads Networks attribute from the DUT",
-                     "Verify that the Networks attribute list contains 'NumNetworks' -1 entries and does not contain the PIXIT.CNET.THREAD_1ST_EXTPANID"),
+                     "Verify that the Networks attribute list contains 'NumNetworks' -1 entries and does not contain the Extended PAN ID from the operational dataset"),
             TestStep(20, "(Cleanup) TH adds the Thread network back to the DUT.")
         ]
 
@@ -121,15 +172,20 @@ class TC_CNET_4_10(MatterBaseTest):
         cnet = Clusters.NetworkCommissioning
         gen_comm = Clusters.GeneralCommissioning
 
-        # Get NetworkID (Extended PAN ID) directly from PIXIT
-        thread_network_id_bytes = self.matter_test_config.global_test_params.get('PIXIT.CNET.THREAD_1ST_EXTPANID')
-        asserts.assert_is_not_none(thread_network_id_bytes, "PIXIT.CNET.THREAD_1ST_EXTPANID must be supplied via --hex-arg.")
-        # Ensure it's bytes and the correct length (8 bytes)
-        asserts.assert_is_instance(thread_network_id_bytes, bytes,
-                                   "PIXIT.CNET.THREAD_1ST_EXTPANID should be delivered as bytes by --hex-arg.")
-        asserts.assert_equal(len(thread_network_id_bytes), 8,
-                             f"PIXIT.CNET.THREAD_1ST_EXTPANID must be 8 bytes (16 hex chars), received {len(thread_network_id_bytes)} bytes.")
-        logging.info(f"Using Network ID (ExtPANID) from PIXIT: {thread_network_id_bytes.hex()}")
+        # Parse Extended PAN ID from the Thread operational dataset
+        operational_dataset_hex = self.matter_test_config.thread_operational_dataset.hex()
+        logging.info(f"Parsing Thread operational dataset: {operational_dataset_hex}")
+
+        parsed_dataset = parse_openthread_dataset_stream(operational_dataset_hex)
+        asserts.assert_is_not_none(parsed_dataset, "Failed to parse Thread operational dataset")
+
+        ext_pan_id_hex = parsed_dataset.get("ExtendedPanId")
+        asserts.assert_is_not_none(ext_pan_id_hex, "Extended PAN ID not found in Thread operational dataset")
+        asserts.assert_equal(len(ext_pan_id_hex), 16,
+                             f"Extended PAN ID must be 16 hex characters (8 bytes), got {len(ext_pan_id_hex)} characters")
+
+        thread_network_id_bytes = bytes.fromhex(ext_pan_id_hex)
+        logging.info(f"Extracted Extended PAN ID from dataset: {thread_network_id_bytes.hex()}")
 
         # Step 2: Read Networks and verify thread network
         self.step(2)
@@ -353,14 +409,15 @@ class TC_CNET_4_10(MatterBaseTest):
         asserts.assert_equal(len(networks_after_add), num_networks, "Network count incorrect after re-adding")
         found = False
         for network in networks_after_add:
-            # We compare against the NetworkID extracted earlier from the PIXIT
+            # We compare against the NetworkID extracted from the operational dataset
             if network.networkID == thread_network_id_bytes:
                 found = True
                 # Check if connected status is True, although this might take time
                 # asserts.assert_true(network.connected, "Re-added network is not connected")
                 logging.info(f"Network {network.networkID.hex()} found. Connected: {network.connected}")
                 break
-        asserts.assert_true(found, "Added network (matching PIXIT NetworkID) not found in Networks list after cleanup")
+        asserts.assert_true(
+            found, "Added network (matching dataset-extracted Extended PAN ID) not found in Networks list after cleanup")
 
 
 if __name__ == "__main__":
