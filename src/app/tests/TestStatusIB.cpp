@@ -170,7 +170,7 @@ TEST_F(TestStatusIB, ConversionsFromClusterStatusCodeWork)
     EXPECT_EQ(failureWithCode.mStatus, Status::Failure);
     EXPECT_FALSE(failureWithCode.IsSuccess());
     ASSERT_TRUE(failureWithCode.mClusterStatus.has_value());
-    EXPECT_EQ(failureWithCode.mClusterStatus.value(), 42u);
+    EXPECT_EQ(*failureWithCode.mClusterStatus, 42u);
 
     StatusIB imStatusInClusterStatusCode{ ClusterStatusCode{ Status::ConstraintError } };
     EXPECT_EQ(imStatusInClusterStatusCode.mStatus, Status::ConstraintError);
