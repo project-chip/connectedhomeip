@@ -131,8 +131,7 @@ public:
 
         gOnCommandSenderResponseCallback(
             mAppContext, path.mEndpointId, path.mClusterId, path.mCommandId, index, to_underlying(statusIB.mStatus),
-            statusIB.mClusterStatus.has_value() ? *statusIB.mClusterStatus : chip::python::kUndefinedClusterStatus, buffer,
-            size);
+            statusIB.mClusterStatus.has_value() ? *statusIB.mClusterStatus : chip::python::kUndefinedClusterStatus, buffer, size);
     }
 
     void OnError(const CommandSender * apCommandSender, const CommandSender::ErrorData & aErrorData) override
