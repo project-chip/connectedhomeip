@@ -644,7 +644,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
         mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
-    
+
     // Start advertising
     matter_ble_adv_stop();
     vTaskDelay(100);
