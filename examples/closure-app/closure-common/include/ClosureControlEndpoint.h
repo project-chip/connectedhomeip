@@ -68,7 +68,7 @@ public:
      *
      * @param[in] eventTrigger Event trigger to handle.
      *
-     * @return CHIP_ERROR CHIP_NO_ERROR - No erros during the processing
+     * @return CHIP_ERROR CHIP_NO_ERROR - No errors during the processing
      *                    CHIP_ERROR_INVALID_ARGUMENT - eventTrigger isn't a valid value
      */
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;

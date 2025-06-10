@@ -33,7 +33,7 @@ constexpr ElapsedS kDefaultCountdownTime = 30;
 enum class ClosureControlTestEventTrigger : uint64_t
 {
     // MainState is SetupRequired(7) Test Event | Simulate that the device is in SetupRequired state
-    kMainStateIsSetupReuired = 0x0104000000000000,
+    kMainStateIsSetupRequired = 0x0104000000000000,
 
     // MainState is Protected(5) Test Event | Simulate that the device is in protected state
     kMainStateIsProtected = 0x0104000000000001,
@@ -124,17 +124,17 @@ CHIP_ERROR PrintOnlyDelegate::HandleEventTrigger(uint64_t eventTrigger)
 
     switch (trigger)
     {
-    case ClosureControlTestEventTrigger::kMainStateIsSetupReuired:
-        logic->SetMainState(MainStateEnum::kSetupRequired);
+    case ClosureControlTestEventTrigger::kMainStateIsSetupRequired:
+        err = logic->SetMainState(MainStateEnum::kSetupRequired);
         break;
     case ClosureControlTestEventTrigger::kMainStateIsProtected:
-        logic->SetMainState(MainStateEnum::kProtected);
+        err = logic->SetMainState(MainStateEnum::kProtected);
         break;
     case ClosureControlTestEventTrigger::kMainStateIsError:
-        logic->SetMainState(MainStateEnum::kError);
+        err =logic->SetMainState(MainStateEnum::kError);
         break;
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
-        logic->SetMainState(MainStateEnum::kDisengaged);
+        err = logic->SetMainState(MainStateEnum::kDisengaged);
         break;
     case ClosureControlTestEventTrigger::kClearEvent:
         // TODO
