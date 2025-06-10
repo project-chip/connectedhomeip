@@ -45,7 +45,7 @@ protected:
     AdministratorCommissioningLogic mLogic;
 };
 
-/// Adds support for `OpenBasicCommissioningWindow` command to the AdminsitratorCommissioningWindow
+/// Adds support for `OpenBasicCommissioningWindow` command to the AdministratorCommissioningWindow
 class AdministratorCommissioningWithBasicCommissioningWindowCluster : public AdministratorCommissioningCluster
 {
 public:
