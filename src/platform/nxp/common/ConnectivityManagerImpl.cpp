@@ -648,8 +648,9 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
             pNetworkData->security.psk_len = keyLen;
         }
         /* Needed for WPA3 SAE support as the max length of SAE password is larger than max length of WPA-PSK */
-        memcpy(pNetworkData->security.password, key, keyLen);
-        pNetworkData->security.password_len = keyLen;
+        size_t password_actual_copy_len = chip::min(static_cast<size_t>(keyLen), sizeof(pNetworkData->security.password));
+        memcpy(pNetworkData->security.password, key, password_actual_copy_len);
+        pNetworkData->security.password_len = static_cast<uint8_t>(password_actual_copy_len);
     }
 
     ConnectNetworkTimerHandler(NULL, (void *) pNetworkData);
