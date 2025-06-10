@@ -507,7 +507,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::_Init()
 
     // Start the NFC processing thread
     mThreadRunning = true;
-    mNfcThread = std::thread(&NFCCommissioningManagerImpl::NfcThreadMain, this);
+    mNfcThread     = std::thread(&NFCCommissioningManagerImpl::NfcThreadMain, this);
 
     return CHIP_NO_ERROR;
 }

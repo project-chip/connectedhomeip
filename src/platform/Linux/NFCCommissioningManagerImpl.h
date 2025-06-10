@@ -27,13 +27,12 @@
 
 #include <platform/internal/NFCCommissioningManager.h>
 
-#include <winscard.h>
-#include <thread>
-#include <queue>
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
-
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+#include <thread>
+#include <winscard.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
