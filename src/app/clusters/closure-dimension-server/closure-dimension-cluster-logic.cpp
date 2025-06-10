@@ -20,6 +20,7 @@
 
 #include "closure-dimension-cluster-logic.h"
 #include <platform/LockTracker.h>
+#include <clusters/ClosureDimension/Metadata.h>
 
 namespace chip {
 namespace app {
@@ -484,7 +485,7 @@ CHIP_ERROR ClusterLogic::GetFeatureMap(BitFlags<Feature> & featureMap)
 CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    clusterRevision = kClusterRevision;
+    clusterRevision = ClosureDimension::kRevision;
     return CHIP_NO_ERROR;
 }
 
@@ -501,6 +502,13 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
     DataModel::Nullable<GenericTargetStruct> target;
     VerifyOrReturnError(GetTarget(target) == CHIP_NO_ERROR, Status::Failure);
+
+    // If target is null, we need to initialize to default value.
+    // This is to ensure that we can set the position, latch, and speed values in the target.
+    if (target.IsNull())
+    {
+        target.SetNonNull(GenericTargetStruct{});
+    }
 
     // If position field is present and Positioning(PS) feature is not supported, we should not set target.position value.
     if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))

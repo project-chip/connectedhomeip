@@ -19,6 +19,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <clusters/ClosureControl/Metadata.h>
 
 namespace chip {
 namespace app {
@@ -415,7 +416,7 @@ CHIP_ERROR ClusterLogic::GetFeatureMap(BitFlags<Feature> & featureMap)
 CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-    clusterRevision = kClusterRevision;
+    clusterRevision = ClosureControl::kRevision;
     return CHIP_NO_ERROR;
 }
 

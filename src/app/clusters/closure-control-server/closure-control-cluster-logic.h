@@ -298,10 +298,6 @@ public:
     CHIP_ERROR GenerateSecureStateChangedEvent(const bool secureValue);
 
 private:
-    // This cluster implements version 1 of the Closure Control cluster. Do not change this revision without updating
-    // the cluster to implement the newest features.
-    static constexpr Attributes::ClusterRevision::TypeInfo::Type kClusterRevision = 1u;
-
     bool mIsInitialized = false;
     DelegateBase & mDelegate;
     ClusterConformance mConformance;
