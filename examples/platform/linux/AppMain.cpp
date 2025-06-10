@@ -149,6 +149,10 @@ using namespace chip::app::Clusters;
 using namespace chip::Access;
 using namespace chip::Platform;
 
+extern "C" {
+extern uint16_t gFoobarPort;
+}
+
 // Network comissioning implementation
 namespace {
 // If secondaryNetworkCommissioningEndpoint has a value and both Thread and WiFi
@@ -621,6 +625,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     pthread_sigmask(SIG_BLOCK, &set, nullptr);
 #endif
 
+    gFoobarPort = LinuxDeviceOptions::GetInstance().securedDevicePort;
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
