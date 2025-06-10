@@ -177,7 +177,7 @@ struct TariffUpdateCtx
 };
 
 /**
- * @class CommodityTariffDataProvider
+ * @class Delegate
  * @brief Core tariff data management and processing class
  *
  * This class provides:
@@ -186,12 +186,12 @@ struct TariffUpdateCtx
  * - Attribute access methods
  * - Data validation and change management
  */
-class CommodityTariffDataProvider
+class Delegate
 {
 public:
-    CommodityTariffDataProvider(EndpointId ep) : mEndpointId(ep){};
-    virtual ~CommodityTariffDataProvider() = default;
+    virtual ~Delegate() = default;
 
+    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
     /**
      * @brief Set the current feature map for this tariff instance
      * @param aFeature The current feature map value
@@ -269,7 +269,7 @@ private:
     #undef X
         }*/
 
-    static void TariffDataUpd_AttrChangeCb(uint16_t aAttrId, void * CbCtx)
+    static void TariffDataUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx)
     {
         TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
         ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
@@ -321,7 +321,7 @@ protected:
  * - Command handling
  * - Cluster feature management
  */
-class CommodityTariffServer : public AttributeAccessInterface, public CommandHandlerInterface
+class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     /**
@@ -330,34 +330,27 @@ public:
      * @param aProvider The data provider delegate
      * @param aFeature Bitmask of supported features
      */
-    CommodityTariffServer(EndpointId aEndpointId, BitMask<Feature> aFeature) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mFeature(aFeature)
-    {}
+        mDelegate(aDelegate), mFeature(aFeature)
+    {
+        /* set the base class delegates endpointId */
+        mDelegate.SetEndpointId(aEndpointId);
+        mEndpointId = aEndpointId;
+    }
 
-    ~CommodityTariffServer() { Shutdown(); }
+    ~Instance() { Shutdown(); }
 
     CHIP_ERROR Init();
     void Shutdown();
 
-    /**
-     * @brief Check if a feature is supported
-     * @param aFeature The feature to check
-     * @return true if supported, false otherwise
-     */
     bool HasFeature(Feature aFeature) const;
 
-    void AttachTariffProvider(CommodityTariffDataProvider * aProvider) { mProvider = aProvider; }
-
 private:
-    CommodityTariffDataProvider * mProvider;
+    Delegate & mDelegate;
     BitMask<Feature> mFeature;
-    // Current attribute storage
-#define X(attrName, attrType)                                                                                                      \
-    attrType m##attrName;                                                                                                          \
-    attrType & Get##attrName() { return m##attrName; }
-    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
-#undef X
+
+    EndpointId mEndpointId;
 
     // AttributeAccessInterface implementation
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -368,6 +361,13 @@ private:
     // Command handlers
     void HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData);
     void HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData);
+
+    // Current attributes storage
+#define X(attrName, attrType)                           \
+    attrType m##attrName;                               \
+    attrType & Get##attrName() { return m##attrName; }
+    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+#undef X
 
     // Current attrs (time depended) update methods
     void UpdateCurrentAttrs();
