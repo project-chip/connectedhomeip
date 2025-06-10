@@ -452,7 +452,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Success);
         ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
-        EXPECT_EQ(pathStatus.mClusterStatus.value(), kExampleClusterSpecificSuccess); // NOLINT(bugprone-unchecked-optional-access)
+        EXPECT_EQ(*pathStatus.mClusterStatus, kExampleClusterSpecificSuccess); // NOLINT(bugprone-unchecked-optional-access)
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
