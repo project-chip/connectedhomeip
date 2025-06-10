@@ -18,6 +18,7 @@
 #pragma once
 
 #include <limits>
+#include <optional>
 #include <type_traits>
 
 #include <stdint.h>
@@ -67,6 +68,7 @@ const char * StatusName(Status status);
 class ClusterStatusCode
 {
 public:
+    ClusterStatusCode() = delete;
     explicit ClusterStatusCode(Status status) : mStatus(status) {}
     explicit ClusterStatusCode(CHIP_ERROR err);
 
@@ -85,7 +87,7 @@ public:
     ClusterStatusCode & operator=(const Status & status)
     {
         this->mStatus              = status;
-        this->mClusterSpecificCode = chip::NullOptional;
+        this->mClusterSpecificCode = std::nullopt;
         return *this;
     }
 
@@ -140,26 +142,25 @@ public:
     Status GetStatus() const { return mStatus; }
 
     /// @return true if a cluster-specific code is associated with the ClusterStatusCode.
-    bool HasClusterSpecificCode() const { return mClusterSpecificCode.HasValue(); }
+    bool HasClusterSpecificCode() const { return mClusterSpecificCode.has_value(); }
 
     /// @return the cluster-specific code associated with this ClusterStatusCode or chip::NullOptional if none is associated.
-    chip::Optional<ClusterStatus> GetClusterSpecificCode() const
+    std::optional<ClusterStatus> GetClusterSpecificCode() const
     {
         if ((mStatus != Status::Failure) && (mStatus != Status::Success))
         {
-            return chip::NullOptional;
+            return std::nullopt;
         }
         return mClusterSpecificCode;
     }
 
 private:
-    ClusterStatusCode() = delete;
     ClusterStatusCode(Status status, ClusterStatus cluster_specific_code) :
-        mStatus(status), mClusterSpecificCode(chip::MakeOptional(cluster_specific_code))
+        mStatus(status), mClusterSpecificCode(cluster_specific_code)
     {}
 
     Status mStatus;
-    chip::Optional<ClusterStatus> mClusterSpecificCode;
+    std::optional<ClusterStatus> mClusterSpecificCode;
 };
 
 static_assert(sizeof(ClusterStatusCode) <= sizeof(uint32_t), "ClusterStatusCode must not grow to be larger than a uint32_t");

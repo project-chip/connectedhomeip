@@ -44,7 +44,7 @@ TEST(TestStatusCode, TestClusterStatusCode)
         ClusterStatusCode status_code_success{ Status::Success };
         EXPECT_EQ(status_code_success.GetStatus(), Status::Success);
         EXPECT_FALSE(status_code_success.HasClusterSpecificCode());
-        EXPECT_EQ(status_code_success.GetClusterSpecificCode(), chip::NullOptional);
+        EXPECT_EQ(status_code_success.GetClusterSpecificCode(), std::nullopt);
         EXPECT_TRUE(status_code_success.IsSuccess());
 
         ClusterStatusCode status_code_failure{ Status::Failure };
