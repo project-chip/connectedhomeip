@@ -99,7 +99,7 @@ using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
 
 #ifdef SL_WIFI
-app::Clusters::NetworkDriverObj<NetworkCommissioning::SlWiFiDriver> networkDriver(chip::kRootEndpointId);
+app::Clusters::NetworkDriverObj<NetworkCommissioning::SlWiFiDriver> wifiNetworkDriver(chip::kRootEndpointId);
 #endif /* SL_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -118,7 +118,7 @@ app::Clusters::NetworkDriverObj<NetworkCommissioning::SlWiFiDriver> networkDrive
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 
-app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> networkDriver(chip::kRootEndpointId);
+app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(chip::kRootEndpointId);
 // ================================================================================
 // Matter Networking Callbacks
 // ================================================================================
@@ -153,6 +153,8 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
+
+    threadNetworkDriver.Init();
 
     ChipLogProgress(DeviceLayer, "Starting OpenThread task");
     return ThreadStackMgrImpl().StartThreadTask();
@@ -264,7 +266,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #if CHIP_ENABLE_OPENTHREAD
     ReturnErrorOnFailure(InitOpenThread());
 #endif
-    networkDriver.Init();
 
     // Stop Matter event handling while setting up resources
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -331,6 +332,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
+    wifiNetworkDriver.Init();
     return WifiInterface::GetInstance().InitWiFiStack();
 }
 #endif // SL_WIFI
