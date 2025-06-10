@@ -131,7 +131,7 @@ CHIP_ERROR PrintOnlyDelegate::HandleEventTrigger(uint64_t eventTrigger)
         err = logic->SetMainState(MainStateEnum::kProtected);
         break;
     case ClosureControlTestEventTrigger::kMainStateIsError:
-        err =logic->SetMainState(MainStateEnum::kError);
+        err = logic->SetMainState(MainStateEnum::kError);
         break;
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
         err = logic->SetMainState(MainStateEnum::kDisengaged);
