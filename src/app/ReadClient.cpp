@@ -46,8 +46,7 @@ using Status = Protocols::InteractionModel::Status;
 
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
                        InteractionType aInteractionType) :
-    mExchange(*this),
-    mpCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
+    mExchange(*this), mpCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
     assertChipStackLockedByCurrentThread();
@@ -519,16 +518,13 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
 
-    if (mReadPrepareParams.mRegisteredCheckInToken)
-    {
-        mPeerIsOperatingAsLIT = (aType == PeerType::kLITICD);
-    }
+    mIsPeerLIT = (aType == PeerType::kLITICD);
 
-    ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mPeerIsOperatingAsLIT ? "a" : "not a");
+    ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLIT ? "a" : "not a");
 
     // If the peer is no longer LIT and we were waiting for a check-in to try to resubscribe,
     // just try to resubscribe now, because a SIT is not going to send a check-in.
-    if (!mPeerIsOperatingAsLIT && IsInactiveICDSubscription())
+    if (!mIsPeerLIT && IsInactiveICDSubscription())
     {
         TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
     }
@@ -1057,7 +1053,11 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    if (_this->mPeerIsOperatingAsLIT)
+    // If subscription client is capable to handle checkIn message and peer operation mode is LIT,
+    // CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT is set as subscriptionTerminationCause, subscription drops can usefully wait for a
+    // check-in message before trying to resubscribe, otherwise, CHIP_ERROR_TIMEOUT is used as subscriptionTerminationCause, and the
+    // subscription retry would not wait for check-in and still continue.
+    if (_this->mIsPeerLIT && _this->mReadPrepareParams.mRegisteredCheckInToken)
     {
         subscriptionTerminationCause = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
     }
@@ -1187,13 +1187,9 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
         mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
     }
 
-    mPeerIsOperatingAsLIT                      = aReadPrepareParams.mIsPeerLIT;
+    mIsPeerLIT                                 = aReadPrepareParams.mIsPeerLIT;
     mReadPrepareParams.mRegisteredCheckInToken = aReadPrepareParams.mRegisteredCheckInToken;
-    if (aReadPrepareParams.mIsPeerLIT && !aReadPrepareParams.mRegisteredCheckInToken)
-    {
-        ChipLogProgress(DataManagement, "Error: LIT ICD needs set mRegisteredCheckInToken as true");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+
     if (aReadPrepareParams.mRegisteredCheckInToken)
     {
         ChipLogProgress(DataManagement, "Peer device has been registered with ICD CheckIn token");
