@@ -93,6 +93,13 @@ else()
 set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CHIP_SHELL_DIR}/shell_common/"
+# Exclude chef-rpc-actions-worker.cpp from compilation when RPC is disabled
+# Path to the chef-rpc-actions-worker.cpp file, which is part of ${CHEF}/common directory included in SRC_DIRS_LIST
+set(STUBS_CPP_ABSOLUTE_PATH "${CHEF}/common/chef-rpc-actions-worker.cpp")
+# Calculate the path relative to the current component directory (main/)
+file(RELATIVE_PATH STUBS_CPP_RELATIVE_TO_MAIN "${CMAKE_CURRENT_LIST_DIR}" "${STUBS_CPP_ABSOLUTE_PATH}")
+# Add it to the list of excluded sources for this component
+set(COMPONENT_EXCLUDE_SRCS "${STUBS_CPP_RELATIVE_TO_MAIN}")
 )
 endif (CONFIG_ENABLE_PW_RPC)
 
