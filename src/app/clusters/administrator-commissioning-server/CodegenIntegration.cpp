@@ -42,27 +42,13 @@ using ClusterImpl = AdministratorCommissioningCluster;
 
 LazyRegisteredServerCluster<ClusterImpl> gServers[kAdministratorCommissioningMaxClusterCount];
 
-// Find the 0-based array index corresponding to the given endpoint id.
-// Log an error if not found.
-bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
-{
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, AdministratorCommissioning::Id,
-                                                               kAdministratorCommissioningFixedClusterCount);
-
-    if (arrayIndex >= kAdministratorCommissioningMaxClusterCount)
-    {
-        ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
-        return false;
-    }
-    return true;
-}
-
 } // namespace
 
 void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
+    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, AdministratorCommissioning::Id,
+                                                               kAdministratorCommissioningFixedClusterCount);
+    if (arrayIndex >= kAdministratorCommissioningMaxClusterCount)
     {
         return;
     }
@@ -78,14 +64,15 @@ void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to register OTA on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        ChipLogError(AppServer, "Admin Commissioning register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
 }
 
 void emberAfAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
+    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, AdministratorCommissioning::Id,
+                                                               kAdministratorCommissioningFixedClusterCount);
+    if (arrayIndex >= kAdministratorCommissioningMaxClusterCount)
     {
         return;
     }
@@ -93,8 +80,7 @@ void emberAfAdministratorCommissioningClusterShutdownCallback(EndpointId endpoin
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to unregister Administrator Commissioning on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
+        ChipLogError(AppServer, "Admin Commissioning unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
     gServers[arrayIndex].Destroy();
 }
