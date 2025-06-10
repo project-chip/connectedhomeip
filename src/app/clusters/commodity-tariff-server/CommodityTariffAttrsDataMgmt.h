@@ -374,7 +374,7 @@ public:
      * - List types: initialized as empty list
      * - Others: left uninitialized
      */
-    explicit CTC_BaseDataClass(T & aValueStorage, uint16_t aAttrId) : mValue(aValueStorage), mNewValue(mValue), mAttrId(aAttrId)
+    explicit CTC_BaseDataClass(T & aValueStorage, uint32_t aAttrId) : mValue(aValueStorage), mNewValue(mValue), mAttrId(aAttrId)
     {
         if constexpr (IsValueNullable())
         {
@@ -524,7 +524,7 @@ public:
      * @pre Must be in kAssigned state (after MarkAsAssigned())
      * @post On success, transitions to kValidated state
      */
-    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(uint16_t, void *))
+    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(uint32_t, void *))
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
@@ -625,8 +625,8 @@ protected:
     T & mValue;             // Reference to the applied value storage
     T & mNewValue = mValue; // Reference to a value for updating
     void * mAuxData;        // Pointer to an auxiliary data which can be used in some method implementations
-    const uint16_t mAttrId;
-    void (*mAuxCb)(uint16_t, void *);
+    const uint32_t mAttrId;
+    void (*mAuxCb)(uint32_t, void *);
 
     StorageState mHoldState  = StorageState::kEmpty;
     UpdateState mUpdateState = UpdateState::kIdle;

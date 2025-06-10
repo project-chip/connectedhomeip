@@ -39,7 +39,7 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
-CHIP_ERROR CommodityTariffServer::Init()
+CHIP_ERROR Instance::Init()
 {
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
@@ -47,40 +47,40 @@ CHIP_ERROR CommodityTariffServer::Init()
     return CHIP_NO_ERROR;
 }
 
-void CommodityTariffServer::Shutdown()
+void Instance::Shutdown()
 {
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-bool CommodityTariffServer::HasFeature(Feature aFeature) const
+bool Instance::HasFeature(Feature aFeature) const
 {
     return mFeature.Has(aFeature);
 }
 
 // AttributeAccessInterface
-CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
     case TariffInfo::Id:
-        return aEncoder.Encode(mProvider->GetTariffInfo());
+        return aEncoder.Encode(mDelegate.GetTariffInfo());
     case TariffUnit::Id:
-        return aEncoder.Encode(mProvider->GetTariffUnit());
+        return aEncoder.Encode(mDelegate.GetTariffUnit());
     case StartDate::Id:
-        return aEncoder.Encode(mProvider->GetStartDate());
+        return aEncoder.Encode(mDelegate.GetStartDate());
     case DayEntries::Id:
-        return aEncoder.Encode(mProvider->GetDayEntries());
+        return aEncoder.Encode(mDelegate.GetDayEntries());
     case DayPatterns::Id:
-        return aEncoder.Encode(mProvider->GetDayPatterns());
+        return aEncoder.Encode(mDelegate.GetDayPatterns());
     case CalendarPeriods::Id:
-        return aEncoder.Encode(mProvider->GetCalendarPeriods());
+        return aEncoder.Encode(mDelegate.GetCalendarPeriods());
     case IndividualDays::Id:
-        return aEncoder.Encode(mProvider->GetIndividualDays());
+        return aEncoder.Encode(mDelegate.GetIndividualDays());
     case TariffComponents::Id:
-        return aEncoder.Encode(mProvider->GetTariffComponents());
+        return aEncoder.Encode(mDelegate.GetTariffComponents());
     case TariffPeriods::Id:
-        return aEncoder.Encode(mProvider->GetTariffPeriods());
+        return aEncoder.Encode(mDelegate.GetTariffPeriods());
     case CurrentDay::Id:
         return aEncoder.Encode(GetCurrentDay());
     case NextDay::Id:
@@ -102,13 +102,13 @@ CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, 
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mProvider->GetDefaultRandomizationOffset());
+        return aEncoder.Encode(mDelegate.GetDefaultRandomizationOffset());
     case DefaultRandomizationType::Id:
         if (!HasFeature(Feature::kRandomization))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mProvider->GetDefaultRandomizationType());
+        return aEncoder.Encode(mDelegate.GetDefaultRandomizationType());
 
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
@@ -119,7 +119,7 @@ CHIP_ERROR CommodityTariffServer::Read(const ConcreteReadAttributePath & aPath, 
     return CHIP_NO_ERROR;
 }
 
-void CommodityTariffServer::InvokeCommand(HandlerContext & handlerContext)
+void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     using namespace Commands;
 
@@ -136,12 +136,12 @@ void CommodityTariffServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-void CommodityTariffServer::HandleGetTariffComponent(HandlerContext & ctx,
+void Instance::HandleGetTariffComponent(HandlerContext & ctx,
                                                      const Commands::GetTariffComponent::DecodableType & commandData)
 {
     Commands::GetTariffComponentResponse::Type response;
 
-    Status status = mProvider->GetTariffComponentInfoById(commandData.tariffComponentID, response.label, response.dayEntryIDs,
+    Status status = mDelegate.GetTariffComponentInfoById(commandData.tariffComponentID, response.label, response.dayEntryIDs,
                                                           response.tariffComponent);
     if (status != Status::Success)
     {
@@ -152,11 +152,11 @@ void CommodityTariffServer::HandleGetTariffComponent(HandlerContext & ctx,
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void CommodityTariffServer::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData)
+void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData)
 {
     Commands::GetDayEntryResponse::Type response;
 
-    Status status = mProvider->GetDayEntryById(commandData.dayEntryID, response.dayEntry);
+    Status status = mDelegate.GetDayEntryById(commandData.dayEntryID, response.dayEntry);
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
