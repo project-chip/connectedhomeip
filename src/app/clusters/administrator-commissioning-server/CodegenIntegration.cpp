@@ -82,7 +82,7 @@ void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfAdministratorCommissioningClusterShudownCallback(EndpointId endpointId)
+void emberAfAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpointId, arrayIndex))
