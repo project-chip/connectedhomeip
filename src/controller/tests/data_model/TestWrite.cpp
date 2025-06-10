@@ -451,7 +451,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Success);
-        ASSERT_TRUE(pathStatus.mClusterStatus.hasvalue());
+        ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
         EXPECT_EQ(pathStatus.mClusterStatus.value(), kExampleClusterSpecificSuccess);
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
