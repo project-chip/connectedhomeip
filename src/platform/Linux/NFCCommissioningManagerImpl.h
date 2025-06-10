@@ -28,6 +28,12 @@
 #include <platform/internal/NFCCommissioningManager.h>
 
 #include <winscard.h>
+#include <thread>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
@@ -36,6 +42,33 @@ namespace DeviceLayer {
 namespace Internal {
 
 class TagInstance;
+
+// Message to send to an NFC Tag.
+class NFCMessage
+{
+private:
+    // Pointer to the NFC Tag instance to communicate with
+    TagInstance * pTagInstance;
+
+    uint8_t * pMessage;
+    size_t messageSize = 0;
+
+public:
+    NFCMessage(TagInstance * instance, System::PacketBufferHandle && msgBuf) : pTagInstance(instance)
+    {
+        messageSize = msgBuf->DataLength();
+        pMessage    = new uint8_t[messageSize];
+        std::memcpy(pMessage, msgBuf->Start(), messageSize);
+    }
+
+    ~NFCMessage() { delete[] pMessage; }
+
+    TagInstance * GetTagInstance() { return pTagInstance; }
+
+    uint8_t * GetMessage() { return pMessage; }
+
+    size_t GetMessageSize() { return messageSize; }
+};
 
 /**
  * Concrete implementation of the NFCCommissioningManagerImpl singleton object for the Linux platforms.
@@ -68,11 +101,6 @@ private:
 
     static NFCCommissioningManagerImpl sInstance;
 
-    // Static function called by ScheduleWork()
-    static void SendToNfcTag(intptr_t arg);
-
-    void SendChainedAPDUs(intptr_t arg);
-
     void DeleteAllTagInstancesUsingReaderName(const char * readerName);
     TagInstance * SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName, SCARDHANDLE cardHandle);
     TagInstance * SearchTagInstanceFromDiscriminator(uint16_t discriminator);
@@ -81,6 +109,17 @@ private:
     CHIP_ERROR ScanReader(uint16_t nfcShortId, char * readerName);
 
     Transport::NFCBase * mNFCBase = nullptr;
+
+    // Thread and synchronization primitives
+    std::thread mNfcThread;
+    std::queue<NFCMessage *> mMessageQueue;
+    std::mutex mQueueMutex;
+    std::condition_variable mQueueCondition;
+    std::atomic<bool> mThreadRunning;
+
+    // Private methods
+    void NfcThreadMain();
+    void EnqueueMessage(NFCMessage * message);
 };
 
 /**
