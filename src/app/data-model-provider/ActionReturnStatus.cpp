@@ -101,7 +101,7 @@ CHIP_ERROR ActionReturnStatus::GetUnderlyingError() const
         std::optional<ClusterStatus> code = status->GetClusterSpecificCode();
 
         return code.has_value() ? CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(*code)
-                               : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status->GetStatus());
+                                : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status->GetStatus());
     }
 
     chipDie();
