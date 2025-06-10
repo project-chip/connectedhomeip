@@ -28,10 +28,15 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
 #include <core/ErrorStr.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif // CHIP_ENABLE_OPENTHREAD
 
 using namespace ::chip;
 
@@ -42,6 +47,10 @@ namespace DeviceManager {
 using namespace ::chip::DeviceLayer;
 
 chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+
+#if CHIP_ENABLE_OPENTHREAD
+app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+#endif // CHIP_ENABLE_OPENTHREAD
 
 void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -103,6 +112,8 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
     SuccessOrExit(err);
+
+    threadNetworkDriver.Init();
 
     ChipLogProgress(DeviceLayer, "Start OpenThread task");
     err = ThreadStackMgrImpl().StartThreadTask();
