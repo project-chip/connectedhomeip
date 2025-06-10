@@ -26,7 +26,6 @@
 #include <cstring>
 #include <protocols/interaction_model/StatusCode.h>
 #include <utility>
-
 #include "../../chef-operational-state-delegate-impl.h"
 #include "../microwave-oven-mode/chef-microwave-oven-mode.h"
 
@@ -110,8 +109,6 @@ private:
 } // namespace app
 } // namespace chip
 
-void MatterMicrowaveOvenServerInit();
-
-void MatterMicrowaveOvenServerShutdown();
+void InitChefMicrowaveOvenControlCluster();
 
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER

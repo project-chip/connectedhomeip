@@ -539,7 +539,7 @@ void ApplicationInit()
 
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
     ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenControl cluster.");
-    MatterMicrowaveOvenServerInit();
+    InitChefMicrowaveOvenControlCluster();
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 }
 

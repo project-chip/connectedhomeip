@@ -17,6 +17,9 @@
  */
 
 #include "chef-microwave-oven-control.h"
+#include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
+#include <memory>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,8 +42,8 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
                                                                          MicrowaveOvenControl::Feature::kPowerNumberLimits),
                                   *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr)
 {
-    VerifyOrDie(mOperationalStateInstancePtr != nullptr);
-    VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
+    mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    mMicrowaveOvenControlInstance.Init();
 }
 
 void ChefMicrowaveOvenDevice::MicrowaveOvenInit()
@@ -65,12 +68,14 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
 
     mMicrowaveOvenControlInstance.SetCookTimeSec(cookTimeSec);
 
-    // If using power as number, check if powerSettingNum has value before setting the power number.
-    // If powerSetting field is missing in the command, the powerSettingNum passed here is handled to the max value
-    // and user can use this value directly.
     if (powerSettingNum.HasValue())
     {
         mPowerSettingNum = powerSettingNum.Value();
+    }
+
+    if (startAfterSetting)
+    {
+        mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     }
 
     return Status::Success;
@@ -90,19 +95,34 @@ CHIP_ERROR ChefMicrowaveOvenDevice::GetWattSettingByIndex(uint8_t index, uint16_
     return CHIP_NO_ERROR;
 }
 
-static constexpr EndpointId kDemoEndpointId = 1;
+namespace {
+    constexpr size_t kMicrowaveOvenDeviceSize = MATTER_DM_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
+    static_assert(kMicrowaveOvenDeviceSize <= kEmberInvalidEndpointIndex, "MicrowaveOvenDevice table size error");
 
-Platform::UniquePtr<ChefMicrowaveOvenDevice> gMicrowaveOvenDevice;
-
-void MatterMicrowaveOvenServerInit()
-{
-    gMicrowaveOvenDevice = Platform::MakeUnique<ChefMicrowaveOvenDevice>(kDemoEndpointId);
-    gMicrowaveOvenDevice.get()->MicrowaveOvenInit();
+    std::unique_ptr<ChefMicrowaveOvenDevice> gMicrowaveOvenDevice[kMicrowaveOvenDeviceSize];
 }
 
-void MatterMicrowaveOvenServerShutdown()
+void InitChefMicrowaveOvenControlCluster()
 {
-    gMicrowaveOvenDevice = nullptr;
+    ChipLogProgress(NotSpecified, "Deferred Initializing MicrowaveOvenControl cluster for all relevant endpoints.");
+    for (uint16_t i = 0; i < emberAfEndpointCount(); ++i)
+    {
+        EndpointId endpoint = emberAfEndpointFromIndex(i);
+        if (emberAfContainsServer(endpoint, MicrowaveOvenControl::Id))
+        {
+            uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpoint, MicrowaveOvenControl::Id, kMicrowaveOvenDeviceSize);
+            if (epIndex < kMicrowaveOvenDeviceSize)
+            {
+                // Check if an instance already exists for this endpoint.
+                if (gMicrowaveOvenDevice[epIndex])
+                {
+                    continue;
+                }
+                gMicrowaveOvenDevice[epIndex] = std::make_unique<ChefMicrowaveOvenDevice>(endpoint);
+                gMicrowaveOvenDevice[epIndex]->MicrowaveOvenInit();
+            }
+        }
+    }
 }
 
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
