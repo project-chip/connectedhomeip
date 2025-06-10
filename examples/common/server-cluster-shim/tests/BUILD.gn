@@ -15,24 +15,6 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/data-model-providers/codegen/model.gni")
 
-source_set("mock_data_model_with_shim") {
-  sources = codegen_data_model_SOURCES
-
-  sources += [
-    "../ServerClusterShim.cpp",
-    "../ServerClusterShim.h",
-  ]
-
-  public_deps = codegen_data_model_PUBLIC_DEPS
-
-  # this ties in the codegen model to an actual ember implementation
-  public_deps += [
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/data-model-providers/codegen/tests:ember_extra_files",
-    "${chip_root}/src/lib/core:string-builder-adapters",
-  ]
-}
-
 chip_test_suite("tests") {
   output_name = "libServerClusterShimTests"
 
@@ -41,7 +23,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    ":mock_data_model_with_shim",
+    "${chip_root}/examples/common/server-cluster-shim:mock_data_model_with_shim",
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
     "${chip_root}/src/app/server-cluster/testing",
   ]

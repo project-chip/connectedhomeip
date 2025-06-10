@@ -15,11 +15,16 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/data-model-providers/codegen/model.gni")
 
+config("includes") {
+  include_dirs = [ "." ]
+}
+
 source_set("mock_data_model_with_shim") {
   sources = codegen_data_model_SOURCES
+
   sources += [
-    "../ServerClusterShim.cpp",
-    "../ServerClusterShim.h",
+    "ServerClusterShim.cpp",
+    "ServerClusterShim.h",
   ]
 
   public_deps = codegen_data_model_PUBLIC_DEPS
@@ -30,18 +35,6 @@ source_set("mock_data_model_with_shim") {
     "${chip_root}/src/data-model-providers/codegen/tests:ember_extra_files",
     "${chip_root}/src/lib/core:string-builder-adapters",
   ]
-}
 
-chip_test_suite("tests") {
-  output_name = "libServerClusterShimTests"
-
-  test_sources = [ "TestServerClusterShim.cpp" ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    ":mock_data_model_with_shim",
-    "${chip_root}/src/app/data-model-provider:string-builder-adapters",
-    "${chip_root}/src/app/server-cluster/testing",
-  ]
+  public_configs = [ ":includes" ]
 }
