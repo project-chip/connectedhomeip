@@ -16,7 +16,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/data-model-providers/codegen/model.gni")
 
 config("includes") {
-  include_dirs = [ "." ]
+  include_dirs = [ "../" ]
 }
 
 source_set("mock_data_model_with_shim") {

@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "ServerClusterShim.h"
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -25,6 +24,7 @@
 #include <data-model-providers/codegen/tests/EmberReadWriteOverride.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <pw_unit_test/framework.h>
+#include <server-cluster-shim/ServerClusterShim.h>
 
 // This file has just basic tests for the ServerClusterShim.
 // TestCodeDrivenModelViaMocks has a more comprehensive suite of tests for the DataModel
