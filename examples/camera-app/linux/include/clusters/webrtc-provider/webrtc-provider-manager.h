@@ -76,7 +76,7 @@ public:
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
 
-    bool IsPrivacyModeActive() override;
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
 
     bool HasAllocatedVideoStreams() override;
 

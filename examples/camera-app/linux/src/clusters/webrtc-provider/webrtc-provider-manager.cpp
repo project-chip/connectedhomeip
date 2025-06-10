@@ -493,19 +493,20 @@ CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-bool WebRTCProviderManager::IsPrivacyModeActive()
+CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
 {
     if (mCameraAVStreamMgmtServer == nullptr)
     {
         ChipLogError(Camera, "AV Stream Management Server not available");
-        return false;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     // Check privacy mode attributes
     bool softRecordingPrivacyMode  = mCameraAVStreamMgmtServer->GetSoftRecordingPrivacyModeEnabled();
     bool softLivestreamPrivacyMode = mCameraAVStreamMgmtServer->GetSoftLivestreamPrivacyModeEnabled();
 
-    return softRecordingPrivacyMode || softLivestreamPrivacyMode;
+    isActive = softRecordingPrivacyMode || softLivestreamPrivacyMode;
+    return CHIP_NO_ERROR;
 }
 
 bool WebRTCProviderManager::HasAllocatedVideoStreams()

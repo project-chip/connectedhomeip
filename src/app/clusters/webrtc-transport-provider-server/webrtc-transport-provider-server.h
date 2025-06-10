@@ -246,10 +246,10 @@ public:
      * Reads the SoftLivestreamPrivacyModeEnabled and HardPrivacyModeOn attributes from the CameraAvStreamManagement
      * cluster. Privacy mode is considered **active** when **either** attribute is true.
      *
-     * @return true   Privacy mode is active.
-     * @return false  Privacy mode is inactive or the attributes could not be read.
+     * @param[out] isActive Set to true if privacy mode is active, false if inactive.
+     * @return CHIP_NO_ERROR on success, error code if privacy mode state cannot be determined.
      */
-    virtual bool IsPrivacyModeActive() = 0;
+    virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
 
     /**
      * @brief Check if there are any allocated video streams.

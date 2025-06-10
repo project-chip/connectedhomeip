@@ -60,9 +60,9 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
             TestStep(3, "Send ProvideOffer with null VideoStreamID => expect INVALID_IN_STATE"),
             TestStep(4, "Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
             TestStep(5, "Send ProvideOffer with null AudioStreamID => expect INVALID_IN_STATE"),
-            TestStep(6, "Write SoftLivestreamPrivacyModeSetting=true, HardPrivacyModeOnAttribute=false, send ProvideOffer => expect INVALID_IN_STATE"),
-            TestStep(7, "Write SoftLivestreamPrivacyModeSetting=false, HardPrivacyModeOnAttribute=true, send ProvideOffer => expect INVALID_IN_STATE"),
-            TestStep(8, "Write SoftLivestreamPrivacyModeSetting=false, HardPrivacyModeOnAttribute=false"),
+            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=true, HardPrivacyModeOn=false, send ProvideOffer => expect INVALID_IN_STATE"),
+            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=false, HardPrivacyModeOn=true, send ProvideOffer => expect INVALID_IN_STATE"),
+            TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, HardPrivacyModeOn=false"),
             TestStep(9, "Send VideoStreamAllocate command with valid parameters to create a video stream"),
             TestStep(10, "Send ProvideOffer with valid parameters => expect ProvideOfferResponse"),
             TestStep(11, "Read CurrentSessions attribute => expect 1"),
@@ -179,13 +179,13 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
             await self.write_single_attribute(
                 endpoint=endpoint,
                 cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeSetting,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled,
                 value=True
             )
             await self.write_single_attribute(
                 endpoint=endpoint,
                 cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOnAttribute,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn,
                 value=False
             )
 
@@ -206,13 +206,13 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
             await self.write_single_attribute(
                 endpoint=endpoint,
                 cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeSetting,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled,
                 value=False
             )
             await self.write_single_attribute(
                 endpoint=endpoint,
                 cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOnAttribute,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn,
                 value=True
             )
 
@@ -233,13 +233,13 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
             await self.write_single_attribute(
                 endpoint=endpoint,
                 cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeSetting,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled,
                 value=False
             )
             await self.write_single_attribute(
                 endpoint=endpoint,
                 cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOnAttribute,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn,
                 value=False
             )
         else:

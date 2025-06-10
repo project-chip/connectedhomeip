@@ -256,8 +256,14 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    // Check privacy mode settings through delegate - if either is true, fail with INVALID_IN_STATE
-    bool privacyModeActive = mDelegate.IsPrivacyModeActive();
+    bool privacyModeActive = false;
+    if (mDelegate.IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot determine privacy mode state");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+        return;
+    }
+
     if (privacyModeActive)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Privacy mode is enabled");
@@ -414,7 +420,14 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         // WebRTCSessionID is null - new session request
 
         // Check privacy mode settings - if either is true, fail with INVALID_IN_STATE
-        bool privacyModeActive = mDelegate.IsPrivacyModeActive();
+        bool privacyModeActive = false;
+        if (mDelegate.IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot determine privacy mode state");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+            return;
+        }
+
         if (privacyModeActive)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Privacy mode is enabled");
