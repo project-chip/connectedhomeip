@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "AdministratorCommimssioningCluster.h"
+#include "AdministratorCommissioningCluster.h"
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <clusters/AdministratorCommissioning/Commands.h>
