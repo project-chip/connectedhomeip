@@ -778,7 +778,7 @@ def main() -> int:
                 f"-DCONFIG_CHEF_DEVICE_TYPE='\"{options.sample_device_type_name}\"'")
             nrf_build_cmds.append(
                 "-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
-            if options.enable_lit_icd:
+            if options.enable_lit_icd or re.search(_ICD_DEVICE_PATTERN, options.sample_device_type_name):
                 nrf_build_cmds.append(
                     "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=y")
                 nrf_build_cmds.append(

@@ -44,9 +44,9 @@ steps:
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
-          - ./examples/chef/chef.py --build_all --build_include linux_x86-icd
+          - ./examples/chef/chef.py --build_all --build_include linux_x86-icd nrf52840dk-icd
       allowFailure: true # TODO: Remove this once compilation stability is established.
-      id: CompileICDLinux
+      id: CompileICD
       waitFor:
           - CompileAll
       entrypoint: ./scripts/run_in_build_env.sh
@@ -68,7 +68,7 @@ steps:
       allowFailure: true
       id: CompileNoip
       waitFor:
-          - CompileICDLinux
+          - CompileICD
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
