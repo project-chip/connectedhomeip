@@ -244,30 +244,27 @@ public:
             return;
         }
 
-        // TODO - shall we do cleanup for UpdCtx?
         TariffDataUpd_Abort();
     }
 
     // Attribute accessors
-#define X(attrName, attrType)                                                                                                      \
-    attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
+#define X(attrName, attrType)  attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
 private:
     // Primary attribute storage and management
-#define X(attrName, attrType)                                                                                                      \
-    attrType m##attrName;                                                                                                          \
+#define X(attrName, attrType) attrType m##attrName;             \
     attrName##DataClass m##attrName##_MgmtObj{ m##attrName };
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
-    /*
-        void CleanupCurrentAttrs()
-        {
-    #define X(attrName, attrType) m##attrName = attrType##(0);
-        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-    #undef X
-        }*/
+
+    void CleanupTariffAttrs()
+    {
+#define X(attrName, attrType) m##attrName##_MgmtObj.Cleanup();
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+    }
 
     static void TariffDataUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx)
     {
