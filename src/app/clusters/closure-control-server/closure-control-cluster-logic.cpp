@@ -16,10 +16,10 @@
  */
 
 #include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
+#include <clusters/ClosureControl/Metadata.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <clusters/ClosureControl/Metadata.h>
 
 namespace chip {
 namespace app {

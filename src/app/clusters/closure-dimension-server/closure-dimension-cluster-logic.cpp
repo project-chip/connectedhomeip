@@ -19,8 +19,8 @@
  */
 
 #include "closure-dimension-cluster-logic.h"
-#include <platform/LockTracker.h>
 #include <clusters/ClosureDimension/Metadata.h>
+#include <platform/LockTracker.h>
 
 namespace chip {
 namespace app {
