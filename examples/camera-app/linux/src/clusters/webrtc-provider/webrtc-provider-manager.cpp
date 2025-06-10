@@ -172,6 +172,8 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     outSession.peerNodeID  = args.peerNodeId;
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
+    mVideoStreamID         = 0;
+    mAudioStreamID         = 0;
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
@@ -271,6 +273,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     outSession.peerNodeID  = args.peerNodeId;
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
+    mVideoStreamID         = 0;
+    mAudioStreamID         = 0;
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
@@ -432,6 +436,12 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
     if (mWebrtcTransportMap.find(sessionId) != mWebrtcTransportMap.end())
     {
         ChipLogProgress(Camera, "Delete Webrtc Transport for the session: %u", sessionId);
+
+        // Release the Video and Audio Streams from the CameraAVStreamManagement
+        // cluster and update the reference counts.
+        // TODO: Lookup the sessionID to get the Video/Audio StreamID
+        ReleaseAudioVideoStreams();
+
         mWebrtcTransportMap.erase(sessionId);
     }
 
@@ -659,8 +669,11 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
 
 CHIP_ERROR WebRTCProviderManager::AcquireAudioVideoStreams()
 {
+    return mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportAcquireAudioVideoStreams(mAudioStreamID, mVideoStreamID);
+}
 
-    mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportAcquireAudioVideoStreams(mAudioStreamID, mVideoStreamID);
-
-    return CHIP_NO_ERROR;
+CHIP_ERROR WebRTCProviderManager::ReleaseAudioVideoStreams()
+{
+    // TODO: Use passed in audio/video stream ids corresponding to a sessionId.
+    return mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportReleaseAudioVideoStreams(mAudioStreamID, mVideoStreamID);
 }
