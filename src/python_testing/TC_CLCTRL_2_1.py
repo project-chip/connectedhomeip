@@ -127,11 +127,12 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         # STEP 7: Read OverallState attribute
         self.step(7)
         overall_state: typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallState)
-        logging.info(f"OverallState: {overall_state}")
-
+        
         if overall_state is NullValue:
-            logging.info("OverallState is NULL")
+            logging.info("OverallState is NULL, skipping field validations")
         else:
+            logging.info(f"OverallState: {overall_state}")
+            
             # Check Positioning feature in OverallState - PS feature (bit 0)
             if is_positioning_supported and overall_state.positioning is not NullValue:
                 logging.info(f"OverallState.positioning: {overall_state.positioning}")
@@ -161,11 +162,12 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         # STEP 8: Read OverallTarget attribute
         self.step(8)
         overall_target: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallTarget)
-        logging.info(f"OverallTarget: {overall_target}")
 
         if overall_target is NullValue:
-            logging.info("OverallTarget is NULL")
+            logging.info("OverallTarget is NULL, skipping field validations")
         else:
+            logging.info(f"OverallTarget: {overall_target}")
+            
             # Check Positioning feature in OverallTarget
             if is_positioning_supported:  # PS feature (bit 0)
                 asserts.assert_less_equal(
