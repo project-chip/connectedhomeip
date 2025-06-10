@@ -317,7 +317,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     if (error.domain == MTRInteractionErrorDomain) {
         chip::app::StatusIB status(static_cast<chip::Protocols::InteractionModel::Status>(error.code));
         if (error.userInfo != nil && error.userInfo[@"clusterStatus"] != nil) {
-            status.mClusterStatus.Emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
+            status.mClusterStatus.emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
         }
         return status.ToChipError();
     }

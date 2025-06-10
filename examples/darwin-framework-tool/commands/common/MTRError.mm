@@ -34,7 +34,7 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
     if (error.domain == MTRInteractionErrorDomain) {
         chip::app::StatusIB status(static_cast<chip::Protocols::InteractionModel::Status>(error.code));
         if (error.userInfo != nil && error.userInfo[@"clusterStatus"] != nil) {
-            status.mClusterStatus.Emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
+            status.mClusterStatus.emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
         }
         return status.ToChipError();
     }
@@ -108,7 +108,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             return nil;
         }
         return [NSDictionary dictionaryWithObjectsAndKeys:MTRSignedIntegerValueType, MTRTypeKey, [NSNumber numberWithLongLong:val],
-                             MTRValueKey, nil];
+            MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_UnsignedInteger: {
         uint64_t val;
@@ -118,7 +118,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             return nil;
         }
         return [NSDictionary dictionaryWithObjectsAndKeys:MTRUnsignedIntegerValueType, MTRTypeKey,
-                             [NSNumber numberWithUnsignedLongLong:val], MTRValueKey, nil];
+            [NSNumber numberWithUnsignedLongLong:val], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_Boolean: {
         bool val;
@@ -155,7 +155,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             return nil;
         }
         return [NSDictionary dictionaryWithObjectsAndKeys:MTRUTF8StringValueType, MTRTypeKey,
-                             [[NSString alloc] initWithBytes:ptr length:len encoding:NSUTF8StringEncoding], MTRValueKey, nil];
+            [[NSString alloc] initWithBytes:ptr length:len encoding:NSUTF8StringEncoding], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_ByteString: {
         uint32_t len = data->GetLength();
@@ -166,7 +166,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             return nil;
         }
         return [NSDictionary dictionaryWithObjectsAndKeys:MTROctetStringValueType, MTRTypeKey,
-                             [NSData dataWithBytes:ptr length:len], MTRValueKey, nil];
+            [NSData dataWithBytes:ptr length:len], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_Null: {
         return [NSDictionary dictionaryWithObjectsAndKeys:MTRNullValueType, MTRTypeKey, nil];
