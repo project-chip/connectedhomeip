@@ -100,5 +100,5 @@ Wait until commissioning succeeds.
 liveview start 1
 ```
 
-You should see the GStreamer pipeline start and a video window appear,
-confirming that the camera stream is active.
+Wave your hand in front of the camera to trigger live view; a video window will
+appear, confirming that the stream is active.
