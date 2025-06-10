@@ -116,7 +116,6 @@ app::Clusters::NetworkDriverObj<NetworkCommissioning::SlWiFiDriver> wifiNetworkD
 #include <openthread/thread.h>
 
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 
 app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(chip::kRootEndpointId);
 // ================================================================================
