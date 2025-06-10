@@ -369,7 +369,7 @@ TEST_F(TestCommands, TestSuccessNoDataResponseWithClusterStatus)
     auto onSuccessCb = [&onSuccessWasCalled, &statusCheck](const app::ConcreteCommandPath & commandPath,
                                                            const app::StatusIB & aStatus, const auto & dataResponse) {
         statusCheck        = (aStatus.mStatus == Protocols::InteractionModel::Status::Success &&
-                       aStatus.mClusterStatus.value() == kTestSuccessClusterStatus);
+                       *aStatus.mClusterStatus == kTestSuccessClusterStatus);
         onSuccessWasCalled = true;
     };
 
