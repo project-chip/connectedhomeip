@@ -21,6 +21,7 @@
 #include "Esp32ThreadInit.h"
 #include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
@@ -28,6 +29,11 @@
 #include <app/server/Server.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#endif
 
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
@@ -77,6 +83,10 @@ app::Clusters::NetworkCommissioning::Instance
 app::Clusters::NetworkCommissioning::Instance
     sEthernetNetworkCommissioningInstance(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID /* Endpoint Id */,
                                           &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
+app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> ThreadNetworkDriver(CONFIG_THREAD_NETWORK_ENDPOINT_ID);
 #endif
 
 #if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID)
@@ -215,6 +225,9 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #endif // CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#ifdef CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
+    ThreadNetworkDriver.Init();
+#endif // CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
     {
