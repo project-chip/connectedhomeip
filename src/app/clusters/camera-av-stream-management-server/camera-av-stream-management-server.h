@@ -523,6 +523,7 @@ public:
     CHIP_ERROR UpdateAudioStreamRefCount(uint16_t audioStreamId, bool shouldIncrement);
 
     CHIP_ERROR UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement);
+
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
     EndpointId mEndpointId;

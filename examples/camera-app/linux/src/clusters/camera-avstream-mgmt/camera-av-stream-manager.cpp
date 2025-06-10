@@ -388,7 +388,14 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
     {
         if (stream.audioStreamParams.audioStreamID == audioStreamID && stream.isAllocated)
         {
-            stream.audioStreamParams.referenceCount++;
+            if (stream.audioStreamParams.referenceCount < UINT8_MAX)
+            {
+                stream.audioStreamParams.referenceCount++;
+            }
+            else
+            {
+                ChipLogError(Camera, "Attempted to increment audio stream %u ref count beyond max limit", audioStreamID);
+            }
         }
     }
 
@@ -397,7 +404,14 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
     {
         if (stream.videoStreamParams.videoStreamID == videoStreamID && stream.isAllocated)
         {
-            stream.videoStreamParams.referenceCount++;
+            if (stream.videoStreamParams.referenceCount < UINT8_MAX)
+            {
+                stream.videoStreamParams.referenceCount++;
+            }
+            else
+            {
+                ChipLogError(Camera, "Attempted to increment video stream %u ref count beyond max limit", videoStreamID);
+            }
         }
     }
 
@@ -416,7 +430,14 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     {
         if (stream.audioStreamParams.audioStreamID == audioStreamID && stream.isAllocated)
         {
-            stream.audioStreamParams.referenceCount--;
+            if (stream.audioStreamParams.referenceCount > 0)
+            {
+                stream.audioStreamParams.referenceCount--;
+            }
+            else
+            {
+                ChipLogError(Camera, "Attempted to decrement audio stream %u ref count when it was already 0", audioStreamID);
+            }
         }
     }
 
@@ -425,7 +446,14 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     {
         if (stream.videoStreamParams.videoStreamID == videoStreamID && stream.isAllocated)
         {
-            stream.videoStreamParams.referenceCount--;
+            if (stream.videoStreamParams.referenceCount > 0)
+            {
+                stream.videoStreamParams.referenceCount--;
+            }
+            else
+            {
+                ChipLogError(Camera, "Attempted to decrement video stream %u ref count when it was already 0", videoStreamID);
+            }
         }
     }
 

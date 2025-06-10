@@ -332,7 +332,6 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveSnapshotStream(uint16_t snapshotStrea
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRefCount(uint16_t videoStreamId, bool shouldIncrement)
 {
     auto it = std::find_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
@@ -345,11 +344,25 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRefCount(uint16_t videoStr
 
     if (shouldIncrement)
     {
-        it->referenceCount++;
+        if (it->referenceCount < UINT8_MAX)
+        {
+            it->referenceCount++;
+        }
+        else
+        {
+            ChipLogError(Camera, "Attempted to increment video stream %u ref count beyond max limit", videoStreamId);
+        }
     }
     else
     {
-        it->referenceCount--;
+        if (it->referenceCount > 0)
+        {
+            it->referenceCount--;
+        }
+        else
+        {
+            ChipLogError(Camera, "Attempted to decrement video stream %u ref count when it was already 0", videoStreamId);
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -367,11 +380,25 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateAudioStreamRefCount(uint16_t audioStr
 
     if (shouldIncrement)
     {
-        it->referenceCount++;
+        if (it->referenceCount < UINT8_MAX)
+        {
+            it->referenceCount++;
+        }
+        else
+        {
+            ChipLogError(Camera, "Attempted to increment audio stream %u ref count beyond max limit", audioStreamId);
+        }
     }
     else
     {
-        it->referenceCount--;
+        if (it->referenceCount > 0)
+        {
+            it->referenceCount--;
+        }
+        else
+        {
+            ChipLogError(Camera, "Attempted to decrement audio stream %u ref count when it was already 0", audioStreamId);
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -379,8 +406,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateAudioStreamRefCount(uint16_t audioStr
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement)
 {
-    auto it = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
-                           [snapshotStreamId](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamId; });
+    auto it = std::find_if(
+        mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+        [snapshotStreamId](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamId; });
 
     if (it == mAllocatedSnapshotStreams.end())
     {
@@ -389,11 +417,25 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRefCount(uint16_t snaps
 
     if (shouldIncrement)
     {
-        it->referenceCount++;
+        if (it->referenceCount < UINT8_MAX)
+        {
+            it->referenceCount++;
+        }
+        else
+        {
+            ChipLogError(Camera, "Attempted to increment snapshot stream %u ref count beyond max limit", snapshotStreamId);
+        }
     }
     else
     {
-        it->referenceCount--;
+        if (it->referenceCount > 0)
+        {
+            it->referenceCount--;
+        }
+        else
+        {
+            ChipLogError(Camera, "Attempted to decrement snapshot stream %u ref count when it was already 0", snapshotStreamId);
+        }
     }
 
     return CHIP_NO_ERROR;
