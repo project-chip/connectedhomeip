@@ -21,8 +21,9 @@ set -e
 # Default settings options
 TIZEN_SDK_ROOT=/opt/tizen-sdk
 TIZEN_SDK_DATA_PATH=$HOME/tizen-sdk-data
-TIZEN_VERSION=8.0
+TIZEN_VERSION=9.0
 SECRET_TOOL=false
+unset FETCH_SDK_PKGS INSTALL_SDK_PKGS
 
 SCRIPT_NAME=$(basename -- "$(readlink -f "${BASH_SOURCE:?}")")
 SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE:?}")")
@@ -48,6 +49,9 @@ function show_help() {
     echo "  --cpu                      Comma separated list of CPU architectures. Like arm or arm64"
     echo "  --tizen-sdk-path           Set directory for Tizen SDK installation. Default is $TIZEN_SDK_ROOT"
     echo "  --tizen-sdk-data-path      Set directory for Tizen SDK runtime data. Default is $TIZEN_SDK_DATA_PATH"
+    echo "  --tizen-pkgs-dir           Set the directory to store downloaded Tizen SDK packages, default is /tmp/XXXXXX"
+    echo "  --fetch-sdk-pkgs           Fetch RPMs and ZIPs from https://download.tizen.org/ into pkgs path"
+    echo "  --install-sdk-pkgs         Install fetched packages into Tizen SDK directory (default $TIZEN_SDK_ROOT)"
     echo "  --install-dependencies     This option installs all required dependencies"
     echo "  --tizen-version            Select Tizen version. Default is $TIZEN_VERSION"
     echo "  --override-secret-tool     Circumvent the requirement of having functional D-Bus Secrets service"
@@ -99,7 +103,7 @@ function download() {
     # Skip downloading if no packages are specified
     [[ ${#PKGS[@]} -eq 0 ]] && return
 
-    wget -r -nd --no-parent -e robots=off --progress=dot:mega "${PKGS[@]}" "$1"
+    wget -r -nd --timestamping --no-parent -e robots=off --progress=dot:mega "${PKGS[@]}" "$1"
 
     # Check if the files have been downloaded
     for PKG in "${@:2}"; do
@@ -129,83 +133,70 @@ function install_dependencies() {
 # ------------------------------------------------------------------------------
 # Function for unpacking RPM packages.
 function unrpm() {
+    local sysroot="$1"
+    shift
     for PKG in "${@}"; do
-        echo "Extracting $PKG..."
-        7z x -so "$PKG" | cpio -idmv
+        info "Extracting $PKG..."
+        7z x -so "$PKG" | cpio --directory="$sysroot" -idmuv
     done
 }
 
 # ------------------------------------------------------------------------------
 # Function for cleaning up temporary files on exit.
 function cleanup() {
-    rm -rf "${TMP_DIR:?}"
+    rm "$TIZEN_SDK_ROOT/data" || true
+    rm -rf "${PKG_DIR:?}"
 }
 
-# ------------------------------------------------------------------------------
-# Function for installing common packages for Tizen SDK.
-function install_tizen_sdk_common() {
-    mkdir -p "$TIZEN_SDK_ROOT" || return
+# Make symbolic links relative
+function fixup_symlinks() {
+    while [ "$1" ]; do
+        path="$1"
+        shift
+        [ -d "$path" ] || continue
 
-    info "Tizen SDK installation directory: $TIZEN_SDK_ROOT"
+        find "$path" -maxdepth 1 -type l | while IFS= read -r LNK; do
+            ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
+        done
+    done
+}
 
-    cd "$TMP_DIR" || return
-
+function download_tizen_sdk_common() {
     # Get Tizen Studio CLI
     info "Downloading Tizen Studio CLI..."
 
     # Download
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    PKG_ARR=(
-        'certificate-encryptor_1.0.10_ubuntu-64.zip'
-        'certificate-generator_0.1.4_ubuntu-64.zip'
-        'new-common-cli_2.5.64_ubuntu-64.zip'
-        'new-native-cli_2.5.64_ubuntu-64.zip'
-        'sdb_4.2.23_ubuntu-64.zip'
-        "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip")
-    download "$URL" "${PKG_ARR[@]}"
+    download "$URL" "${COMMON_TIZENSTUDIO_ZIPS[@]}"
 
     # Tizen Developer Platform Certificate
     URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
     # Tizen site does not have this package available in version 8.0.
     # Certificates are the same for 7.0 and 8.0, though.
-    PKG_ARR=(
-        "7.0-iot-things-add-ons_*_ubuntu-64.zip")
-    download "$URL" "${PKG_ARR[@]}"
+    download "$URL" "${IOT_ZIPS[@]}"
+}
+
+# ------------------------------------------------------------------------------
+# Function for installing common packages for Tizen SDK.
+function install_tizen_sdk_common() {
+
+    info "Tizen SDK installation directory: $TIZEN_SDK_ROOT"
 
     info "Installing Tizen Studio CLI..."
 
-    unzip -o '*.zip'
-    cp -rf data/* "$TIZEN_SDK_ROOT"
-
-    # Cleanup
-    rm -rf -- *
+    for zip in "${COMMON_TIZENSTUDIO_ZIPS[@]}" "${IOT_ZIPS[@]}"; do
+        unzip -o "$zip" 'data/*' -d "$TIZEN_SDK_ROOT"
+    done
 
 }
 
-# Function for installing Tizen SDK (arm).
-function install_tizen_sdk_arm() {
-
-    SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
-
+function download_tizen_sdk_arm() {
     # Get toolchain
-    info "Downloading Tizen ARM toolchain..."
+    info "Downloading Tizen ARM toolchain and sysroot ..."
 
     # Download
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    PKG_ARR=(
-        "cross-arm-gcc-9.2_0.1.9_ubuntu-64.zip"
-        "sbi-toolchain-gcc-9.2.cpp.app_2.2.16_ubuntu-64.zip")
-    download "$URL" "${PKG_ARR[@]}"
-
-    # Get Tizen sysroot
-    info "Downloading Tizen ARM sysroot..."
-
-    # Base sysroot
-    # Different versions of Tizen have different rootstrap versions
-    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    PKG_ARR=(
-        "tizen-$TIZEN_VERSION-rs-device.core_*_ubuntu-64.zip")
-    download "$URL" "${PKG_ARR[@]}"
+    download "$URL" "${SDK_ARM_TIZENSTUDIO_ZIPS[@]}"
 
     # Base packages
     URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/armv7l/"
@@ -246,6 +237,7 @@ function install_tizen_sdk_arm() {
         'dbus-devel-*.armv7l.rpm'
         'dbus-libs-1*.armv7l.rpm'
         'glib2-devel-2*.armv7l.rpm'
+        'pcre2-devel-[0-9]*.armv7l.rpm'
         'hal-api-common-*.armv7l.rpm'
         'hal-api-sensor-*.armv7l.rpm'
         'json-glib-devel-*.armv7l.rpm'
@@ -271,52 +263,32 @@ function install_tizen_sdk_arm() {
     URL="http://download.tizen.org/snapshots/TIZEN/Tizen/Tizen-Unified/latest/repos/standard/packages/armv7l/"
     PKG_ARR=()
     download "$URL" "${PKG_ARR[@]}"
+}
+
+# Function for installing Tizen SDK (armv7l).
+function install_tizen_sdk_arm() {
+
+    SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
 
     info "Installing Tizen ARM SDK..."
 
-    unzip -o '*.zip'
-    cp -rf data/* "$TIZEN_SDK_ROOT"
-
-    unrpm *.rpm
-    cp -rf lib usr "$SYSROOT"
-
-    # Make symbolic links relative
-    find "$SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do
-        ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
+    for zip in "${SDK_ARM_TIZENSTUDIO_ZIPS[@]}"; do
+        unzip -o "$zip" 'data/*' -d "$TIZEN_SDK_ROOT"
     done
 
-    ln -sf ../../lib/libcap.so.2 "$SYSROOT/usr/lib/libcap.so"
-    ln -sf openssl3.pc "$SYSROOT/usr/lib/pkgconfig/openssl.pc"
+    unrpm "$SYSROOT" *.armv7l.rpm
+    fixup_symlinks $SYSROOT/usr/{lib,lib64}
 
-    # Cleanup
-    rm -rf -- *
+    ln -sf openssl3.pc "$SYSROOT/usr/lib/pkgconfig/openssl.pc"
 
 }
 
-# Function for installing Tizen SDK (arm64).
-function install_tizen_sdk_arm64() {
-
-    SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core"
-
-    # Get toolchain
-    info "Downloading Tizen ARM64 toolchain..."
+function download_tizen_sdk_arm64() {
+    info "Downloading Tizen ARM64 toolchain and sysroot ..."
 
     # Download
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    PKG_ARR=(
-        "cross-aarch64-gcc-9.2_0.1.9_ubuntu-64.zip"
-        "sbi-toolchain-gcc-9.2.cpp.app_2.2.16_ubuntu-64.zip")
-    download "$URL" "${PKG_ARR[@]}"
-
-    # Get Tizen sysroot
-    info "Downloading Tizen ARM64 sysroot..."
-
-    # Base sysroot
-    # Different versions of Tizen have different rootstrap versions
-    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    PKG_ARR=(
-        "tizen-$TIZEN_VERSION-rs-device64.core_*_ubuntu-64.zip")
-    download "$URL" "${PKG_ARR[@]}"
+    download "$URL" "${SDK_ARM64_TIZENSTUDIO_ZIPS[@]}"
 
     # Base packages
     URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/aarch64/"
@@ -357,6 +329,7 @@ function install_tizen_sdk_arm64() {
         'dbus-devel-*.aarch64.rpm'
         'dbus-libs-1*.aarch64.rpm'
         'glib2-devel-2*.aarch64.rpm'
+        'pcre2-devel-[0-9]*.aarch64.rpm'
         'hal-api-common-*.aarch64.rpm'
         'hal-api-sensor-*.aarch64.rpm'
         'json-glib-devel-*.aarch64.rpm'
@@ -383,27 +356,26 @@ function install_tizen_sdk_arm64() {
     URL="http://download.tizen.org/snapshots/TIZEN/Tizen/Tizen-Unified/latest/repos/standard/packages/aarch64/"
     PKG_ARR=()
     download "$URL" "${PKG_ARR[@]}"
+}
+
+# Function for installing Tizen SDK (arm64).
+function install_tizen_sdk_arm64() {
+
+    SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core"
 
     info "Installing Tizen ARM64 SDK..."
 
-    unzip -o '*.zip'
-    cp -rf data/* "$TIZEN_SDK_ROOT"
+    for zip in "${SDK_ARM64_TIZENSTUDIO_ZIPS[@]}"; do
+        unzip -o "$zip" 'data/*' -d "$TIZEN_SDK_ROOT"
+    done
 
     info "Installing Tizen ARM64 sysroot..."
 
-    unrpm *.rpm
-    cp -rf lib64 usr "$SYSROOT"
+    unrpm "$SYSROOT" *.aarch64.rpm
 
-    # Make symbolic links relative
-    find "$SYSROOT/usr/lib64" -maxdepth 1 -type l | while IFS= read -r LNK; do
-        ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
-    done
+    fixup_symlinks $SYSROOT/usr/{lib,lib64}
 
-    ln -sf ../../lib64/libcap.so.2 "$SYSROOT/usr/lib64/libcap.so"
     ln -sf openssl3.pc "$SYSROOT/usr/lib64/pkgconfig/openssl.pc"
-
-    # Cleanup
-    rm -rf -- *
 
 }
 
@@ -475,6 +447,16 @@ while (($#)); do
             TIZEN_SDK_DATA_PATH="$2"
             shift
             ;;
+        --tizen-pkgs-dir)
+            PKG_DIR="$2"
+            shift
+            ;;
+        --fetch-sdk-pkgs)
+            FETCH_SDK_PKGS=true
+            ;;
+        --install-sdk-pkgs)
+            INSTALL_SDK_PKGS=true
+            ;;
         --tizen-version)
             TIZEN_VERSION=$2
             shift
@@ -500,11 +482,18 @@ if [ -z "$INSTALL_ARM" ] && [ -z "$INSTALL_ARM64" ]; then
     exit 1
 fi
 
+if [ -z "$FETCH_SDK_PKGS" ] && [ -z "$INSTALL_SDK_PKGS" ] && [ -z "$INSTALL_DEPENDENCIES" ]; then
+    error "Nothing to do. See --help."
+    exit 1
+fi
+
 # ------------------------------------------------------------------------------
 # Prepare a temporary directory and cleanup
-trap cleanup EXIT
-TMP_DIR=$(mktemp -d)
-info "Created tmp directory $TMP_DIR"
+if [ -z "$PKG_DIR" ]; then
+    PKG_DIR=$(mktemp -d)
+    info "Created package directory $PKG_DIR"
+    trap cleanup EXIT
+fi
 
 # ------------------------------------------------------------------------------
 # Checks if the user need install dependencies
@@ -526,20 +515,76 @@ for PKG in '7z' 'cpio' 'java' 'unzip' 'wget'; do
     fi
 done
 if [[ $dep_lost ]]; then
-    echo "[HINT]: sudo apt-get install ${DEPENDENCIES[*]}"
+    info "[HINT]: sudo apt-get install ${DEPENDENCIES[*]}"
     exit 1
 fi
 
 # ------------------------------------------------------------------------------
+# Generate zip and RPM lists whose names are dependent upon $TIZEN_VERSION
+
+COMMON_TIZENSTUDIO_ZIPS=(
+    'certificate-encryptor_1.0.10_ubuntu-64.zip'
+    'certificate-generator_0.1.4_ubuntu-64.zip'
+    'new-common-cli_2.5.64_ubuntu-64.zip'
+    'new-native-cli_2.5.64_ubuntu-64.zip'
+    'sdb_4.2.23_ubuntu-64.zip'
+    "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
+)
+
+IOT_ZIPS=(
+    "7.0-iot-things-add-ons_*_ubuntu-64.zip"
+)
+
+SDK_ARM_TIZENSTUDIO_ZIPS=(
+    "cross-arm-gcc-9.2_0.1.9_ubuntu-64.zip"
+    "sbi-toolchain-gcc-9.2.cpp.app_2.2.16_ubuntu-64.zip"
+    # Base sysroot
+    "tizen-$TIZEN_VERSION-rs-device.core_*_ubuntu-64.zip"
+)
+
+SDK_ARM64_TIZENSTUDIO_ZIPS=(
+    "cross-aarch64-gcc-9.2_0.1.9_ubuntu-64.zip"
+    "sbi-toolchain-gcc-9.2.cpp.app_2.2.16_ubuntu-64.zip"
+    # Base sysroot
+    "tizen-$TIZEN_VERSION-rs-device64.core_*_ubuntu-64.zip"
+)
+
+# ------------------------------------------------------------------------------
 # Installation Tizen SDK
-install_tizen_sdk_common
+if [ -n "$INSTALL_SDK_PKGS" ]; then
+    mkdir -p "$TIZEN_SDK_ROOT"
+
+    # Trick unzip into junking the first path component:
+    # Then unzip -o '*.zip' 'data/*' -d "$TIZEN_SDK_ROOT" creates:
+    # $TIZEN_SDK_ROOT/platforms/*
+    # not
+    # $TIZEN_SDK_ROOT/data/platforms/*
+    # Kudos: https://askubuntu.com/a/1088207
+    (
+        cd "$TIZEN_SDK_ROOT"
+        if ! [ -L data ]; then
+            ln -s . data
+        fi
+    )
+fi
+
+cd "$PKG_DIR"
+
+[ -n "$FETCH_SDK_PKGS" ] && download_tizen_sdk_common
+[ -n "$INSTALL_SDK_PKGS" ] && install_tizen_sdk_common
 
 if [ "$INSTALL_ARM" = true ]; then
-    install_tizen_sdk_arm
+    [ -n "$FETCH_SDK_PKGS" ] && download_tizen_sdk_arm
+    [ -n "$INSTALL_SDK_PKGS" ] && install_tizen_sdk_arm
 fi
 
 if [ "$INSTALL_ARM64" = true ]; then
-    install_tizen_sdk_arm64
+    [ -n "$FETCH_SDK_PKGS" ] && download_tizen_sdk_arm64
+    [ -n "$INSTALL_SDK_PKGS" ] && install_tizen_sdk_arm64
 fi
 
-install_tizen_sdk_finalize
+if [ -n "$INSTALL_SDK_PKGS" ]; then
+    install_tizen_sdk_finalize
+fi
+
+[ -L "$TIZEN_SDK_ROOT/data" ] && rm "$TIZEN_SDK_ROOT/data"
