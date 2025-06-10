@@ -43,7 +43,6 @@ using namespace Camera;
 namespace {
 
 // Constants
-constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
 
