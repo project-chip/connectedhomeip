@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Optional
 from unittest.mock import MagicMock
 
+import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute
 from mobly import signals
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
@@ -311,15 +312,15 @@ def run_tests_no_exit(
     # Lazy import to avoid circular dependency
     from typing import TYPE_CHECKING
 
-    from chip.testing.matter_testing import MatterStackState, stash_globally
+    from chip.testing.matter_testing import MatterStackState
     if TYPE_CHECKING:
-        from chip.testing.matter_testing import CommissionDeviceTest
+        from chip.testing.commissioning import CommissionDeviceTest
     else:
         CommissionDeviceTest = None  # Initial placeholder
 
     # Actual runtime import
     if CommissionDeviceTest is None:
-        from chip.testing.matter_testing import CommissionDeviceTest
+        from chip.testing.commissioning import CommissionDeviceTest
 
     # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
     #       Mobly deep copies the user params before passing them to the test class and the event
@@ -347,7 +348,7 @@ def run_tests_no_exit(
         for destination in matter_test_config.trace_to:
             tracing_ctx.StartFromString(destination)
 
-        test_config.user_params["matter_stack"] = stash_globally(stack)
+        test_config.user_params["matter_stack"] = global_stash.stash_globally(stack)
 
         # TODO: Steer to right FabricAdmin!
         # TODO: If CASE Admin Subject is a CAT tag range, then make sure to
@@ -361,17 +362,16 @@ def run_tests_no_exit(
                 dacRevocationSetPath=str(
                     matter_test_config.dac_revocation_set_path),
             )
-        test_config.user_params["default_controller"] = stash_globally(
+        test_config.user_params["default_controller"] = global_stash.stash_globally(
             default_controller)
-
-        test_config.user_params["matter_test_config"] = stash_globally(
+        test_config.user_params["matter_test_config"] = global_stash.stash_globally(
             matter_test_config)
-        test_config.user_params["hooks"] = stash_globally(hooks)
+        test_config.user_params["hooks"] = global_stash.stash_globally(hooks)
 
         # Execute the test class with the config
         ok = True
 
-        test_config.user_params["certificate_authority_manager"] = stash_globally(
+        test_config.user_params["certificate_authority_manager"] = global_stash.stash_globally(
             stack.certificate_authority_manager)
 
         # Execute the test class with the config
@@ -386,7 +386,9 @@ def run_tests_no_exit(
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:
+                test_config.matter_test_config = matter_test_config
                 runner.add_test_class(test_config, test_class, tests)
+                runner
 
             if hooks:
                 # Right now, we only support running a single test class at once,
