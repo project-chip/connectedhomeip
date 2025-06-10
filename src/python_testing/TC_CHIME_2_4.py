@@ -46,7 +46,7 @@ from TC_CHIMETestBase import CHIMETestBase
 class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
 
     def desc_TC_CHIME_2_4(self) -> str:
-        return "[TC-CHIME-2.2] Verify that Chime can be enabled"
+        return "[TC-CHIME-2.4] Verify functionality of the PlayChimeSound command"
 
     def steps_TC_CHIME_2_4(self) -> list[TestStep]:
         steps = [
