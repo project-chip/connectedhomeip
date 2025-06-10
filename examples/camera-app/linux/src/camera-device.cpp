@@ -318,12 +318,6 @@ CameraDevice::CameraDevice()
 
     InitializeStreams();
 
-    // Initialize Video Sources
-    mNetworkVideoSource.Init(&mMediaController, VIDEO_STREAM_GST_DEST_PORT, StreamType::kVideo);
-
-    // Initialize Audio Sources
-    mNetworkAudioSource.Init(&mMediaController, AUDIO_STREAM_GST_DEST_PORT, StreamType::kAudio);
-
     // Initialize WebRTC connnection
     mWebRTCProviderManager.Init();
 
@@ -676,9 +670,6 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    // TODO:: Start the network stream source after the Gstreamer pipeline is setup
-    // mNetworkVideoSource.Start(streamID);
-
     // Store in stream context
     it->videoContext = videoPipeline;
 
@@ -762,9 +753,6 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
         it->audioContext = nullptr;
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
-
-    // Start the network stream source after the Gstreamer pipeline is setup
-    mNetworkAudioSource.Start(streamID);
 
     // Store in stream context
     it->audioContext = audioPipeline;
