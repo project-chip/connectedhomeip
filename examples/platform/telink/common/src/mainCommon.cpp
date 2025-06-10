@@ -21,12 +21,17 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
 #endif
 
 #include <zephyr/kernel.h>
+
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
 
 #ifdef CONFIG_USB_DEVICE_STACK
 #include <zephyr/usb/usb_device.h>
@@ -45,6 +50,10 @@ using namespace ::chip::DeviceLayer;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::TelinkWiFiDriver::Instance()));
 #endif
+
+#if CHIP_ENABLE_OPENTHREAD
+app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+#endif // CHIP_ENABLE_OPENTHREAD
 
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
 static constexpr uint32_t kFactoryResetOnBootMaxCnt       = 5;
@@ -164,6 +173,9 @@ int main(void)
         LOG_ERR("SetThreadDeviceType fail");
         goto exit;
     }
+
+    threadNetworkDriver.Init();
+
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiCommissioningInstance.Init();
 #else
