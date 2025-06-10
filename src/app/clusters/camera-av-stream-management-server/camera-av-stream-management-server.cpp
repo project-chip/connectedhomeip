@@ -344,28 +344,10 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRefCount(uint16_t videoStr
 
     if (shouldIncrement)
     {
-        if (it->referenceCount < UINT8_MAX)
-        {
-            it->referenceCount++;
-        }
-        else
-        {
-            ChipLogError(Camera, "Attempted to increment video stream %u ref count beyond max limit", videoStreamId);
-        }
-    }
-    else
-    {
-        if (it->referenceCount > 0)
-        {
-            it->referenceCount--;
-        }
-        else
-        {
-            ChipLogError(Camera, "Attempted to decrement video stream %u ref count when it was already 0", videoStreamId);
-        }
+        return (it->referenceCount < UINT8_MAX) ? (it->referenceCount++, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
     }
 
-    return CHIP_NO_ERROR;
+    return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateAudioStreamRefCount(uint16_t audioStreamId, bool shouldIncrement)
@@ -380,28 +362,10 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateAudioStreamRefCount(uint16_t audioStr
 
     if (shouldIncrement)
     {
-        if (it->referenceCount < UINT8_MAX)
-        {
-            it->referenceCount++;
-        }
-        else
-        {
-            ChipLogError(Camera, "Attempted to increment audio stream %u ref count beyond max limit", audioStreamId);
-        }
-    }
-    else
-    {
-        if (it->referenceCount > 0)
-        {
-            it->referenceCount--;
-        }
-        else
-        {
-            ChipLogError(Camera, "Attempted to decrement audio stream %u ref count when it was already 0", audioStreamId);
-        }
+        return (it->referenceCount < UINT8_MAX) ? (it->referenceCount++, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
     }
 
-    return CHIP_NO_ERROR;
+    return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement)
@@ -417,28 +381,10 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRefCount(uint16_t snaps
 
     if (shouldIncrement)
     {
-        if (it->referenceCount < UINT8_MAX)
-        {
-            it->referenceCount++;
-        }
-        else
-        {
-            ChipLogError(Camera, "Attempted to increment snapshot stream %u ref count beyond max limit", snapshotStreamId);
-        }
-    }
-    else
-    {
-        if (it->referenceCount > 0)
-        {
-            it->referenceCount--;
-        }
-        else
-        {
-            ChipLogError(Camera, "Attempted to decrement snapshot stream %u ref count when it was already 0", snapshotStreamId);
-        }
+        return (it->referenceCount < UINT8_MAX) ? (it->referenceCount++, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
     }
 
-    return CHIP_NO_ERROR;
+    return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
 }
 
 // AttributeAccessInterface
