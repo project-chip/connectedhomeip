@@ -43,6 +43,7 @@ from chip.interaction_model import Status
 from mobly import asserts
 from TC_CHIMETestBase import CHIMETestBase
 
+
 class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
 
     def desc_TC_CHIME_2_3(self) -> str:
@@ -116,6 +117,7 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
             asserts.assert_equal(mySelectedChime, newSelectedChime, "SelectedChime is not the first item from InstalledChimeSounds")
         else:
             self.skip_step(8)
- 
+
+
 if __name__ == "__main__":
     default_matter_test_main()

@@ -42,6 +42,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter
 from mobly import asserts
 from TC_CHIMETestBase import CHIMETestBase
 
+
 class TC_CHIME_2_2(MatterBaseTest, CHIMETestBase):
 
     def desc_TC_CHIME_2_2(self) -> str:
@@ -79,6 +80,7 @@ class TC_CHIME_2_2(MatterBaseTest, CHIMETestBase):
         self.step(4)
         myNewEnabled = await self.read_chime_attribute_expect_success(endpoint, attributes.Enabled)
         asserts.assert_equal(myNewEnabled, not myEnabled, "Enabled has not been changed.")
- 
+
+
 if __name__ == "__main__":
     default_matter_test_main()

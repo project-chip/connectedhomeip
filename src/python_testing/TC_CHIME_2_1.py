@@ -76,7 +76,8 @@ class TC_CHIME_2_1(MatterBaseTest, CHIMETestBase):
         self.step(2)
         myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
         asserts.assert_greater_equal(len(myChimeSounds), 1, "InstalledChimeSounds contains fewer than the minimum number of chimes")
-        asserts.assert_less_equal(len(myChimeSounds), 255, "InstalledChimeSounds contains more than the maximummum number of chimes")
+        asserts.assert_less_equal(len(myChimeSounds), 255,
+                                  "InstalledChimeSounds contains more than the maximummum number of chimes")
 
         myChimeIDs = []
         myChimeNames = []
@@ -97,7 +98,7 @@ class TC_CHIME_2_1(MatterBaseTest, CHIMETestBase):
         self.step(5)
         mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
         asserts.assert_greater_equal(mySelectedChime, 0, "SelectedChime must be zero or greater")
-        asserts.assert_less_equal(mySelectedChime, 255, "SelectedChime must be less than or equal to 255")       
+        asserts.assert_less_equal(mySelectedChime, 255, "SelectedChime must be less than or equal to 255")
 
         self.step(6)
         myEnabled = await self.read_chime_attribute_expect_success(endpoint, attributes.Enabled)
@@ -105,6 +106,5 @@ class TC_CHIME_2_1(MatterBaseTest, CHIMETestBase):
             asserts.fail("Enabled is not a boolean value")
 
 
- 
 if __name__ == "__main__":
     default_matter_test_main()

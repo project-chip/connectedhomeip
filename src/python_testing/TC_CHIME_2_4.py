@@ -42,6 +42,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter
 from mobly import asserts
 from TC_CHIMETestBase import CHIMETestBase
 
+
 class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
 
     def desc_TC_CHIME_2_4(self) -> str:
@@ -94,6 +95,6 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                                                      default_value="y")
             asserts.assert_equal(user_response.lower(), "y")
 
- 
+
 if __name__ == "__main__":
     default_matter_test_main()

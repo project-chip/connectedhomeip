@@ -43,11 +43,9 @@ class CHIMETestBase:
     async def send_play_chime_sound_command(self, endpoint, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.Chime.Commands.PlayChimeSound(),
-                endpoint=endpoint)
+                                       endpoint=endpoint)
 
             asserts.assert_equal(expected_status, Status.Success)
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-
-    
