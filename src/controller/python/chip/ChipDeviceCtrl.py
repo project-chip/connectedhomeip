@@ -303,7 +303,7 @@ class CommissionableNode(discovery.CommissionableNode):
         setupPinCode: The setup pin code of the device
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
+            int: Effective Node ID of the device (as defined by the assigned NOC)
         '''
         return self._devCtrl.CommissionOnNetwork(
             nodeId, setupPinCode, filterType=discovery.FilterType.INSTANCE_NAME, filter=self.instanceName)
@@ -632,7 +632,8 @@ class ChipDeviceControllerBase():
         self._isActive = False
 
     def ShutdownAll(self):
-        ''' Shut down all active controllers and reclaim any used resources.
+        ''' 
+        Shut down all active controllers and reclaim any used resources.
         '''
         #
         # We want a shallow copy here since it would other create new instances
@@ -689,8 +690,9 @@ class ChipDeviceControllerBase():
             discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
             setupPinCode (int): The setup pin code of the device.
             nodeid (int): Node id of the device.
+
         Returns:
-            int: Effective Node ID of the device (as defined by the assigned NOC)
+            int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
         self.CheckIsActive()
 
@@ -706,6 +708,9 @@ class ChipDeviceControllerBase():
     async def UnpairDevice(self, nodeid: int) -> None:
         '''
         Unpairs the device with the specified node ID.
+
+        Parameters:
+            nodeid (int): Node id of the device.
 
         Returns:
             None.
@@ -742,6 +747,9 @@ class ChipDeviceControllerBase():
         UpdateNOC.
 
         WARNING: ONLY CALL THIS IF YOU UNDERSTAND THE SIDE-EFFECTS
+
+        Parameters:
+            nodeid (int): Node id of the device.
 
         Raises:
             ChipStackError: On failure.
@@ -822,18 +830,51 @@ class ChipDeviceControllerBase():
             await asyncio.futures.wrap_future(ctx.future)
 
     async def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int) -> None:
+        '''
+        Establish a PASE session over BLE.
+
+        Parameters:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            setupPinCode (int): The setup pin code of the device.
+            nodeid (int): Node id of the device.
+
+        Returns:
+            None
+        '''
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
                 self.devCtrl, setupPinCode, discriminator, nodeid)
         )
 
     async def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = 0) -> None:
+        '''
+        Establish a PASE session over IP.
+
+        Parameters:
+            ipaddr (str): IP address.
+            port (int): IP port to use (default is 0).
+            setupPinCode (int): The setup pin code of the device.
+            nodeid (int): Node id of the device.
+
+        Returns:
+            None
+        '''
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
         )
 
     async def EstablishPASESession(self, setUpCode: str, nodeid: int) -> None:
+        '''
+        Establish a PASE session using setUpCode.
+
+        Parameters:
+            setUpCode (str): The setup code of the device.
+            nodeid (int): Node id of the device.
+
+        Returns:
+            None
+        '''
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
                 self.devCtrl, setUpCode.encode("utf-8"), nodeid)
@@ -857,6 +898,9 @@ class ChipDeviceControllerBase():
         '''
         Simulates a failure on a specific stage of the test commissioner.
 
+        Parameters:
+            stage (int): The commissioning to simulate.
+
         Returns:
             bool: True if the failure simulate success, False if not.
         '''
@@ -867,6 +911,9 @@ class ChipDeviceControllerBase():
         '''
         Simulates a failure on report of the test commissioner.
 
+        Parameters:
+            stage (int): The commissioning to simulate.
+
         Returns:
             bool: True if the failure simulate success, False if not.
         '''
@@ -876,6 +923,9 @@ class ChipDeviceControllerBase():
     def SetTestCommissionerPrematureCompleteAfter(self, stage: int):
         '''
         Premature complete of the test commissioner.
+
+        Parameters:
+            stage (int): The commissioning to simulate.
 
         Returns:
             bool: True if the premature complete success, False if not.
@@ -898,6 +948,9 @@ class ChipDeviceControllerBase():
         '''
         Check the test commissioner stage sucess.
 
+        Parameters:
+            stage (int): The commissioning to simulate.
+
         Returns:
             bool: True if test commissioner stage success, False if not.
         '''
@@ -909,12 +962,21 @@ class ChipDeviceControllerBase():
         '''
         Check the test commissioner Pase connection sucess.
 
+        Parameters:
+            nodeid (int): Node id of the device.
+
         Returns:
             bool: True if test commissioner Pase connection success, False if not.
         '''
         return self._dmLib.pychip_TestPaseConnection(nodeid)
 
     def ResolveNode(self, nodeid):
+        '''
+        Resove Node id.
+
+        Parameters:
+            nodeid (int): Node id of the device.
+        '''
         self.CheckIsActive()
 
         self.GetConnectedDeviceSync(nodeid, allowPASE=False)
@@ -922,6 +984,9 @@ class ChipDeviceControllerBase():
     def GetAddressAndPort(self, nodeid):
         '''
         Get the address and port.
+
+        Parameters:
+            nodeid (int): Node id of the device.
 
         Returns:
             tuple: The address and port if no error occurs or None on failure.
@@ -941,8 +1006,9 @@ class ChipDeviceControllerBase():
 
     async def DiscoverCommissionableNodes(self, filterType: discovery.FilterType = discovery.FilterType.NONE, filter: typing.Any = None,
                                           stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
-        ''' Discover commissionable nodes via DNS-SD with specified filters.
-            Supported filters are:
+        ''' 
+        Discover commissionable nodes via DNS-SD with specified filters.
+        Supported filters are:
 
                 discovery.FilterType.NONE
                 discovery.FilterType.SHORT_DISCRIMINATOR
@@ -954,8 +1020,8 @@ class ChipDeviceControllerBase():
                 discovery.FilterType.COMMISSIONER
                 discovery.FilterType.COMPRESSED_FABRIC_ID
 
-            This function will always return a list of CommissionableDevice. When stopOnFirst is set,
-            this function will return when at least one device is discovered or on timeout.
+        This function will always return a list of CommissionableDevice. When stopOnFirst is set,
+        this function will return when at least one device is discovered or on timeout.
 
         Returns:
             list: A list of discovered devices.
@@ -1018,6 +1084,11 @@ class ChipDeviceControllerBase():
         '''
         Get the IP address for a discovered device.
 
+        Parameters:
+            idx (int): Index of the discovered device.
+            addrStr (str): Address of the device.
+            length (int): Length of the address.
+
         Returns:
             bool: True if IP for discovered device success, False if not.
         '''
@@ -1034,16 +1105,20 @@ class ChipDeviceControllerBase():
 
     async def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int,
                                       discriminator: int, option: CommissioningWindowPasscode) -> CommissioningParameters:
-        ''' Opens a commissioning window on the device with the given nodeid.
-            nodeid:        Node id of the device
-            timeout:       Command timeout
-            iteration:     The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
-                           PAKE passcode verifier to be used for this commissioning. Valid range: 1000 - 100000
-                           Ignored if option == 0
-            discriminator: The long discriminator for the DNS-SD advertisement. Valid range: 0-4095
-                           Ignored if option == 0
-            option:        0 = kOriginalSetupCode
-                           1 = kTokenWithRandomPIN
+        ''' 
+        Opens a commissioning window on the device with the given nodeid.
+
+        Parameters:
+            nodeid (int): Node id of the device.
+            timeout (int): Command timeout
+            iteration (int): The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+                PAKE passcode verifier to be used for this commissioning. Valid range: 1000 - 100000
+                Ignored if option == 0
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095
+                Ignored if option == 0
+            option (int): 
+                0 = kOriginalSetupCode
+                1 = kTokenWithRandomPIN
 
             Returns:
                 CommissioningParameters
@@ -1176,7 +1251,15 @@ class ChipDeviceControllerBase():
 
     async def FindOrEstablishPASESession(self, setupCode: str, nodeid: int, timeoutMs: typing.Optional[int] = None) -> typing.Optional[DeviceProxyWrapper]:
         '''
-        Returns CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device
+        Find or establish a PASE session.
+
+        Parameters:
+            setUpCode (str): The setup code of the device.
+            nodeid (int): Node id of the device.
+            timeoutMs (int): Optional timeout in milliseconds.
+
+        Returns:
+            CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device
 
         Returns:
             DeviceProxyWrapper on success, if not is None.
@@ -1202,7 +1285,7 @@ class ChipDeviceControllerBase():
         Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
         Arg:
-            nodeId: Target's Node ID
+            nodeid: Target's Node ID
             allowPASE: Get a device proxy of a device being commissioned.
             timeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
 
@@ -1384,7 +1467,6 @@ class ChipDeviceControllerBase():
                                         suppressResponse: typing.Optional[bool] = None, remoteMaxPathsPerInvoke: typing.Optional[int] = None,
                                         suppressTimedRequestMessage: bool = False, commandRefsOverride: typing.Optional[typing.List[int]] = None):
         '''
-
         Please see SendBatchCommands for description.
         TestOnly overridable arguments:
             remoteMaxPathsPerInvoke: Overrides the number of batch commands we think can be sent to remote node.
@@ -2379,11 +2461,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         auto-commissioning should use the supplied "CommissionWithCode" function, which will
         establish the PASE connection and commission automatically.
 
+        Parameters:
+            nodeid (int): Node id of the device.
+
         Raises:
-            - A ChipStackError on failure.
+            A ChipStackError on failure.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC).
+            int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
         self.CheckIsActive()
 
@@ -2400,6 +2485,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Commissions a Thread device over BLE.
 
+        Parameters:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            setupPinCode (int): The setup pin code of the device.
+            nodeId (int): Node id of the device.
+            threadOperationalDataset (bytes): The Thread operational dataset for commissioning.
+            isShortDiscriminator (bool): Optional short discriminator.
+
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
@@ -2410,6 +2502,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Commissions a Wi-Fi device over BLE.
 
+        Parameters:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            setupPinCode (int): The setup pin code of the device.
+            nodeId (int): Node id of the device.
+            ssid (str): SSID of the WiFi  network.
+            credentials (str): WiFi network password.
+            isShortDiscriminator (bool): Optional short discriminator.
+
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
@@ -2419,6 +2519,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def SetWiFiCredentials(self, ssid: str, credentials: str):
         '''
         Set the Wi-Fi credentials to set during commissioning.
+
+        Parameters:
+            ssid (str): SSID of the WiFi  network.
+            credentials (str): WiFi network password.
 
         Raises:
             ChipStackError: On failure.
@@ -2433,6 +2537,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def SetThreadOperationalDataset(self, threadOperationalDataset):
         '''
         Set the Thread operational dataset to set during commissioning.
+
+        Parameters:
+            threadOperationalDataset (bytes): The Thread operational dataset for commissioning.
 
         Raises:
             ChipStackError: On failure.
@@ -2460,6 +2567,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the time zone to set during commissioning. Currently only one time zone entry is supported.
 
+        Parameters:
+            offset (int): Timezone offset.
+            validAt (int): Timestamp of the timezone.
+            name (str):  Name or label of the timezone.
+
         Raises:
             ChipStackError: On failure.
         '''
@@ -2471,6 +2583,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def SetDSTOffset(self, offset: int, validStarting: int, validUntil: int):
         '''
         Set the DST offset to set during commissioning. Currently only one DST entry is supported.
+
+        Parameters:
+            offset (int): Timezone offset.
+            validStarting (int): 
+            validUntil (int):
 
         Raises:
             ChipStackError: On failure.
@@ -2484,6 +2601,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the TC acknowledgements to set during commissioning.
 
+        Parameters:
+            tcAcceptedVersion (int):
+            tcUserResponse (int): 
+
         Raises:
             ChipStackError: On failure.
         '''
@@ -2495,6 +2616,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def SetSkipCommissioningComplete(self, skipCommissioningComplete: bool):
         '''
         Set whether to skip the commissioning complete callback.
+
+        Parameters:
+            skipCommissioningComplete (bool):
 
         Raises:
             ChipStackError: On failure.
@@ -2508,6 +2632,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the DefaultNTP to set during commissioning.
 
+        Parameters:
+            defaultNTP (str):
+
         Raises:
             ChipStackError: On failure.
         '''
@@ -2520,6 +2647,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the trusted time source nodeId to set during commissioning. This must be a node on the commissioner fabric.
 
+        Parameters:
+            nodeId (int): Node id of the device.
+            endpoint (int): endpoint of the device.
+
         Raises:
             ChipStackError: On failure.
         '''
@@ -2531,6 +2662,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def SetCheckMatchingFabric(self, check: bool):
         '''
         Instructs the auto-commissioner to perform a matching fabric check before commissioning.
+
+        Parameters:
+            check (bool): Validation fabric before commissioning. 
 
         Raises:
             ChipStackError: On failure.
@@ -2673,11 +2807,16 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Commission with the given nodeid from the setupPayload.
         setupPayload may be a QR or manual code.
 
+        Parameters:
+            setupPayload (str):
+            nodeid (int): Node id of the device.
+            discoveryType (DiscoveryType.DISCOVERY_ALL):
+
         Raises:
             ChipStackError: On failure.
 
         Returns:
-            Effective Node ID of the device (as defined by the assigned NOC)
+            int: Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.CheckIsActive()
 
@@ -2715,6 +2854,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Callback function for handling the NOC chain result.
 
+        Parameters:
+            nocChain ():
+
         Returns:
             None
         '''
@@ -2728,6 +2870,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Issue an NOC chain using the associated OperationalCredentialsDelegate.
         The NOC chain will be provided in TLV cert format.
+
+        Parameters:
+            crs (cluster): Certificate Signing Request response
+            nodeId (int): Node id of the device.
 
         Returns:
             asyncio.Future: A future object that is the result of the NOC Chain operation.
@@ -2775,13 +2921,13 @@ class BareChipDeviceController(ChipDeviceControllerBase):
 
         Args:
             operationalKey: A P256Keypair object for the operational key of the controller.
-            noc: The NOC for the controller, in bytes.
-            icac: The optional ICAC for the controller.
-            rcac: The RCAC for the controller.
-            ipk: The optional IPK for the controller, when None is provided, the defaultIpk
+            noc (bytes): The NOC for the controller, in bytes.
+            icac (bytes): The optional ICAC for the controller.
+            rcac (bytes): The RCAC for the controller.
+            ipk (bytes): The optional IPK for the controller, when None is provided, the defaultIpk
                 will be used.
-            adminVendorId: The adminVendorId of the controller.
-            name: The name of the controller, for debugging use only.
+            adminVendorId (int): The adminVendorId of the controller.
+            name (str): The name of the controller, for debugging use only.
 
         Raises:
             ChipStackError: On failure
