@@ -18,6 +18,7 @@
 
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterContext.h>
+#include <clusters/Descriptor/ClusterId.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -66,11 +67,13 @@ SpanEndpointProvider::Builder & SpanEndpointProvider::Builder::SetDeviceTypes(Sp
 
 std::variant<SpanEndpointProvider, CHIP_ERROR> SpanEndpointProvider::Builder::build()
 {
-    if (mEndpointId == kInvalidEndpointId)
+    if (mEndpointId == kInvalidEndpointId || mServerClusters.empty())
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    // Check that cluster list is not invalid and that it contains the Descriptor cluster
+    bool foundDescriptor = false;
     for (auto * cluster : mServerClusters)
     {
         if (cluster == nullptr || cluster->GetPaths().empty())
@@ -78,17 +81,22 @@ std::variant<SpanEndpointProvider, CHIP_ERROR> SpanEndpointProvider::Builder::bu
             ChipLogError(DataManagement, "Builder: Attempted to build with an invalid server cluster entry.");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
+
+        if (cluster->GetPaths().front().mClusterId == chip::app::Clusters::Descriptor::Id)
+        {
+            foundDescriptor = true;
+        }
+    }
+
+    if (!foundDescriptor)
+    {
+        ChipLogError(DataManagement, "Builder: Descriptor cluster is mandatory and was not found.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return SpanEndpointProvider(mEndpointId, mComposition, mParentId, mServerClusters, mClientClusters, mSemanticTags,
                                 mDeviceTypes);
 }
-
-// SpanEndpointProvider implementation
-SpanEndpointProvider::SpanEndpointProvider() :
-    mEndpointEntry({ kInvalidEndpointId, kInvalidEndpointId, DataModel::EndpointCompositionPattern::kFullFamily })
-// Other members are default-initialzed (empty spans)
-{}
 
 CHIP_ERROR
 SpanEndpointProvider::SemanticTags(
@@ -131,8 +139,8 @@ SpanEndpointProvider::SpanEndpointProvider(EndpointId id, DataModel::EndpointCom
                                            Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
                                            Span<const SemanticTag> semanticTags,
                                            Span<const DataModel::DeviceTypeEntry> deviceTypes) :
-    mEndpointEntry({ id, parentId, composition }),
-    mDeviceTypes(deviceTypes), mSemanticTags(semanticTags), mClientClusters(clientClusters), mServerClusters(serverClusters)
+    mEndpointEntry({ id, parentId, composition }), mDeviceTypes(deviceTypes), mSemanticTags(semanticTags),
+    mClientClusters(clientClusters), mServerClusters(serverClusters)
 {}
 
 } // namespace app

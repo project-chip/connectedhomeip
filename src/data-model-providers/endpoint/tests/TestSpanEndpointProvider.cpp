@@ -4,6 +4,9 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <data-model-providers/endpoint/SpanEndpointProvider.h>
 
+#include <clusters/Descriptor/ClusterId.h>
+#include <clusters/OnOff/ClusterId.h>
+
 using namespace chip;
 using namespace chip::app;
 using chip::app::DataModel::DeviceTypeEntry;
@@ -86,8 +89,14 @@ TEST(TestSpanEndpointProvider, InstantiateWithParameters)
     EndpointId id                                     = 1;
     DataModel::EndpointCompositionPattern composition = DataModel::EndpointCompositionPattern::kTree;
     EndpointId parentId                               = 0;
+    MockServerCluster descriptorCluster({ id, chip::app::Clusters::Descriptor::Id }, 1, {});
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster };
 
-    auto result = SpanEndpointProvider::Builder(id).SetComposition(composition).SetParentId(parentId).build();
+    auto result = SpanEndpointProvider::Builder(id)
+                      .SetComposition(composition)
+                      .SetParentId(parentId)
+                      .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
+                      .build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(result));
 
     const auto & provider = std::get<SpanEndpointProvider>(result);
@@ -103,10 +112,11 @@ TEST(TestSpanEndpointProvider, InstantiateWithAllParameters)
     DataModel::EndpointCompositionPattern composition = DataModel::EndpointCompositionPattern::kTree;
     EndpointId parentId                               = 0;
 
-    MockServerCluster serverCluster1({ 1, 10 }, 1, {});
-    MockServerCluster serverCluster2(ConcreteClusterPath(1, 20), 1, {});
+    MockServerCluster descriptorCluster({ id, chip::app::Clusters::Descriptor::Id }, 1, {});
+    MockServerCluster serverCluster1({ id, 10 }, 1, {});
+    MockServerCluster serverCluster2(ConcreteClusterPath(id, 20), 1, {});
 
-    ServerClusterInterface * serverClusters[] = { &serverCluster1, &serverCluster2 };
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster, &serverCluster1, &serverCluster2 };
     const chip::ClusterId clientClusters[]    = { 10, 20 };
     const SemanticTag semanticTags[]          = { { .mfgCode = chip::VendorId::TestVendor1, .namespaceID = 1, .tag = 1 },
                                                   { .mfgCode = chip::VendorId::TestVendor2, .namespaceID = 2, .tag = 2 } };
@@ -148,12 +158,15 @@ TEST(TestSpanEndpointProvider, InstantiateWithAllParameters)
 
 TEST(TestSpanEndpointProvider, SetAndGetServerClusters)
 {
-    MockServerCluster serverCluster1(ConcreteClusterPath(1, 1), 1, {});
-    MockServerCluster serverCluster2(ConcreteClusterPath(1, 2), 1, {});
+    constexpr EndpointId kTestEndpoint = 1;
+    MockServerCluster descriptorCluster({ kTestEndpoint, chip::app::Clusters::Descriptor::Id }, 1, {});
+    MockServerCluster serverCluster1(ConcreteClusterPath(kTestEndpoint, 1), 1, {});
+    MockServerCluster serverCluster2(ConcreteClusterPath(kTestEndpoint, 2), 1, {});
 
-    ServerClusterInterface * serverClusters[] = { &serverCluster1, &serverCluster2 };
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster, &serverCluster1, &serverCluster2 };
 
-    auto result = SpanEndpointProvider::Builder(1).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).build();
+    auto result =
+        SpanEndpointProvider::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(result));
 
     const auto & provider = std::get<SpanEndpointProvider>(result);
@@ -161,9 +174,11 @@ TEST(TestSpanEndpointProvider, SetAndGetServerClusters)
     ASSERT_EQ(provider.ServerClusterInterfaces(builder), CHIP_NO_ERROR);
     auto retrievedClusters = builder.TakeBuffer();
     ASSERT_EQ(retrievedClusters.size(), std::size(serverClusters));
-    EXPECT_EQ(retrievedClusters[0], &serverCluster1);
-    EXPECT_EQ(retrievedClusters[1], &serverCluster2);
+    EXPECT_EQ(retrievedClusters[0], &descriptorCluster);
+    EXPECT_EQ(retrievedClusters[1], &serverCluster1);
+    EXPECT_EQ(retrievedClusters[2], &serverCluster2);
 
+    EXPECT_EQ(provider.GetServerCluster(chip::app::Clusters::Descriptor::Id), &descriptorCluster);
     EXPECT_EQ(provider.GetServerCluster(1), &serverCluster1);
     EXPECT_EQ(provider.GetServerCluster(2), &serverCluster2);
     EXPECT_EQ(provider.GetServerCluster(3), nullptr); // Non-existent
@@ -171,19 +186,29 @@ TEST(TestSpanEndpointProvider, SetAndGetServerClusters)
 
 TEST(TestSpanEndpointProvider, SetInvalidServerClusters)
 {
-    MockServerCluster serverCluster1(ConcreteClusterPath(1, 1), 1, {});
+    constexpr EndpointId kTestEndpoint = 1;
+    MockServerCluster descriptorCluster({ kTestEndpoint, chip::app::Clusters::Descriptor::Id }, 1, {});
+    MockServerCluster serverCluster1(ConcreteClusterPath(kTestEndpoint, 1), 1, {});
 
-    ServerClusterInterface * serverClustersWithNull[] = { &serverCluster1, nullptr };
-    auto result =
-        SpanEndpointProvider::Builder(1).SetServerClusters(Span<ServerClusterInterface *>(serverClustersWithNull)).build();
+    ServerClusterInterface * serverClustersWithNull[] = { &descriptorCluster, &serverCluster1, nullptr };
+    auto result                                       = SpanEndpointProvider::Builder(kTestEndpoint)
+                      .SetServerClusters(Span<ServerClusterInterface *>(serverClustersWithNull))
+                      .build();
     ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(result));
     EXPECT_EQ(std::get<CHIP_ERROR>(result), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST(TestSpanEndpointProvider, SetAndGetClientClusters)
 {
+    constexpr EndpointId kTestEndpoint = 1;
+    MockServerCluster descriptorCluster({ kTestEndpoint, chip::app::Clusters::Descriptor::Id }, 1, {});
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster };
+
     const chip::ClusterId clientClusters[] = { 10, 20, 30 };
-    auto result = SpanEndpointProvider::Builder(1).SetClientClusters(Span<const chip::ClusterId>(clientClusters)).build();
+    auto result                            = SpanEndpointProvider::Builder(kTestEndpoint)
+                      .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
+                      .SetClientClusters(Span<const chip::ClusterId>(clientClusters))
+                      .build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(result));
 
     const auto & provider = std::get<SpanEndpointProvider>(result);
@@ -197,9 +222,16 @@ TEST(TestSpanEndpointProvider, SetAndGetClientClusters)
 
 TEST(TestSpanEndpointProvider, SetAndGetSemanticTags)
 {
+    constexpr EndpointId kTestEndpoint = 1;
+    MockServerCluster descriptorCluster({ kTestEndpoint, chip::app::Clusters::Descriptor::Id }, 1, {});
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster };
+
     const SemanticTag semanticTags[] = { { .mfgCode = chip::VendorId::TestVendor1, .namespaceID = 1, .tag = 1 },
                                          { .mfgCode = chip::VendorId::TestVendor2, .namespaceID = 2, .tag = 2 } };
-    auto result = SpanEndpointProvider::Builder(1).SetSemanticTags(Span<const SemanticTag>(semanticTags)).build();
+    auto result                      = SpanEndpointProvider::Builder(kTestEndpoint)
+                      .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
+                      .SetSemanticTags(Span<const SemanticTag>(semanticTags))
+                      .build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(result));
 
     const auto & provider = std::get<SpanEndpointProvider>(result);
@@ -214,9 +246,16 @@ TEST(TestSpanEndpointProvider, SetAndGetSemanticTags)
 
 TEST(TestSpanEndpointProvider, SetAndGetDeviceTypes)
 {
+    constexpr EndpointId kTestEndpoint = 1;
+    MockServerCluster descriptorCluster({ kTestEndpoint, chip::app::Clusters::Descriptor::Id }, 1, {});
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster };
+
     const DeviceTypeEntry deviceTypes[] = { { .deviceTypeId = 100, .deviceTypeRevision = 1 },
                                             { .deviceTypeId = 200, .deviceTypeRevision = 2 } };
-    auto result = SpanEndpointProvider::Builder(1).SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes)).build();
+    auto result                         = SpanEndpointProvider::Builder(kTestEndpoint)
+                      .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
+                      .SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes))
+                      .build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(result));
 
     const auto & provider = std::get<SpanEndpointProvider>(result);
@@ -233,9 +272,12 @@ TEST(TestSpanEndpointProvider, BuildWithSpecificEndpointEntry)
     DataModel::EndpointEntry newEntry = { .id                 = 10,
                                           .parentId           = 1,
                                           .compositionPattern = DataModel::EndpointCompositionPattern::kTree };
+    MockServerCluster descriptorCluster({ newEntry.id, chip::app::Clusters::Descriptor::Id }, 1, {});
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster };
 
     auto result = SpanEndpointProvider::Builder(newEntry.id)
                       .SetParentId(newEntry.parentId)
+                      .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
                       .SetComposition(newEntry.compositionPattern)
                       .build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(result));
@@ -249,8 +291,12 @@ TEST(TestSpanEndpointProvider, BuildWithSpecificEndpointEntry)
 
 TEST(TestSpanEndpointProvider, BuildWithEmptySpans)
 {
-    auto result = SpanEndpointProvider::Builder(1)
-                      .SetServerClusters(Span<ServerClusterInterface *>())
+    constexpr EndpointId kTestEndpoint = 1;
+    MockServerCluster descriptorCluster({ kTestEndpoint, chip::app::Clusters::Descriptor::Id }, 1, {});
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster };
+
+    auto result = SpanEndpointProvider::Builder(kTestEndpoint)
+                      .SetServerClusters(Span<ServerClusterInterface *>(serverClusters)) // Provide minimal valid server clusters
                       .SetClientClusters(Span<const chip::ClusterId>())
                       .SetSemanticTags(Span<const SemanticTag>())
                       .SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>())
@@ -258,10 +304,10 @@ TEST(TestSpanEndpointProvider, BuildWithEmptySpans)
     ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(result));
     const auto & provider = std::get<SpanEndpointProvider>(result);
 
-    // Test SetServerClusters with an empty span
+    // Verify server clusters are present (at least the descriptor)
     ReadOnlyBufferBuilder<ServerClusterInterface *> serverBuilder;
     ASSERT_EQ(provider.ServerClusterInterfaces(serverBuilder), CHIP_NO_ERROR);
-    ASSERT_EQ(serverBuilder.Size(), 0u);
+    ASSERT_EQ(serverBuilder.Size(), 1u);                // Should have the descriptor cluster
     ASSERT_EQ(provider.GetServerCluster(123), nullptr); // Check GetServerCluster with no clusters
 
     // Test SetClientClusters with an empty span
@@ -278,4 +324,51 @@ TEST(TestSpanEndpointProvider, BuildWithEmptySpans)
     ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> deviceTypeBuilder;
     ASSERT_EQ(provider.DeviceTypes(deviceTypeBuilder), CHIP_NO_ERROR);
     ASSERT_EQ(deviceTypeBuilder.Size(), 0u);
+}
+
+TEST(TestSpanEndpointProvider, BuildFailsWithEmptyServerClusterList)
+{
+    constexpr EndpointId kTestEndpoint = 1; // A valid endpoint ID for testing
+    auto result                        = SpanEndpointProvider::Builder(kTestEndpoint)
+                      .SetServerClusters(Span<ServerClusterInterface *>()) // Empty span
+                      .build();
+    ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(result)) << "Build should fail with an empty server cluster list.";
+    // This assertion expects that the build() method (or future versions) will validate this.
+    EXPECT_EQ(std::get<CHIP_ERROR>(result), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestSpanEndpointProvider, BuildFailsWithoutDescriptorCluster)
+{
+    constexpr EndpointId kTestEndpoint = 1; // A valid endpoint ID for testing
+    MockServerCluster onOffCluster({ kTestEndpoint, chip::app::Clusters::OnOff::Id }, 1, {});
+    ServerClusterInterface * serverClusters[] = { &onOffCluster };
+
+    auto result =
+        SpanEndpointProvider::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).build();
+    ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(result)) << "Build should fail without Descriptor cluster.";
+    // This assertion expects that the build() method (or future versions) will validate this.
+    EXPECT_EQ(std::get<CHIP_ERROR>(result), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestSpanEndpointProvider, BuildSucceedsWithDescriptorCluster)
+{
+    constexpr EndpointId kTestEndpoint = 1; // A valid endpoint ID for testing
+    MockServerCluster descriptorCluster({ kTestEndpoint, chip::app::Clusters::Descriptor::Id }, 1, {});
+    MockServerCluster onOffCluster({ kTestEndpoint, chip::app::Clusters::OnOff::Id }, 1, {}); // Another optional cluster
+
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster, &onOffCluster };
+
+    auto result =
+        SpanEndpointProvider::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(result))
+        << "Build should succeed with Descriptor cluster. Error: "
+        << (std::holds_alternative<CHIP_ERROR>(result) ? chip::ErrorStr(std::get<CHIP_ERROR>(result)) : "Not a CHIP_ERROR");
+
+    if (std::holds_alternative<SpanEndpointProvider>(result))
+    {
+        const auto & provider = std::get<SpanEndpointProvider>(result);
+        EXPECT_EQ(provider.GetEndpointEntry().id, kTestEndpoint);
+        EXPECT_NE(provider.GetServerCluster(chip::app::Clusters::Descriptor::Id), nullptr);
+        EXPECT_NE(provider.GetServerCluster(chip::app::Clusters::OnOff::Id), nullptr);
+    }
 }
