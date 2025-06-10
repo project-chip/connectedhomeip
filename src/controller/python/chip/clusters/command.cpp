@@ -131,7 +131,7 @@ public:
 
         gOnCommandSenderResponseCallback(
             mAppContext, path.mEndpointId, path.mClusterId, path.mCommandId, index, to_underlying(statusIB.mStatus),
-            statusIB.mClusterStatus.HasValue() ? statusIB.mClusterStatus.Value() : chip::python::kUndefinedClusterStatus, buffer,
+            statusIB.mClusterStatus.has_value() ? *statusIB.mClusterStatus : chip::python::kUndefinedClusterStatus, buffer,
             size);
     }
 

@@ -94,7 +94,7 @@ TEST_F(TestStatusIB, TestStatusIBToFromChipError)
     {
         StatusIB newStatus(err);
         EXPECT_EQ(newStatus.mStatus, Status::Failure);
-        EXPECT_FALSE(newStatus.mClusterStatus.HasValue());
+        EXPECT_FALSE(newStatus.mClusterStatus.has_value());
     }
 }
 
@@ -163,19 +163,19 @@ TEST_F(TestStatusIB, ConversionsFromClusterStatusCodeWork)
     StatusIB successWithCode{ ClusterStatusCode::ClusterSpecificSuccess(123u) };
     EXPECT_EQ(successWithCode.mStatus, Status::Success);
     EXPECT_TRUE(successWithCode.IsSuccess());
-    ASSERT_TRUE(successWithCode.mClusterStatus.HasValue());
+    ASSERT_TRUE(successWithCode.mClusterStatus.has_value());
     EXPECT_EQ(successWithCode.mClusterStatus.Value(), 123u);
 
     StatusIB failureWithCode{ ClusterStatusCode::ClusterSpecificFailure(42u) };
     EXPECT_EQ(failureWithCode.mStatus, Status::Failure);
     EXPECT_FALSE(failureWithCode.IsSuccess());
-    ASSERT_TRUE(failureWithCode.mClusterStatus.HasValue());
+    ASSERT_TRUE(failureWithCode.mClusterStatus.has_value());
     EXPECT_EQ(failureWithCode.mClusterStatus.Value(), 42u);
 
     StatusIB imStatusInClusterStatusCode{ ClusterStatusCode{ Status::ConstraintError } };
     EXPECT_EQ(imStatusInClusterStatusCode.mStatus, Status::ConstraintError);
     EXPECT_FALSE(imStatusInClusterStatusCode.IsSuccess());
-    EXPECT_FALSE(imStatusInClusterStatusCode.mClusterStatus.HasValue());
+    EXPECT_FALSE(imStatusInClusterStatusCode.mClusterStatus.has_value());
 }
 
 } // namespace

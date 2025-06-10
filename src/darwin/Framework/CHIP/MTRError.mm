@@ -296,8 +296,8 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
     NSMutableDictionary * userInfo = [[NSMutableDictionary alloc] init];
     userInfo[NSLocalizedDescriptionKey] = description;
-    if (status.mClusterStatus.HasValue()) {
-        userInfo[@"clusterStatus"] = @(status.mClusterStatus.Value());
+    if (status.mClusterStatus.has_value()) {
+        userInfo[@"clusterStatus"] = @(*status.mClusterStatus);
     }
 
     return [NSError errorWithDomain:MTRInteractionErrorDomain code:chip::to_underlying(status.mStatus) userInfo:userInfo];
