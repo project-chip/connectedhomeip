@@ -74,6 +74,7 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
     "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
     "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
+    "CHIP_CRYPTO_TRUSTY_OS=${chip_with_trusty_os}",
   ]
 }
 
@@ -93,6 +94,10 @@ source_set("public_headers") {
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
   ]
+
+  if (chip_with_trusty_os) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
 }
 
 if (chip_crypto == "openssl") {
@@ -106,8 +111,14 @@ if (chip_crypto == "openssl") {
     sources = [
       "CHIPCryptoPALOpenSSL.cpp",
       "CHIPCryptoPALOpenSSL.h",
-      "P256KeyPairOpenSSL.cpp",
     ]
+
+    if (chip_with_trusty_os) {
+      sources += [ "P256KeyPairTrustyImpl.cpp" ]
+    } else {
+      sources += [ "P256KeyPairOpenSSL.cpp" ]
+    }
+
     public_configs = [ ":openssl_config" ]
     public_deps = [ ":public_headers" ]
   }
@@ -119,8 +130,14 @@ if (chip_crypto == "openssl") {
     sources = [
       "CHIPCryptoPALOpenSSL.cpp",
       "CHIPCryptoPALOpenSSL.h",
-      "P256KeyPairOpenSSL.cpp",
     ]
+
+    if (chip_with_trusty_os) {
+      sources += [ "P256KeyPairTrustyImpl.cpp" ]
+    } else {
+      sources += [ "P256KeyPairOpenSSL.cpp" ]
+    }
+
     public_deps = [
       ":public_headers",
       "${boringssl_root}:boringssl",
