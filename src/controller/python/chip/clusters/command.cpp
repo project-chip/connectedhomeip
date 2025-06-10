@@ -139,7 +139,7 @@ public:
         CHIP_ERROR protocolError = aErrorData.error;
         StatusIB status(protocolError);
         gOnCommandSenderErrorCallback(mAppContext, to_underlying(status.mStatus),
-                                      status.mClusterStatus.ValueOr(chip::python::kUndefinedClusterStatus),
+                                      status.mClusterStatus.value_or(chip::python::kUndefinedClusterStatus),
                                       // If we have an actual IM status, pass 0
                                       // for the error code, because otherwise
                                       // the callee will think we have a stack
