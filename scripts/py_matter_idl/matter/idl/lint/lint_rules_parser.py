@@ -90,8 +90,12 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
         for attr in element.findall('attribute'):
             if attr.attrib['side'] != 'server':
                 continue
-
+            # Check for optional attributes in the old "optional" element format
             if 'optional' in attr.attrib and attr.attrib['optional'] == 'true':
+                continue
+
+            # Check for optionalConform inside the attribute or feature conditional mandatoryConform
+            if attr.find('optionalConform') is not None or (attr.find('mandatoryConform') is not None and attr.find('mandatoryConform').find('feature') is not None):
                 continue
 
             if 'apiMaturity' in attr.attrib and attr.attrib['apiMaturity'] == 'provisional':
