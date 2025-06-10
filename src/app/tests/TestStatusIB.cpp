@@ -164,7 +164,7 @@ TEST_F(TestStatusIB, ConversionsFromClusterStatusCodeWork)
     EXPECT_EQ(successWithCode.mStatus, Status::Success);
     EXPECT_TRUE(successWithCode.IsSuccess());
     ASSERT_TRUE(successWithCode.mClusterStatus.has_value());
-    EXPECT_EQ(successWithCode.mClusterStatus.value(), 123u);
+    EXPECT_EQ(successWithCode.mClusterStatus.value(), 123u); // NOLINT(bugprone-unchecked-optional-access)
 
     StatusIB failureWithCode{ ClusterStatusCode::ClusterSpecificFailure(42u) };
     EXPECT_EQ(failureWithCode.mStatus, Status::Failure);
