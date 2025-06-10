@@ -141,7 +141,7 @@ AdministratorCommissioningWithBasicCommissioningWindowCluster::ReadAttribute(con
 {
     using namespace AdministratorCommissioning::Attributes;
 
-    if (request.path.mAttributeId)
+    if (request.path.mAttributeId == FeatureMap::Id)
     {
         return encoder.Encode(mFeatures);
     }
