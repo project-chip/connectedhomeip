@@ -386,9 +386,7 @@ def run_tests_no_exit(
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:
-                test_config.matter_test_config = matter_test_config
                 runner.add_test_class(test_config, test_class, tests)
-                runner
 
             if hooks:
                 # Right now, we only support running a single test class at once,
