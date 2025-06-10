@@ -264,7 +264,7 @@ void ChimeServer::HandlePlayChimeSound(HandlerContext & ctx, const Commands::Pla
     Status status = Status::Success;
 
     // Only invoke the delegate if enabled, otherwise don't play a sound, and "silently" return
-    if (mEnabled) 
+    if (mEnabled)
     {
         // call the delegate to play the chime
         status = mDelegate.PlayChimeSound();
