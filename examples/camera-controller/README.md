@@ -84,7 +84,7 @@ out/linux-x64-camera/chip-camera-app.
 ./out/linux-x64-camera-controller/chip-camera-controller
 ```
 
-5. Commission the camera device At the controller prompt, pair over the local
+6. Commission the camera device At the controller prompt, pair over the local
    network using the default setup PIN 20202021 and an arbitrary nodeID 1:
 
 ```
@@ -93,12 +93,12 @@ pairing onnetwork 1 20202021
 
 Wait until commissioning succeeds.
 
-6. Start a live‑view stream Still in the controller shell, request a live view
+7. Start a live‑view stream Still in the controller shell, request a live view
    from the camera you just paired:
 
 ```
 liveview start 1
 ```
 
-You should see the GStreamer pipeline start and a video window appear,
-confirming that the camera stream is active.
+Wave your hand in front of the camera to trigger live view; a video window will
+appear, confirming that the stream is active.

@@ -54,6 +54,7 @@ config("config") {
 pkg_config("gstreamer") {
   packages = [
     "gstreamer-1.0",
+    "gstreamer-app-1.0",
     "gobject-2.0",
   ]
 }

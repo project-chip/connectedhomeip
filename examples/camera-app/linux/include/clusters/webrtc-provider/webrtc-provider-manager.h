@@ -109,7 +109,8 @@ private:
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
-    std::shared_ptr<rtc::DataChannel> mDataChannel;
+    std::shared_ptr<rtc::Track> mVideoTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
 
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mOriginatingEndpointId;
