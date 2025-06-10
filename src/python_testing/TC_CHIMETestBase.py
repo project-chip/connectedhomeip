@@ -34,6 +34,12 @@ class CHIMETestBase:
         cluster = Clusters.Objects.Chime
         return await self.write_single_attribute(attribute_value=attribute(value), endpoint_id=endpoint)
 
+    async def write_chime_attribute_expect_failure(self, endpoint, attribute, value, status):
+        cluster = Clusters.Objects.Chime
+        response = await self.write_single_attribute(attribute_value=attribute(value), endpoint_id=endpoint, expect_success=False)
+
+        asserts.assert_equal(response, status, "Unexpected error returned")
+
     async def send_play_chime_sound_command(self, endpoint, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.Chime.Commands.PlayChimeSound(),

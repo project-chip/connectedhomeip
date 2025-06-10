@@ -76,7 +76,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
         await self.write_chime_attribute_expect_success(endpoint, attributes.Enabled, False)
 
         self.step(3)
-        wait self.send_play_chime_sound_command(endpoint)
+        await self.send_play_chime_sound_command(endpoint)
         if not self.is_ci:
             user_response = self.wait_for_user_input(prompt_msg="A chime sound should not have been played, is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",

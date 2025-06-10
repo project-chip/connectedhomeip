@@ -39,6 +39,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from chip.interaction_model import Status
 from mobly import asserts
 from TC_CHIMETestBase import CHIMETestBase
 
@@ -55,8 +56,8 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
             TestStep(4, "Read the SelectedChime attribute, store as mySelectedChime"),
             TestStep(5, "Write to SelectedChime a new value from myChimeSounds."),
             TestStep(6, "Read the SelectedChime attribute, verfy that it's the same as the value written in step 5"),
-            TestStep(7, "Write to SelectedChime a value not found in myChimeSounds"),
-            TestStep(8, "Read the SelectedChime attribute, verfy that it's the same as the first value in myChimeSounds"),
+            TestStep(7, "Write to SelectedChime a value not found in myChimeSounds. Verify a NotFound error response"),
+            TestStep(8, "Read the SelectedChime attribute, verfy that it's the same as the value written in step 5"),
 
         ]
         return steps
@@ -107,12 +108,12 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
                 break
 
         if foundNotPresent:
-            await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, valueToUse)
+            await self.write_chime_attribute_expect_failure(endpoint, attributes.SelectedChime, valueToUse, Status.NotFound)
 
             self.step(8)
             mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
 
-            asserts.assert_equal(mySelectedChime, myChimeSounds[0].chimeID, "SelectedChime is not the first item from InstalledChimeSounds")
+            asserts.assert_equal(mySelectedChime, newSelectedChime, "SelectedChime is not the first item from InstalledChimeSounds")
         else:
             self.skip_step(8)
  
