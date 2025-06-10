@@ -686,7 +686,7 @@ class ChipDeviceControllerBase():
         '''
         Connect to a BLE device via PASE using the given discriminator and setup pin code.
 
-        Parameters:
+        Args:
             discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
             setupPinCode (int): The setup pin code of the device.
             nodeid (int): Node id of the device.
@@ -709,7 +709,7 @@ class ChipDeviceControllerBase():
         '''
         Unpairs the device with the specified node ID.
 
-        Parameters:
+        Args:
             nodeid (int): Node id of the device.
 
         Returns:
@@ -748,7 +748,7 @@ class ChipDeviceControllerBase():
 
         WARNING: ONLY CALL THIS IF YOU UNDERSTAND THE SIDE-EFFECTS
 
-        Parameters:
+        Args:
             nodeid (int): Node id of the device.
 
         Raises:
@@ -770,7 +770,7 @@ class ChipDeviceControllerBase():
         This function should only be called on an active session.
         This will NOT detach any existing SessionHolders.
 
-        Parameters:
+        Args:
             nodeid (int): The node ID of the device whose session should be marked as defunct.
 
         Raises:
@@ -793,7 +793,7 @@ class ChipDeviceControllerBase():
 
         Once marked for eviction, the session SHALL NOT ever become active again.
 
-        Parameters:
+        Args:
             nodeid (int): The node ID of the device whose session should be marked for eviction.
 
         Raises:
@@ -833,7 +833,7 @@ class ChipDeviceControllerBase():
         '''
         Establish a PASE session over BLE.
 
-        Parameters:
+        Args:
             discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
             setupPinCode (int): The setup pin code of the device.
             nodeid (int): Node id of the device.
@@ -850,7 +850,7 @@ class ChipDeviceControllerBase():
         '''
         Establish a PASE session over IP.
 
-        Parameters:
+        Args:
             ipaddr (str): IP address.
             port (int): IP port to use (default is 0).
             setupPinCode (int): The setup pin code of the device.
@@ -868,7 +868,7 @@ class ChipDeviceControllerBase():
         '''
         Establish a PASE session using setUpCode.
 
-        Parameters:
+        Args:
             setUpCode (str): The setup code of the device.
             nodeid (int): Node id of the device.
 
@@ -898,7 +898,7 @@ class ChipDeviceControllerBase():
         '''
         Simulates a failure on a specific stage of the test commissioner.
 
-        Parameters:
+        Args:
             stage (int): The commissioning to simulate.
 
         Returns:
@@ -911,7 +911,7 @@ class ChipDeviceControllerBase():
         '''
         Simulates a failure on report of the test commissioner.
 
-        Parameters:
+        Args:
             stage (int): The commissioning to simulate.
 
         Returns:
@@ -924,7 +924,7 @@ class ChipDeviceControllerBase():
         '''
         Premature complete of the test commissioner.
 
-        Parameters:
+        Args:
             stage (int): The commissioning to simulate.
 
         Returns:
@@ -948,7 +948,7 @@ class ChipDeviceControllerBase():
         '''
         Check the test commissioner stage sucess.
 
-        Parameters:
+        Args:
             stage (int): The commissioning to simulate.
 
         Returns:
@@ -962,7 +962,7 @@ class ChipDeviceControllerBase():
         '''
         Check the test commissioner Pase connection sucess.
 
-        Parameters:
+        Args:
             nodeid (int): Node id of the device.
 
         Returns:
@@ -974,7 +974,7 @@ class ChipDeviceControllerBase():
         '''
         Resove Node id.
 
-        Parameters:
+        Args:
             nodeid (int): Node id of the device.
         '''
         self.CheckIsActive()
@@ -985,7 +985,7 @@ class ChipDeviceControllerBase():
         '''
         Get the address and port.
 
-        Parameters:
+        Args:
             nodeid (int): Node id of the device.
 
         Returns:
@@ -1084,7 +1084,7 @@ class ChipDeviceControllerBase():
         '''
         Get the IP address for a discovered device.
 
-        Parameters:
+        Args:
             idx (int): Index of the discovered device.
             addrStr (str): Address of the device.
             length (int): Length of the address.
@@ -1108,7 +1108,7 @@ class ChipDeviceControllerBase():
         ''' 
         Opens a commissioning window on the device with the given nodeid.
 
-        Parameters:
+        Args:
             nodeid (int): Node id of the device.
             timeout (int): Command timeout
             iteration (int): The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
@@ -1253,7 +1253,7 @@ class ChipDeviceControllerBase():
         '''
         Find or establish a PASE session.
 
-        Parameters:
+        Args:
             setUpCode (str): The setup code of the device.
             nodeid (int): Node id of the device.
             timeoutMs (int): Optional timeout in milliseconds.
@@ -2461,7 +2461,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         auto-commissioning should use the supplied "CommissionWithCode" function, which will
         establish the PASE connection and commission automatically.
 
-        Parameters:
+        Args:
             nodeid (int): Node id of the device.
 
         Raises:
@@ -2485,7 +2485,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Commissions a Thread device over BLE.
 
-        Parameters:
+        Args:
             discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
             setupPinCode (int): The setup pin code of the device.
             nodeId (int): Node id of the device.
@@ -2502,7 +2502,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Commissions a Wi-Fi device over BLE.
 
-        Parameters:
+        Args:
             discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
             setupPinCode (int): The setup pin code of the device.
             nodeId (int): Node id of the device.
@@ -2520,7 +2520,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the Wi-Fi credentials to set during commissioning.
 
-        Parameters:
+        Args:
             ssid (str): SSID of the WiFi  network.
             credentials (str): WiFi network password.
 
@@ -2538,7 +2538,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the Thread operational dataset to set during commissioning.
 
-        Parameters:
+        Args:
             threadOperationalDataset (bytes): The Thread operational dataset for commissioning.
 
         Raises:
@@ -2567,7 +2567,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the time zone to set during commissioning. Currently only one time zone entry is supported.
 
-        Parameters:
+        Args:
             offset (int): Timezone offset.
             validAt (int): Timestamp of the timezone.
             name (str):  Name or label of the timezone.
@@ -2584,7 +2584,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the DST offset to set during commissioning. Currently only one DST entry is supported.
 
-        Parameters:
+        Args:
             offset (int): Timezone offset.
             validStarting (int): 
             validUntil (int):
@@ -2601,7 +2601,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the TC acknowledgements to set during commissioning.
 
-        Parameters:
+        Args:
             tcAcceptedVersion (int):
             tcUserResponse (int): 
 
@@ -2617,7 +2617,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set whether to skip the commissioning complete callback.
 
-        Parameters:
+        Args:
             skipCommissioningComplete (bool):
 
         Raises:
@@ -2632,7 +2632,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the DefaultNTP to set during commissioning.
 
-        Parameters:
+        Args:
             defaultNTP (str):
 
         Raises:
@@ -2647,7 +2647,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Set the trusted time source nodeId to set during commissioning. This must be a node on the commissioner fabric.
 
-        Parameters:
+        Args:
             nodeId (int): Node id of the device.
             endpoint (int): endpoint of the device.
 
@@ -2663,7 +2663,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Instructs the auto-commissioner to perform a matching fabric check before commissioning.
 
-        Parameters:
+        Args:
             check (bool): Validation fabric before commissioning. 
 
         Raises:
@@ -2807,7 +2807,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Commission with the given nodeid from the setupPayload.
         setupPayload may be a QR or manual code.
 
-        Parameters:
+        Args:
             setupPayload (str):
             nodeid (int): Node id of the device.
             discoveryType (DiscoveryType.DISCOVERY_ALL):
@@ -2854,7 +2854,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         Callback function for handling the NOC chain result.
 
-        Parameters:
+        Args:
             nocChain ():
 
         Returns:
@@ -2871,7 +2871,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Issue an NOC chain using the associated OperationalCredentialsDelegate.
         The NOC chain will be provided in TLV cert format.
 
-        Parameters:
+        Args:
             crs (cluster): Certificate Signing Request response
             nodeId (int): Node id of the device.
 
