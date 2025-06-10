@@ -30,9 +30,9 @@ _GLOBAL_DATA = {}
 
 
 def stash_globally(o: object) -> str:
-    id = str(uuid.uuid1())
-    _GLOBAL_DATA[id] = o
-    return id
+    unique_id = str(uuid.uuid1())
+    _GLOBAL_DATA[unique_id] = o
+    return unique_id
 
 
 def unstash_globally(id: str) -> Any:

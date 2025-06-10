@@ -21,7 +21,7 @@ This module contains classes and functions designed to handle the commissioning 
 
 import logging
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import chip.testing.global_stash as global_stash
 from chip import ChipDeviceCtrl, discovery
@@ -216,7 +216,7 @@ async def commission_devices(
     return all(commissioned)
 
 
-def get_setup_payload_info(matter_test_config) -> List[SetupPayloadInfo]:
+def get_setup_payload_info(matter_test_config: Any) -> List[SetupPayloadInfo]:
     """
     Get and builds the payload info provided in the execution.
 
