@@ -70,7 +70,7 @@ TEST_F(TestStatusIB, TestStatusIBToFromChipError)
     EXPECT_NE(err, CHIP_NO_ERROR);
     VERIFY_ROUNDTRIP(err, status);
 
-    status.mClusterStatus = MakeOptional(static_cast<ClusterStatus>(5));
+    status.mClusterStatus = static_cast<ClusterStatus>(5);
 
     status.mStatus = Status::Success;
     err            = status.ToChipError();
@@ -113,7 +113,7 @@ TEST_F(TestStatusIB, TestStatusIBErrorToString)
 #endif // CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
 
     status.mStatus        = Status::Failure;
-    status.mClusterStatus = MakeOptional(static_cast<ClusterStatus>(5));
+    status.mClusterStatus = static_cast<ClusterStatus>(5);
     err                   = status.ToChipError();
     str                   = ErrorStr(err);
     EXPECT_STREQ(str, "IM Error 0x00000605: Cluster-specific error: 0x05");
