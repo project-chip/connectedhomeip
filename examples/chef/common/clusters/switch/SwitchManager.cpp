@@ -153,7 +153,6 @@ static SwitchActionsDelegate * gSwitchActionsDelegate = new SwitchActionsDelegat
 
 #endif // CONFIG_ENABLE_PW_RPC
 
-
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gLatchingSwitch[] = {
     { .namespaceID = kNamespaceCommonLevel,
       .tag         = kTagCommonLow,
