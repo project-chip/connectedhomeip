@@ -124,8 +124,7 @@ struct AttributeEntry
     _StartBitFieldInit; // Disabling '-Wconversion' & '-Wnarrowing'
     constexpr AttributeEntry(AttributeId id, BitMask<AttributeQualityFlags> attrQualityFlags,
                              std::optional<Access::Privilege> readPriv, std::optional<Access::Privilege> writePriv) :
-        attributeId{ id },
-        mask{
+        attributeId{ id }, mask{
             .flags          = attrQualityFlags.Raw() & kAttrQualityMask,
             .readPrivilege  = readPriv.has_value() ? (to_underlying(*readPriv) & kPrivilegeMask) : 0,
             .writePrivilege = writePriv.has_value() ? (to_underlying(*writePriv) & kPrivilegeMask) : 0,
@@ -230,8 +229,7 @@ struct AcceptedCommandEntry
 
     constexpr AcceptedCommandEntry(CommandId id = 0, BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
                                    Access::Privilege invokePriv = Access::Privilege::kOperate) :
-        commandId(id),
-        mask{
+        commandId(id), mask{
             .flags           = cmdQualityFlags.Raw() & kCmdQualityMask,
             .invokePrivilege = to_underlying(invokePriv) & kPrivilegeMask,
         }
@@ -246,6 +244,14 @@ struct AcceptedCommandEntry
     }
 
     [[nodiscard]] constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & to_underlying(f)) != 0; }
+
+    bool operator==(const AcceptedCommandEntry & other) const
+    {
+        return (commandId == other.commandId) && (mask.flags == other.mask.flags) &&
+            (mask.invokePrivilege == other.mask.invokePrivilege);
+    }
+
+    bool operator!=(const AcceptedCommandEntry & other) const { return !(*this == other); }
 
 private:
     // Constant used to narrow binary expressions
