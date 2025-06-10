@@ -69,7 +69,7 @@ CHIP_ERROR _create_evp_key_from_binary_p256_key(const P256PublicKey & key, EVP_P
 
     VerifyOrExit(*out_evp_pkey == nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    nid = CryptoPAL_MapECName(MapECName(key.Type()));
+    nid = CryptoPAL_nidForCurve(CryptoPAL_MapECName(key.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INTERNAL);
 
     ec_key = EC_KEY_new_by_curve_name(nid);
@@ -142,7 +142,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     static_assert(P256ECDSASignature::Capacity() >= kP256_ECDSA_Signature_Length_Raw, "P256ECDSASignature must be large enough");
     VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
-    nid = CryptoPAL_MapECName(MapECName(mPublicKey.Type()));
+    nid = CryptoPAL_nidForCurve(CryptoPAL_MapECName(mPublicKey.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     ec_key = to_EC_KEY(&mKeypair);
@@ -255,9 +255,9 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     EC_KEY * ec_key  = nullptr;
-    ECName curve     = MapECName(mPublicKey.Type());
+    ECName curve     = CryptoPAL_MapECName(mPublicKey.Type());
 
-    int nid = CryptoPAL_MapECName(curve);
+    int nid = CryptoPAL_nidForCurve(curve);
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     ec_key = EC_KEY_new_by_curve_name(nid);
@@ -327,7 +327,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     EC_POINT * key_point = nullptr;
 
     EC_KEY * ec_key = nullptr;
-    ECName curve    = MapECName(mPublicKey.Type());
+    ECName curve    = CryptoPAL_MapECName(mPublicKey.Type());
 
     ERR_clear_error();
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -340,7 +340,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
-    nid = CryptoPAL_MapECName(curve);
+    nid = CryptoPAL_nidForCurve(curve);
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     group = EC_GROUP_new_by_curve_name(nid);
