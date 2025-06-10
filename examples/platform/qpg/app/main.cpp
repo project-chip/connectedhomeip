@@ -48,6 +48,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
 #include "Rpc.h"
 #endif // PW_RPC_ENABLED
@@ -70,6 +73,8 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
+
+app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(chip::kRootEndpointId);
 
 namespace {
 constexpr uint32_t kInitOTARequestorDelaySec = 3;
@@ -218,6 +223,8 @@ CHIP_ERROR CHIP_Init(void)
         ChipLogError(NotSpecified, "ConnectivityMgr().SetThreadDeviceType() failed");
         goto exit;
     }
+
+    threadNetworkDriver.Init();
 
     ChipLogProgress(NotSpecified, "Starting OpenThread task");
     ret = ThreadStackMgrImpl().StartThreadTask();
