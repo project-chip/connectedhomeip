@@ -34,7 +34,7 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 namespace ChefMicrowaveOvenMode {
-
+constexpr uint32_t kMicrowaveOvenFeatureMap  = 0;
 constexpr size_t kMicrowaveOvenModeTableSize = MATTER_DM_MICROWAVE_OVEN_MODE_CLUSTER_SERVER_ENDPOINT_COUNT;
 static_assert(kMicrowaveOvenModeTableSize <= kEmberInvalidEndpointIndex, "MicrowaveOvenMode table size error");
 
@@ -65,9 +65,8 @@ void InitChefMicrowaveOvenModeCluster()
         gDelegateTable[epIndex] = std::make_unique<MicrowaveOvenMode::ChefDelegate>();
         gDelegateTable[epIndex]->Init();
 
-        constexpr uint32_t featureMap = 0;
-        gInstanceTable[epIndex] =
-            std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId, MicrowaveOvenMode::Id, featureMap);
+        gInstanceTable[epIndex] = std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId,
+                                                                       MicrowaveOvenMode::Id, kMicrowaveOvenFeatureMap);
         gInstanceTable[epIndex]->Init();
 
         ChipLogProgress(DeviceLayer, "Endpoint %d MicrowaveOvenMode Initialized.", endpointId);
