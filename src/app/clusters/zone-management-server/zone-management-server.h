@@ -35,6 +35,11 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
+using TwoDCartesianZoneStruct   = Structs::TwoDCartesianZoneStruct::Type;
+using TwoDCartesianVertexStruct = Structs::TwoDCartesianVertexStruct::Type;
+using ZoneInformationStruct     = Structs::ZoneInformationStruct::Type;
+using ZoneTriggerControlStruct  = Structs::ZoneTriggerControlStruct::Type;
+
 class ZoneManagementServer;
 
 /** @brief
@@ -117,6 +122,12 @@ public:
      */
     virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
 
+    /**
+     *   @brief Delegate callback for notifying change in an attribute.
+     *
+     */
+    virtual void OnAttributeChanged(AttributeId attributeId) = 0;
+
 private:
     friend class ZoneManagementServer;
 
@@ -168,7 +179,7 @@ public:
                          const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
                          uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
 
-    ~ZoneManagementServer() overrise;
+    ~ZoneManagementServer() override;
 
     /**
      * @brief Initialise the Zone Management server instance.
@@ -193,8 +204,8 @@ public:
 
     uint8_t GetMaxUserDefinedZones() const { return mMaxUserDefinedZones; }
     uint8_t GetMaxZones() const { return mMaxZones; }
-    uint8_t GetSensitivityMax() const { return mSensitityMax; }
-    uint8_t GetSensitivity() const { return mSensitity; }
+    uint8_t GetSensitivityMax() const { return mSensitivityMax; }
+    uint8_t GetSensitivity() const { return mSensitivity; }
     const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const { return mTwoDCartesianMax; }
 
     // Send Zone events
