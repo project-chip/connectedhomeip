@@ -1056,7 +1056,7 @@ class TC_OPSTATE_BASE():
         # STEP 5: Verify the PICS is set, if not, skip the entire TC.
         self.step(5)
         if not opcomplete_pics:
-            self.skip_all_remaining_steps(2)
+            self.skip_all_remaining_steps(6)
             return
 
         # STEP 6: If PICS is set, set up a subscription to the OperationCompletion event
