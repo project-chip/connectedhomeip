@@ -4,6 +4,10 @@ inputs:
   platform-name:
     description: "Platform name Name"
     required: true
+  report-dir:
+    description: "Directory where bloat report files are located"
+    required: false
+    default: "/tmp/bloat_reports/"
 
 runs:
   using: "composite"
@@ -14,4 +18,4 @@ runs:
       with:
         name: Size,${{ inputs.platform-name }}-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
         path: |
-          /tmp/bloat_reports/
+          ${{ inputs.report-dir }}
