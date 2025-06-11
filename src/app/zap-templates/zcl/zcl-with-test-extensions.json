@@ -205,7 +205,8 @@
         "Closure Control": [
             "CountdownTime",
             "OverallCurrentState",
-            "OverallTargetState"],
+            "OverallTargetState"
+        ],
         "Closure Dimension": [
             "CurrentState",
             "TargetState",
