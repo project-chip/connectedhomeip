@@ -298,7 +298,7 @@ private:
         return true;
     }
 
-    bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx);
+    virtual bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) { return true; }
 
     void TariffDataUpd_Commit()
     {
