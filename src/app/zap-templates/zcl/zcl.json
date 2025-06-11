@@ -201,10 +201,13 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
+        "Closure Control": [
+            "CountdownTime",
+            "OverallCurrentState",
+            "OverallTargetState"],
         "Closure Dimension": [
             "CurrentState",
-            "Target",
+            "TargetState",
             "UnitRange",
             "LimitRange"
         ],
