@@ -94,7 +94,7 @@ static uint8_t NvmButtonStateCpt = 0;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CHIP_ENABLE_OPENTHREAD
-Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+Clusters::NetworkDriverObj<DeviceLayer::NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
 #endif // CHIP_ENABLE_OPENTHREAD
 
 CHIP_ERROR AppTask::StartAppTask()

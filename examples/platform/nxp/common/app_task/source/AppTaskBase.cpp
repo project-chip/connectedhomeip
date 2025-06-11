@@ -123,7 +123,7 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
 #if CONFIG_NET_L2_OPENTHREAD
-app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+app::Clusters::NetworkDriverObj<DeviceLayer::NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
 #endif
 
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
