@@ -96,6 +96,10 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback();
 
+    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID);
+
+    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID);
+
     void Init();
 
     CameraAVStreamManager()  = default;
