@@ -352,41 +352,41 @@ CHIP_ERROR CommodityTariffDelegate::LoadTariffData(const Json::Value & root)
 {
     const std::map<std::string, std::function<CHIP_ERROR(const Json::Value &)>> required_tariff_items = {
         { "TariffUnit",
-          [this](const Json::Value & v) { return JSON_Utilities::TariffUnit_LoadFromJson(v, this->GetTariffUnit_MgmtObj()); } },
+          [this](const Json::Value & v) { return JSON_Utilities::TariffUnit_LoadFromJson(v, GetTariffUnit_MgmtObj()); } },
         { "StartDate",
-          [this](const Json::Value & v) { return JSON_Utilities::StartDate_LoadFromJson(v, this->GetStartDate_MgmtObj()); } },
+          [this](const Json::Value & v) { return JSON_Utilities::StartDate_LoadFromJson(v, GetStartDate_MgmtObj()); } },
         { "TariffInfo",
-          [this](const Json::Value & v) { return JSON_Utilities::TariffInfo_LoadFromJson(v, this->GetTariffInfo_MgmtObj()); } },
+          [this](const Json::Value & v) { return JSON_Utilities::TariffInfo_LoadFromJson(v, GetTariffInfo_MgmtObj()); } },
         { "DayEntries",
-          [this](const Json::Value & v) { return JSON_Utilities::DayEntries_LoadFromJson(v, this->GetDayEntries_MgmtObj()); } },
+          [this](const Json::Value & v) { return JSON_Utilities::DayEntries_LoadFromJson(v, GetDayEntries_MgmtObj()); } },
         { "TariffComponents",
           [this](const Json::Value & v) {
-              return JSON_Utilities::TariffComponents_LoadFromJson(v, this->GetTariffComponents_MgmtObj());
+              return JSON_Utilities::TariffComponents_LoadFromJson(v, GetTariffComponents_MgmtObj());
           } },
         { "TariffPeriods",
           [this](const Json::Value & v) {
-              return JSON_Utilities::TariffPeriods_LoadFromJson(v, this->GetTariffPeriods_MgmtObj());
+              return JSON_Utilities::TariffPeriods_LoadFromJson(v, GetTariffPeriods_MgmtObj());
           } }
     };
 
     const std::map<std::string, std::function<CHIP_ERROR(const Json::Value &)>> generic_tariff_items = {
         { "DefaultRandomizationOffset",
           [this](const Json::Value & v) {
-              return JSON_Utilities::DefaultRandomizationOffset_LoadFromJson(v, this->GetDefaultRandomizationOffset_MgmtObj());
+              return JSON_Utilities::DefaultRandomizationOffset_LoadFromJson(v, GetDefaultRandomizationOffset_MgmtObj());
           } },
         { "DefaultRandomizationType",
           [this](const Json::Value & v) {
-              return JSON_Utilities::DefaultRandomizationType_LoadFromJson(v, this->GetDefaultRandomizationType_MgmtObj());
+              return JSON_Utilities::DefaultRandomizationType_LoadFromJson(v, GetDefaultRandomizationType_MgmtObj());
           } },
         { "DayPatterns",
-          [this](const Json::Value & v) { return JSON_Utilities::DayPatterns_LoadFromJson(v, this->GetDayPatterns_MgmtObj()); } },
+          [this](const Json::Value & v) { return JSON_Utilities::DayPatterns_LoadFromJson(v, GetDayPatterns_MgmtObj()); } },
         { "IndividualDays",
           [this](const Json::Value & v) {
-              return JSON_Utilities::IndividualDays_LoadFromJson(v, this->GetIndividualDays_MgmtObj());
+              return JSON_Utilities::IndividualDays_LoadFromJson(v, GetIndividualDays_MgmtObj());
           } },
         { "CalendarPeriods",
           [this](const Json::Value & v) {
-              return JSON_Utilities::CalendarPeriods_LoadFromJson(v, this->GetCalendarPeriods_MgmtObj());
+              return JSON_Utilities::CalendarPeriods_LoadFromJson(v, GetCalendarPeriods_MgmtObj());
           } },
     };
 
@@ -439,6 +439,106 @@ CHIP_ERROR CommodityTariffDelegate::LoadTariffData(const Json::Value & root)
     }
 
     return err;
+}
+
+bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
+{
+
+    if (!GetTariffInfo_MgmtObj().IsValid())
+    {
+        ChipLogError(NotSpecified, "TariffInfo not present!");
+        return false;
+    }
+    else if (GetDayEntries_MgmtObj().IsValid())
+    {
+        ChipLogError(NotSpecified, "DayEntries not present!");
+        return false;
+    }
+    else if (GetTariffComponents_MgmtObj().IsValid())
+    {
+        ChipLogError(NotSpecified, "TariffComponents not present!");
+        return false;
+    }
+    else if (GetTariffPeriods_MgmtObj().IsValid())
+    {
+        ChipLogError(NotSpecified, "TariffPeriods not present!");
+        return false;
+    }
+
+    assert(!UpdCtx.DayEntryKeyIDs.empty());
+    assert(!UpdCtx.TariffComponentKeyIDs.empty());
+
+    assert(!UpdCtx.TariffPeriodsDayEntryIDs.empty());        // Something went wrong if TariffPeriods has no DayEntries IDs
+    assert(!UpdCtx.TariffPeriodsTariffComponentIDs.empty()); // Something went wrong if TariffPeriods has no TariffComponents IDs
+
+    // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
+    for (const auto & item : UpdCtx.TariffPeriodsDayEntryIDs)
+    {
+        if (!UpdCtx.DayEntryKeyIDs.count(item))
+        {
+            return false; // The item not found in original list
+        }
+    }
+
+    // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
+    for (const auto & item : UpdCtx.TariffPeriodsTariffComponentIDs)
+    {
+        if (!UpdCtx.TariffComponentKeyIDs.count(item))
+        {
+            return false; // The item not found in original list
+        }
+    }
+
+    if (GetDayPatterns_MgmtObj().IsValid())
+    {
+        assert(!UpdCtx.DayPatternKeyIDs.empty());
+        assert(!UpdCtx.DayPatternsDayEntryIDs.empty()); // Something went wrong if DP has no DE IDs
+
+        // Checks that all DP_DEs are in main DE list:
+        for (const auto & item : UpdCtx.DayPatternsDayEntryIDs)
+        {
+            if (!UpdCtx.DayEntryKeyIDs.count(item))
+            {
+                return false; // The item not found in original list
+            }
+        }
+    }
+
+    if (GetIndividualDays_MgmtObj().IsValid())
+    {
+        assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
+
+        // Checks that all ID_DE_IDs are in main DE list:
+        for (const auto & item : UpdCtx.IndividualDaysDayEntryIDs)
+        {
+            if (!UpdCtx.DayEntryKeyIDs.count(item))
+            {
+                return false; // The item not found in original list
+            }
+
+            if (UpdCtx.DayPatternsDayEntryIDs.count(item))
+            {
+                return false; // If same item from ID list has found in DP list
+            }
+        }
+    }
+
+    //
+    if (GetCalendarPeriods_MgmtObj().IsValid())
+    {
+        assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
+
+        // Checks that all ID_DE_IDs are in main DE list:
+        for (const auto & item : UpdCtx.CalendarPeriodsDayPatternIDs)
+        {
+            if (!UpdCtx.DayPatternKeyIDs.count(item))
+            {
+                return false; // The item not found in original list
+            }
+        }
+    }
+
+    return true;
 }
 
 Status CommodityTariffDelegate::GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId, DayEntryStructType & aDayEntry)
