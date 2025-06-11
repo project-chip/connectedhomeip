@@ -209,7 +209,7 @@ public:
 
     void OnError(CHIP_ERROR aError) override { gOnReadErrorCallback(mAppContext, ToPyChipError(aError)); }
 
-    void NotifySubscriptionStillActive(const ReadClient &) { gOnSubscriptionStillActiveCallback(mAppContext); }
+    void NotifySubscriptionStillActive(const ReadClient &) override { gOnSubscriptionStillActiveCallback(mAppContext); }
     void OnReportBegin() override { gOnReportBeginCallback(mAppContext); }
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
