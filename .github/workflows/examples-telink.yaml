@@ -327,7 +327,7 @@ jobs:
                     out/telink-tlsr9518adk80d-temperature-measurement-mars-ota/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-             - name: clean out build output (keep tools)
+            - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
             - name: Build example Telink (B91) Thermostat App
