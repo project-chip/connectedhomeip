@@ -105,7 +105,8 @@ details.
 
 ## Trigger event using air-quality-sensor-app event named pipe
 
-You can send a command to air-quality-sensor-app to trigger specific event by adding the --app-pipe argument with the named pipe path value `<file_path>`
+You can send a command to air-quality-sensor-app to trigger specific event by
+adding the --app-pipe argument with the named pipe path value `<file_path>`
 
 ### Example to enable named pipes
 

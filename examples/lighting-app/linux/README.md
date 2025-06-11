@@ -136,10 +136,11 @@ Obtain tracing json file.
 
 ## Trigger event using lighting-app event named pipe
 
-You can send a command to lighting-app to trigger specific event by
-adding the --app-pipe argument and providing the path of the file to use `<file_path>`.
+You can send a command to lighting-app to trigger specific event by adding the
+--app-pipe argument and providing the path of the file to use `<file_path>`.
 
 ### Example to enable named pipes
+
 ```
 sudo out/debug/chip-lighting-app --app-pipe /tmp/chip_lighting_fifo
 ```

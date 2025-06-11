@@ -521,10 +521,12 @@ self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 ```
 
 In the case that a test script requires the use of named-pipe commands to
-achieve the manual steps, you can use the method `write_to_app_pipe(command,app_pipe)` to send
-these commands. This method requires value for `app_pipe`, if is not provided in the method it will use
-argument from the CMD or CI argument `--app-pipe` which must contain the
-string value with path of the pipe. This value depends on how the --app-pipe in the app is set up.
+achieve the manual steps, you can use the method
+`write_to_app_pipe(command,app_pipe)` to send these commands. This method
+requires value for `app_pipe`, if is not provided in the method it will use
+argument from the CMD or CI argument `--app-pipe` which must contain the string
+value with path of the pipe. This value depends on how the --app-pipe in the app
+is set up.
 
 Note: The name of the pipe can be anything while is a valid file path.
 

@@ -12,16 +12,16 @@ The application could be build in the same manner as `all-clusters-app`:
 
 # Named Pipe Interface
 
-This application accepts commands over named pipe. Named pipes can be enabled by 
-adding the --app-pipe argument and providing the path of the file to use `<file_path>`.
-
+This application accepts commands over named pipe. Named pipes can be enabled by
+adding the --app-pipe argument and providing the path of the file to use
+`<file_path>`.
 
 ### Example to enable named pipes
+
 ```
 ./out/darwin-arm64-lock/chip-lock-app --app-pipe /tmp/lock_fifo
 
 ```
-
 
 ## Command Format
 

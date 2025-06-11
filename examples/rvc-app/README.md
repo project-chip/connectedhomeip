@@ -15,9 +15,9 @@ This app can support most of the tests in the test plans.
 
 Out-of-band messages are available to simulate typical device behaviors and
 allow the app to navigate to all the states. To send an out-of-band message,
-echo the JSON message to the `/tmp/chip_rvc_fifo_` file. The JSON message
-must have a `"Name"` key that contains the command name. This name is shown in
-the state machine diagram above. Example
+echo the JSON message to the `/tmp/chip_rvc_fifo_` file. The JSON message must
+have a `"Name"` key that contains the command name. This name is shown in the
+state machine diagram above. Example
 `echo '{"Name": "Charged"}' > /tmp/chip_rvc_fifo_`.
 
 ### ServiceArea related messages

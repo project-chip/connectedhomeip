@@ -109,7 +109,8 @@ nicer stack traces.
 
 ### Trigger event using all-cluster-app event named pipe
 
-You can send a command to all-cluster-app to trigger specific event by adding --app-pipe argument and providing the path of the file to use `<file_path>`.
+You can send a command to all-cluster-app to trigger specific event by adding
+--app-pipe argument and providing the path of the file to use `<file_path>`.
 
 ### Example to enable named pipes
 
