@@ -23,15 +23,14 @@
 #include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
 #include <lib/core/CHIPError.h>
 
-#include <string>
 #include <thread>
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "pigweed/rpc_services/FabricBridge.h"
 #endif
 
-#include "BridgedDevice.h"
-#include "BridgedDeviceManager.h"
+#include <fabric-bridge-common/BridgedDevice.h>
+#include <fabric-bridge-common/BridgedDeviceManager.h>
 
 using namespace chip;
 using namespace chip::app;
