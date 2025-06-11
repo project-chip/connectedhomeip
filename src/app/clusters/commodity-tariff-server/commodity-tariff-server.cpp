@@ -136,13 +136,12 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-void Instance::HandleGetTariffComponent(HandlerContext & ctx,
-                                                     const Commands::GetTariffComponent::DecodableType & commandData)
+void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData)
 {
     Commands::GetTariffComponentResponse::Type response;
 
     Status status = mDelegate.GetTariffComponentInfoById(commandData.tariffComponentID, response.label, response.dayEntryIDs,
-                                                          response.tariffComponent);
+                                                         response.tariffComponent);
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
