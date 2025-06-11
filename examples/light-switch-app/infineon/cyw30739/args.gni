@@ -31,3 +31,6 @@ matter_wpan_sdk_board_list = [
   "CYW30739B2-P5-EVK-02",
   "CYW30739B2-P5-EVK-03",
 ]
+
+# General fault listener configurations
+enable_general_diagnostics_on_hardware_faults_detect=true
