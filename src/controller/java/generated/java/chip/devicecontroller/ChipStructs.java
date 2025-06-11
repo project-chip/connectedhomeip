@@ -19173,12 +19173,14 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
   public Integer caid;
   public @Nullable Integer ccdid;
   public Integer status;
+  public Integer fabricIndex;
   private static final long ENDPOINT_ID_ID = 0L;
   private static final long HOSTNAME_ID = 1L;
   private static final long PORT_ID = 2L;
   private static final long CAID_ID = 3L;
   private static final long CCDID_ID = 4L;
   private static final long STATUS_ID = 5L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public TlsClientManagementClusterTLSEndpointStruct(
     Integer endpointID,
@@ -19186,7 +19188,8 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     Integer port,
     Integer caid,
     @Nullable Integer ccdid,
-    Integer status
+    Integer status,
+    Integer fabricIndex
   ) {
     this.endpointID = endpointID;
     this.hostname = hostname;
@@ -19194,6 +19197,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     this.caid = caid;
     this.ccdid = ccdid;
     this.status = status;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -19204,6 +19208,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     values.add(new StructElement(CAID_ID, new UIntType(caid)));
     values.add(new StructElement(CCDID_ID, ccdid != null ? new UIntType(ccdid) : new NullType()));
     values.add(new StructElement(STATUS_ID, new UIntType(status)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -19218,6 +19223,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     Integer caid = null;
     @Nullable Integer ccdid = null;
     Integer status = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ENDPOINT_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -19249,6 +19255,11 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
           UIntType castingValue = element.value(UIntType.class);
           status = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new TlsClientManagementClusterTLSEndpointStruct(
@@ -19257,7 +19268,8 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
       port,
       caid,
       ccdid,
-      status
+      status,
+      fabricIndex
     );
   }
 
@@ -19282,6 +19294,9 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     output.append("\n");
     output.append("\tstatus: ");
     output.append(status);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();

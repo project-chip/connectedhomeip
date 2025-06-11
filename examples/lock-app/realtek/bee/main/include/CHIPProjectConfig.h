@@ -155,3 +155,18 @@
 #ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 #endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_SSED
+ *
+ * Enable support for Thread Synchronized Sleepy End Device behavior.
+ *
+ */
+#if CHIP_ENABLE_OPENTHREAD
+#ifndef CHIP_DEVICE_CONFIG_THREAD_SSED
+#define CHIP_DEVICE_CONFIG_THREAD_SSED 0
+#endif
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+#define CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL System::Clock::Milliseconds32(2000)
+#endif
+#endif
