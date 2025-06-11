@@ -18,7 +18,6 @@
 
 #pragma once
 
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/util/config.h>
@@ -26,111 +25,88 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <utility>
 
-
 #include "../../chef-operational-state-delegate-impl.h"
 #include "../microwave-oven-mode/chef-microwave-oven-mode.h"
 
-
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
-
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-
 class ChefMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate
 {
 public:
-   explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint);
+    explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint);
 
+    void MicrowaveOvenInit();
 
-   void MicrowaveOvenInit();
+    /**
+     * handle command for microwave oven control: set cooking parameters
+     */
+    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
+                                                                           bool startAfterSetting,
+                                                                           Optional<uint8_t> powerSettingNum,
+                                                                           Optional<uint8_t> wattSettingIndex) override;
 
+    /**
+     * handle command for microwave oven control: add more time
+     */
+    Protocols::InteractionModel::Status HandleModifyCookTimeSecondsCallback(uint32_t finalcookTimeSec) override;
 
-   /**
-    * handle command for microwave oven control: set cooking parameters
-    */
-   Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
-                                                                          bool startAfterSetting,
-                                                                          Optional<uint8_t> powerSettingNum,
-                                                                          Optional<uint8_t> wattSettingIndex) override;
+    /**
+     * Get the watt setting from the supported watts array.
+     * @param index The index of the watt setting to be returned.
+     * It is assumed that watt setting are indexable from 0 and with no
+     * gaps.
+     * @param wattSetting A reference to receive the watt setting on success.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
+     * CHIP_ERROR_NOT_FOUND if the index in beyond the list of available labels.
+     */
+    CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) override;
 
+    uint8_t GetPowerSettingNum() const override { return mPowerSettingNum; }
 
-   /**
-    * handle command for microwave oven control: add more time
-    */
-   Protocols::InteractionModel::Status HandleModifyCookTimeSecondsCallback(uint32_t finalcookTimeSec) override;
+    uint8_t GetMinPowerNum() const override { return kMinPowerNum; }
 
+    uint8_t GetMaxPowerNum() const override { return kMaxPowerNum; }
 
-   /**
-    * Get the watt setting from the supported watts array.
-    * @param index The index of the watt setting to be returned.
-    * It is assumed that watt setting are indexable from 0 and with no
-    * gaps.
-    * @param wattSetting A reference to receive the watt setting on success.
-    * @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
-    * CHIP_ERROR_NOT_FOUND if the index in beyond the list of available labels.
-    */
-   CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) override;
+    uint8_t GetPowerStepNum() const override { return kPowerStepNum; }
 
+    uint32_t GetMaxCookTimeSec() const override { return 100; }
 
-   uint8_t GetPowerSettingNum() const override { return mPowerSettingNum; }
+    uint8_t GetCurrentWattIndex() const override { return mSelectedWattIndex; };
 
-
-   uint8_t GetMinPowerNum() const override { return kMinPowerNum; }
-
-
-   uint8_t GetMaxPowerNum() const override { return kMaxPowerNum; }
-
-
-   uint8_t GetPowerStepNum() const override { return kPowerStepNum; }
-
-
-   uint32_t GetMaxCookTimeSec() const override { return 100; }
-
-
-   uint8_t GetCurrentWattIndex() const override { return mSelectedWattIndex; };
-
-
-   uint16_t GetWattRating() const override { return mWattRating; };
-
+    uint16_t GetWattRating() const override { return mWattRating; };
 
 private:
-   chip::app::Clusters::OperationalState::Instance * mOperationalStateInstancePtr;
-   chip::app::Clusters::ModeBase::Instance * mMicrowaveOvenModeInstancePtr;
+    chip::app::Clusters::OperationalState::Instance * mOperationalStateInstancePtr;
+    chip::app::Clusters::ModeBase::Instance * mMicrowaveOvenModeInstancePtr;
 
+    MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
 
-   MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
+    static constexpr uint8_t kMinPowerNum            = 20u;
+    static constexpr uint8_t kMaxPowerNum            = 90u;
+    static constexpr uint8_t kPowerStepNum           = 10u;
+    static constexpr uint32_t kMaxCookTimeSec        = 86400u;
+    static constexpr uint8_t kDefaultPowerSettingNum = kMaxPowerNum;
 
+    static constexpr uint16_t kExampleWatt1 = 100u;
+    static constexpr uint16_t kExampleWatt2 = 300u;
+    static constexpr uint16_t kExampleWatt3 = 500u;
+    static constexpr uint16_t kExampleWatt4 = 800u;
+    static constexpr uint16_t kExampleWatt5 = 1000u;
 
-   static constexpr uint8_t kMinPowerNum            = 20u;
-   static constexpr uint8_t kMaxPowerNum            = 90u;
-   static constexpr uint8_t kPowerStepNum           = 10u;
-   static constexpr uint32_t kMaxCookTimeSec        = 86400u;
-   static constexpr uint8_t kDefaultPowerSettingNum = kMaxPowerNum;
+    uint8_t mPowerSettingNum   = kDefaultPowerSettingNum;
+    uint8_t mSelectedWattIndex = 0;
+    uint16_t mWattRating       = 0;
 
-
-   static constexpr uint16_t kExampleWatt1 = 100u;
-   static constexpr uint16_t kExampleWatt2 = 300u;
-   static constexpr uint16_t kExampleWatt3 = 500u;
-   static constexpr uint16_t kExampleWatt4 = 800u;
-   static constexpr uint16_t kExampleWatt5 = 1000u;
-
-
-   uint8_t mPowerSettingNum   = kDefaultPowerSettingNum;
-   uint8_t mSelectedWattIndex = 0;
-   uint16_t mWattRating       = 0;
-
-
-   const uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
+    const uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
 };
-
 
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
 
 void InitChefMicrowaveOvenControlCluster();
 
