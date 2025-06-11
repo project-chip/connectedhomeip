@@ -140,7 +140,6 @@ class TC_CLDIM_4_1(MatterBaseTest):
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
         is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: If Positioning feature is not supported, skip remaining steps
