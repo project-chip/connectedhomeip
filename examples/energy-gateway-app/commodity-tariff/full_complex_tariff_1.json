@@ -49,43 +49,30 @@
         {
             "DayPatternID": 0,
             "DaysOfWeek": "0x01",
-            "DayEntryIDs": [
-                10
-            ]
+            "DayEntryIDs": [10]
         },
         {
             "DayPatternID": 1,
             "DaysOfWeek": "0x02",
-            "DayEntryIDs": [
-                20,
-                21
-            ]
+            "DayEntryIDs": [20, 21]
         },
         {
             "DayPatternID": 2,
             "DaysOfWeek": "0x7C",
-            "DayEntryIDs": [
-                30
-            ]
+            "DayEntryIDs": [30]
         }
     ],
     "CalendarPeriods": [
         {
             "StartDate": 0,
-            "DayPatternIDs": [
-                0,
-                1,
-                2
-            ]
+            "DayPatternIDs": [0, 1, 2]
         }
     ],
     "IndividualDays": [
         {
             "Date": 1745427104,
             "DayType": 1,
-            "DayEntryIDs": [
-                40
-            ]
+            "DayEntryIDs": [40]
         }
     ],
     "TariffComponents": [
@@ -143,41 +130,23 @@
     "TariffPeriods": [
         {
             "Label": "Simple day",
-            "DayEntryIDs": [
-                10
-            ],
-            "TariffComponentIDs": [
-                10
-            ]
+            "DayEntryIDs": [10],
+            "TariffComponentIDs": [10]
         },
         {
             "Label": "Combo day",
-            "DayEntryIDs": [
-                20,
-                21
-            ],
-            "TariffComponentIDs": [
-                20
-            ]
+            "DayEntryIDs": [20, 21],
+            "TariffComponentIDs": [20]
         },
         {
             "Label": "Another day",
-            "DayEntryIDs": [
-                30
-            ],
-            "TariffComponentIDs": [
-                10,
-                20
-            ]
+            "DayEntryIDs": [30],
+            "TariffComponentIDs": [10, 20]
         },
         {
             "Label": "Holiday",
-            "DayEntryIDs": [
-                40
-            ],
-            "TariffComponentIDs": [
-                20
-            ]
+            "DayEntryIDs": [40],
+            "TariffComponentIDs": [20]
         }
     ],
     "DefaultRandomizationOffset": 0,

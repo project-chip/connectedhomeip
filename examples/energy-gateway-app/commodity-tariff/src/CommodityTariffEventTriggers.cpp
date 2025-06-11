@@ -32,30 +32,28 @@ using namespace chip::app::Clusters::CommodityTariff::Structs;
 uint8_t presetIndex = 0;
 
 namespace TariffPresets {
-    static constexpr const char* kTariff1 =  "./DefaultTariff.json";;
-    static constexpr const char* kTariff2 ="./full_complex_tariff_1.json";
-    static constexpr const char* kTariff3 ="./full_complex_tariff_2.json";
+static constexpr const char * kTariff1 = "./DefaultTariff.json";
+;
+static constexpr const char * kTariff2 = "./full_complex_tariff_1.json";
+static constexpr const char * kTariff3 = "./full_complex_tariff_2.json";
 
-    // Array of all presets
-    static constexpr std::array<const char*, 3> kAllPresets = {
-        kTariff1,
-        kTariff2,
-        kTariff3
-    };
+// Array of all presets
+static constexpr std::array<const char *, 3> kAllPresets = { kTariff1, kTariff2, kTariff3 };
 
-    // Number of presets (compile-time constant)
-    static constexpr size_t kCount = kAllPresets.size();
+// Number of presets (compile-time constant)
+static constexpr size_t kCount = kAllPresets.size();
 
-    // Safe accessor function
-    static constexpr const char* GetPreset(size_t index) {
-        return (index < kCount) ? kAllPresets[index] : nullptr;
-    }
+// Safe accessor function
+static constexpr const char * GetPreset(size_t index)
+{
+    return (index < kCount) ? kAllPresets[index] : nullptr;
 }
+} // namespace TariffPresets
 
-static bool LoadJsonFile(const char * aFname, Json::Value &jsonValue)
+static bool LoadJsonFile(const char * aFname, Json::Value & jsonValue)
 {
     bool is_ok = false;
-    std::ifstream ifs;    
+    std::ifstream ifs;
     Json::CharReaderBuilder builder;
     Json::String errs;
 
@@ -63,14 +61,13 @@ static bool LoadJsonFile(const char * aFname, Json::Value &jsonValue)
 
     if (!ifs.good())
     {
-        ChipLogError(NotSpecified,
-             "AllClusters App: Error open file %s", aFname);
+        ChipLogError(NotSpecified, "AllClusters App: Error open file %s", aFname);
         goto exit;
     }
 
-    if (!parseFromStream(builder, ifs, &jsonValue, &errs)) {
-        ChipLogError(NotSpecified,
-             "AllClusters App: Error parsing JSON file %s with error %s:", aFname, errs.c_str());
+    if (!parseFromStream(builder, ifs, &jsonValue, &errs))
+    {
+        ChipLogError(NotSpecified, "AllClusters App: Error parsing JSON file %s with error %s:", aFname, errs.c_str());
         goto exit;
     }
 
@@ -90,11 +87,11 @@ void SetTestEventTrigger_TariffDataUpdated()
 {
     CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
 
-    if (const char* preset = TariffPresets::GetPreset(presetIndex))
+    if (const char * preset = TariffPresets::GetPreset(presetIndex))
     {
         Json::Value json_root;
         ChipLogProgress(NotSpecified, "Tariff preset file %s", preset);
-        if ( LoadJsonFile(preset, json_root) )
+        if (LoadJsonFile(preset, json_root))
         {
             ChipLogProgress(NotSpecified, "The tariff file opened successfully");
             dg->LoadTariffData(json_root);
@@ -132,7 +129,7 @@ bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)
         ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Tariff Data Updated");
         SetTestEventTrigger_TariffDataUpdated();
         break;
-   case CommodityTariffTrigger::kTariffDataClear:
+    case CommodityTariffTrigger::kTariffDataClear:
         ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Tariff Data Clear");
         SetTestEventTrigger_TariffDataClear();
         break;

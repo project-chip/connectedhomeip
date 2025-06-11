@@ -43,35 +43,25 @@
         {
             "DayPatternID": 0,
             "DaysOfWeek": "0x01",
-            "DayEntryIDs": [
-                10
-            ]
+            "DayEntryIDs": [10]
         },
         {
             "DayPatternID": 1,
             "DaysOfWeek": "0x7E",
-            "DayEntryIDs": [
-                20,
-                21
-            ]
+            "DayEntryIDs": [20, 21]
         }
     ],
     "CalendarPeriods": [
         {
             "StartDate": 0,
-            "DayPatternIDs": [
-                0,
-                1
-            ]
+            "DayPatternIDs": [0, 1]
         }
     ],
     "IndividualDays": [
         {
             "Date": 1745506377,
             "DayType": 1,
-            "DayEntryIDs": [
-                30
-            ]
+            "DayEntryIDs": [30]
         }
     ],
     "TariffComponents": [
@@ -154,31 +144,18 @@
     "TariffPeriods": [
         {
             "Label": "Simple day",
-            "DayEntryIDs": [
-                10
-            ],
-            "TariffComponentIDs": [
-                10
-            ]
+            "DayEntryIDs": [10],
+            "TariffComponentIDs": [10]
         },
         {
             "Label": "Combo day",
-            "DayEntryIDs": [
-                20,
-                21
-            ],
-            "TariffComponentIDs": [
-                20
-            ]
+            "DayEntryIDs": [20, 21],
+            "TariffComponentIDs": [20]
         },
         {
             "Label": "Holiday",
-            "DayEntryIDs": [
-                40
-            ],
-            "TariffComponentIDs": [
-                30
-            ]
+            "DayEntryIDs": [40],
+            "TariffComponentIDs": [30]
         }
     ],
     "DefaultRandomizationOffset": 0,

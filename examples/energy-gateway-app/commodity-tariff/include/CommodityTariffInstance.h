@@ -36,13 +36,11 @@ public:
     CommodityTariffDelegate();
     ~CommodityTariffDelegate() = default;
 
-    Status GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId,
-                                                        Structs::DayEntryStruct::Type & aDayEntry) override;
+    Status GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId, Structs::DayEntryStruct::Type & aDayEntry) override;
 
-    Status GetTariffComponentInfoById(DataModel::Nullable<uint32_t>  aTariffComponentId,
-                                                                   DataModel::Nullable<chip::CharSpan> & label,
-                                                                   DataModel::List<const uint32_t> & dayEntryIDs,
-                                                                   Structs::TariffComponentStruct::Type & aTariffComponent) override;
+    Status GetTariffComponentInfoById(DataModel::Nullable<uint32_t> aTariffComponentId, DataModel::Nullable<chip::CharSpan> & label,
+                                      DataModel::List<const uint32_t> & dayEntryIDs,
+                                      Structs::TariffComponentStruct::Type & aTariffComponent) override;
     CHIP_ERROR LoadTariffData(const Json::Value & value);
 
     bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) override;
@@ -76,4 +74,3 @@ private:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
- 
