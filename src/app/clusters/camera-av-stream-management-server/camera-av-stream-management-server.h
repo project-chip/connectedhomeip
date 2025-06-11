@@ -251,6 +251,18 @@ public:
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
+    /**
+     * @brief Called by transports when they start using the corresponding audio and video streams.
+     *
+     */
+    virtual CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
+
+    /**
+     * @brief Called by transports when they release the corresponding audio and video streams.
+     *
+     */
+    virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
+
 private:
     friend class CameraAVStreamMgmtServer;
 
@@ -505,6 +517,12 @@ public:
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
     CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
+
+    CHIP_ERROR UpdateVideoStreamRefCount(uint16_t videoStreamId, bool shouldIncrement);
+
+    CHIP_ERROR UpdateAudioStreamRefCount(uint16_t audioStreamId, bool shouldIncrement);
+
+    CHIP_ERROR UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement);
 
 private:
     CameraAVStreamMgmtDelegate & mDelegate;

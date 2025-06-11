@@ -208,6 +208,7 @@ endif # NET_L2_OPENTHREAD
 
 config CHIP_IPV4
 	bool "IPv4 support for Matter"
+	default n if CHIP_NET_L2_OPENTHREAD && !CHIP_WIFI
 	default y
 	help
 		If disabled, it allows to build NXP SDK application
