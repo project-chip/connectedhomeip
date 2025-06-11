@@ -77,3 +77,34 @@ class IcdAppServerSubprocess(AppServerSubprocess):
         # Make sure the ICD server process is not paused before terminating it.
         self.resume(check_state=False)
         super().terminate()
+
+
+class JFControllerSubprocess(Subprocess):
+    """Wrapper class for starting a controller in a subprocess."""
+
+    # Prefix for log messages from the application server.
+    PREFIX = b"[JF-CTRL]"
+
+    def __init__(self, app: str, rpc_server_port: int, storage_dir: str,
+                 vendor_id: hex, extra_args: list[str] = []):
+
+        self.kvs_fd, self.kvs_path = tempfile.mkstemp(dir=storage_dir)
+
+        # Build the command list
+        command = [app]
+        if extra_args:
+            command.extend(extra_args)
+
+        command.extend([
+            "--rpc-server-port", str(rpc_server_port),
+            "--storage-directory", storage_dir,
+            "--commissioner-vendor-id", str(vendor_id)
+        ])
+
+        # Start the server application
+        super().__init__(*command,  # Pass the constructed command list
+                         output_cb=lambda line, is_stderr: self.PREFIX + line)
+
+    def __del__(self):
+        # Remove folder used for storage
+        os.remove(self.storage_dir)
