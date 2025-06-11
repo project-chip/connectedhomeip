@@ -45,7 +45,7 @@ enum class CommodityTariffTrigger : uint64_t
     // Simulate a tariff data update to trigger loading and validation of new data followed by the cluster attributes changes.
     kTariffDataUpdated = 0x0700'0000'0000'0000,
     //
-    kTariffDataClear= 0x0700'0000'0000'0001,
+    kTariffDataClear = 0x0700'0000'0000'0001,
     // Force jump to next day to check of updating for time of day context-dependent attribute values.
     kForcedOneDayForward = 0x0700'0000'0000'0002
 };
