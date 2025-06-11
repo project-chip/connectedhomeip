@@ -3585,10 +3585,9 @@ void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
 {
     VerifyOrDie(nullptr != commandObj);
 
-    if (status.HasClusterSpecificCode())
+    if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
     {
-        const auto clusterStatus = *status.GetClusterSpecificCode(); // NOLINT(bugprone-unchecked-optional-access)
-        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, clusterStatus) == CHIP_NO_ERROR);
+        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, *clusterStatus) == CHIP_NO_ERROR);
     }
     else
     {
