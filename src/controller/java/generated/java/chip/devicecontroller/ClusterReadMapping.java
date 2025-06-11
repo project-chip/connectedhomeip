@@ -10557,6 +10557,17 @@ public class ClusterReadMapping {
           readClosureControlCurrentErrorListCommandParams
         );
         result.put("readCurrentErrorListAttribute", readClosureControlCurrentErrorListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureControlLatchControlModesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureControlLatchControlModesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureControlCluster) cluster).readLatchControlModesAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureControlLatchControlModesCommandParams
+        );
+        result.put("readLatchControlModesAttribute", readClosureControlLatchControlModesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readClosureControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readClosureControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -10693,6 +10704,17 @@ public class ClusterReadMapping {
           readClosureDimensionModulationTypeCommandParams
         );
         result.put("readModulationTypeAttribute", readClosureDimensionModulationTypeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionLatchControlModesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionLatchControlModesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readLatchControlModesAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureDimensionLatchControlModesCommandParams
+        );
+        result.put("readLatchControlModesAttribute", readClosureDimensionLatchControlModesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readClosureDimensionGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readClosureDimensionGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

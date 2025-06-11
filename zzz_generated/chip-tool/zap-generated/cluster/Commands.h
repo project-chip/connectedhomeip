@@ -9048,8 +9048,9 @@ private:
 | * CountdownTime                                                     | 0x0000 |
 | * MainState                                                         | 0x0001 |
 | * CurrentErrorList                                                  | 0x0002 |
-| * OverallState                                                      | 0x0003 |
-| * OverallTarget                                                     | 0x0004 |
+| * OverallCurrentState                                               | 0x0003 |
+| * OverallTargetState                                                | 0x0004 |
+| * LatchControlModes                                                 | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9183,7 +9184,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentState                                                      | 0x0000 |
-| * Target                                                            | 0x0001 |
+| * TargetState                                                       | 0x0001 |
 | * Resolution                                                        | 0x0002 |
 | * StepValue                                                         | 0x0003 |
 | * Unit                                                              | 0x0004 |
@@ -9193,6 +9194,7 @@ private:
 | * RotationAxis                                                      | 0x0008 |
 | * Overflow                                                          | 0x0009 |
 | * ModulationType                                                    | 0x000A |
+| * LatchControlModes                                                 | 0x000B |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -25522,8 +25524,9 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<ReadAttribute>(Id, "countdown-time", Attributes::CountdownTime::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "main-state", Attributes::MainState::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "overall-current-state", Attributes::OverallCurrentState::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "overall-target-state", Attributes::OverallTargetState::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25539,11 +25542,14 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::ClosureControl::ClosureErrorEnum>>>(
             Id, "current-error-list", Attributes::CurrentErrorList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type>>>(
-            Id, "overall-state", Attributes::OverallState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::Type>>>(
+            Id, "overall-current-state", Attributes::OverallCurrentState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type>>>(
-            Id, "overall-target", Attributes::OverallTarget::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::Type>>>(
+            Id, "overall-target-state", Attributes::OverallTargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap>>>(
+            Id, "latch-control-modes", 0, UINT8_MAX, Attributes::LatchControlModes::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25559,8 +25565,9 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "countdown-time", Attributes::CountdownTime::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "main-state", Attributes::MainState::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "overall-current-state", Attributes::OverallCurrentState::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "overall-target-state", Attributes::OverallTargetState::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25601,7 +25608,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "target", Attributes::Target::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "resolution", Attributes::Resolution::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "step-value", Attributes::StepValue::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "unit", Attributes::Unit::Id, credsIssuerConfig),                                   //
@@ -25611,6 +25618,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "rotation-axis", Attributes::RotationAxis::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "overflow", Attributes::Overflow::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "modulation-type", Attributes::ModulationType::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25618,11 +25626,11 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type>>>(
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type>>>(
             Id, "current-state", Attributes::CurrentState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type>>>(
-            Id, "target", Attributes::Target::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type>>>(
+            Id, "target-state", Attributes::TargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent100ths>>(Id, "resolution", 0, UINT16_MAX, Attributes::Resolution::Id,
                                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent100ths>>(Id, "step-value", 0, UINT16_MAX, Attributes::StepValue::Id,
@@ -25644,6 +25652,9 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<chip::app::Clusters::ClosureDimension::ModulationTypeEnum>>(
             Id, "modulation-type", 0, UINT8_MAX, Attributes::ModulationType::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap>>>(
+            Id, "latch-control-modes", 0, UINT8_MAX, Attributes::LatchControlModes::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25657,7 +25668,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "target", Attributes::Target::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "resolution", Attributes::Resolution::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "step-value", Attributes::StepValue::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "unit", Attributes::Unit::Id, credsIssuerConfig),                                   //
@@ -25667,6 +25678,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "rotation-axis", Attributes::RotationAxis::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "overflow", Attributes::Overflow::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "modulation-type", Attributes::ModulationType::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

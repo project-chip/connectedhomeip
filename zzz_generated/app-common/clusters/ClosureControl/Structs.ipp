@@ -29,11 +29,11 @@ namespace Clusters {
 namespace ClosureControl {
 namespace Structs {
 
-namespace OverallStateStruct {
+namespace OverallCurrentStateStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kPositioning), positioning);
+    encoder.Encode(to_underlying(Fields::kPosition), position);
     encoder.Encode(to_underlying(Fields::kLatch), latch);
     encoder.Encode(to_underlying(Fields::kSpeed), speed);
     encoder.Encode(to_underlying(Fields::kSecureState), secureState);
@@ -50,9 +50,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kPositioning))
+        if (__context_tag == to_underlying(Fields::kPosition))
         {
-            err = DataModel::Decode(reader, positioning);
+            err = DataModel::Decode(reader, position);
         }
         else if (__context_tag == to_underlying(Fields::kLatch))
         {
@@ -71,9 +71,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace OverallStateStruct
+} // namespace OverallCurrentStateStruct
 
-namespace OverallTargetStruct {
+namespace OverallTargetStateStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -110,7 +110,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace OverallTargetStruct
+} // namespace OverallTargetStateStruct
 } // namespace Structs
 } // namespace ClosureControl
 } // namespace Clusters
