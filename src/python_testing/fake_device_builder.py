@@ -23,8 +23,8 @@ from chip.testing.spec_parsing import XmlCluster, XmlDeviceType
 from chip.tlv import uint
 
 
-def _is_mandatory(conformance):
-    return conformance(0, [], []).decision == ConformanceDecision.MANDATORY
+def _is_mandatory(conformance, feature_map=0):
+    return conformance(feature_map, [], []).decision == ConformanceDecision.MANDATORY
 
 
 def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label: str) -> Optional[Clusters.ClusterObjects.ClusterObjectFieldDescriptor]:
@@ -34,20 +34,25 @@ def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label:
     return None
 
 
-def _create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int) -> dict[int, Any]:
+def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int) -> dict[int, Any]:
     attrs = {}
-    attrs[GlobalAttributeIds.FEATURE_MAP_ID] = 0
+    mandatory_features = [mask for mask, f in xml_clusters[cluster_id].features.items() if _is_mandatory(f.conformance)]
+    feature_map = 0
+    for mask in mandatory_features:
+        feature_map |= mask
 
-    mandatory_attributes = [id for id, a in xml_clusters[cluster_id].attributes.items() if _is_mandatory(a.conformance)]
+    mandatory_attributes = [id for id, a in xml_clusters[cluster_id].attributes.items()
+                            if _is_mandatory(a.conformance, feature_map)]
     for m in mandatory_attributes:
         # dummy versions - we're not using the values in this test
         attrs[m] = 0
+    attrs[GlobalAttributeIds.FEATURE_MAP_ID] = feature_map
     attrs[GlobalAttributeIds.ATTRIBUTE_LIST_ID] = mandatory_attributes
     mandatory_accepted_commands = [id for id, a in xml_clusters[cluster_id].accepted_commands.items()
-                                   if _is_mandatory(a.conformance)]
+                                   if _is_mandatory(a.conformance, feature_map)]
     attrs[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] = mandatory_accepted_commands
     mandatory_generated_commands = [id for id, a in xml_clusters[cluster_id].generated_commands.items()
-                                    if _is_mandatory(a.conformance)]
+                                    if _is_mandatory(a.conformance, feature_map)]
     attrs[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID] = mandatory_generated_commands
     attrs[GlobalAttributeIds.CLUSTER_REVISION_ID] = xml_clusters[cluster_id].revision
     return attrs
@@ -65,7 +70,7 @@ def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: di
     device_type_revision = xml_device_types[device_type_id].revision
 
     for s in required_servers:
-        endpoint[s] = _create_minimal_cluster(xml_clusters, s)
+        endpoint[s] = create_minimal_cluster(xml_clusters, s)
 
     # Descriptor
     attr = Clusters.Descriptor.Attributes

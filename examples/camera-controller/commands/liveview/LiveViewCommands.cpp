@@ -44,7 +44,7 @@ CHIP_ERROR LiveViewStopCommand::RunCommand()
 {
     ChipLogProgress(Camera, "Run LiveViewStopCommand");
 
-    camera::DeviceManager::Instance().StopVideoStreamProcess(mVideoStreamID);
+    camera::DeviceManager::Instance().StopVideoStream(mVideoStreamID);
 
     return camera::DeviceManager::Instance().DeallocateVideoStream(mPeerNodeId, mVideoStreamID);
 }

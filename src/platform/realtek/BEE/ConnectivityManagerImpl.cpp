@@ -45,6 +45,11 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
+extern "C" void SetMatterBLEAdvEnabled(bool val)
+{
+    ConnectivityMgr().SetBLEAdvertisingEnabled(val);
+}
+
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

@@ -813,6 +813,13 @@ class AsyncReadTransaction:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
+        #
+        # At the end of the life cycle, the C++ end memory has been released,
+        # and pReadClient is set to None, otherwise it will cause a dangling pointer.
+        # For example: When a subscription calls Shutdown() after an error occurs,
+        # pReadClient will be referenced, causing a crash
+        #
+        self._pReadClient = None
         self._event_loop.call_soon_threadsafe(self._handleDone)
 
     def handleReportBegin(self):

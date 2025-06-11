@@ -85,6 +85,19 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
+void ConnectivityManagerImpl::UpdateEthernetNetworkingStatus()
+{
+    if (mpStatusChangeCallback != nullptr)
+    {
+        if (mEthIfName[0] != '\0')
+        {
+            ByteSpan ifNameSpan(reinterpret_cast<unsigned char *>(mEthIfName),
+                                strnlen(mEthIfName, Inet::InterfaceId::kMaxIfNameLength));
+            mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ifNameSpan), NullOptional);
+        }
+    }
+}
+
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
