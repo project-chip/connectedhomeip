@@ -405,6 +405,10 @@ def getGlobalTemplatesTargets():
                 continue
 
             example_name = "chef-"+os.path.basename(filepath)[:-len(".zap")]
+        if example_name == 'fabric-sync':
+            # Fabric sync symlinks to fabric-bridge-app (they are identical)
+            # so we skip this part
+            continue
 
         logging.info("Found example %s (via %s)" %
                      (example_name, str(filepath)))
