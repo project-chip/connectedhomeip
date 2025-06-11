@@ -42,8 +42,7 @@ source_set("fabric-bridge-common") {
   public_deps = [ ":fabric-bridge-common-zap" ]
 }
 
-source_set("app-config")
-{
+source_set("app-config") {
   public_configs = [ ":config" ]
   sources = [ "include/CHIPProjectAppConfig.h" ]
 }
@@ -54,10 +53,10 @@ source_set("fabric-bridge-lib") {
   sources = [
     "BridgedAdministratorCommissioning.cpp",
     "BridgedAdministratorCommissioning.h",
-    "BridgedDeviceBasicInformationImpl.cpp",
-    "BridgedDeviceBasicInformationImpl.h",
     "BridgedDevice.cpp",
     "BridgedDevice.h",
+    "BridgedDeviceBasicInformationImpl.cpp",
+    "BridgedDeviceBasicInformationImpl.h",
     "BridgedDeviceManager.cpp",
     "BridgedDeviceManager.h",
   ]
