@@ -64,7 +64,7 @@ def current_position_and_speed_matcher(position: int, speed: Globals.Enums.Three
                 return True
         else:
             return False
-    return AttributeMatcher.from_callable(description=f"CurrentState.Speed is {speed}", matcher=predicate)
+    return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position} and CurrentState.Speed is {speed}", matcher=predicate)
 
 
 class TC_CLDIM_4_1(MatterBaseTest):
