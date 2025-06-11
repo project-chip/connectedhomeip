@@ -16,7 +16,7 @@
 
 #
 # Usage:
-#  ./scripts/helpers/roll_docker_version.sh -v=X --reason="INSERT_REASON_HERE"
+#  ./scripts/helpers/docker-version-roll.sh -v=X --reason="INSERT_REASON_HERE"
 #
 
 CURRENT_VERSION=$(sed 's/ .*//' ./integrations/docker/images/base/chip-build/version)
