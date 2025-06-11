@@ -690,7 +690,7 @@ class ChipDeviceControllerBase():
             discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
             setupPinCode (int): The setup pin code of the device.
             nodeid (int): Node id of the device.
-            isShortDiscriminator (bool): Optional short discriminator.
+            isShortDiscriminator (Optional[bool]): Optional short discriminator.
 
 
         Returns:
@@ -1258,7 +1258,7 @@ class ChipDeviceControllerBase():
         Args:
             setUpCode (str): The setup code of the device.
             nodeid (int): Node id of the device.
-            timeoutMs (int): Optional timeout in milliseconds.
+            timeoutMs (Optional[int]): Optional timeout in milliseconds.
 
         Returns:
             CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device
@@ -1287,9 +1287,9 @@ class ChipDeviceControllerBase():
         Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
         Arg:
-            nodeid: Target's Node ID
-            allowPASE: Get a device proxy of a device being commissioned.
-            timeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+            nodeid (int): Target's Node ID
+            allowPASE (bool): Get a device proxy of a device being commissioned.
+            timeoutMs (Optional[int]): Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
 
         Returns:
             DeviceProxyWrapper on success.
@@ -1346,8 +1346,8 @@ class ChipDeviceControllerBase():
         Waits a LIT ICD device to become active. Will send a StayActive command to the device on active to allow human operations.
 
         Args:
-            nodeId: Node ID of the LID ICD
-            stayActiveDurationMs: The duration in the StayActive command, in milliseconds
+            nodeId: Node ID of the LID ICD.
+            stayActiveDurationMs: The duration in the StayActive command, in milliseconds.
 
         Returns:
             StayActiveResponse on success
@@ -1361,12 +1361,12 @@ class ChipDeviceControllerBase():
         Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
         Args:
-            nodeId: Target's Node ID
-            allowPASE: Get a device proxy of a device being commissioned.
-            timeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+            nodeId (int): Target's Node ID.
+            allowPASE (bool): Get a device proxy of a device being commissioned.
+            timeoutMs (Optional[int]): Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
 
         Returns:
-            DeviceProxyWrapper on success
+            DeviceProxyWrapper on success.
         '''
         self.CheckIsActive()
 
@@ -1443,7 +1443,7 @@ class ChipDeviceControllerBase():
         This will result in a session being established if one wasn't already established.
 
         Returns:
-            SessionParameters: The session parameters.
+            Optional[SessionParameters]: The session parameters.
         '''
 
         # First creating the struct to make building the ByteArray to be sent to CFFI easier.
@@ -2818,7 +2818,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Args:
             setupPayload (str): The setup payload (QR or manual code).
             nodeid (int): Node id of the device.
-            discoveryType (DiscoveryType.DISCOVERY_ALL): The optional discovery type to use.
+            discoveryType (DiscoveryType.DISCOVERY_ALL): The discovery type to use.
 
         Raises:
             ChipStackError: On failure.
@@ -2901,7 +2901,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Set the path to the device attestation revocation set JSON file.
 
         Args:
-            dacRevocationSetPath (str): Path to the JSON file containing the device attestation revocation set.
+            dacRevocationSetPath (Optional[str]): Path to the JSON file containing the device attestation revocation set.
 
         Raises:
             ChipStackError: On failure.
@@ -2930,10 +2930,9 @@ class BareChipDeviceController(ChipDeviceControllerBase):
         Args:
             operationalKey: A P256Keypair object for the operational key of the controller.
             noc (bytes): The NOC for the controller, in bytes.
-            icac (bytes): The optional ICAC for the controller.
+            icac (Optional[bytes]): The optional ICAC for the controller.
             rcac (bytes): The RCAC for the controller.
-            ipk (bytes): The optional IPK for the controller, when None is provided, the defaultIpk
-                will be used.
+            ipk (Optional[bytes]): The optional IPK for the controller, when None is provided, the defaultIpk will be used.
             adminVendorId (int): The adminVendorId of the controller.
             name (str): The name of the controller, for debugging use only.
 
