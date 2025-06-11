@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,28 +16,13 @@
  *    limitations under the License.
  */
 
-#include "AppTask.h"
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
 
-#ifdef CONFIG_CHIP_PW_RPC
-#include "Rpc.h"
-#endif
-
-#include <zephyr/logging/log.h>
-
-LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
-
-using namespace chip;
-
-int main()
-{
-    CHIP_ERROR err = AppTask::Instance().StartApp();
-
-#ifdef CONFIG_CHIP_PW_RPC
-    rpc::Init();
-#endif
-
-    LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
-    return err == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;
-
-    return 0;
-}
+#pragma once
