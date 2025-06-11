@@ -28,8 +28,6 @@
 #        --commissioning-method on-network
 #        --discriminator 1234
 #        --passcode 20202021
-#        --int-arg PIXIT.CLDIM.FullMotionDuration:1
-#        --int-arg PIXIT.CLDIM.StepMotionDuration:1
 #        --trace-to json:${TRACE_TEST_JSON}.json
 #        --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #      factory-reset: true
@@ -37,12 +35,36 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time
-
 import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.clusters import Globals
+from chip.interaction_model import (InteractionModelError, Status)
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main, AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator)
 from mobly import asserts
+
+
+def current_position_matcher(position: int) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
+            return False
+        for entry in report.value:
+            if entry.Position == position:
+                return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
+
+
+def current_position_and_speed_matcher(position: int, speed: Globals.Enums.ThreeLevelAutoEnum) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
+            return False
+        for entry in report.value:
+            if (entry.Position == position) and (entry.Speed == speed):
+                return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"CurrentState.Speed is {speed}", matcher=predicate)
 
 
 class TC_CLDIM_4_1(MatterBaseTest):
@@ -61,41 +83,36 @@ class TC_CLDIM_4_1(MatterBaseTest):
             TestStep("2c", "Read AttributeList attribute"),
             TestStep("2d", "Read StepValue attribute"),
             TestStep("2e", "Read LimitRange attribute"),
+            TestStep("2f", "Establish wilcard subscription to all attributes"),
+            TestStep("2g", "Read CurrentState attribute"),
             TestStep("3a", "Send Step command to increase position to MaxPosition"),
-            TestStep("3b", "Wait for PIXIT.CLDIM.FullMotionDuration seconds"),
-            TestStep("3c", "Verify CurrentState attribute is at MaxPosition"),
+            TestStep("3b", "Wait for CurrentState.Position to be updated to MaxPosition"),
             TestStep("4a", "Send Step command to decrease position by 2 steps"),
             TestStep("4b", "Verify Target attribute is updated"),
-            TestStep("4c", "Wait for PIXIT.CLDIM.StepMotionDuration * 2 seconds"),
-            TestStep("4d", "Verify CurrentState attribute is updated"),
-            TestStep("4e", "Send Step command to increase position by 2 steps"),
-            TestStep("4f", "Verify Target attribute is updated"),
-            TestStep("4g", "Wait for PIXIT.CLDIM.StepMotionDuration * 2 seconds"),
-            TestStep("4h", "Verify CurrentState attribute is updated"),
-            TestStep("5a", "If Speed Feature is not supported, skip step 5b to 5e"),
+            TestStep("4c", "Wait for CurrentState.Position to be updated"),
+            TestStep("4d", "Send Step command to increase position by 2 steps"),
+            TestStep("4e", "Verify Target attribute is updated"),
+            TestStep("4f", "Wait for CurrentState.Position to be updated"),
+            TestStep("5a", "If Speed Feature is not supported, skip step 5b to 5d"),
             TestStep("5b", "Send Step command to decrease position by 1 step with Speed=High"),
             TestStep("5c", "Verify Target attribute is updated"),
-            TestStep("5d", "Wait for PIXIT.CLDIM.StepMotionDuration seconds"),
-            TestStep("5e", "Verify CurrentState attribute is updated"),
-            TestStep("6a", "If Speed Feature is not supported, skip step 6b to 6e"),
+            TestStep("5d", "Wait for CurrentState to be updated"),
+            TestStep("6a", "If Speed Feature is not supported, skip step 6b to 6d"),
             TestStep("6b", "Send Step command to increase position by 1 step with Speed=Auto"),
             TestStep("6c", "Verify Target attribute is updated"),
-            TestStep("6d", "Wait for PIXIT.CLDIM.StepMotionDuration seconds"),
-            TestStep("6e", "Verify CurrentState attribute is updated"),
+            TestStep("6d", "Wait for CurrentState to be updated"),
             TestStep("7a", "Send Step command to decrease position by 1 step"),
             TestStep("7b", "Send Step command to decrease position by 1 step"),
             TestStep("7c", "Send Step command to decrease position by 1 step"),
             TestStep("7d", "Verify Target attribute is updated"),
-            TestStep("7e", "Wait for PIXIT.CLDIM.StepMotionDuration * 3 seconds"),
-            TestStep("7f", "Verify CurrentState attribute is updated"),
-            TestStep("8a", "Send Step command to decrease position by 65535"),
-            TestStep("8b", "Verify Target attribute is at MinPosition"),
-            TestStep("8c", "Wait for PIXIT.CLDIM.FullMotionDuration seconds"),
-            TestStep("8d", "Verify CurrentState attribute is at MinPosition"),
+            TestStep("7e", "Wait for CurrentState to be updated"),
+            TestStep("8a", "Read CurrentState attribute"),
+            TestStep("8b", "Send Step command to decrease position by 65535"),
+            TestStep("8c", "Verify Target attribute is at MinPosition"),
+            TestStep("8d", "Wait for CurrentState to be updated"),
             TestStep("8e", "Send Step command to increase position by 65535"),
             TestStep("8f", "Verify Target attribute is at MaxPosition"),
-            TestStep("8g", "Wait for PIXIT.CLDIM.FullMotionDuration seconds"),
-            TestStep("8h", "Verify CurrentState attribute is at MaxPosition"),
+            TestStep("8g", "Wait for CurrentState to be updated"),
         ]
         return steps
 
@@ -107,23 +124,8 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CLDIM_4_1(self):
-        asserts.assert_true('PIXIT.CLDIM.FullMotionDuration' in self.matter_test_config.global_test_params,
-                            "PIXIT.CLDIM.FullMotionDuration must be included on the command line in "
-                            "the --int-arg flag as PIXIT.CLDIM.FullMotionDuration:<duration>")
-        asserts.assert_true('PIXIT.CLDIM.StepMotionDuration' in self.matter_test_config.global_test_params,
-                            "PIXIT.CLDIM.StepMotionDuration must be included on the command line in "
-                            "the --int-arg flag as PIXIT.CLDIM.StepMotionDuration:<duration>")
-
-        full_motion_duration = self.matter_test_config.global_test_params['PIXIT.CLDIM.FullMotionDuration']
-        step_motion_duration = self.matter_test_config.global_test_params['PIXIT.CLDIM.StepMotionDuration']
-
-        if full_motion_duration <= 0:
-            asserts.fail("PIXIT.CLDIM.FullMotionDuration must be greater than 0")
-
-        if step_motion_duration <= 0:
-            asserts.fail("PIXIT.CLDIM.StepMotionDuration must be greater than 0")
-
         endpoint = self.get_endpoint(default=1)
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -165,6 +167,15 @@ class TC_CLDIM_4_1(MatterBaseTest):
             min_position = limit_range.min
             max_position = limit_range.max
 
+        # STEP 2f: Establish wildcard subscription to all attributes"
+        self.step("2f")
+        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
+        await sub_handler.start(self.default_controller, self.dut.node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+
+        # STEP 2g: Read CurrentState attribute
+        self.step("2g")
+        initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+
         # STEP 3a: Send Step command to increase position to MaxPosition
         self.step("3a")
         try:
@@ -176,23 +187,14 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 3b: Wait for PIXIT.CLDIM.FullMotionDuration seconds
+        # STEP 3b: Wait for CurrentState.Position to be updated to MaxPosition
         self.step("3b")
-        time.sleep(full_motion_duration)
-
-        # STEP 3c: Verify CurrentState attribute is at MaxPosition
-        self.step("3c")
-        if attributes.CurrentState.attribute_id in attribute_list:
-            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-
-            asserts.assert_equal(current_state.position, max_position, "CurrentState Position is not at MaxPosition")
-
-            if is_latching_supported:
-                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
+        if initial_state.Position == max_position:
+            logging.info("MaxPosition == 0. Skipping step 3b.")
+            self.mark_current_step_skipped()
+        else:
+            sub_handler.await_all_expected_report_matches(
+                expected_matches=[current_position_matcher(max_position)], timeout_sec=timeout)
 
         # STEP 4a: Send Step command to decrease position by 2 steps
         self.step("4a")
@@ -212,26 +214,14 @@ class TC_CLDIM_4_1(MatterBaseTest):
             expected_position = max(max_position - 2 * step_value, min_position)
             asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
-        # STEP 4c: Wait for PIXIT.CLDIM.StepMotionDuration * 2 seconds
+        # STEP 4c: Wait for CurrentState.Position to be updated
         self.step("4c")
-        time.sleep(step_motion_duration * 2)
+        expected_position = max(max_position - 2 * step_value, min_position)
+        sub_handler.await_all_expected_report_matches(
+            expected_matches=[current_position_matcher(expected_position)], timeout_sec=timeout)
 
-        # STEP 4d: Verify CurrentState attribute is updated
+        # STEP 4d: Send Step command to increase position by 2 steps
         self.step("4d")
-        if attributes.CurrentState.attribute_id in attribute_list:
-            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            expected_position = max(max_position - 2 * step_value, min_position)
-            asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
-
-            if is_latching_supported:
-                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
-
-        # STEP 4e: Send Step command to increase position by 2 steps
-        self.step("4e")
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
@@ -241,37 +231,24 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 4f: Verify Target attribute is updated
-        self.step("4f")
+        # STEP 4e: Verify Target attribute is updated
+        self.step("4e")
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             asserts.assert_equal(target.position, max_position, "Target Position is not updated correctly")
 
-        # STEP 4g: Wait for PIXIT.CLDIM.StepMotionDuration * 2 seconds
-        self.step("4g")
-        time.sleep(step_motion_duration * 2)
+        # STEP 4f: Wait for CurrentState.Position to be updated
+        self.step("4f")
+        sub_handler.await_all_expected_report_matches(
+            expected_matches=[current_position_matcher(max_position)], timeout_sec=timeout)
 
-        # STEP 4h: Verify CurrentState attribute is updated
-        self.step("4h")
-        if attributes.CurrentState.attribute_id in attribute_list:
-            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            asserts.assert_equal(current_state.position, max_position, "CurrentState Position is not updated correctly")
-
-            if is_latching_supported:
-                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
-
-        # STEP 5a: If Speed Feature is not supported, skip step 5b to 5e
+        # STEP 5a: If Speed Feature is not supported, skip step 5b to 5d
         self.step("5a")
         if not is_speed_supported:
-            logging.info("Speed feature is not supported. Skipping steps 5b to 5e.")
+            logging.info("Speed feature is not supported. Skipping steps 5b to 5d.")
             self.skip_step("5b")
             self.skip_step("5c")
             self.skip_step("5d")
-            self.skip_step("5e")
         else:
             # STEP 5b: Send Step command to decrease position by 1 step with Speed=High
             self.step("5b")
@@ -294,32 +271,21 @@ class TC_CLDIM_4_1(MatterBaseTest):
                 expected_position = max_position - step_value
                 asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
-                asserts.assert_equal(target.speed, 3, "Target Speed is not High")
+                asserts.assert_equal(target.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
+                                     "Target Speed is not High")
 
-            # STEP 5d: Wait for PIXIT.CLDIM.StepMotionDuration seconds
+            # STEP 5d: Wait for CurrentState to be updated
             self.step("5d")
-            time.sleep(step_motion_duration)
+            sub_handler.await_all_expected_report_matches(
+                expected_matches=[current_position_and_speed_matcher(max_position - step_value, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
 
-            # STEP 5e: Verify CurrentState attribute is updated
-            self.step("5e")
-            if attributes.CurrentState.attribute_id in attribute_list:
-                current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-                expected_position = max_position - step_value
-                asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
-
-                if is_latching_supported:
-                    asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-                asserts.assert_equal(current_state.speed, 3, "CurrentState Speed is not High")
-
-        # STEP 6a: If Speed Feature is not supported, skip step 6b to 6e
+        # STEP 6a: If Speed Feature is not supported, skip step 6b to 6d
         self.step("6a")
         if not is_speed_supported:
-            logging.info("Speed feature is not supported. Skipping steps 6b to 6e.")
+            logging.info("Speed feature is not supported. Skipping steps 6b to 6d.")
             self.skip_step("6b")
             self.skip_step("6c")
             self.skip_step("6d")
-            self.skip_step("6e")
         else:
             # STEP 6b: Send Step command to increase position by 1 step with Speed=Auto
             self.step("6b")
@@ -342,23 +308,13 @@ class TC_CLDIM_4_1(MatterBaseTest):
                 expected_position = max_position
                 asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
-                asserts.assert_equal(target.speed, 0, "Target Speed is not Auto")
+                asserts.assert_equal(target.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto,
+                                     "Target Speed is not Auto")
 
-            # STEP 6d: Wait for PIXIT.CLDIM.StepMotionDuration seconds
+            # STEP 6d: Wait for CurrentState to be updated
             self.step("6d")
-            time.sleep(step_motion_duration)
-
-            # STEP 6e: Verify CurrentState attribute is updated
-            self.step("6e")
-            if attributes.CurrentState.attribute_id in attribute_list:
-                current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-                expected_position = max_position
-                asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
-
-                if is_latching_supported:
-                    asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-                asserts.assert_equal(current_state.speed, 0, "CurrentState Speed is not Auto")
+            sub_handler.await_all_expected_report_matches(
+                expected_matches=[current_position_and_speed_matcher(max_position, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto)], timeout_sec=timeout)
 
         # STEP 7a: Send Step command to decrease position by 1 step
         self.step("7a")
@@ -409,26 +365,18 @@ class TC_CLDIM_4_1(MatterBaseTest):
             expected_position = max(max_position - 3 * step_value, min_position)
             asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
 
-        # STEP 7e: Wait for PIXIT.CLDIM.StepMotionDuration * 3 seconds
+        # STEP 7e: Wait for CurrentState to be updated
         self.step("7e")
-        time.sleep(step_motion_duration * 3)
+        expected_position = max(max_position - 3 * step_value, min_position)
+        sub_handler.await_all_expected_report_matches(
+            expected_matches=[current_position_matcher(expected_position)], timeout_sec=timeout)
 
-        # STEP 7f: Verify CurrentState attribute is updated after multiple steps
-        self.step("7f")
-        if attributes.CurrentState.attribute_id in attribute_list:
-            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            expected_position = max(max_position - 3 * step_value, min_position)
-            asserts.assert_equal(current_state.position, expected_position, "CurrentState Position is not updated correctly")
-
-            if is_latching_supported:
-                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
-
-        # STEP 8a: Send Step command to decrease position beyond MinPosition
+        # STEP 8a: Read CurrentState attribute
         self.step("8a")
+        initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+
+        # STEP 8b: Send Step command to decrease position beyond MinPosition
+        self.step("8b")
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
@@ -440,28 +388,20 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 8b: Verify Target attribute is at MinPosition
-        self.step("8b")
+        # STEP 8c: Verify Target attribute is at MinPosition
+        self.step("8c")
         if attributes.Target.attribute_id in attribute_list:
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             asserts.assert_equal(target.position, min_position, "Target Position is not at MinPosition")
 
-        # STEP 8c: Wait for PIXIT.CLDIM.FullMotionDuration seconds
-        self.step("8c")
-        time.sleep(full_motion_duration)
-
-        # STEP 8d: Verify CurrentState attribute is at MinPosition
+        # STEP 8d: Wait for CurrentState to be updated
         self.step("8d")
-        if attributes.CurrentState.attribute_id in attribute_list:
-            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            asserts.assert_equal(current_state.position, min_position, "CurrentState Position is not at MinPosition")
-
-            if is_latching_supported:
-                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
+        if initial_state.Position == min_position:
+            logging.info("Initial position == MinPosition. Skipping step 8d.")
+            self.mark_current_step_skipped()
+        else:
+            sub_handler.await_all_expected_report_matches(
+                expected_matches=[current_position_matcher(min_position)], timeout_sec=timeout)
 
         # STEP 8e: Send Step command to increase position beyond MaxPosition
         self.step("8e")
@@ -482,22 +422,10 @@ class TC_CLDIM_4_1(MatterBaseTest):
             target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
             asserts.assert_equal(target.position, max_position, "Target Position is not at MaxPosition")
 
-        # STEP 8g: Wait for PIXIT.CLDIM.FullMotionDuration seconds
+        # STEP 8g: Wait for CurrentState to be updated
         self.step("8g")
-        time.sleep(full_motion_duration)
-
-        # STEP 8h: Verify CurrentState attribute is at MaxPosition
-        self.step("8h")
-        if attributes.CurrentState.attribute_id in attribute_list:
-            current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
-            asserts.assert_equal(current_state.position, max_position, "CurrentState Position is not at MaxPosition")
-
-            if is_latching_supported:
-                asserts.assert_equal(current_state.latch, False, "CurrentState Latch is not False")
-
-            if is_speed_supported:
-                asserts.assert_greater_equal(current_state.speed, 0, "CurrentState Speed is outside allowed range")
-                asserts.assert_less_equal(current_state.speed, 3, "CurrentState Speed is outside allowed range")
+        sub_handler.await_all_expected_report_matches(
+            expected_matches=[current_position_matcher(max_position)], timeout_sec=timeout)
 
 
 if __name__ == "__main__":
