@@ -1261,9 +1261,6 @@ class ChipDeviceControllerBase():
             timeoutMs (Optional[int]): Optional timeout in milliseconds.
 
         Returns:
-            CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device
-
-        Returns:
             DeviceProxyWrapper on success, if not is None.
         '''
         self.CheckIsActive()
@@ -1286,7 +1283,7 @@ class ChipDeviceControllerBase():
         '''
         Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
-        Arg:
+        Args:
             nodeid (int): Target's Node ID
             allowPASE (bool): Get a device proxy of a device being commissioned.
             timeoutMs (Optional[int]): Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
