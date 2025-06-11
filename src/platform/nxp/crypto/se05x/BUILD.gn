@@ -40,8 +40,8 @@ static_library("nxp_crypto_lib") {
 
   if (!external_mbedtls) {
     public_deps = [
-      "${mbedtls_root}:mbedtls",
       "${chip_root}/src/crypto",
+      "${mbedtls_root}:mbedtls",
     ]
   }
 
