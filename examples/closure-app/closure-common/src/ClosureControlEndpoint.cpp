@@ -48,7 +48,6 @@ enum class ClosureControlTestEventTrigger : uint64_t
     // MainState Test clear Event | Returns the device to pre-test status for that test event.
     kClearEvent = 0x0104000000000004,
 
-
 };
 
 } // namespace
