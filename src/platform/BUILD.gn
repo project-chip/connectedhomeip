@@ -575,8 +575,8 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
-      "${chip_root}/src/app/common:ids",
       "${chip_root}/src/app/clusters/general-diagnostics-server:general_fault_listener_buildconfig",
+      "${chip_root}/src/app/common:ids",
       "${chip_root}/src/app/util:types",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
