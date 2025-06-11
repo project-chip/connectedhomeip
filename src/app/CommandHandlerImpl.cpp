@@ -600,16 +600,13 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
             context = "no additional context";
         }
 
-        if (status.HasClusterSpecificCode())
+        if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
         {
-            const auto clusterStatus =
-                static_cast<unsigned>(*status.GetClusterSpecificCode()); // NOLINT(bugprone-unchecked-optional-access)
-
             ChipLogError(DataManagement,
                          "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
                          " ClusterSpecificCode=%u (%s)",
                          path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                         ChipLogValueIMStatus(status.GetStatus()), clusterStatus, context);
+                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(*clusterStatus), context);
         }
         else
         {

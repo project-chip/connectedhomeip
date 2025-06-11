@@ -78,7 +78,7 @@ public:
 
     bool operator==(const ClusterStatusCode & other) const
     {
-        return (this->mStatus == other.mStatus) && (this->HasClusterSpecificCode() == other.HasClusterSpecificCode()) &&
+        return (this->mStatus == other.mStatus) && 
             (this->GetClusterSpecificCode() == other.GetClusterSpecificCode());
     }
 
@@ -141,10 +141,7 @@ public:
     /// @return the core Status code associated withi this ClusterStatusCode.
     Status GetStatus() const { return mStatus; }
 
-    /// @return true if a cluster-specific code is associated with the ClusterStatusCode.
-    bool HasClusterSpecificCode() const { return mClusterSpecificCode.has_value(); }
-
-    /// @return the cluster-specific code associated with this ClusterStatusCode or chip::NullOptional if none is associated.
+    /// @return the cluster-specific code associated with this ClusterStatusCode (std::nullopt if none is associated).
     std::optional<ClusterStatus> GetClusterSpecificCode() const
     {
         if ((mStatus != Status::Failure) && (mStatus != Status::Success))
