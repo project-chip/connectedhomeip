@@ -53,10 +53,10 @@ source_set("fabric-bridge-lib") {
   sources = [
     "BridgedAdministratorCommissioning.cpp",
     "BridgedAdministratorCommissioning.h",
-    "BridgedDeviceBasicInformationImpl.cpp",
-    "BridgedDeviceBasicInformationImpl.h",
     "BridgedDevice.cpp",
     "BridgedDevice.h",
+    "BridgedDeviceBasicInformationImpl.cpp",
+    "BridgedDeviceBasicInformationImpl.h",
     "BridgedDeviceManager.cpp",
     "BridgedDeviceManager.h",
     "RootEndpointOnlyAccessInterface.cpp",

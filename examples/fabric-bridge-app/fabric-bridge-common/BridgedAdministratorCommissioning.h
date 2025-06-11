@@ -22,7 +22,7 @@
 
 namespace bridge {
 
-// Forward declaration: AdministratorCommissioning uses the device to initialize and 
+// Forward declaration: AdministratorCommissioning uses the device to initialize and
 // handle interfaces, bridged device contains the AdministratorCommissioning
 class BridgedDevice;
 
@@ -37,15 +37,14 @@ public:
     // device. Device `GetEndpointId` MUST be set.
     //
     // Automatically registers itself to the AttributeAccessInterfaceRegistry
-    BridgedAdministratorCommissioning(BridgedDevice &device);
+    BridgedAdministratorCommissioning(BridgedDevice & device);
     virtual ~BridgedAdministratorCommissioning();
 
     /// The only AAI we support: reading some attributes
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
 
 private:
-    BridgedDevice &mDevice;
-
+    BridgedDevice & mDevice;
 };
 
 } // namespace bridge

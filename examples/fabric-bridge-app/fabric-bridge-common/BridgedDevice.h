@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <fabric-bridge-common/BridgedAdministratorCommissioning.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
+#include <fabric-bridge-common/BridgedAdministratorCommissioning.h>
 
 #include <string>
 
