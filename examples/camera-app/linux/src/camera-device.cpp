@@ -333,6 +333,9 @@ CameraDevice::CameraDevice()
 
     // Provider manager uses the Media controller to register WebRTC Transport with media controller for AV source data
     mWebRTCProviderManager.SetMediaController(&mMediaController);
+
+    // Set the CameraDevice interface in WebRTCManager
+    mWebRTCProviderManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()

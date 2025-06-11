@@ -18,16 +18,21 @@ import("//build_overrides/nlassert.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/mbedtls/mbedtls.gni")
 import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
 config("se05x_config") {
   defines = [ "SSS_USE_FTR_FILE" ]
 
-  defines += [
-    "T1oI2C",
-    "T1oI2C_UM11225",
-    "SMCOM_T1oI2C",
-  ]
+  if (chip_se05x_smcom == "vcom") {
+    defines += [ "RJCT_VCOM" ]
+  } else {
+    defines += [
+      "T1oI2C",
+      "T1oI2C_UM11225",
+      "SMCOM_T1oI2C",
+    ]
+  }
 
   # defines += ["FLOW_VERBOSE"]
 
@@ -40,7 +45,6 @@ config("se05x_config") {
   }
 
   include_dirs = [
-    "repo",
     "repo/sss/inc",
     "repo/sss/port/default",
     "repo/sss/ex/src",
@@ -52,8 +56,16 @@ config("se05x_config") {
     "repo/hostlib/hostLib/se05x_03_xx_xx",
     "repo/hostlib/hostLib/platform/inc",
     "repo/hostlib/hostLib/libCommon/smCom",
+    "repo/hostlib/hostLib/libCommon/smCom/T1oI2C",
+    "repo/hostlib/hostLib/accessManager/inc",
   ]
-  include_dirs += [ "repo/hostlib/hostLib/libCommon/smCom/T1oI2C" ]
+
+  if (chip_se05x_auth == "scp03") {
+    include_dirs += [ "repo/scp03_ftr" ]
+  } else {
+    include_dirs += [ "repo" ]
+  }
+
   if (chip_device_platform == "k32w0") {
     include_dirs += [
       "repo/demos/ksdk/common/boards/DK6/wireless_examples/chip",
@@ -71,7 +83,6 @@ static_library("se05x") {
     "repo/hostlib/hostLib/libCommon/infra/sm_printf.c",
     "repo/hostlib/hostLib/libCommon/log/nxLog.c",
     "repo/hostlib/hostLib/libCommon/smCom/smCom.c",
-    "repo/hostlib/hostLib/platform/rsp/se05x_reset.c",
     "repo/hostlib/hostLib/se05x/src/se05x_ECC_curves.c",
     "repo/hostlib/hostLib/se05x/src/se05x_mw.c",
     "repo/hostlib/hostLib/se05x/src/se05x_tlv.c",
@@ -91,12 +102,30 @@ static_library("se05x") {
     "repo/sss/src/se05x/fsl_sss_se05x_policy.c",
   ]
 
-  sources += [
-    "repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEsePal_i2c.c",
-    "repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEseProto7816_3.c",
-    "repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEse_Api.c",
-    "repo/hostlib/hostLib/libCommon/smCom/smComT1oI2C.c",
-  ]
+  if (chip_se05x_auth == "scp03") {
+    sources += [
+      "repo/hostlib/hostLib/libCommon/nxScp/nxScp03_Com.c",
+      "repo/sss/ex/src/ex_sss_scp03_auth.c",
+      "repo/sss/src/se05x/fsl_sss_se05x_eckey.c",
+      "repo/sss/src/se05x/fsl_sss_se05x_scp03.c",
+    ]
+    public_deps = [ "${mbedtls_root}:mbedtls" ]
+  }
+
+  if (chip_se05x_smcom == "vcom") {
+    sources += [
+      "repo/hostlib/hostLib/libCommon/smCom/smComSerial_PCLinux.c",
+      "repo/hostlib/hostLib/libCommon/smCom/smComSocket_fd.c",
+    ]
+  } else {
+    sources += [
+      "repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEsePal_i2c.c",
+      "repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEseProto7816_3.c",
+      "repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEse_Api.c",
+      "repo/hostlib/hostLib/libCommon/smCom/smComT1oI2C.c",
+      "repo/hostlib/hostLib/platform/rsp/se05x_reset.c",
+    ]
+  }
 
   if (chip_device_platform == "k32w0") {
     sources += [
@@ -104,10 +133,14 @@ static_library("se05x") {
       "repo/hostlib/hostLib/platform/ksdk/timer_kinetis_freertos.c",
     ]
   } else if (chip_device_platform == "linux") {
-    sources += [
-      "repo/hostlib/hostLib/platform/generic/sm_timer.c",
-      "repo/hostlib/hostLib/platform/linux/i2c_a7.c",
-    ]
+    if (chip_se05x_smcom == "vcom") {
+      sources += [ "repo/hostlib/hostLib/platform/generic/sm_timer.c" ]
+    } else {
+      sources += [
+        "repo/hostlib/hostLib/platform/generic/sm_timer.c",
+        "repo/hostlib/hostLib/platform/linux/i2c_a7.c",
+      ]
+    }
   }
 
   public_configs = [ ":se05x_config" ]
