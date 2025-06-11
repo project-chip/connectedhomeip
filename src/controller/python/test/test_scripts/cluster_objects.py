@@ -204,6 +204,26 @@ class ClusterObjectTests:
 
     @ classmethod
     @ base.test_case
+    async def TestSubscribeStillActive(cls, devCtrl):
+        logger.info("Test Subscription Still Active")
+        sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], reportInterval=(3, 10))
+        is_active = False
+
+        def subStillActive(transaction: SubscriptionTransaction):
+            nonlocal is_active
+            logger.info(
+                f"Subscription: 0x{transaction.subscriptionId:08x} still active.")
+            is_active = True
+        sub.SetSubscriptionStillActiveCallback(subStillActive)
+        await asyncio.sleep(5)
+
+        if not is_active:
+            raise AssertionError("Did not receive subscription still active notification.")
+
+        sub.Shutdown()
+
+    @ classmethod
+    @ base.test_case
     async def TestAttributeCacheAttributeView(cls, devCtrl):
         logger.info("Test AttributeCache Attribute-View")
         sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=False, reportInterval=(3, 10))
@@ -720,6 +740,7 @@ class ClusterObjectTests:
             await cls.TestReadAttributeRequests(devCtrl)
             await cls.TestSubscribeZeroMinInterval(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
+            await cls.TestSubscribeStillActive(devCtrl)
             await cls.TestAttributeCacheAttributeView(devCtrl)
             await cls.TestAttributeCacheClusterView(devCtrl)
             await cls.TestMixedReadAttributeAndEvents(devCtrl)
