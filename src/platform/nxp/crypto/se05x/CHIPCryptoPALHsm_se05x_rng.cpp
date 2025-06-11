@@ -114,7 +114,7 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 
     ChipLogDetail(Crypto, "se05x::Random number generation using se05x");
 
-    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     status = sss_rng_context_init(&ctx_rng, &gex_sss_chip_ctx.session /* Session */);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
