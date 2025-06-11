@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <fabric-bridge-common/BridgedAdministratorCommissioning.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
 
@@ -81,6 +82,9 @@ public:
     /// is one of the few attributes that is not always bulk-set
     void SetUniqueId(const std::string & value) { mAttributes.uniqueId = value; }
 
+    /// Register additional clusters on `GetEndpointId` to handle this device
+    void RegisterClusters();
+
 protected:
     bool mReachable = false;
     bool mIsIcd     = false;
@@ -91,6 +95,7 @@ protected:
 
     BridgedAttributes mAttributes;
     AdminCommissioningAttributes mAdminCommissioningAttributes;
+    std::unique_ptr<BridgedAdministratorCommissioning> mAdministratorCommissioningCluster;
 };
 
 } // namespace bridge
