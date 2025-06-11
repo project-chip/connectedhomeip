@@ -53,7 +53,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             TestStep("2a", "Read feature map determine supported features"),
             TestStep("2b", "Read attribute list to determine supported attributes"),
             TestStep(3, "Read CurrentState attribute, if supported"),
-            TestStep(4, "Read Target attribute, if supported"),
+            TestStep(4, "Read TargetState attribute, if supported"),
             TestStep(5, "Read Resolution attribute, if supported"),
             TestStep(6, "Read StepValue attribute, if supported"),
             TestStep(7, "Read Unit attribute, if supported"),
@@ -111,19 +111,19 @@ class TC_CLDIM_2_1(MatterBaseTest):
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
 
-        # STEP 4: Read Target attribute
+        # STEP 4: Read TargetState attribute
         self.step(4)
-        if attributes.Target.attribute_id in attribute_list:
-            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            if target is not NullValue:
+        if attributes.TargetState.attribute_id in attribute_list:
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            if target_state is not NullValue:
                 if is_positioning_supported:
-                    asserts.assert_true(target.position is NullValue or (0 <= target.position <= 10000),
+                    asserts.assert_true(target_state.position is NullValue or (0 <= target_state.position <= 10000),
                                         "Position is not NullValue or not in the expected range")
                 if is_latching_supported:
-                    asserts.assert_true(isinstance(target.latch, bool) or target.latch is NullValue,
+                    asserts.assert_true(isinstance(target_state.latch, bool) or target_state.latch is NullValue,
                                         "Latch is not a boolean or NullValue")
                 if is_speed_supported:
-                    asserts.assert_true(target.speed is NullValue or (0 <= target.speed <= 3),
+                    asserts.assert_true(target_state.speed is NullValue or (0 <= target_state.speed <= 3),
                                         "Speed is not NullValue or in the expected range")
         else:
             logging.info("Test step skipped")
