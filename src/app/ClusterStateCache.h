@@ -84,17 +84,17 @@ public:
         /*
          * Called anytime an attribute value has changed in the cache
          */
-        virtual void OnAttributeChanged(ClusterStateCacheT * cache, const ConcreteAttributePath & path) {};
+        virtual void OnAttributeChanged(ClusterStateCacheT * cache, const ConcreteAttributePath & path){};
 
         /*
          * Called anytime any attribute in a cluster has changed in the cache
          */
-        virtual void OnClusterChanged(ClusterStateCacheT * cache, EndpointId endpointId, ClusterId clusterId) {};
+        virtual void OnClusterChanged(ClusterStateCacheT * cache, EndpointId endpointId, ClusterId clusterId){};
 
         /*
          * Called anytime an endpoint was added to the cache
          */
-        virtual void OnEndpointAdded(ClusterStateCacheT * cache, EndpointId endpointId) {};
+        virtual void OnEndpointAdded(ClusterStateCacheT * cache, EndpointId endpointId){};
     };
 
     /**
@@ -111,7 +111,9 @@ public:
 
     template <bool DataCachingEnabled = CanEnableDataCaching, std::enable_if_t<DataCachingEnabled, bool> = true>
     ClusterStateCacheT(Callback & callback, Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing(),
-                       bool cacheData = true) : mCallback(callback), mBufferedReader(*this), mCacheData(cacheData)
+                       bool cacheData = true) :
+        mCallback(callback),
+        mBufferedReader(*this), mCacheData(cacheData)
     {
         mHighestReceivedEventNumber = highestReceivedEventNumber;
     }
@@ -706,6 +708,6 @@ private:
 using ClusterStateCache       = ClusterStateCacheT<true>;
 using ClusterStateCacheNoData = ClusterStateCacheT<false>;
 
-}; // namespace app
-}; // namespace chip
+};     // namespace app
+};     // namespace chip
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
