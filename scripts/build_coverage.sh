@@ -230,13 +230,11 @@ lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
-    --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_test.info"
 
 lcov --ignore-errors format,unsupported,inconsistent \
     --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
-    --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_final.info"
 
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
