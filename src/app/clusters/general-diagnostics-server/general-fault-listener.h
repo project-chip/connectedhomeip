@@ -38,9 +38,9 @@ public:
 
 #if ENABLE_GENERAL_DIAGNOSTICS_ON_DEVICE_REBOOT
     /**
-      * @brief
-      *   Called after the current device is rebooted.
-      */
+     * @brief
+     *   Called after the current device is rebooted.
+     */
     virtual void OnDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason) = 0;
 
     static void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason)
