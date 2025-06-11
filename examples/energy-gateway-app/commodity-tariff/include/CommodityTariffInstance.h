@@ -45,6 +45,7 @@ public:
                                                                    Structs::TariffComponentStruct::Type & aTariffComponent) override;
     CHIP_ERROR LoadTariffData(const Json::Value & value);
 
+    bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) override;
 };
 
 class CommodityTariffInstance : public Instance

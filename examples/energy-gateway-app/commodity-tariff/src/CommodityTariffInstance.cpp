@@ -407,6 +407,106 @@ CHIP_ERROR CommodityTariffDelegate::LoadTariffData(const Json::Value& root)
     return err;
 }
 
+bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
+{
+
+    if (!GetTariffInfo_MgmtObj().IsValid())
+    {
+        ChipLogError(NotSpecified, "TariffInfo not present!");
+        return false;
+    }
+    else if (GetDayEntries_MgmtObj().IsValid())
+    {
+        ChipLogError(NotSpecified, "DayEntries not present!");
+        return false;
+    }
+    else if (GetTariffComponents_MgmtObj().IsValid())
+    {
+        ChipLogError(NotSpecified, "TariffComponents not present!");
+        return false;
+    }
+    else if (GetTariffPeriods_MgmtObj().IsValid())
+    {
+        ChipLogError(NotSpecified, "TariffPeriods not present!");
+        return false;
+    }
+
+    assert(!UpdCtx.DayEntryKeyIDs.empty());
+    assert(!UpdCtx.TariffComponentKeyIDs.empty());
+
+    assert(!UpdCtx.TariffPeriodsDayEntryIDs.empty());        // Something went wrong if TariffPeriods has no DayEntries IDs
+    assert(!UpdCtx.TariffPeriodsTariffComponentIDs.empty()); // Something went wrong if TariffPeriods has no TariffComponents IDs
+
+    // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
+    for (const auto & item : UpdCtx.TariffPeriodsDayEntryIDs)
+    {
+        if (!UpdCtx.DayEntryKeyIDs.count(item))
+        {
+            return false; // The item not found in original list
+        }
+    }
+
+    // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
+    for (const auto & item : UpdCtx.TariffPeriodsTariffComponentIDs)
+    {
+        if (!UpdCtx.TariffComponentKeyIDs.count(item))
+        {
+            return false; // The item not found in original list
+        }
+    }
+
+    if (GetDayPatterns_MgmtObj().IsValid())
+    {
+        assert(!UpdCtx.DayPatternKeyIDs.empty());
+        assert(!UpdCtx.DayPatternsDayEntryIDs.empty()); // Something went wrong if DP has no DE IDs
+
+        // Checks that all DP_DEs are in main DE list:
+        for (const auto & item : UpdCtx.DayPatternsDayEntryIDs)
+        {
+            if (!UpdCtx.DayEntryKeyIDs.count(item))
+            {
+                return false; // The item not found in original list
+            }
+        }
+    }
+
+    if (GetIndividualDays_MgmtObj().IsValid())
+    {
+        assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
+
+        // Checks that all ID_DE_IDs are in main DE list:
+        for (const auto & item : UpdCtx.IndividualDaysDayEntryIDs)
+        {
+            if (!UpdCtx.DayEntryKeyIDs.count(item))
+            {
+                return false; // The item not found in original list
+            }
+
+            if (UpdCtx.DayPatternsDayEntryIDs.count(item))
+            {
+                return false; // If same item from ID list has found in DP list
+            }
+        }
+    }
+
+    //
+    if (GetCalendarPeriods_MgmtObj().IsValid())
+    {
+        assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
+
+        // Checks that all ID_DE_IDs are in main DE list:
+        for (const auto & item : UpdCtx.CalendarPeriodsDayPatternIDs)
+        {
+            if (!UpdCtx.DayPatternKeyIDs.count(item))
+            {
+                return false; // The item not found in original list
+            }
+        }
+    }
+
+    return true;
+}
+
 Status CommodityTariffDelegate::GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId, DayEntryStructType & aDayEntry)
 {
     return Status::Success;
