@@ -104,7 +104,6 @@ class TC_CLDIM_3_2(MatterBaseTest):
         attributes = Clusters.ClosureDimension.Attributes
 
         # Default values
-        min_position = 0
         max_position = 10000
 
         # STEP 2a: Read feature map and determine supported features
@@ -113,7 +112,6 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
-        is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: If MotionLatching Feature is not supported, skip remaining steps
         self.step("2b")
@@ -130,7 +128,6 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("2d")
         if attributes.LimitRange.attribute_id in attribute_list:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
-            min_position = limit_range.min
             max_position = limit_range.max
 
         # STEP 2e: Read LatchControlModes attribute
