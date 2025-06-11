@@ -139,7 +139,7 @@ void InitChefMicrowaveOvenControlCluster()
                gMicrowaveOvenDevice[epIndex]->MicrowaveOvenInit();
            }
        }
-   }   
+   }
 }
 
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
