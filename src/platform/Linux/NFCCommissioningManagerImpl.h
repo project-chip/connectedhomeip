@@ -33,6 +33,8 @@
 #include <queue>
 #include <thread>
 #include <winscard.h>
+#include <lib/support/Span.h>
+#include <cstring>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
@@ -47,26 +49,46 @@ class NFCMessage
 {
 private:
     // Pointer to the NFC Tag instance to communicate with
-    TagInstance * pTagInstance;
+    TagInstance * mTagInstance;
 
-    uint8_t * pMessage;
-    size_t messageSize = 0;
+    // Data to send to the NFC Tag
+    chip::ByteSpan mDataToSend;
+
+    // Dynamically allocated buffer to store the duplicated message data
+    std::unique_ptr<uint8_t[]> mDataToSendBuffer;
+
+    bool mIsMessageValid = false;
 
 public:
-    NFCMessage(TagInstance * instance, System::PacketBufferHandle && msgBuf) : pTagInstance(instance)
+    NFCMessage(TagInstance * instance, System::PacketBufferHandle && msgBuf) : mTagInstance(instance)
     {
-        messageSize = msgBuf->DataLength();
-        pMessage    = new uint8_t[messageSize];
-        std::memcpy(pMessage, msgBuf->Start(), messageSize);
+        // Duplicate the data from the PacketBufferHandle
+        size_t dataSize = msgBuf->DataLength();
+        mDataToSendBuffer.reset(new (std::nothrow) uint8_t[dataSize]);
+
+        if (mDataToSendBuffer != nullptr)
+        {
+            std::memcpy(mDataToSendBuffer.get(), msgBuf->Start(), dataSize);
+
+            // Initialize mDataToSend ByteSpan to point to the duplicated buffer
+            mDataToSend = chip::ByteSpan(mDataToSendBuffer.get(), dataSize);
+
+            mIsMessageValid = true;
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to allocate memory for NFCMessage");
+            mIsMessageValid = false;
+        }
     }
 
-    ~NFCMessage() { delete[] pMessage; }
+    ~NFCMessage() = default;
 
-    TagInstance * GetTagInstance() { return pTagInstance; }
+    TagInstance * GetTagInstance() { return mTagInstance; }
 
-    uint8_t * GetMessage() { return pMessage; }
+    chip::ByteSpan GetDataToSend() { return mDataToSend; }
 
-    size_t GetMessageSize() { return messageSize; }
+    bool IsMessageValid() const { return mIsMessageValid; }
 };
 
 /**
@@ -118,6 +140,9 @@ private:
 
     // Private methods
     void NfcThreadMain();
+    // message MUST be created with 'new'.
+    // This function then takes ownership of the message (and will call
+    //  "delete" when the message is not needed anymore)
     void EnqueueMessage(NFCMessage * message);
 };
 

@@ -72,6 +72,9 @@ static SCARD_IO_REQUEST pioSendPci;
 class TagInstance
 {
 private:
+    static constexpr uint32_t kMagicNumber = 0xDEADBEEF;
+
+    uint32_t mMagicNumber;
     Transport::NFCBase * nfcBase;
     const Transport::PeerAddress peerAddress;
     char * readerName;
@@ -95,6 +98,7 @@ public:
     {
         readerName    = strdup(name); // Allocate memory and copy the string
         discriminator = 0;            // Will be retrieved when RetrieveDiscriminator() is called
+        mMagicNumber  = kMagicNumber;
 
         memset(mAPDUTxBuffer, 0, sizeof(mAPDUTxBuffer));
         memset(mAPDURxBuffer, 0, sizeof(mAPDURxBuffer));
@@ -107,6 +111,12 @@ public:
         {
             free(readerName);
         }
+        mMagicNumber = 0; // Invalidate the magic number
+    }
+
+    bool IsValid() const
+    {
+        return mMagicNumber == kMagicNumber;
     }
 
     void Print()
@@ -149,12 +159,12 @@ public:
     //
     // When the tag's response is fully received, OnNfcTagResponse() notification
     // will be called.
-    void SendChainedAPDUs(uint8_t * pMessage, size_t messageSize)
+    void SendChainedAPDUs(ByteSpan dataToSend)
     {
         CHIP_ERROR res;
-        uint32_t totalLength         = static_cast<uint32_t>(messageSize);
-        uint32_t nbrOfBytesRemaining = static_cast<uint32_t>(messageSize);
-        uint8_t * pNextDataToSend    = pMessage;
+        uint32_t totalLength         = static_cast<uint32_t>(dataToSend.size());
+        uint32_t nbrOfBytesRemaining = static_cast<uint32_t>(dataToSend.size());
+        const uint8_t* pNextDataToSend = dataToSend.data();
 
         while (nbrOfBytesRemaining > 0)
         {
@@ -404,7 +414,7 @@ public:
 
     /////////////////////////////////////////////////////////////////
 
-    CHIP_ERROR SendTransportAPDU(uint8_t * dataToSend, uint32_t dataToSendLength, bool isLastBlock, uint32_t totalLength,
+    CHIP_ERROR SendTransportAPDU(const uint8_t * dataToSend, uint32_t dataToSendLength, bool isLastBlock, uint32_t totalLength,
                                  uint8_t * pRcvBuffer, uint32_t * pRcvLength)
     {
 
@@ -518,7 +528,7 @@ void NFCCommissioningManagerImpl::_Shutdown()
     {
         std::lock_guard<std::mutex> lock(mQueueMutex);
         mThreadRunning = false;
-        mQueueCondition.notify_all();
+        mQueueCondition.notify_one();
     }
 
     if (mNfcThread.joinable())
@@ -609,7 +619,12 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
     VerifyOrReturnLogError(pTargetedTagInstance != nullptr, CHIP_ERROR_PEER_NODE_NOT_FOUND);
 
     NFCMessage * nfcMessage = new (std::nothrow) NFCMessage(pTargetedTagInstance, std::move(msgBuf));
-    VerifyOrReturnLogError(((nfcMessage != nullptr) && (nfcMessage->GetMessage() != nullptr)), CHIP_ERROR_NO_MEMORY);
+    if ((nfcMessage == nullptr) || (!nfcMessage->IsMessageValid()))
+    {
+        ChipLogError(DeviceLayer, "Invalid NFCMessage!");
+        delete nfcMessage;
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
     // Enqueue the message for processing in the NFC thread
     EnqueueMessage(nfcMessage);
@@ -640,9 +655,17 @@ void NFCCommissioningManagerImpl::NfcThreadMain()
         // Process the message
         if (message != nullptr)
         {
-            uint8_t * pMessage = message->GetMessage();
-            size_t messageSize = message->GetMessageSize();
-            message->GetTagInstance()->SendChainedAPDUs(pMessage, messageSize);
+            TagInstance * tagInstance = message->GetTagInstance();
+            if (tagInstance == nullptr || !tagInstance->IsValid())
+            {
+                ChipLogError(DeviceLayer, "Invalid TagInstance detected. Discarding message.");
+                delete message; // Clean up the invalid message
+                continue;       // Skip processing this message
+            }
+
+            // Process the message
+            ByteSpan dataToSend = message->GetDataToSend();
+            tagInstance->SendChainedAPDUs(dataToSend);
 
             // Clean up the message after processing
             delete message;
