@@ -24,7 +24,6 @@
 #include "webrtc-provider-manager.h"
 
 #include "default-media-controller.h"
-#include "network-stream-source.h"
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <gst/gst.h>
@@ -227,9 +226,6 @@ private:
 
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
-
-    NetworkStreamSource mNetworkVideoSource;
-    NetworkStreamSource mNetworkAudioSource;
 
     DefaultMediaController mMediaController;
 
