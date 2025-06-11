@@ -143,7 +143,7 @@ class TC_OPSTATE_BASE():
             found = next((mydevice for mydevice in mandatedevicetypes if mydevice["devicetype"] == device.deviceType), None)
             if found is not None:
                 logging.info("Found matching device type for OpCompletion Event mandate %s", found["devicetype"])
-                if found["revision"] == device.revision:
+                if found["revision"] <= device.revision:
                     logging.info("Revision matches")
                     return True
                 else:
