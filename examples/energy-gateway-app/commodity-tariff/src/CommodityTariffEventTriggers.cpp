@@ -88,7 +88,7 @@ exit:
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
-    CommodityTariffInstance * dg = GetCommodityTariffInstance();
+    CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
 
     if (const char* preset = TariffPresets::GetPreset(presetIndex))
     {

@@ -33,18 +33,18 @@
  using namespace chip::app::Clusters::CommodityTariff;
  
  static std::unique_ptr<CommodityTariffInstance> gCommodityTariffInstance;
- static std::unique_ptr<CommodityTariffInstance> gCommodityTariffInstance;
+ static std::unique_ptr<CommodityTariffDelegate> gCommodityTariffDelegate;
  
  CommodityTariffInstance * CommodityTariff::GetCommodityTariffInstance()
  {
      return gCommodityTariffInstance.get();
  }
 
- CommodityTariffInstance * CommodityTariff::GetCommodityTariffInstance()
+ CommodityTariffDelegate * CommodityTariff::GetCommodityTariffDelegate()
  {
      CommodityTariffInstance * mInst = GetCommodityTariffInstance();
      VerifyOrDieWithMsg(mInst != nullptr, AppServer, "CommodityTariffInstance is null");
-     CommodityTariffInstance * dg = mInst->GetDelegate();
+     CommodityTariffDelegate * dg = mInst->GetDelegate();
      VerifyOrDieWithMsg(dg != nullptr, AppServer, "CommodityTariffInstance is null");
  
      return dg;
@@ -54,21 +54,22 @@
  {
      CHIP_ERROR err;
  
-     if (gCommodityTariffInstance || gCommodityTariffInstance)
+     if (gCommodityTariffInstance || gCommodityTariffDelegate)
      {
          ChipLogError(AppServer, "Commodity Tariff Instance or Delegate already exist.");
          return CHIP_ERROR_INCORRECT_STATE;
      }
  
-     gCommodityTariffInstance = std::make_unique<CommodityTariffInstance>();
-     if (!gCommodityTariffInstance)
+     gCommodityTariffDelegate = std::make_unique<CommodityTariffDelegate>();
+     if (!gCommodityTariffDelegate)
      {
          ChipLogError(AppServer, "Failed to allocate memory for CommodityTariffInstance");
          return CHIP_ERROR_NO_MEMORY;
      }
+
      /* Manufacturer may optionally not support all features, commands & attributes */
      gCommodityTariffInstance =
-         std::make_unique<CommodityTariffInstance>(EndpointId(endpointId), *gCommodityTariffInstance,
+         std::make_unique<CommodityTariffInstance>(EndpointId(endpointId), *gCommodityTariffDelegate,
                                                   BitMask<CommodityTariff::Feature, uint32_t>(
                                                     CommodityTariff::Feature::kPricing,
                                                     CommodityTariff::Feature::kFriendlyCredit,
@@ -90,7 +91,7 @@
      {
          ChipLogError(AppServer, "Init failed on gCommodityTariffInstance");
          gCommodityTariffInstance.reset();
-         gCommodityTariffInstance.reset();
+         gCommodityTariffDelegate.reset();
          return err;
      }
  
@@ -109,9 +110,9 @@
          gCommodityTariffInstance.reset();
      }
  
-     if (gCommodityTariffInstance)
+     if (gCommodityTariffDelegate)
      {
-         gCommodityTariffInstance.reset();
+         gCommodityTariffDelegate.reset();
      }
  
      return CHIP_NO_ERROR;
