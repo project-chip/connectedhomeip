@@ -522,24 +522,20 @@ self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
 In the case that a test script requires the use of named-pipe commands to
 achieve the manual steps, you can use the method `write_to_app_pipe(command,app_pipe)` to send
-these commands. This method requires value for `app_pipe`, if not sent in the method it will use 
-argument from the CMD or CI argument `--app-pipe` which contains the
-string value with the name of the pipe. This value depends on how the app is set up.
+these commands. This method requires value for `app_pipe`, if is not provided in the method it will use
+argument from the CMD or CI argument `--app-pipe` which must contain the
+string value with path of the pipe. This value depends on how the --app-pipe in the app is set up.
 
-If you would like the name of the app_pipe to be dynamic you need to send the app-id to the application 
-and send the full path which includes the app-id to the test script.
+Note: The name of the pipe can be anything while is a valid file path.
 
+Example of usage:
 
-Default without `--app-id`
 ```bash
-./out/darwin-arm64-all-clusters/chip-all-clusters-app
-python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/chip_all_clusters_fifo_  --int-arg PIXIT.REFALM.AlarmThreshold:1
-```
+First run the app with the desired app-pipe path:
+./out/darwin-arm64-all-clusters/chip-all-clusters-app --app-pipe  /tmp/ref_alm_2_2
 
-Using custom `--app-id`.
-```bash
-./out/darwin-arm64-all-clusters/chip-all-clusters-app --app-id 9001
-python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/chip_all_clusters_fifo_9001  --int-arg PIXIT.REFALM.AlarmThreshold:1
+Then execute the test with the app-pipe argument with the value defined while running the app.
+python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/ref_alm_2_2  --int-arg PIXIT.REFALM.AlarmThreshold:1
 ```
 
 ### Running on a separate machines
