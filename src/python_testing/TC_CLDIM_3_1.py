@@ -35,8 +35,8 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import (InteractionModelError, Status)
 from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main, AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator)
@@ -67,7 +67,7 @@ def current_speed_matcher(speed: int) -> AttributeMatcher:
     return AttributeMatcher.from_callable(description=f"CurrentState.Speed is {speed}", matcher=predicate)
 
 
-def current_position_and_speed_matcher(position: int, speed: int) -> AttributeMatcher:
+def current_position_and_speed_matcher(position: int, speed: Globals.Enums.ThreeLevelAutoEnum) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
             return False
@@ -76,7 +76,7 @@ def current_position_and_speed_matcher(position: int, speed: int) -> AttributeMa
                 return True
         else:
             return False
-    return AttributeMatcher.from_callable(description=f"CurrentState.Speed is {speed}", matcher=predicate)
+    return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position} and CurrentState.Speed is {speed}", matcher=predicate)
 
 
 class TC_CLDIM_3_1(MatterBaseTest):

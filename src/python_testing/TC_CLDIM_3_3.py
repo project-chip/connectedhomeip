@@ -262,7 +262,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 sub_handler.await_all_expected_report_matches(
                     expected_matches=[current_position_matcher(0)], timeout_sec=timeout)
             else:
-                logging.info("MinPosition not > 0. Skipping step 5d.")
+                logging.info("Initial Position not > 0. Skipping step 5d.")
                 self.mark_current_step_skipped()
 
             # STEP 5e: Send SetTarget command with Position 100%
@@ -398,14 +398,14 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 7i: If not Resolution > 2: Wait for CurrentState.Position to be updated
             self.step("7i")
-            if (resolution < 2):
+            if (resolution > 2):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
                     expected_matches=[current_position_matcher(max_position)], timeout_sec=timeout)
 
             # STEP 7j: If not Resolution <= 2: Wait for CurrentState.Position to be updated
-            self.step("7f")
+            self.step("7j")
             if (resolution <= 2):
                 self.mark_current_step_skipped()
             else:
