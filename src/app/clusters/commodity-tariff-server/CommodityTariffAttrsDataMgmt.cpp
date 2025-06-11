@@ -127,27 +127,6 @@ using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 
-static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
-static constexpr size_t kDefaultListAttrMaxLength        = 128u;
-constexpr uint16_t kMaxCurrencyValue                     = 999; // From spec
-
-static constexpr size_t kTariffInfoMaxLabelLength      = kDefaultStringValuesMaxBufLength;
-static constexpr size_t kTariffInfoMaxProviderLength   = kDefaultStringValuesMaxBufLength;
-static constexpr size_t kTariffComponentMaxLabelLength = kDefaultStringValuesMaxBufLength;
-
-static constexpr size_t kDayEntriesAttrMaxLength       = kDefaultListAttrMaxLength;
-static constexpr size_t kDayPatternsAttrMaxLength      = kDefaultListAttrMaxLength;
-static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLength;
-static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
-
-// static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
-static constexpr size_t kIndividualDaysAttrMaxLength = 50;
-
-// static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
-// static constexpr size_t kDayStructItemMaxDayEntryIDs = 96;
-// static constexpr size_t kDayPatternItemMaxDayEntryIDs = kDayStructItemMaxDayEntryIDs;
-static constexpr size_t kTariffPeriodItemMaxIDs = 20;
-
 // static constexpr size_t kAuxSwitchesSettingsMax = 8;
 
 #define VerifyOrReturnError_LogSend(expr, code, ...)                                                                               \
@@ -209,6 +188,26 @@ static bool AreOptionalEqual(const Optional<T> & lhs, const Optional<T> & rhs)
 }
 
 }; // namespace CommonUtilities
+
+CHIP_ERROR TariffUnitDataClass::Validate(const ValueType & aValue) const
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StartDateDataClass::Validate(const ValueType & aValue) const
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultRandomizationOffsetDataClass::Validate(const ValueType & aValue) const
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultRandomizationTypeDataClass::Validate(const ValueType & aValue) const
+{
+    return CHIP_NO_ERROR;
+}
 
 // TariffInfoDataClass
 
@@ -381,6 +380,9 @@ static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue
 
     VerifyOrReturnError_LogSend(entryNewValue.daysOfWeek.HasAny(), CHIP_ERROR_INVALID_ARGUMENT,
                                 "The daysOfWeek must have least one bit set!");
+
+    if (entryNewValue.dayEntryIDs.empty() || entryNewValue.dayEntryIDs.size() > kDayPatternItemMaxDayEntryIDs)
+        return CHIP_ERROR_INVALID_ARGUMENT;
 
     // Check that the current day pattern item has no duplicated dayEntryIDs
     if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, seenDeIDs))
@@ -747,6 +749,9 @@ CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
         VerifyOrReturnError_LogSend(item.date > tmpDate, CHIP_ERROR_INVALID_ARGUMENT, "IndividualDays must be order by startTime");
         VerifyOrReturnError(EnsureKnownEnumValue(item.dayType) != DayTypeEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
 
+        if (item.dayEntryIDs.empty() || item.dayEntryIDs.size() > kDayStructItemMaxDayEntryIDs)
+            return CHIP_ERROR_INVALID_ARGUMENT;
+
         if (CommonUtilities::HasDuplicateIDs(item.dayEntryIDs, IndividualDaysDayEntryIDs))
         {
             err = CHIP_ERROR_DUPLICATE_KEY_ID;
@@ -777,7 +782,7 @@ CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
     uint32_t tmpStartDate                                       = 0;
     std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs = ((TariffUpdateCtx *) mAuxData)->CalendarPeriodsDayPatternIDs;
 
-    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kIndividualDaysAttrMaxLength),
+    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kCalendarPeriodsAttrMaxLength),
                                 CHIP_ERROR_INVALID_LIST_LENGTH, "Incorrect IndividualDays length");
 
     for (const auto & item : newList)
@@ -787,6 +792,9 @@ CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
             VerifyOrReturnError_LogSend(item.startDate.Value() > tmpStartDate, CHIP_ERROR_INVALID_ARGUMENT,
                                         "IndividualDays must be order by startTime");
         }
+
+        if (item.dayPatternIDs.empty() || item.dayPatternIDs.size() > kCalendarPeriodItemMaxDayPatternIDs)
+            return CHIP_ERROR_INVALID_ARGUMENT;
 
         if (CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CalendarPeriodsDayPatternIDs))
         {

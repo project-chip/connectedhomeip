@@ -26,6 +26,26 @@
 #include <cstring>
 #include <type_traits>
 
+static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
+static constexpr size_t kDefaultListAttrMaxLength        = 128u;
+constexpr uint16_t kMaxCurrencyValue                     = 999; // From spec
+
+static constexpr size_t kTariffInfoMaxLabelLength      = kDefaultStringValuesMaxBufLength;
+static constexpr size_t kTariffInfoMaxProviderLength   = kDefaultStringValuesMaxBufLength;
+static constexpr size_t kTariffComponentMaxLabelLength = kDefaultStringValuesMaxBufLength;
+
+static constexpr size_t kDayEntriesAttrMaxLength       = kDefaultListAttrMaxLength;
+static constexpr size_t kDayPatternsAttrMaxLength      = kDefaultListAttrMaxLength;
+static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLength;
+static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
+
+static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
+static constexpr size_t kIndividualDaysAttrMaxLength = 50;
+
+static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
+static constexpr size_t kDayStructItemMaxDayEntryIDs = 96;
+static constexpr size_t kDayPatternItemMaxDayEntryIDs = kDayStructItemMaxDayEntryIDs;
+static constexpr size_t kTariffPeriodItemMaxIDs = 20;
 namespace chip {
 namespace app {
 
@@ -429,7 +449,7 @@ public:
      * @pre Must be called in kIdle state
      * @post On success, transitions to kInitiated state
      */
-    CHIP_ERROR CreateNewValue(uint16_t size)
+    CHIP_ERROR CreateNewValue(size_t size)
     {
         if (mUpdateState != UpdateState::kIdle)
         {
@@ -461,14 +481,7 @@ public:
         }
         else if constexpr (IsValueNullable())
         {
-            if constexpr (IsPayloadStruct())
-            {
-                mNewValue = ValueType({ 0 });
-            }
-            else
-            {
-                mNewValue = ValueType(0);
-            }
+            mNewValue = ValueType();
         }
 
         mUpdateState = UpdateState::kInitiated;
@@ -705,6 +718,99 @@ protected:
     }
 
     virtual void CleanupStructValue(PayloadType & aValue) { (void) aValue; }
+};
+
+template <typename T>
+struct SpanCopier {
+    static bool Copy(const chip::Span<const T>& source, 
+                   DataModel::List<const T>& destination,
+                   size_t maxElements = std::numeric_limits<size_t>::max()) 
+    {
+        if (source.empty()) {
+            destination = DataModel::List<const T>();
+            return true;
+        }
+
+        size_t elementsToCopy = std::min(source.size(), maxElements);
+        auto* buffer = static_cast<T*>(chip::Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
+        
+        if (!buffer) {
+            return false;
+        }
+
+        std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
+        destination = DataModel::List<const T>(chip::Span<const T>(buffer, elementsToCopy));
+        return true;
+    }
+};
+
+template <>
+struct SpanCopier<char> {
+    static bool Copy(const chip::CharSpan& source,
+                   DataModel::Nullable<chip::CharSpan>& destination,
+                   size_t maxLength = std::numeric_limits<size_t>::max()) 
+    {
+        if (source.size() > maxLength) {
+            return false;
+        }
+
+        if (source.empty()) {
+            destination.SetNull();
+            return true;
+        }
+
+        size_t bytesToCopy = std::min(source.size(), maxLength);
+        char* buffer = static_cast<char*>(chip::Platform::MemoryCalloc(1, bytesToCopy + 1)); // +1 for null terminator
+        
+        if (!buffer) {
+            return false;
+        }
+
+        std::copy(source.begin(), source.begin() + bytesToCopy, buffer);
+        buffer[bytesToCopy] = '\0';
+        destination.SetNonNull(chip::CharSpan(buffer, bytesToCopy));
+        return true;
+    }
+};
+
+struct StrToSpan {
+    static CHIP_ERROR Copy(const std::string& source,
+                         chip::CharSpan& destination,
+                         size_t maxLength = std::numeric_limits<size_t>::max())
+    {
+        // Handle empty string case
+        if (source.empty()) {
+            destination = chip::CharSpan();
+            return CHIP_NO_ERROR;
+        }
+
+        // Check length limit
+        if (source.size() > maxLength) {
+            return CHIP_ERROR_INVALID_STRING_LENGTH;
+        }
+
+        // Allocate memory (including null terminator)
+        char* buffer = static_cast<char*>(chip::Platform::MemoryAlloc(source.size() + 1));
+        if (buffer == nullptr) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        // Copy data and null-terminate
+        memcpy(buffer, source.data(), source.size());
+        buffer[source.size()] = '\0';
+
+        // Set output span
+        destination = chip::CharSpan(buffer, source.size());
+        return CHIP_NO_ERROR;
+    }
+
+    // Optional: Memory cleanup helper
+    static void Release(chip::CharSpan& span) {
+        if (!span.empty()) {
+            chip::Platform::MemoryFree(const_cast<char*>(span.data()));
+            span = chip::CharSpan();
+        }
+    }
 };
 
 } // namespace app

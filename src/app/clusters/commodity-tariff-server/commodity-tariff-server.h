@@ -144,7 +144,7 @@ COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
     public:                                                                                                                        \
         attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}    \
         ~attrName##DataClass() override = default;                                                                                 \
-                                                                                                                                   \
+        void CleanupExtEntry(PayloadType & entry) { CleanupStructValue(entry); }                                                    \
     protected:                                                                                                                     \
         CHIP_ERROR Validate(const ValueType & aValue) const override;                                                              \
         bool CompareStructValue(const PayloadType & source, const PayloadType & destination) const override;                       \
@@ -252,19 +252,23 @@ public:
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
+#define X(attrName, attrType)  attrName##DataClass & Get##attrName##_MgmtObj() { return m##attrName##_MgmtObj; }
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+
+    void CleanupTariffData()
+    {
+#define X(attrName, attrType) m##attrName##_MgmtObj.Cleanup();
+    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+#undef X
+    }
+
 private:
     // Primary attribute storage and management
 #define X(attrName, attrType) attrType m##attrName;             \
     attrName##DataClass m##attrName##_MgmtObj{ m##attrName };
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
-
-    void CleanupTariffAttrs()
-    {
-#define X(attrName, attrType) m##attrName##_MgmtObj.Cleanup();
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
-    }
 
     static void TariffDataUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx)
     {
@@ -327,7 +331,7 @@ public:
      * @param aProvider The data provider delegate
      * @param aFeature Bitmask of supported features
      */
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
         mDelegate(aDelegate), mFeature(aFeature)
     {
