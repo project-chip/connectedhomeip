@@ -18,9 +18,13 @@ import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   enable_general_diagnostics_on_device_reboot = true
-  enable_general_diagnostics_on_hardware_faults_detect = chip_device_platform=="linux" || chip_device_platform == "cyw30739" || chip_device_platform == "qpg"
-  enable_general_diagnostics_on_radio_faults_detect = chip_device_platform=="linux" || chip_device_platform == "qpg"
-  enable_general_diagnostics_on_network_faults_detect = chip_device_platform=="linux" || chip_device_platform == "qpg"
+  enable_general_diagnostics_on_hardware_faults_detect =
+      chip_device_platform == "linux" || chip_device_platform == "cyw30739" ||
+      chip_device_platform == "qpg"
+  enable_general_diagnostics_on_radio_faults_detect =
+      chip_device_platform == "linux" || chip_device_platform == "qpg"
+  enable_general_diagnostics_on_network_faults_detect =
+      chip_device_platform == "linux" || chip_device_platform == "qpg"
 }
 
 buildconfig_header("general_fault_listener_buildconfig") {
