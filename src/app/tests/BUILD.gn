@@ -348,7 +348,10 @@ chip_test_suite("tests") {
     ]
   } else if (!chip_fake_platform) {
     test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
-    public_deps += [ ":thread-border-router-management-test-srcs" ]
+    public_deps += [
+      ":thread-border-router-management-test-srcs",
+      "${chip_root}/src/app/clusters/general-commissioning-server:test-only-temporary-coupling",
+    ]
   }
 
   if (!chip_fake_platform) {
