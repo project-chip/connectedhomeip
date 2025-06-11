@@ -207,20 +207,22 @@ class ClusterObjectTests:
     async def TestSubscribeStillActive(cls, devCtrl):
         logger.info("Test Subscription Still Active")
         sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], reportInterval=(3, 10))
-        is_active = False
+
+        event = asyncio.Event()
 
         def subStillActive(transaction: SubscriptionTransaction):
-            nonlocal is_active
             logger.info(
                 f"Subscription: 0x{transaction.subscriptionId:08x} still active.")
-            is_active = True
+            event.set()
+
         sub.SetSubscriptionStillActiveCallback(subStillActive)
-        await asyncio.sleep(5)
 
-        if not is_active:
+        try:
+            await asyncio.wait_for(event.wait(), timeout=11)
+        except TimeoutError:
             raise AssertionError("Did not receive subscription still active notification.")
-
-        sub.Shutdown()
+        finally:
+            sub.Shutdown()
 
     @ classmethod
     @ base.test_case
