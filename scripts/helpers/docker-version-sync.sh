@@ -22,4 +22,4 @@ sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9]+|image: ghcr.io/project-chi
 
 echo "Syncing README.md Files"
 find . -iname README.md -not -path './third_party/*' -exec \
-  sed -r -i "s|ghcr\.io/project-chip/(.*):[0-9]+|ghcr.io/project-chip/\1:$VERSION|" {} +
+    sed -r -i "s|ghcr\.io/project-chip/(.*):[0-9]+|ghcr.io/project-chip/\1:$VERSION|" {} +

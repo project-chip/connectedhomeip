@@ -57,14 +57,14 @@ sed -r -i "s|matter-dev-environment:local --version [0-9,a-z,A-Z,-]*|matter-dev-
 
 echo "Rolling docker images"
 find . -iname Dockerfile -not -path "./third_party/*" -exec \
-  sed -r -i "s|ARG VERSION=[0-9,a-z,A-Z,-]*|ARG VERSION=$NEXT_VERSION|" {} +
+    sed -r -i "s|ARG VERSION=[0-9,a-z,A-Z,-]*|ARG VERSION=$NEXT_VERSION|" {} +
 
 echo "Rolling main docker version"
 echo "$NEXT_VERSION : $ROLL_REASON" >./integrations/docker/images/base/chip-build/version
 
 echo "Rolling README.md files"
 find . -iname readme.md -not -path "./third_party/*" -exec \
-  sed -r -i "s|ghcr\.io/project-chip/(.*):[0-9]+|ghcr.io/project-chip/\1:$NEXT_VERSION|" {} +
+    sed -r -i "s|ghcr\.io/project-chip/(.*):[0-9]+|ghcr.io/project-chip/\1:$NEXT_VERSION|" {} +
 
 echo ""
 echo "Done"
