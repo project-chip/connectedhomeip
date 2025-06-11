@@ -144,7 +144,11 @@ COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
     public:                                                                                                                        \
         attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}    \
         ~attrName##DataClass() override = default;                                                                                 \
-        void CleanupExtEntry(PayloadType & entry) { CleanupStructValue(entry); }                                                    \
+        void CleanupExtEntry(PayloadType & entry)                                                                                  \
+        {                                                                                                                          \
+            CleanupStructValue(entry);                                                                                             \
+        }                                                                                                                          \
+                                                                                                                                   \
     protected:                                                                                                                     \
         CHIP_ERROR Validate(const ValueType & aValue) const override;                                                              \
         bool CompareStructValue(const PayloadType & source, const PayloadType & destination) const override;                       \
@@ -248,24 +252,27 @@ public:
     }
 
     // Attribute accessors
-#define X(attrName, attrType)  attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
+#define X(attrName, attrType)                                                                                                      \
+    attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
-#define X(attrName, attrType)  attrName##DataClass & Get##attrName##_MgmtObj() { return m##attrName##_MgmtObj; }
+#define X(attrName, attrType)                                                                                                      \
+    attrName##DataClass & Get##attrName##_MgmtObj() { return m##attrName##_MgmtObj; }
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
     void CleanupTariffData()
     {
 #define X(attrName, attrType) m##attrName##_MgmtObj.Cleanup();
-    COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
+        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
     }
 
 private:
     // Primary attribute storage and management
-#define X(attrName, attrType) attrType m##attrName;             \
+#define X(attrName, attrType)                                                                                                      \
+    attrType m##attrName;                                                                                                          \
     attrName##DataClass m##attrName##_MgmtObj{ m##attrName };
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
@@ -364,8 +371,8 @@ private:
     void HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData);
 
     // Current attributes storage
-#define X(attrName, attrType)                           \
-    attrType m##attrName;                               \
+#define X(attrName, attrType)                                                                                                      \
+    attrType m##attrName;                                                                                                          \
     attrType & Get##attrName() { return m##attrName; }
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
 #undef X
