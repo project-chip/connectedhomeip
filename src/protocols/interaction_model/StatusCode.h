@@ -78,7 +78,7 @@ public:
 
     bool operator==(const ClusterStatusCode & other) const
     {
-        return (this->mStatus == other.mStatus) && 
+        return (this->mStatus == other.mStatus) &&
             (this->GetClusterSpecificCode() == other.GetClusterSpecificCode());
     }
 
