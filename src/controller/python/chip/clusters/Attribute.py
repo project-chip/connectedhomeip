@@ -567,7 +567,7 @@ class SubscriptionTransaction:
     def SetSubscriptionStillActiveCallback(self, callback: Callable[[SubscriptionTransaction], None]):
         '''Sets the callback function for the subscription still active notification.'''
         if callback is not None:
-            self._onSubscriptionStillActiveCallback = callback
+            self._onSubscriptionStillActiveCb = callback
 
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
@@ -587,7 +587,7 @@ class SubscriptionTransaction:
 
     @property
     def OnSubscriptionStillActiveCb(self) -> Callable[[SubscriptionTransaction], None]:
-        return self._onSubscriptionStillActiveCallback
+        return self._onSubscriptionStillActiveCb
 
     def Shutdown(self):
         if self._isDone:
