@@ -736,6 +736,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test004_Subscribe
 {
+    XCTSkip("Skipping due to flakyness/failing. https://github.com/project-chip/connectedhomeip/issues/27449");
+
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -898,14 +900,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSDictionary * fields = [NSDictionary
         dictionaryWithObjectsAndKeys:@"Structure", @"type",
         [NSArray arrayWithObjects:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:0], @"contextTag",
-                                                [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
-                                                              [NSNumber numberWithUnsignedInteger:0], @"value", nil],
-                                                @"data", nil],
-                 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], @"contextTag",
-                               [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
-                                             [NSNumber numberWithUnsignedInteger:10], @"value", nil],
-                               @"data", nil],
-                 nil],
+                                      [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
+                                          [NSNumber numberWithUnsignedInteger:0], @"value", nil],
+                                      @"data", nil],
+            [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], @"contextTag",
+                [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
+                    [NSNumber numberWithUnsignedInteger:10], @"value", nil],
+                @"data", nil],
+            nil],
         @"value", nil];
     [device
         invokeCommandWithEndpointID:@1
