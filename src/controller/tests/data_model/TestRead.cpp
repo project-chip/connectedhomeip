@@ -1554,8 +1554,8 @@ TEST_F(TestRead, TestResubscribeAttributeTimeoutLITWithoutRegisteringToken)
         AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
-        readPrepareParams.mIsPeerLIT = true;
-        readPrepareParams.mRegisteredCheckInToken = false;
+        readPrepareParams.mIsPeerLIT                   = true;
+        readPrepareParams.mRegisteredCheckInToken      = false;
         attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
