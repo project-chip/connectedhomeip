@@ -411,9 +411,10 @@ void HandleSimulateConfigurationChange(void)
     }
     else
     {
-        // LevelStep in ValveConfigurationAndControl has been modified, so bump ConfigurationVersion
-        DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction(
-            InteractionModelEngine::GetInstance()->GetDataModelProvider());
+        // LevelStep in ValveConfigurationAndControl has been modified,so bump ConfigurationVersion
+        // by calling the getter function to obtain a ScopedConfigurationVersionUpdater
+        DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction =
+            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfigurationVersionUpdater();
     }
 }
 

@@ -149,6 +149,13 @@ public:
     virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & nodeDataModelConfiguration) = 0;
     virtual CHIP_ERROR ResetNodeDataModelConfigurationVersion()                                               = 0;
 
+    /// Function used to get a ScopedConfigurationVersionUpdater object to bump
+    /// the stored configuration version.
+    ScopedConfigurationVersionUpdater GetNodeDataModelConfigurationVersionUpdater()
+    {
+        return ScopedConfigurationVersionUpdater(this);
+    }
+
     // "convenience" functions that just return the data and ignore the error
     // This returns the `ReadOnlyBufferBuilder<..>::TakeBuffer` from their equivalent fuctions as-is,
     // even after an error (e.g. not found would return empty data).
