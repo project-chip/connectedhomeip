@@ -16,35 +16,34 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
- #include <app-common/zap-generated/ids/Attributes.h>
- #include <app-common/zap-generated/ids/Clusters.h>
- 
- #include <lib/support/CodeUtils.h>
- 
- #include "CommodityTariffInstance.h"
- 
- CHIP_ERROR CommodityTariffInit(chip::EndpointId endpointId);
- CHIP_ERROR CommodityTariffShutdown();
- namespace chip {
- namespace app {
- namespace Clusters {
- namespace CommodityTariff {
- 
- /** @brief Helper function to return the singleton CommodityTariffInstance instance
-  *
-  * This is needed to support TestEventTriggers which are called outside of any
-  * class context. This allows the Delegate instance in which to invoke the test
-  * events on.
-  *
-  * This function is typically found in main.cpp or wherever the singleton is created.
-  */
- CommodityTariffInstance * GetCommodityTariffInstance();
- CommodityTariffDelegate * GetCommodityTariffDelegate();
- 
- } // namespace CommodityTariff
- } // namespace Clusters
- } // namespace app
- } // namespace chip
- 
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+
+#include <lib/support/CodeUtils.h>
+
+#include "CommodityTariffInstance.h"
+
+CHIP_ERROR CommodityTariffInit(chip::EndpointId endpointId);
+CHIP_ERROR CommodityTariffShutdown();
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace CommodityTariff {
+
+/** @brief Helper function to return the singleton CommodityTariffInstance instance
+ *
+ * This is needed to support TestEventTriggers which are called outside of any
+ * class context. This allows the Delegate instance in which to invoke the test
+ * events on.
+ *
+ * This function is typically found in main.cpp or wherever the singleton is created.
+ */
+CommodityTariffInstance * GetCommodityTariffInstance();
+CommodityTariffDelegate * GetCommodityTariffDelegate();
+
+} // namespace CommodityTariff
+} // namespace Clusters
+} // namespace app
+} // namespace chip
