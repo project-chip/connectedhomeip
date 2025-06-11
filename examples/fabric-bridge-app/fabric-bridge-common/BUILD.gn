@@ -16,10 +16,13 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 config("config") {
-  include_dirs = [
-    "include", # for CHIPProjectAppConfig.h includes
-    "..", # allow includes via <fabric-bridge-common/...>
-  ]
+  # for CHIPProjectAppConfig.h includes
+  include_dirs = [ "include" ]
+}
+
+config("includes") {
+  # allow includes via <fabric-bridge-common/...>
+  include_dirs = [ ".." ]
 }
 
 chip_data_model("fabric-bridge-common-zap") {
@@ -39,8 +42,14 @@ source_set("fabric-bridge-common") {
   public_deps = [ ":fabric-bridge-common-zap" ]
 }
 
-source_set("fabric-bridge-lib") {
+source_set("app-config")
+{
   public_configs = [ ":config" ]
+  sources = [ "include/CHIPProjectAppConfig.h" ]
+}
+
+source_set("fabric-bridge-lib") {
+  public_configs = [ ":includes" ]
 
   sources = [
     "BridgedAdministratorCommissioning.cpp",
@@ -51,7 +60,6 @@ source_set("fabric-bridge-lib") {
     "BridgedDevice.h",
     "BridgedDeviceManager.cpp",
     "BridgedDeviceManager.h",
-    "include/CHIPProjectAppConfig.h",
   ]
 
   deps = [
