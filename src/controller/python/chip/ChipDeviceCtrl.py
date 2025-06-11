@@ -690,6 +690,8 @@ class ChipDeviceControllerBase():
             discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
             setupPinCode (int): The setup pin code of the device.
             nodeid (int): Node id of the device.
+            isShortDiscriminator (bool): Optional short discriminator.
+
 
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC).
@@ -2130,8 +2132,13 @@ class ChipDeviceControllerBase():
         '''
         Creates a standard flow manual code from the given discriminator and passcode.
 
+        Args:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            passcode (int): The setup passcode of the device.
+
         Returns:
             str: The decoded string from the buffer.
+
         Raises:
             MemoryError: If the output size is invalid during manual code creation.
         '''
@@ -2402,7 +2409,8 @@ class ChipDeviceControllerBase():
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
-    ''' The ChipDeviceCommissioner binding, named as ChipDeviceController
+    ''' 
+    The ChipDeviceCommissioner binding, named as ChipDeviceController
 
     TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
     '''
@@ -2490,7 +2498,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             setupPinCode (int): The setup pin code of the device.
             nodeId (int): Node id of the device.
             threadOperationalDataset (bytes): The Thread operational dataset for commissioning.
-            isShortDiscriminator (bool): Optional short discriminator.
+            isShortDiscriminator (bool): Short discriminator.
 
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC).
@@ -2508,7 +2516,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             nodeId (int): Node id of the device.
             ssid (str): SSID of the WiFi  network.
             credentials (str): WiFi network password.
-            isShortDiscriminator (bool): Optional short discriminator.
+            isShortDiscriminator (bool): Short discriminator.
 
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC).
@@ -2586,8 +2594,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         Args:
             offset (int): Timezone offset.
-            validStarting (int): 
-            validUntil (int):
+            validStarting (int): The start timestamp.
+            validUntil (int): The end timestamp
 
         Raises:
             ChipStackError: On failure.
@@ -2602,8 +2610,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Set the TC acknowledgements to set during commissioning.
 
         Args:
-            tcAcceptedVersion (int):
-            tcUserResponse (int): 
+            tcAcceptedVersion (int): TC accepted version.
+            tcUserResponse (int):  TC user responde.
 
         Raises:
             ChipStackError: On failure.
@@ -2618,7 +2626,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Set whether to skip the commissioning complete callback.
 
         Args:
-            skipCommissioningComplete (bool):
+            skipCommissioningComplete (bool): The value skip the commissioning complete.
 
         Raises:
             ChipStackError: On failure.
@@ -2633,7 +2641,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Set the DefaultNTP to set during commissioning.
 
         Args:
-            defaultNTP (str):
+            defaultNTP (str): The default NTP.
 
         Raises:
             ChipStackError: On failure.
@@ -2808,9 +2816,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
         setupPayload may be a QR or manual code.
 
         Args:
-            setupPayload (str):
+            setupPayload (str): The setup payload (QR or manual code).
             nodeid (int): Node id of the device.
-            discoveryType (DiscoveryType.DISCOVERY_ALL):
+            discoveryType (DiscoveryType.DISCOVERY_ALL): The optional discovery type to use.
 
         Raises:
             ChipStackError: On failure.
@@ -2855,7 +2863,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Callback function for handling the NOC chain result.
 
         Args:
-            nocChain ():
+            nocChain (nocChain): The object NOC chain data received.
 
         Returns:
             None
@@ -2893,7 +2901,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Set the path to the device attestation revocation set JSON file.
 
         Args:
-            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set.
+            dacRevocationSetPath (str): Path to the JSON file containing the device attestation revocation set.
 
         Raises:
             ChipStackError: On failure.
