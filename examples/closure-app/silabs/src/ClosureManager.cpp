@@ -19,6 +19,7 @@
 #include "ClosureManager.h"
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
+#include "AppTask.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
@@ -30,6 +31,8 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
+constexpr uint32_t kCountdownTimeSeconds = 10;
+ClosureManager::Action_t mCurrentAction = ClosureManager::Action_t::INVALID_ACTION;
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -72,6 +75,18 @@ ClosureManager ClosureManager::sClosureMgr;
 
 void ClosureManager::Init()
 {
+    // Create cmsis os sw timer for light timer.
+    mClosureTimer = osTimerNew(TimerEventHandler, // timer callback handler
+                             osTimerOnce,       // no timer reload (one-shot timer)
+                             (void *) this,     // pass the app task obj context
+                             NULL               // No osTimerAttr_t to provide.
+    );
+
+    if (mClosureTimer == NULL)
+    {
+        SILABS_LOG("mClosureTimer timer create failed");
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
+    }
     DeviceLayer::PlatformMgr().LockChipStack();
 
     // Closure endpoints initialization
@@ -85,4 +100,134 @@ void ClosureManager::Init()
     SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEp3TagList));
 
     DeviceLayer::PlatformMgr().UnlockChipStack();
+}
+
+void ClosureManager::StartTimer(uint32_t aTimeoutMs)
+{
+    // Starts or restarts the function timer
+    if (osTimerStart(mClosureTimer, pdMS_TO_TICKS(aTimeoutMs)) != osOK)
+    {
+        SILABS_LOG("mClosureTimer timer start() failed");
+        appError(APP_ERROR_START_TIMER_FAILED);
+    }
+}
+
+void ClosureManager::CancelTimer(void)
+{
+    if (osTimerStop(mClosureTimer) == osError)
+    {
+        SILABS_LOG("mClosureTimer stop() failed");
+        appError(APP_ERROR_STOP_TIMER_FAILED);
+    }
+}
+
+void ClosureManager::InitiateAction(AppEvent * event)
+{
+    mCurrentAction = static_cast<Action_t>(event->ClosureEvent.Action);
+    switch (mCurrentAction)
+        {
+        case Action_t::CALIBRATE_ACTION:
+            ChipLogError(AppServer, "Initiating calibration action");
+            break;
+        case Action_t::STOP_MOTION_ACTION:
+            ChipLogError(AppServer, "Initiating stop motion action");
+            break;
+        case Action_t::STOP_CALIBRATE_ACTION:
+            ChipLogError(AppServer, "Initiating stop calibration action");
+            ClosureManager::GetInstance().StartTimer(kCountdownTimeSeconds * 1000);
+            break;
+        case Action_t::MOVE_TO_ACTION:
+            ChipLogError(AppServer, "Initiating move to action");
+            break;
+        default:
+            ChipLogError(AppServer, "Invalid action received in InitiateAction");
+            return;
+        }
+}
+
+void ClosureManager::HandleClosureEvent(AppEvent * event)
+{
+    mCurrentAction = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t){ ClosureManager::GetInstance().HandleClosureActionComplete(mCurrentAction); });
+}
+
+void ClosureManager::TimerEventHandler(void * timerCbArg)
+{
+    // The timer event handler will be called in the context of the timer task
+    // once sClosureTimer expires. Post an event to apptask queue with the actual handler
+    // so that the event can be handled in the context of the apptask.
+    AppEvent event;
+    event.Type              = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = mCurrentAction;
+    event.Handler           = HandleClosureEvent;
+    AppTask::GetAppTask().PostEvent(&event);
+}
+
+chip::Protocols::InteractionModel::Status  ClosureManager::OnCalibrateCommand()
+{
+  // Before calibration, we set cuurent and target state of all endpoints to null and set countdowntime.
+  VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
+                      ChipLogError(AppServer, "Failed to set countdown time for calibration"));
+  VerifyOrReturnValue(ep1.GetLogic().SetOverallState(DataModel::NullNullable) == CHIP_NO_ERROR, Status::Failure,
+                      ChipLogError(AppServer, "Failed to set overall state for calibration"));
+  VerifyOrReturnValue(ep1.GetLogic().SetOverallTarget(DataModel::NullNullable) == CHIP_NO_ERROR, Status::Failure,
+                      ChipLogError(AppServer, "Failed to set overall target for calibration"));
+  VerifyOrReturnValue(ep2.GetLogic().SetCurrentState(DataModel::NullNullable) == CHIP_NO_ERROR, Status::Failure,
+                      ChipLogError(AppServer, "Failed to set current state for calibration on Endpoint 2"));
+  VerifyOrReturnValue(ep2.GetLogic().SetTarget(DataModel::NullNullable) == CHIP_NO_ERROR, Status::Failure,
+                      ChipLogError(AppServer, "Failed to set target for calibration on Endpoint 2"));
+  VerifyOrReturnValue(ep3.GetLogic().SetCurrentState(DataModel::NullNullable) == CHIP_NO_ERROR, Status::Failure,
+                      ChipLogError(AppServer, "Failed to set current state for calibration on Endpoint 3"));
+  VerifyOrReturnValue(ep3.GetLogic().SetTarget(DataModel::NullNullable) == CHIP_NO_ERROR, Status::Failure,
+                      ChipLogError(AppServer, "Failed to set target for calibration on Endpoint 3"));
+
+    
+    AppEvent event;
+    event.Type              = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = CALIBRATE_ACTION;
+    event.Handler           = InitiateAction;
+    AppTask::GetAppTask().PostEvent(&event);
+    
+    isCalibrationInProgress = true;
+    return Status::Success;
+}
+
+chip::Protocols::InteractionModel::Status  ClosureManager::OnStopCommand()
+{
+  // this function will contain the code for Stop command handling and initiate the stop action.
+  return Status::Success; 
+}
+
+chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(
+        const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum>  position,
+        const chip::Optional<bool>  latch,
+        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum>  speed)
+{
+  // this function will contain the code for MoveTo command handling and initiate the motion action.
+  return Status::Success;
+}
+
+void ClosureManager::HandleClosureActionComplete(Action_t action)
+{
+        switch (action)
+        {
+        case Action_t::CALIBRATE_ACTION:
+        {
+            isCalibrationInProgress = false;
+            GetInstance().ep1.OnClosureActionComplete(Action_t::CALIBRATE_ACTION);
+            GetInstance().ep2.OnClosureActionComplete(Action_t::CALIBRATE_ACTION);
+            GetInstance().ep3.OnClosureActionComplete(Action_t::CALIBRATE_ACTION);
+
+            break;
+        }
+        case Action_t::STOP_MOTION_ACTION:
+          break;
+        case Action_t::STOP_CALIBRATE_ACTION:
+          break;
+        case Action_t::MOVE_TO_ACTION:
+          break;
+        default:
+            ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
+            break;
+        }
 }

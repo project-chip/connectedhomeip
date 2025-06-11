@@ -29,10 +29,20 @@
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
 #include <lib/core/DataModelTypes.h>
+#include <AppEvent.h>
 
 class ClosureManager
 {
 public:
+    enum Action_t
+    {
+        CALIBRATE_ACTION   = 0,
+        MOVE_TO_ACTION     = 1,
+        STOP_MOTION_ACTION = 2,
+        STOP_CALIBRATE_ACTION = 3,
+
+        INVALID_ACTION     = 4
+    };
     /**
      * @brief Initializes the ClosureManager.
      *
@@ -43,14 +53,47 @@ public:
 
     static ClosureManager & GetInstance() { return sClosureMgr; }
 
+    /**
+     * Handles the "Calibrate" command for the closure manager.
+     *
+     * This method initiates the calibration process for the closure system. It resets the states
+     * and targets of all endpoints to null, sets a countdown time for the calibration process,
+     * and starts a timer to handle the calibration action after a specified duration.
+     *
+     * @return Status::Success if the calibration Action is successfully initiated.
+     */
+    chip::Protocols::InteractionModel::Status OnCalibrateCommand();
+
+    chip::Protocols::InteractionModel::Status OnMoveToCommand(
+        const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum>  position,
+        const chip::Optional<bool>  latch,
+        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed);
+
+    chip::Protocols::InteractionModel::Status OnStopCommand();
+
 private:
     static ClosureManager sClosureMgr;
+    osTimerId_t mClosureTimer;
     // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;
     static constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
     static constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
 
+    void CancelTimer(void);
+    void StartTimer(uint32_t aTimeoutMs);
+
+
     chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
+
+    void HandleClosureActionComplete(Action_t action);
+
+    static void InitiateAction(AppEvent * event);
+    static void HandleClosureEvent(AppEvent * event);
+
+    static void TimerEventHandler(void * timerCbArg);
+
+    bool isCalibrationInProgress = false;
+    bool isMoveToInProgress = false;
 };

@@ -17,6 +17,7 @@
  */
 
 #include <ClosureControlEndpoint.h>
+#include <ClosureManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -30,64 +31,61 @@ namespace {
 constexpr ElapsedS kDefaultCountdownTime = 30;
 } // namespace
 
-Status PrintOnlyDelegate::HandleCalibrateCommand()
+Status ClosureControlDelegate::HandleCalibrateCommand()
 {
     ChipLogProgress(AppServer, "HandleCalibrateCommand");
-    // Add the calibration logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnCalibrateCommand();
 }
 
-Status PrintOnlyDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
+Status ClosureControlDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
                                               const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleMoveToCommand");
-    // Add the move to logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnMoveToCommand(position, latch, speed);
 }
 
-Status PrintOnlyDelegate::HandleStopCommand()
+Status ClosureControlDelegate::HandleStopCommand()
 {
     ChipLogProgress(AppServer, "HandleStopCommand");
-    // Add the stop logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnStopCommand();
 }
 
-CHIP_ERROR PrintOnlyDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
+CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
 {
     // This function should return the current error at the specified index.
     // For now, we dont have a ErrorList implemented, so will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-bool PrintOnlyDelegate::IsReadyToMove()
+bool ClosureControlDelegate::IsReadyToMove()
 {
     // This function should return true if the closure is ready to move.
     // For now, we will return true.
     return true;
 }
 
-bool PrintOnlyDelegate::IsManualLatchingNeeded()
+bool ClosureControlDelegate::IsManualLatchingNeeded()
 {
     // This function should return true if manual latching is needed.
     // For now, we will return false.
     return false;
 }
 
-ElapsedS PrintOnlyDelegate::GetCalibrationCountdownTime()
+ElapsedS ClosureControlDelegate::GetCalibrationCountdownTime()
 {
     // This function should return the calibration countdown time.
     // For now, we will return kDefaultCountdownTime.
     return kDefaultCountdownTime;
 }
 
-ElapsedS PrintOnlyDelegate::GetMovingCountdownTime()
+ElapsedS ClosureControlDelegate::GetMovingCountdownTime()
 {
     // This function should return the moving countdown time.
     // For now, we will return kDefaultCountdownTime.
     return kDefaultCountdownTime;
 }
 
-ElapsedS PrintOnlyDelegate::GetWaitingForMotionCountdownTime()
+ElapsedS ClosureControlDelegate::GetWaitingForMotionCountdownTime()
 {
     // This function should return the waiting for motion countdown time.
     // For now, we will return kDefaultCountdownTime.
@@ -114,4 +112,63 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     ReturnErrorOnFailure(mInterface.Init());
 
     return CHIP_NO_ERROR;
+}
+
+void ClosureControlEndpoint::OnClosureActionComplete(uint8_t action) 
+{
+    ChipLogError(AppServer, "#######In OnActionComplete############");
+    ClosureManager::Action_t closureAction = static_cast<ClosureManager::Action_t>(action);
+
+    switch (closureAction)
+    {
+    case ClosureManager::Action_t::STOP_MOTION_ACTION:
+        OnStopMotionActionComplete();
+        break;
+    case ClosureManager::Action_t::STOP_CALIBRATE_ACTION:
+        OnStopCalibrateActionComplete();
+        break;
+    case ClosureManager::Action_t::CALIBRATE_ACTION:
+        OnCalibrateActionComplete();
+        break;
+    case ClosureManager::Action_t::MOVE_TO_ACTION:
+        OnMoveToActionComplete();
+        break;
+    default:
+        ChipLogError(AppServer, "Invalid action received in OnActionComplete");
+    }
+}
+
+void ClosureControlEndpoint::OnStopCalibrateActionComplete()
+{
+    // This function should handle closure control state updation after stopping of calibration Action.
+}
+
+void ClosureControlEndpoint::OnStopMotionActionComplete()
+{
+    // This function should handle closure control state updation after stopping of Motion Action.
+}
+
+void ClosureControlEndpoint::OnCalibrateActionComplete()
+{
+    ChipLogError(AppServer, "#######In CALIBRATE_ACTION ############");
+
+    DataModel::Nullable<GenericOverallState> overallState(
+    GenericOverallState(MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)),
+                        MakeOptional(DataModel::MakeNullable(true)),
+                        MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)),
+                        MakeOptional(DataModel::MakeNullable(true))));
+    DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
+
+    mLogic.SetMainState(MainStateEnum::kStopped);
+    mLogic.SetOverallState(overallState);
+    mLogic.SetOverallTarget(overallTarget);
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
+
+    ChipLogError(AppServer, "####### CALIBRATE_ACTION done ############");
+}
+
+void ClosureControlEndpoint::OnMoveToActionComplete()
+{
+    // This function should handle closure control state updation after scompletion of Motion Action.   
 }

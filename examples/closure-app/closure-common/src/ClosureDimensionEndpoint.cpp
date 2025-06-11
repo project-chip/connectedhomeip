@@ -17,6 +17,7 @@
  */
 
 #include <ClosureDimensionEndpoint.h>
+#include <ClosureManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -26,7 +27,7 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 using Protocols::InteractionModel::Status;
 
-Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
+Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
                                           const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleSetTarget");
@@ -34,7 +35,7 @@ Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, c
     return Status::Success;
 }
 
-Status PrintOnlyDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                      const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleStep");
@@ -58,4 +59,42 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
     ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());
     return CHIP_NO_ERROR;
+}
+
+void ClosureDimensionEndpoint::OnClosureActionComplete(uint8_t action) 
+{
+    ClosureManager::Action_t closureAction = static_cast<ClosureManager::Action_t>(action);
+
+    if (closureAction == ClosureManager::Action_t::INVALID_ACTION)
+    {
+        ChipLogError(AppServer, "Invalid action received in OnActionComplete");
+        return;
+    }
+
+    // Call the logic to handle the action completion
+    switch (closureAction)
+    {
+    case ClosureManager::Action_t::STOP_MOTION_ACTION:
+        break;
+    case ClosureManager::Action_t::STOP_CALIBRATE_ACTION:
+        break;
+    case ClosureManager::Action_t::CALIBRATE_ACTION:
+    {
+        DataModel::Nullable<GenericCurrentStateStruct> currentState(
+            GenericCurrentStateStruct(MakeOptional(10000),
+                                      MakeOptional(true),
+                                      MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+        DataModel::Nullable<GenericTargetStruct> target{ DataModel::NullNullable };
+
+        mLogic.SetCurrentState(currentState);
+        mLogic.SetTarget(target);
+        mLogic.SetTarget(target);
+        break;
+    }
+    case ClosureManager::Action_t::MOVE_TO_ACTION:
+        break;
+    default:
+        ChipLogError(AppServer, "Invalid action received in OnActionComplete");
+        return;
+    }
 }

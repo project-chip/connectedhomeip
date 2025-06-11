@@ -37,18 +37,17 @@ namespace ClosureDimension {
 using Protocols::InteractionModel::Status;
 
 /**
- * @class PrintOnlyDelegate
+ * @class ClosureDimensionDelegate
  * @brief A delegate class that handles Closure Dimension commands at the application level.
  *
  * This class is responsible for processing Closure Dimension commands such as Stop, MoveTo, and Calibrate
  * according to specific business logic. It is designed to be used as a delegate for the Closure Dimension cluster.
  *
- * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
  */
-class PrintOnlyDelegate : public DelegateBase
+class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    PrintOnlyDelegate() {}
+    ClosureDimensionDelegate() {}
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
@@ -88,14 +87,18 @@ public:
     /**
      * @brief Retrieves the delegate associated with this Closure Dimension endpoint.
      *
-     * @return Reference to the PrintOnlyDelegate instance.
+     * @return Reference to the ClosureDimensionDelegate instance.
      */
-    PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+    ClosureDimensionDelegate & GetDelegate() { return mDelegate; }
+
+    ClusterLogic & GetLogic() { return mLogic; }
+
+    void OnClosureActionComplete(uint8_t action);
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
-    PrintOnlyDelegate mDelegate;
+    ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
 };

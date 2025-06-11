@@ -35,18 +35,17 @@ namespace Clusters {
 namespace ClosureControl {
 
 /**
- * @class PrintOnlyDelegate
+ * @class ClosureControlDelegate
  * @brief A delegate class that handles Closure Control commands at the application level.
  *
  * This class is responsible for processing Closure Control commands such as Stop, MoveTo, and Calibrate
  * according to specific business logic. It is designed to be used as a delegate for the Closure Control cluster.
  *
- * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
  */
-class PrintOnlyDelegate : public DelegateBase
+class ClosureControlDelegate : public DelegateBase
 {
 public:
-    PrintOnlyDelegate() {}
+    ClosureControlDelegate() {}
 
     // Override for the DelegateBase Virtual functions
     Protocols::InteractionModel::Status HandleStopCommand() override;
@@ -93,16 +92,25 @@ public:
     /**
      * @brief Retrieves the delegate associated with this Closure Control endpoint.
      *
-     * @return Reference to the PrintOnlyDelegate instance.
+     * @return Reference to the ClosureControlDelegate instance.
      */
-    PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+    ClosureControlDelegate & GetDelegate() { return mDelegate; }
+
+    ClusterLogic & GetLogic() { return mLogic; }
+    
+    void OnClosureActionComplete(uint8_t action);
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
-    PrintOnlyDelegate mDelegate;
+    ClosureControlDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
+
+    void OnStopMotionActionComplete();
+    void OnStopCalibrateActionComplete();
+    void OnCalibrateActionComplete();
+    void OnMoveToActionComplete();
 };
 
 } // namespace ClosureControl

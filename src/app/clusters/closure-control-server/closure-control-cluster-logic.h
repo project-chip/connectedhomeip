@@ -188,6 +188,19 @@ public:
      */
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
 
+
+    /**
+     * @brief Set OverallTarget.
+     *
+     * @param[in] overallTarget OverallTarget Position, Latch and Speed.
+     *
+     * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     */
+    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
+
     /**
      * @brief Set OverallTarget.
      *
