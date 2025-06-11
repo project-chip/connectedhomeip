@@ -13,7 +13,8 @@ provider.
 
 <hr>
 
-All the instructions given below assumes that we are in the connectedhomeip repo, thus referencing the “top level”.
+All the instructions given below assumes that we are in the connectedhomeip
+repo, thus referencing the “top level”.
 
 ## Prepare for building
 
