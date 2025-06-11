@@ -32,9 +32,11 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-
+import typing
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
+
+from chip.tlv import uint
+from chip.clusters.Types import Nullable, NullValue
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -107,7 +109,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
 
         # STEP 5: Read MainState attribute
         self.step(5)
-        main_state: ClosureControl.Enums.MainStateEnum = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        main_state: Clusters.ClosureControl.Enums.MainStateEnum = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
         logging.info(f"MainState: {main_state, Clusters.ClosureControl.Enums.MainStateEnum(main_state).name}")
         asserts.assert_less_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kSetupRequired,
                                   "MainState attribute is out of range")
@@ -116,7 +118,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
 
         # STEP 6: Read CurrentErrorList attribute
         self.step(6)
-        current_error_list: typing.List[ClosureControl.Enums.ClosureErrorEnum] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentErrorList)
+        current_error_list: typing.List[Clusters.ClosureControl.Enums.ClosureErrorEnum] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentErrorList)
         logging.info(f"CurrentErrorList: {current_error_list}")
         asserts.assert_less_equal(len(current_error_list), 10, "CurrentErrorList length is out of range")
         for error in current_error_list:
@@ -126,7 +128,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
 
         # STEP 7: Read OverallState attribute
         self.step(7)
-        overall_state: typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallState)
+        overall_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallStateStruct] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallState)
         
         if overall_state is NullValue:
             logging.info("OverallState is NULL, skipping field validations")
@@ -161,7 +163,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             
         # STEP 8: Read OverallTarget attribute
         self.step(8)
-        overall_target: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallTarget)
+        overall_target: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallTargetStruct] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallTarget)
 
         if overall_target is NullValue:
             logging.info("OverallTarget is NULL, skipping field validations")
