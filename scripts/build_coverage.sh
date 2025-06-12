@@ -230,23 +230,24 @@ lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
-    --ignore-errors inconsistent \
+    --ignore-errors format,unsupported,inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_base.info"
 
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
+    --ignore-errors format,unsupported,inconsistent \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
-    --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_test.info"
 
-lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
+lcov --ignore-errors format,unsupported,inconsistent \
+    --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
-    --ignore-errors inconsistent \
     --output-file "$COVERAGE_ROOT/lcov_final.info"
 
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
-    --ignore-errors inconsistent \
+    --ignore-errors inconsistent,category,count \
+    --rc max_message_count=1000 \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
     --header-title "Matter SDK Coverage Report"
@@ -259,3 +260,15 @@ gcovr --exclude=zzz_generated/ \
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
+
+HTML_INDEX=$(_normpath "$COVERAGE_ROOT/html/index.html")
+if [ -f "$HTML_INDEX" ]; then
+    echo
+    echo "============================================================"
+    echo "Coverage report successfully generated:"
+    echo "    file://$HTML_INDEX"
+    echo "============================================================"
+else
+    echo "WARNING: Coverage HTML index was not found at expected path:"
+    echo "    $HTML_INDEX"
+fi

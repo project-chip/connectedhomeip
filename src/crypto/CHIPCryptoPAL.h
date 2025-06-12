@@ -32,10 +32,12 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/support/Base64.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -1803,6 +1805,73 @@ CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteS
  * @brief Extracts Issuer Distinguished Name from X509 Certificate. The value is copied into buffer in a raw ASN.1 X.509 format.
  **/
 CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer);
+
+class PemEncoder
+{
+public:
+    /**
+     * @brief Construct a PEM encoder for element type `encodedElement` whose DER data is in `derBytes` span.
+     *
+     * LIFETIME: both encodedElement and derBytes lifetime must be >= PemEncoder lifetime.
+     *           PemEncoder references these while processing `NextLine()` calls.
+     *
+     * @param encodedElement - Element type string to include in header/footer (e.g. "CERTIFICATE"). Caller must provide correct
+     * uppercase.
+     * @param derBytes - Byte span containing data to encode. May be empty.
+     */
+    explicit PemEncoder(const char * encodedElement, ByteSpan derBytes) : mEncodedElement(encodedElement), mDerBytes(derBytes) {}
+
+    // No copies.
+    PemEncoder(const PemEncoder &)             = delete;
+    PemEncoder & operator=(const PemEncoder &) = delete;
+
+    /**
+     * @brief Returns the pointer to the next null-terminated line of the encoding, or nullptr if done.
+     *
+     * The returned pointer has the lifetime of this class and during that lifetime will always point
+     * to valid memory.
+     *
+     * When header/footer are written, the heading type (`encodedElement` value) such as
+     * `CERTIFICATE` is clamped so that the entire header line with `-----BEGIN ${encodedElement}-----`
+     * and footer line with `-----END ${encodedElement}-----` are not wider than 64 bytes. This
+     * will not happen in practice with the types of things this is meant to encode.
+     *
+     * Usage should be in a loop, for example:
+     *
+     *   std::vector<std::string> pemLines;
+     *
+     *   PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
+     *
+     *   const char* line = encoder.NextLine();
+     *   while (line)
+     *   {
+     *       pemLines.push_back(std::string{ line });
+     *       line = encoder.NextLine();
+     *   }
+     *
+     * @return a pointer to the internal line buffer for next line or nullptr when done.
+     */
+    const char * NextLine();
+
+private:
+    static constexpr size_t kNumBytesPerLine = 48u;
+    static constexpr size_t kLineBufferSize  = 64u + 1u; // PEM expects 64 characters wide and a null terminator at least.
+    static_assert(kLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1), "Internal incoherence of library configuration!");
+
+    enum State : int
+    {
+        kPrintHeader = 0,
+        kPrintBody   = 1,
+        kPrintFooter = 2,
+        kDone        = 3,
+    };
+
+    const char * mEncodedElement; // "CERTIFICATE", "EC PUBLIC KEY", etc. Must be capitalized by caller.
+    ByteSpan mDerBytes;
+    State mState           = State::kPrintHeader;
+    size_t mProcessedBytes = 0;
+    StringBuilder<kLineBufferSize> mStringBuilder{};
+};
 
 /**
  * @brief Checks for resigned version of the certificate in the list and returns it.
