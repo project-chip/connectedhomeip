@@ -94,6 +94,23 @@ public:
     CHIP_ERROR
     LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams);
 
+    CHIP_ERROR
+    ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+
+    CHIP_ERROR
+    ValidateVideoStreamID(uint16_t videoStreamId) override;
+
+    CHIP_ERROR
+    ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR
+    IsPrivacyModeActive(bool & isActive) override;
+
+    bool HasAllocatedVideoStreams() override;
+
+    bool HasAllocatedAudioStreams() override;
+
     CHIP_ERROR PersistentAttributesLoadedCallback();
 
     CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID);
