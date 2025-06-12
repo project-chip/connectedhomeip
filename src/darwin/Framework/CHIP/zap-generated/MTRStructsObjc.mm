@@ -10260,13 +10260,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
+        _fragmentDuration = @(0);
+
         _chunkDuration = @(0);
+
+        _segmentGroup = @(0);
+
+        _trackName = @"";
 
         _cencKey = nil;
 
-        _metadataEnabled = nil;
-
         _cencKeyID = nil;
+
+        _metadataEnabled = nil;
     }
     return self;
 }
@@ -10275,17 +10281,20 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct alloc] init];
 
+    other.fragmentDuration = self.fragmentDuration;
     other.chunkDuration = self.chunkDuration;
+    other.segmentGroup = self.segmentGroup;
+    other.trackName = self.trackName;
     other.cencKey = self.cencKey;
-    other.metadataEnabled = self.metadataEnabled;
     other.cencKeyID = self.cencKeyID;
+    other.metadataEnabled = self.metadataEnabled;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chunkDuration:%@; cencKey:%@; metadataEnabled:%@; cencKeyID:%@; >", NSStringFromClass([self class]), _chunkDuration, [_cencKey base64EncodedStringWithOptions:0], _metadataEnabled, [_cencKeyID base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fragmentDuration:%@; chunkDuration:%@; segmentGroup:%@; trackName:%@; cencKey:%@; cencKeyID:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _fragmentDuration, _chunkDuration, _segmentGroup, _trackName, [_cencKey base64EncodedStringWithOptions:0], [_cencKeyID base64EncodedStringWithOptions:0], _metadataEnabled];
     return descriptionString;
 }
 

@@ -59,6 +59,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     case EnumType::kInvalidCombination:
     case EnumType::kInvalidTriggerType:
     case EnumType::kInvalidTransportStatus:
+    case EnumType::kInvalidOptions:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

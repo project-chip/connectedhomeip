@@ -15301,9 +15301,7 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * This command SHALL return the Transport Configuration for the specified push transport or all allocated transports for the fabric if null.
  */
-- (void)findTransportWithParams:(MTRPushAVStreamTransportClusterFindTransportParams * _Nullable)params completion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)findTransportWithCompletion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion
-    MTR_PROVISIONALLY_AVAILABLE;
+- (void)findTransportWithParams:(MTRPushAVStreamTransportClusterFindTransportParams *)params completion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSupportedFormatsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeSupportedFormatsWithParams:(MTRSubscribeParams *)params
@@ -21865,6 +21863,7 @@ typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStatusCode) {
     MTRPushAVStreamTransportStatusCodeInvalidCombination MTR_PROVISIONALLY_AVAILABLE = 0x06,
     MTRPushAVStreamTransportStatusCodeInvalidTriggerType MTR_PROVISIONALLY_AVAILABLE = 0x07,
     MTRPushAVStreamTransportStatusCodeInvalidTransportStatus MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRPushAVStreamTransportStatusCodeInvalidOptions MTR_PROVISIONALLY_AVAILABLE = 0x09,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTransportStatus) {

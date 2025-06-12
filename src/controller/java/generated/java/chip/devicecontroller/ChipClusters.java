@@ -60861,16 +60861,16 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void findTransport(FindTransportResponseCallback callback, @Nullable Optional<Integer> connectionID) {
+    public void findTransport(FindTransportResponseCallback callback, @Nullable Integer connectionID) {
       findTransport(callback, connectionID, 0);
     }
 
-    public void findTransport(FindTransportResponseCallback callback, @Nullable Optional<Integer> connectionID, int timedInvokeTimeoutMs) {
+    public void findTransport(FindTransportResponseCallback callback, @Nullable Integer connectionID, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long connectionIDFieldID = 0L;
-      BaseTLVType connectionIDtlvValue = connectionID != null ? connectionID.<BaseTLVType>map((nonOptionalconnectionID) -> new UIntType(nonOptionalconnectionID)).orElse(new EmptyType()) : new NullType();
+      BaseTLVType connectionIDtlvValue = connectionID != null ? new UIntType(connectionID) : new NullType();
       elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
 
       StructType commandArgs = new StructType(elements);

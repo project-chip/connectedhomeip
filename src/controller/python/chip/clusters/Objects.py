@@ -48801,6 +48801,7 @@ class PushAvStreamTransport(Cluster):
             kInvalidCombination = 0x06
             kInvalidTriggerType = 0x07
             kInvalidTransportStatus = 0x08
+            kInvalidOptions = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -48897,16 +48898,22 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="chunkDuration", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="CENCKey", Tag=1, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=2, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="CENCKeyID", Tag=3, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="fragmentDuration", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="chunkDuration", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="segmentGroup", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="trackName", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(Label="CENCKey", Tag=4, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="CENCKeyID", Tag=5, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
                     ])
 
+            fragmentDuration: 'uint' = 0
             chunkDuration: 'uint' = 0
+            segmentGroup: 'uint' = 0
+            trackName: 'str' = ""
             CENCKey: 'typing.Optional[bytes]' = None
-            metadataEnabled: 'typing.Optional[bool]' = None
             CENCKeyID: 'typing.Optional[bytes]' = None
+            metadataEnabled: 'typing.Optional[bool]' = None
 
         @dataclass
         class ContainerOptionsStruct(ClusterObject):
@@ -49094,10 +49101,10 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=typing.Union[Nullable, uint]),
                     ])
 
-            connectionID: typing.Union[None, Nullable, uint] = None
+            connectionID: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class FindTransportResponse(ClusterCommand):
