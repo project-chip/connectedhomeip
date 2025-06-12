@@ -204,7 +204,7 @@
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
         "Closure Dimension": [
-            "CurrentState", 
+            "CurrentState",
             "TargetState",
             "UnitRange",
             "LimitRange"
