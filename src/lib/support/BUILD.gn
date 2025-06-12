@@ -183,6 +183,7 @@ static_library("support") {
   output_name = "libSupportLayer"
 
   sources = [
+    "AutoRelease.h",
     "Base64.cpp",
     "Base64.h",
     "BitFlags.h",

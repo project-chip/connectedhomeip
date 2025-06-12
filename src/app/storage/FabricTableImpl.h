@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/storage/TableEntry.h>
+#include <functional>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/TypeTraits.h>
@@ -73,7 +74,7 @@ public:
  * FabricTableImpl is an implementation that allows to store arbitrary entities using PersistentStorageDelegate.
  * It handles the storage of entities by their StorageId and EnpointId over multiple fabrics.
  */
-template <class StorageId, class StorageData, size_t kIteratorsMax>
+template <class StorageId, class StorageData>
 class FabricTableImpl
 {
     using TableEntry = Data::TableEntry<StorageId, StorageData>;
@@ -82,6 +83,7 @@ public:
     using EntryIterator = CommonIterator<TableEntry>;
     using EntryIndex    = Data::EntryIndex;
     using Serializer    = DefaultSerializer<StorageId, StorageData>;
+    using IterateFnType = std::function<CHIP_ERROR(EntryIterator & certBuffer)>;
 
     virtual ~FabricTableImpl() { Finish(); };
 
@@ -106,7 +108,18 @@ public:
 
     // Data
     CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity);
-    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data);
+
+    /**
+     * @brief Writes the entry to persistent storage.
+     * @param fabric_index the fabric to write the entry to
+     * @param entry_id the unique entry identifier
+     * @param data the source data
+     * @param writeBuffer the buffer that will be used to write the data before being persisted; PersistentStorageDelegate does not
+     * offer a way to stream bytes to be written
+     */
+    template <size_t kEntryMaxBytes>
+    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data,
+                             PersistentStore<kEntryMaxBytes> & writeBuffer);
 
     /**
      * @brief Loads the entry from persistent storage.
@@ -136,6 +149,9 @@ public:
     void SetTableSize(uint16_t endpointEntryTableSize, uint16_t maxPerFabric);
     bool IsInitialized() { return (mStorage != nullptr); }
 
+    template <size_t kEntryMaxBytes>
+    CHIP_ERROR IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store, IterateFnType iterateFn);
+
 protected:
     // This constructor is meant for test purposes, it allows to change the defined max for entries per fabric and global, which
     // allows to simulate OTA where this value was changed
@@ -152,17 +168,19 @@ protected:
      * If you would like to expose iterators in your subclass of FabricTableImpl, use this class
      * in an ObjectPool<EntryIteratorImpl> field to allow callers to obtain an iterator.
      */
+    template <size_t kEntryMaxBytes>
     class EntryIteratorImpl : public EntryIterator
     {
     public:
         EntryIteratorImpl(FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxEntriesPerFabric,
-                          uint16_t maxEntriesPerEndpoint);
+                          uint16_t maxEntriesPerEndpoint, PersistentStore<kEntryMaxBytes> & store);
         size_t Count() override;
         bool Next(TableEntry & output) override;
         void Release() override;
 
     protected:
         FabricTableImpl & mProvider;
+        PersistentStore<kEntryMaxBytes> & mStore;
         FabricIndex mFabric  = kUndefinedFabricIndex;
         EndpointId mEndpoint = kInvalidEndpointId;
         EntryIndex mNextEntryIdx;
