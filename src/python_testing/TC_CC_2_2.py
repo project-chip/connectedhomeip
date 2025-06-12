@@ -289,7 +289,7 @@ class TC_CC_2_3(MatterBaseTest):
 
         self.step(33)
         if cc.Attributes.RemainingTime.attribute_id not in attribute_list or not supports_ct:
-            self.skip_all_remaining_steps(34)
+            self.mark_all_remaining_steps_skipped(34)
             return
 
         self.step(34)

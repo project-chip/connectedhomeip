@@ -80,43 +80,56 @@ CHIP_ERROR FactoryDataProvider::SetSetupDiscriminator(uint16_t setupDiscriminato
 CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
     Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
 
     VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    uint8_t qorvoDacPrivKeyBuffer[DEVICE_ATTESTATION_PRIVATE_KEY_LEN];
-    uint8_t qorvoDacPubKeyBuffer[DEVICE_ATTESTATION_PUBLIC_KEY_LEN];
-    MutableByteSpan qorvoDacPrivateKey(qorvoDacPrivKeyBuffer, DEVICE_ATTESTATION_PRIVATE_KEY_LEN);
-    MutableByteSpan qorvoDacPublicKey(qorvoDacPubKeyBuffer, DEVICE_ATTESTATION_PUBLIC_KEY_LEN);
-
     qvStatus_t status;
-    uint32_t tlvDataLength;
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY, qorvoDacPrivateKey.data(), qorvoDacPrivateKey.size(),
-                                        &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
-    ReturnErrorOnFailure(MapQorvoError(status));
+    // check if valid DAC and key are present in the info page
+    // sign using private key from factory data otherwise
+    if (qvCHIP_Crypto_DacAndKeyInInfoPage())
+    {
+        status = qvCHIP_Crypto_SignWithDacPk((uint8_t *) messageToSign.data(), messageToSign.size(), signature.Bytes());
+        VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
+        ReturnErrorOnFailure(MapQorvoError(status));
+        signature.SetLength(signature.Capacity());
+    }
+    else
+    {
+        uint8_t qorvoDacPrivKeyBuffer[DEVICE_ATTESTATION_PRIVATE_KEY_LEN];
+        uint8_t qorvoDacPubKeyBuffer[DEVICE_ATTESTATION_PUBLIC_KEY_LEN];
+        MutableByteSpan qorvoDacPrivateKey(qorvoDacPrivKeyBuffer, DEVICE_ATTESTATION_PRIVATE_KEY_LEN);
+        MutableByteSpan qorvoDacPublicKey(qorvoDacPubKeyBuffer, DEVICE_ATTESTATION_PUBLIC_KEY_LEN);
+        uint32_t tlvDataLength;
+        Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(tlvDataLength <= qorvoDacPrivateKey.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
+        status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY, qorvoDacPrivateKey.data(),
+                                            qorvoDacPrivateKey.size(), &tlvDataLength);
 
-    qorvoDacPrivateKey.reduce_size(tlvDataLength);
+        VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
+        ReturnErrorOnFailure(MapQorvoError(status));
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_PUBLIC_KEY, qorvoDacPublicKey.data(), qorvoDacPublicKey.size(),
-                                        &tlvDataLength);
+        VerifyOrReturnError(tlvDataLength <= qorvoDacPrivateKey.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
-    ReturnErrorOnFailure(MapQorvoError(status));
+        qorvoDacPrivateKey.reduce_size(tlvDataLength);
 
-    VerifyOrReturnError(tlvDataLength <= qorvoDacPublicKey.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
+        status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_PUBLIC_KEY, qorvoDacPublicKey.data(),
+                                            qorvoDacPublicKey.size(), &tlvDataLength);
 
-    qorvoDacPublicKey.reduce_size(tlvDataLength);
+        VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
+        ReturnErrorOnFailure(MapQorvoError(status));
 
-    // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
-    // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    ReturnErrorOnFailure(LoadKeypairFromRaw(qorvoDacPrivateKey, qorvoDacPublicKey, keypair));
-    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
+        VerifyOrReturnError(tlvDataLength <= qorvoDacPublicKey.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
+
+        qorvoDacPublicKey.reduce_size(tlvDataLength);
+
+        // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
+        // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
+        ReturnErrorOnFailure(LoadKeypairFromRaw(qorvoDacPrivateKey, qorvoDacPublicKey, keypair));
+        ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
+    }
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }
@@ -142,7 +155,6 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCou
 
     status = qvCHIP_FactoryDataGetValue(TAG_ID_SPAKE2_ITERATION_COUNT, (uint8_t *) &iterationCount, sizeof(iterationCount),
                                         &tlvDataLength);
-
     VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength == sizeof(iterationCount), CHIP_ERROR_INVALID_LIST_LENGTH);
 
@@ -227,17 +239,41 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
 
 CHIP_ERROR FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    qvStatus_t status;
+    uint32_t tlvDataLength;
+
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_PART_NUMBER, (uint8_t *) buf, bufSize, &tlvDataLength);
+
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
+    VerifyOrReturnError(tlvDataLength <= bufSize, CHIP_ERROR_INVALID_LIST_LENGTH);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    qvStatus_t status;
+    uint32_t tlvDataLength;
+
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_URL, (uint8_t *) buf, bufSize, &tlvDataLength);
+
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
+    VerifyOrReturnError(tlvDataLength <= bufSize, CHIP_ERROR_INVALID_LIST_LENGTH);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    qvStatus_t status;
+    uint32_t tlvDataLength;
+
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_LABEL, (uint8_t *) buf, bufSize, &tlvDataLength);
+
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
+    VerifyOrReturnError(tlvDataLength <= bufSize, CHIP_ERROR_INVALID_LIST_LENGTH);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
@@ -345,8 +381,17 @@ CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & attes
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_CERTIFICATE, attestationCertSpan.data(),
-                                        attestationCertSpan.size(), &tlvDataLength);
+    // check if valid DAC and key are present in the info page
+    // read DAC from factory data otherwise
+    if (qvCHIP_Crypto_DacAndKeyInInfoPage())
+    {
+        status = qvCHIP_Crypto_ReadDac((uint8_t *) attestationCertSpan.data(), attestationCertSpan.size(), &tlvDataLength);
+    }
+    else
+    {
+        status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_CERTIFICATE, (uint8_t *) attestationCertSpan.data(),
+                                            attestationCertSpan.size(), &tlvDataLength);
+    }
 
     VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= attestationCertSpan.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
