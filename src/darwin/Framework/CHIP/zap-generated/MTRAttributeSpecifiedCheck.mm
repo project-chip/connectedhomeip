@@ -3616,7 +3616,7 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
     case Attributes::CurrentState::Id: {
         return YES;
     }
-    case Attributes::Target::Id: {
+    case Attributes::TargetState::Id: {
         return YES;
     }
     case Attributes::Resolution::Id: {
@@ -3644,6 +3644,9 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::ModulationType::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

@@ -2786,8 +2786,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::ClosureDimension::Attributes::CurrentState::Id:
             return "CurrentState";
-        case chip::app::Clusters::ClosureDimension::Attributes::Target::Id:
-            return "Target";
+        case chip::app::Clusters::ClosureDimension::Attributes::TargetState::Id:
+            return "TargetState";
         case chip::app::Clusters::ClosureDimension::Attributes::Resolution::Id:
             return "Resolution";
         case chip::app::Clusters::ClosureDimension::Attributes::StepValue::Id:
@@ -2806,6 +2806,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Overflow";
         case chip::app::Clusters::ClosureDimension::Attributes::ModulationType::Id:
             return "ModulationType";
+        case chip::app::Clusters::ClosureDimension::Attributes::LatchControlModes::Id:
+            return "LatchControlModes";
         case chip::app::Clusters::ClosureDimension::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ClosureDimension::Attributes::AcceptedCommandList::Id:
