@@ -374,7 +374,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
  * Methods handling known video stream IDs, the addition and removal thereof.
  */
 void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(
-    uint16_t aVideoStreamID, chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport)
+    uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport)
 {
     DPTZStruct dptzEntry;
     dptzEntry.videoStreamID = aVideoStreamID;
@@ -384,7 +384,7 @@ void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(
 }
 
 void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(
-    uint16_t aVideoStreamID, chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport)
+    uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport)
 {
     auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
                            [aVideoStreamID](const DPTZStruct & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
@@ -401,7 +401,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(
 }
 
 void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStreams(
-    chip::app::Clusters::Globals::Structs::ViewportStruct::Type aViewport)
+    Globals::Structs::ViewportStruct::Type aViewport)
 {
     for (auto & dptzStream : mDptzStreams)
     {
@@ -1223,7 +1223,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
                                                                 const Commands::DPTZSetViewport::DecodableType & commandData)
 {
     uint16_t videoStreamID                                               = commandData.videoStreamID;
-    chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewport = commandData.viewport;
+    Globals::Structs::ViewportStruct::Type viewport = commandData.viewport;
 
     // Is this a video stream ID of which we have already been informed?
     // If not, fail.
@@ -1283,7 +1283,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
     }
 
     // Create a viewport and call the delegate; on success update our Stream Viewport with that which was set
-    chip::app::Clusters::Globals::Structs::ViewportStruct::Type viewport;
+    Globals::Structs::ViewportStruct::Type viewport;
     Status status = mDelegate.DPTZRelativeMove(videoStreamID, deltaX, deltaY, zoomDelta, viewport);
 
     if (status == Status::Success)
