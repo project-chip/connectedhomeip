@@ -411,10 +411,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-air-quality-sensor' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9528a_retention air-quality-sensor-app \
-                    out/telink-tlsr9528a_retention-air-quality-sensor/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -425,10 +421,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-all-clusters' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9118bdk40d all-clusters-app \
-                    out/telink-tlsr9118bdk40d-all-clusters/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -439,10 +431,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9528a all-clusters-minimal-app \
-                    out/telink-tlsr9528a-all-clusters-minimal/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -452,10 +440,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x-bridge' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tl7218x bridge-app \
-                    out/telink-tl7218x-bridge/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -466,10 +450,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-contact-sensor' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9528a_retention contact-sensor-app \
-                    out/telink-tlsr9528a_retention-contact-sensor/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -479,10 +459,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-light-ota-factory-data' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9118bdk40d lighting-app-ota-factory-data \
-                    out/telink-tlsr9118bdk40d-light-ota-factory-data/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -492,10 +468,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-ota-rpc-factory-data-4mb' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9518adk80d lighting-app-ota-rpc-factory-data-4mb \
-                    out/telink-tlsr9518adk80d-light-ota-rpc-factory-data-4mb/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -505,10 +477,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-compress-lzma-shell-factory-data' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tl3218x light-app-ota-compress-lzma-shell-factory-data \
-                    out/telink-tl3218x-light-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -518,10 +486,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota-shell-factory-data' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tl3218x_retention light-switch-app-ota-shell-factory-data \
-                    out/telink-tl3218x_retention-light-switch-ota-shell-factory-data/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -531,10 +495,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x-light-ota-shell-factory-data' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tl7218x light-app-ota-shell-factory-data \
-                    out/telink-tl7218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -545,10 +505,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x-light-tflm' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tl7218x light-app-tflm \
-                    out/telink-tl7218x-light-tflm/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -558,10 +514,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tl7218x_retention light-switch-app-ota-compress-lzma-factory-data \
-                    out/telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -571,10 +523,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9528a light-switch-app-ota-compress-lzma-shell-factory-data \
-                    out/telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -585,10 +533,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9528a lock-app-dfu \
-                    out/telink-tlsr9528a-lock-dfu/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -599,10 +543,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl3218x-ota-requestor' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tl3218x ota-requestor-app \
-                    out/telink-tl3218x-ota-requestor/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -613,10 +553,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump-usb' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9518adk80d pump-app-usb \
-                    out/telink-tlsr9518adk80d-pump-usb/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -627,10 +563,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump-controller' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9518adk80d pump-controller-app \
-                    out/telink-tlsr9518adk80d-pump-controller/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -641,10 +573,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-shell' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9518adk80d shell \
-                    out/telink-tlsr9518adk80d-shell/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -655,10 +583,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-smoke-co-alarm' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9528a_retention smoke_co_alarm-app \
-                    out/telink-tlsr9528a_retention-smoke-co-alarm/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -669,10 +593,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a-light-precompiled-ot' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9528a light-precompiled-ot \
-                    out/telink-tlsr9528a-light-precompiled-ot/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -683,10 +603,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-thermostat' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tlsr9518adk80d thermostat \
-                    out/telink-tlsr9518adk80d-thermostat/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -697,16 +613,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x-window-covering' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink_3_3 tl7218x window-covering \
-                    out/telink-tl7218x-window-covering/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
-
-            - name: Uploading Size Reports
-              uses: ./.github/actions/upload-size-reports
-              if: ${{ !env.ACT }}
-              with:
-                platform-name: Telink_3_3
