@@ -40,18 +40,18 @@ using TwoDCartesianVertexStruct = Structs::TwoDCartesianVertexStruct::Type;
 using ZoneInformationStruct     = Structs::ZoneInformationStruct::Type;
 using ZoneTriggerControlStruct  = Structs::ZoneTriggerControlStruct::Type;
 
-class ZoneManagementServer;
+class ZoneMgmtServer;
 
 /** @brief
  *  Defines interfaces for implementing application-specific logic for various aspects of the ZoneManagement Cluster.
  *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
  */
-class ZoneManagementDelegate
+class ZoneMgmtDelegate
 {
 public:
-    ZoneManagementDelegate() = default;
+    ZoneMgmtDelegate() = default;
 
-    virtual ~ZoneManagementDelegate() = default;
+    virtual ~ZoneMgmtDelegate() = default;
 
     /**
      *    @brief Command Delegate for creation of TwoDCartesianZone with the provided parameters.
@@ -129,21 +129,21 @@ public:
     virtual void OnAttributeChanged(AttributeId attributeId) = 0;
 
 private:
-    friend class ZoneManagementServer;
+    friend class ZoneMgmtServer;
 
-    ZoneManagementServer * mZoneManagementServer = nullptr;
+    ZoneMgmtServer * mZoneMgmtServer = nullptr;
 
     /**
      * This method is used by the SDK to ensure the delegate points to the server instance it's associated with.
      * When a server instance is created or destroyed, this method will be called to set and clear, respectively,
      * the pointer to the server instance.
      *
-     * @param aZoneManagementServer  A pointer to the ZoneManagementServer object related to this delegate object.
+     * @param aZoneMgmtServer  A pointer to the ZoneMgmtServer object related to this delegate object.
      */
-    void SetZoneManagementServer(ZoneManagementServer * aZoneManagementServer) { mZoneManagementServer = aZoneManagementServer; }
+    void SetZoneMgmtServer(ZoneMgmtServer * aZoneMgmtServer) { mZoneMgmtServer = aZoneMgmtServer; }
 
 protected:
-    ZoneManagementServer * GetZoneManagementServer() const { return mZoneManagementServer; }
+    ZoneMgmtServer * GetZoneMgmtServer() const { return mZoneMgmtServer; }
 };
 
 enum class OptionalAttribute : uint32_t
@@ -151,7 +151,7 @@ enum class OptionalAttribute : uint32_t
 
 };
 
-class ZoneManagementServer : public CommandHandlerInterface, public AttributeAccessInterface
+class ZoneMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
     /**
@@ -175,15 +175,15 @@ public:
      * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
      *
      */
-    ZoneManagementServer(ZoneManagementDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                         const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
-                         uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
+    ZoneMgmtServer(ZoneMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+                   const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
+                   uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
 
-    ~ZoneManagementServer() override;
+    ~ZoneMgmtServer() override;
 
     /**
      * @brief Initialise the Zone Management server instance.
-     * This function must be called after defining a ZoneManagementServer class object.
+     * This function must be called after defining a ZoneMgmtServer class object.
      * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
      * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
      * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
@@ -213,7 +213,7 @@ public:
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
 
 private:
-    ZoneManagementDelegate & mDelegate;
+    ZoneMgmtDelegate & mDelegate;
     EndpointId mEndpointId;
     const BitFlags<Feature> mFeatures;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
