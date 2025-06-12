@@ -602,7 +602,7 @@ CHIP_ERROR WiFiPAFEndPoint::DriveSending()
         return CHIP_NO_ERROR;
     }
 
-    if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable() && !mAckToSend.IsNull() && !mSendQueue.IsNull())
+    if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable() && (!mAckToSend.IsNull() || !mSendQueue.IsNull()))
     {
         // Resource is currently unavailable, send packets later
         StartWaitResourceTimer();
