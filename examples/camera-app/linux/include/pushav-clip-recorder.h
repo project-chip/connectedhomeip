@@ -137,7 +137,7 @@ public:
     void PushPacket(const char * data, size_t size, bool isVideo);
 
     std::atomic<bool> mRunning; ///< Recording activity flag
-
+    std::atomic<bool> mDeintializeRecorder;
 private:
     int kMaxQueueSize = 500;
 
@@ -152,28 +152,29 @@ private:
     AVFormatContext * mInputFormatContext;
     AVStream * mVideoStream;
     AVStream * mAudioStream;
-    AVIOContext * mAvioContext;
     AVCodecContext * mAudioEncoderContext;
     std::thread mWorkerThread;
-    std::atomic<bool> mWorkerRunning{ false };
     std::mutex mQueueMutex;
     std::condition_variable mCondition;
 
     std::queue<AVPacket *> mAudioQueue;
     std::queue<AVPacket *> mVideoQueue;
 
-    int mLastFragmentId          = 0;
+    int mAudioFragment           = 1;
+    int mVideoFragment           = 1;
     int64_t mCurrentClipStartPts = AV_NOPTS_VALUE;
     int64_t mFoundFirstIFramePts = -1;
     int64_t currentPts           = AV_NOPTS_VALUE;
     bool mMetadataSet            = false;
+    bool mUploadedInitSegment    = false;
+    bool mUploadMPD              = false;
 
     PushAVUploader mUploader;
 
     /// @name Internal Methods
     /// @{
     bool FileExists(const std::string & path);
-    bool CheckAndUploadFile(char * path);
+    bool CheckAndUploadFile(std::string path);
     bool IsH264IFrame(const uint8_t * data, unsigned int length);
     AVPacket * CreatePacket(const uint8_t * data, int size, bool isVideo);
 
