@@ -110,9 +110,14 @@ enum class AttributeQualityFlags : uint32_t
     // If you add new items here, remember to change kAttrQualityBits
 };
 
+struct EventEntry
+{
+    Access::Privilege readPrivilege; // Required access level to read this event
+};
+
 struct AttributeEntry
 {
-    AttributeId attributeId;
+    const AttributeId attributeId;
 
     // Constructor
 

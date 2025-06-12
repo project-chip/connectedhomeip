@@ -167,7 +167,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindEndpoint::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
 
-    DataModel::Nullable<uint16_t> endpointID;
+    uint16_t endpointID = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -183,7 +183,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    DataModel::Nullable<uint16_t> endpointID;
+    uint16_t endpointID = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
@@ -191,7 +191,7 @@ public:
 namespace FindEndpointResponse {
 enum class Fields : uint8_t
 {
-    kEndpoints = 0,
+    kEndpoint = 0,
 };
 
 struct Type
@@ -201,7 +201,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindEndpointResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
 
-    DataModel::List<const Structs::TLSEndpointStruct::Type> endpoints;
+    Structs::TLSEndpointStruct::Type endpoint;
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -216,7 +216,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindEndpointResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
 
-    DataModel::DecodableList<Structs::TLSEndpointStruct::DecodableType> endpoints;
+    Structs::TLSEndpointStruct::DecodableType endpoint;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

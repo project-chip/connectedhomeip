@@ -18,12 +18,11 @@
 
 #include <AppMain.h>
 
-#include "BridgedAdministratorCommissioning.h"
-#include "BridgedDevice.h"
-#include "BridgedDeviceBasicInformationImpl.h"
-#include "BridgedDeviceManager.h"
-#include "CommissionableInit.h"
 #include "CommissionerControlDelegate.h"
+#include <fabric-bridge-common/BridgedAdministratorCommissioning.h>
+#include <fabric-bridge-common/BridgedDevice.h>
+#include <fabric-bridge-common/BridgedDeviceBasicInformationImpl.h>
+#include <fabric-bridge-common/BridgedDeviceManager.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>

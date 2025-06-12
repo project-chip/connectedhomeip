@@ -44,12 +44,13 @@ public:
     // Indicates that the transport is ready to send audio data
     bool CanSendAudio() override;
 
-private:
-    // Transport is registered after peer connection is established for receiving the video and audio buffers.
-    // Hence keeping the default values as true for canSendVideo, canSendAudio
-    bool mCanSendVideo = true;
-    bool mCanSendAudio = true;
+    // Set video track for the transport
+    void SetVideoTrack(std::shared_ptr<rtc::Track> videoTrack);
 
+    // Set audio track for the transport
+    void SetAudioTrack(std::shared_ptr<rtc::Track> audioTrack);
+
+private:
     uint16_t mSessionID;
     uint64_t mNodeID;
     uint32_t mAudioSampleTimestamp;
