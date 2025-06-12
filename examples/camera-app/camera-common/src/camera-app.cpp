@@ -24,6 +24,7 @@ using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
+using namespace chip::app::Clusters::ZoneManagement;
 
 template <typename T>
 using List   = chip::app::DataModel::List<T>;
@@ -42,24 +43,24 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
-    BitFlags<CameraAvStreamManagement::Feature> features;
-    features.Set(CameraAvStreamManagement::Feature::kSnapshot);
-    features.Set(CameraAvStreamManagement::Feature::kVideo);
+    BitFlags<CameraAvStreamManagement::Feature> avsmFeatures;
+    avsmFeatures.Set(CameraAvStreamManagement::Feature::kSnapshot);
+    avsmFeatures.Set(CameraAvStreamManagement::Feature::kVideo);
 
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
-        features.Set(CameraAvStreamManagement::Feature::kAudio);
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kAudio);
     }
 
-    features.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
+    avsmFeatures.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
 
-    BitFlags<OptionalAttribute> optionalAttrs;
+    BitFlags<CameraAvStreamManagement::OptionalAttribute> avsmOptionalAttrs;
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
     {
-        features.Set(CameraAvStreamManagement::Feature::kNightVision);
-        optionalAttrs.Set(OptionalAttribute::kNightVision);
-        optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kNightVision);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kNightVision);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
     }
 
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
@@ -81,7 +82,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     // Instantiate the CameraAVStreamMgmt Server
     mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
-        mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
+        mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs, maxConcurrentVideoEncoders,
         maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
         micCapabilities, spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
         rankedStreamPriorities);
@@ -113,6 +114,25 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     mAVSettingsUserLevelMgmtServerPtr->SetTiltMin(mCameraDevice->GetCameraHALInterface().GetTiltMin());
     mAVSettingsUserLevelMgmtServerPtr->SetTiltMax(mCameraDevice->GetCameraHALInterface().GetTiltMax());
     mAVSettingsUserLevelMgmtServerPtr->SetZoomMax(mCameraDevice->GetCameraHALInterface().GetZoomMax());
+
+    // Fetch all initialization parameters for the ZoneManagement Server
+    BitFlags<ZoneManagement::Feature, uint32_t> zoneMgmtFeatures(
+        ZoneManagement::Feature::kTwoDimensionalCartesianZone, ZoneManagement::Feature::kPerZoneSensitivity,
+        ZoneManagement::Feature::kUserDefined, ZoneManagement::Feature::kFocusZones);
+
+    BitFlags<ZoneManagement::OptionalAttribute> zoneMgmtOptionalAttrs;
+    // Hardcode these initialization params for now. TODO: Define HAL interfaces
+    uint8_t appMaxZones                           = 8;  // Spec: min 1
+    uint8_t appMaxUserDefinedZones                = 5;  // Spec: min 5
+    uint8_t sensitivityMax                        = 10; // Spec: 2 to 10
+    TwoDCartesianVertexStruct appTwoDCartesianMax = {};
+    appTwoDCartesianMax.x                         = sensorParams.sensorWidth - 1;
+    appTwoDCartesianMax.y                         = sensorParams.sensorHeight - 1;
+
+    // Instantiate the ZoneManagement Server
+    mZoneMgmtServerPtr = std::make_unique<ZoneMgmtServer>(mCameraDevice->GetZoneManagementDelegate(), mEndpoint, zoneMgmtFeatures,
+                                                          zoneMgmtOptionalAttrs, appMaxUserDefinedZones, appMaxZones,
+                                                          sensitivityMax, appTwoDCartesianMax);
 }
 
 void CameraApp::InitializeCameraAVStreamMgmt()
@@ -134,6 +154,8 @@ void CameraApp::InitCameraDeviceClusters()
     mAVSettingsUserLevelMgmtServerPtr->Init();
 
     InitializeCameraAVStreamMgmt();
+
+    mZoneMgmtServerPtr->Init();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

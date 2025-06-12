@@ -22,6 +22,7 @@
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
+#include "zone-manager.h"
 
 #include "default-media-controller.h"
 #include <protocols/interaction_model/StatusCode.h>
@@ -75,6 +76,7 @@ public:
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::ZoneManagement::ZoneMgmtDelegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
 
@@ -226,6 +228,7 @@ private:
 
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
+    chip::app::Clusters::ZoneManagement::ZoneManager mZoneManager;
 
     DefaultMediaController mMediaController;
 

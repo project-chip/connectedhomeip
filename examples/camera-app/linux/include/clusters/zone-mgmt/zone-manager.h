@@ -32,7 +32,7 @@ namespace ZoneManagement {
 /**
  * The application delegate to define the options & implement commands.
  */
-class ZoneManager : public ZoneManagementDelegate
+class ZoneManager : public ZoneMgmtDelegate
 {
 public:
     Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStruct & zone,

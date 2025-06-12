@@ -37,6 +37,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
+using namespace chip::app::Clusters::ZoneManagement;
 
 using namespace Camera;
 
@@ -1118,6 +1119,11 @@ CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
+}
+
+ZoneMgmtDelegate & CameraDevice::GetZoneManagementDelegate()
+{
+    return mZoneManager;
 }
 
 MediaController & CameraDevice::GetMediaController()
