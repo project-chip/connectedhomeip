@@ -39,7 +39,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from itertools import chain
-from typing import Any, Callable, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
@@ -237,7 +237,7 @@ class EventChangeCallback:
 
 class AttributeChangeCallback:
     def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
-        self._output = queue.Queue()
+        self._output: queue.Queue[tuple[TypedAttributePath, SubscriptionTransaction]] = queue.Queue()
         self._expected_attribute = expected_attribute
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
@@ -301,7 +301,7 @@ class AttributeMatcher:
 
         The condition matched should be clearly expressed by the `description` property.
         """
-        pass
+        raise NotImplementedError("Subclasses must implement the matches method")
 
     @property
     def description(self):
@@ -390,12 +390,12 @@ class ClusterAttributeChangeAccumulator:
             If provided, subscribes to a single attribute. Defaults to None.
     """
 
-    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
+    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: Optional[ClusterObjects.ClusterAttributeDescriptor] = None):
         self._expected_cluster = expected_cluster
         self._expected_attribute = expected_attribute
         self._subscription = None
         self._lock = threading.Lock()
-        self._q = queue.Queue()
+        self._q: queue.Queue[AttributeValue] = queue.Queue()
         self._endpoint_id = 0
         self.reset()
 
@@ -415,9 +415,14 @@ class ClusterAttributeChangeAccumulator:
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
-        attributes = [(endpoint, self._expected_cluster)]
+        from typing import Union
+
         if self._expected_attribute is not None:
-            attributes = [(endpoint, self._expected_attribute)]
+            attributes: list[tuple[int, Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]] = [
+                (endpoint, self._expected_attribute)]
+        else:
+            attributes = [(endpoint, self._expected_cluster)]
+
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
             attributes=attributes,
