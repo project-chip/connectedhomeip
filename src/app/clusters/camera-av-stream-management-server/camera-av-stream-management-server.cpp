@@ -38,7 +38,6 @@ using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvStreamManagement::Structs;
 using namespace chip::app::Clusters::CameraAvStreamManagement::Attributes;
 using namespace Protocols::InteractionModel;
-using StreamUsageEnum = chip::app::Clusters::Globals::StreamUsageEnum;
 
 namespace chip {
 namespace app {
