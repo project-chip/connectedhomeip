@@ -27,6 +27,10 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 using Protocols::InteractionModel::Status;
 
+namespace {
+constexpr Percent100ths kFullClosedTargetPosition = 10000; // Default target position in 100ths of a percent
+} // namespace
+
 Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
                                           const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
@@ -61,40 +65,28 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
     return CHIP_NO_ERROR;
 }
 
-void ClosureDimensionEndpoint::OnClosureActionComplete(uint8_t action) 
+void ClosureDimensionEndpoint::OnStopMotionActionComplete()
 {
-    ClosureManager::Action_t closureAction = static_cast<ClosureManager::Action_t>(action);
+    // This function should handle closure dimension state updation after stopping of motion Action.
+}
 
-    if (closureAction == ClosureManager::Action_t::INVALID_ACTION)
-    {
-        ChipLogError(AppServer, "Invalid action received in OnActionComplete");
-        return;
-    }
+void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
+{
+    // This function should handle closure dimension state updation after stopping of calibration Action.
+}
 
-    // Call the logic to handle the action completion
-    switch (closureAction)
-    {
-    case ClosureManager::Action_t::STOP_MOTION_ACTION:
-        break;
-    case ClosureManager::Action_t::STOP_CALIBRATE_ACTION:
-        break;
-    case ClosureManager::Action_t::CALIBRATE_ACTION:
-    {
-        DataModel::Nullable<GenericCurrentStateStruct> currentState(
-            GenericCurrentStateStruct(MakeOptional(10000),
-                                      MakeOptional(true),
-                                      MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
-        DataModel::Nullable<GenericTargetStruct> target{ DataModel::NullNullable };
+void ClosureDimensionEndpoint::OnCalibrateActionComplete()
+{
+    DataModel::Nullable<GenericCurrentStateStruct> currentState(
+        GenericCurrentStateStruct(MakeOptional(kFullClosedTargetPosition),
+                                  MakeOptional(true),
+                                  MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    DataModel::Nullable<GenericTargetStruct> target{ DataModel::NullNullable };
+    mLogic.SetCurrentState(currentState);
+    mLogic.SetTarget(target);
+}
 
-        mLogic.SetCurrentState(currentState);
-        mLogic.SetTarget(target);
-        mLogic.SetTarget(target);
-        break;
-    }
-    case ClosureManager::Action_t::MOVE_TO_ACTION:
-        break;
-    default:
-        ChipLogError(AppServer, "Invalid action received in OnActionComplete");
-        return;
-    }
+void ClosureDimensionEndpoint::OnMoveToActionComplete()
+{
+    // This function should handle closure dimension state updation after MoveTo Action.
 }

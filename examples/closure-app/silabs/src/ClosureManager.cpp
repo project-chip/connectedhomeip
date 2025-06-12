@@ -112,7 +112,8 @@ void ClosureManager::StartTimer(uint32_t aTimeoutMs)
     }
 }
 
-void ClosureManager::CancelTimer(void)
+
+void ClosureManager::CancelTimer()
 {
     if (osTimerStop(mClosureTimer) == osError)
     {
@@ -127,20 +128,20 @@ void ClosureManager::InitiateAction(AppEvent * event)
     switch (mCurrentAction)
         {
         case Action_t::CALIBRATE_ACTION:
-            ChipLogError(AppServer, "Initiating calibration action");
+            ChipLogDetail(AppServer, "Initiating calibration action");
             break;
         case Action_t::STOP_MOTION_ACTION:
-            ChipLogError(AppServer, "Initiating stop motion action");
+            ChipLogDetail(AppServer, "Initiating stop motion action");
             break;
         case Action_t::STOP_CALIBRATE_ACTION:
-            ChipLogError(AppServer, "Initiating stop calibration action");
+            ChipLogDetail(AppServer, "Initiating stop calibration action");
             ClosureManager::GetInstance().StartTimer(kCountdownTimeSeconds * 1000);
             break;
         case Action_t::MOVE_TO_ACTION:
-            ChipLogError(AppServer, "Initiating move to action");
+            ChipLogDetail(AppServer, "Initiating move to action");
             break;
         default:
-            ChipLogError(AppServer, "Invalid action received in InitiateAction");
+            ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
             return;
         }
 }
@@ -214,10 +215,9 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         case Action_t::CALIBRATE_ACTION:
         {
             isCalibrationInProgress = false;
-            GetInstance().ep1.OnClosureActionComplete(Action_t::CALIBRATE_ACTION);
-            GetInstance().ep2.OnClosureActionComplete(Action_t::CALIBRATE_ACTION);
-            GetInstance().ep3.OnClosureActionComplete(Action_t::CALIBRATE_ACTION);
-
+            GetInstance().ep1.OnCalibrateActionComplete();
+            GetInstance().ep2.OnCalibrateActionComplete();
+            GetInstance().ep3.OnCalibrateActionComplete();
             break;
         }
         case Action_t::STOP_MOTION_ACTION:

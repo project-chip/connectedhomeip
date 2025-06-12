@@ -114,34 +114,11 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     return CHIP_NO_ERROR;
 }
 
-void ClosureControlEndpoint::OnClosureActionComplete(uint8_t action) 
-{
-    ChipLogError(AppServer, "#######In OnActionComplete############");
-    ClosureManager::Action_t closureAction = static_cast<ClosureManager::Action_t>(action);
-
-    switch (closureAction)
-    {
-    case ClosureManager::Action_t::STOP_MOTION_ACTION:
-        OnStopMotionActionComplete();
-        break;
-    case ClosureManager::Action_t::STOP_CALIBRATE_ACTION:
-        OnStopCalibrateActionComplete();
-        break;
-    case ClosureManager::Action_t::CALIBRATE_ACTION:
-        OnCalibrateActionComplete();
-        break;
-    case ClosureManager::Action_t::MOVE_TO_ACTION:
-        OnMoveToActionComplete();
-        break;
-    default:
-        ChipLogError(AppServer, "Invalid action received in OnActionComplete");
-    }
-}
-
 void ClosureControlEndpoint::OnStopCalibrateActionComplete()
 {
     // This function should handle closure control state updation after stopping of calibration Action.
 }
+
 
 void ClosureControlEndpoint::OnStopMotionActionComplete()
 {
@@ -150,8 +127,6 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
-    ChipLogError(AppServer, "#######In CALIBRATE_ACTION ############");
-
     DataModel::Nullable<GenericOverallState> overallState(
     GenericOverallState(MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)),
                         MakeOptional(DataModel::MakeNullable(true)),
@@ -164,11 +139,9 @@ void ClosureControlEndpoint::OnCalibrateActionComplete()
     mLogic.SetOverallTarget(overallTarget);
     mLogic.SetCountdownTimeFromDelegate(0);
     mLogic.GenerateMovementCompletedEvent();
-
-    ChipLogError(AppServer, "####### CALIBRATE_ACTION done ############");
 }
 
 void ClosureControlEndpoint::OnMoveToActionComplete()
 {
-    // This function should handle closure control state updation after scompletion of Motion Action.   
+    // This function should handle closure control state updation after completion of Motion Action.   
 }
