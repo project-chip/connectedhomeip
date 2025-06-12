@@ -184,6 +184,13 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendThreePacket)
 TEST_F(TestBtpEngine, HandleCharacteristicSendEmptyPacket)
 {
     EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
+
+    auto packet0 = System::PacketBufferHandle::New(20);
+    packet0->SetDataLength(20);
+
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), true));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
 }
 
 } // namespace
