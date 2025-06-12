@@ -3582,10 +3582,13 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
     case Attributes::CurrentErrorList::Id: {
         return YES;
     }
-    case Attributes::OverallState::Id: {
+    case Attributes::OverallCurrentState::Id: {
         return YES;
     }
-    case Attributes::OverallTarget::Id: {
+    case Attributes::OverallTargetState::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

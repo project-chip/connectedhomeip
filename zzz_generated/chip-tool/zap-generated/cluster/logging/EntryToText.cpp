@@ -2763,10 +2763,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MainState";
         case chip::app::Clusters::ClosureControl::Attributes::CurrentErrorList::Id:
             return "CurrentErrorList";
-        case chip::app::Clusters::ClosureControl::Attributes::OverallState::Id:
-            return "OverallState";
-        case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
-            return "OverallTarget";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallCurrentState::Id:
+            return "OverallCurrentState";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallTargetState::Id:
+            return "OverallTargetState";
+        case chip::app::Clusters::ClosureControl::Attributes::LatchControlModes::Id:
+            return "LatchControlModes";
         case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
