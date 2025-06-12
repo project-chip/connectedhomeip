@@ -20495,6 +20495,7 @@ static id _Nullable DecodeAttributeValueForTLSClientManagementCluster(AttributeI
                     newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid.Value()];
                 }
                 newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
