@@ -60,6 +60,7 @@ private:
     bool mIsMessageValid = false;
 
 public:
+    // Constructor
     NFCMessage(TagInstance * instance, System::PacketBufferHandle && msgBuf) : mTagInstance(instance)
     {
         // Duplicate the data from the PacketBufferHandle
@@ -82,12 +83,51 @@ public:
         }
     }
 
+    // Move Constructor
+    NFCMessage(NFCMessage && other) noexcept
+        : mTagInstance(other.mTagInstance),
+          mDataToSend(other.mDataToSend),
+          mDataToSendBuffer(std::move(other.mDataToSendBuffer)),
+          mIsMessageValid(other.mIsMessageValid)
+    {
+        other.mTagInstance = nullptr;
+        other.mDataToSend = chip::ByteSpan();
+        other.mIsMessageValid = false;
+    }
+
+    // Move Assignment Operator
+    NFCMessage & operator=(NFCMessage && other) noexcept
+    {
+        if (this != &other)
+        {
+            mTagInstance = other.mTagInstance;
+            mDataToSend = other.mDataToSend;
+            mDataToSendBuffer = std::move(other.mDataToSendBuffer);
+            mIsMessageValid = other.mIsMessageValid;
+
+            other.mTagInstance = nullptr;
+            other.mDataToSend = chip::ByteSpan();
+            other.mIsMessageValid = false;
+        }
+        return *this;
+    }
+
+    // Deleted Copy Constructor
+    NFCMessage(const NFCMessage &) = delete;
+
+    // Deleted Copy Assignment Operator
+    NFCMessage & operator=(const NFCMessage &) = delete;
+
+    // Destructor
     ~NFCMessage() = default;
 
+    // Get the TagInstance
     TagInstance * GetTagInstance() { return mTagInstance; }
 
+    // Get the data to send
     chip::ByteSpan GetDataToSend() { return mDataToSend; }
 
+    // Check if the message is valid
     bool IsMessageValid() const { return mIsMessageValid; }
 };
 
@@ -133,17 +173,14 @@ private:
 
     // Thread and synchronization primitives
     std::thread mNfcThread;
-    std::queue<NFCMessage *> mMessageQueue;
+    std::queue<std::unique_ptr<NFCMessage>> mMessageQueue;
     std::mutex mQueueMutex;
     std::condition_variable mQueueCondition;
     std::atomic<bool> mThreadRunning;
 
     // Private methods
     void NfcThreadMain();
-    // message MUST be created with 'new'.
-    // This function then takes ownership of the message (and will call
-    //  "delete" when the message is not needed anymore)
-    void EnqueueMessage(NFCMessage * message);
+    void EnqueueMessage(std::unique_ptr<NFCMessage> message);
 };
 
 /**

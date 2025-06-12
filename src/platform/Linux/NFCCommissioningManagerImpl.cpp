@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
  *
@@ -584,11 +584,11 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
     return canSendToPeer;
 }
 
-void NFCCommissioningManagerImpl::EnqueueMessage(NFCMessage * message)
+void NFCCommissioningManagerImpl::EnqueueMessage(std::unique_ptr<NFCMessage> message)
 {
     {
         std::lock_guard<std::mutex> lock(mQueueMutex);
-        mMessageQueue.push(message);
+        mMessageQueue.push(std::move(message)); // Move the unique_ptr into the queue
     }
     mQueueCondition.notify_one();
 }
@@ -618,16 +618,12 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
 
     VerifyOrReturnLogError(pTargetedTagInstance != nullptr, CHIP_ERROR_PEER_NODE_NOT_FOUND);
 
-    NFCMessage * nfcMessage = new (std::nothrow) NFCMessage(pTargetedTagInstance, std::move(msgBuf));
-    if ((nfcMessage == nullptr) || (!nfcMessage->IsMessageValid()))
-    {
-        ChipLogError(DeviceLayer, "Invalid NFCMessage!");
-        delete nfcMessage;
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    // Create the NFCMessage as a unique_ptr
+    auto nfcMessage = std::make_unique<NFCMessage>(pTargetedTagInstance, std::move(msgBuf));
+    VerifyOrReturnLogError(nfcMessage->IsMessageValid(), CHIP_ERROR_NO_MEMORY);
 
     // Enqueue the message for processing in the NFC thread
-    EnqueueMessage(nfcMessage);
+    EnqueueMessage(std::move(nfcMessage));
 
     return CHIP_NO_ERROR;
 }
@@ -636,39 +632,41 @@ void NFCCommissioningManagerImpl::NfcThreadMain()
 {
     while (mThreadRunning)
     {
-        NFCMessage * message = nullptr;
+        std::unique_ptr<NFCMessage> message;
 
         // Wait for a message to process
         {
             std::unique_lock<std::mutex> lock(mQueueMutex);
             mQueueCondition.wait(lock, [this]() { return !mMessageQueue.empty() || !mThreadRunning; });
 
+            // If the thread is signaled to stop and the queue is empty, exit the loop
             if (!mThreadRunning && mMessageQueue.empty())
             {
                 break;
             }
 
-            message = mMessageQueue.front();
+            // Retrieve the message from the queue
+            message = std::move(mMessageQueue.front());
             mMessageQueue.pop();
         }
 
         // Process the message
-        if (message != nullptr)
+        if (message)
         {
             TagInstance * tagInstance = message->GetTagInstance();
             if (tagInstance == nullptr || !tagInstance->IsValid())
             {
                 ChipLogError(DeviceLayer, "Invalid TagInstance detected. Discarding message.");
-                delete message; // Clean up the invalid message
-                continue;       // Skip processing this message
+                continue; // Skip processing this message
             }
 
-            // Process the message
+            // Send the data to the NFC tag
             ByteSpan dataToSend = message->GetDataToSend();
             tagInstance->SendChainedAPDUs(dataToSend);
-
-            // Clean up the message after processing
-            delete message;
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Null NFCMessage detected. Skipping.");
         }
     }
 }
