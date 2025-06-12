@@ -72,8 +72,6 @@
 #define WIFIPAF_ACK_SEND_TIMEOUT_MS 2500
 #define WIFIPAF_WAIT_RES_TIMEOUT_MS 1000
 // Drop the connection if network resources remain unavailable for the period.
-// Known condition: If the remote side is awaiting an ACK packet, the wait time must not exceed PAFTP_CONN_IDLE_TIMEOUT_MS.
-// Ref: "PAFTP_CONN_IDLE_TIMEOUT" in Table 43 of PAFTP definition
 #define WIFIPAF_MAX_RESOURCE_BLOCK_COUNT (PAFTP_CONN_IDLE_TIMEOUT_MS / WIFIPAF_WAIT_RES_TIMEOUT_MS)
 
 /**
