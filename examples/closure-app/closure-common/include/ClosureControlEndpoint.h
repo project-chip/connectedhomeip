@@ -41,7 +41,7 @@ namespace ClosureControl {
  *
  * Inherits from DelegateBase and TestEventTriggerHandler to provide implementations
  * for closure control operations such as Stop, MoveTo, Calibration, and
- * error retrieval, and Test event triggering. 
+ * error retrieval, and Test event triggering.
  */
 class ClosureControlDelegate : public DelegateBase, public TestEventTriggerHandler
 {
