@@ -63,7 +63,7 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
 }
 
 // TODO: CurrentState should be QuietReporting.
-CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurrentStateStruct> & incomingCurrentState)
+CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimensionStateStruct> & incomingCurrentState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -73,18 +73,19 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     if (!incomingCurrentState.IsNull())
     {
         // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
-        if (incomingCurrentState.Value().position.HasValue())
+        if (incomingCurrentState.Value().position.HasValue() &&
+            !incomingCurrentState.Value().position.Value().IsNull())
         {
             //  If the position member is present in the incoming CurrentState, we need to check if the Positioning
             //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue,
+            VerifyOrReturnError(incomingCurrentState.Value().position.Value().Value() <= kPercents100thsMaxValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
         // Validate the incoming latch value has valid FeatureMap conformance.
-        if (incomingCurrentState.Value().latch.HasValue())
+        if (incomingCurrentState.Value().latch.HasValue() && !incomingCurrentState.Value().latch.Value().IsNull())
         {
             //  If the latching member is present in the incoming CurrentState, we need to check if the MotionLatching
             //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
@@ -110,7 +111,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct> & incomingTarget)
+CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericDimensionStateStruct> & incomingTarget)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -120,24 +121,25 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     if (!incomingTarget.IsNull())
     {
         // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
-        if (incomingTarget.Value().position.HasValue())
+        if (incomingTarget.Value().position.HasValue() &&
+            !incomingTarget.Value().position.Value().IsNull())
         {
             //  If the position member is present in the incoming Target, we need to check if the Positioning
             //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            VerifyOrReturnError(incomingTarget.Value().position.Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(incomingTarget.Value().position.Value().Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
 
             // Incoming Target Position value SHALL follow the scaling from Resolution Attribute.
             Percent100ths resolution;
             ReturnErrorOnFailure(GetResolution(resolution));
             VerifyOrReturnError(
-                incomingTarget.Value().position.Value() % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
+                incomingTarget.Value().position.Value().Value() % resolution == 0, CHIP_ERROR_INVALID_ARGUMENT,
                 ChipLogError(NotSpecified, "Target Position value SHALL follow the scaling from Resolution Attribute"));
         }
 
         // Validate the incoming latch value has valid FeatureMap conformance.
-        if (incomingTarget.Value().latch.HasValue())
+        if (incomingTarget.Value().latch.HasValue() && !incomingTarget.Value().latch.Value().IsNull())
         {
             //  If the latching member is present in the incoming Target, we need to check if the MotionLatching
             //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
@@ -158,7 +160,7 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericTargetStruct
     }
 
     mState.target = incomingTarget;
-    mMatterContext.MarkDirty(Attributes::Target::Id);
+    mMatterContext.MarkDirty(Attributes::TargetState::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -387,14 +389,14 @@ CHIP_ERROR ClusterLogic::SetModulationType(const ModulationTypeEnum modulationTy
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetCurrentState(DataModel::Nullable<GenericCurrentStateStruct> & currentState)
+CHIP_ERROR ClusterLogic::GetCurrentState(DataModel::Nullable<GenericDimensionStateStruct> & currentState)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     currentState = mState.currentState;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetTarget(DataModel::Nullable<GenericTargetStruct> & target)
+CHIP_ERROR ClusterLogic::GetTarget(DataModel::Nullable<GenericDimensionStateStruct> & target)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     target = mState.target;
@@ -499,7 +501,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // TODO: If this command is sent while the closure is in a non-compatible internal-state, a status code of
     // INVALID_IN_STATE SHALL be returned.
 
-    GenericTargetStruct target{};
+    GenericDimensionStateStruct target{};
 
     // If position field is present and Positioning(PS) feature is not supported, we should not set target.position value.
     if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
@@ -544,7 +546,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     }
 
     // Check if the current position is valid or else return InvalidInState
-    DataModel::Nullable<GenericCurrentStateStruct> currentState;
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
     VerifyOrReturnError(currentState.Value().position.HasValue(), Status::InvalidInState);
@@ -569,7 +571,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
 
-    GenericTargetStruct stepTarget{};
+    GenericDimensionStateStruct stepTarget{};
 
     // If speed field is present and Speed feature is not supported, we should not set stepTarget.speed value.
     if (speed.HasValue() && mConformance.HasFeature(Feature::kSpeed))
@@ -582,10 +584,10 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     // INVALID_IN_STATE response and the Target attribute value SHALL remain unchanged.
 
     // Check if the current position is valid or else return InvalidInState
-    DataModel::Nullable<GenericCurrentStateStruct> currentState;
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
-    VerifyOrReturnError(currentState.Value().position.HasValue(), Status::InvalidInState);
+    VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(), Status::InvalidInState);
 
     // Derive Target Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;
@@ -608,7 +610,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     }
 
     // Position = Position - NumberOfSteps * StepValue
-    uint32_t currentPosition = static_cast<uint32_t>(currentState.Value().position.Value());
+    uint32_t currentPosition = static_cast<uint32_t>(currentState.Value().position.Value().Value());
 
     switch (direction)
     {

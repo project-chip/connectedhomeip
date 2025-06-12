@@ -140,8 +140,8 @@ struct ClusterInitParameters
  */
 struct ClusterState
 {
-    DataModel::Nullable<GenericCurrentStateStruct> currentState{ DataModel::NullNullable };
-    DataModel::Nullable<GenericTargetStruct> target{ DataModel::NullNullable };
+    DataModel::Nullable<GenericDimensionStateStruct> currentState{ DataModel::NullNullable };
+    DataModel::Nullable<GenericDimensionStateStruct> target{ DataModel::NullNullable };
     Percent100ths resolution                                      = 1;
     Percent100ths stepValue                                       = 1;
     ClosureUnitEnum unit                                          = ClosureUnitEnum::kUnknownEnumValue;
@@ -188,7 +188,7 @@ public:
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
-    CHIP_ERROR SetCurrentState(const DataModel::Nullable<GenericCurrentStateStruct> & currentState);
+    CHIP_ERROR SetCurrentState(const DataModel::Nullable<GenericDimensionStateStruct> & currentState);
 
     /**
      * @brief Set Target.
@@ -200,7 +200,7 @@ public:
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
-    CHIP_ERROR SetTarget(const DataModel::Nullable<GenericTargetStruct> & target);
+    CHIP_ERROR SetTarget(const DataModel::Nullable<GenericDimensionStateStruct> & target);
 
     /**
      * @brief Set Resolution.
@@ -278,8 +278,8 @@ public:
     // Return CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported.
     // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
-    CHIP_ERROR GetCurrentState(DataModel::Nullable<GenericCurrentStateStruct> & currentState);
-    CHIP_ERROR GetTarget(DataModel::Nullable<GenericTargetStruct> & target);
+    CHIP_ERROR GetCurrentState(DataModel::Nullable<GenericDimensionStateStruct> & currentState);
+    CHIP_ERROR GetTarget(DataModel::Nullable<GenericDimensionStateStruct> & target);
     CHIP_ERROR GetResolution(Percent100ths & resolution);
     CHIP_ERROR GetStepValue(Percent100ths & stepValue);
     CHIP_ERROR GetUnit(ClosureUnitEnum & unit);
