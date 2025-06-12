@@ -1124,8 +1124,3 @@ MediaController & CameraDevice::GetMediaController()
 {
     return mMediaController;
 }
-
-void CameraDevice::SetAVStreamMgmtServer(CameraAVStreamMgmtServer * cameraAVStreamMgmtServer)
-{
-    mWebRTCProviderManager.SetAVStreamMgmtServer(cameraAVStreamMgmtServer);
-}

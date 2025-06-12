@@ -163,11 +163,6 @@ void WebRTCProviderManager::SetMediaController(MediaController * mediaController
     mMediaController = mediaController;
 }
 
-void WebRTCProviderManager::SetAVStreamMgmtServer(CameraAVStreamMgmtServer * cameraAVStreamMgmtServer)
-{
-    mCameraAVStreamMgmtServer = cameraAVStreamMgmtServer;
-}
-
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                                      bool & outDeferredOffer)
 {
@@ -465,94 +460,80 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
                                            const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
-    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
-    return CHIP_NO_ERROR;
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+
+    return delegate.ValidateStreamUsage(streamUsage, videoStreamId, audioStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::ValidateVideoStreamID(uint16_t videoStreamId)
 {
-    if (mCameraAVStreamMgmtServer == nullptr)
+    if (mCameraDevice == nullptr)
     {
-        ChipLogError(Camera, "AV Stream Management Server not available for video stream validation");
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    const std::vector<VideoStreamStruct> & allocatedVideoStreams = mCameraAVStreamMgmtServer->GetAllocatedVideoStreams();
+    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
-    // Check if the videoStreamId exists in allocated streams
-    for (const auto & stream : allocatedVideoStreams)
-    {
-        if (stream.videoStreamID == videoStreamId)
-        {
-            ChipLogProgress(Camera, "Video stream ID %u is valid and allocated", videoStreamId);
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    ChipLogError(Camera, "Video stream ID %u not found in allocated video streams", videoStreamId);
-    return CHIP_ERROR_INVALID_ARGUMENT;
+    return delegate.ValidateVideoStreamID(videoStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
 {
-    if (mCameraAVStreamMgmtServer == nullptr)
+    if (mCameraDevice == nullptr)
     {
-        ChipLogError(Camera, "AV Stream Management Server not available for audio stream validation");
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    const std::vector<AudioStreamStruct> & allocatedAudioStreams = mCameraAVStreamMgmtServer->GetAllocatedAudioStreams();
+    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
-    // Check if the audioStreamId exists in allocated streams
-    for (const auto & stream : allocatedAudioStreams)
-    {
-        if (stream.audioStreamID == audioStreamId)
-        {
-            ChipLogProgress(Camera, "Audio stream ID %u is valid and allocated", audioStreamId);
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    ChipLogError(Camera, "Audio stream ID %u not found in allocated audio streams", audioStreamId);
-    return CHIP_ERROR_INVALID_ARGUMENT;
+    return delegate.ValidateAudioStreamID(audioStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
 {
-    if (mCameraAVStreamMgmtServer == nullptr)
+    if (mCameraDevice == nullptr)
     {
-        ChipLogError(Camera, "AV Stream Management Server not available");
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Check privacy mode attributes
-    bool softRecordingPrivacyMode  = mCameraAVStreamMgmtServer->GetSoftRecordingPrivacyModeEnabled();
-    bool softLivestreamPrivacyMode = mCameraAVStreamMgmtServer->GetSoftLivestreamPrivacyModeEnabled();
+    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
-    isActive = softRecordingPrivacyMode || softLivestreamPrivacyMode;
-    return CHIP_NO_ERROR;
+    return delegate.IsPrivacyModeActive(isActive);
 }
 
 bool WebRTCProviderManager::HasAllocatedVideoStreams()
 {
-    if (mCameraAVStreamMgmtServer == nullptr)
+    if (mCameraDevice == nullptr)
     {
-        ChipLogError(Camera, "AV Stream Management Server not available for HasAllocatedVideoStreams check");
-        return false; // Or handle as an error if appropriate
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return false;
     }
-    const std::vector<VideoStreamStruct> & allocatedVideoStreams = mCameraAVStreamMgmtServer->GetAllocatedVideoStreams();
-    return !allocatedVideoStreams.empty();
+
+    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+
+    return delegate.HasAllocatedVideoStreams();
 }
 
 bool WebRTCProviderManager::HasAllocatedAudioStreams()
 {
-    if (mCameraAVStreamMgmtServer == nullptr)
+    if (mCameraDevice == nullptr)
     {
-        ChipLogError(Camera, "AV Stream Management Server not available for HasAllocatedAudioStreams check");
-        return false; // Or handle as an error if appropriate
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return false;
     }
-    const std::vector<AudioStreamStruct> & allocatedAudioStreams = mCameraAVStreamMgmtServer->GetAllocatedAudioStreams();
-    return !allocatedAudioStreams.empty();
+
+    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+
+    return delegate.HasAllocatedAudioStreams();
 }
 
 void WebRTCProviderManager::MoveToState(const State targetState)

@@ -35,7 +35,6 @@ using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSe
 using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
-using CameraAVStreamMgmtServer = chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer;
 
 class WebRTCProviderManager : public chip::app::Clusters::WebRTCTransportProvider::Delegate
 {
@@ -51,8 +50,6 @@ public:
     void CloseConnection();
 
     void SetMediaController(MediaController * mediaController);
-
-    void SetAVStreamMgmtServer(CameraAVStreamMgmtServer * cameraAVStreamMgmtServer);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
@@ -158,8 +155,6 @@ private:
     // Handle to the Camera Device interface. For accessing other
     // clusters, if required.
     CameraDeviceInterface * mCameraDevice = nullptr;
-
-    CameraAVStreamMgmtServer * mCameraAVStreamMgmtServer = nullptr;
 };
 
 } // namespace Camera
