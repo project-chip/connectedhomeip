@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -81,7 +82,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTimer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t newTime = static_cast<uint32_t>(0);
 
@@ -115,7 +115,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetTimer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -146,7 +145,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t additionalTime = static_cast<uint32_t>(0);
 
@@ -181,7 +179,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ReduceTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t timeReduction = static_cast<uint32_t>(0);
 

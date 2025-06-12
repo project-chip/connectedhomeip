@@ -174,7 +174,7 @@
 /**
  * CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD, CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
  *
- * NFC onboarding payload is not supported on K32W1
+ * NFC onboarding payload is not supporte
  */
 #define CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD 0
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD 0
@@ -231,3 +231,6 @@
 #define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 1
 #define CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE 1024
 #endif
+
+// Enable `Extension` attribute of ACL Cluster as required by door locks
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

@@ -411,7 +411,7 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -6177,7 +6177,7 @@
           "commands": [
             {
               "name": "SolicitOffer",
-              "code": 1,
+              "code": 0,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -6185,7 +6185,7 @@
             },
             {
               "name": "SolicitOfferResponse",
-              "code": 2,
+              "code": 1,
               "mfgCode": null,
               "source": "server",
               "isIncoming": 0,
@@ -6193,7 +6193,7 @@
             },
             {
               "name": "ProvideOffer",
-              "code": 3,
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -6201,7 +6201,7 @@
             },
             {
               "name": "ProvideOfferResponse",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "isIncoming": 0,
@@ -6209,7 +6209,7 @@
             },
             {
               "name": "ProvideAnswer",
-              "code": 5,
+              "code": 4,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -6217,7 +6217,7 @@
             },
             {
               "name": "ProvideICECandidates",
-              "code": 6,
+              "code": 5,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -6225,7 +6225,7 @@
             },
             {
               "name": "EndSession",
-              "code": 7,
+              "code": 6,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -6342,7 +6342,7 @@
           "commands": [
             {
               "name": "Offer",
-              "code": 1,
+              "code": 0,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,
@@ -6350,7 +6350,7 @@
             },
             {
               "name": "Answer",
-              "code": 2,
+              "code": 1,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,
@@ -6358,7 +6358,7 @@
             },
             {
               "name": "ICECandidates",
-              "code": 3,
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,
@@ -6366,7 +6366,7 @@
             },
             {
               "name": "End",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,

@@ -46,8 +46,8 @@ public:
         return true;
     }
     void Release() override
-    { /* nothing to do, we don't hold the ownership of the vector, and users is not expected to hold the ownership in OnFinished for
-         scan. */
+    { /* nothing to do, we don't hold the ownership of the vector, and users is not expected to hold the
+         ownership in OnFinished for scan. */
     }
 
 private:
@@ -234,6 +234,8 @@ public:
 
     uint8_t GetMaxNetworks() override { return 1; };
     NetworkIterator * GetNetworks() override;
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    void Shutdown() override;
 };
 
 } // namespace NetworkCommissioning

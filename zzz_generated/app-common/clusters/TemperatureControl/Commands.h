@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -67,7 +68,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<int16_t> targetTemperature;
     Optional<uint8_t> targetTemperatureLevel;
