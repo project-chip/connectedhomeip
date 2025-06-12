@@ -52,14 +52,14 @@ enum class ClosureControlTestEventTrigger : uint64_t
 
 } // namespace
 
-Status PrintOnlyDelegate::HandleCalibrateCommand()
+Status ClosureControlDelegate::HandleCalibrateCommand()
 {
     ChipLogProgress(AppServer, "HandleCalibrateCommand");
     // Add the calibration logic here
     return Status::Success;
 }
 
-Status PrintOnlyDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
+Status ClosureControlDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
                                               const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleMoveToCommand");
@@ -67,86 +67,77 @@ Status PrintOnlyDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum>
     return Status::Success;
 }
 
-Status PrintOnlyDelegate::HandleStopCommand()
+Status ClosureControlDelegate::HandleStopCommand()
 {
     ChipLogProgress(AppServer, "HandleStopCommand");
     // Add the stop logic here
     return Status::Success;
 }
 
-CHIP_ERROR PrintOnlyDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
+CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
 {
     // This function should return the current error at the specified index.
     // For now, we dont have a ErrorList implemented, so will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-bool PrintOnlyDelegate::IsReadyToMove()
+bool ClosureControlDelegate::IsReadyToMove()
 {
     // This function should return true if the closure is ready to move.
     // For now, we will return true.
     return true;
 }
 
-bool PrintOnlyDelegate::IsManualLatchingNeeded()
+bool ClosureControlDelegate::IsManualLatchingNeeded()
 {
     // This function should return true if manual latching is needed.
     // For now, we will return false.
     return false;
 }
 
-ElapsedS PrintOnlyDelegate::GetCalibrationCountdownTime()
+ElapsedS ClosureControlDelegate::GetCalibrationCountdownTime()
 {
     // This function should return the calibration countdown time.
     // For now, we will return kDefaultCountdownTime.
     return kDefaultCountdownTime;
 }
 
-ElapsedS PrintOnlyDelegate::GetMovingCountdownTime()
+ElapsedS ClosureControlDelegate::GetMovingCountdownTime()
 {
     // This function should return the moving countdown time.
     // For now, we will return kDefaultCountdownTime.
     return kDefaultCountdownTime;
 }
 
-ElapsedS PrintOnlyDelegate::GetWaitingForMotionCountdownTime()
+ElapsedS ClosureControlDelegate::GetWaitingForMotionCountdownTime()
 {
     // This function should return the waiting for motion countdown time.
     // For now, we will return kDefaultCountdownTime.
     return kDefaultCountdownTime;
 }
 
-CHIP_ERROR PrintOnlyDelegate::HandleEventTrigger(uint64_t eventTrigger)
+CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
 {
     eventTrigger                           = clearEndpointInEventTrigger(eventTrigger);
     ClosureControlTestEventTrigger trigger = static_cast<ClosureControlTestEventTrigger>(eventTrigger);
     ClusterLogic * logic                   = GetLogic();
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
 
     switch (trigger)
     {
     case ClosureControlTestEventTrigger::kMainStateIsSetupRequired:
-        err = logic->SetMainState(MainStateEnum::kSetupRequired);
-        break;
+        return logic->SetMainState(MainStateEnum::kSetupRequired);
     case ClosureControlTestEventTrigger::kMainStateIsProtected:
-        err = logic->SetMainState(MainStateEnum::kProtected);
-        break;
+        return logic->SetMainState(MainStateEnum::kProtected);
     case ClosureControlTestEventTrigger::kMainStateIsError:
-        err = logic->SetMainState(MainStateEnum::kError);
-        break;
+        return logic->SetMainState(MainStateEnum::kError);
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
-        err = logic->SetMainState(MainStateEnum::kDisengaged);
-        break;
+        return logic->SetMainState(MainStateEnum::kDisengaged);
     case ClosureControlTestEventTrigger::kClearEvent:
         // TODO
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
-        break;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     default:
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-        break;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    return err;
 }
 
 CHIP_ERROR ClosureControlEndpoint::Init()
