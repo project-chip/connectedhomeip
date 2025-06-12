@@ -1,5 +1,3 @@
-
-
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
@@ -20,14 +18,15 @@
 
 #pragma once
 
-#include "../../chef-operational-state-delegate-impl.h"
-#include "../microwave-oven-mode/chef-microwave-oven-mode.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <protocols/interaction_model/StatusCode.h>
 #include <utility>
+
+#include "../../chef-operational-state-delegate-impl.h"
+#include "../microwave-oven-mode/chef-microwave-oven-mode.h"
 
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 

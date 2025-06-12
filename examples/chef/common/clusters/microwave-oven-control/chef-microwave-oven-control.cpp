@@ -18,8 +18,6 @@
 
 #include "chef-microwave-oven-control.h"
 #include <app/util/attribute-storage.h>
-#include <app/util/endpoint-config-api.h>
-#include <memory>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,8 +40,8 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
                                                                          MicrowaveOvenControl::Feature::kPowerNumberLimits),
                                   *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr)
 {
-    mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-    mMicrowaveOvenControlInstance.Init();
+    VerifyOrDie(mOperationalStateInstancePtr != nullptr);
+    VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
 }
 
 void ChefMicrowaveOvenDevice::MicrowaveOvenInit()
@@ -68,6 +66,9 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
 
     mMicrowaveOvenControlInstance.SetCookTimeSec(cookTimeSec);
 
+    // If using power as number, check if powerSettingNum has value before setting the power number.
+    // If powerSetting field is missing in the command, the powerSettingNum passed here is handled to the max value
+    // and user can use this value directly.
     if (powerSettingNum.HasValue())
     {
         mPowerSettingNum = powerSettingNum.Value();
