@@ -129,19 +129,25 @@ public:
 namespace CMAFContainerOptionsStruct {
 enum class Fields : uint8_t
 {
-    kChunkDuration   = 0,
-    kCENCKey         = 1,
-    kMetadataEnabled = 2,
-    kCENCKeyID       = 3,
+    kFragmentDuration = 0,
+    kChunkDuration    = 1,
+    kSegmentGroup     = 2,
+    kTrackName        = 3,
+    kCENCKey          = 4,
+    kCENCKeyID        = 5,
+    kMetadataEnabled  = 6,
 };
 
 struct Type
 {
 public:
-    uint16_t chunkDuration = static_cast<uint16_t>(0);
+    uint16_t fragmentDuration = static_cast<uint16_t>(0);
+    uint16_t chunkDuration    = static_cast<uint16_t>(0);
+    uint8_t segmentGroup      = static_cast<uint8_t>(0);
+    chip::CharSpan trackName;
     Optional<chip::ByteSpan> CENCKey;
-    Optional<bool> metadataEnabled;
     Optional<chip::ByteSpan> CENCKeyID;
+    Optional<bool> metadataEnabled;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

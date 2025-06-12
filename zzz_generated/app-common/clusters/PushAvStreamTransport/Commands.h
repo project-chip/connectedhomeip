@@ -318,7 +318,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindTransport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    Optional<DataModel::Nullable<uint16_t>> connectionID;
+    DataModel::Nullable<uint16_t> connectionID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -334,7 +334,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    Optional<DataModel::Nullable<uint16_t>> connectionID;
+    DataModel::Nullable<uint16_t> connectionID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
