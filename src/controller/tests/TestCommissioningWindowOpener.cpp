@@ -67,6 +67,25 @@ protected:
     Controller::CommissioningWindowOpener opener = Controller::CommissioningWindowOpener(&mockController);
 };
 
+TEST_F(TestCommissioningWindowOpener, OpenBasicCommissioningWindowVerifier_Success)
+{
+    chip::System::Clock::Seconds16 timeout(300);
+    Callback::Callback<Controller::OnOpenBasicCommissioningWindow> callback(OCWVerifierCallback, this);
+    CHIP_ERROR err = opener.OpenBasicCommissioningWindow(0x1234, timeout, &callback);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_SuccessArguments)
+{
+    chip::System::Clock::Seconds16 timeout(300);
+    SetupPayload ignored;
+    Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
+    CHIP_ERROR err = opener.OpenCommissioningWindow(0x1234, timeout, sTestSpake2p01_IterationCount,
+                                                    3840, Optional(20202021U), Optional(ByteSpan(sTestSpake2p01_Salt)),
+                                                    &callback, ignored, false);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
 TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Success)
 {
     Callback::Callback<Controller::OnOpenCommissioningWindowWithVerifier> callback(OCWVerifierCallback, this);
