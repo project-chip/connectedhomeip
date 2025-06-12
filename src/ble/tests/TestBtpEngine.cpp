@@ -181,4 +181,9 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendThreePacket)
     EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(8));
 }
 
+TEST_F(TestBtpEngine, HandleCharacteristicSendEmptyPacket)
+{
+    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
+}
+
 } // namespace
