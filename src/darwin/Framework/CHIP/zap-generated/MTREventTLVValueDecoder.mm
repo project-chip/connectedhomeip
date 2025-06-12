@@ -4814,24 +4814,9 @@ static id _Nullable DecodeEventPayloadForZoneManagementCluster(EventId aEventId,
         __auto_type * value = [MTRZoneManagementClusterZoneTriggeredEvent new];
 
         do {
-            NSArray * _Nonnull memberValue;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.zones.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                    [array_0 addObject:newElement_0];
-                }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                memberValue = array_0;
-            }
-            value.zones = memberValue;
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.zone];
+            value.zone = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -4851,24 +4836,9 @@ static id _Nullable DecodeEventPayloadForZoneManagementCluster(EventId aEventId,
         __auto_type * value = [MTRZoneManagementClusterZoneStoppedEvent new];
 
         do {
-            NSArray * _Nonnull memberValue;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.zones.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                    [array_0 addObject:newElement_0];
-                }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                memberValue = array_0;
-            }
-            value.zones = memberValue;
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.zone];
+            value.zone = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;

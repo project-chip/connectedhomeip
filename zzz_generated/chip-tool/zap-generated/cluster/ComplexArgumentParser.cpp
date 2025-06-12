@@ -6301,6 +6301,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.zoneID", "zoneID", value.isMember("zoneID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.initialDuration", "initialDuration",
                                                                   value.isMember("initialDuration")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.augmentationDuration",
@@ -6311,6 +6313,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("blindDuration")));
 
     char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "zoneID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.zoneID, value["zoneID"]));
+    valueCopy.removeMember("zoneID");
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "initialDuration");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.initialDuration, value["initialDuration"]));
     valueCopy.removeMember("initialDuration");
@@ -6340,6 +6346,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type & request)
 {
+    ComplexArgumentParser::Finalize(request.zoneID);
     ComplexArgumentParser::Finalize(request.initialDuration);
     ComplexArgumentParser::Finalize(request.augmentationDuration);
     ComplexArgumentParser::Finalize(request.maxDuration);
@@ -8794,6 +8801,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.status, value["status"]));
     valueCopy.removeMember("status");
 
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8805,6 +8819,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TlsClientManagement::S
     ComplexArgumentParser::Finalize(request.caid);
     ComplexArgumentParser::Finalize(request.ccdid);
     ComplexArgumentParser::Finalize(request.status);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
