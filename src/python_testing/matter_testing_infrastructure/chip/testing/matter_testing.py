@@ -1547,21 +1547,24 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step(step)
         self.mark_current_step_skipped()
 
-    def skip_all_remaining_steps(self, starting_step_number):
-        ''' Skips all remaining test steps starting with provided starting step
-
+    def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
+        """Mark all remaining test steps starting with provided starting step
             starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
-            starting_step_number must be provided, and is not derived intentionally. By providing argument
-                test is more deliberately identifying where test skips are starting from, making
-                it easier to validate against the test plan for correctness.
-        '''
+            starting_step_number must be provided, and is not derived intentionally.
+            By providing argument test is more deliberately identifying where test skips are starting from, 
+            making it easier to validate against the test plan for correctness.
+        Args:
+            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+
+        Returns nothing on success so the test can go on.
+        """
         steps = self.get_test_steps(self.current_test_info.name)
         for idx, step in enumerate(steps):
             if step.test_plan_number == starting_step_number:
                 starting_step_idx = idx
                 break
         else:
-            asserts.fail("skip_all_remaining_steps was provided with invalid starting_step_num")
+            asserts.fail("mark_all_remaining_steps_skipped was provided with invalid starting_step_num")
         remaining = steps[starting_step_idx:]
         for step in remaining:
             self.skip_step(step.test_plan_number)
