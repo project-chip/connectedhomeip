@@ -381,7 +381,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestClusterRevision)
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateWithNoIntialisation)
 {
     GenericDimensionStateStruct testCurrentStateStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -398,7 +398,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateWithNoIntialisation)
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateWithNoPositioningFeature)
 {
     GenericDimensionStateStruct testCurrentStateStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -435,7 +435,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateWithNoPositioningFeatur
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateWithNoMotionLatchingFeature)
 {
     GenericDimensionStateStruct testCurrentStateStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -473,7 +473,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateWithNoMotionLatchingFea
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateWithNoSpeedFeature)
 {
     GenericDimensionStateStruct testCurrentStateStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -516,7 +516,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentState)
     mockContext.ClearDirtyList();
 
     GenericDimensionStateStruct testCurrentStateStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                        Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -562,7 +562,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentState)
     mockContext.ClearDirtyList();
     // Invalid position
     GenericDimensionStateStruct InvalidCurrentState{ Optional<Percent100ths>(10001), Optional<bool>(false),
-                                                   Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow) };
+                                                     Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow) };
     DataModel::Nullable<GenericDimensionStateStruct> testInvalid(InvalidCurrentState);
     EXPECT_EQ(logic->SetCurrentState(testInvalid), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -591,7 +591,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentState)
 TEST_F(TestClosureDimensionClusterLogic, TestTargetWithNoIntialisation)
 {
     GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
     DataModel::Nullable<GenericDimensionStateStruct> target;
@@ -608,7 +608,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestTargetWithNoIntialisation)
 TEST_F(TestClosureDimensionClusterLogic, TestTargetWithNoPositioningFeature)
 {
     GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
     DataModel::Nullable<GenericDimensionStateStruct> target;
@@ -645,7 +645,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestTargetWithNoPositioningFeature)
 TEST_F(TestClosureDimensionClusterLogic, TestTargetWithNoMotionLatchingFeature)
 {
     GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
     DataModel::Nullable<GenericDimensionStateStruct> target;
@@ -683,7 +683,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestTargetWithNoMotionLatchingFeature)
 TEST_F(TestClosureDimensionClusterLogic, TestTargetWithNoSpeedFeature)
 {
     GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
     DataModel::Nullable<GenericDimensionStateStruct> target;
@@ -726,7 +726,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestTarget)
     mockContext.ClearDirtyList();
 
     GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
 
     DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
     DataModel::Nullable<GenericDimensionStateStruct> target;
@@ -780,7 +780,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestTarget)
     mockContext.ClearDirtyList();
     // Invalid position
     GenericDimensionStateStruct InvalidTarget{ Optional<Percent100ths>(10001), Optional<bool>(false),
-                                       Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow) };
+                                               Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow) };
     DataModel::Nullable<GenericDimensionStateStruct> testInvalid(InvalidTarget);
     EXPECT_EQ(logic->SetTarget(testInvalid), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1647,7 +1647,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
 
     // Validating SetTarget with proper arguments
     GenericDimensionStateStruct setCurrentStateStruct(Optional<Percent100ths>(0), Optional<bool>(false),
-                                                    Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -1698,7 +1698,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitatio
 
     // Validating SetTarget with position greater than Limit.Max
     GenericDimensionStateStruct setCurrentStateStruct(Optional<Percent100ths>(1000), Optional<bool>(false),
-                                                    Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -1783,7 +1783,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
 
     // Validating Step increase with proper arguments
     GenericDimensionStateStruct setCurrentStateStruct(Optional<Percent100ths>(0), Optional<bool>(false),
-                                                    Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -1878,7 +1878,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWithLimitation)
 
     // Validating Step with proper arguments
     GenericDimensionStateStruct setCurrentStateStruct(Optional<Percent100ths>(1000), Optional<bool>(false),
-                                                    Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
     Structs::RangePercent100thsStruct::Type limitRange = { .min = 1000, .max = 9000 };

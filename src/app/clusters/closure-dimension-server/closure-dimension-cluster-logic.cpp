@@ -74,8 +74,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
     if (!incomingCurrentState.IsNull())
     {
         // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
-        if (incomingCurrentState.Value().position.HasValue() &&
-            !incomingCurrentState.Value().position.Value().IsNull())
+        if (incomingCurrentState.Value().position.HasValue() && !incomingCurrentState.Value().position.Value().IsNull())
         {
             //  If the position member is present in the incoming CurrentState, we need to check if the Positioning
             //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
@@ -122,14 +121,14 @@ CHIP_ERROR ClusterLogic::SetTarget(const DataModel::Nullable<GenericDimensionSta
     if (!incomingTarget.IsNull())
     {
         // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
-        if (incomingTarget.Value().position.HasValue() &&
-            !incomingTarget.Value().position.Value().IsNull())
+        if (incomingTarget.Value().position.HasValue() && !incomingTarget.Value().position.Value().IsNull())
         {
             //  If the position member is present in the incoming Target, we need to check if the Positioning
             //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            VerifyOrReturnError(incomingTarget.Value().position.Value().Value() <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(incomingTarget.Value().position.Value().Value() <= kPercents100thsMaxValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
 
             // Incoming Target Position value SHALL follow the scaling from Resolution Attribute.
             Percent100ths resolution;
@@ -604,7 +603,8 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
-    VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(), Status::InvalidInState);
+    VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
+                        Status::InvalidInState);
 
     // Derive Target Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;
