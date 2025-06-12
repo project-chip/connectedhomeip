@@ -19,6 +19,7 @@ import unittest
 from difflib import unified_diff
 from pathlib import Path
 from typing import List, Optional, Union
+from unittest.mock import patch, mock_open
 
 try:
     from matter.idl.data_model_xml import ParseSource, ParseXmls
@@ -29,6 +30,7 @@ except ImportError:
 from matter.idl.generators.idl import IdlGenerator
 from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_parser import CreateParser
+from matter.idl.lint.lint_rules_parser import CreateParser as CreateLintParser
 from matter.idl.matter_idl_types import Idl
 
 
@@ -112,6 +114,56 @@ class TestXmlParser(unittest.TestCase):
         ''')
 
         self.assertIdlEqual(xml_idl, expected_idl)
+
+    def testLinterAttributes(self):
+
+        linter_rules = '''
+all endpoints {
+  require global attribute featureMap = 65532;
+  require global attribute clusterRevision = 65533;
+}
+        '''
+        # Sample simulating an example app with only one cluster defined in one endpoint (the endpoint is needed
+        # for the lint rules check).
+        idlToCheck = IdlTextToIdl(
+            '''
+cluster TestCluster = 1045 {
+  revision 3;
+
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+endpoint 2 {
+  server cluster TestCluster {
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+}
+        ''')
+
+        lint_rules = []
+        # Since the CreateLintParser (alias for lint_rules_parser.CreateParser) uses internally
+        # a 'open' function to read the rules file the mock_open method is used to avoid
+        # creating or adding a file with the text.
+        original_open = open
+        with patch('builtins.open', mock_open(read_data=linter_rules)) as mock_file:
+
+            def selective_open(filename, *args, **kwargs):
+                if filename == 'nonexistent':
+                    return mock_file.return_value
+                return original_open(filename, *args, **kwargs)
+
+            mock_file.side_effect = selective_open
+            lint_rules.extend(CreateLintParser('nonexistent').parse())
+
+        errors = []
+        for rule in lint_rules:
+            errors.extend(rule.LintIdl(idlToCheck))
+        # Verify that there are no errors detected in the IDL based on the linter defined rules.
+        self.assertFalse(errors)
 
     def testClusterDerivation(self):
         # This test is based on a subset of ModeBase and Mode_Dishwasher original xml files
