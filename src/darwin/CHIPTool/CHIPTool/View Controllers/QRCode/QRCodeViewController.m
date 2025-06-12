@@ -521,8 +521,7 @@
     }];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel"
                                                         style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * action) {
-                                                      }]];
+                                                      handler:^(UIAlertAction * action) {}]];
 
     __weak typeof(self) weakSelf = self;
     [alertController
