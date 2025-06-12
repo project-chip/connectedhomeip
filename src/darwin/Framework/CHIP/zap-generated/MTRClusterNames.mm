@@ -5141,8 +5141,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentState";
             break;
 
-        case MTRAttributeIDTypeClusterClosureDimensionAttributeTargetID:
-            result = @"Target";
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeTargetStateID:
+            result = @"TargetState";
             break;
 
         case MTRAttributeIDTypeClusterClosureDimensionAttributeResolutionID:
@@ -5179,6 +5179,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterClosureDimensionAttributeModulationTypeID:
             result = @"ModulationType";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeLatchControlModesID:
+            result = @"LatchControlModes";
             break;
 
         case MTRAttributeIDTypeClusterClosureDimensionAttributeGeneratedCommandListID:
