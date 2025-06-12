@@ -60,7 +60,7 @@ Status ClosureControlDelegate::HandleCalibrateCommand()
 }
 
 Status ClosureControlDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
-                                              const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                                   const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleMoveToCommand");
     // Add the move to logic here
