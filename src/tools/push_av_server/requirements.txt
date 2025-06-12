@@ -1,5 +1,7 @@
 zeroconf
 cryptography
-uvicorn
 fastapi
 jinja2
+# We are currently patching hypercorn to add support for the TLS ASGI extension
+# As such updating its version should be linked to an update to the associated patch file
+Hypercorn==0.17.3
