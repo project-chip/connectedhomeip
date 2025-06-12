@@ -769,7 +769,8 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, LooksUpFails
     ASSERT_EQ(expectedTimerError, CHIP_ERROR_CANCELLED);
 }
 
-TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, OperationalNodeResolved)
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener,
+       CallsSuccessAndFailureListenersWhenAppropriateLookupResultsAreFound)
 {
     chip::Dnssd::Resolver::SetInstance(mockResolver);
 
@@ -781,15 +782,46 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, OperationalN
     System::Clock::Internal::MockClock clock;
     System::Clock::Internal::SetSystemClockForTesting(&clock);
 
-    AddressResolve::NodeLookupHandle handle;
-    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+    AddressResolve::NodeLookupHandle successfulHandle;
+    auto successfulRequest = NodeLookupRequest(chip::PeerId(1, 2));
 
-    request.SetMinLookupTime(100_ms32);
-    request.SetMaxLookupTime(200_ms32);
+    successfulRequest.SetMinLookupTime(100_ms32);
+    successfulRequest.SetMaxLookupTime(200_ms32);
 
-    r = resolver.LookupNode(request, handle);
+    AddressResolve::NodeLookupHandle failedHandle;
+    auto failedRequest = NodeLookupRequest(chip::PeerId(1, 3));
+
+    failedRequest.SetMinLookupTime(50_ms32);
+    failedRequest.SetMaxLookupTime(100_ms32);
+
+    r = resolver.LookupNode(successfulRequest, successfulHandle);
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    r = resolver.LookupNode(failedRequest, failedHandle);
+    ASSERT_EQ(r, CHIP_NO_ERROR);
 
     clock.AdvanceMonotonic(150_ms64);
+
+    chip::PeerId expectedPeerId;
+    chip::AddressResolve::ResolveResult expectedResult;
+    // set up a success lookup listener
+    mNodeListener.SetOnNodeAddressResolved(
+        [&expectedPeerId, &expectedResult](const chip::PeerId & peerId, const chip::AddressResolve::ResolveResult & result) {
+            expectedPeerId = peerId;
+            expectedResult = result;
+        });
+
+    CHIP_ERROR expectedError = CHIP_NO_ERROR;
+    chip::PeerId expectedFailedPeerId;
+    // set up a failed lookup listener
+    mNodeListener.SetOnNodeAddressResolutionFailed(
+        [&expectedFailedPeerId, &expectedError](const chip::PeerId & peerId, CHIP_ERROR reason) {
+            expectedFailedPeerId = peerId;
+            expectedError        = reason;
+        });
+
+    successfulHandle.SetListener(&mNodeListener);
+    failedHandle.SetListener(&mNodeListener);
 
     ResolveResult lowResult;
     lowResult.address = GetAddressWithLowScore();
@@ -799,9 +831,15 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, OperationalN
     resolvedData.resolutionData.ipAddress[0] = lowResult.address.GetIPAddress();
     resolvedData.resolutionData.interfaceId  = lowResult.address.GetInterface();
     resolvedData.resolutionData.port         = lowResult.address.GetPort();
-    resolver.OnOperationalNodeResolved(resolvedData);
+    resolvedData.operationalData.peerId      = successfulRequest.GetPeerId();
 
-    // ASSERT_EQ(r, CHIP_NO_ERROR);
+    resolver.OnOperationalNodeResolved(resolvedData);                                          // successful resolution
+    resolver.OnOperationalNodeResolutionFailed(failedRequest.GetPeerId(), CHIP_ERROR_TIMEOUT); // failed resolution
+
+    ASSERT_EQ(expectedPeerId.GetNodeId(), NodeId{ 2 });
+    ASSERT_EQ(expectedResult.address, GetAddressWithLowScore());
+    ASSERT_EQ(expectedFailedPeerId.GetNodeId(), NodeId{ 3 });
+    ASSERT_EQ(expectedError, CHIP_ERROR_TIMEOUT);
 }
 
 } // namespace
