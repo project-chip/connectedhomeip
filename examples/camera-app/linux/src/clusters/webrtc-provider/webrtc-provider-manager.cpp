@@ -468,7 +468,7 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
 
     auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
-    return delegate.ValidateStreamUsage(streamUsage, videoStreamId, audioStreamId);
+    return avsmDelegate.ValidateStreamUsage(streamUsage, videoStreamId, audioStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::ValidateVideoStreamID(uint16_t videoStreamId)
@@ -479,9 +479,9 @@ CHIP_ERROR WebRTCProviderManager::ValidateVideoStreamID(uint16_t videoStreamId)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
-    return delegate.ValidateVideoStreamID(videoStreamId);
+    return avsmDelegate.ValidateVideoStreamID(videoStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
@@ -492,9 +492,9 @@ CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
-    return delegate.ValidateAudioStreamID(audioStreamId);
+    return avsmDelegate.ValidateAudioStreamID(audioStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
@@ -505,9 +505,9 @@ CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
-    return delegate.IsPrivacyModeActive(isActive);
+    return avsmDelegate.IsPrivacyModeActive(isActive);
 }
 
 bool WebRTCProviderManager::HasAllocatedVideoStreams()
@@ -518,9 +518,9 @@ bool WebRTCProviderManager::HasAllocatedVideoStreams()
         return false;
     }
 
-    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
-    return delegate.HasAllocatedVideoStreams();
+    return avsmDelegate.HasAllocatedVideoStreams();
 }
 
 bool WebRTCProviderManager::HasAllocatedAudioStreams()
@@ -531,9 +531,9 @@ bool WebRTCProviderManager::HasAllocatedAudioStreams()
         return false;
     }
 
-    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
-    return delegate.HasAllocatedAudioStreams();
+    return avsmDelegate.HasAllocatedAudioStreams();
 }
 
 void WebRTCProviderManager::MoveToState(const State targetState)
