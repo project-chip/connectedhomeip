@@ -49,7 +49,7 @@ executable("${sample_name}") {
     "${project_dir}/common/chef-laundry-washer-controls-delegate-impl.cpp",
     "${project_dir}/common/chef-laundry-washer-mode.cpp",
     "${project_dir}/common/chef-operational-state-delegate-impl.cpp",
-    "${project_dir}/common/chef-rpc-actions-worker.cpp",
+    "${project_dir}/common/chef-pump.cpp",
     "${project_dir}/common/chef-rvc-mode-delegate.cpp",
     "${project_dir}/common/chef-rvc-operational-state-delegate.cpp",
     "${project_dir}/common/clusters/audio-output/AudioOutputManager.cpp",
@@ -106,6 +106,7 @@ executable("${sample_name}") {
     sources += [
       "${chip_root}/examples/platform/linux/Rpc.cpp",
       "${chip_root}/examples/platform/linux/system_rpc_server.cc",
+      "${project_dir}/common/chef-rpc-actions-worker.cpp",
     ]
 
     deps += [

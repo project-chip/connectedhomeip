@@ -939,7 +939,7 @@ limitations under the License.
         <typeName>Closure</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0230</deviceId>
-        <class>App</class>
+        <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
             <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
