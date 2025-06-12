@@ -986,5 +986,10 @@ CHIP_ERROR AutoCommissioner::AllocateMemoryAndCopySpan(Platform::ScopedMemoryBuf
     return CHIP_NO_ERROR;
 }
 
+void AutoCommissioner::SetThreadNetworkProvisionNeeded(bool needed)
+{
+    mNeedsNetworkSetup = mNeedsNetworkSetup || needed;
+}
+
 } // namespace Controller
 } // namespace chip
