@@ -2815,6 +2815,7 @@ endpoint 1 {
     callback attribute currentErrorList;
     callback attribute overallCurrentState;
     callback attribute overallTargetState;
+    ram      attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2855,6 +2856,7 @@ endpoint 2 {
     ram      attribute rotationAxis;
     ram      attribute overflow;
     ram      attribute modulationType;
+    ram      attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2894,6 +2896,7 @@ endpoint 3 {
     ram      attribute rotationAxis;
     ram      attribute overflow;
     ram      attribute modulationType;
+    ram      attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
