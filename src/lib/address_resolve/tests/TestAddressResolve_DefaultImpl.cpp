@@ -842,4 +842,35 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener,
     ASSERT_EQ(expectedError, CHIP_ERROR_TIMEOUT);
 }
 
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, ResolverShutsDownAndClearsAllPendingLookups)
+{
+    chip::AddressResolve::Impl::Resolver resolver;
+    auto r = resolver.Init(&mSystemLayer);
+
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    AddressResolve::NodeLookupHandle handle;
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    r = resolver.LookupNode(request, handle);
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    CHIP_ERROR expectedError = CHIP_NO_ERROR;
+    mNodeListener.SetOnNodeAddressResolutionFailed(
+        [&expectedError](const chip::PeerId & peerId, CHIP_ERROR reason) { expectedError = reason; });
+
+    handle.SetListener(&mNodeListener);
+
+    // Shutdown the resolver
+    resolver.Shutdown();
+
+    ASSERT_EQ(expectedError, CHIP_ERROR_SHUT_DOWN);
+}
+
 } // namespace
