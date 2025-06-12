@@ -91,25 +91,25 @@ bool ClusterLogic::IsValidMainStateTransition(MainStateEnum mainState) const
     return true;
 }
 
-bool ClusterLogic::IsSupportedOverallStatePositioning(PositioningEnum positioning) const
+bool ClusterLogic::IsSupportedOverallStatePositioning(CurrentPositionEnum positioning) const
 {
     bool isSupported = false;
 
     switch (positioning)
     {
-    case PositioningEnum::kFullyClosed:
-    case PositioningEnum::kFullyOpened:
-    case PositioningEnum::kPartiallyOpened:
-    case PositioningEnum::kOpenedAtSignature:
+    case CurrentPositionEnum::kFullyClosed:
+    case CurrentPositionEnum::kFullyOpened:
+    case CurrentPositionEnum::kPartiallyOpened:
+    case CurrentPositionEnum::kOpenedAtSignature:
         // Mandatory states are always supported
         isSupported = true;
         break;
 
-    case PositioningEnum::kOpenedForPedestrian:
+    case CurrentPositionEnum::kOpenedForPedestrian:
         isSupported = mConformance.HasFeature(Feature::kPedestrian);
         break;
 
-    case PositioningEnum::kOpenedForVentilation:
+    case CurrentPositionEnum::kOpenedForVentilation:
         isSupported = mConformance.HasFeature(Feature::kVentilation);
         break;
 
@@ -127,18 +127,18 @@ bool ClusterLogic::IsSupportedOverallTargetPositioning(TargetPositionEnum positi
 
     switch (positioning)
     {
-    case TargetPositionEnum::kCloseInFull:
-    case TargetPositionEnum::kOpenInFull:
-    case TargetPositionEnum::kSignature:
+    case TargetPositionEnum::kMoveToFullyClosed:
+    case TargetPositionEnum::kMoveToFullyOpen:
+    case TargetPositionEnum::kMoveToSignaturePosition:
         // Mandatory states are always supported
         isSupported = true;
         break;
 
-    case TargetPositionEnum::kPedestrian:
+    case TargetPositionEnum::kMoveToPedestrianPosition:
         isSupported = mConformance.HasFeature(Feature::kPedestrian);
         break;
 
-    case TargetPositionEnum::kVentilation:
+    case TargetPositionEnum::kMoveToVentilationPosition:
         isSupported = mConformance.HasFeature(Feature::kVentilation);
         break;
 
@@ -220,7 +220,7 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState)
+CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOverallCurrentState> & overallState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -229,27 +229,24 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
 
     if (!overallState.IsNull())
     {
-        const GenericOverallState & incomingOverallState = overallState.Value();
+        const GenericOverallCurrentState & incomingOverallState = overallState.Value();
 
         // Validate the incoming Positioning value and FeatureMap conformance.
-        if (incomingOverallState.positioning.HasValue())
+        if (incomingOverallState.position.HasValue() && !incomingOverallState.position.Value().IsNull())
         {
             // If the positioning member is present in the incoming OverallState, we need to check if the Positioning
             // feature is supported by the closure. If the Positioning feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            if (!incomingOverallState.positioning.Value().IsNull())
-            {
-                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.positioning.Value().Value()) !=
-                                        PositioningEnum::kUnknownEnumValue,
+                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.position.Value().Value()) !=
+                                        CurrentPositionEnum::kUnknownEnumValue,
                                     CHIP_ERROR_INVALID_ARGUMENT);
-                VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.positioning.Value().Value()),
+                VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.position.Value().Value()),
                                     CHIP_ERROR_INVALID_ARGUMENT);
-            }
         }
 
         // Validate the incoming Latch FeatureMap conformance.
-        if (incomingOverallState.latch.HasValue())
+        if (incomingOverallState.latch.HasValue() && !incomingOverallState.latch.Value().IsNull())
         {
             // If the latch member is present in the incoming OverallState, we need to check if the MotionLatching
             // feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
@@ -263,12 +260,9 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
             // supported by the closure. If the Speed feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            if (!incomingOverallState.speed.Value().IsNull())
-            {
-                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value().Value()) !=
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value()) !=
                                         Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                                     CHIP_ERROR_INVALID_ARGUMENT);
-            }
         }
 
         // Validate the incoming SecureState FeatureMap conformance.
@@ -282,12 +276,12 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
     }
 
     mState.mOverallState = overallState;
-    mMatterContext.MarkDirty(Attributes::OverallState::Id);
+    mMatterContext.MarkDirty(Attributes::OverallCurrentState::Id);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget)
+CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOverallTargetState> & overallTarget)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -296,25 +290,25 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
 
     if (!overallTarget.IsNull())
     {
-        const GenericOverallTarget & incomingOverallTarget = overallTarget.Value();
+        const GenericOverallTargetState & incomingOverallTarget = overallTarget.Value();
 
         // Validate the incoming Position value and FeatureMap conformance.
-        if (incomingOverallTarget.position.HasValue())
+        if (incomingOverallTarget.position.HasValue() && !incomingOverallTarget.position.Value().IsNull())
         {
             // If the position member is present in the incoming OverallTarget, we need to check if the Position
             // feature is supported by the closure. If the Position feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.position.Value()) !=
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTarget.position.Value().Value()) !=
                                     TargetPositionEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
 
-            VerifyOrReturnError(IsSupportedOverallTargetPositioning(incomingOverallTarget.position.Value()),
+            VerifyOrReturnError(IsSupportedOverallTargetPositioning(incomingOverallTarget.position.Value().Value()),
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
         // Validate the incoming Latch FeatureMap conformance.
-        if (incomingOverallTarget.latch.HasValue())
+        if (incomingOverallTarget.latch.HasValue() && incomingOverallTarget.latch.Value().IsNull())
         {
             // If the latch member is present in the incoming OverallTarget, we need to check if the MotionLatching
             // feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
@@ -335,7 +329,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     }
 
     mState.mOverallTarget = overallTarget;
-    mMatterContext.MarkDirty(Attributes::OverallTarget::Id);
+    mMatterContext.MarkDirty(Attributes::OverallTargetState::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -360,7 +354,7 @@ CHIP_ERROR ClusterLogic::GetMainState(MainStateEnum & mainState)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetOverallState(DataModel::Nullable<GenericOverallState> & overallState)
+CHIP_ERROR ClusterLogic::GetOverallState(DataModel::Nullable<GenericOverallCurrentState> & overallState)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -370,7 +364,7 @@ CHIP_ERROR ClusterLogic::GetOverallState(DataModel::Nullable<GenericOverallState
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget)
+CHIP_ERROR ClusterLogic::GetOverallTarget(DataModel::Nullable<GenericOverallTargetState> & overallTarget)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -435,7 +429,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "MoveTo Command called before Initialization of closure");
 
-    GenericOverallTarget target;
+    GenericOverallTargetState target;
 
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
