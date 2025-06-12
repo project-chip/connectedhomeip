@@ -64,16 +64,15 @@ enum class Type : uint8_t
 class PeerAddress
 {
 public:
-    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) { mId.mRemoteId = kUndefinedNodeId; }
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type)
-    {
-        mId.mRemoteId = kUndefinedNodeId;
-    }
-    PeerAddress(Type type) : mTransportType(type) { mId.mRemoteId = kUndefinedNodeId; }
-    PeerAddress(Type type, NodeId remoteId) : mTransportType(type) { mId.mRemoteId = remoteId; }
+    constexpr PeerAddress() : mTransportType(Type::kUndefined), mId{ .mRemoteId = kUndefinedNodeId } {}
+    constexpr PeerAddress(const Inet::IPAddress & addr, Type type) :
+        mIPAddress(addr), mTransportType(type), mId{ .mRemoteId = kUndefinedNodeId }
+    {}
+    constexpr PeerAddress(Type type) : mTransportType(type), mId{ .mRemoteId = kUndefinedNodeId } {}
+    constexpr PeerAddress(Type type, NodeId remoteId) : mTransportType(type), mId{ .mRemoteId = remoteId } {}
 
-    PeerAddress(PeerAddress &&)                  = default;
-    PeerAddress(const PeerAddress &)             = default;
+    constexpr PeerAddress(PeerAddress &&)        = default;
+    constexpr PeerAddress(const PeerAddress &)   = default;
     PeerAddress & operator=(const PeerAddress &) = default;
     PeerAddress & operator=(PeerAddress &&)      = default;
 
@@ -210,9 +209,9 @@ public:
 
     /****** Factory methods for convenience ******/
 
-    static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
+    static constexpr PeerAddress Uninitialized() { return PeerAddress(Type::kUndefined); }
 
-    static PeerAddress BLE() { return PeerAddress(Type::kBle); }
+    static constexpr PeerAddress BLE() { return PeerAddress(Type::kBle); }
 
     // NB: 0xFFFF is not allowed for NFC ShortId.
     static constexpr PeerAddress NFC() { return PeerAddress(kUndefinedNFCShortId()); }
@@ -245,7 +244,7 @@ public:
         return TCP(addr).SetPort(port).SetInterface(interface);
     }
 
-    static PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF, remoteId); }
+    static constexpr PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF, remoteId); }
 
     static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
     {
