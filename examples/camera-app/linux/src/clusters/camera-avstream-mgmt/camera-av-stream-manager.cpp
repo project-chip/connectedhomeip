@@ -41,6 +41,72 @@ void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDe
     mCameraDeviceHAL = aCameraDeviceHAL;
 }
 
+CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
+                                                      const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                      const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+{
+    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamManager::ValidateVideoStreamID(uint16_t videoStreamId)
+{
+    const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+
+    // Check if the videoStreamId exists in allocated streams
+    for (const auto & stream : allocatedVideoStreams)
+    {
+        if (stream.videoStreamID == videoStreamId)
+        {
+            ChipLogProgress(Camera, "Video stream ID %u is valid and allocated", videoStreamId);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    ChipLogError(Camera, "Video stream ID %u not found in allocated video streams", videoStreamId);
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
+{
+    const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+
+    // Check if the audioStreamId exists in allocated streams
+    for (const auto & stream : allocatedAudioStreams)
+    {
+        if (stream.audioStreamID == audioStreamId)
+        {
+            ChipLogProgress(Camera, "Audio stream ID %u is valid and allocated", audioStreamId);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    ChipLogError(Camera, "Audio stream ID %u not found in allocated audio streams", audioStreamId);
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR CameraAVStreamManager::IsPrivacyModeActive(bool & isActive)
+{
+    // Check privacy mode attributes
+    bool softRecordingPrivacyMode  = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
+    bool softLivestreamPrivacyMode = GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled();
+
+    isActive = softRecordingPrivacyMode || softLivestreamPrivacyMode;
+    return CHIP_NO_ERROR;
+}
+
+bool CameraAVStreamManager::HasAllocatedVideoStreams()
+{
+    const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+    return !allocatedVideoStreams.empty();
+}
+
+bool CameraAVStreamManager::HasAllocatedAudioStreams()
+{
+    const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+    return !allocatedAudioStreams.empty();
+}
+
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
