@@ -1,1 +1,1 @@
-136 : Upgrade docker to remove K32W0 SDK
+139 : Update chip-build-crosscompile docker to point to the latest version of sysroot

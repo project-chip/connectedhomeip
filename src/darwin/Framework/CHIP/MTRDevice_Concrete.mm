@@ -56,6 +56,36 @@
 #import <platform/LockTracker.h>
 #import <platform/PlatformManager.h>
 
+#pragma mark - TimeSynchronization configuration
+
+// There are two types of schedules for time updates, a short and a long time
+// into the future. The short time is used to schedule the initial update,
+// after a device becomes reachable, and when we detect a time synchronization
+// issue, to update the time more quickly when it's clearly wrong. The long
+// time is used for recurring regular updates.
+
+// Recurring time updates are a day apart (this can be changed in the future)
+#define MTR_DEVICE_TIME_UPDATE_LONG_WAIT_TIME_SEC (24 * 60 * 60)
+
+// Initial time update happens 2 minutes after a device becomes reachable, and
+// for time synchronization issues 2 minutes after detection of the issue (this
+// can be changed in the future). Unit tests can override this using
+// unitTestTimeUpdateShortDelayIsZero, so you should probably use
+// timeUpdateShortDelayInSeconds instead of this constant.
+#define MTR_DEVICE_TIME_UPDATE_SHORT_WAIT_TIME_SEC (60 * 2)
+
+// Redo time synchronization if the clocks are more than 5 minutes apart (this
+// can be changed in the future)
+#define MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC (60 * 5)
+
+// We only respond to time synchronization issues once every hour after
+// detecting an issue for the first time. Unit tests can override this using
+// unitTestTimeSynchronizationLossDetectionCadenceIsZero, so you should
+// probably use shouldDetectTimeSynchronizationLoss instead of this constant.
+#define MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE (1 * 60 * 60)
+
+#pragma mark - Constant string definitions
+
 static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 static NSString * const sHighestObservedEventNumberKey = @"highestObservedEventNumber";
 
@@ -373,6 +403,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
 - (void)unitTestSubscriptionCallbackDeleteForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device;
+- (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
+- (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
+- (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device;
 @end
 #endif
 
@@ -408,6 +441,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // This boolean keeps track of any device configuration changes received in an attribute report.
     // If this is true when the report ends, we notify the delegate.
     BOOL _deviceConfigurationChanged;
+
+    // Keep track of the current schedule of time updates (only valid if
+    // timeUpdateTimer is not nil).
+    uint64_t _lastTimeUpdateScheduledDelayInSeconds;
+    // This boolean keeps track, during a priming read, of whether time
+    // synchronization loss has been detected.
+    BOOL _timeSynchronizationLossDetected;
+    // Keep track of the last time we detected a time synchronization loss.
+    NSDate * _Nullable _timeSynchronizationLossDetectedTime;
 
     // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when any of the following happen:
     //   1. Subscription establishes
@@ -670,8 +712,55 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 #pragma mark - Time Synchronization
 
+- (uint64_t)timeUpdateShortDelayInSeconds
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    __block uint64_t delay = MTR_DEVICE_TIME_UPDATE_SHORT_WAIT_TIME_SEC;
+
+    // Make our unit tests more deterministic by removing non-zero timers.
+#ifdef DEBUG
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestTimeUpdateShortDelayIsZero:)]
+            && [testDelegate unitTestTimeUpdateShortDelayIsZero:self]) {
+            delay = 0;
+        }
+    }];
+#endif
+
+    return delay;
+}
+
+- (BOOL)shouldDetectTimeSynchronizationLoss
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (_timeSynchronizationLossDetectedTime == nil) {
+        return YES;
+    }
+
+    __block uint64_t cadence = MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE;
+
+#ifdef DEBUG
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectionCadenceIsZero:)]
+            && [testDelegate unitTestTimeSynchronizationLossDetectionCadenceIsZero:self]) {
+            cadence = 0;
+        }
+    }];
+#endif
+
+    if ([_timeSynchronizationLossDetectedTime timeIntervalSinceNow] * -1 >= cadence) {
+        return YES;
+    }
+
+    return NO;
+}
+
 - (void)_setTimeOnDevice
 {
+    os_unfair_lock_assert_owner(&self->_timeSyncLock);
+
     NSDate * now = [NSDate date];
     // If no date available, error
     if (!now) {
@@ -732,7 +821,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     auto timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
 
-    dispatch_source_set_timer(timerSource, dispatch_time(DISPATCH_TIME_NOW, nextUpdateInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER,
+    _lastTimeUpdateScheduledDelayInSeconds = nextUpdateInSeconds;
+    dispatch_source_set_timer(timerSource, dispatch_time(DISPATCH_TIME_NOW, _lastTimeUpdateScheduledDelayInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER,
         // Allow 3 seconds of leeway; should be plenty, in practice.
         static_cast<uint64_t>(3 * static_cast<double>(NSEC_PER_SEC)));
 
@@ -753,8 +843,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     dispatch_resume(timerSource);
 }
 
-// Time Updates are a day apart (this can be changed in the future)
-#define MTR_DEVICE_TIME_UPDATE_DEFAULT_WAIT_TIME_SEC (24 * 60 * 60)
 // assume lock is held
 - (void)_updateDeviceTimeAndScheduleNextUpdate
 {
@@ -765,7 +853,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     [self _setTimeOnDevice];
-    [self _scheduleNextUpdate:MTR_DEVICE_TIME_UPDATE_DEFAULT_WAIT_TIME_SEC];
+    [self _scheduleNextUpdate:MTR_DEVICE_TIME_UPDATE_LONG_WAIT_TIME_SEC];
 }
 
 - (void)_performScheduledTimeUpdate
@@ -835,6 +923,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         if (error) {
             MTR_LOG_ERROR("%@ _setUTCTime failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
         }
+#ifdef DEBUG
+        {
+            std::lock_guard lock(self->_lock);
+            [self _callDelegatesWithBlock:^(id testDelegate) {
+                if ([testDelegate respondsToSelector:@selector(unitTestSetUTCTimeInvokedForDevice:error:)]) {
+                    [testDelegate unitTestSetUTCTimeInvokedForDevice:self error:error];
+                }
+            }];
+        }
+#endif
     };
 
     [self _invokeKnownCommandWithEndpointID:endpoint
@@ -1291,8 +1389,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 }
 #endif
 
-// First Time Sync happens 2 minutes after reachability (this can be changed in the future)
-#define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
 - (void)_handleSubscriptionEstablished
 {
     os_unfair_lock_lock(&self->_lock);
@@ -1330,12 +1426,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _storePersistedDeviceData];
     }
 
+    uint64_t newUpdateDelay = [self timeUpdateShortDelayInSeconds];
+
     os_unfair_lock_unlock(&self->_lock);
 
     os_unfair_lock_lock(&self->_timeSyncLock);
 
     if (self.timeUpdateTimer == nil) {
-        [self _scheduleNextUpdate:MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC];
+        [self _scheduleNextUpdate:newUpdateDelay];
     }
 
     os_unfair_lock_unlock(&self->_timeSyncLock);
@@ -1792,6 +1890,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _changeState:MTRDeviceStateReachable];
     }
 
+    // Reset _timeSynchronizationLossDetected, so that it will get set based
+    // on the values in this report.
+    _timeSynchronizationLossDetected = NO;
+
     // If we currently don't have an established subscription, this must be a
     // priming report.
     _receivingPrimingReport = !HaveSubscriptionEstablishedRightNow(_internalDeviceState);
@@ -2132,7 +2234,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     MTR_LOG("%@ handling report end", self);
 
-    std::lock_guard lock(_lock);
+    os_unfair_lock_lock(&self->_lock);
+
     _receivingReport = NO;
     _receivingPrimingReport = NO;
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
@@ -2174,6 +2277,31 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }];
 #endif
+
+    uint64_t newUpdateDelay = [self timeUpdateShortDelayInSeconds];
+
+    BOOL timeSynchronizationLossDetected = _timeSynchronizationLossDetected;
+
+    os_unfair_lock_unlock(&self->_lock);
+
+    os_unfair_lock_lock(&self->_timeSyncLock);
+
+    // If we haven't scheduled a time update, then time synchronization will be
+    // handled by us eventually scheduling that update (e.g. when subscription
+    // setup completes).  But if an update is already scheduled (possibly for a
+    // while from now) and we detect that we are in a bad state already, we
+    // should deal with it quickly.
+    BOOL longTimeUpdateScheduled = self.timeUpdateTimer != nil
+        && _lastTimeUpdateScheduledDelayInSeconds == MTR_DEVICE_TIME_UPDATE_LONG_WAIT_TIME_SEC;
+
+    if (timeSynchronizationLossDetected && longTimeUpdateScheduled) {
+        MTR_LOG("%@ Trying to correct time synchronization loss, reschedule time update", self);
+        dispatch_source_cancel(self.timeUpdateTimer);
+        self.timeUpdateTimer = nil;
+        [self _scheduleNextUpdate:newUpdateDelay];
+    }
+
+    os_unfair_lock_unlock(&self->_timeSyncLock);
 }
 
 - (void)_handleCASESessionEstablished:(const SessionHandle &)session
@@ -4360,6 +4488,24 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
 
                 [self _attributeValue:attributeDataValue reportedForPath:attributePath];
+
+                // If we've never detected a time synchronization loss, or it's
+                // been a while since we last detected a time synchronization
+                // loss then check for a time synchronization loss now.
+                if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeTimeSynchronizationID
+                    && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID
+                    && [self shouldDetectTimeSynchronizationLoss]) {
+                    auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:attributeResponseValue error:nil];
+                    if (attrReport) {
+                        NSNumber * deviceUTCTime = attrReport.value;
+                        auto * deviceDate = MatterEpochMicrosecondsAsDate(deviceUTCTime.unsignedLongLongValue);
+                        if (std::abs([deviceDate timeIntervalSinceNow]) > MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC) {
+                            MTR_LOG("%@ Time synchronization loss detected", self);
+                            _timeSynchronizationLossDetected = YES;
+                            _timeSynchronizationLossDetectedTime = [NSDate now];
+                        }
+                    }
+                }
             }
 
 #ifdef DEBUG
