@@ -115,8 +115,8 @@ struct ClusterState
     };
 
     QuieterReportingAttribute<ElapsedS> mCountdownTime{ DataModel::NullNullable };
-    MainStateEnum mMainState                                 = MainStateEnum::kUnknownEnumValue;
-    DataModel::Nullable<GenericOverallCurrentState> mOverallState   = DataModel::NullNullable;
+    MainStateEnum mMainState                                      = MainStateEnum::kUnknownEnumValue;
+    DataModel::Nullable<GenericOverallCurrentState> mOverallState = DataModel::NullNullable;
     DataModel::Nullable<GenericOverallTargetState> mOverallTarget = DataModel::NullNullable;
 
     // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
@@ -128,7 +128,7 @@ struct ClusterState
  */
 struct ClusterInitParameters
 {
-    MainStateEnum mMainState                               = MainStateEnum::kStopped;
+    MainStateEnum mMainState                                      = MainStateEnum::kStopped;
     DataModel::Nullable<GenericOverallCurrentState> mOverallState = DataModel::NullNullable;
 };
 
