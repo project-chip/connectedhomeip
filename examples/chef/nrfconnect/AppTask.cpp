@@ -30,12 +30,17 @@
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#ifdef CONFIG_NET_L2_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 #include <crypto/PSAOperationalKeystore.h>
 #endif
@@ -78,6 +83,10 @@ chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 
 #ifdef CONFIG_CHIP_ICD_DSLS_SUPPORT
 bool sIsSitModeRequested = false;
+#endif
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+app::Clusters::NetworkDriverObj<DeviceLayer::NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
 #endif
 } // namespace
 
@@ -157,6 +166,8 @@ CHIP_ERROR AppTask::Init()
         ChipLogError(AppServer, "ConnectivityMgr().SetThreadDeviceType() failed");
         return err;
     }
+
+    threadNetworkDriver.Init();
 #else
     return CHIP_ERROR_INTERNAL;
 #endif // CONFIG_NET_L2_OPENTHREAD

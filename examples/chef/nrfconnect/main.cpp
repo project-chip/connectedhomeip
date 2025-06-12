@@ -23,6 +23,10 @@
 
 #include <zephyr/logging/log.h>
 
+#ifdef CONFIG_NET_L2_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
+
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
