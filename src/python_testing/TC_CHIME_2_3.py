@@ -51,12 +51,12 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the InstalledChimeSounds attribute, store as myChimeSounds."),
-            TestStep(3, "If myChimeSounds has only 1 value, end the test case."),
-            TestStep(4, "Read the SelectedChime attribute, store as mySelectedChime"),
+            TestStep(3, "Read the SelectedChime attribute, store as mySelectedChime"),
+            TestStep(4, "If myChimeSounds has only 1 value, jump to step 7."),
             TestStep(5, "Write to SelectedChime a new value from myChimeSounds."),
             TestStep(6, "Read the SelectedChime attribute, verfy that it's the same as the value written in step 5"),
             TestStep(7, "Write to SelectedChime a value not found in myChimeSounds. Verify a NotFound error response"),
-            TestStep(8, "Read the SelectedChime attribute, verfy that it's the same as the value written in step 5"),
+            TestStep(8, "Read the SelectedChime attribute, verfy that it's unchanged"),
 
         ]
         return steps
@@ -79,23 +79,24 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
         myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
 
         self.step(3)
-        if len(myChimeSounds) == 1:
-            self.skip_all_remaining_steps(4)
+        mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
 
         self.step(4)
-        mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
+        if len(myChimeSounds) > 1:
+            self.step(5)
+            newSelectedChime = mySelectedChime
+            for chime in myChimeSounds:
+                if chime.chimeID != mySelectedChime:
+                    newSelectedChime = chime.chimeID
+                    break
+            await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, newSelectedChime)
 
-        self.step(5)
-        newSelectedChime = mySelectedChime
-        for chime in myChimeSounds:
-            if chime.chimeID != mySelectedChime:
-                newSelectedChime = chime.chimeID
-                break
-        await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, newSelectedChime)
-
-        self.step(6)
-        mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
-        asserts.assert_equal(mySelectedChime, newSelectedChime, "Read SelectedChime does not match written SelectedChime")
+            self.step(6)
+            mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
+            asserts.assert_equal(mySelectedChime, newSelectedChime, "Read SelectedChime does not match written SelectedChime")
+        else:
+            self.skip_step(5)
+            self.skip_step(6)
 
         self.step(7)
         foundNotPresent = False
@@ -110,9 +111,9 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
             await self.write_chime_attribute_expect_failure(endpoint, attributes.SelectedChime, valueToUse, Status.NotFound)
 
             self.step(8)
-            mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
+            step8SelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
 
-            asserts.assert_equal(mySelectedChime, newSelectedChime, "SelectedChime is not the first item from InstalledChimeSounds")
+            asserts.assert_equal(step8SelectedChime, mySelectedChime, "SelectedChime has been written to an invalid value")
         else:
             self.skip_step(8)
 
