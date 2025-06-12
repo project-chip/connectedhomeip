@@ -69,6 +69,29 @@ class ServerClusterRequirement:
     id: Union[str, int]
 
 
+def _isRequired(attrib: xml.etree.ElementTree.Element) -> bool:
+
+    # Check for optional attributes in the old "optional" element format
+    if 'optional' in attrib.attrib and attrib.attrib['optional'] == 'true':
+        return False
+    # Check for optionalConform inside the element
+    if attrib.find('optionalConform'):
+        return False
+
+    # Check for provisional elements
+    if 'apiMaturity' in attrib.attrib and attrib.attrib['apiMaturity'] == 'provisional':
+        return False
+
+    # mandatory is a marker, as long as the mandatory is not
+    # turned into an optional by being controlled by a feature
+    mandatory_element = attrib.find('mandatoryConform')
+
+    if not mandatory_element:
+        return True
+
+    return mandatory_element.find('feature') is None
+
+
 def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     if element.tag != 'cluster':
         logging.error("Not a cluster element: %r" % element)
@@ -90,15 +113,8 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
         for attr in element.findall('attribute'):
             if attr.attrib['side'] != 'server':
                 continue
-            # Check for optional attributes in the old "optional" element format
-            if 'optional' in attr.attrib and attr.attrib['optional'] == 'true':
-                continue
 
-            # Check for optionalConform inside the attribute or feature conditional mandatoryConform
-            if attr.find('optionalConform') is not None or (attr.find('mandatoryConform') is not None and attr.find('mandatoryConform').find('feature') is not None):
-                continue
-
-            if 'apiMaturity' in attr.attrib and attr.attrib['apiMaturity'] == 'provisional':
+            if not _isRequired(attr):
                 continue
 
             # when introducing access controls, the content of attributes may either be:
