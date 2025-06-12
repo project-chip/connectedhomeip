@@ -47,6 +47,7 @@ private:
     std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelMgmtServer>
         mAVSettingsUserLevelMgmtServerPtr;
+    std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
 
     // Helper to set attribute defaults for CameraAVStreamMgmt
     void InitializeCameraAVStreamMgmt();

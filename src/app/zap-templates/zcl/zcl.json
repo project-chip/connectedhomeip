@@ -790,7 +790,13 @@
             "ClusterRevision"
         ],
         "Unit Localization": ["TemperatureUnit"],
-        "Zone Management": ["TwoDCartesianMax"]
+        "Zone Management": [
+            "MaxUserDefinedZones",
+            "MaxZones",
+            "SensitivityMax",
+            "Sensitivity",
+            "TwoDCartesianMax"
+        ]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

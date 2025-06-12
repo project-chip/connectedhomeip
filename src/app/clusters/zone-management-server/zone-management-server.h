@@ -1,0 +1,268 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/StatusResponse.h>
+#include <app/reporting/reporting.h>
+
+#include <app/SafeAttributePersistenceProvider.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/TypeTraits.h>
+#include <protocols/interaction_model/StatusCode.h>
+#include <vector>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ZoneManagement {
+
+using TwoDCartesianZoneStruct   = Structs::TwoDCartesianZoneStruct::Type;
+using TwoDCartesianVertexStruct = Structs::TwoDCartesianVertexStruct::Type;
+using ZoneInformationStruct     = Structs::ZoneInformationStruct::Type;
+using ZoneTriggerControlStruct  = Structs::ZoneTriggerControlStruct::Type;
+
+class ZoneMgmtServer;
+
+/** @brief
+ *  Defines interfaces for implementing application-specific logic for various aspects of the ZoneManagement Cluster.
+ *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
+ */
+class ZoneMgmtDelegate
+{
+public:
+    ZoneMgmtDelegate() = default;
+
+    virtual ~ZoneMgmtDelegate() = default;
+
+    /**
+     *    @brief Command Delegate for creation of TwoDCartesianZone with the provided parameters.
+     *
+     *   @param[in]  zone       Structure with parameters for defining a TwoDCartesian zone.
+     *
+     *   @param[out] outZoneID  Indicates the ID of the created zone.
+     *
+     *   @return Success if the creation is successful and a zoneID was
+     *   produced; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
+     */
+    virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStruct & zone,
+                                                                        uint16_t & outZoneID) = 0;
+
+    /**
+     *    @brief Command Delegate for updating of a TwoDCartesianZone with the provided parameters.
+     *
+     *   @param[in] zoneID  Indicates the ID of the zone to update.
+     *   @param[in]  zone    Structure with parameters for a TwoDCartesian zone.
+     *
+     *
+     *   @return Success if the update is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
+    virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStruct & zone) = 0;
+
+    /**
+     *    @brief Command Delegate for retrieval of a TwoDCartesianZone for a given zoneID.
+     *
+     *   @param[in] zoneID    Indicates the ID of the zone to fetch.
+     *   @param[out]  outZones  TwoDCartesian zone being fetched.
+     *   Note: The whole list of zones is returned if zoneID is null.
+     *
+     *   @return Success if the retrieval is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
+    virtual Protocols::InteractionModel::Status GetTwoDCartesianZone(const DataModel::Nullable<uint16_t> zoneID,
+                                                                     const std::vector<TwoDCartesianZoneStruct> & outZones) = 0;
+
+    /**
+     *    @brief Command Delegate for the removal of a TwoDCartesianZone for a given zoneID.
+     *
+     *   @param[in] zoneID  Indicates the ID of the zone to remove.
+     *
+     *   @return Success if the removal is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
+    virtual Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID) = 0;
+
+    /**
+     *    @brief Command Delegate for creation/update of a ZoneTrigger.
+     *
+     *   @param[in]  zoneTrigger    Structure with parameters for defining a ZoneTriggerControl.
+     *
+     *   @return Success if the creation/update is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
+    virtual Protocols::InteractionModel::Status CreateOrUpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) = 0;
+
+    /**
+     *    @brief Command Delegate for the removal of a ZoneTrigger for a given zoneID.
+     *
+     *   @param[in] zoneID  Indicates the ID of the zone to remove the ZoneTrigger for.
+     *
+     *   @return Success if the removal is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
+    virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
+
+    /**
+     *   @brief Delegate callback for notifying change in an attribute.
+     *
+     */
+    virtual void OnAttributeChanged(AttributeId attributeId) = 0;
+
+private:
+    friend class ZoneMgmtServer;
+
+    ZoneMgmtServer * mZoneMgmtServer = nullptr;
+
+    /**
+     * This method is used by the SDK to ensure the delegate points to the server instance it's associated with.
+     * When a server instance is created or destroyed, this method will be called to set and clear, respectively,
+     * the pointer to the server instance.
+     *
+     * @param aZoneMgmtServer  A pointer to the ZoneMgmtServer object related to this delegate object.
+     */
+    void SetZoneMgmtServer(ZoneMgmtServer * aZoneMgmtServer) { mZoneMgmtServer = aZoneMgmtServer; }
+
+protected:
+    ZoneMgmtServer * GetZoneMgmtServer() const { return mZoneMgmtServer; }
+};
+
+enum class OptionalAttribute : uint32_t
+{
+
+};
+
+class ZoneMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
+{
+public:
+    /**
+     * @brief Creates a Zone Management cluster instance. The Init() function needs to be called for this instance
+     * to be registered and called by the interaction model at the appropriate times.
+     *
+     * @param aDelegate                         A pointer to the delegate to be used by this server.
+     *                                          Note: the caller must ensure that the delegate lives throughout the instance's
+     *                                          lifetime.
+     *
+     * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aFeatures                         The bitflags value that identifies which features are supported by this instance.
+     * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
+     *                                          instance.
+     * @param aMaxUserDefinedZones              The maximum number of user-defined zones supported by the device.
+     *                                          This value is specified by the device manufacturer.
+     * @param aMaxZones                         The maximum number of zones that are allowed to exist on the device. This is the
+     *                                          sum of the predefined built-in zones and the user-defined zones.
+     * @param aSensitivityMax                   The hardware-specific value for the number of supported sensitivity levels.
+     *                                          This value is specified by the device manufacturer.
+     * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
+     *
+     */
+    ZoneMgmtServer(ZoneMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+                   const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
+                   uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
+
+    ~ZoneMgmtServer() override;
+
+    /**
+     * @brief Initialise the Zone Management server instance.
+     * This function must be called after defining a ZoneMgmtServer class object.
+     * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
+     * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
+     * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
+     */
+    CHIP_ERROR Init();
+
+    bool HasFeature(Feature feature) const;
+
+    bool SupportsOptAttr(OptionalAttribute aOptionalAttr) const;
+
+    // Attribute Setters
+    CHIP_ERROR SetSensitivity(uint8_t aSensitivity);
+
+    // Attribute Getters
+    const std::vector<ZoneInformationStruct> & GetZones() const { return mZones; }
+
+    const std::vector<ZoneTriggerControlStruct> & GetTriggers() const { return mTriggers; }
+
+    uint8_t GetMaxUserDefinedZones() const { return mMaxUserDefinedZones; }
+    uint8_t GetMaxZones() const { return mMaxZones; }
+    uint8_t GetSensitivityMax() const { return mSensitivityMax; }
+    uint8_t GetSensitivity() const { return mSensitivity; }
+    const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const { return mTwoDCartesianMax; }
+
+    // Send Zone events
+    Protocols::InteractionModel::Status GenerateZoneTriggerredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
+    Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
+
+private:
+    ZoneMgmtDelegate & mDelegate;
+    EndpointId mEndpointId;
+    const BitFlags<Feature> mFeatures;
+    const BitFlags<OptionalAttribute> mOptionalAttrs;
+
+    // Attributes
+    const uint8_t mMaxUserDefinedZones;
+    const uint8_t mMaxZones;
+    const uint8_t mSensitivityMax;
+    const TwoDCartesianVertexStruct mTwoDCartesianMax;
+
+    std::vector<ZoneInformationStruct> mZones;
+    std::vector<ZoneTriggerControlStruct> mTriggers;
+    uint8_t mSensitivity;
+
+    /**
+     * IM-level implementation of read
+     * @return appropriately mapped CHIP_ERROR if applicable
+     */
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    /**
+     * IM-level implementation of write
+     * @return appropriately mapped CHIP_ERROR if applicable
+     */
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    CHIP_ERROR ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    CHIP_ERROR ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    /**
+     * @brief Inherited from CommandHandlerInterface
+     */
+    void InvokeCommand(HandlerContext & ctx) override;
+
+    void HandleCreateTwoDCartesianZone(HandlerContext & ctx, const Commands::CreateTwoDCartesianZone::DecodableType & req);
+
+    void HandleUpdateTwoDCartesianZone(HandlerContext & ctx, const Commands::UpdateTwoDCartesianZone::DecodableType & req);
+
+    void HandleGetTwoDCartesianZone(HandlerContext & ctx, const Commands::GetTwoDCartesianZone::DecodableType & req);
+
+    void HandleRemoveZone(HandlerContext & ctx, const Commands::RemoveZone::DecodableType & req);
+
+    void HandleCreateOrUpdateTrigger(HandlerContext & ctx, const Commands::CreateOrUpdateTrigger::DecodableType & req);
+
+    void HandleRemoveTrigger(HandlerContext & ctx, const Commands::RemoveTrigger::DecodableType & req);
+};
+
+} // namespace ZoneManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
