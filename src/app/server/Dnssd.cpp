@@ -149,8 +149,9 @@ CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminat
 template <class AdvertisingParams>
 void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
 {
-VerifyOrReturn(mICDManager != nullptr, ChipLogError(Discovery, "Invalid pointer to the ICDManager which is required for adding Dnssd advertisement key"));
-    }
+    VerifyOrReturn(
+        mICDManager != nullptr,
+        ChipLogError(Discovery, "Invalid pointer to the ICDManager which is required for adding Dnssd advertisement key"));
 
     Dnssd::ICDModeAdvertise ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kNone;
     // Only advertise the ICD key if the device can operate as a LIT
