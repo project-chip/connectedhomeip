@@ -196,7 +196,7 @@ source_set("closure-dimension-test-srcs") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
-    "${chip_root}/zzz_generated/app-common/clusters/ClosureControl:metadata",
+    "${chip_root}/zzz_generated/app-common/clusters/ClosureDimension:metadata",
   ]
 }
 
