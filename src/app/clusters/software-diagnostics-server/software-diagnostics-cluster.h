@@ -101,7 +101,7 @@ public:
         case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
             return LOGIC::ReadThreadMetrics(encoder);
         case Globals::Attributes::FeatureMap::Id:
-            return encoder.Encode(LOGIC::GetFeatureMap());
+            return encoder.Encode(LOGIC::GetFeatureMap().Raw());
         case Globals::Attributes::ClusterRevision::Id:
             return encoder.Encode(SoftwareDiagnostics::kRevision);
         default:
