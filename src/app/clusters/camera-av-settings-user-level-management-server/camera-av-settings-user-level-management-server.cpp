@@ -373,8 +373,8 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
 /**
  * Methods handling known video stream IDs, the addition and removal thereof.
  */
-void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(
-    uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport)
+void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(uint16_t aVideoStreamID,
+                                                                    Globals::Structs::ViewportStruct::Type aViewport)
 {
     DPTZStruct dptzEntry;
     dptzEntry.videoStreamID = aVideoStreamID;
@@ -383,8 +383,8 @@ void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(
-    uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport)
+void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(uint16_t aVideoStreamID,
+                                                                       Globals::Structs::ViewportStruct::Type aViewport)
 {
     auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
                            [aVideoStreamID](const DPTZStruct & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
@@ -400,8 +400,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStreams(
-    Globals::Structs::ViewportStruct::Type aViewport)
+void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport)
 {
     for (auto & dptzStream : mDptzStreams)
     {
@@ -1222,7 +1221,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
                                                                 const Commands::DPTZSetViewport::DecodableType & commandData)
 {
-    uint16_t videoStreamID                                               = commandData.videoStreamID;
+    uint16_t videoStreamID                          = commandData.videoStreamID;
     Globals::Structs::ViewportStruct::Type viewport = commandData.viewport;
 
     // Is this a video stream ID of which we have already been informed?
