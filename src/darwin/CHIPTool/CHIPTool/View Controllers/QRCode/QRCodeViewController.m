@@ -281,7 +281,7 @@
     _serialNumber = [UILabel new];
     NSArray<UILabel *> * resultLabels =
         @[ _versionLabel, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _vendorID, _productID, _serialNumber ];
-    for (int i = 0; i < resultLabels.count && i < resultLabels.count; i++) {
+    for (int i = 0; i < resultLabels.count && i < resultLabelTexts.count; i++) {
         UILabel * label = [UILabel new];
         label.text = [resultLabelTexts objectAtIndex:i];
         UILabel * result = [resultLabels objectAtIndex:i];
