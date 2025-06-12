@@ -72,6 +72,17 @@ void InitChefMicrowaveOvenModeCluster()
         ChipLogProgress(DeviceLayer, "Endpoint %d MicrowaveOvenMode Initialized.", endpointId);
     }
 }
+
+ModeBase::Instance * GetInstance(EndpointId endpointId)
+{
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, MicrowaveOvenMode::Id,
+                                                            MATTER_DM_MICROWAVE_OVEN_MODE_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIndex < kMicrowaveOvenModeTableSize)
+    {
+        return gInstanceTable[epIndex].get();
+    }
+    return nullptr;
+}
 } // namespace ChefMicrowaveOvenMode
 
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::Init()

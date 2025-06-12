@@ -71,6 +71,7 @@ public:
 
 namespace ChefMicrowaveOvenMode {
 void InitChefMicrowaveOvenModeCluster();
+chip::app::Clusters::ModeBase::Instance * GetInstance(chip::EndpointId endpointId);
 } // namespace ChefMicrowaveOvenMode
 
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
