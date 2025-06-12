@@ -22,7 +22,7 @@ using namespace chip::app;
 
 namespace bridge {
 
-CHIP_ERROR RootEndpointOnlyAccessInterface::RootEndpointOnlyAccessInterface::Init()
+CHIP_ERROR RootEndpointOnlyAccessInterface::Init()
 {
     AttributeAccessInterface * oldInterface = AttributeAccessInterfaceRegistry::Instance().Get(kRootEndpointId, mClusterId);
     VerifyOrDie(oldInterface != this);
