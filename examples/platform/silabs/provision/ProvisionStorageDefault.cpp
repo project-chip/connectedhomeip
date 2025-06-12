@@ -365,6 +365,28 @@ CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & 
     return SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_PersistentUniqueId, value, max, size);
 }
 
+CHIP_ERROR Storage::SetSoftwareVersionString(const char * value, size_t len)
+{
+    return SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_SoftwareVersionString, value, len);
+}
+
+CHIP_ERROR Storage::GetSoftwareVersionString(char * value, size_t max)
+{
+    size_t hw_version_len = 0; // @ithout counting null-terminator
+
+    CHIP_ERROR err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_SoftwareVersionString, value, max, hw_version_len);
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    {
+        VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+        err = CHIP_NO_ERROR;
+    }
+#endif
+    return err;
+}
+
 //
 // CommissionableDataProvider
 //
@@ -670,6 +692,12 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
     return SilabsConfig::WriteConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, key.GetId());
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
+{
+    // TODO: Implement this function if needed.
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
 
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
