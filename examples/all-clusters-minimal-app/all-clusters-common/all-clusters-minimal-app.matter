@@ -6430,7 +6430,6 @@ endpoint 0 {
 
   server cluster TimeFormatLocalization {
     persist  attribute hourFormat default = 0;
-    ram      attribute activeCalendarType;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
