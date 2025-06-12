@@ -581,6 +581,13 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     DataModel::Nullable<GenericTargetStruct> stepTarget;
     VerifyOrReturnError(GetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
 
+    if (stepTarget.IsNull())
+    {
+        // If stepTarget is null, we need to initialize to default value.
+        // This is to ensure that we can set the position, latch, and speed values in the stepTarget.
+        stepTarget.SetNonNull(GenericTargetStruct{});
+    }
+
     // If speed field is present and Speed feature is not supported, we should not set stepTarget.speed value.
     if (speed.HasValue() && mConformance.HasFeature(Feature::kSpeed))
     {
