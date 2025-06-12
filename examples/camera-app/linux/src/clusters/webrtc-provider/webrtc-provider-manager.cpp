@@ -466,7 +466,7 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
 
     return delegate.ValidateStreamUsage(streamUsage, videoStreamId, audioStreamId);
 }
