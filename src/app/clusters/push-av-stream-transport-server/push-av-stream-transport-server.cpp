@@ -181,7 +181,8 @@ void PushAvStreamTransportServer::RemoveTimerAppState(const uint16_t connectionI
                              [connectionID](const std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext> & s) {
                                  if (s->connectionID == connectionID)
                                  {
-                                     DeviceLayer::SystemLayer().CancelTimer(NULL, static_cast<void *>(s.get()));
+                                     DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback,
+                                                                            static_cast<void *>(s.get()));
                                      return true; // Remove from vector
                                  }
                                  return false; // Keep in vector
@@ -408,9 +409,8 @@ Status PushAvStreamTransportServer::ValidateIncomingTransportOptions(
 
     VerifyOrReturnValue(
         transportOptions.url.size() >= kMinUrlLength && transportOptions.url.size() <= kMaxUrlLength, Status::ConstraintError,
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: URL length: %u not in allowed length range of 13 to 2000",
-                     AttributeAccessInterface::GetEndpointId().Value(),
-                     static_cast<uint32_t>(AttributeAccessInterface::GetEndpointId().Value(), transportOptions.url.size())));
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: URL length: %" PRIu32 " not in allowed length range of 13 to 2000",
+                     AttributeAccessInterface::GetEndpointId().Value(), static_cast<uint32_t>(transportOptions.url.size())));
 
     auto & triggerOptions = transportOptions.triggerOptions;
 
@@ -547,7 +547,8 @@ Status PushAvStreamTransportServer::ValidateIncomingTransportOptions(
                 containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size() == kMaxCENCKeyLength, Status::ConstraintError,
                 ChipLogError(
                     Zcl,
-                    "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key constraint Error, actual length: %u not "
+                    "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key constraint Error, actual length: %" PRIu32
+                    " not "
                     "equal to expected length of 16",
                     AttributeAccessInterface::GetEndpointId().Value(),
                     static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size())));
@@ -573,7 +574,7 @@ Status PushAvStreamTransportServer::ValidateIncomingTransportOptions(
                 Status::ConstraintError,
                 ChipLogError(Zcl,
                              "HandleAllocatePushTransport[ep=%d]: CMAF Container Options CENC Key ID constraint Error, actual "
-                             "length: %u not equal to expected length of 16",
+                             "length: %" PRIu32 " not equal to expected length of 16",
                              AttributeAccessInterface::GetEndpointId().Value(),
                              static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size())));
         }
