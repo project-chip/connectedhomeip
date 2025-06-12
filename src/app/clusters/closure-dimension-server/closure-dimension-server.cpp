@@ -44,11 +44,11 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     switch (aPath.mAttributeId)
     {
     case Attributes::CurrentState::Id: {
-        typedef DataModel::Nullable<GenericCurrentStateStruct> T;
+        typedef DataModel::Nullable<GenericDimensionStateStruct> T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrentState(ret); });
     }
-    case Attributes::Target::Id: {
-        typedef DataModel::Nullable<GenericTargetStruct> T;
+    case Attributes::TargetState::Id: {
+        typedef DataModel::Nullable<GenericDimensionStateStruct> T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTarget(ret); });
     }
     case Attributes::Resolution::Id: {
