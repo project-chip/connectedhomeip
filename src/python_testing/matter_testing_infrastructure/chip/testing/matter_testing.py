@@ -404,7 +404,7 @@ class ClusterAttributeChangeAccumulator:
             self._attribute_report_counts = {}
             attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
                 cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
-            self._attribute_reports: dict[Any, AttributeValue] = {}
+            self._attribute_reports: dict[Any, list[AttributeValue]] = {}
             if self._expected_attribute is not None:
                 attrs = [self._expected_attribute]
             for a in attrs:
@@ -431,7 +431,8 @@ class ClusterAttributeChangeAccumulator:
             keepSubscriptions=keepSubscriptions
         )
         self._endpoint_id = endpoint
-        self._subscription.SetAttributeUpdateCallback(self.__call__)
+        if self._subscription is not None:
+            self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
     async def cancel(self):
@@ -455,13 +456,15 @@ class ClusterAttributeChangeAccumulator:
 
         if valid_report:
             data = transaction.GetAttribute(path)
-            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
-                                   value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
-            self._q.put(value)
-            with self._lock:
-                self._attribute_report_counts[path.AttributeType] += 1
-                self._attribute_reports[path.AttributeType].append(value)
+            # Ensure path.Path and path.AttributeType are not None before accessing their properties
+            if path.Path is not None and path.AttributeType is not None:
+                value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
+                                       value=data, timestamp_utc=datetime.now(timezone.utc))
+                logging.info(f"Got subscription report for {path.AttributeType}: {data}")
+                self._q.put(value)
+                with self._lock:
+                    self._attribute_report_counts[path.AttributeType] += 1
+                    self._attribute_reports[path.AttributeType].append(value)
 
     def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
         """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
@@ -586,7 +589,7 @@ class ClusterAttributeChangeAccumulator:
             return self._attribute_report_counts
 
     @property
-    def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
+    def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, list[AttributeValue]]:
         with self._lock:
             return self._attribute_reports.copy()
 
