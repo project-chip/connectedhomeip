@@ -2351,10 +2351,6 @@ provisional cluster ClosureDimension = 261 {
     kBackward = 9;
     kDepthMask = 10;
     kDepthSymmetry = 11;
-    kCeilingSimple = 12;
-    kCeilingMask = 13;
-    kCeilingSidedSymmetry = 14;
-    kCeilingCenteredSymmetry = 15;
   }
 
   bitmap Feature : bitmap32 {
@@ -2368,9 +2364,14 @@ provisional cluster ClosureDimension = 261 {
     kModulation = 0x80;
   }
 
-  struct CurrentStateStruct {
-    optional percent100ths position = 0;
-    optional boolean latch = 1;
+  bitmap LatchControlModesBitmap : bitmap8 {
+    kRemoteLatching = 0x1;
+    kRemoteUnlatching = 0x2;
+  }
+
+  struct DimensionStateStruct {
+    optional nullable percent100ths position = 0;
+    optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -2379,19 +2380,13 @@ provisional cluster ClosureDimension = 261 {
     percent100ths max = 1;
   }
 
-  struct TargetStruct {
-    optional percent100ths position = 0;
-    optional boolean latch = 1;
-    optional ThreeLevelAutoEnum speed = 2;
-  }
-
   struct UnitRangeStruct {
     int16s min = 0;
     int16s max = 1;
   }
 
-  readonly attribute nullable CurrentStateStruct currentState = 0;
-  readonly attribute nullable TargetStruct target = 1;
+  readonly attribute nullable DimensionStateStruct currentState = 0;
+  readonly attribute nullable DimensionStateStruct targetState = 1;
   readonly attribute optional percent100ths resolution = 2;
   readonly attribute optional percent100ths stepValue = 3;
   readonly attribute optional ClosureUnitEnum unit = 4;
@@ -2401,6 +2396,7 @@ provisional cluster ClosureDimension = 261 {
   readonly attribute optional RotationAxisEnum rotationAxis = 8;
   readonly attribute optional OverflowEnum overflow = 9;
   readonly attribute optional ModulationTypeEnum modulationType = 10;
+  readonly attribute optional LatchControlModesBitmap latchControlModes = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2419,9 +2415,9 @@ provisional cluster ClosureDimension = 261 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  /** This command is used to move a dimension of the device to a target position. */
+  /** This command is used to move a dimension of the closure to a target position. */
   command SetTarget(SetTargetRequest): DefaultSuccess = 0;
-  /** This command is used to move a dimension of the device to a target position by a number of steps. */
+  /** Upon receipt, this SHALL move a dimension of the closure to a target position by a number of steps. */
   command Step(StepRequest): DefaultSuccess = 1;
 }
 
@@ -2854,7 +2850,7 @@ endpoint 2 {
 
   server cluster ClosureDimension {
     callback attribute currentState;
-    callback attribute target;
+    callback attribute targetState;
     ram      attribute resolution;
     ram      attribute stepValue;
     ram      attribute unit;
@@ -2864,6 +2860,7 @@ endpoint 2 {
     ram      attribute rotationAxis;
     ram      attribute overflow;
     ram      attribute modulationType;
+    ram      attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2893,7 +2890,7 @@ endpoint 3 {
 
   server cluster ClosureDimension {
     callback attribute currentState;
-    callback attribute target;
+    callback attribute targetState;
     ram      attribute resolution;
     ram      attribute stepValue;
     ram      attribute unit;
@@ -2903,6 +2900,7 @@ endpoint 3 {
     ram      attribute rotationAxis;
     ram      attribute overflow;
     ram      attribute modulationType;
+    ram      attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
