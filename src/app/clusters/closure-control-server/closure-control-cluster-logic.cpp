@@ -239,11 +239,11 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
             // feature is supported by the closure. If the Positioning feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.position.Value().Value()) !=
-                                        CurrentPositionEnum::kUnknownEnumValue,
-                                    CHIP_ERROR_INVALID_ARGUMENT);
-                VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.position.Value().Value()),
-                                    CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.position.Value().Value()) !=
+                                    CurrentPositionEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(IsSupportedOverallStatePositioning(incomingOverallState.position.Value().Value()),
+                                CHIP_ERROR_INVALID_ARGUMENT);
         }
 
         // Validate the incoming Latch FeatureMap conformance.
@@ -262,8 +262,8 @@ CHIP_ERROR ClusterLogic::SetOverallState(const DataModel::Nullable<GenericOveral
             VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
             VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallState.speed.Value()) !=
-                                        Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                                    CHIP_ERROR_INVALID_ARGUMENT);
+                                    Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
         }
 
         // Validate the incoming SecureState FeatureMap conformance.

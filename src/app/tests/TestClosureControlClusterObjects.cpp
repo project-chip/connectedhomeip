@@ -41,8 +41,8 @@ TEST(GenericOverallStateTest, DefaultConstructor)
 TEST(GenericOverallStateTest, ParameterizedConstructor)
 {
     auto position = Optional<DataModel::Nullable<CurrentPositionEnum>>(MakeNullable(CurrentPositionEnum::kFullyClosed));
-    auto latch       = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
-    auto speed       = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto);
+    auto latch    = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
+    auto speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto);
 
     GenericOverallCurrentState state(position, latch, speed, NullOptional);
 
@@ -75,16 +75,16 @@ TEST(GenericOverallStateTest, EqualityOperator)
 TEST(GenericOverallStateTest, CopyConstructor)
 {
     auto position = Optional<DataModel::Nullable<CurrentPositionEnum>>(MakeNullable(CurrentPositionEnum::kFullyClosed));
-    auto latch       = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
-    auto speed       = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto);
+    auto latch    = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
+    auto speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto);
 
     GenericOverallCurrentState originalState(position, latch, speed, NullOptional);
     GenericOverallCurrentState copiedState(originalState);
 
     // Modify the original object
     originalState.position = Optional<DataModel::Nullable<CurrentPositionEnum>>(MakeNullable(CurrentPositionEnum::kFullyOpened));
-    originalState.latch       = Optional<DataModel::Nullable<bool>>(MakeNullable(false));
-    originalState.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    originalState.latch    = Optional<DataModel::Nullable<bool>>(MakeNullable(false));
+    originalState.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     // Validate that the copied object remains unchanged
     EXPECT_TRUE(copiedState.position.HasValue());

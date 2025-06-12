@@ -31,10 +31,10 @@ namespace ClosureControl {
  */
 struct GenericOverallCurrentState : public Structs::OverallCurrentStateStruct::Type
 {
-    GenericOverallCurrentState(Optional<DataModel::Nullable<CurrentPositionEnum>> positionValue      = NullOptional,
-                        Optional<DataModel::Nullable<bool>> latchValue                        = NullOptional,
-                        Optional<Globals::ThreeLevelAutoEnum> speedValue                      = NullOptional,
-                        Optional<DataModel::Nullable<bool>> secureStateValue                  = NullOptional)
+    GenericOverallCurrentState(Optional<DataModel::Nullable<CurrentPositionEnum>> positionValue = NullOptional,
+                               Optional<DataModel::Nullable<bool>> latchValue                   = NullOptional,
+                               Optional<Globals::ThreeLevelAutoEnum> speedValue                 = NullOptional,
+                               Optional<DataModel::Nullable<bool>> secureStateValue             = NullOptional)
     {
         Set(positionValue, latchValue, speedValue, secureStateValue);
     }
@@ -47,10 +47,10 @@ struct GenericOverallCurrentState : public Structs::OverallCurrentStateStruct::T
         return *this;
     }
 
-    void Set(Optional<DataModel::Nullable<CurrentPositionEnum>> positionValue      = NullOptional,
-             Optional<DataModel::Nullable<bool>> latchValue                        = NullOptional,
-             Optional<Globals::ThreeLevelAutoEnum> speedValue                       = NullOptional,
-             Optional<DataModel::Nullable<bool>> secureStateValue                  = NullOptional)
+    void Set(Optional<DataModel::Nullable<CurrentPositionEnum>> positionValue = NullOptional,
+             Optional<DataModel::Nullable<bool>> latchValue                   = NullOptional,
+             Optional<Globals::ThreeLevelAutoEnum> speedValue                 = NullOptional,
+             Optional<DataModel::Nullable<bool>> secureStateValue             = NullOptional)
     {
         position    = positionValue;
         latch       = latchValue;
@@ -69,9 +69,9 @@ struct GenericOverallCurrentState : public Structs::OverallCurrentStateStruct::T
  */
 struct GenericOverallTargetState : public Structs::OverallTargetStateStruct::Type
 {
-    GenericOverallTargetState(Optional<DataModel::Nullable<TargetPositionEnum>> positionValue  = NullOptional,
-                         Optional<DataModel::Nullable<bool>> latchValue                   = NullOptional,
-                         Optional<Globals::ThreeLevelAutoEnum> speedValue                 = NullOptional)
+    GenericOverallTargetState(Optional<DataModel::Nullable<TargetPositionEnum>> positionValue = NullOptional,
+                              Optional<DataModel::Nullable<bool>> latchValue                  = NullOptional,
+                              Optional<Globals::ThreeLevelAutoEnum> speedValue                = NullOptional)
     {
         Set(positionValue, latchValue, speedValue);
     }
@@ -85,8 +85,8 @@ struct GenericOverallTargetState : public Structs::OverallTargetStateStruct::Typ
     }
 
     void Set(Optional<DataModel::Nullable<TargetPositionEnum>> positionValue = NullOptional,
-             Optional<DataModel::Nullable<bool>> latchValue = NullOptional,
-             Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
+             Optional<DataModel::Nullable<bool>> latchValue                  = NullOptional,
+             Optional<Globals::ThreeLevelAutoEnum> speedValue                = NullOptional)
     {
         position = positionValue;
         latch    = latchValue;
