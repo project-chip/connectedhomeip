@@ -28,6 +28,10 @@ import("${chip_root}/src/crypto/crypto.gni")
 
 assert(chip_build_tools)
 
+declare_args() {
+  libs = []
+}
+
 config("config") {
   include_dirs = [
     ".",
