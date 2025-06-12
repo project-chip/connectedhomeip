@@ -309,7 +309,7 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
         }
 
         // Validate the incoming Latch FeatureMap conformance.
-        if (incomingOverallTarget.latch.HasValue() && incomingOverallTarget.latch.Value().IsNull())
+        if (incomingOverallTarget.latch.HasValue() && !incomingOverallTarget.latch.Value().IsNull())
         {
             // If the latch member is present in the incoming OverallTarget, we need to check if the MotionLatching
             // feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
