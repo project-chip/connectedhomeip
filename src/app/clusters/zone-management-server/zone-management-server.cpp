@@ -44,30 +44,29 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-ZoneManagementServer::ZoneManagementServer(ZoneManagementDelegate & aDelegate, EndpointId aEndpointId,
-                                           const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs,
-                                           uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
-                                           const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
+ZoneMgmtServer::ZoneMgmtServer(ZoneMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+                               const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
+                               uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
     CommandHandlerInterface(MakeOptional(aEndpointId), ZoneManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), ZoneManagement::Id), mDelegate(aDelegate), mEndpointId(aEndpointId),
     mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones),
     mSensitivityMax(aSensitivityMax), mTwoDCartesianMax(aTwoDCartesianMax)
 {
-    mDelegate.SetZoneManagementServer(this);
+    mDelegate.SetZoneMgmtServer(this);
 }
 
-ZoneManagementServer::~ZoneManagementServer()
+ZoneMgmtServer::~ZoneMgmtServer()
 {
-    // Explicitly set the ZoneManagementServer pointer in the Delegate to
+    // Explicitly set the ZoneMgmtServer pointer in the Delegate to
     // null.
-    mDelegate.SetZoneManagementServer(nullptr);
+    mDelegate.SetZoneMgmtServer(nullptr);
 
     // Unregister command handler and attribute access interfaces
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-CHIP_ERROR ZoneManagementServer::Init()
+CHIP_ERROR ZoneMgmtServer::Init()
 {
     // Perform constraint checks
     if (HasFeature(Feature::kUserDefined))
@@ -84,20 +83,21 @@ CHIP_ERROR ZoneManagementServer::Init()
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+
     return CHIP_NO_ERROR;
 }
 
-bool ZoneManagementServer::HasFeature(Feature feature) const
+bool ZoneMgmtServer::HasFeature(Feature feature) const
 {
     return mFeatures.Has(feature);
 }
 
-bool ZoneManagementServer::SupportsOptAttr(OptionalAttribute aOptionalAttr) const
+bool ZoneMgmtServer::SupportsOptAttr(OptionalAttribute aOptionalAttr) const
 {
     return mOptionalAttrs.Has(aOptionalAttr);
 }
 
-CHIP_ERROR ZoneManagementServer::ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR ZoneMgmtServer::ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     for (const auto & zone : mZones)
     {
@@ -107,7 +107,7 @@ CHIP_ERROR ZoneManagementServer::ReadAndEncodeZones(const AttributeValueEncoder:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ZoneManagementServer::ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR ZoneMgmtServer::ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     for (const auto & trigger : mTriggers)
     {
@@ -117,7 +117,7 @@ CHIP_ERROR ZoneManagementServer::ReadAndEncodeTriggers(const AttributeValueEncod
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ZoneManagementServer::SetSensitivity(uint8_t aSensitivity)
+CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t aSensitivity)
 {
     VerifyOrReturnValue(aSensitivity != mSensitivity, CHIP_NO_ERROR);
 
@@ -131,7 +131,7 @@ CHIP_ERROR ZoneManagementServer::SetSensitivity(uint8_t aSensitivity)
 }
 
 // AttributeAccessInterface
-CHIP_ERROR ZoneManagementServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ZoneMgmtServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == ZoneManagement::Id);
     ChipLogProgress(Zcl, "Zone Management[ep=%d]: Reading", mEndpointId);
@@ -178,7 +178,7 @@ CHIP_ERROR ZoneManagementServer::Read(const ConcreteReadAttributePath & aPath, A
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ZoneManagementServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR ZoneMgmtServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     VerifyOrDie(aPath.mClusterId == ZoneManagement::Id);
 
@@ -200,7 +200,7 @@ CHIP_ERROR ZoneManagementServer::Write(const ConcreteDataAttributePath & aPath, 
 }
 
 // CommandHandlerInterface
-void ZoneManagementServer::InvokeCommand(HandlerContext & handlerContext)
+void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
 {
     switch (handlerContext.mRequestPath.mCommandId)
     {
@@ -280,8 +280,8 @@ void ZoneManagementServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-void ZoneManagementServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
-                                                         const Commands::CreateTwoDCartesianZone::DecodableType & commandData)
+void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
+                                                   const Commands::CreateTwoDCartesianZone::DecodableType & commandData)
 {
     Commands::CreateTwoDCartesianZoneResponse::Type response;
     uint16_t zoneID = 0;
@@ -303,8 +303,8 @@ void ZoneManagementServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void ZoneManagementServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
-                                                         const Commands::UpdateTwoDCartesianZone::DecodableType & commandData)
+void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
+                                                   const Commands::UpdateTwoDCartesianZone::DecodableType & commandData)
 {
     auto & zoneID = commandData.zoneID;
     auto & zone   = commandData.zone;
@@ -323,8 +323,8 @@ void ZoneManagementServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
 
-void ZoneManagementServer::HandleGetTwoDCartesianZone(HandlerContext & ctx,
-                                                      const Commands::GetTwoDCartesianZone::DecodableType & commandData)
+void ZoneMgmtServer::HandleGetTwoDCartesianZone(HandlerContext & ctx,
+                                                const Commands::GetTwoDCartesianZone::DecodableType & commandData)
 {
     Commands::GetTwoDCartesianZoneResponse::Type response;
     auto & zoneID = commandData.zoneID;
@@ -344,7 +344,7 @@ void ZoneManagementServer::HandleGetTwoDCartesianZone(HandlerContext & ctx,
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void ZoneManagementServer::HandleRemoveZone(HandlerContext & ctx, const Commands::RemoveZone::DecodableType & commandData)
+void ZoneMgmtServer::HandleRemoveZone(HandlerContext & ctx, const Commands::RemoveZone::DecodableType & commandData)
 {
     auto & zoneID = commandData.zoneID;
 
@@ -360,8 +360,8 @@ void ZoneManagementServer::HandleRemoveZone(HandlerContext & ctx, const Commands
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
 
-void ZoneManagementServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
-                                                       const Commands::CreateOrUpdateTrigger::DecodableType & commandData)
+void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
+                                                 const Commands::CreateOrUpdateTrigger::DecodableType & commandData)
 {
     auto & trigger = commandData.trigger;
 
@@ -377,7 +377,7 @@ void ZoneManagementServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
 
-void ZoneManagementServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::RemoveTrigger::DecodableType & commandData)
+void ZoneMgmtServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::RemoveTrigger::DecodableType & commandData)
 {
     auto & zoneID = commandData.zoneID;
 
@@ -403,5 +403,12 @@ void ZoneManagementServer::HandleRemoveTrigger(HandlerContext & ctx, const Comma
  * Server Init
  *
  */
-void MatterZoneManagementPluginServerInitCallback() {}
-void MatterZoneManagementPluginServerShutdownCallback() {}
+void MatterZoneManagementPluginServerInitCallback()
+{
+    ChipLogProgress(Zcl, "Initializing Zone Management cluster.");
+}
+
+void MatterZoneManagementPluginServerShutdownCallback()
+{
+    ChipLogProgress(Zcl, "Shutting down Zone Management cluster.");
+}

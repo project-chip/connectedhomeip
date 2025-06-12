@@ -38,6 +38,7 @@ using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
+using namespace chip::app::Clusters::ZoneManagement;
 
 using namespace Camera;
 
@@ -1236,6 +1237,11 @@ CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
 CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
+}
+
+ZoneMgmtDelegate & CameraDevice::GetZoneManagementDelegate()
+{
+    return mZoneManager;
 }
 
 MediaController & CameraDevice::GetMediaController()
