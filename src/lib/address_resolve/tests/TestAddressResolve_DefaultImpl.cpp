@@ -411,7 +411,7 @@ TEST(TestAddressResolveDefaultImpl, TestNextActionConsumesTimeoutWhenResultsAreF
     ASSERT_EQ(handle.NextEventTimeout(now), 0_ms64);
 }
 
-TEST(TestAddressResolveDefaultImpl, TestTimeoutGetsCleredWhehnResultsAreNotFoundAndMaxLookupTimeIsSurpassed)
+TEST(TestAddressResolveDefaultImpl, TestTimeoutGetsClearedWhenResultsAreNotFoundAndMaxLookupTimeIsSurpassed)
 {
     AddressResolve::NodeLookupHandle handle;
 
