@@ -75,12 +75,6 @@ CHIP_ERROR LayerImplZephyr::ExtendTimerTo(Clock::Timeout delay, TimerCompleteCal
     Clock::Timeout remainingTime = mTimerList.GetRemainingTime(onComplete, appState);
     if (remainingTime.count() < delay.count())
     {
-        if (remainingTime == Clock::kZero)
-        {
-            // If remaining time is Clock::kZero, it might possible that our timer is in
-            // the mExpiredTimers list and about to be fired. Remove it from that list, since we are extending it.
-            mExpiredTimers.Remove(onComplete, appState);
-        }
         return StartTimer(delay, onComplete, appState);
     }
 
@@ -129,8 +123,6 @@ void LayerImplZephyr::CancelTimer(TimerCompleteCallback onComplete, void * appSt
 
     VerifyOrReturn(timer != nullptr);
     mTimerPool.Release(timer);
-
-    TriggerPlatformTimerUpdate();
 }
 
 CHIP_ERROR LayerImplZephyr::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
@@ -176,11 +168,13 @@ CHIP_ERROR LayerImplZephyr::ScheduleWork(TimerCompleteCallback onComplete, void 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LayerImplZephyr::TriggerPlatformTimerUpdate()
+void LayerImplZephyr::TriggerPlatformTimerUpdate()
 {
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR status = PlatformEventing::StartTimer(*this, Clock::kZero);
-    return status;
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error starting platform timer: %" CHIP_ERROR_FORMAT, status.Format());
+    }
 }
 
 /**
