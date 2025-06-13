@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -90,7 +91,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpoint::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan hostname;
     uint16_t port = static_cast<uint16_t>(0);
@@ -133,11 +133,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpointResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t endpointID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -149,7 +148,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpointResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t endpointID = static_cast<uint16_t>(0);
 
@@ -168,9 +166,8 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FindEndpoint::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
-    DataModel::Nullable<uint16_t> endpointID;
+    uint16_t endpointID = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -186,7 +183,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    DataModel::Nullable<uint16_t> endpointID;
+    uint16_t endpointID = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
@@ -194,7 +191,7 @@ public:
 namespace FindEndpointResponse {
 enum class Fields : uint8_t
 {
-    kEndpoints = 0,
+    kEndpoint = 0,
 };
 
 struct Type
@@ -203,11 +200,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FindEndpointResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const Structs::TLSEndpointStruct::Type> endpoints;
+    Structs::TLSEndpointStruct::Type endpoint;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -219,9 +215,8 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::FindEndpointResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
-    DataModel::DecodableList<Structs::TLSEndpointStruct::DecodableType> endpoints;
+    Structs::TLSEndpointStruct::DecodableType endpoint;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -238,7 +233,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveEndpoint::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t endpointID = static_cast<uint16_t>(0);
 

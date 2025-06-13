@@ -331,6 +331,21 @@
             "PowerThreshold",
             "FeatureMap"
         ],
+        "Network Commissioning": [
+            "ClusterRevision",
+            "ConnectMaxTimeSeconds",
+            "FeatureMap",
+            "InterfaceEnabled",
+            "LastConnectErrorValue",
+            "LastNetworkID",
+            "LastNetworkingStatus",
+            "MaxNetworks",
+            "Networks",
+            "ScanMaxTimeSeconds",
+            "SupportedThreadFeatures",
+            "SupportedWiFiBands",
+            "ThreadVersion"
+        ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",
@@ -734,18 +749,11 @@
             "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
             "NightVisionUsesInfrared",
-            "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
-            "SnapshotCapabilities",
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",
-            "SupportedStreamUsages",
-            "AllocatedVideoStreams",
-            "AllocatedAudioStreams",
-            "AllocatedSnapshotStreams",
-            "RankedVideoStreamPrioritiesList",
             "SoftRecordingPrivacyModeEnabled",
             "SoftLivestreamPrivacyModeEnabled",
             "HardPrivacyModeOn",
@@ -770,8 +778,13 @@
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
-        "Soil Measurement": ["SoilMoistureMeasurementLimits"],
-        "Unit Localization": ["TemperatureUnit"]
+        "Soil Measurement": [
+            "SoilMoistureMeasurementLimits",
+            "SoilMoistureMeasuredValue",
+            "ClusterRevision"
+        ],
+        "Unit Localization": ["TemperatureUnit"],
+        "Zone Management": ["TwoDCartesianMax"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

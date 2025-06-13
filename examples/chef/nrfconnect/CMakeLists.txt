@@ -58,6 +58,7 @@ target_include_directories(app PRIVATE
                            ${CHEF}
                            ${CHEF}/common
                            ${CHEF}/common/clusters/
+                           ${CHEF}/nrfconnect/include/
                            ${GEN_DIR}/../
                            ${CHIP_ROOT}/src
                            ${CHIP_ROOT}/examples/shell/shell_common/include
@@ -78,6 +79,7 @@ if (CONFIG_CHIP_LIB_SHELL)
 endif()
 
 target_sources(app PRIVATE
+    ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
     ${CHEF}/common/DeviceTypes.cpp
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
@@ -87,7 +89,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-dishwasher-alarm-delegate-impl.cpp
     ${CHEF}/common/chef-dishwasher-mode-delegate-impl.cpp
     ${CHEF}/common/chef-operational-state-delegate-impl.cpp
-    ${CHEF}/common/chef-rpc-actions-worker.cpp
+    ${CHEF}/common/chef-pump.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
     ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
@@ -110,6 +112,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
     ${CHEF}/common/clusters/window-covering/chef-window-covering.cpp
     ${CHEF}/common/stubs.cpp
+    ${CHEF}/nrfconnect/AppTask.cpp
     ${CHEF}/nrfconnect/main.cpp
 )
 
@@ -229,6 +232,7 @@ pw_proto_library(thread_service
 )
 
 target_sources(app PRIVATE
+  ${CHEF}/common/chef-rpc-actions-worker.cpp
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/nrfconnect/PigweedLoggerMutex.cpp
   ${NRFCONNECT_COMMON}/Rpc.cpp
@@ -252,6 +256,7 @@ target_compile_options(app PRIVATE
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
+                       "-DCONFIG_ENABLE_PW_RPC=1"
 )
 
 target_link_libraries(app PRIVATE

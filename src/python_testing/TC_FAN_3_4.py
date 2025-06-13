@@ -90,7 +90,7 @@ class TC_FAN_3_4(MatterBaseTest):
     @async_test_body
     async def test_TC_FAN_3_4(self):
         if not self.check_pics("FAN.S.F03"):
-            self.skip_all_remaining_steps(1)
+            self.mark_all_remaining_steps_skipped(1)
             logger.info("Test skipped because PICS FAN.S.F03 is not set")
             return
 

@@ -31,7 +31,6 @@
 #include "laundry-dryer-controls-delegate-impl.h"
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
-#include "meter-identification-instance.h"
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
@@ -79,7 +78,6 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_";
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
@@ -175,79 +173,13 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
-namespace {
-
-class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
-{
-public:
-    void Init(DeviceInstanceInfoProvider * defaultProvider) { mDefaultProvider = defaultProvider; }
-
-    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return mDefaultProvider->GetVendorName(buf, bufSize); }
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return mDefaultProvider->GetVendorId(vendorId); }
-    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductName(buf, bufSize); }
-    CHIP_ERROR GetProductId(uint16_t & productId) override { return mDefaultProvider->GetProductId(productId); }
-    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
-    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
-    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductLabel(buf, bufSize); }
-    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetSerialNumber(buf, bufSize); }
-    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override
-    {
-        return mDefaultProvider->GetManufacturingDate(year, month, day);
-    }
-    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override
-    {
-        return mDefaultProvider->GetHardwareVersion(hardwareVersion);
-    }
-    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override
-    {
-        return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
-    }
-    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
-    {
-        return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
-    }
-    CHIP_ERROR GetProductFinish(Clusters::BasicInformation::ProductFinishEnum * finish) override;
-    CHIP_ERROR GetProductPrimaryColor(Clusters::BasicInformation::ColorEnum * primaryColor) override;
-
-private:
-    DeviceInstanceInfoProvider * mDefaultProvider;
-};
-
-CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductFinish(Clusters::BasicInformation::ProductFinishEnum * finish)
-{
-    // Our example device claims to have a Satin finish for now.  We can make
-    // this configurable as needed.
-    *finish = Clusters::BasicInformation::ProductFinishEnum::kSatin;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::BasicInformation::ColorEnum * primaryColor)
-{
-    // Our example device claims to have a nice purple color for now.  We can
-    // make this configurable as needed.
-    *primaryColor = Clusters::BasicInformation::ColorEnum::kPurple;
-    return CHIP_NO_ERROR;
-}
-
-ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
-
-} // namespace
-
 void ApplicationInit()
 {
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
-
-    if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
-    }
-
-    auto * defaultProvider = GetDeviceInstanceInfoProvider();
-    if (defaultProvider != &gExampleDeviceInstanceInfoProvider)
-    {
-        gExampleDeviceInstanceInfoProvider.Init(defaultProvider);
-        SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -294,7 +226,6 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
-    Clusters::MeterIdentification::Shutdown();
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
     Clusters::WaterHeaterMode::Shutdown();
