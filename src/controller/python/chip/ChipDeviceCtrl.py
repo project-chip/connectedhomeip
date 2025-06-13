@@ -2414,6 +2414,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
     def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [
     ], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: typing.Optional[FabricAdmin.FabricAdmin] = None, name: str = '', keypair: typing.Optional[p256keypair.P256Keypair] = None):
+        assert fabricAdmin is not None  # fabricAdmin must be provided
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
@@ -2440,7 +2441,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._fabricAdmin = fabricAdmin
         self._fabricId = fabricId
         self._nodeId = nodeId
-        assert fabricAdmin is not None
         self._caIndex = fabricAdmin.caIndex
 
         self._set_dev_ctrl(devCtrl=devCtrl, pairingDelegate=pairingDelegate)
