@@ -1,1 +1,1 @@
-134 : [Ameba] Update Docker image
+139 : Update chip-build-crosscompile docker to point to the latest version of sysroot
