@@ -145,7 +145,7 @@ void ApplicationInit()
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     SILABS_LOG("==================================================");
 #if SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-    SILABS_LOG("energy-management-example EVSE starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
+    SILABS_LOG("energy-management-example EVSE starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
 
     EvseApplicationInit();
     // Disable Water Heater Endpoint
@@ -153,7 +153,7 @@ void ApplicationInit()
 #endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    SILABS_LOG("energy-management-example WaterHeater starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
+    SILABS_LOG("energy-management-example WaterHeater starting. featureMap 0x%08lx", GetDEMFeatureMap().Raw());
 
     WaterHeaterApplicationInit();
     // Disable EVSE Endpoint
@@ -181,6 +181,22 @@ CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+
+#ifdef DISPLAY_ENABLED
+#if SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
+    GetLCD().Init((uint8_t *) "energy-management-App (EVSE)");
+#elif SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
+    GetLCD().Init((uint8_t *) "energy-management-App (WaterHeater)");
+#endif
+#endif
+
+    err = BaseApplication::Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("BaseApplication::Init() failed");
+        appError(err);
+    }
+
     ApplicationInit();
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
