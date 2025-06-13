@@ -31,7 +31,7 @@ from typing import Any, Iterable, Optional
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import Status
-from chip.testing.matter_testing import AttributeMatcher, AttributeValue
+from chip.testing.matter_testing import AttributeMatcher, AttributeValue, await_sequence_of_reports
 from mobly import asserts
 
 
