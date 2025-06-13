@@ -56,7 +56,7 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) override;
 
-    void OnRankedStreamPrioritiesChanged() override;
+    void OnStreamUsagePrioritiesChanged() override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
 
@@ -73,7 +73,28 @@ public:
     CHIP_ERROR
     LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) override;
 
+    CHIP_ERROR
+    ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+
+    CHIP_ERROR
+    ValidateVideoStreamID(uint16_t videoStreamId) override;
+
+    CHIP_ERROR
+    ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR
+    IsPrivacyModeActive(bool & isActive) override;
+
+    bool HasAllocatedVideoStreams() override;
+
+    bool HasAllocatedAudioStreams() override;
+
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
+
+    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
+
+    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;
