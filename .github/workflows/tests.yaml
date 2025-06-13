@@ -292,6 +292,11 @@ jobs:
                   "
 
             - name: Run BLE-WiFi commissioning test
+              env:
+                # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
+                # The reason for that is BlueZ and WPA supplicant integration which involves GIO
+                # globals (glib internals) that TSAN does not understand...
+                TSAN_OPTIONS="report_bugs=0"
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -561,7 +566,7 @@ jobs:
                   echo "BRIDGE_APP: out/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: out/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: out/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_CONTROLLER_APP: out/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml                  
+                  echo "CAMERA_CONTROLLER_APP: out/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml
                   echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
                   echo "ENERGY_GATEWAY_APP: out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test/chip-energy-gateway-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
