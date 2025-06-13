@@ -58,8 +58,9 @@ class TC_WebRTCProvider_2_1(MatterBaseTest):
             TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
             TestStep(2, "Send SolicitOffer with VideoStreamID that doesn't match AllocatedVideoStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
             TestStep(3, "Send SolicitOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
-            TestStep(4, "Send SolicitOffer with valid parameters => expect DeferredOffer=TRUE"),
-            TestStep(5, "Read CurrentSessions attribute => expect 1 with valid session data"),
+            TestStep(4, "Write SoftLivestreamPrivacyModeEnabled=true, send SolicitOffer => expect INVALID_IN_STATE"),
+            TestStep(5, "Write SoftLivestreamPrivacyModeEnabled=false, send SolicitOffer => expect DeferredOffer=TRUE"),
+            TestStep(6, "Read CurrentSessions attribute => expect 1 with valid session data"),
         ]
         return steps
 
@@ -71,6 +72,12 @@ class TC_WebRTCProvider_2_1(MatterBaseTest):
 
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.WebRTCTransportProvider
+
+        # Check if privacy feature is supported before testing privacy mode
+        aFeatureMap = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.FeatureMap
+        )
+        privacySupported = aFeatureMap & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kPrivacy
 
         self.step(1)
         current_sessions = await self.read_single_attribute_check_success(
@@ -100,7 +107,33 @@ class TC_WebRTCProvider_2_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
-        self.step(4)
+        if privacySupported:
+            self.step(4)
+            # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
+            await self.write_single_attribute(
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(True),
+                endpoint_id=endpoint,
+            )
+
+            cmd = cluster.Commands.SolicitOffer(
+                streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
+            try:
+                await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+                asserts.fail("Unexpected success on SolicitOffer with privacy mode enabled")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
+        else:
+            # Skip privacy mode test if not supported
+            self.skip_step(4)
+
+        self.step(5)
+        if privacySupported:
+            # Write SoftLivestreamPrivacyModeEnabled=false and send valid SolicitOffer
+            await self.write_single_attribute(
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(False),
+                endpoint_id=endpoint,
+            )
+
         # Send valid SolicitOffer command
         cmd = cluster.Commands.SolicitOffer(
             streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
@@ -110,7 +143,7 @@ class TC_WebRTCProvider_2_1(MatterBaseTest):
         asserts.assert_not_equal(resp.webRTCSessionID, 0, "webrtcSessionID in SolicitOfferResponse should not be 0.")
         asserts.assert_true(resp.deferredOffer, "Expected 'deferredOffer' to be True.")
 
-        self.step(5)
+        self.step(6)
         # Verify CurrentSessions contains valid session data
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,

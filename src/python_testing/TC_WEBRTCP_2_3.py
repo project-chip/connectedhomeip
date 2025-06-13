@@ -60,8 +60,8 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
             TestStep(3, "Send ProvideOffer with null VideoStreamID => expect INVALID_IN_STATE"),
             TestStep(4, "Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
             TestStep(5, "Send ProvideOffer with null AudioStreamID => expect INVALID_IN_STATE"),
-            TestStep(6, "Send VideoStreamAllocate command with valid parameters to create a video stream"),
-            TestStep(7, "Send ProvideOffer with valid parameters => expect ProvideOfferResponse"),
+            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer => expect INVALID_IN_STATE"),
+            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer => expect ProvideOfferResponse"),
             TestStep(8, "Read CurrentSessions attribute => expect 1"),
         ]
         return steps
@@ -95,6 +95,12 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
             "a=ice-ufrag:ytRw\n"
             "a=ice-pwd:blrzPJtaV9Y1BNgbC1bXpi"
         )
+
+        # Check if privacy feature is supported before testing privacy mode
+        aFeatureMap = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.FeatureMap
+        )
+        privacySupported = aFeatureMap & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kPrivacy
 
         self.step(1)
         current_sessions = await self.read_single_attribute_check_success(
@@ -164,18 +170,49 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
 
-        self.step(6)
-        # Send valid ProvideOffer command using the allocated video stream ID
+        if privacySupported:
+            self.step(6)
+            # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
+            await self.write_single_attribute(
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(True),
+                endpoint_id=endpoint,
+            )
+
+            cmd = cluster.Commands.ProvideOffer(
+                webRTCSessionID=NullValue,
+                sdp=test_sdp,
+                streamUsage=3,
+                originatingEndpointID=endpoint
+            )
+            try:
+                await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+                asserts.fail("Unexpected success on ProvideOffer with privacy mode enabled")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
+        else:
+            # Skip privacy mode test if not supported
+            self.skip_step(6)
+
+        self.step(7)
+        if privacySupported:
+            # Write SoftLivestreamPrivacyModeEnabled=false and send valid ProvideOffer
+            await self.write_single_attribute(
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(False),
+                endpoint_id=endpoint,
+            )
+
+        # Send valid ProvideOffer command with empty VideoStreamID and AudioStreamID
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=test_sdp,
             streamUsage=3,
             originatingEndpointID=endpoint
+            # videoStreamID and audioStreamID not specified (empty)
         )
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
                              "Incorrect response type")
-        asserts.assert_not_equal(resp.webRTCSessionID, 0, "webrtcSessionID in ProvideOfferResponse should not be 0.")
+        asserts.assert_not_equal(resp.webRTCSessionID, 0, "webRTCSessionID in ProvideOfferResponse should not be 0.")
 
         self.step(8)
         # Verify CurrentSessions contains the new session
