@@ -139,7 +139,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         # STEP 2f: Establish wildcard subscription to all attributes
         self.step("2f")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
-        await sub_handler.start(self.default_controller, self.dut.node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
         # STEP 3a: If manual latching is required, skip steps 3b and 3c
         self.step("3a")

@@ -161,7 +161,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         # STEP 2e: Establish wildcard subscription to all attributes"
         self.step("2e")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
-        await sub_handler.start(self.default_controller, self.dut.node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
         # STEP 2f: Read CurrentState attribute
         self.step("2f")
