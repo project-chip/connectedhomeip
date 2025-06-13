@@ -117,6 +117,10 @@
 #define LWIP_DHCP (LWIP_IPV4)
 #endif /* LWIP_DHCP */
 
+// IPv6 should be enabled by default
+#define LWIP_IPV6 1
+#define LWIP_NETIF_API 1
+
 #define LWIP_ETHERNET (LWIP_IPV6) // Required for IPV6 only mode
 #define LWIP_IPV6_MLD (LWIP_IPV6)
 #define LWIP_ICMP6 (LWIP_IPV6)
