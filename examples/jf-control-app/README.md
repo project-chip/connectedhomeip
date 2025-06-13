@@ -9,7 +9,7 @@ provider.
 <hr>
 
 -   [Matter Joint Fabric Control Example](#matter-joint-fabric-control-example)
--   [Building the example Application on Linux](#building-the-example-application-on-linux)
+    -   [Building the example Application on Linux](#building-the-example-application-on-linux)
 
 <hr>
 
