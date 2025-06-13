@@ -78,7 +78,7 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID);
 
-    void OnRankedStreamPrioritiesChanged();
+    void OnStreamUsagePrioritiesChanged();
 
     void OnAttributeChanged(AttributeId attributeId);
 
@@ -93,6 +93,23 @@ public:
 
     CHIP_ERROR
     LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams);
+
+    CHIP_ERROR
+    ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
+
+    CHIP_ERROR
+    ValidateVideoStreamID(uint16_t videoStreamId);
+
+    CHIP_ERROR
+    ValidateAudioStreamID(uint16_t audioStreamId);
+
+    CHIP_ERROR
+    IsPrivacyModeActive(bool & isActive);
+
+    bool HasAllocatedVideoStreams();
+
+    bool HasAllocatedAudioStreams();
 
     CHIP_ERROR PersistentAttributesLoadedCallback();
 
