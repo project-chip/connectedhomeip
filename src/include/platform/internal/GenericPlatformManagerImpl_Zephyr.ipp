@@ -134,9 +134,6 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void
     mShouldRunEventLoop = false;
 
 #if !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    // If the platform timer is being updated by a thread other than the event loop thread,
-    // trigger the event loop thread to recalculate its wait time by posting a no-op event
-    // to the event queue.
     if (k_current_get() != &mChipThread)
     {
         ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
@@ -266,6 +263,13 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessEventLoop()
             }
             else
             {
+                // Call into the system layer to dispatch the callback functions for all timers
+                // that have expired.
+                CHIP_ERROR err = systemLayer.HandlePlatformTimer();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Error handling CHIP timers: %" CHIP_ERROR_FORMAT, err.Format());
+                }
                 // Some timer already expired, do not wait if event queue is empty
                 timeout = K_NO_WAIT;
             }
@@ -274,14 +278,6 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessEventLoop()
         Impl()->UnlockChipStack();
         eventReceived = k_msgq_get(&mChipEventQueue, &event, timeout) == 0;
         Impl()->LockChipStack();
-
-        // Call into the system layer to dispatch the callback functions for all timers
-        // that have expired.
-        CHIP_ERROR err = systemLayer.HandlePlatformTimer();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Error handling CHIP timers: %" CHIP_ERROR_FORMAT, err.Format());
-        }
 
         while (eventReceived)
         {

@@ -56,7 +56,7 @@ public:
 private:
     friend class PlatformEventing;
 
-    CHIP_ERROR TriggerPlatformTimerUpdate();
+    void TriggerPlatformTimerUpdate();
 
     TimerPool<TimerList::Node> mTimerPool;
     TimerList mTimerList;
