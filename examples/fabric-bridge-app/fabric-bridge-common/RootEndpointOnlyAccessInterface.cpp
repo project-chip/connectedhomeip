@@ -43,7 +43,20 @@ CHIP_ERROR RootEndpointOnlyAccessInterface::Shutdown()
                         CHIP_ERROR_INCORRECT_STATE);
 
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(mOriginalAttributeInterface));
+
+    // Existing applications do not clean up extra dynamic endpoints, so this
+    // registration may fail (as it can be on a wildcard endpoint and if existing
+    // endpoints already contain this cluster, the register fails)
+    //
+    // Concrete example:
+    //   - AdministratorCommissioningCluster default instance is on * endpoint
+    //   - devices register this cluster on explicit endpoints
+    if (!AttributeAccessInterfaceRegistry::Instance().Register(mOriginalAttributeInterface))
+    {
+        ChipLogError(AppServer,
+                     "Failed to re-register the default AttributeAccessInterface for cluster " ChipLogFormatMEI " for endpoint 0",
+                     ChipLogValueMEI(mClusterId));
+    }
 
     mOriginalAttributeInterface = nullptr;
 
