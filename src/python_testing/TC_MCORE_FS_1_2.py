@@ -178,6 +178,9 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 30)
 
+        # Commissioning
+        self.step(0)
+
         self.step(1)
         # Subscribe to the PartsList
         root_endpoint = 0

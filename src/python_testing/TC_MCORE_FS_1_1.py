@@ -171,6 +171,9 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
         asserts.assert_not_equal(dut_commissioning_control_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with test.")
 
+        # Commissioning
+        self.step(0)
+
         self.step(1)
         self.step(2)
         self.step(3)

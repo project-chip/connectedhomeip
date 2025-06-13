@@ -54,7 +54,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
     def steps_TC_DRLK_2_9(self) -> list[TestStep]:
         steps = [
-
+            TestStep("0", "Commissioning already done.", is_commissioning=True),
             TestStep("1", "TH reads NumberOfTotalUsersSupported attribute.",
                      "Verify that TH is able to read the attribute successfully."),
             TestStep("2a", "TH sends SetUser Command to DUT.", "Verify that the DUT sends SUCCESS response"),
@@ -389,6 +389,9 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
         aliroevictableendpointkey2 = bytes.fromhex(
             "047a4c662d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
+
+        # Commissioning
+        self.step("0")
 
         self.step("1")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.A0011")):
