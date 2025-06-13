@@ -197,62 +197,6 @@ class AttributeMatcher:
         return AttributeMatcherFromCallable(description, matcher)
 
 
-def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
-    """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
-
-    Args:
-      - report_queue: the queue that receives all the reports.
-      - endpoint_id: endpoint ID to match for reports to check.
-      - attribute: attribute to match for reports to check.
-      - sequence: list of attribute values in order that are expected.
-      - timeout_sec: number of seconds to wait for.
-
-    *** WARNING: The queue contains every report since the sub was established. Use
-        clear_queue to make it empty. ***
-
-    This will fail current Mobly test with assertion failure if the data is not as expected in order.
-
-    Returns nothing on success so the test can go on.
-    """
-    start_time = time.time()
-    elapsed = 0.0
-    time_remaining = timeout_sec
-
-    sequence_idx = 0
-    actual_values = []
-
-    while time_remaining > 0:
-        expected_value = sequence[sequence_idx]
-        logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
-        try:
-            item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
-
-            # Track arrival of all values for the given attribute.
-            if item.endpoint_id == endpoint_id and item.attribute == attribute:
-                actual_values.append(item.value)
-
-                if item.value == expected_value:
-                    logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
-                    sequence_idx += 1
-                else:
-                    asserts.assert_equal(item.value, expected_value,
-                                         msg=f"Did not get expected attribute value in correct sequence. Sequence so far: {actual_values}")
-
-                # We are done waiting when we have accumulated all results.
-                if sequence_idx == len(sequence):
-                    logging.info("Got all attribute changes, done waiting.")
-                    return
-        except queue.Empty:
-            # No error, we update timeouts and keep going
-            pass
-
-        elapsed = time.time() - start_time
-        time_remaining = timeout_sec - elapsed
-
-    asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
-
-
 @dataclass
 class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
