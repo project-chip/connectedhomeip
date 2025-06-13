@@ -72,8 +72,18 @@ def build_darwin_framework(args):
         args.project_path,
         '-derivedDataPath',
         abs_path,
-        "ARCHS={}".format(args.target_arch),
     ]
+
+    if args.target_sdk == "macosx" and args.use_mac_catalyst:
+        command += [
+            '-xcconfig',
+            args.xcconfig_path,
+            '-destination',
+            'platform=macOS,variant=Mac Catalyst',
+            'SUPPORTS_MACCATALYST=YES',
+        ]
+
+    command += ["ARCHS={}".format(args.target_arch)]
 
     if args.target_sdk != "macosx":
         command += [
@@ -133,6 +143,12 @@ def build_darwin_framework(args):
     if args.compdb:
         cflags += ["-gen-cdb-fragment-path ", abs_path + '/compdb']
 
+    if args.leak_checking:
+        cflags += ["-DDFT_ENABLE_LEAK_CHECKING=1"]
+
+    if args.enable_provisional:
+        cflags += ["-DMTR_ENABLE_PROVISIONAL=1"]
+
     command += ["OTHER_CFLAGS=" + ' '.join(cflags), "OTHER_LDFLAGS=" + ' '.join(ldflags)]
     command_result = run_command(command)
     print("Build Framework Result: {}".format(command_result))
@@ -179,6 +195,12 @@ if __name__ == "__main__":
     parser.add_argument('--compdb', action=argparse.BooleanOptionalAction)
     parser.add_argument('--use-network-framework',
                         action=argparse.BooleanOptionalAction)
+    parser.add_argument('--use-mac-catalyst', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--xcconfig_path',
+                        help="xcconfig file path to use",
+                        required=False)
+    parser.add_argument('--leak-checking', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--enable-provisional', action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)
