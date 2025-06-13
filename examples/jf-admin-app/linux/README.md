@@ -35,7 +35,7 @@ to build and test.
 
           $ cd examples/jf-admin-app/linux/
           $ gn gen out/debug
-          $ ninja -C out/debug/
+          $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
 
