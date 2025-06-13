@@ -17,11 +17,16 @@
  */
 #include "default-media-controller.h"
 #include <algorithm>
+#include <lib/support/logging/CHIPLogging.h>
 
 void DefaultMediaController::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
 {
+    ChipLogProgress(Camera, "Registering transport: videoStreamID=%u, audioStreamID=%u", videoStreamID, audioStreamID);
+
     std::lock_guard<std::mutex> lock(connectionsMutex);
     connections.push_back({ transport, videoStreamID, audioStreamID });
+
+    ChipLogProgress(Camera, "Transport registered successfully. Total connections: %u", (unsigned) connections.size());
 }
 
 void DefaultMediaController::UnregisterTransport(Transport * transport)
