@@ -2943,7 +2943,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
 
         # Device should hold a reference to the key to avoid it being GC-ed.
         self._externalKeyPair = operationalKey
-        nativeKey = operationalKey.create_native_object()
+        nativeKey = operationalKey._create_native_object()
 
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
