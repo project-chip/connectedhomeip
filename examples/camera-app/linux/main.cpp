@@ -31,7 +31,10 @@ CameraDevice gCameraDevice;
 
 void ApplicationInit()
 {
-    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
+    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit() with Video Device Path: %s",
+                    AppOptions::GetVideoDevicePath().c_str());
+    gCameraDevice.SetVideoDevicePath(AppOptions::GetVideoDevicePath());
+    VerifyOrDie(gCameraDevice.Init() == CHIP_NO_ERROR);
     CameraAppInit(&gCameraDevice);
 }
 

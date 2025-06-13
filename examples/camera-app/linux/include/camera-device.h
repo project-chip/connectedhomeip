@@ -88,6 +88,8 @@ public:
 
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() override { return *this; }
 
+    CHIP_ERROR Init();
+
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
 
@@ -266,8 +268,11 @@ public:
 
     std::vector<SnapshotStream> & GetAvailableSnapshotStreams() override { return mSnapshotStreams; }
 
+    void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
+
 private:
-    int videoDeviceFd = -1;
+    int videoDeviceFd            = -1;
+    std::string mVideoDevicePath = "/dev/video0";
     std::vector<VideoStream> mVideoStreams;       // Vector to hold available video streams
     std::vector<AudioStream> mAudioStreams;       // Vector to hold available audio streams
     std::vector<SnapshotStream> mSnapshotStreams; // Vector to hold available snapshot streams
