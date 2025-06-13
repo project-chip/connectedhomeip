@@ -311,6 +311,12 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleDeviceInfoProvider;
 
+
+void UpdateDnssdServiceCallback(System::Layer *, void * callbackContext)
+{
+    app::DnssdServer::Instance().StartServer();
+}
+
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
@@ -320,8 +326,11 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
     else if ((event->Type == chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange))
     {
-        // Restart the server on connectivity change
-        app::DnssdServer::Instance().StartServer();
+          //Restart the server with a timer delay on connectivity change.
+        // When kInternetConnectivityChange happens,it doesn't guarantee immediate network reachablility,
+        //which restart dnssd server will fail with some low layer fail,so a delay timer  will be needed.
+         DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(UPDATE_DNS_SD_SERVICE_DELAY_VALUE),UpdateDnssdServiceCallback , nullptr);
+       
     }
 }
 
