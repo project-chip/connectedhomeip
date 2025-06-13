@@ -29,7 +29,6 @@ import re
 import shlex
 import sys
 import textwrap
-import time
 import typing
 import uuid
 from binascii import unhexlify
@@ -62,7 +61,6 @@ from chip import discovery
 from chip.ChipStack import ChipStack
 from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
