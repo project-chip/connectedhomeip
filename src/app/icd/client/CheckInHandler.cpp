@@ -70,6 +70,7 @@ void CheckInHandler::Shutdown()
 {
     mpICDClientStorage = nullptr;
     mpCheckInDelegate  = nullptr;
+    mpImEngine         = nullptr;
     if (mpExchangeManager)
     {
         mpExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn);
