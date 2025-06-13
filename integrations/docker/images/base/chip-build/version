@@ -1,1 +1,1 @@
-137 : Upgrade docker to add gstreamer‑app‑1.0
+139 : Update chip-build-crosscompile docker to point to the latest version of sysroot
