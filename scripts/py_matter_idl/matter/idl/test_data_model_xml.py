@@ -145,19 +145,7 @@ endpoint 2 {
         ''')
 
         lint_rules = []
-        # Since the CreateLintParser (alias for lint_rules_parser.CreateParser) uses internally
-        # a 'open' function to read the rules file the mock_open method is used to avoid
-        # creating or adding a file with the text.
-        original_open = open
-        with patch('builtins.open', mock_open(read_data=linter_rules)) as mock_file:
-
-            def selective_open(filename, *args, **kwargs):
-                if filename == 'nonexistent':
-                    return mock_file.return_value
-                return original_open(filename, *args, **kwargs)
-
-            mock_file.side_effect = selective_open
-            lint_rules.extend(CreateLintParser('nonexistent').parse())
+        lint_rules.extend(CreateLintParser().parse(linter_rules))
 
         errors = []
         for rule in lint_rules:

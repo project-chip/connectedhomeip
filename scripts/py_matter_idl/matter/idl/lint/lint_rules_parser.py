@@ -328,9 +328,11 @@ class LintRulesTransformer(Transformer):
     @v_args(inline=True)
     def load_xml(self, path):
         if not os.path.isabs(path):
-            path = os.path.abspath(os.path.join(
-                os.path.dirname(self.file_name), path))
-
+            if self.file_name:
+                path = os.path.abspath(os.path.join(
+                    os.path.dirname(self.file_name), path))
+            else:
+                path = os.path.abspath(path)
         self.context.LoadXml(path)
 
     @v_args(inline=True)
@@ -364,19 +366,20 @@ class LintRulesTransformer(Transformer):
 
 
 class Parser:
-    def __init__(self, parser, file_name: str):
-        self.parser = parser
+    def __init__(self, file_name: Optional[str] = None):
+        self.parser = Lark.open(
+            'lint_rules_grammar.lark', rel_to=__file__, parser='lalr',
+            propagate_positions=True, maybe_placeholders=True)
         self.file_name = file_name
 
-    def parse(self):
+    def parse(self, file: str):
         data = LintRulesTransformer(self.file_name).transform(
-            self.parser.parse(open(self.file_name, "rt").read()))
+            self.parser.parse(file))
         return data
 
 
-def CreateParser(file_name: str):
+def CreateParser(file_name: Optional[str] = None):
     """
     Generates a parser that will process a ".matter" file into a IDL
     """
-    return Parser(
-        Lark.open('lint_rules_grammar.lark', rel_to=__file__, parser='lalr', propagate_positions=True, maybe_placeholders=True), file_name=file_name)
+    return Parser(file_name)
