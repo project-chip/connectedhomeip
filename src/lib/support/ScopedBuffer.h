@@ -268,6 +268,12 @@ public:
     template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     ScopedMemoryBufferWithSize & CopyFromSpan(const chip::Span<const U> & span)
     {
+        if (span.size() == 0)
+        {
+            Free();
+            return *this;
+        }
+        
         ScopedMemoryBufferWithSize<T>::Alloc(span.size());
         memcpy(ScopedMemoryBuffer<T>::Get(), span.data(), AllocatedSize());
         return *this;
