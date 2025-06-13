@@ -29,12 +29,12 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <cstring>
+#include <lib/support/Span.h>
 #include <mutex>
 #include <queue>
 #include <thread>
 #include <winscard.h>
-#include <lib/support/Span.h>
-#include <cstring>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
@@ -84,14 +84,12 @@ public:
     }
 
     // Move Constructor
-    NFCMessage(NFCMessage && other) noexcept
-        : mTagInstance(other.mTagInstance),
-          mDataToSend(other.mDataToSend),
-          mDataToSendBuffer(std::move(other.mDataToSendBuffer)),
-          mIsMessageValid(other.mIsMessageValid)
+    NFCMessage(NFCMessage && other) noexcept :
+        mTagInstance(other.mTagInstance), mDataToSend(other.mDataToSend), mDataToSendBuffer(std::move(other.mDataToSendBuffer)),
+        mIsMessageValid(other.mIsMessageValid)
     {
-        other.mTagInstance = nullptr;
-        other.mDataToSend = chip::ByteSpan();
+        other.mTagInstance    = nullptr;
+        other.mDataToSend     = chip::ByteSpan();
         other.mIsMessageValid = false;
     }
 
@@ -100,13 +98,13 @@ public:
     {
         if (this != &other)
         {
-            mTagInstance = other.mTagInstance;
-            mDataToSend = other.mDataToSend;
+            mTagInstance      = other.mTagInstance;
+            mDataToSend       = other.mDataToSend;
             mDataToSendBuffer = std::move(other.mDataToSendBuffer);
-            mIsMessageValid = other.mIsMessageValid;
+            mIsMessageValid   = other.mIsMessageValid;
 
-            other.mTagInstance = nullptr;
-            other.mDataToSend = chip::ByteSpan();
+            other.mTagInstance    = nullptr;
+            other.mDataToSend     = chip::ByteSpan();
             other.mIsMessageValid = false;
         }
         return *this;

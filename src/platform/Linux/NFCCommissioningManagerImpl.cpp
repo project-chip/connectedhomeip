@@ -1,4 +1,4 @@
- /*
+/*
  *
  *    Copyright (c) 2025 Project CHIP Authors
  *
@@ -114,10 +114,7 @@ public:
         mMagicNumber = 0; // Invalidate the magic number
     }
 
-    bool IsValid() const
-    {
-        return mMagicNumber == kMagicNumber;
-    }
+    bool IsValid() const { return mMagicNumber == kMagicNumber; }
 
     void Print()
     {
@@ -162,9 +159,9 @@ public:
     void SendChainedAPDUs(ByteSpan dataToSend)
     {
         CHIP_ERROR res;
-        uint32_t totalLength         = static_cast<uint32_t>(dataToSend.size());
-        uint32_t nbrOfBytesRemaining = static_cast<uint32_t>(dataToSend.size());
-        const uint8_t* pNextDataToSend = dataToSend.data();
+        uint32_t totalLength            = static_cast<uint32_t>(dataToSend.size());
+        uint32_t nbrOfBytesRemaining    = static_cast<uint32_t>(dataToSend.size());
+        const uint8_t * pNextDataToSend = dataToSend.data();
 
         while (nbrOfBytesRemaining > 0)
         {
