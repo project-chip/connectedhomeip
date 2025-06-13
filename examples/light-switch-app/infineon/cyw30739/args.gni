@@ -33,4 +33,4 @@ matter_wpan_sdk_board_list = [
 ]
 
 # General fault listener configurations
-enable_general_diagnostics_on_hardware_faults_detect=true
+enable_general_diagnostics_on_hardware_faults_detect = true

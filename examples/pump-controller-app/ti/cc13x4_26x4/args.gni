@@ -79,6 +79,6 @@ if (chip_openthread_target != "") {
 }
 
 # General fault listener configurations
-enable_general_diagnostics_on_hardware_faults_detect=true
-enable_general_diagnostics_on_radio_faults_detect=true
-enable_general_diagnostics_on_network_faults_detect=true
+enable_general_diagnostics_on_hardware_faults_detect = true
+enable_general_diagnostics_on_radio_faults_detect = true
+enable_general_diagnostics_on_network_faults_detect = true
