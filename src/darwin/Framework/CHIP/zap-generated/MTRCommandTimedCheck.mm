@@ -723,6 +723,24 @@ static BOOL CommandNeedsTimedInvokeInDoorLockCluster(AttributeId aAttributeId)
     case Commands::UnlockWithTimeout::Id: {
         return YES;
     }
+    case Commands::SetPINCode::Id: {
+        return YES;
+    }
+    case Commands::ClearPINCode::Id: {
+        return YES;
+    }
+    case Commands::ClearAllPINCodes::Id: {
+        return YES;
+    }
+    case Commands::SetRFIDCode::Id: {
+        return YES;
+    }
+    case Commands::ClearRFIDCode::Id: {
+        return YES;
+    }
+    case Commands::ClearAllRFIDCodes::Id: {
+        return YES;
+    }
     case Commands::SetUser::Id: {
         return YES;
     }
