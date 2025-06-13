@@ -1,4 +1,7 @@
+# src/python_testing/matter_testing_infrastructure/chip/typings/chip/testing/pics.py
+
 import typing
+
 
 def attribute_pics_str(pics_base: str, id: int) -> str: ...
 def accepted_cmd_pics_str(pics_base: str, id: int) -> str: ...

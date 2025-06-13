@@ -25,7 +25,6 @@ from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, Ho
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
-from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
@@ -176,6 +175,7 @@ def BuildHostTarget():
     target.AppendModifier("no-wifipaf", enable_wifipaf=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
+    target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
         "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
@@ -630,7 +630,7 @@ def BuildQorvoTarget():
 
     # board
     target.AppendFixedTargets([
-        TargetPart('qpg6105', board=QpgBoard.QPG6105),
+        TargetPart('qpg6200', board=QpgBoard.QPG6200),
     ])
 
     # apps
@@ -762,13 +762,6 @@ def BuildIMXTarget():
     return target
 
 
-def BuildMW320Target():
-    target = BuildTarget('mw320', MW320Builder)
-    target.AppendFixedTargets(
-        [TargetPart('all-clusters-app', app=MW320App.ALL_CLUSTERS)])
-    return target
-
-
 def BuildGenioTarget():
     target = BuildTarget('genio', GenioBuilder)
     target.AppendFixedTargets([TargetPart('lighting-app', app=GenioApp.LIGHT)])
@@ -881,7 +874,6 @@ BUILD_TARGETS = [
     BuildInfineonTarget(),
     BuildNxpTarget(),
     BuildMbedTarget(),
-    BuildMW320Target(),
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
     BuildNuttXTarget(),

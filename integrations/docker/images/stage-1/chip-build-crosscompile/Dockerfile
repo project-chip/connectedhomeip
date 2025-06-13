@@ -17,7 +17,7 @@ WORKDIR /opt
 RUN set -x \
   && git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot_tools \
   # TODO: Remove experimental solution to create the sysroot file in cross-compile image
-  && echo 'experimental/matter/sysroot/ubuntu-24.04-aarch64 version:build-2025.01.28' > ensure_file.txt \
+  && echo 'experimental/matter/sysroot/ubuntu-24.04-aarch64 version:build-2025.06.05' > ensure_file.txt \
   && ./depot_tools/cipd ensure -ensure-file ensure_file.txt -root ./ \
   && rm -rf /opt/ubuntu-24.04-aarch64-sysroot/usr/lib/firmware \
   && rm -rf /opt/ubuntu-24.04-aarch64-sysroot/usr/lib/git-core \

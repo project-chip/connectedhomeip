@@ -378,7 +378,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     if (mWiFiStationState == kWiFiStationState_Connected)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-        haveIPv4Conn = WifiInterface::GetIstance().HasAnIPv4Address();
+        haveIPv4Conn = WifiInterface::GetInstance().HasAnIPv4Address();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         haveIPv6Conn = WifiInterface::GetInstance().HasAnIPv6Address();
     }
