@@ -83,7 +83,7 @@ class TC_SEAR_1_3(MatterBaseTest):
                              expected_response,
                              f"Command response ({ret.status}) doesn't match the expected one")
 
-    def TC_SEAR_1_3(self) -> list[str]:
+    def pics_TC_SEAR_1_3(self) -> list[str]:
         return ["SEAR.S"]
 
     @async_test_body
@@ -157,7 +157,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            if self.check_pics("SEAR.S.F00"):
+            if await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.ServiceArea, feature_int=Clusters.ServiceArea.Bitmaps.Feature.kSelectWhileRunning):
                 await self.send_cmd_select_areas_expect_response(step=15, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kSuccess)
             else:
                 await self.send_cmd_select_areas_expect_response(step=15, new_areas=valid_areas, expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kInvalidInMode)
