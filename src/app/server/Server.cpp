@@ -52,6 +52,9 @@
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
+#if defined(CHIP_MDNS_MINIMAL)
+#include <lib/dnssd/minimal_mdns/AddressPolicy_SingleInterface.h> // nogncheck
+#endif
 #include <setup_payload/SetupPayload.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
@@ -121,6 +124,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mOperationalServicePort        = initParams.operationalServicePort;
     mUserDirectedCommissioningPort = initParams.userDirectedCommissioningPort;
     mInterfaceId                   = initParams.interfaceId;
+
+#if defined(CHIP_MDNS_MINIMAL)
+    if (mInterfaceId != chip::Inet::InterfaceId::Null())
+    {
+        static mdns::Minimal::SingleInterfaceAddressPolicy policy(mdns::Minimal::GetAddressPolicy(), mInterfaceId);
+        mdns::Minimal::SetAddressPolicy(&policy);
+    }
+#endif
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     auto tcpListenParams = TcpListenParameters(DeviceLayer::TCPEndPointManager())

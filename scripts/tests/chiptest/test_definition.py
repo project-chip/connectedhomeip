@@ -111,18 +111,16 @@ class App:
                     self.cv_stopped.wait()
 
     def __startServer(self, runner, command):
-        app_cmd = command + ['--interface-id', str(-1)]
-
         if not self.options:
             logging.debug('Executing application under test with default args')
         else:
             logging.debug('Executing application under test with the following args:')
             for key, value in self.options.items():
                 logging.debug('   %s: %s' % (key, value))
-                app_cmd = app_cmd + [key, value]
+                command = command + [key, value]
                 if key == '--KVS':
                     self.kvsPathSet.add(value)
-        return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
+        return runner.RunSubprocess(command, name='APP ', wait=False)
 
     def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
         logging.debug('Waiting for %s' % waitForString)

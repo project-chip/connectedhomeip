@@ -32,7 +32,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/dnssd/minimal_mdns",
-    "${chip_root}/src/lib/dnssd/minimal_mdns:default_policy",
+    "${chip_root}/src/lib/dnssd/minimal_mdns:builtin_policy",
     "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
   ]
 }
