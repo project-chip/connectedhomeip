@@ -49,8 +49,8 @@ import chip.clusters as Clusters
 import nest_asyncio
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
-                                         TestStep, default_matter_test_main, has_command, run_if_endpoint_matches)
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main,
+                                         has_command, run_if_endpoint_matches)
 from chip.testing.pics import accepted_cmd_pics_str
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks

@@ -46,7 +46,7 @@
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.event_reporting import EventChangeCallback
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
