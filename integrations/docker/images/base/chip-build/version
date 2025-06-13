@@ -1,1 +1,1 @@
-138 : Install dbus-daemon required for BLE-WiFi testing
+139 : Update chip-build-crosscompile docker to point to the latest version of sysroot

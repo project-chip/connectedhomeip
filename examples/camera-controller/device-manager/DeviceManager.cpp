@@ -193,10 +193,10 @@ void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
     auto streamUsage           = static_cast<StreamUsageEnum>(mStreamUsage);
 
     // Provide the offer to establish the WebRTC session
-    err = WebRTCManager::Instance().ProvideOffer(app::DataModel::NullNullable,                // session ID (null)
-                                                 streamUsage,                                 // stream‑usage field
-                                                 videoStreamIdOptional,                       // videoStreamId you just built
-                                                 MakeOptional(app::DataModel::NullNullable)); // audioStreamID (null)
+    err = WebRTCManager::Instance().ProvideOffer(app::DataModel::NullNullable, // session ID (null)
+                                                 streamUsage,                  // stream‑usage field
+                                                 videoStreamIdOptional,        // videoStreamId you just built
+                                                 NullOptional);                // audioStreamID (empty)
 
     if (err != CHIP_NO_ERROR)
     {
