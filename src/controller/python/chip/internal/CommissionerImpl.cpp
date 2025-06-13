@@ -133,8 +133,9 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         const chip::Credentials::AttestationTrustStore * testingRootStore =
             GetTestFileAttestationTrustStore("./credentials/development/paa-root-certs");
         // TODO: Ensure that attestation revocation data is actually provided.
-        chip::Credentials::DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
-        chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        chip::Credentials::DeviceAttestationVerifier * dacVerifier =
+            chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
         VerifyOrDie(dacVerifier != nullptr);
         dacVerifier->EnableVerboseLogs(true);
         chip::Credentials::SetDeviceAttestationVerifier(dacVerifier);

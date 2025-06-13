@@ -542,9 +542,9 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     // Initialize device attestation verifier
     // TODO: Ensure that attestation revocation data is actually provided.
-    chip::Credentials::DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
+    chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    auto * dacVerifier                                                = chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+    auto * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
     VerifyOrDie(dacVerifier != nullptr);
     dacVerifier->EnableVerboseLogs(true);
 

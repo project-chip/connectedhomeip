@@ -182,8 +182,9 @@ JNI_METHOD(void, validateAttestationInfo)
 
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         // TODO: Ensure that attestation revocation data is actually provided.
-        chip::Credentials::DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
-        chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        chip::Credentials::DeviceAttestationVerifier * dacVerifier =
+            chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
         VerifyOrDie(dacVerifier != nullptr);
         dacVerifier->EnableVerboseLogs(true);
 

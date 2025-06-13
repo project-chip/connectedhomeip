@@ -38,8 +38,8 @@ public:
     {
         chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-        DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
-        mDacVerifier                          = chip::Credentials::GetDefaultDACVerifier(trustStore, kDeviceAttestationRevocationNotChecked);
+        DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        mDacVerifier = chip::Credentials::GetDefaultDACVerifier(trustStore, kDeviceAttestationRevocationNotChecked);
         setupParams.deviceAttestationVerifier = mDacVerifier;
         mDacVerifier->EnableCdTestKeySupport(mAllowTestCdSigningKey);
 

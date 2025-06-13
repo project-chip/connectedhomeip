@@ -157,8 +157,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         // TODO: Ensure that attestation revocation data is actually provided.
-        chip::Credentials::DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
-        chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked));
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        chip::Credentials::SetDeviceAttestationVerifier(
+            GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked));
     }
 
     // Because garbage collection may delay the removal of old controller instances, two instances could temporarily exist.

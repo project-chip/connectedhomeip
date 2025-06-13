@@ -208,8 +208,9 @@ TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_AttestationInfoV
     attestationResult = default_verifier->ValidateCertificationDeclarationSignature(ByteSpan(), emptyByteSpan);
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kNotImplemented);
 
-    DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
+    DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    DeviceAttestationVerifier * example_dac_verifier =
+        GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
     ASSERT_NE(example_dac_verifier, nullptr);
     EXPECT_NE(default_verifier, example_dac_verifier);
 
@@ -278,8 +279,9 @@ TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_CertDeclarationV
     };
 
     // Replace default verifier with example verifier
-    DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
+    DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    DeviceAttestationVerifier * example_dac_verifier =
+        GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
     ASSERT_NE(example_dac_verifier, nullptr);
 
     SetDeviceAttestationVerifier(example_dac_verifier);
@@ -356,8 +358,9 @@ TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_NocsrInformation
                                                  0xf8, 0x5d, 0xca, 0xb2, 0x01, 0x9a, 0x0a, 0xb6, 0xf5, 0x59, 0x57, 0x75, 0xfe,
                                                  0x8d, 0x85, 0xfb, 0xd7, 0xa0, 0x7c, 0x8e, 0x83, 0x7d, 0xa4, 0xd5, 0xa8, 0xb9 };
 
-    DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
-    DeviceAttestationVerifier * exampleDacVerifier = GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
+    DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    DeviceAttestationVerifier * exampleDacVerifier =
+        GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
     ASSERT_NE(exampleDacVerifier, nullptr);
 
     P256PublicKey dacPubkey;

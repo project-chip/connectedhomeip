@@ -134,10 +134,11 @@ int main(int argc, char * argv[])
         ChipLogError(AppServer, "Initialization of CommissionableDataProvider failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     // TODO: Ensure attestation revocation is properly checked.
-    chip::Credentials::DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
-    err = appParameters.Create(&rotatingDeviceIdUniqueIdProvider, &gCommissionableDataProvider,
-                               chip::Credentials::Examples::GetExampleDACProvider(),
-                               GetDefaultDACVerifier(chip::Credentials::GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked), &serverInitParamsProvider);
+    chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    err                                                                                             = appParameters.Create(
+        &rotatingDeviceIdUniqueIdProvider, &gCommissionableDataProvider, chip::Credentials::Examples::GetExampleDACProvider(),
+        GetDefaultDACVerifier(chip::Credentials::GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked),
+        &serverInitParamsProvider);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "Creation of AppParameters failed %" CHIP_ERROR_FORMAT, err.Format()));
 
