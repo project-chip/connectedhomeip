@@ -165,39 +165,12 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
             asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
 
         self.step(6)
-        # Send VideoStreamAllocate command with valid parameters to create a video stream
-        videoStreamAllocateCmd = Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
-            streamUsage=3,  # kLiveView
-            videoCodec=Clusters.CameraAvStreamManagement.Enums.VideoCodecEnum.kH264,
-            minFrameRate=30,  # kMinFrameRate
-            maxFrameRate=120,  # kMaxFrameRate
-            minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
-                width=640, height=360  # kMinWidth, kMinHeight
-            ),
-            maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
-                width=1920, height=1080  # kMaxWidth, kMaxHeight
-            ),
-            minBitRate=10000,  # kDefaultBitRate (10,000 bits per second)
-            maxBitRate=10000,  # kDefaultBitRate
-            minFragmentLen=1,  # kMinFragmentLen
-            maxFragmentLen=10,  # kMaxFragmentLen
-        )
-        videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-        asserts.assert_is_not_none(
-            videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
-        )
-
-        # Save the allocated video stream ID for use in the next step
-        allocated_video_stream_id = videoStreamAllocateResponse.videoStreamID
-
-        self.step(7)
         # Send valid ProvideOffer command using the allocated video stream ID
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=test_sdp,
             streamUsage=3,
-            originatingEndpointID=endpoint,
-            videoStreamID=allocated_video_stream_id
+            originatingEndpointID=endpoint
         )
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
