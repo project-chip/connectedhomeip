@@ -6232,6 +6232,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRDeviceController * controller = [self createControllerOnTestFabric];
     XCTAssertNotNil(controller);
 
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -6244,12 +6250,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     };
 
     [device setDelegate:delegate queue:queue];
-
-    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
-                                                          arguments:@[]
-                                                         controller:controller
-                                                            payload:kOnboardingPayload2
-                                                             nodeID:@(kDeviceId2)];
 
     [self waitForExpectations:@[ reachableExpectation ] timeout:60];
 
