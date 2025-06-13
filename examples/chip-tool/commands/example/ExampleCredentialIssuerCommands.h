@@ -39,7 +39,7 @@ public:
     {
         chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-        mDacVerifier = chip::Credentials::GetDefaultDACVerifier(trustStore);
+        mDacVerifier = chip::Credentials::GetDefaultDACVerifier(trustStore, revocationDelegate);
         VerifyOrDie(mDacVerifier != nullptr);
 
         mDacVerifier->EnableCdTestKeySupport(mAllowTestCdSigningKey);

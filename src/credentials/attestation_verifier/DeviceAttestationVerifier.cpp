@@ -178,8 +178,6 @@ const char * GetAttestationResultDescription(AttestationVerificationResult resul
                "device)";
     case AttestationVerificationResult::kNotImplemented:
         return "Reached a critical-but-unimplemented part of the device attestation procedure!";
-    default:
-        break;
     }
 
     return "<AttestationVerificationResult does not have a description!>";
