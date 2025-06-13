@@ -150,7 +150,7 @@ const char * GetAttestationResultDescription(AttestationVerificationResult resul
     case AttestationVerificationResult::kAttestationElementsMalformed:
         return "Attestation elements payload is malformed";
     case AttestationVerificationResult::kAttestationNonceMismatch:
-        return "Attestation nonce mismatches one from Attestation Request";
+        return "Attestation nonce does not match the one from Attestation Request";
     case AttestationVerificationResult::kAttestationSignatureInvalidFormat:
         return "Attestation signature format is invalid (likely wrong signature algorithm in certificate)";
     case AttestationVerificationResult::kCertificationDeclarationNoKeyId:
@@ -167,14 +167,14 @@ const char * GetAttestationResultDescription(AttestationVerificationResult resul
         return "Certification declaration product ID failed to cross-reference with DAC and/or PAI and/or Basic Information "
                "cluster";
     case AttestationVerificationResult::kCertificationDeclarationInvalidPAA:
-        return "Certification declaration required a fixed allowed PAA which mismatches the final PAA found";
+        return "Certification declaration required a fixed allowed PAA which does not match the final PAA found";
     case AttestationVerificationResult::kNoMemory:
         return "Failed to allocate memory to process attestation verification";
     case AttestationVerificationResult::kInvalidArgument:
         return "Some unexpected invalid argument was provided internally to the device attestation procedure (likely malformed "
                "input data from candidate device)";
     case AttestationVerificationResult::kInternalError:
-        return "An internal error error arose in the device attestation procedure (likely malformed input data from candidate "
+        return "An internal error arose in the device attestation procedure (likely malformed input data from candidate "
                "device)";
     case AttestationVerificationResult::kNotImplemented:
         return "Reached a critical-but-unimplemented part of the device attestation procedure!";

@@ -1887,7 +1887,7 @@ public:
      * This is optimized for standard 20-byte AKID/SKID but works for any length, truncating very long ones.
      *
      * @param keyIdBuffer - buffer of bytes of the key ID.
-     * @return pointer to class-owned storage of a null-terminated string having the conversion.
+     * @return pointer to class-owned storage of a null-terminated string in DCL format.
      */
     const char * KeyIdToHex(ByteSpan keyIdBuffer)
     {

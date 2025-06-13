@@ -311,7 +311,7 @@ AttestationVerificationResult MapError(CertificateChainValidationResult certific
     }
 }
 
-// CertificateType class doesn't work since it doesn't encode PAA>
+// CertificateType class doesn't work since it doesn't encode PAA.
 enum class AttestationChainElement : uint8_t
 {
     kPAA = 0,

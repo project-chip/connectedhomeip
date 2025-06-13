@@ -408,9 +408,9 @@ public:
     virtual WellKnownKeysTrustStore * GetCertificationDeclarationTrustStore() { return nullptr; }
 
     /**
-     * @brief Set whether the test CD keys from SDK are acceptedc (should be false in production)
+     * @brief Set whether the test CD keys from SDK are accepted (should be false in production)
      *
-     * @param enabled - true to trust the SDK's untrused CD signing key, false otherwise.
+     * @param enabled - true to trust the SDK's test CD signing key, false otherwise.
      */
     void EnableCdTestKeySupport(bool enabled) { mEnableCdTestKeySupport = enabled; }
 
