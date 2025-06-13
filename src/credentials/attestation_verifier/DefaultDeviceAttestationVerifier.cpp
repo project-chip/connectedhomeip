@@ -402,6 +402,13 @@ void LogCertificateAsPem(AttestationChainElement element, ByteSpan derBuffer)
 #endif // CHIP_PROGRESS_LOGGING
 }
 
+void LogCertDebugData(AttestationChainElement element, ByteSpan derBuffer)
+{
+    LogCertificateAsPem(element, info.derBuffer);
+    LogOneKeyId(KeyIdType::kSubjectKeyId, element, derBuffer);
+    LogOneKeyId(KeyIdType::kAuthorityKeyId, element, derBuffer);
+}
+
 } // namespace
 
 void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
@@ -457,13 +464,8 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         ChipLogProgress(NotSpecified, "--> DAC's VID: 0x%04X, PID: 0x%04X", dacVidPid.mVendorId.Value(),
                         dacVidPid.mProductId.Value());
 
-        LogCertificateAsPem(AttestationChainElement::kDAC, info.dacDerBuffer);
-        LogOneKeyId(KeyIdType::kSubjectKeyId, AttestationChainElement::kDAC, info.dacDerBuffer);
-        LogOneKeyId(KeyIdType::kAuthorityKeyId, AttestationChainElement::kDAC, info.dacDerBuffer);
-
-        LogCertificateAsPem(AttestationChainElement::kPAI, info.paiDerBuffer);
-        LogOneKeyId(KeyIdType::kSubjectKeyId, AttestationChainElement::kPAI, info.paiDerBuffer);
-        LogOneKeyId(KeyIdType::kAuthorityKeyId, AttestationChainElement::kPAI, info.paiDerBuffer);
+        LogCertDebugData(AttestationChainElement::kDAC, info.dacDerBuffer);
+        LogCertDebugData(AttestationChainElement::kPAI, info.paiDerBuffer);
     }
 
     // Validate overall attestation signature on attestation information.
@@ -518,9 +520,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         if (AreVerboseLogsEnabled())
         {
             // PAA details following the DAC/PAI above.
-            LogCertificateAsPem(AttestationChainElement::kPAA, paaDerBuffer);
-            LogOneKeyId(KeyIdType::kSubjectKeyId, AttestationChainElement::kPAA, paaDerBuffer);
-            LogOneKeyId(KeyIdType::kAuthorityKeyId, AttestationChainElement::kPAA, paaDerBuffer);
+            LogCertDebugData(AttestationChainElement::kPAA, paaDerBuffer);
         }
 
         VerifyOrExit(ExtractVIDPIDFromX509Cert(paaDerBuffer, paaVidPid) == CHIP_NO_ERROR,
