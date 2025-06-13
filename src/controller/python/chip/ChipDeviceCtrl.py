@@ -2706,7 +2706,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         if parameters is None:
             raise ValueError("ICD registration parameter required.")
-        if len(parameters.symmetricKey) != 16:
+        if parameters.symmetricKey is None or len(parameters.symmetricKey) != 16:
             raise ValueError("symmetricKey should be 16 bytes")
 
         self.CheckIsActive()
