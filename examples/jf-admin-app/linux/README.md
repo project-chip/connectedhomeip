@@ -5,7 +5,7 @@ An example application that acts as a Joint Fabric Administrator.
 <hr>
 
 -   [Matter Joint Fabric Admin Example](#matter-joint-fabric-admin-example)
--   [Building the example Application on Linux](#building-the-example-application-on-linux)
+    -   [Building the example Application on Linux](#building-the-example-application-on-linux)
 
 <hr>
 
