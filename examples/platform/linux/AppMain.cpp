@@ -278,6 +278,9 @@ void InitNetworkCommissioning()
     {
 #if CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
         sEthernetNetworkCommissioningInstance.Init();
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+        DeviceLayer::ConnectivityMgrImpl().UpdateEthernetNetworkingStatus();
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
     }
 }

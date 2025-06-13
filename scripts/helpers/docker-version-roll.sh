@@ -16,7 +16,7 @@
 
 #
 # Usage:
-#  ./scripts/helpers/roll_docker_version.sh -v=X --reason="INSERT_REASON_HERE"
+#  ./scripts/helpers/docker-version-roll.sh -v=X --reason="INSERT_REASON_HERE"
 #
 
 CURRENT_VERSION=$(sed 's/ .*//' ./integrations/docker/images/base/chip-build/version)
@@ -40,7 +40,7 @@ done
 
 if [[ ! $ROLL_REASON ]]; then
     echo 'Roll reason required, please add --reason="Why I am rolling"'
-    exit -1
+    exit 1
 fi
 
 echo "Current version: $CURRENT_VERSION"
@@ -49,20 +49,22 @@ echo "Reason: $ROLL_REASON"
 echo ""
 
 echo "Rolling workflows"
-sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9,a-z,A-Z,-]*(\..*)?|image: ghcr.io/project-chip/\1:$NEXT_VERSION|" .github/workflows/*.yaml
-sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9,a-z,A-Z,-]*(\..*)?|image: ghcr.io/project-chip/\1:$NEXT_VERSION|" .github/workflows/*.yml
+sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9]+|image: ghcr.io/project-chip/\1:$NEXT_VERSION|" .github/workflows/*.yaml
+sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9]+|image: ghcr.io/project-chip/\1:$NEXT_VERSION|" .github/workflows/*.yml
 
 echo "Rolling VSCode container"
 sed -r -i "s|matter-dev-environment:local --version [0-9,a-z,A-Z,-]*|matter-dev-environment:local --version $NEXT_VERSION|" .devcontainer/devcontainer.json
 
 echo "Rolling docker images"
-find . -iname Dockerfile -not -path "./third_party/*" | xargs sed -r -i "s|ARG VERSION=[0-9,a-z,A-Z,-]*|ARG VERSION=$NEXT_VERSION|"
+find . -iname Dockerfile -not -path "./third_party/*" -exec \
+    sed -r -i "s|ARG VERSION=[0-9,a-z,A-Z,-]*|ARG VERSION=$NEXT_VERSION|" {} +
 
 echo "Rolling main docker version"
 echo "$NEXT_VERSION : $ROLL_REASON" >./integrations/docker/images/base/chip-build/version
 
 echo "Rolling README.md files"
-find . -iname readme.md -not -path "./third_party/*" | xargs sed -r -i "s|ghcr\.io/project-chip/(.*):[0-9,a-z,A-Z,-]*(\..*)?|ghcr.io/project-chip/\1:$NEXT_VERSION|"
+find . -iname readme.md -not -path "./third_party/*" -exec \
+    sed -r -i "s|ghcr\.io/project-chip/(.*):[0-9]+|ghcr.io/project-chip/\1:$NEXT_VERSION|" {} +
 
 echo ""
 echo "Done"

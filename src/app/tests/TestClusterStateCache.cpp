@@ -464,8 +464,6 @@ private:
 
     void OnAttributeChanged(ClusterStateCache * cache, const ConcreteAttributePath & path) override
     {
-        StatusIB status;
-
         // Ensure that the provided path is one that we're expecting to find
         auto iter = mExpectedAttributes.find(path);
         ASSERT_NE(iter, mExpectedAttributes.end());

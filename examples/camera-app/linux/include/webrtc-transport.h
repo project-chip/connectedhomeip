@@ -44,6 +44,12 @@ public:
     // Indicates that the transport is ready to send audio data
     bool CanSendAudio() override;
 
+    // Set video track for the transport
+    void SetVideoTrack(std::shared_ptr<rtc::Track> videoTrack);
+
+    // Set audio track for the transport
+    void SetAudioTrack(std::shared_ptr<rtc::Track> audioTrack);
+
 private:
     uint16_t mSessionID;
     uint64_t mNodeID;

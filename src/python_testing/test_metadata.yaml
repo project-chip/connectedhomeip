@@ -27,12 +27,9 @@ not_automated:
       reason: Camera App does not support all features required for this TC
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
-    - name: TC_CNET_4_3.py
-      reason:
-          network commissioning cluster does not return expected values on linux
-          example apps -
-          https://github.com/project-chip/connectedhomeip/issues/37824
     - name: TC_CNET_4_4.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_9.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
       reason: It has no CI execution block, is not executed in CI
@@ -145,6 +142,14 @@ not_automated:
           are fully verified.
     - name: TC_WEBRTC_Utils.py
       reason: Helper methods for WebRTC TCs, not a standalone test.
+    - name: TC_WEBRTCP_2_1.py
+      reason:
+          Breaks CI. Temporarily disabling to allow correct fix. See
+          https://github.com/project-chip/connectedhomeip/issues/39529
+    - name: TC_WEBRTCP_2_3.py
+      reason:
+          Breaks CI. Temporarily disabling to allow correct fix. See
+          https://github.com/project-chip/connectedhomeip/issues/39529
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

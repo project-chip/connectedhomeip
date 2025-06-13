@@ -169,20 +169,20 @@ public:
      * digital movement. This should be invoked by a delegate on the conclusion of allocating a video stream via the AV Stream
      * Management cluster.
      */
-    void AddMoveCapableVideoStream(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport);
+    void AddMoveCapableVideoStream(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport);
 
     /**
      * Allows for a delegate or application to update the viewport of an already allocated video stream.
      * This should be invoked whenever a viewport is updated by DPTZSetVewport or DPTZRelativeMove
      */
-    void UpdateMoveCapableVideoStream(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport);
+    void UpdateMoveCapableVideoStream(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport);
 
     /**
      * Allows for a delegate or application to update all of the viewports for all of the allocated video streams.
      * This should be invoked whenever the device default viewport is updated via a write to Viewport on the
      * AV Stream Management Cluster
      */
-    void UpdateMoveCapableVideoStreams(Structs::ViewportStruct::Type aViewport);
+    void UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport);
 
     /**
      * Allows for a delegate or application to remove a video stream from the set that is capable of digital movement.
@@ -277,9 +277,9 @@ public:
      * allocated or deallocated stream, or the viewport when the device level viewport is updated.
      * The delegate shall invoke the appropriate MoveCapableVideoStream methods on its instance of the server
      */
-    virtual void VideoStreamAllocated(uint16_t aStreamID)                        = 0;
-    virtual void VideoStreamDeallocated(uint16_t aStreamID)                      = 0;
-    virtual void DefaultViewportUpdated(Structs::ViewportStruct::Type aViewport) = 0;
+    virtual void VideoStreamAllocated(uint16_t aStreamID)                                 = 0;
+    virtual void VideoStreamDeallocated(uint16_t aStreamID)                               = 0;
+    virtual void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) = 0;
 
     /**
      * Delegate command handlers
@@ -347,7 +347,7 @@ public:
      * @param aViewport      The new values of Viewport that are to be set
      */
     virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
-                                                                Structs::ViewportStruct::Type aViewport) = 0;
+                                                                Globals::Structs::ViewportStruct::Type aViewport) = 0;
     /**
      * Informs the delegate that a request has been made to digitally alter the current rendered stream. The server has already
      * validated that the Zoom Delta (if provided) is in range, and that the video stream ID is valid. The app needs to work with
@@ -360,7 +360,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                                  Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                                 Structs::ViewportStruct::Type & aViewport) = 0;
+                                                                 Globals::Structs::ViewportStruct::Type & aViewport) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
