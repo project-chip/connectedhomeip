@@ -64,6 +64,8 @@ TEST_TARGET=check
 ENABLE_YAML=false
 ENABLE_PYTHON=false
 
+GENERATE_XML=false
+
 help() {
     echo "Usage: $file_name [--output_root=<output_root>] [--code=<core|clusters|all>] [Test options"
     echo
@@ -120,6 +122,10 @@ for i in "$@"; do
             ;;
         --python)
             ENABLE_PYTHON=true
+            shift
+            ;;
+        --xml)
+            GENERATE_XML=true
             shift
             ;;
         *)
@@ -252,11 +258,27 @@ genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --title "SHA:$(git rev-parse HEAD)" \
     --header-title "Matter SDK Coverage Report"
 
-gcovr --exclude=zzz_generated/ \
-    --exclude=third_party/ \
-    --include=src/ \
-    --gcov-ignore-parse-errors \
-    --xml="$COVERAGE_ROOT"/coverage.xml
+if [ "$GENERATE_XML" == true ]; then
+    _install_gcovr
+
+    gcovr --exclude=zzz_generated/ \
+        --exclude=third_party/ \
+        --include=src/ \
+        --gcov-ignore-parse-errors \
+        --xml="$COVERAGE_ROOT"/coverage.xml
+
+    XML_INDEX=$(_normpath "$COVERAGE_ROOT/coverage.xml")
+    if [ -f "$XML_INDEX" ]; then
+        echo
+        echo "============================================================"
+        echo "Coverage report successfully generated:"
+        echo "    file://$XML_INDEX"
+        echo "============================================================"
+    else
+        echo "WARNING: Coverage XML index was not found at expected path:"
+        echo "    $XML_INDEX"
+    fi
+fi
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
