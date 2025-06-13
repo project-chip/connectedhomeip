@@ -31,13 +31,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from support_modules.cadmin_support import CADMINSupport
+from mobly import asserts
+from chip.testing.event_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
-from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
 
 
 class TC_CADMIN_1_19(MatterBaseTest):
