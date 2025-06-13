@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 set -e
 
 # For each target
-for target in out/*; do
+for target in out/tizen-*; do
     # For each coredump
     for zip in "$target/dump"/*.zip; do
         basepath=$(dirname "$zip")
@@ -32,6 +32,10 @@ for target in out/*; do
         tar -xf "$path"/*.tar -C "$path"
 
         echo "----------------------------------------------------------------------------------------------------"
-        gdb-multiarch --batch -ex "set auto-load safe-basepath /" -ex "set sysroot $TIZEN_SDK_SYSROOT" -ex "bt full" "$target/$binary" "$coredump"
+        gdb-multiarch --batch \
+            -ex "set auto-load safe-basepath /" \
+            -ex "set sysroot $TIZEN_SDK_SYSROOT" \
+            -ex "thread apply all bt full" \
+            "$target/$binary" "$coredump"
     done
 done
