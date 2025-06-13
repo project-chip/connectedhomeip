@@ -2440,6 +2440,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._fabricAdmin = fabricAdmin
         self._fabricId = fabricId
         self._nodeId = nodeId
+        assert fabricAdmin is not None
         self._caIndex = fabricAdmin.caIndex
 
         self._set_dev_ctrl(devCtrl=devCtrl, pairingDelegate=pairingDelegate)
