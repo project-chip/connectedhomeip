@@ -404,7 +404,7 @@ void LogCertificateAsPem(AttestationChainElement element, ByteSpan derBuffer)
 
 void LogCertDebugData(AttestationChainElement element, ByteSpan derBuffer)
 {
-    LogCertificateAsPem(element, info.derBuffer);
+    LogCertificateAsPem(element, derBuffer);
     LogOneKeyId(KeyIdType::kSubjectKeyId, element, derBuffer);
     LogOneKeyId(KeyIdType::kAuthorityKeyId, element, derBuffer);
 }
