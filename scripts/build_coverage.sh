@@ -45,8 +45,6 @@ _install_gcovr() {
     fi
 }
 
-_install_gcovr
-
 _normpath() {
     python3 -c "import os.path; print(os.path.normpath('$@'))"
 }
