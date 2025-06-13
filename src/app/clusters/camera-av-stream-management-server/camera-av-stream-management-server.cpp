@@ -1918,16 +1918,14 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    SnapshotStreamStruct snapshotStreamArgs;
-    snapshotStreamArgs.snapshotStreamID = 0;
+    CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
     snapshotStreamArgs.imageCodec       = commandData.imageCodec;
-    snapshotStreamArgs.frameRate        = commandData.maxFrameRate;
+    snapshotStreamArgs.maxFrameRate     = commandData.maxFrameRate;
     snapshotStreamArgs.minResolution    = commandData.minResolution;
     snapshotStreamArgs.maxResolution    = commandData.maxResolution;
     snapshotStreamArgs.quality          = commandData.quality;
     snapshotStreamArgs.watermarkEnabled = commandData.watermarkEnabled;
     snapshotStreamArgs.OSDEnabled       = commandData.OSDEnabled;
-    snapshotStreamArgs.referenceCount   = 0;
 
     // Call the delegate
     Status status = mDelegate.SnapshotStreamAllocate(snapshotStreamArgs, snapshotStreamID);
@@ -1938,17 +1936,26 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         return;
     }
 
-    // Check if the streamID matches an existing one in the
-    // mAllocatedSnapshotStreams.
+    // Check if the streamID matches an existing one in the mAllocatedSnapshotStreams.
     bool streamExists = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
                                      [&snapshotStreamID](const SnapshotStreamStruct & entry) {
                                          return entry.snapshotStreamID == snapshotStreamID;
                                      }) != mAllocatedSnapshotStreams.end();
     if (!streamExists)
     {
-        // Add the allocated snapshotstream object in the AllocatedSnapshotStreams list.
-        snapshotStreamArgs.snapshotStreamID = snapshotStreamID;
-        AddSnapshotStream(snapshotStreamArgs);
+        // Add the allocated snapshot stream object in the mAllocatedSnapshotStreams list.
+        SnapshotStreamStruct allocatedSnapshotStream;
+        allocatedSnapshotStream.snapshotStreamID = snapshotStreamID;
+        allocatedSnapshotStream.referenceCount   = 0;
+        allocatedSnapshotStream.imageCodec       = snapshotStreamArgs.imageCodec;
+        allocatedSnapshotStream.frameRate        = snapshotStreamArgs.maxFrameRate;
+        allocatedSnapshotStream.minResolution    = snapshotStreamArgs.minResolution;
+        allocatedSnapshotStream.maxResolution    = snapshotStreamArgs.maxResolution;
+        allocatedSnapshotStream.quality          = snapshotStreamArgs.quality;
+        allocatedSnapshotStream.watermarkEnabled = snapshotStreamArgs.watermarkEnabled;
+        allocatedSnapshotStream.OSDEnabled       = snapshotStreamArgs.OSDEnabled;
+
+        AddSnapshotStream(allocatedSnapshotStream);
     }
 
     response.snapshotStreamID = snapshotStreamID;

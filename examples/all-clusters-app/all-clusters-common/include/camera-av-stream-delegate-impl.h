@@ -71,7 +71,8 @@ public:
 
     Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID);
 
-    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs, uint16_t & outStreamID);
+    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
+                                                               uint16_t & outStreamID);
 
     Protocols::InteractionModel::Status SnapshotStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
                                                              const chip::Optional<bool> osdEnabled);

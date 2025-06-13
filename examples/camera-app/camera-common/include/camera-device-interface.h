@@ -78,10 +78,11 @@ struct SnapshotStream
     void * snapshotContext; // Platform-specific context object associated with
                             // snapshot stream;
 
-    bool IsCompatible(const SnapshotStreamStruct & inputParams) const
+    bool IsCompatible(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs &
+                          inputParams) const
     {
         return (snapshotStreamParams.imageCodec == inputParams.imageCodec && snapshotStreamParams.quality == inputParams.quality &&
-                snapshotStreamParams.frameRate <= inputParams.frameRate &&
+                snapshotStreamParams.frameRate <= inputParams.maxFrameRate &&
                 snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 snapshotStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
