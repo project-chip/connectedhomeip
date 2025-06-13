@@ -138,8 +138,9 @@ public:
 
     std::atomic<bool> mRunning; ///< Recording activity flag
     std::atomic<bool> mDeintializeRecorder;
+
 private:
-    int kMaxQueueSize = 500;
+    long unsigned int kMaxQueueSize = 500;
 
     /// @name Stream Configuration
     /// @{
