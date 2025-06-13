@@ -199,7 +199,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             # STEP 3d: Wait for CurrentState.Position to be updated to MaxPosition
             self.step("3d")
             sub_handler.await_all_expected_report_matches(
-                expected_matches=[current_position_matcher(max_position)], timeout_sec=timeout)
+                expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
 
         # STEP 4a: If Speed feature is not supported, skip step 4b to 4d
         self.step("4a")
@@ -234,7 +234,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             # STEP 4d: Wait for CurrentState.Speed to be updated to Medium
             self.step("4d")
             sub_handler.await_all_expected_report_matches(
-                expected_matches=[current_speed_matcher(Globals.Enums.ThreeLevelAutoEnum.kMedium)], timeout_sec=timeout)
+                expected_matchers=[current_speed_matcher(Globals.Enums.ThreeLevelAutoEnum.kMedium)], timeout_sec=timeout)
 
         # STEP 5a: Set Position to min_position
         self.step("5a")
@@ -259,7 +259,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         # STEP 5c: Wait for CurrentState.Position to be updated to MinPosition
         self.step("5c")
         sub_handler.await_all_expected_report_matches(
-            expected_matches=[current_position_matcher(min_position)], timeout_sec=timeout)
+            expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
 
         # STEP 6a: If Speed feature is not supported, skip step 6b to 6d
         self.step("6a")
@@ -296,7 +296,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             # STEP 6d: Wait for CurrentState.Position to be updated to MaxPosition and CurrentState.Speed to High
             self.step("6d")
             sub_handler.await_all_expected_report_matches(
-                expected_matches=[current_position_and_speed_matcher(min_position, Globals.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
+                expected_matchers=[current_position_and_speed_matcher(min_position, Globals.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
 
 
 if __name__ == "__main__":

@@ -261,7 +261,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             self.step("5d")
             if initial_state.Position > 0:
                 sub_handler.await_all_expected_report_matches(
-                    expected_matches=[current_position_matcher(0)], timeout_sec=timeout)
+                    expected_matchers=[current_position_matcher(0)], timeout_sec=timeout)
             else:
                 logging.info("Initial Position not > 0. Skipping step 5d.")
                 self.mark_current_step_skipped()
@@ -294,7 +294,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             self.step("5g")
             if max_position < 10000:
                 sub_handler.await_all_expected_report_matches(
-                    expected_matches=[current_position_matcher(10000)], timeout_sec=timeout)
+                    expected_matchers=[current_position_matcher(10000)], timeout_sec=timeout)
             else:
                 logging.info("MaxPosition not < 10000. Skipping step 5g.")
                 self.mark_current_step_skipped()
@@ -363,7 +363,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
-                    expected_matches=[current_position_matcher(min_position)], timeout_sec=timeout)
+                    expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
 
             # STEP 7f: If not Resolution == 1: Wait for CurrentState.Position to be updated
             self.step("7f")
@@ -371,7 +371,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
-                    expected_matches=[current_position_matcher(min_position + resolution)], timeout_sec=timeout)
+                    expected_matchers=[current_position_matcher(min_position + resolution)], timeout_sec=timeout)
 
             # STEP 7g: Send SetTarget command with Position not a multiple of Resolution
             self.step("7g")
@@ -403,7 +403,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
-                    expected_matches=[current_position_matcher(max_position)], timeout_sec=timeout)
+                    expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
 
             # STEP 7j: If not Resolution <= 2: Wait for CurrentState.Position to be updated
             self.step("7j")
@@ -411,7 +411,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
-                    expected_matches=[current_position_matcher(max_position - resolution)], timeout_sec=timeout)
+                    expected_matchers=[current_position_matcher(max_position - resolution)], timeout_sec=timeout)
 
         # STEP 8: Send SetTarget command with Latch field when MotionLatching is unsupported
         self.step(8)

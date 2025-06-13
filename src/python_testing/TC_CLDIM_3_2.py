@@ -192,7 +192,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         # STEP 3g: Wait for CurrentState.Latch to be updated to True
         self.step("3g")
         sub_handler.await_all_expected_report_matches(
-            expected_matches=[current_latch_matcher(True)], timeout_sec=timeout)
+            expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
 
         # STEP 4a: Send Step command while device is latched
         self.step("4a")
@@ -258,7 +258,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("5e")
         self.step("3g")
         sub_handler.await_all_expected_report_matches(
-            expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+            expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
 
 if __name__ == "__main__":
