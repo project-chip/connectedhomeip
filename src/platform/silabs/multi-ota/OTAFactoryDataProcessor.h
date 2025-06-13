@@ -62,8 +62,6 @@ enum class FactoryTags
 class OTAFactoryDataProcessor : public OTATlvProcessor
 {
 public:
-    CHIP_ERROR Init() override;
-    CHIP_ERROR Clear() override;
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
 
@@ -76,6 +74,8 @@ private:
     OTAFactoryPayload mPayload;
     OTADataAccumulator mAccumulator;
     uint8_t * mFactoryData = nullptr;
-};
 
+protected:
+    uint32_t GetAccumulatorSize() const override { return mLength; }
+};
 } // namespace chip
