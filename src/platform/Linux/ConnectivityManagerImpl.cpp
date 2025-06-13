@@ -169,6 +169,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
     case DeviceEventType::kCHIPoWiFiPAFConnected: {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFConnected");
+        DeviceLayer::SystemLayer().CancelTimer(HandleWiFiPAFScanTimer, this);
         WiFiPAF::WiFiPAFSession SessionInfo;
         memcpy(&SessionInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
         WiFiPafLayer.HandleTransportConnectionInitiated(SessionInfo, mOnPafSubscribeComplete, mAppState, mOnPafSubscribeError);
@@ -176,6 +177,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
     case DeviceEventType::kCHIPoWiFiPAFCancelConnect: {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFCancelConnect");
+        DeviceLayer::SystemLayer().CancelTimer(HandleWiFiPAFScanTimer, this);
         if (mOnPafSubscribeError != nullptr)
         {
             mOnPafSubscribeError(mAppState, CHIP_ERROR_CANCELLED);
@@ -1348,7 +1350,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     dataValue.reset(value);
     auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
-    GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
+    GetWiFiPafLayer()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
     /*
         Error Checking
@@ -1629,8 +1631,21 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
             return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
         }),
         this);
+    static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
+    CHIP_ERROR timerErr = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleWiFiPAFScanTimer, this);
+    if (timerErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to start WiFiPAF scan timeout: %" CHIP_ERROR_FORMAT, timerErr.Format());
+    }
 
     return CHIP_NO_ERROR;
+}
+
+void ConnectivityManagerImpl::HandleWiFiPAFScanTimer(chip::System::Layer *, void * appState)
+{
+    auto * manager = static_cast<ConnectivityManagerImpl *>(appState);
+    manager->mOnPafSubscribeError(manager->mAppState, CHIP_ERROR_TIMEOUT);
+    manager->mOnPafSubscribeError = nullptr;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelSubscribe(uint32_t SubscribeId)

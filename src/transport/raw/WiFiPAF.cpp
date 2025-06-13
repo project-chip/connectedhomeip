@@ -37,7 +37,7 @@ namespace Transport {
 CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
 {
     ChipLogDetail(Inet, "WiFiPAFBase::Init - setting/overriding transport");
-    mWiFiPAFLayer = DeviceLayer::ConnectivityMgr().GetWiFiPAF();
+    mWiFiPAFLayer = DeviceLayer::ConnectivityMgr().GetWiFiPafLayer();
     SetWiFiPAFLayerTransportToSelf();
     mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
     return CHIP_NO_ERROR;

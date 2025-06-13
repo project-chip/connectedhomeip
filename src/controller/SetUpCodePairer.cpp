@@ -275,7 +275,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
                                             .nodeId        = mRemoteId,
                                             .discriminator = discriminator };
     ReturnErrorOnFailure(
-        DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+        DeviceLayer::ConnectivityMgr().GetWiFiPafLayer()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
 
     mWaitingForDiscovery[kWiFiPAFTransport] = true;
     CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
@@ -288,15 +288,25 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
     return err;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#endif
 }
 
 CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
 {
-    mWaitingForDiscovery[kWiFiPAFTransport] = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (mWaitingForDiscovery[kWiFiPAFTransport] == true)
+    {
+        WiFiPAF::WiFiPAFSession InSessionInfo = { .role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber, .nodeId = mRemoteId };
+        WiFiPAF::WiFiPAFSession * pSession =
+            DeviceLayer::ConnectivityMgr().GetWiFiPafLayer()->GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, InSessionInfo);
+        if (pSession != nullptr)
+        {
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pSession->id);
+        }
+    }
     DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
 #endif
+    mWaitingForDiscovery[kWiFiPAFTransport] = false;
     return CHIP_NO_ERROR;
 }
 
@@ -462,6 +472,18 @@ void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
 void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 {
     ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed: %" CHIP_ERROR_FORMAT, err.Format());
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (mWaitingForDiscovery[kWiFiPAFTransport] == true)
+    {
+        WiFiPAF::WiFiPAFSession InSessionInfo = { .role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber, .nodeId = mRemoteId };
+        WiFiPAF::WiFiPAFSession * pSession =
+            DeviceLayer::ConnectivityMgr().GetWiFiPafLayer()->GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, InSessionInfo);
+        if (pSession != nullptr)
+        {
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pSession->id);
+        }
+    }
+#endif
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 }
 

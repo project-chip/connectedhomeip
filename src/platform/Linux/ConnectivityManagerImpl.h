@@ -162,6 +162,7 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                  OnConnectionErrorFunct onError);
+    static void HandleWiFiPAFScanTimer(chip::System::Layer * systemLayer, void * appState);
     CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
     CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
     void OnDiscoveryResult(GVariant * obj);

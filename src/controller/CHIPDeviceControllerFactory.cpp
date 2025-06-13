@@ -90,6 +90,9 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
 #if CONFIG_NETWORK_LAYER_BLE
     params.bleLayer = mSystemState->BleLayer();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    params.wifipaf_layer = mSystemState->WiFiPafLayer();
+#endif
     params.listenPort                = mListenPort;
     params.fabricIndependentStorage  = mFabricIndependentStorage;
     params.enableServerInteractions  = mEnableServerInteractions;
@@ -160,10 +163,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #else
     stateParams.bleLayer = params.bleLayer;
 #endif // CONFIG_DEVICE_LAYER
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    stateParams.wifipaf_layer = params.wifipaf_layer;
-#endif
     VerifyOrReturnError(stateParams.bleLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    stateParams.wifipaf_layer = &WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
 #endif
 
     stateParams.transportMgr = chip::Platform::New<DeviceTransportMgr>();
