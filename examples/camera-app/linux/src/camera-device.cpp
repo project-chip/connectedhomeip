@@ -1197,13 +1197,56 @@ void CameraDevice::InitializeAudioStreams()
 void CameraDevice::InitializeSnapshotStreams()
 {
     // Create single snapshot stream with typical supported parameters
-    SnapshotStream snapshotStream = { { 1 /* Id */,
-                                        ImageCodecEnum::kJpeg,
-                                        kSnapshotStreamFrameRate /* FrameRate */,
-                                        { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
-                                        { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                                        90 /* Quality */,
-                                        0 /* RefCount */ },
+    AddSnapshotStream({ ImageCodecEnum::kJpeg,
+                        kSnapshotStreamFrameRate /* FrameRate */,
+                        { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
+                        { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
+                        90 /* Quality */ });
+}
+
+void CameraDevice::AddSnapshotStream(
+    const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager::SnapshotStreamAllocateArgs &
+        snapshotStreamAllocateArgs)
+{
+    constexpr uint16_t kMaxSnapshotStreams = std::numeric_limits<uint16_t>::max();
+
+    if (mSnapshotStreams.size() >= kMaxSnapshotStreams)
+    {
+        ChipLogError(Camera, "Maximum number of snapshot streams reached. Cannot a allocate new one.");
+        return;
+    }
+
+    uint16_t streamId = 0;
+    for (const auto & s : mSnapshotStreams)
+    {
+        // Find the highest existing stream ID.
+        if (s.snapshotStreamParams.snapshotStreamID > streamId)
+        {
+            streamId = s.snapshotStreamParams.snapshotStreamID;
+        }
+    }
+
+    // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
+    for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
+    {
+        streamId   = (streamId + 1) % kMaxSnapshotStreams; // Wraps to 0 after max-1
+        auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
+            return s.snapshotStreamParams.snapshotStreamID == streamId;
+        });
+        if (found == mSnapshotStreams.end())
+        {
+            break;
+        }
+        if (attempts == kMaxSnapshotStreams - 1)
+        {
+            ChipLogError(Camera, "No available snapshotStreamID for allocation.");
+            return;
+        }
+    }
+
+    SnapshotStream snapshotStream = { { streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
+                                        snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
+                                        snapshotStreamAllocateArgs.quality, 0 /* RefCount */ },
                                       false,
                                       nullptr };
 

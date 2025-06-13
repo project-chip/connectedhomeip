@@ -276,6 +276,9 @@ private:
     void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
+    void AddSnapshotStream(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager::SnapshotStreamAllocateArgs &
+                               snapshotStreamAllocateArgs);
+
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
     GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error);
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
