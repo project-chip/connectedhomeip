@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -31,9 +31,11 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
+
 
 import logging
 from typing import List
@@ -111,6 +113,9 @@ class TC_G_2_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_G_2_3(self):
+        if self.matter_test_config.endpoint is None:
+            self.matter_test_config.endpoint = 0
+
         # Pre-Conditions: Commissioning
         self.step(0)
         th1 = self.default_controller
@@ -122,19 +127,18 @@ class TC_G_2_3(MatterBaseTest):
 
         self.step("1a")
         kGroupKeySetID = 1
-        kGroupKeySecurityPolicy = Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst
         groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=kGroupKeySetID,
-            groupKeySecurityPolicy=kGroupKeySecurityPolicy,
-            epochKey0="0123456789abcdef".encode(),
-            epochStartTime0=1110000,
-            epochKey1="0123456789abcdef".encode(),
-            epochStartTime1=1110001,
-            epochKey2="0123456789abcdef".encode(),
-            epochStartTime2=1110002)
+            groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
+            epochStartTime0=1,
+            epochKey1=bytes.fromhex("d1d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
+            epochStartTime1=18446744073709551613,
+            epochKey2=bytes.fromhex("d2d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
+            epochStartTime2=18446744073709551614)
 
         cmd = Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey)
-        resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
+        resp = await self.send_single_cmd(dev_ctrl=th1, endpoint=0, node_id=self.dut_node_id, cmd=cmd)
 
         self.step("1b")
         GroupKeyMapStruct = Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct
@@ -157,14 +161,35 @@ class TC_G_2_3(MatterBaseTest):
         self.step("2a")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_equal(groupTableList[0].groupId, kGroupId2, "Found groupId does not match written value")
+        expected_group_id = 0x0002
+        expected_endpoint = self.matter_test_config.endpoint
+        matched_entries = [
+            entry for entry in groupTableList
+            if entry.groupId == expected_group_id and expected_endpoint in entry.endpoints
+        ]
+        asserts.assert_true(len(matched_entries) > 0, f"No GroupTable entry found with groupId={expected_group_id}")
+
+        # Verify if is supported groupName feature
+        feature_map: int = await self.read_single_attribute(
+            dev_ctrl=th1,
+            node_id=self.dut_node_id,
+            endpoint=self.matter_test_config.endpoint,
+            attribute=Clusters.Groups.Attributes.FeatureMap
+        )
+
+        name_feature_bit: int = 0
+        group_name_supported: bool = (feature_map & (1 << name_feature_bit)) != 0
 
         self.step("2b")
-        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        try:
-            asserts.assert_equal(result[0].groupName, kGroupNameGp2, "Found groupName does not match written value")
-        except Exception as e:
-            logging.exception("Error while retrieving the groupName %s", e)
+        if group_name_supported:
+            group_found = False
+            for group in groupTableList:
+                if group.groupName == kGroupNameGp2:
+                    group_found = True
+                    break
+            asserts.assert_true(group_found, f"Group with name '{kGroupNameGp2}' not found in the GroupTable")
+        else:
+            self.mark_current_step_skipped()
 
         self.step("3")
         kGroupId3 = 3
@@ -175,15 +200,21 @@ class TC_G_2_3(MatterBaseTest):
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0003 failed")
 
         self.step("4a")
-        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_equal(result[1].groupId, kGroupId3, "Found groupId does not match written value")
+        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
+            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+        found = any(entry.groupId == kGroupId3 for entry in groupTableList)
+        asserts.assert_true(found, f"groupId {kGroupId3} not found in GroupTable")
 
         self.step("4b")
-        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        try:
-            asserts.assert_equal(result[1].groupName, kGroupNameGp3, "Found groupName does not match written value")
-        except Exception as e:
-            logging.exception("Error while retrieving the groupName %s", e)
+        if group_name_supported:
+            group_found = False
+            for group in groupTableList:
+                if group.groupName == kGroupNameGp3:
+                    group_found = True
+                    break
+            asserts.assert_true(group_found, f"Group with name '{kGroupNameGp3}' not found in the GroupTable")
+        else:
+            self.mark_current_step_skipped()
 
         self.step("5")
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.GetGroupMembership())
@@ -200,13 +231,17 @@ class TC_G_2_3(MatterBaseTest):
         is_valid, msg = self.verify_group_membership_response(result, [kGroupId2, kGroupId3])
         asserts.assert_equal(True, is_valid, msg)
 
+        kGroupId6 = 6
+        kGroupNameGp6 = "Gp6"
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId6, kGroupNameGp6))
+
         self.step("8")
         cmd = Clusters.Groups.Commands.RemoveAllGroups()
         await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
 
         self.step("9a")
         GroupKeyMapStruct = Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct
-        groupKeyMapStruct = [GroupKeyMapStruct(groupId=i, groupKeySetID=kGroupKeySetID) for i in range(6, maxgroups-1)]
+        groupKeyMapStruct = [GroupKeyMapStruct(groupId=i, groupKeySetID=kGroupKeySetID) for i in range(0x0006, 0x0006 + maxgroups)]
         resp = await th1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStruct))])
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
@@ -214,28 +249,35 @@ class TC_G_2_3(MatterBaseTest):
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Identify.Commands.Identify(0x0078))
 
         self.step("9c")
-        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Identify.Attributes.IdentifyTime)
+        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=1, attribute=Clusters.Identify.Attributes.IdentifyTime)
         asserts.assert_equal(result, int("0x0078", 16), "IdentifyTime attribute has a very different 0x0078 hex value")
 
         self.step("10")
         kGroupId6 = 6
         kGroupNameGp6 = "Gp6"
-        try:
-            await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId6, kGroupNameGp6))
-        except Exception as e:
-            logging.exception("Error while sending command AddGroupIfIdentify %s", e)
+        cmd = Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId6, kGroupNameGp6)
+        resp = await self.send_single_cmd(dev_ctrl=self.default_controller, endpoint=1, node_id=self.dut_node_id, cmd=cmd)
 
         self.step("11a")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
-            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_equal(groupTableList[0].groupId, kGroupId6, "AddGroupIfIdentify send command to adding group 0x0006 failed")
+            dev_ctrl=th1,
+            node_id=self.dut_node_id,
+            endpoint=0,
+            attribute=Clusters.GroupKeyManagement.Attributes.GroupTable
+        )
+        matching_entry = next((entry for entry in groupTableList if entry.groupId == kGroupId6), None)
+        asserts.assert_is_not_none(matching_entry, f"GroupId 0x{kGroupId6:04X} not found in GroupTable attribute")
 
         self.step("11b")
-        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        try:
-            asserts.assert_equal(result[0].groupName, kGroupNameGp6, "Found groupName does not match written value")
-        except Exception as e:
-            logging.exception("Error while retrieving the groupName %s", e)
+        if group_name_supported:
+            group_found = False
+            for group in groupTableList:
+                if group.groupName == kGroupNameGp6:
+                    group_found = True
+                    break
+            asserts.assert_true(group_found, f"Group with name '{kGroupNameGp6}' not found in the GroupTable")
+        else:
+            self.mark_current_step_skipped()
 
         self.step("12")
         kGroupId7 = 7
@@ -248,14 +290,19 @@ class TC_G_2_3(MatterBaseTest):
         self.step("13")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_equal(groupTableList[1].groupId, kGroupId7, "AddGroupIfIdentify send command to adding group 0x0007 failed")
+        received_group_ids = [entry.groupId for entry in groupTableList]
+        asserts.assert_true(kGroupId7 in received_group_ids, f"Expected GroupId {kGroupId7} not found in DUT GroupTable: {received_group_ids}")
 
         self.step("14")
-        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        try:
-            asserts.assert_equal(result[1].groupName, kGroupNameGp7, "Found groupName does not match written value")
-        except Exception as e:
-            logging.exception("Error while retrieving the groupName %s", e)
+        if group_name_supported:
+            group_found = False
+            for group in groupTableList:
+                if group.groupName == kGroupNameGp7:
+                    group_found = True
+                    break
+            asserts.assert_true(group_found, f"Group with name '{kGroupNameGp7}' not found in the GroupTable")
+        else:
+            self.mark_current_step_skipped()
 
         self.step("15")
         startGroupId = 8
@@ -285,7 +332,7 @@ class TC_G_2_3(MatterBaseTest):
             asserts.fail("Unexpected success call to sending command AddGroupIfIdentifying")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedAccess,
-                                 "Unexpected error response from command AddGroupIfIndetifying")
+                                 "Unexpected error response from command AddGroupIfIdentifying")
 
         self.step("17")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
@@ -305,7 +352,7 @@ class TC_G_2_3(MatterBaseTest):
             asserts.fail("Unexpected success call to sending command AddGroupIfIdentifying")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
-                                 "Unexpected error response from command AddGroupIfIndetifying")
+                                 "Unexpected error response from command AddGroupIfIdentifying")
 
         self.step("19b")
         kGroupName = "Gp123456789123456"
@@ -314,7 +361,7 @@ class TC_G_2_3(MatterBaseTest):
             asserts.fail("Unexpected success call to sending command AddGroupIfIdentifying")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
-                                 "Unexpected error response from command AddGroupIfIndetifying")
+                                 "Unexpected error response from command AddGroupIfIdentifying")
 
         self.step("20")
         kGroupId = 46
@@ -324,13 +371,13 @@ class TC_G_2_3(MatterBaseTest):
             asserts.fail("Unexpected success call to sending command AddGroupIfIdentifying")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedAccess,
-                                 "Unexpected error response from command AddGroupIfIndetifying")
+                                 "Unexpected error response from command AddGroupIfIdentifying")
 
         self.step("21a")
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Identify.Commands.Identify(0x0000))
 
         self.step("21b")
-        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Identify.Attributes.IdentifyTime)
+        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=self.matter_test_config.endpoint, attribute=Clusters.Identify.Attributes.IdentifyTime)
         asserts.assert_equal(result, int("0x0000", 16), "IdentifyTime attribute has a very different 0x0000 hex value")
 
         self.step("22")
