@@ -1085,7 +1085,7 @@ class TC_OPSTATE_BASE():
                                                                     attribute=attributes.CountdownTime)
 
         if initial_countdown_time is NullValue:
-            self.skip_all_remaining_steps(10)
+            self.mark_all_remaining_steps_skipped(10)
             return
 
         # STEP 10: TH reads from the DUT the OperationalState attribute
