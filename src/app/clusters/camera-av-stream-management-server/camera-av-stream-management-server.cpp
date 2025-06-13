@@ -2050,6 +2050,22 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     auto & requestedResolution = commandData.requestedResolution;
     ImageSnapshot image;
 
+    VerifyOrReturn(!mAllocatedSnapshotStreams.empty(), {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: No snapshot streams are allocated", mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+    });
+
+    if (!snapshotStreamID.IsNull())
+    {
+        auto found = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+                                  [&](const SnapshotStreamStruct & s) { return s.snapshotStreamID == snapshotStreamID.Value(); });
+        VerifyOrReturn(found != mAllocatedSnapshotStreams.end(), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: No snapshot stream exist by id %d", mEndpointId,
+                         snapshotStreamID.Value());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        });
+    }
+
     VerifyOrReturn(commandData.requestedResolution.width >= 1 && commandData.requestedResolution.height >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
