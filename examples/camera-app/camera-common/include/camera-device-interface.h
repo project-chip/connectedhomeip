@@ -164,6 +164,11 @@ public:
         // Stop audio stream
         virtual CameraError StopAudioStream(uint16_t streamID) = 0;
 
+        // Allocate snapshot stream
+        virtual CameraError AllocateSnapshotStream(
+            const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+            uint16_t & outStreamID) = 0;
+
         // Start snapshot stream
         virtual CameraError StartSnapshotStream(uint16_t streamID) = 0;
 

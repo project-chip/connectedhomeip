@@ -789,6 +789,28 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
     return CameraError::SUCCESS;
 }
 
+// Allocate snapshot stream
+CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+                                                 uint16_t & outStreamID)
+{
+
+    if (AddSnapshotStream(args, outStreamID))
+    {
+        auto it = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [outStreamID](const SnapshotStream & s) {
+            return s.snapshotStreamParams.snapshotStreamID == outStreamID;
+        });
+        if (it == mSnapshotStreams.end())
+        {
+            ChipLogError(Camera, "Snapshot stream with ID %u not found", outStreamID);
+            return CameraError::ERROR_RESOURCE_EXHAUSTED;
+        }
+        it->isAllocated = true;
+        ChipLogProgress(Camera, "Allocated snapshot stream with ID: %u", outStreamID);
+        return CameraError::SUCCESS;
+    }
+    return CameraError::ERROR_RESOURCE_EXHAUSTED;
+}
+
 // Start snapshot stream
 CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 {
@@ -1197,23 +1219,24 @@ void CameraDevice::InitializeAudioStreams()
 void CameraDevice::InitializeSnapshotStreams()
 {
     // Create single snapshot stream with typical supported parameters
+    uint16_t streamId;
     AddSnapshotStream({ ImageCodecEnum::kJpeg,
                         kSnapshotStreamFrameRate /* FrameRate */,
                         { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
                         { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                        90 /* Quality */ });
+                        90 /* Quality */ },
+                      streamId);
 }
 
-void CameraDevice::AddSnapshotStream(
-    const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager::SnapshotStreamAllocateArgs &
-        snapshotStreamAllocateArgs)
+bool CameraDevice::AddSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStreamAllocateArgs,
+                                     uint16_t & outStreamID)
 {
     constexpr uint16_t kMaxSnapshotStreams = std::numeric_limits<uint16_t>::max();
 
     if (mSnapshotStreams.size() >= kMaxSnapshotStreams)
     {
-        ChipLogError(Camera, "Maximum number of snapshot streams reached. Cannot a allocate new one.");
-        return;
+        ChipLogError(Camera, "Maximum number of snapshot streams reached. Cannot a allocate new one");
+        return false;
     }
 
     uint16_t streamId = 0;
@@ -1229,7 +1252,6 @@ void CameraDevice::AddSnapshotStream(
     // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
     for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
     {
-        streamId   = (streamId + 1) % kMaxSnapshotStreams; // Wraps to 0 after max-1
         auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
             return s.snapshotStreamParams.snapshotStreamID == streamId;
         });
@@ -1239,11 +1261,13 @@ void CameraDevice::AddSnapshotStream(
         }
         if (attempts == kMaxSnapshotStreams - 1)
         {
-            ChipLogError(Camera, "No available snapshotStreamID for allocation.");
-            return;
+            ChipLogError(Camera, "No available slot for stream allocation");
+            return false;
         }
+        streamId = (streamId + 1) % kMaxSnapshotStreams; // Wraps to 0 after max-1
     }
 
+    outStreamID                   = streamId;
     SnapshotStream snapshotStream = { { streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
                                         snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
                                         snapshotStreamAllocateArgs.quality, 0 /* RefCount */ },
@@ -1251,6 +1275,7 @@ void CameraDevice::AddSnapshotStream(
                                       nullptr };
 
     mSnapshotStreams.push_back(snapshotStream);
+    return true;
 }
 
 ChimeDelegate & CameraDevice::GetChimeDelegate()

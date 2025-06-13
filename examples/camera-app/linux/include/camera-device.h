@@ -107,6 +107,11 @@ public:
     // Stop audio stream
     CameraError StopAudioStream(uint16_t streamID) override;
 
+    // Allocate snapshot stream
+    CameraError AllocateSnapshotStream(
+        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+        uint16_t & outStreamID) override;
+
     // Start snapshot stream
     CameraError StartSnapshotStream(uint16_t streamID) override;
 
@@ -276,8 +281,9 @@ private:
     void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
-    void AddSnapshotStream(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager::SnapshotStreamAllocateArgs &
-                               snapshotStreamAllocateArgs);
+    bool AddSnapshotStream(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager::SnapshotStreamAllocateArgs &
+                               snapshotStreamAllocateArgs,
+                           uint16_t & outStreamID);
 
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
     GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error);

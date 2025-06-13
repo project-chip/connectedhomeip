@@ -282,6 +282,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
         }
     }
 
+    // If no pre-allocated stream matches, try allocating a new one.
+    if (mCameraDeviceHAL->GetCameraHALInterface().AllocateSnapshotStream(allocateArgs, outStreamID) == CameraError::SUCCESS)
+    {
+        mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
+        return Status::Success;
+    }
+
     return Status::DynamicConstraintError;
 }
 
