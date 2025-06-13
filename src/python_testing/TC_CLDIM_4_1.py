@@ -88,30 +88,30 @@ class TC_CLDIM_4_1(MatterBaseTest):
             TestStep("3a", "Send Step command to increase position to MaxPosition"),
             TestStep("3b", "Wait for CurrentState.Position to be updated to MaxPosition"),
             TestStep("4a", "Send Step command to decrease position by 2 steps"),
-            TestStep("4b", "Verify Target attribute is updated"),
+            TestStep("4b", "Verify TargetState attribute is updated"),
             TestStep("4c", "Wait for CurrentState.Position to be updated"),
             TestStep("4d", "Send Step command to increase position by 2 steps"),
-            TestStep("4e", "Verify Target attribute is updated"),
+            TestStep("4e", "Verify TargetState attribute is updated"),
             TestStep("4f", "Wait for CurrentState.Position to be updated"),
             TestStep("5a", "If Speed Feature is not supported, skip step 5b to 5d"),
             TestStep("5b", "Send Step command to decrease position by 1 step with Speed=High"),
-            TestStep("5c", "Verify Target attribute is updated"),
+            TestStep("5c", "Verify TargetState attribute is updated"),
             TestStep("5d", "Wait for CurrentState to be updated"),
             TestStep("6a", "If Speed Feature is not supported, skip step 6b to 6d"),
             TestStep("6b", "Send Step command to increase position by 1 step with Speed=Auto"),
-            TestStep("6c", "Verify Target attribute is updated"),
+            TestStep("6c", "Verify TargetState attribute is updated"),
             TestStep("6d", "Wait for CurrentState to be updated"),
             TestStep("7a", "Send Step command to decrease position by 1 step"),
             TestStep("7b", "Send Step command to decrease position by 1 step"),
             TestStep("7c", "Send Step command to decrease position by 1 step"),
-            TestStep("7d", "Verify Target attribute is updated"),
+            TestStep("7d", "Verify TargetState attribute is updated"),
             TestStep("7e", "Wait for CurrentState to be updated"),
             TestStep("8a", "Read CurrentState attribute"),
             TestStep("8b", "Send Step command to decrease position by 65535"),
-            TestStep("8c", "Verify Target attribute is at MinPosition"),
+            TestStep("8c", "Verify TargetState attribute is at MinPosition"),
             TestStep("8d", "Wait for CurrentState to be updated"),
             TestStep("8e", "Send Step command to increase position by 65535"),
-            TestStep("8f", "Verify Target attribute is at MaxPosition"),
+            TestStep("8f", "Verify TargetState attribute is at MaxPosition"),
             TestStep("8g", "Wait for CurrentState to be updated"),
         ]
         return steps
@@ -206,12 +206,12 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 4b: Verify Target attribute is updated
+        # STEP 4b: Verify TargetState attribute is updated
         self.step("4b")
-        if attributes.Target.attribute_id in attribute_list:
-            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+        if attributes.TargetState.attribute_id in attribute_list:
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
             expected_position = max(max_position - 2 * step_value, min_position)
-            asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
+            asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
 
         # STEP 4c: Wait for CurrentState.Position to be updated
         self.step("4c")
@@ -230,11 +230,11 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 4e: Verify Target attribute is updated
+        # STEP 4e: Verify TargetState attribute is updated
         self.step("4e")
-        if attributes.Target.attribute_id in attribute_list:
-            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            asserts.assert_equal(target.position, max_position, "Target Position is not updated correctly")
+        if attributes.TargetState.attribute_id in attribute_list:
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.position, max_position, "TargetState Position is not updated correctly")
 
         # STEP 4f: Wait for CurrentState.Position to be updated
         self.step("4f")
@@ -263,15 +263,15 @@ class TC_CLDIM_4_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 5c: Verify Target attribute is updated
+            # STEP 5c: Verify TargetState attribute is updated
             self.step("5c")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
                 expected_position = max_position - step_value
-                asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
+                asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
 
-                asserts.assert_equal(target.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
-                                     "Target Speed is not High")
+                asserts.assert_equal(target_state.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
+                                     "TargetState Speed is not High")
 
             # STEP 5d: Wait for CurrentState to be updated
             self.step("5d")
@@ -300,15 +300,15 @@ class TC_CLDIM_4_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 6c: Verify Target attribute is updated
+            # STEP 6c: Verify TargetState attribute is updated
             self.step("6c")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
                 expected_position = max_position
-                asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
+                asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
 
-                asserts.assert_equal(target.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto,
-                                     "Target Speed is not Auto")
+                asserts.assert_equal(target_state.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto,
+                                     "TargetState Speed is not Auto")
 
             # STEP 6d: Wait for CurrentState to be updated
             self.step("6d")
@@ -357,12 +357,12 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 7d: Verify Target attribute is updated after multiple steps
+        # STEP 7d: Verify TargetState attribute is updated after multiple steps
         self.step("7d")
-        if attributes.Target.attribute_id in attribute_list:
-            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+        if attributes.TargetState.attribute_id in attribute_list:
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
             expected_position = max(max_position - 3 * step_value, min_position)
-            asserts.assert_equal(target.position, expected_position, "Target Position is not updated correctly")
+            asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
 
         # STEP 7e: Wait for CurrentState to be updated
         self.step("7e")
@@ -387,11 +387,11 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 8c: Verify Target attribute is at MinPosition
+        # STEP 8c: Verify TargetState attribute is at MinPosition
         self.step("8c")
-        if attributes.Target.attribute_id in attribute_list:
-            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            asserts.assert_equal(target.position, min_position, "Target Position is not at MinPosition")
+        if attributes.TargetState.attribute_id in attribute_list:
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.position, min_position, "TargetState Position is not at MinPosition")
 
         # STEP 8d: Wait for CurrentState to be updated
         self.step("8d")
@@ -415,11 +415,11 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 8f: Verify Target attribute is at MaxPosition
+        # STEP 8f: Verify TargetState attribute is at MaxPosition
         self.step("8f")
-        if attributes.Target.attribute_id in attribute_list:
-            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-            asserts.assert_equal(target.position, max_position, "Target Position is not at MaxPosition")
+        if attributes.TargetState.attribute_id in attribute_list:
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.position, max_position, "TargetState Position is not at MaxPosition")
 
         # STEP 8g: Wait for CurrentState to be updated
         self.step("8g")
