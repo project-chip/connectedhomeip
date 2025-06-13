@@ -111,7 +111,7 @@ tests:
                 value: nodeId
 
     - label: "Step 3b: TH reads the CurrentMode attribute from the DUT"
-      PICS: MOD.S.A0003 && MOD.S.F00 && PICS_USER_PROMPT
+      PICS: MOD.S.A0003
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
