@@ -203,7 +203,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
         # STEP 4a: If Speed feature is not supported, skip step 4b to 4d
         self.step("4a")
-        if (not is_speed_supported) or (initial_state.speed == Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium):
+        if (not is_speed_supported) or (initial_state.speed == Globals.Enums.ThreeLevelAutoEnum.kMedium):
             logging.info("Speed feature is not supported. Skipping steps 4b to 4d.")
             self.skip_step("4b")
             self.skip_step("4c")
@@ -214,7 +214,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
-                        speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium),
+                        speed=Globals.Enums.ThreeLevelAutoEnum.kMedium),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -233,7 +233,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             # STEP 4d: Wait for CurrentState.Speed to be updated to Medium
             self.step("4d")
             sub_handler.await_all_expected_report_matches(
-                expected_matches=[current_speed_matcher(Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kMedium)], timeout_sec=timeout)
+                expected_matches=[current_speed_matcher(Globals.Enums.ThreeLevelAutoEnum.kMedium)], timeout_sec=timeout)
 
         # STEP 5a: Set Position to min_position
         self.step("5a")
@@ -273,7 +273,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
-                        position=max_position, speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh),
+                        position=max_position, speed=Globals.Enums.ThreeLevelAutoEnum.kHigh),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
@@ -286,7 +286,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
                 asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
 
-                asserts.assert_equal(target_state.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
+                asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kHigh,
                                      "TargetState Speed does not match High")
             else:
                 logging.info("TargetState attribute is not supported. Skipping step 6c.")
@@ -295,7 +295,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             # STEP 6d: Wait for CurrentState.Position to be updated to MaxPosition and CurrentState.Speed to High
             self.step("6d")
             sub_handler.await_all_expected_report_matches(
-                expected_matches=[current_position_and_speed_matcher(min_position, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
+                expected_matches=[current_position_and_speed_matcher(min_position, Globals.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
 
 
 if __name__ == "__main__":

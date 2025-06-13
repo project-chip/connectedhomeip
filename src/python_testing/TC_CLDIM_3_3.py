@@ -36,6 +36,7 @@
 
 import logging
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import (InteractionModelError, Status)
 from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main, AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator)
@@ -432,7 +433,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
-                        speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh),
+                        speed=Globals.Enums.ThreeLevelAutoEnum.kHigh),
                     endpoint=endpoint
                 )
             except InteractionModelError as e:
