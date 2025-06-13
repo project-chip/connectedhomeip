@@ -291,7 +291,8 @@ class TC_G_2_3(MatterBaseTest):
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
         received_group_ids = [entry.groupId for entry in groupTableList]
-        asserts.assert_true(kGroupId7 in received_group_ids, f"Expected GroupId {kGroupId7} not found in DUT GroupTable: {received_group_ids}")
+        asserts.assert_true(kGroupId7 in received_group_ids,
+                            f"Expected GroupId {kGroupId7} not found in DUT GroupTable: {received_group_ids}")
 
         self.step("14")
         if group_name_supported:
