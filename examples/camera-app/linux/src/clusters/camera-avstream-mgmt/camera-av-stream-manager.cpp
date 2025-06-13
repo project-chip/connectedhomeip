@@ -131,6 +131,9 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
                 // Inform DPTZ that there's an allocated stream
                 mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
+                // Set the current frame rate attribute from HAL once stream has started
+                GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+
                 return Status::Success;
             }
             else
@@ -336,9 +339,9 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
     return Status::NotFound;
 }
 
-void CameraAVStreamManager::OnRankedStreamPrioritiesChanged()
+void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
 {
-    ChipLogProgress(Camera, "Ranked stream priorities changed");
+    ChipLogProgress(Camera, "Stream usage priorities changed");
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
@@ -353,12 +356,17 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         break;
     }
     case SoftRecordingPrivacyModeEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetSoftRecordingPrivacyModeEnabled(
+            GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled());
         break;
     }
     case SoftLivestreamPrivacyModeEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetSoftLivestreamPrivacyModeEnabled(
+            GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled());
         break;
     }
     case NightVision::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetNightVision(GetCameraAVStreamMgmtServer()->GetNightVision());
         break;
     }
     case NightVisionIllum::Id: {
@@ -393,6 +401,32 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     }
     case MicrophoneVolumeLevel::Id: {
         mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneVolume(GetCameraAVStreamMgmtServer()->GetMicrophoneVolumeLevel());
+        break;
+    }
+    case LocalVideoRecordingEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetLocalVideoRecordingEnabled(
+            GetCameraAVStreamMgmtServer()->GetLocalVideoRecordingEnabled());
+        break;
+    }
+    case LocalSnapshotRecordingEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetLocalSnapshotRecordingEnabled(
+            GetCameraAVStreamMgmtServer()->GetLocalSnapshotRecordingEnabled());
+        break;
+    }
+    case StatusLightEnabled::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetStatusLightEnabled(GetCameraAVStreamMgmtServer()->GetStatusLightEnabled());
+        break;
+    }
+    case ImageRotation::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageRotation(GetCameraAVStreamMgmtServer()->GetImageRotation());
+        break;
+    }
+    case ImageFlipHorizontal::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipHorizontal(GetCameraAVStreamMgmtServer()->GetImageFlipHorizontal());
+        break;
+    }
+    case ImageFlipVertical::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipVertical(GetCameraAVStreamMgmtServer()->GetImageFlipVertical());
         break;
     }
     default:

@@ -29,19 +29,20 @@ using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
 using chip::app::Clusters::CameraAvStreamManagement::RateDistortionTradeOffStruct;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;
+using chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum;
 using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
-using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
 using chip::app::Clusters::Globals::StreamUsageEnum;
 
 struct VideoStream
 {
     VideoStreamStruct videoStreamParams;
-    bool isAllocated;        // Flag to indicate if the stream is allocated.
-    ViewportStruct viewport; // Stream specific viewport, defaults to the camera viewport
-    void * videoContext;     // Platform-specific context object associated with
-                             // video stream;
+    bool isAllocated; // Flag to indicate if the stream is allocated.
+    chip::app::Clusters::Globals::Structs::ViewportStruct::Type
+        viewport;        // Stream specific viewport, defaults to the camera viewport
+    void * videoContext; // Platform-specific context object associated with
+                         // video stream;
 
     bool IsCompatible(const VideoStreamStruct & inputParams) const
     {
@@ -179,11 +180,26 @@ public:
         // capabilities)
         virtual VideoSensorParamsStruct & GetVideoSensorParams() = 0;
 
+        // Get indication whether camera supports high dynamic range for video
+        virtual bool GetCameraSupportsHDR() = 0;
+
         // Get indication whether camera supports night vision
         virtual bool GetCameraSupportsNightVision() = 0;
 
         // Get indication whether camera night vision using infrared
         virtual bool GetNightVisionUsesInfrared() = 0;
+
+        // Get indication whether camera supports image control
+        virtual bool GetCameraSupportsImageControl() = 0;
+
+        // Get indication whether camera supports watermark for video and snapshot
+        virtual bool GetCameraSupportsWatermark() = 0;
+
+        // Get indication whether camera supports on-screen display for video and snapshot
+        virtual bool GetCameraSupportsOSD() = 0;
+
+        // Get indication whether camera suppots soft recording and livestream privacy modes
+        virtual bool GetCameraSupportsSoftPrivacy() = 0;
 
         // Get indication of the min resolution(pixels) that camera allows for
         // its viewport.
@@ -222,26 +238,47 @@ public:
         // This also sets the default priority of the stream usages.
         virtual std::vector<StreamUsageEnum> & GetSupportedStreamUsages() = 0;
 
-        // Get Ranked stream priorities as an ordered list. This is expected to
+        // Get stream usage priorities as an ordered list. This is expected to
         // be a subset of the SupportedStreamUsages.
-        virtual std::vector<StreamUsageEnum> & GetRankedStreamPriorities() = 0;
+        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities() = 0;
+
+        // Get/Set soft recording privacy mode
+        virtual CameraError SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode) = 0;
+        virtual bool GetSoftRecordingPrivacyModeEnabled()                                     = 0;
+
+        // Get/Set soft livestream privacy mode
+        virtual CameraError SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode) = 0;
+        virtual bool GetSoftLivestreamPrivacyModeEnabled()                                      = 0;
+
+        // Does camera have a hard privacy switch
+        virtual bool HasHardPrivacySwitch() = 0;
+
+        // Get whether hard privacy mode is on
+        virtual bool GetHardPrivacyMode() = 0;
+
+        // Get/Set night vision
+        virtual CameraError SetNightVision(TriStateAutoEnum nightVision) = 0;
+        virtual TriStateAutoEnum GetNightVision()                        = 0;
+
+        // Set the viewport for all streams
+        virtual CameraError SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) = 0;
+
+        // Get the current camera viewport.
+        virtual const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & GetViewport() = 0;
+
+        // Set the viewport for a specific stream
+        virtual CameraError SetViewport(VideoStream & stream,
+                                        const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) = 0;
 
         // Does camera have a speaker
         virtual bool HasSpeaker() = 0;
 
-        // Set the viewport for all streams
-        virtual CameraError SetViewport(const ViewportStruct & viewPort) = 0;
-
-        // Get the current camera viewport.
-        virtual const ViewportStruct & GetViewport() = 0;
-
-        // Set the viewport for a specific stream
-        virtual CameraError SetViewport(VideoStream & stream, const ViewportStruct & viewPort) = 0;
-
         // Mute/Unmute speaker.
+        virtual bool GetSpeakerMuted()                        = 0;
         virtual CameraError SetSpeakerMuted(bool muteSpeaker) = 0;
 
-        // Set speaker volume level.
+        // Get/Set speaker volume level.
+        virtual uint8_t GetSpeakerVolume()                       = 0;
         virtual CameraError SetSpeakerVolume(uint8_t speakerVol) = 0;
 
         // Get the speaker max and min levels.
@@ -262,6 +299,31 @@ public:
         // Get the microphone max and min levels.
         virtual uint8_t GetMicrophoneMaxLevel() = 0;
         virtual uint8_t GetMicrophoneMinLevel() = 0;
+
+        // Get/Set image control attributes
+        virtual CameraError SetImageRotation(uint16_t imageRotation) = 0;
+        virtual uint16_t GetImageRotation()                          = 0;
+
+        virtual CameraError SetImageFlipHorizontal(bool imageFlipHorizontal) = 0;
+        virtual bool GetImageFlipHorizontal()                                = 0;
+
+        virtual CameraError SetImageFlipVertical(bool imageFlipVertical) = 0;
+        virtual bool GetImageFlipVertical()                              = 0;
+
+        // Does camera have local storage
+        virtual bool HasLocalStorage() = 0;
+
+        virtual CameraError SetLocalVideoRecordingEnabled(bool localVideoRecordingEnabled) = 0;
+        virtual bool GetLocalVideoRecordingEnabled()                                       = 0;
+
+        virtual CameraError SetLocalSnapshotRecordingEnabled(bool localSnapshotRecordingEnabled) = 0;
+        virtual bool GetLocalSnapshotRecordingEnabled()                                          = 0;
+
+        // Does camera have a status light
+        virtual bool HasStatusLight() = 0;
+
+        virtual CameraError SetStatusLightEnabled(bool statusLightEnabled) = 0;
+        virtual bool GetStatusLightEnabled()                               = 0;
 
         // Set Pan, Tilt, and Zoom
         virtual CameraError SetPan(int16_t aPan)   = 0;
