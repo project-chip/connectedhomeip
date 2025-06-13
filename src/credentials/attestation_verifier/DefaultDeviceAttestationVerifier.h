@@ -118,7 +118,7 @@ const AttestationTrustStore * GetTestAttestationTrustStore();
  *                         of default DeviceAttestationVerifier. Caller must ensure storage is
  *                         always available while the DeviceAttestationVerifier could be used.
  * @param[in] revocationDelegate Pointer to the DeviceAttestationRevocationDelegate instance to be used by
- *                         the mplementation of default DeviceAttestationVerifier to determine revoked entities.
+ *                         the implementation of default DeviceAttestationVerifier to determine revoked entities.
  *                         If nullptr, all device attestation revocation checks will be disabled.
  *                         Caller must ensure the revocation delegate is always available while the
  *                         DeviceAttestationVerifier could be used.
