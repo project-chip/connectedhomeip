@@ -15,36 +15,21 @@
  *    limitations under the License.
  */
 
-#include "AppOptions.h"
-#include "camera-app.h"
-#include "camera-device.h"
+#pragma once
 
-#include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
+#include "AppMain.h"
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace Camera;
+#include <string>
 
-CameraDevice gCameraDevice;
-
-void ApplicationInit()
+class AppOptions
 {
-    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&gCameraDevice);
-}
+public:
+    static chip::ArgParser::OptionSet * GetOptions();
+    static std::string GetVideoDevicePath();
 
-void ApplicationShutdown()
-{
-    CameraAppShutdown();
-}
+private:
+    static bool HandleOptions(const char * program, chip::ArgParser::OptionSet * options, int identifier, const char * name,
+                              const char * value);
 
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) == 0);
-
-    ChipLinuxAppMainLoop();
-
-    return 0;
-}
+    static bool IsEmptyString(const char * value);
+};
