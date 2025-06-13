@@ -2221,8 +2221,7 @@ DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId,
                         "[SetCredential] Unable to create new user for credential: internal error "
                         "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
                         endpointId, credential.credentialIndex, availableUserIndex,
-                        status.HasClusterSpecificCode() ? status.GetClusterSpecificCode().Value()
-                                                        : (to_underlying(status.GetStatus())));
+                        status.GetClusterSpecificCode().value_or(to_underlying(status.GetStatus())));
         return DlStatus::kFailure;
     }
 
@@ -3586,9 +3585,9 @@ void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
 {
     VerifyOrDie(nullptr != commandObj);
 
-    if (status.HasClusterSpecificCode())
+    if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
     {
-        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, status.GetClusterSpecificCode().Value()) == CHIP_NO_ERROR);
+        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, *clusterStatus) == CHIP_NO_ERROR);
     }
     else
     {
