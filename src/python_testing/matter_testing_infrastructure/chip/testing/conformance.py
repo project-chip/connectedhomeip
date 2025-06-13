@@ -15,6 +15,24 @@
 #    limitations under the License.
 #
 
+"""
+Matter Specification Conformance Engine
+
+This module implements the conformance checking system for Matter clusters, attributes, 
+commands, and device types. It provides:
+
+- Conformance decision types (mandatory, optional, disallowed, etc.)
+- Boolean operations on conformance (AND, OR, NOT)
+- Feature, attribute, and command-based conformance evaluation
+- Choice conformance handling for mutually exclusive options
+- XML parsing for conformance specifications
+- Support for complex conditional conformance expressions
+
+The conformance system evaluates whether a particular element (attribute, command, feature)
+should be present on a device based on the device's implemented features, attributes, and
+commands.
+"""
+
 import xml.etree.ElementTree as ElementTree
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -417,6 +435,31 @@ class otherwise(Conformance):
 
 
 def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
+    """
+    Parse simple, leaf-node conformance elements from XML.
+
+    Basic conformance elements are XML elements without children that represent
+    simple conformance decisions such as:
+    - mandatoryConform (M)
+    - optionalConform (O) 
+    - disallowConform (X)
+    - deprecateConform (D)
+    - provisionalConform (P)
+    - zigbee conditions
+    - literal values
+
+    This is in contrast to complex conformance expressions that involve
+    boolean operations (AND, OR, NOT) or wrapper operations.
+
+    Args:
+        element: XML element representing a basic conformance rule
+
+    Returns:
+        Callable conformance object for the basic conformance type
+
+    Raises:
+        BasicConformanceException: If element has children or is not a recognized basic type
+    """
     if list(element):
         raise BasicConformanceException("parse_basic_callable_from_xml called for XML element with children")
     # This will throw a key error if this is not a basic element key.
@@ -441,6 +484,30 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
 
 
 def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Conformance]) -> Conformance:
+    """
+    Parse complex conformance expressions that wrap or operate on other conformance elements.
+
+    Wrapper conformance elements are XML elements with children that represent
+    composite conformance operations such as:
+    - Boolean operations: AND, OR, NOT
+    - Wrapper operations: optional[...], mandatory[...]
+    - Control flow: otherwise (comma-separated alternatives)
+    - Comparison operations: greater than
+
+    These contrast with basic conformance elements which are simple leaf nodes.
+    Wrapper conformances combine multiple sub-conformances using logical operations
+    to create complex conditional requirements.
+
+    Args:
+        element: XML element representing a wrapper conformance operation
+        ops: List of parsed child conformance callables to be combined
+
+    Returns:
+        Callable conformance object that wraps/operates on the child conformances
+
+    Raises:
+        ConformanceException: If element tag is unrecognized or has wrong number of children
+    """
     # optional can be a wrapper as well as a standalone
     # This can be any of the boolean operations, optional or otherwise
     choice = parse_choice(element)
