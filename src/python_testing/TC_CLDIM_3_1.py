@@ -225,7 +225,8 @@ class TC_CLDIM_3_1(MatterBaseTest):
             if attributes.TargetState.attribute_id in attribute_list:
                 target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
-                asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
+                asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kMedium,
+                                     "TargetState Speed does not match Medium")
             else:
                 logging.info("TargetState attribute is not supported. Skipping step 4c.")
                 self.mark_current_step_skipped()
