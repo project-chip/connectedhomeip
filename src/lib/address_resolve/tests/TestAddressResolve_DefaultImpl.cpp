@@ -24,9 +24,7 @@
 #include <transport/raw/PeerAddress.h>
 
 #include <functional>
-#include <iostream>
 #include <optional>
-#include <thread>
 
 using namespace chip;
 using namespace chip::AddressResolve;
