@@ -98,18 +98,18 @@ class TC_CLDIM_3_1(MatterBaseTest):
             TestStep("2f", "Read CurrentState attribute"),
             TestStep("3a", "If Position = MaxPosition, skip steps 3b to 3d"),
             TestStep("3b", "Set Position to MaxPosition"),
-            TestStep("3c", "Verify Target attribute is updated"),
+            TestStep("3c", "Verify TargetState attribute is updated"),
             TestStep("3d", "Wait for CurrentState.Position to be updated to MaxPosition"),
             TestStep("4a", "If Speed feature is not supported or if current speed = Medium, skip steps 4b to 4d"),
             TestStep("4b", "Set Speed to Medium"),
-            TestStep("4c", "Verify Target attribute is updated"),
+            TestStep("4c", "Verify TargetState attribute is updated"),
             TestStep("4d", "Wait for CurrentState.Speed to be updated to Medium"),
             TestStep("5a", "Set Position to min_position"),
-            TestStep("5b", "Verify Target attribute is updated"),
+            TestStep("5b", "Verify TargetState attribute is updated"),
             TestStep("5c", "Wait for CurrentState.Position to be updated to MinPosition"),
             TestStep("6a", "If Speed feature is not supported, skip step 6b to 6d"),
             TestStep("6b", "Set Position to MaxPosition and Speed to High"),
-            TestStep("6c", "Verify Target attribute is updated"),
+            TestStep("6c", "Verify TargetState attribute is updated"),
             TestStep("6d", "Wait for CurrentState.Position to be updated to MaxPosition and CurrentState.Speed to High"),
         ]
         return steps
@@ -186,14 +186,14 @@ class TC_CLDIM_3_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 3c: Verify Target attribute is updated
+            # STEP 3c: Verify TargetState attribute is updated
             self.step("3c")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
-                asserts.assert_equal(target.position, max_position, "Target Position does not match MaxPosition")
+                asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
             else:
-                logging.info("Target attribute is not supported. Skipping step 3b.")
+                logging.info("TargetState attribute is not supported. Skipping step 3b.")
                 self.mark_current_step_skipped()
 
             # STEP 3d: Wait for CurrentState.Position to be updated to MaxPosition
@@ -220,14 +220,14 @@ class TC_CLDIM_3_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 4c: Verify Target attribute is updated
+            # STEP 4c: Verify TargetState attribute is updated
             self.step("4c")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
-                asserts.assert_equal(target.position, max_position, "Target Position does not match MaxPosition")
+                asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
             else:
-                logging.info("Target attribute is not supported. Skipping step 4c.")
+                logging.info("TargetState attribute is not supported. Skipping step 4c.")
                 self.mark_current_step_skipped()
 
             # STEP 4d: Wait for CurrentState.Speed to be updated to Medium
@@ -245,14 +245,14 @@ class TC_CLDIM_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 5b: Verify Target attribute is updated
+        # STEP 5b: Verify TargetState attribute is updated
         self.step("5b")
-        if attributes.Target.attribute_id in attribute_list:
-            target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+        if attributes.TargetState.attribute_id in attribute_list:
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
-            asserts.assert_equal(target.position, min_position, "Target Position does not match MinPosition")
+            asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
         else:
-            logging.info("Target attribute is not supported. Skipping step 5b.")
+            logging.info("TargetState attribute is not supported. Skipping step 5b.")
             self.mark_current_step_skipped()
 
         # STEP 5c: Wait for CurrentState.Position to be updated to MinPosition
@@ -279,17 +279,17 @@ class TC_CLDIM_3_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 6c: Verify Target attribute is updated
+            # STEP 6c: Verify TargetState attribute is updated
             self.step("6c")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
-                asserts.assert_equal(target.position, max_position, "Target Position does not match MaxPosition")
+                asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
 
-                asserts.assert_equal(target.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
-                                     "Target Speed does not match High")
+                asserts.assert_equal(target_state.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
+                                     "TargetState Speed does not match High")
             else:
-                logging.info("Target attribute is not supported. Skipping step 6c.")
+                logging.info("TargetState attribute is not supported. Skipping step 6c.")
                 self.mark_current_step_skipped()
 
             # STEP 6d: Wait for CurrentState.Position to be updated to MaxPosition and CurrentState.Speed to High

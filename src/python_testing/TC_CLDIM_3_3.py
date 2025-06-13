@@ -79,20 +79,20 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep("4e", "Send SetTarget command with Position exceeding 100%"),
             TestStep("5a", "If LimitRange is unsupported, skip step 5b to 5g"),
             TestStep("5b", "Send SetTarget command with Position 0%"),
-            TestStep("5c", "Verify Target attribute is updated"),
+            TestStep("5c", "Verify TargetState attribute is updated"),
             TestStep("5d", "Wait for CurrentState.Position to be updated to 0%"),
             TestStep("5e", "Send SetTarget command with Position 100%"),
-            TestStep("5f", "Verify Target attribute is updated"),
+            TestStep("5f", "Verify TargetState attribute is updated"),
             TestStep("5g", "Wait for CurrentState.Position to be updated to 100%"),
             TestStep(6, "Send SetTarget command with invalid Position"),
             TestStep("7a", "If Resolution is unsupported, skip step 7b to 7j"),
             TestStep("7b", "Read CurrentState attribute"),
             TestStep("7c", "Send SetTarget command with Position not a multiple of Resolution"),
-            TestStep("7d", "Verify Target attribute is updated"),
+            TestStep("7d", "Verify TargetState attribute is updated"),
             TestStep("7e", "If not Resolution != 1: Wait for CurrentState.Position to be updated"),
             TestStep("7f", "If not Resolution == 1: Wait for CurrentState.Position to be updated"),
             TestStep("7g", "Send SetTarget command with Position not a multiple of Resolution"),
-            TestStep("7h", "Verify Target attribute is updated"),
+            TestStep("7h", "Verify TargetState attribute is updated"),
             TestStep("7i", "If not Resolution > 2: Wait for CurrentState.Position to be updated"),
             TestStep("7j", "If not Resolution <= 2: Wait for CurrentState.Position to be updated"),
             TestStep(8, "Send SetTarget command with Latch field when MotionLatching is unsupported"),
@@ -250,11 +250,11 @@ class TC_CLDIM_3_3(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 5c: Verify Target attribute is updated
+            # STEP 5c: Verify TargetState attribute is updated
             self.step("5c")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-                asserts.assert_equal(target.position, min_position, "Target Position does not match MinPosition")
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+                asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
 
             # STEP 5d: Wait for CurrentState.Position to be updated to 0%
             self.step("5d")
@@ -279,12 +279,12 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 logging.info("MaxPosition not < 10000. Skipping step 5e.")
                 self.mark_current_step_skipped()
 
-            # STEP 5f: Verify Target attribute is updated
+            # STEP 5f: Verify TargetState attribute is updated
             self.step("5f")
             if max_position < 10000:
-                if attributes.Target.attribute_id in attribute_list:
-                    target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
-                    asserts.assert_equal(target.position, max_position, "Target Position does not match MaxPosition")
+                if attributes.TargetState.attribute_id in attribute_list:
+                    target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+                    asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
             else:
                 logging.info("MaxPosition not < 10000. Skipping step 5f.")
                 self.mark_current_step_skipped()
@@ -342,18 +342,18 @@ class TC_CLDIM_3_3(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 7d: Verify Target attribute is updated
+            # STEP 7d: Verify TargetState attribute is updated
             self.step("7d")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
                 if resolution == 1:
-                    asserts.assert_equal(target.position, min_position, "Target Position does not match expected value")
+                    asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match expected value")
                 else:
-                    asserts.assert_equal(target.position, min_position + resolution,
-                                         "Target Position does not match expected value")
+                    asserts.assert_equal(target_state.position, min_position + resolution,
+                                         "TargetState Position does not match expected value")
             else:
-                logging.info("Target attribute not supported. Skipping step 7d.")
+                logging.info("TargetState attribute not supported. Skipping step 7d.")
                 self.mark_current_step_skipped()
 
             # STEP 7e: If not Resolution != 1: Wait for CurrentState.Position to be updated
@@ -382,18 +382,18 @@ class TC_CLDIM_3_3(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 7h: Verify Target attribute is updated
+            # STEP 7h: Verify TargetState attribute is updated
             self.step("7h")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
                 if resolution <= 2:
-                    asserts.assert_equal(target.position, max_position, "Target Position does not match expected value")
+                    asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match expected value")
                 else:
-                    asserts.assert_equal(target.position, max_position - resolution,
-                                         "Target Position does not match expected value")
+                    asserts.assert_equal(target_state.position, max_position - resolution,
+                                         "TargetState Position does not match expected value")
             else:
-                logging.info("Target attribute not supported. Skipping step 7h.")
+                logging.info("TargetState attribute not supported. Skipping step 7h.")
                 self.mark_current_step_skipped()
 
             # STEP 7i: If not Resolution > 2: Wait for CurrentState.Position to be updated

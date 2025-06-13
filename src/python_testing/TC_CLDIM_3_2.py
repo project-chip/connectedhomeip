@@ -76,14 +76,14 @@ class TC_CLDIM_3_2(MatterBaseTest):
             TestStep("3c", "Manually latch the device"),
             TestStep("3d", "If manual latching is not required, skip steps 3e to 3f"),
             TestStep("3e", "Send SetTarget command with Latch=True"),
-            TestStep("3f", "Verify Target attribute is updated"),
+            TestStep("3f", "Verify TargetState attribute is updated"),
             TestStep("3g", "Wait for CurrentState.Latch to be updated to True"),
             TestStep("4a", "Send Step command while device is latched"),
             TestStep("4b", "Send SetTarget command while device is latched"),
             TestStep("5a", "If manual latching is required, unlatch device manually"),
             TestStep("5b", "If manual latching is required, skip steps 5c to 5d"),
             TestStep("5c", "Send SetTarget command with Latch=False"),
-            TestStep("5d", "Verify Target attribute is updated"),
+            TestStep("5d", "Verify TargetState attribute is updated"),
             TestStep("5e", "Wait for CurrentState.Latch to be updated to False"),
         ]
         return steps
@@ -179,14 +179,14 @@ class TC_CLDIM_3_2(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 3f: Verify Target attribute is updated
+            # STEP 3f: Verify TargetState attribute is updated
             self.step("3f")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
-                asserts.assert_equal(target.latch, True, "Target Latch is not True")
+                asserts.assert_equal(target_state.latch, True, "TargetState Latch is not True")
             else:
-                logging.info("Target attribute is not supported. Skipping step 3f.")
+                logging.info("TargetState attribute is not supported. Skipping step 3f.")
                 self.mark_current_step_skipped()
 
         # STEP 3g: Wait for CurrentState.Latch to be updated to True
@@ -244,14 +244,14 @@ class TC_CLDIM_3_2(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected status returned")
 
-            # STEP 5d: Verify Target attribute is updated
+            # STEP 5d: Verify TargetState attribute is updated
             self.step("5d")
-            if attributes.Target.attribute_id in attribute_list:
-                target = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Target)
+            if attributes.TargetState.attribute_id in attribute_list:
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
-                asserts.assert_equal(target.latch, False, "Target Latch is not False")
+                asserts.assert_equal(target_state.latch, False, "TargetState Latch is not False")
             else:
-                logging.info("Target attribute is not supported. Skipping step 5d.")
+                logging.info("TargetState attribute is not supported. Skipping step 5d.")
                 self.mark_current_step_skipped()
 
         # STEP 5e: Wait for CurrentState.Latch to be updated to False
