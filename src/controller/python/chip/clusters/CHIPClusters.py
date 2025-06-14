@@ -7817,15 +7817,21 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "OverallState",
+                "attributeName": "OverallCurrentState",
                 "attributeId": 0x00000003,
                 "type": "",
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "OverallTarget",
+                "attributeName": "OverallTargetState",
                 "attributeId": 0x00000004,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "LatchControlModes",
+                "attributeId": 0x00000005,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {

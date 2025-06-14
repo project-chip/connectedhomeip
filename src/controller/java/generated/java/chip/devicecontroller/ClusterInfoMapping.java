@@ -11300,7 +11300,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedClosureControlClusterOverallStateAttributeCallback implements ChipClusters.ClosureControlCluster.OverallStateAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedClosureControlClusterOverallCurrentStateAttributeCallback implements ChipClusters.ClosureControlCluster.OverallCurrentStateAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -11308,9 +11308,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallStateStruct value) {
+    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallCurrentStateStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallStateStruct");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallCurrentStateStruct");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -11321,7 +11321,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedClosureControlClusterOverallTargetAttributeCallback implements ChipClusters.ClosureControlCluster.OverallTargetAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedClosureControlClusterOverallTargetStateAttributeCallback implements ChipClusters.ClosureControlCluster.OverallTargetStateAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -11329,9 +11329,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallTargetStruct value) {
+    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallTargetStateStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallTargetStruct");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallTargetStateStruct");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
