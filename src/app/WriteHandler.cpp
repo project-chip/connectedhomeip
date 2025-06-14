@@ -774,9 +774,9 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
 
     DataModel::AttributeFinder finder(mDataModelProvider);
-
     std::optional<DataModel::AttributeEntry> attributeEntry = finder.Find(aPath);
 
+    Status existenceStatus = Status::Success;
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
     {
@@ -784,11 +784,29 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
         Status attributeErrorStatus =
             IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId) ? Status::UnsupportedWrite : Status::UnsupportedAttribute;
 
-        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
+        existenceStatus = DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
     }
 
     // Allow writes on writable attributes only
     VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
+
+    Status writeAccessStatus = CheckWriteAccess(aSubject, aPath, attributeEntry.value());
+
+    VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
+
+    // We only communicate on Existence failures if we are sure access is granted
+    VerifyOrReturnValue(existenceStatus == Status::Success, existenceStatus);
+
+    // validate that timed write is enforced
+    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
+                        Status::NeedsTimedInteraction);
+
+    return Status::Success;
+}
+
+Status WriteHandler::CheckWriteAccess(const Access::SubjectDescriptor & aSubject, const ConcreteAttributePath & aPath,
+                                      const std::optional<DataModel::AttributeEntry> & attributeEntry)
+{
 
     bool checkAcl = true;
     if (mLastSuccessfullyWrittenPath.has_value())
@@ -812,22 +830,27 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
                                          .requestType = Access::RequestType::kAttributeWriteRequest,
                                          .entityId    = aPath.mAttributeId };
 
-        // NOTE: we know that attributeEntry has a GetWriteProvilege based on the check above.
-        //       so we just directly reference it.
+        //  NOTE: we know that attributeEntry has a GetWritePrivilege based on the check before the call to this function.
+        //        so we just directly reference it.
         CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, *attributeEntry->GetWritePrivilege());
 
-        if (err != CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
-            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_DENIED, Status::UnsupportedAccess);
-            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL, Status::AccessRestricted);
-
-            return err;
+            return Status::Success;
         }
-    }
 
-    // validate that timed write is enforced
-    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
-                        Status::NeedsTimedInteraction);
+        if (err == CHIP_ERROR_ACCESS_DENIED)
+        {
+            return Status::UnsupportedAccess;
+        }
+
+        if (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL)
+        {
+            return Status::AccessRestricted;
+        }
+
+        return Status::Failure;
+    }
 
     return Status::Success;
 }
