@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -159,7 +160,7 @@ public:
     chip::ByteSpan certificate;
     DataModel::Nullable<uint16_t> caid;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ProvisionRootCertificate
 namespace ProvisionRootCertificateResponse {
@@ -226,7 +227,7 @@ public:
 
     DataModel::Nullable<uint16_t> caid;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace FindRootCertificate
 namespace FindRootCertificateResponse {
@@ -293,7 +294,7 @@ public:
 
     chip::ByteSpan fingerprint;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace LookupRootCertificate
 namespace LookupRootCertificateResponse {
@@ -360,7 +361,7 @@ public:
 
     uint16_t caid = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace RemoveRootCertificate
 namespace TLSClientCSR {
@@ -394,7 +395,7 @@ public:
 
     chip::ByteSpan nonce;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace TLSClientCSR
 namespace TLSClientCSRResponse {
@@ -470,7 +471,7 @@ public:
     uint16_t ccdid = static_cast<uint16_t>(0);
     Structs::TLSClientCertificateDetailStruct::DecodableType clientCertificateDetails;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ProvisionClientCertificate
 namespace FindClientCertificate {
@@ -504,7 +505,7 @@ public:
 
     DataModel::Nullable<uint16_t> ccdid;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace FindClientCertificate
 namespace FindClientCertificateResponse {
@@ -571,7 +572,7 @@ public:
 
     chip::ByteSpan fingerprint;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace LookupClientCertificate
 namespace LookupClientCertificateResponse {
@@ -638,7 +639,7 @@ public:
 
     uint16_t ccdid = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace RemoveClientCertificate
 } // namespace Commands
