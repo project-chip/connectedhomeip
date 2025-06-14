@@ -19,7 +19,6 @@ import unittest
 from difflib import unified_diff
 from pathlib import Path
 from typing import List, Optional, Union
-from unittest.mock import patch, mock_open
 
 try:
     from matter.idl.data_model_xml import ParseSource, ParseXmls
