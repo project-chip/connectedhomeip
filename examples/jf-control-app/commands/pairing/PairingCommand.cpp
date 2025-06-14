@@ -43,26 +43,27 @@ CHIP_ERROR PairingCommand::RunCommand()
     chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
     NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
 
+    if (mJCM.ValueOr(false) && mAnchor.ValueOr(false))
+    {
+        ChipLogError(JointFabric, "--anchor and --jcm options are not allowed simultaneously!");
+        return CHIP_ERROR_BAD_REQUEST;
+    }
+
+    // TODO: persist and restore mAnchorNodeId due to mAnchorNodeId being reset on
+    // JFC restart and across command invocations
     if (mAnchorNodeId == chip::kUndefinedNodeId)
     {
-        if (!mAnchor.ValueOr(false))
-        {
-            ChipLogError(JointFabric, "Please first commission the Anchor Administrator: add `--anchor true` parameter");
-            return CHIP_ERROR_NOT_CONNECTED;
-        }
-        else
-        {
-            chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
+        // TODO: Once the above is fixed uncomment this code
+        // if (!mAnchor.ValueOr(false))
+        // {
+        //     ChipLogError(JointFabric, "Please first commission the Anchor Administrator: add `--anchor true` parameter");
+        //     return CHIP_ERROR_NOT_CONNECTED;
+        // }
+        
+        chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
 
-            if (mExecuteJCM.ValueOr(false))
-            {
-                ChipLogError(JointFabric, "--anchor and --execute-jcm options are not allowed simultaneously!");
-                return CHIP_ERROR_BAD_REQUEST;
-            }
-
-            // JFA will be issued a NOC with Anchor CAT and Administrator CAT
-            mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
-        }
+        // JFA will be issued a NOC with Anchor CAT and Administrator CAT
+        mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
     }
     else if (mAnchor.ValueOr(false))
     {
@@ -70,8 +71,9 @@ CHIP_ERROR PairingCommand::RunCommand()
                      ChipLogValueX64(mAnchorNodeId));
         return CHIP_ERROR_BAD_REQUEST;
     }
-    else
+    else if (!mJCM.ValueOr(false))
     {
+        // Only skip commissioning complete if we are not using JCM
         mSkipCommissioningComplete = MakeOptional(true);
     }
 
@@ -153,7 +155,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
-    params.SetExecuteJCM(mExecuteJCM.ValueOr(false));
+    params.SetUseJCM(mJCM.ValueOr(false));
     if (mBypassAttestationVerifier.ValueOr(false))
     {
         params.SetDeviceAttestationDelegate(this);
@@ -530,8 +532,19 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         if (!mSkipCommissioningComplete.ValueOr(false))
         {
-            ChipLogProgress(JointFabric, "Anchor Administrator commissioned with sucess");
-            mAnchorNodeId = nodeId;
+            if (mAnchor.ValueOr(false))
+            {
+                ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
+                mAnchorNodeId = nodeId;
+            }
+            else if (mJCM.ValueOr(false))
+            {
+                ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) commissioned with success", nodeId);
+            }
+            else
+            {
+                ChipLogProgress(JointFabric, "Device (%ld) commissioned with success", nodeId);
+            }
         }
         else
         {
