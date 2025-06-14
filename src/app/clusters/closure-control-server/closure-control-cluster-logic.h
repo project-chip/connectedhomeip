@@ -278,7 +278,7 @@ public:
      * @param[in] EngageValue will indicate if the actuator is Engaged or Disengaged
      *
      * @return CHIP_NO_ERROR if the event is generated successfull
-     *         CHIP_NO_ERROR if hte ManuallyOperable feature is not supported.
+     *         CHIP_NO_ERROR if the ManuallyOperable feature is not supported.
      *         Returns an appropriate error code if event generation fails
      */
     CHIP_ERROR GenerateEngageStateChangedEvent(const bool engageValue);

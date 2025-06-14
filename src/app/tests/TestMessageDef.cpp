@@ -99,7 +99,7 @@ void ParseStatusIB(StatusIB::Parser & aStatusIBParser)
     err = aStatusIBParser.DecodeStatusIB(statusIB);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(statusIB.mStatus, chip::Protocols::InteractionModel::Status::InvalidSubscription);
-    EXPECT_FALSE(statusIB.mClusterStatus.HasValue());
+    EXPECT_FALSE(statusIB.mClusterStatus.has_value());
 }
 
 void BuildClusterPathIB(ClusterPathIB::Builder & aClusterPathBuilder)

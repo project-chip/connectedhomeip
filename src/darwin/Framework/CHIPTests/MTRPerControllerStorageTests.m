@@ -3019,6 +3019,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         @(118) : @"MT:0000000000Z1J900000",
         @(119) : @"MT:000008C801FFJ900000",
         @(120) : @"MT:00000GOG02XSJ900000",
+
+        /* Reduce "many devices" to 20 until either a better number or a better testing method is found
         @(121) : @"MT:00000O-O03D4K900000",
         @(122) : @"MT:00000WAX04VHK900000",
         @(123) : @"MT:000002N315BVK900000",
@@ -3049,6 +3051,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         @(148) : @"MT:00000AZB168QT900000",
         @(149) : @"MT:00000I9K17Q1U900000",
         @(150) : @"MT:00000000007FU900000",
+         */
     };
 
     // Start our helper apps.
