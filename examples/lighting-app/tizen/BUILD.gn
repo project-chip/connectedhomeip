@@ -53,6 +53,8 @@ executable("chip-lighting-app") {
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
     "${chip_root}/examples/platform/tizen:app-main",
+    "${chip_root}/src/app/clusters/color-control-server:color-control-common",
+    "${chip_root}/src/app/clusters/on-off-server:on-off-common",
     "${chip_root}/src/lib",
   ]
 
