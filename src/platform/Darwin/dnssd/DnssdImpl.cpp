@@ -38,9 +38,6 @@ constexpr char kLocalDot[] = "local.";
 
 constexpr char kSRPDot[] = "default.service.arpa.";
 
-// The extra time in milliseconds that we will wait for the resolution on the SRP domain to complete.
-constexpr uint16_t kSRPTimeoutInMsec = 250;
-
 bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 {
     return (protocol == DnssdServiceProtocol::kDnssdProtocolUdp) || (protocol == DnssdServiceProtocol::kDnssdProtocolTcp);
@@ -62,26 +59,6 @@ void LogOnFailure(const char * name, DNSServiceErrorType err)
     {
         ChipLogError(Discovery, "%s (%s)", StringOrNullMarker(name), Error::ToString(err));
     }
-}
-
-/**
- * @brief Starts a timer to wait for the resolution on the kSRPDot domain to happen.
- *
- * @param[in] timeoutSeconds The timeout in seconds.
- * @param[in] ResolveContext The resolve context.
- */
-CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
-{
-    // Check to see if a user default value exists for the SRP timeout. If it does, override the timeoutInMSecs with user default
-    // value. To override the timeout value, use ` defaults write org.csa-iot.matter.darwin SRPTimeoutInMSecsOverride
-    // <timeoutinMsecs>` See UserDefaults.mm for details.
-    timeoutInMSecs = GetUserDefaultDnssdSRPTimeoutInMSecs().value_or(timeoutInMSecs);
-
-    VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ChipLogProgress(Discovery, "Starting timer to wait for %d milliseconds for possible SRP resolve results for %s", timeoutInMSecs,
-                    ctx->instanceName.c_str());
-    return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs),
-                                                       ResolveContext::SRPTimerExpiredCallback, static_cast<void *>(ctx));
 }
 
 class ScopedTXTRecord
@@ -284,52 +261,13 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     if (kDNSServiceErr_NoError == err)
     {
         InterfaceKey interfaceKey = { interfaceId, hostname, contextWithType->isSRPResolve };
-        CHIP_ERROR error          = sdCtx->OnNewAddress(interfaceKey, address);
-
-        // If we saw an address resolved on the SRP domain, we don't need to wait
-        // for SRP results, so don't bother with starting a timer to wait for those.
-        if (error == CHIP_NO_ERROR && contextWithType->isSRPResolve)
-        {
-            sdCtx->shouldStartSRPTimerForResolve = false;
-        }
+        sdCtx->OnNewAddress(interfaceKey, address);
     }
 
-    if (flags & kDNSServiceFlagsMoreComing)
+    if (!(flags & kDNSServiceFlagsMoreComing))
     {
-        // If we now don't need to have a timer while we wait for SRP results, ensure that there is no such
-        // timer running.  Otherwise the timer could fire before we get the rest of the results that flags
-        // say are coming, and trigger a finalize before we have all the data that is already available.
-        if (!sdCtx->shouldStartSRPTimerForResolve)
-        {
-            sdCtx->CancelSRPTimerIfRunning();
-        }
-        return;
-    }
-
-    VerifyOrReturn(sdCtx->HasAddress(), sdCtx->Finalize(kDNSServiceErr_BadState));
-
-    // If either we didn't start a resolve on the SRP domain or we started a resolve on the SRP domain and got an address,
-    // we are done. Otherwise start the timer to give the resolve on SRP domain some extra time to complete.
-    if (!sdCtx->shouldStartSRPTimerForResolve)
-    {
-        ChipLogDetail(Discovery, "No need to start SRP resolve timer for %s; completing resolve", sdCtx->instanceName.c_str());
+        VerifyOrReturn(sdCtx->HasAddress(), sdCtx->Finalize(kDNSServiceErr_BadState));
         sdCtx->Finalize();
-    }
-    else
-    {
-        if (!sdCtx->isSRPTimerRunning)
-        {
-            CHIP_ERROR error = StartSRPTimer(kSRPTimeoutInMsec, sdCtx);
-
-            if (error != CHIP_NO_ERROR)
-            {
-                // If we failed to start the timer, just go ahead and report whatever information
-                // we have gotten so far.
-                sdCtx->Finalize();
-                return;
-            }
-            sdCtx->isSRPTimerRunning = true;
-        }
     }
 }
 
@@ -416,17 +354,11 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
     if (domain != nullptr)
     {
         ReturnErrorOnFailure(ResolveWithContext(sdCtx, interfaceId, type, name, domain, &sdCtx->resolveContextWithNonSRPType));
-        sdCtx->shouldStartSRPTimerForResolve = false;
     }
     else
     {
         ReturnErrorOnFailure(ResolveWithContext(sdCtx, interfaceId, type, name, kLocalDot, &sdCtx->resolveContextWithNonSRPType));
-
         ReturnErrorOnFailure(ResolveWithContext(sdCtx, interfaceId, type, name, kSRPDot, &sdCtx->resolveContextWithNonSRPType));
-
-        // Set the flag to start the timer for resolve on SRP domain to complete since a resolve has been requested on the SRP
-        // domain.
-        sdCtx->shouldStartSRPTimerForResolve = true;
     }
 
     auto retval = MdnsContexts::GetInstance().Add(sdCtx);
