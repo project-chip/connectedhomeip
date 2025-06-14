@@ -35,18 +35,26 @@ def get_identity():
         exit(0)
 
     command_result = command_result.replace("\\n", "\n")
-    identity = re.search(r'\b[0-9a-fA-F]{40}\b(?![^\n]*\(CSSMERR_TP_CERT_EXPIRED\))', command_result)
-    if identity is None:
+
+    # Capture all valid identities (skipping expired ones)
+    identities = re.findall(
+        r'\b[0-9a-fA-F]{40}\b(?![^\n]*\(CSSMERR_TP_CERT_EXPIRED\))',
+        command_result
+    )
+
+    if not identities:
         print(
             "No valid identity has been found. Application will run without entitlements.")
         exit(0)
 
-    return identity.group()
+    # Return the last identity in the list
+    return identities[-1]
 
 
 def codesign(args):
-    command = "codesign --force -d --sign {identity} {target}".format(
+    command = "codesign -o library --force -d --sign {identity} --entitlements {entitlements} {target}".format(
         identity=get_identity(),
+        entitlements=args.entitlements_path,
         target=args.target_path)
     command_result = run_command(command)
 
@@ -61,6 +69,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--log_path', help='Output log file destination', required=True)
     parser.add_argument('--target_path', help='Binary to sign', required=True)
+    parser.add_argument('--entitlements_path',
+                        help='Entitlements to use', required=True)
 
     args = parser.parse_args()
     codesign(args)

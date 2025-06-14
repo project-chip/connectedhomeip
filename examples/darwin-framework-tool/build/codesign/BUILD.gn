@@ -13,13 +13,23 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/config/mac/mac_sdk.gni")
+import("${chip_root}/examples/darwin-framework-tool/build/args.gni")
 
 action("codesign") {
   script = "../../entitlements/codesign.py"
 
+  deps = [ "${chip_root}/examples/darwin-framework-tool:darwin-tool-alias" ]
+
   args = [
     "--target_path",
     rebase_path("${root_build_dir}/darwin-framework-tool", root_build_dir),
+    "--entitlements_path",
+    rebase_path(
+        "${chip_root}/examples/darwin-framework-tool/entitlements/darwin-framework-tool.entitlements",
+        root_build_dir),
     "--log_path",
     rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
   ]
