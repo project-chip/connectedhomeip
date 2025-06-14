@@ -31,6 +31,7 @@ from matter.idl.generators.idl import IdlGenerator
 from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.lint.lint_rules_parser import CreateParser as CreateLintParser
+from matter.idl.lint.lint_rules_parser import LintRulesContext
 from matter.idl.matter_idl_types import Idl
 
 
@@ -152,6 +153,55 @@ endpoint 2 {
             errors.extend(rule.LintIdl(idlToCheck))
         # Verify that there are no errors detected in the IDL based on the linter defined rules.
         self.assertFalse(errors)
+
+    def testLinterXMLAttributes(self):
+        xml_cluster = '''
+<configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
+  <domain name="CHIP"/>
+  <cluster>
+    <name>TestCluster</name>
+    <code>123</code>
+    <attribute side="server" code="0x0000" name="MandatoryElement" define="MANDATORY_ELEMENT" type="char">
+      <description>Tests an attribute with a mandatoryConform element</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="NoElements" define="NO_ELEMENTS" type="char">
+      <description>Tests an attribute with no specific elements, mandatory by default</description>
+    </attribute>
+    <attribute side="server" code="0x0002" name="OptionalAttribute" define="OPTIONAL" type="char" optional="true">
+      <description>Tests an attribute with an optional XML attribute</description>
+    </attribute>
+    <attribute side="server" code="0x0003" name="ConditionalMandatory" define="CONDITIONAL_MANDATORY" type="char">
+      <description>Tests an attribute with a conditional mandatoryConform</description>
+      <mandatoryConform>
+        <feature name="SOME_FEATURE"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="OptionalElement" define="OPTIONAL_ELEMENT" type="char">
+      <description>Tests an attribute with an optionalConform element</description>
+      <optionalConform/>
+    </attribute>
+  </cluster>
+</configurator>
+'''
+        # Use LintRulesContext directly to parse the cluster XML and avoid file handling
+        lint_context = LintRulesContext()
+        lint_context.LoadXml(io.StringIO(xml_cluster))
+
+        # Get parsed mandatory attributes from the context.
+        required_attributes = lint_context._required_attributes_rule._mandatory_attributes
+
+        # The first attribute in the XML should be mandatory since
+        # it has the mandatoryConform element not conditioned to any feature.
+        self.assertEqual(required_attributes[0].code, 0)
+        self.assertEqual(required_attributes[0].filter_cluster, 123)
+        self.assertEqual(required_attributes[0].name, "MandatoryElement")
+
+        # The second attribute in the XML also is mandatory since
+        # it doesn't have any condition to it, so mandatory by default
+        self.assertEqual(required_attributes[1].code, 1)
+        self.assertEqual(required_attributes[1].filter_cluster, 123)
+        self.assertEqual(required_attributes[1].name, "NoElements")
 
     def testClusterDerivation(self):
         # This test is based on a subset of ModeBase and Mode_Dishwasher original xml files

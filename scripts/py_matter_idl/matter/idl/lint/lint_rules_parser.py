@@ -69,24 +69,25 @@ class ServerClusterRequirement:
     id: Union[str, int]
 
 
-def _isRequired(attrib: xml.etree.ElementTree.Element) -> bool:
+def _isRequired(attr: xml.etree.ElementTree.Element) -> bool:
 
     # Check for optional attributes in the old "optional" element format
-    if 'optional' in attrib.attrib and attrib.attrib['optional'] == 'true':
+    if 'optional' in attr.attrib and attr.attrib['optional'] == 'true':
         return False
+
     # Check for optionalConform inside the element
-    if attrib.find('optionalConform'):
+    if attr.find('optionalConform') is not None:
         return False
 
     # Check for provisional elements
-    if 'apiMaturity' in attrib.attrib and attrib.attrib['apiMaturity'] == 'provisional':
+    if 'apiMaturity' in attr.attrib and attr.attrib['apiMaturity'] == 'provisional':
         return False
 
     # mandatory is a marker, as long as the mandatory is not
     # turned into an optional by being controlled by a feature
-    mandatory_element = attrib.find('mandatoryConform')
+    mandatory_element = attr.find('mandatoryConform')
 
-    if not mandatory_element:
+    if mandatory_element is None:
         return True
 
     return mandatory_element.find('feature') is None
@@ -121,10 +122,11 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             # <attribute ...>myName</attribute>
             # or
             # <attribute ...><description>myName</description><access .../>...</attribute>
-            attr_name = attr.text
-            description = attr.find('description')
-            if description is not None:
-                attr_name = description.text
+            attr_name = attr.get("name")
+            if not attr_name:
+                description = attr.find('description')
+                if description is not None:
+                    attr_name = description.text
 
             required_attributes.append(
                 RequiredAttribute(
