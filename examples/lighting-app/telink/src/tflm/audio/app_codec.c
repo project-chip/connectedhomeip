@@ -59,7 +59,7 @@ void app_codec_init()
     audio_init();
     if (CONFIG_SOC_RISCV_TELINK_TL721X)
     {
-        audio_set_stream0_dmic_pin(GPIO_FC_PA2, GPIO_FC_PA3, GPIO_FC_PA4);
+        audio_set_stream0_dmic_pin(GPIO_FC_PB4, GPIO_FC_PA2, GPIO_NONE_PIN);
     }
 
     /****stream0 line in/amic/dmic init****/
@@ -79,7 +79,7 @@ void app_codec_init()
     audio_codec_clr_input_pop(20);                                   /* Step3 - Clear codec input pop and dis mute audio */
     audio_codec_input_path_en(audio_codec_stream0_input.fifo_chn);   /* Step4 - enable codec input path, codec data come in */
 
-    audio_stream0_fade_dig_gain(CODEC_IN_D_GAIN_m6_DB);
+    audio_stream0_fade_dig_gain(CODEC_IN_D_GAIN_6_DB);
 
     audio_set_sdm_pin(&sdm_pin_config);
     audio_codec_stream_output_en(audio_stream_output.dma_num);

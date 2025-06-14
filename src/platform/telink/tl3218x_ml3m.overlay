@@ -1,0 +1,140 @@
+
+/ {
+	model = "telink,tl321x";
+	compatible = "telink,tl3218x";
+    
+	chosen {
+		zephyr,console = &cdc_acm_uart0;
+		zephyr,shell-uart = &cdc_acm_uart0;
+	};
+
+    aliases {
+        /delete-property/ mcuboot-button0;
+		pwm-led0 = &pwm_led_white;
+		pwm-0 = &pwm0;
+    };
+
+    leds {
+        compatible = "gpio-leds";
+
+		led_white: led_0 {
+            gpios = <&gpioe 5 GPIO_ACTIVE_HIGH>;
+            label = "LED White";
+        };
+
+		led_green: led_1 {
+            gpios = <&gpioe 4 GPIO_ACTIVE_HIGH>;
+            label = "LED Green";
+        };
+
+    };
+
+	/delete-node/ pwm_leds;
+
+	pwm_leds {
+		compatible = "pwm-leds";
+
+		pwm_led_white: pwm_led_0 {
+			pwms = <&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM LED White";
+		};
+	};
+
+    keys {
+        compatible = "gpio-keys";
+
+        key_1: button_1 {
+            label = "User KEY1";
+            gpios = <&gpioe 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        };
+
+        key_2: button_2 {
+            label = "User KEY2";
+            gpios = <&gpioe 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        };
+
+        key_3: button_3 {
+            label = "User KEY3";
+            gpios = <&gpioa 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        };
+
+        key_4: button_4 {
+            label = "User KEY4";
+            gpios = <&gpioa 7 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        };
+
+    };
+
+    /* Short TL_Key3 (J6 pin 31) to ground */
+	key_pool {
+		compatible = "gpio-keys";
+
+		inp {
+			gpios = <&gpioe 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>,
+				<&gpioe 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		};
+	};
+
+    led_pool {
+		compatible = "gpio-leds";
+
+		out {
+			gpios = <&gpioe 4 GPIO_ACTIVE_HIGH>,
+                    <&gpioe 5 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	pwm_pool {
+		compatible = "pwm-leds";
+		out {
+			pwms = <&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+				<&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+				<&pwm0 2 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+				<&pwm0 3 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+		};
+	};
+};
+
+&uart0 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart0_tx_pb6_default &uart0_rx_pb7_default>;
+	pinctrl-names = "default";
+};
+
+&pwm0 {
+	status = "okay";
+	clock-frequency = <300000>;
+	pinctrl-ch3 = <&pwm_ch3_pe5_default>;
+};
+
+&pinctrl {
+	/* Set pad-mul-sel register value.
+	 * Note: Pins functions below (pinmux = <...>) depend on this value.
+	 */
+	pad-mul-sel = <1>;
+
+	/* UART0: TX(PB6), RX(PB7) */
+
+	uart0_tx_pb6_default: uart0_tx_pb6_default {
+		pinmux = <TLX_PINMUX_SET(TLX_PORT_B, TLX_PIN_6,
+			(TL321X_FUNC_UART0_TX | TLX_PULL_UP))>;
+	};
+	uart0_rx_pb7_default: uart0_rx_pb7_default {
+		pinmux = <TLX_PINMUX_SET(TLX_PORT_B, TLX_PIN_7,
+			(TL321X_FUNC_UART0_RTX_IO | TLX_PULL_UP))>;
+	};
+
+	/* PWM Channel 3 (PE5) */
+	pwm_ch3_pe5_default: pwm_ch3_pe5_default {
+		pinmux = <TLX_PINMUX_SET(TLX_PORT_E, TLX_PIN_5, TL321X_FUNC_PWM3)>;
+	};
+
+};
+
+/* USB configuration (Disable it if need full logging) */
+&zephyr_udc0 {
+	cdc_acm_uart0: cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};

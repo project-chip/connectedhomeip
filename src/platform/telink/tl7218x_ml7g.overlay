@@ -1,0 +1,119 @@
+
+/ {
+	model = "telink,tl721x";
+	compatible = "telink,tl7218x";
+    
+	chosen {
+		zephyr,console = &cdc_acm_uart0;
+		zephyr,shell-uart = &cdc_acm_uart0;
+	};
+
+    aliases {
+        /delete-property/ mcuboot-button0;
+    };
+
+    leds {
+        compatible = "gpio-leds";
+
+		led_green: led_1 {
+            gpios = <&gpioe 2 GPIO_ACTIVE_HIGH>;
+            label = "LED Green";
+        };
+
+        led_white: led_2 {
+            gpios = <&gpioe 1 GPIO_ACTIVE_HIGH>;
+            label = "LED White";
+        };
+    };
+
+    keys {
+        compatible = "gpio-keys";
+
+        key_1: button_1 {
+            label = "User KEY1";
+            gpios = <&gpioe 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        };
+
+        key_2: button_2 {
+            label = "User KEY2";
+            gpios = <&gpioe 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        };
+
+        key_3: button_3 {
+            label = "User KEY3";
+            gpios = <&gpiof 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        };
+
+        key_4: button_4 {
+            label = "User KEY4";
+            gpios = <&gpioa 7 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        };
+
+    };
+
+    /* Short TL_Key3 (J6 pin 31) to ground */
+	key_pool {
+		compatible = "gpio-keys";
+
+		inp {
+			gpios = <&gpioe 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>,
+				<&gpioe 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		};
+	};
+
+    led_pool {
+		compatible = "gpio-leds";
+
+		out {
+			gpios = <&gpioe 2 GPIO_ACTIVE_HIGH>,
+                    <&gpioe 1 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+    /delete-node/ pwm_pool;
+
+};
+
+
+&gpioe {
+	interrupts = <39 1>;
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart0_tx_pf1_default &uart0_rx_pf2_default>;
+	pinctrl-names = "default";
+};
+
+/* Disable LSPI in overlay */
+&lspi {
+    status = "disabled";
+};
+
+&pinctrl {
+	/* Set pad-mul-sel register value.
+	 * Note: Pins functions below (pinmux = <...>) depend on this value.
+	 */
+	pad-mul-sel = <1>;
+
+	/* UART0: TX(PF1), RX(PF2), RTS(PB4), CTS(PB6) */
+
+	uart0_tx_pf1_default: uart0_tx_pf1_default {
+		pinmux = <TLX_PINMUX_SET(TLX_PORT_F, TLX_PIN_1,
+			(TL721X_FUNC_UART0_TX | TL721X_PULL_UP))>;
+	};
+	uart0_rx_pf2_default: uart0_rx_pf2_default {
+		pinmux = <TLX_PINMUX_SET(TLX_PORT_F, TLX_PIN_2,
+			(TL721X_FUNC_UART0_RTX_IO | TL721X_PULL_UP))>;
+	};
+
+};
+
+/* USB configuration (Disable it if need full logging) */
+&zephyr_udc0 {
+	cdc_acm_uart0: cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};
