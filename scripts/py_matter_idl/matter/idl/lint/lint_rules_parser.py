@@ -69,6 +69,30 @@ class ServerClusterRequirement:
     id: Union[str, int]
 
 
+def _isRequired(attr: xml.etree.ElementTree.Element) -> bool:
+
+    # Check for optional attributes in the old "optional" element format
+    if 'optional' in attr.attrib and attr.attrib['optional'] == 'true':
+        return False
+
+    # Check for optionalConform inside the element
+    if attr.find('optionalConform') is not None:
+        return False
+
+    # Check for provisional elements
+    if 'apiMaturity' in attr.attrib and attr.attrib['apiMaturity'] == 'provisional':
+        return False
+
+    # mandatory is a marker, as long as the mandatory is not
+    # turned into an optional by being controlled by a feature
+    mandatory_element = attr.find('mandatoryConform')
+
+    if mandatory_element is None:
+        return True
+
+    return mandatory_element.find('feature') is None
+
+
 def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     if element.tag != 'cluster':
         logging.error("Not a cluster element: %r" % element)
@@ -91,20 +115,18 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             if attr.attrib['side'] != 'server':
                 continue
 
-            if 'optional' in attr.attrib and attr.attrib['optional'] == 'true':
-                continue
-
-            if 'apiMaturity' in attr.attrib and attr.attrib['apiMaturity'] == 'provisional':
+            if not _isRequired(attr):
                 continue
 
             # when introducing access controls, the content of attributes may either be:
             # <attribute ...>myName</attribute>
             # or
             # <attribute ...><description>myName</description><access .../>...</attribute>
-            attr_name = attr.text
-            description = attr.find('description')
-            if description is not None:
-                attr_name = description.text
+            attr_name = attr.get("name")
+            if not attr_name:
+                description = attr.find('description')
+                if description is not None:
+                    attr_name = description.text
 
             required_attributes.append(
                 RequiredAttribute(
@@ -308,9 +330,11 @@ class LintRulesTransformer(Transformer):
     @v_args(inline=True)
     def load_xml(self, path):
         if not os.path.isabs(path):
-            path = os.path.abspath(os.path.join(
-                os.path.dirname(self.file_name), path))
-
+            if self.file_name:
+                path = os.path.abspath(os.path.join(
+                    os.path.dirname(self.file_name), path))
+            else:
+                path = os.path.abspath(path)
         self.context.LoadXml(path)
 
     @v_args(inline=True)
@@ -344,19 +368,20 @@ class LintRulesTransformer(Transformer):
 
 
 class Parser:
-    def __init__(self, parser, file_name: str):
-        self.parser = parser
+    def __init__(self, file_name: Optional[str] = None):
+        self.parser = Lark.open(
+            'lint_rules_grammar.lark', rel_to=__file__, parser='lalr',
+            propagate_positions=True, maybe_placeholders=True)
         self.file_name = file_name
 
-    def parse(self):
+    def parse(self, file: str):
         data = LintRulesTransformer(self.file_name).transform(
-            self.parser.parse(open(self.file_name, "rt").read()))
+            self.parser.parse(file))
         return data
 
 
-def CreateParser(file_name: str):
+def CreateParser(file_name: Optional[str] = None):
     """
     Generates a parser that will process a ".matter" file into a IDL
     """
-    return Parser(
-        Lark.open('lint_rules_grammar.lark', rel_to=__file__, parser='lalr', propagate_positions=True, maybe_placeholders=True), file_name=file_name)
+    return Parser(file_name)
