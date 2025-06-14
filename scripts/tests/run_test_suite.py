@@ -295,10 +295,16 @@ def cmd_list(context):
     default=0,
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
+@click.option(
+    '--ble-wifi',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Use a Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, chip_repl_yaml_tester,
-            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
+            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
         sys.exit(2)
@@ -367,9 +373,18 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
 
+    ble_controller_app = None
+    ble_controller_tool = None
+
     if sys.platform == 'linux':
-        chiptest.linux.PrepareNamespacesForTestExecution(
-            context.obj.in_unshare)
+        chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
+        if ble_wifi:
+            bus = chiptest.linux.DBusTestSystemBus()
+            bluetooth = chiptest.linux.BluetoothMock()
+            wifi = chiptest.linux.WpaSupplicantMock()
+            time.sleep(0.5)  # Give the mock servers time to start
+            ble_controller_app = 0   # Bind app to the first BLE controller
+            ble_controller_tool = 1  # Bind tool to the second BLE controller
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
     logging.info("Each test will be executed %d times" % iterations)
@@ -380,6 +395,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     def cleanup():
         apps_register.uninit()
         if sys.platform == 'linux':
+            if ble_wifi:
+                wifi.terminate()
+                bluetooth.terminate()
+                bus.terminate()
             chiptest.linux.ShutdownNamespaceForTestExecution()
 
     for i in range(iterations):
@@ -404,7 +423,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                     logging.info('%-20s - Starting test' % (test.name))
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
-                    test_runtime=context.obj.runtime)
+                    test_runtime=context.obj.runtime,
+                    ble_controller_app=ble_controller_app,
+                    ble_controller_tool=ble_controller_tool,
+                )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()
                     logging.info('%-30s - Completed in %0.2f seconds' %
