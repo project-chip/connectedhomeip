@@ -20,6 +20,7 @@
 
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/DLLUtil.h>
@@ -32,6 +33,7 @@ namespace Controller {
 typedef void (*OnNOCChainGeneration)(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                      const ByteSpan & rcac, Optional<Crypto::IdentityProtectionKeySpan> ipk,
                                      Optional<NodeId> adminSubject);
+typedef void (*OnICACSigned)(void * context, CHIP_ERROR status, const ByteSpan & icac);
 
 inline constexpr uint32_t kMaxCHIPDERCertLength = 600;
 inline constexpr size_t kCSRNonceLength         = 32;
@@ -67,6 +69,12 @@ public:
                                         const ByteSpan & DAC, const ByteSpan & PAI,
                                         Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
+    virtual CHIP_ERROR SignICAC(const ByteSpan & icaCsr, Callback::Callback<OnICACSigned> * onCompletion) = 0;
+
+    virtual CHIP_ERROR SignNOC(const ByteSpan & icac, const ByteSpan & nocCsr, MutableByteSpan & noc) = 0;
+
+    virtual CHIP_ERROR ObtainIcaCsr(MutableByteSpan & icaCsr) = 0;
+
     /**
      *   This function sets the node ID for which the next NOC Chain would be requested. The node ID is
      *   provided as a hint, and the delegate implementation may chose to ignore it and pick node ID of
@@ -80,6 +88,13 @@ public:
      *   fabric ID.
      */
     virtual void SetFabricIdForNextNOCRequest(FabricId fabricId) {}
+
+    /**
+     *   This function sets the CAT values for which the next NOC Chain should be generated. This API is
+     *   not required to be implemented if the delegate implementation has other mechanisms to find the
+     *   CAT values.
+     */
+    virtual void SetCATValuesForNextNOCRequest(CATValues cats) {}
 
     virtual CHIP_ERROR ObtainCsrNonce(MutableByteSpan & csrNonce)
     {

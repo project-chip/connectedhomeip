@@ -151,4 +151,76 @@ TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesNOCChainAfte
     ASSERT_EQ(r, CHIP_NO_ERROR);
 }
 
+uint8_t gIcac[Controller::kMaxCHIPDERCertLength] = { 0 };
+MutableByteSpan gIcacSpan(gIcac, Controller::kMaxCHIPDERCertLength);
+
+TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulySignsICACAfterValidation)
+{
+    Crypto::P256Keypair ephemeralKey;
+    auto ephemeral_r = ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDSA);
+
+    Platform::ScopedMemoryBuffer<uint8_t> noc;
+    noc.Calloc(Controller::kMaxCHIPDERCertLength);
+    ASSERT_TRUE(noc.Get());
+
+    Platform::ScopedMemoryBuffer<uint8_t> icac;
+    icac.Calloc(Controller::kMaxCHIPDERCertLength);
+    ASSERT_TRUE(icac.Get());
+
+    Platform::ScopedMemoryBuffer<uint8_t> rcac;
+    rcac.Calloc(Controller::kMaxCHIPDERCertLength);
+    ASSERT_TRUE(rcac.Get());
+
+    ASSERT_EQ(ephemeral_r, CHIP_NO_ERROR);
+
+    MutableByteSpan nocSpan(noc.Get(), Controller::kMaxCHIPDERCertLength);
+    MutableByteSpan icacSpan(icac.Get(), Controller::kMaxCHIPDERCertLength);
+    MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
+
+    mCredsIssuer.Initialize(mPersistentStorageDelegate);
+
+    auto r = mCredsIssuer.GenerateNOCChainAfterValidation(mNodeId, ::kFabricId, chip::kUndefinedCATs, ephemeralKey.Pubkey(),
+                                                          rcacSpan, icacSpan, nocSpan);
+
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    Platform::ScopedMemoryBuffer<uint8_t> icacCsr;
+    icacCsr.Calloc(Controller::kMaxCHIPDERCertLength);
+    ASSERT_TRUE(icacCsr.Get());
+
+    MutableByteSpan icacCsrSpan(icacCsr.Get(), Controller::kMaxCHIPDERCertLength);
+
+    r = mCredsIssuer.ObtainIcaCsr(icacCsrSpan);
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    r = mCredsIssuer.SignICACAfterValidation(icacCsrSpan, gIcacSpan);
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+}
+
+TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulySignsNOC)
+{
+    Crypto::P256Keypair ephemeralKey;
+    auto ephemeral_r = ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDSA);
+
+    ASSERT_EQ(ephemeral_r, CHIP_NO_ERROR);
+
+    uint8_t csr[Crypto::kMIN_CSR_Buffer_Size];
+    size_t length = sizeof(csr);
+
+    ASSERT_EQ(ephemeralKey.NewCertificateSigningRequest(csr, length), CHIP_NO_ERROR);
+    ASSERT_GT(length, 2u);
+
+    Platform::ScopedMemoryBuffer<uint8_t> noc;
+    noc.Calloc(Controller::kMaxCHIPDERCertLength);
+    ASSERT_TRUE(noc.Get());
+
+    MutableByteSpan nocSpan(noc.Get(), Controller::kMaxCHIPDERCertLength);
+    ByteSpan nocCsrSpan(csr, length);
+
+    mCredsIssuer.Initialize(mPersistentStorageDelegate);
+
+    auto r = mCredsIssuer.SignNOC(gIcacSpan, nocCsrSpan, nocSpan);
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+}
+
 } // namespace

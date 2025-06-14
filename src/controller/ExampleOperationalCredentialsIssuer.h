@@ -31,7 +31,6 @@
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
@@ -59,6 +58,12 @@ public:
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
+    CHIP_ERROR SignICAC(const ByteSpan & icaCsr, Callback::Callback<OnICACSigned> * onCompletion) override;
+
+    CHIP_ERROR SignNOC(const ByteSpan & icac, const ByteSpan & nocCsr, MutableByteSpan & noc) override;
+
+    CHIP_ERROR ObtainIcaCsr(MutableByteSpan & icaCsr) override;
+
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;
@@ -72,7 +77,7 @@ public:
 
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
-    void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }
+    void SetCATValuesForNextNOCRequest(CATValues cats) override { mNextCATs = cats; }
 
     /**
      * @brief Initialize the issuer with the keypair in the storage.
@@ -110,6 +115,8 @@ public:
     CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const CATValues & cats,
                                                const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac,
                                                MutableByteSpan & noc);
+
+    CHIP_ERROR SignICACAfterValidation(const ByteSpan & icaCsr, MutableByteSpan & icac);
 
 private:
     Crypto::P256Keypair mRootIssuer;
