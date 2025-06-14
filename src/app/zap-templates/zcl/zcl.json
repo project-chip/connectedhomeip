@@ -204,7 +204,7 @@
         "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
         "Closure Dimension": [
             "CurrentState",
-            "Target",
+            "TargetState",
             "UnitRange",
             "LimitRange"
         ],
