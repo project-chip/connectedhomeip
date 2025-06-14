@@ -12,8 +12,16 @@ The application could be build in the same manner as `all-clusters-app`:
 
 # Named Pipe Interface
 
-This application accepts commands over named pipe. Pipe is located in
-`/tmp/chip_lock_app_fifo-<PID>`.
+This application accepts commands over named pipe. Named pipes can be enabled by
+adding the --app-pipe argument and providing the path of the file to use
+`<file_path>`.
+
+### Example to enable named pipes
+
+```
+./out/darwin-arm64-lock/chip-lock-app --app-pipe /tmp/lock_fifo
+
+```
 
 ## Command Format
 
@@ -44,7 +52,7 @@ For example:
     -   `DoorState` (DoorState enum): new door state.
 -   Usage:
     ```bash
-     echo '{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }' > /tmp/chip_lock_app_fifo-<PID>
+     echo '{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }' > /tmp/lock_fifo
     ```
     This command will set the door state to "Closed" resulting in Door State
     Change event.
@@ -59,7 +67,7 @@ For example:
     -   `AlarmCode` (AlarmCode enum): code of the Lock Door Alarm to send.
 -   Usage:
     ```bash
-     echo '{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }' > /tmp/chip_lock_app_fifo-<PID>
+     echo '{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }' > /tmp/lock_fifo
     ```
     This command will send the Door Lock Alarm event with "Lock Jammed" alarm
     code.
