@@ -11,5 +11,54 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/platform/device.gni")
+
+declare_args() {
+  enable_general_diagnostics_on_device_reboot = true
+  enable_general_diagnostics_on_hardware_faults_detect =
+      chip_device_platform == "linux" || chip_device_platform == "qpg" ||
+      chip_device_platform == "nuttx"
+  enable_general_diagnostics_on_radio_faults_detect =
+      chip_device_platform == "linux" || chip_device_platform == "qpg" ||
+      chip_device_platform == "nuttx"
+  enable_general_diagnostics_on_network_faults_detect =
+      chip_device_platform == "linux" || chip_device_platform == "qpg" ||
+      chip_device_platform == "nuttx"
+}
+
+buildconfig_header("general_fault_listener_buildconfig") {
+  header = "GeneralFaultListenerConfig.h"
+  header_dir = "clusters"
+
+  defines = [
+    "ENABLE_GENERAL_DIAGNOSTICS_ON_DEVICE_REBOOT=${enable_general_diagnostics_on_device_reboot}",
+    "ENABLE_GENERAL_DIAGNOSTICS_ON_HARDWARE_FAULTS_DETECT=${enable_general_diagnostics_on_hardware_faults_detect}",
+    "ENABLE_GENERAL_DIAGNOSTICS_ON_RADIO_FAULTS_DETECT=${enable_general_diagnostics_on_radio_faults_detect}",
+    "ENABLE_GENERAL_DIAGNOSTICS_ON_NETWORK_FAULTS_DETECT=${enable_general_diagnostics_on_network_faults_detect}",
+  ]
+}
+
+source_set("general-fault-listener") {
+  sources = [
+    "general-fault-listener.cpp",
+    "general-fault-listener.h",
+  ]
+
+  public_deps = [
+    ":general_fault_listener_buildconfig",
+    "${chip_root}/src/platform:platform",
+    "${chip_root}/zzz_generated/app-common/clusters/GeneralDiagnostics",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 group("general-diagnostics-server") {
+  public_deps = [
+    ":general-fault-listener",
+    ":general_fault_listener_buildconfig",
+  ]
 }

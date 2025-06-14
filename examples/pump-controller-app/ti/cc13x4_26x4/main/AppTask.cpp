@@ -46,7 +46,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
+// #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 #include <src/platform/ti/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
 
 #include <ti/drivers/apps/Button.h>
