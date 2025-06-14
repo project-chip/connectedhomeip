@@ -260,6 +260,14 @@ template("siwx917_sdk") {
       "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK=1",
     ]
 
+    if (silabs_mcu == "SIWG917Y111MGABA") {
+      defines += [
+        "SI91X_32kHz_EXTERNAL_OSCILLATOR=1",
+        "SL_SI91X_ACX_MODULE=1",
+        "SI917Y_DEVKIT=1",
+      ]
+    }
+
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
     } else {
