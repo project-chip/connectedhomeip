@@ -144,14 +144,6 @@ not_automated:
           are fully verified.
     - name: TC_WEBRTC_Utils.py
       reason: Helper methods for WebRTC TCs, not a standalone test.
-    - name: TC_WEBRTCP_2_1.py
-      reason:
-          Breaks CI. Temporarily disabling to allow correct fix. See
-          https://github.com/project-chip/connectedhomeip/issues/39529
-    - name: TC_WEBRTCP_2_3.py
-      reason:
-          Breaks CI. Temporarily disabling to allow correct fix. See
-          https://github.com/project-chip/connectedhomeip/issues/39529
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
