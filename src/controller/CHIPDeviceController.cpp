@@ -1288,7 +1288,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(
         report.Set<AttestationErrorInfo>(result);
 
         return commissioner->CommissioningStageComplete(
-            result == AttestationVerificationResult::kSuccess ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL, report);
+            result == AttestationVerificationResult::kSuccess ? CHIP_NO_ERROR : CHIP_ERROR_FAILED_DEVICE_ATTESTATION, report);
     }
 
     if (!commissioner->mDeviceBeingCommissioned)
@@ -1322,10 +1322,8 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(
             return;
         }
 
-        ChipLogError(Controller,
-                     "Failed in verifying 'Attestation Information' command received from the device: err %hu. Look at "
-                     "AttestationVerificationResult enum to understand the errors",
-                     static_cast<uint16_t>(result));
+        ChipLogError(Controller, "Failed in verifying 'Attestation Information' command received from the device: err %hu (%s)",
+                     static_cast<uint16_t>(result), GetAttestationResultDescription(result));
         // Go look at AttestationVerificationResult enum in src/credentials/attestation_verifier/DeviceAttestationVerifier.h to
         // understand the errors.
 
@@ -1337,7 +1335,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(
         }
         else
         {
-            commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
+            commissioner->CommissioningStageComplete(CHIP_ERROR_FAILED_DEVICE_ATTESTATION, report);
         }
     }
     else
@@ -1891,7 +1889,7 @@ void DeviceCommissioner::OnBasicSuccess(void * context, const chip::app::DataMod
 
 void DeviceCommissioner::OnBasicFailure(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "Received failure response %s\n", chip::ErrorStr(error));
+    ChipLogProgress(Controller, "Received failure response: %" CHIP_ERROR_FORMAT, error.Format());
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(error);
 }
@@ -3510,7 +3508,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     }
     case CommissioningStage::kAttestationVerification: {
-        ChipLogProgress(Controller, "Verifying attestation");
+        ChipLogProgress(Controller, "Verifying Device Attestation information received from the device");
         if (IsAttestationInformationMissing(params))
         {
             ChipLogError(Controller, "Missing attestation information");
@@ -3524,16 +3522,17 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             params.GetAttestationSignature().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
             params.GetAttestationNonce().Value(), params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value());
 
-        if (ValidateAttestationInfo(info) != CHIP_NO_ERROR)
+        CHIP_ERROR err = ValidateAttestationInfo(info);
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Error validating attestation information");
+            ChipLogError(Controller, "Error validating attestation information: %" CHIP_ERROR_FORMAT, err.Format());
             CommissioningStageComplete(CHIP_ERROR_FAILED_DEVICE_ATTESTATION);
             return;
         }
     }
     break;
     case CommissioningStage::kAttestationRevocationCheck: {
-        ChipLogProgress(Controller, "Verifying device's DAC chain revocation status");
+        ChipLogProgress(Controller, "Verifying the device's DAC chain revocation status");
         if (IsAttestationInformationMissing(params))
         {
             ChipLogError(Controller, "Missing attestation information");
@@ -3547,9 +3546,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             params.GetAttestationSignature().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
             params.GetAttestationNonce().Value(), params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value());
 
-        if (CheckForRevokedDACChain(info) != CHIP_NO_ERROR)
+        CHIP_ERROR err = CheckForRevokedDACChain(info);
+
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Error validating device's DAC chain revocation status");
+            ChipLogError(Controller, "Error validating device's DAC chain revocation status: %" CHIP_ERROR_FORMAT, err.Format());
             CommissioningStageComplete(CHIP_ERROR_FAILED_DEVICE_ATTESTATION);
             return;
         }
@@ -3618,7 +3619,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                      params.GetCSRNonce().Value());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to validate CSR");
+            ChipLogError(Controller, "Failed to validate CSR: %" CHIP_ERROR_FORMAT, err.Format());
         }
         CommissioningStageComplete(err);
         return;
@@ -3636,10 +3637,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                     params.GetPAI().Value(), params.GetCSRNonce().Value());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to process Op CSR");
-            // Handle error, and notify session failure to the commissioner application.
-            ChipLogError(Controller, "Failed to process the certificate signing request");
-            // TODO: Map error status to correct error code
+            ChipLogError(Controller, "Failed to process Operational Certificate Signing Request (CSR): %" CHIP_ERROR_FORMAT,
+                         err.Format());
             CommissioningStageComplete(err);
             return;
         }
@@ -3663,7 +3662,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         err = proxy->SetPeerId(params.GetRootCert().Value(), params.GetNoc().Value());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Error setting peer id: %s", err.AsString());
+            ChipLogError(Controller, "Error setting peer id: %" CHIP_ERROR_FORMAT, err.Format());
             CommissioningStageComplete(err);
             return;
         }
@@ -3687,7 +3686,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         if (err != CHIP_NO_ERROR)
         {
             // We won't get any async callbacks here, so just complete our stage.
-            ChipLogError(Controller, "Error sending operational certificate: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Controller, "Error installing operational certificate with AddNOC: %" CHIP_ERROR_FORMAT, err.Format());
             CommissioningStageComplete(err);
             return;
         }
@@ -3696,7 +3695,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kConfigureTrustedTimeSource: {
         if (!params.GetTrustedTimeSource().HasValue())
         {
-            ChipLogError(Controller, "ConfigureTrustedTimeSource stage called with no trusted time source data");
+            ChipLogError(Controller, "ConfigureTrustedTimeSource stage called with no trusted time source data!");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
@@ -3796,7 +3795,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             operationalDataset.Init(params.GetThreadOperationalDataset().Value()) != CHIP_NO_ERROR ||
             operationalDataset.GetExtendedPanIdAsByteSpan(extendedPanId) != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to get extended pan ID for thread operational dataset\n");
+            ChipLogError(Controller, "Invalid Thread operational dataset configured at commissioner!");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
@@ -3897,7 +3896,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             operationalDataset.Init(params.GetThreadOperationalDataset().Value()) != CHIP_NO_ERROR ||
             operationalDataset.GetExtendedPanIdAsByteSpan(extendedPanId) != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to get extended pan ID for thread operational dataset\n");
+            ChipLogError(Controller, "Invalid Thread operational dataset configured at commissioner!");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }

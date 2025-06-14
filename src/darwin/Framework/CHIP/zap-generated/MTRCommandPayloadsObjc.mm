@@ -32923,9 +32923,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _maxBitRate = @(0);
 
-        _minFragmentLen = @(0);
+        _minKeyFrameInterval = @(0);
 
-        _maxFragmentLen = @(0);
+        _maxKeyFrameInterval = @(0);
 
         _watermarkEnabled = nil;
 
@@ -32948,8 +32948,8 @@ NS_ASSUME_NONNULL_BEGIN
     other.maxResolution = self.maxResolution;
     other.minBitRate = self.minBitRate;
     other.maxBitRate = self.maxBitRate;
-    other.minFragmentLen = self.minFragmentLen;
-    other.maxFragmentLen = self.maxFragmentLen;
+    other.minKeyFrameInterval = self.minKeyFrameInterval;
+    other.maxKeyFrameInterval = self.maxKeyFrameInterval;
     other.watermarkEnabled = self.watermarkEnabled;
     other.osdEnabled = self.osdEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -32960,7 +32960,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen, _watermarkEnabled, _osdEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minKeyFrameInterval:%@; maxKeyFrameInterval:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minKeyFrameInterval, _maxKeyFrameInterval, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 
@@ -32999,10 +32999,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.maxBitRate = self.maxBitRate.unsignedIntValue;
     }
     {
-        encodableStruct.minFragmentLen = self.minFragmentLen.unsignedShortValue;
+        encodableStruct.minKeyFrameInterval = self.minKeyFrameInterval.unsignedShortValue;
     }
     {
-        encodableStruct.maxFragmentLen = self.maxFragmentLen.unsignedShortValue;
+        encodableStruct.maxKeyFrameInterval = self.maxKeyFrameInterval.unsignedShortValue;
     }
     {
         if (self.watermarkEnabled != nil) {
@@ -34426,7 +34426,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _videoStreamID = @(0);
 
-        _viewport = [MTRCameraAVSettingsUserLevelManagementClusterViewportStruct new];
+        _viewport = [MTRDataTypeViewportStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }

@@ -40,7 +40,7 @@ public:
 
     virtual void VideoStreamAllocated(uint16_t aStreamID) override;
     virtual void VideoStreamDeallocated(uint16_t aStreamID) override;
-    virtual void DefaultViewportUpdated(Structs::ViewportStruct::Type aViewport) override;
+    virtual void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) override;
 
     /**
      * delegate command handlers
@@ -53,10 +53,11 @@ public:
                                                          Optional<uint8_t> aZoom) override;
     Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset) override;
     Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) override;
-    Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport) override;
+    Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
+                                                        Globals::Structs::ViewportStruct::Type aViewport) override;
     Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                          Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                         Structs::ViewportStruct::Type & aViewport) override;
+                                                         Globals::Structs::ViewportStruct::Type & aViewport) override;
 };
 
 void Shutdown();
