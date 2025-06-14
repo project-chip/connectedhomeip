@@ -33,6 +33,9 @@ choice OPENTHREAD_DEVICE_TYPE
 	default OPENTHREAD_MTD
 endchoice
 
+config CHIP_USE_OPENTHREAD_ENDPOINT
+	default y
+
 endif # NET_L2_OPENTHREAD
 
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
