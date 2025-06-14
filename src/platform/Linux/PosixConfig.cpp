@@ -24,6 +24,8 @@
  *          key-value config calls to the correct partition.
  */
 
+#include <string>
+
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
@@ -31,6 +33,10 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
 #include <platform/Linux/PosixConfig.h>
+
+extern "C" {
+uint16_t gFoobarPort = 0;
+}
 
 namespace chip {
 namespace DeviceLayer {
@@ -462,7 +468,9 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     if (strcmp(ns, kConfigNamespace_ChipFactory) == 0)
     {
         storage = &gChipLinuxFactoryStorage;
-        err     = storage->Init(CHIP_DEFAULT_FACTORY_PATH);
+        char buffer[128];
+        snprintf(buffer, sizeof(buffer), "/tmp/chip_factory_%hu.ini", gFoobarPort);
+        err     = storage->Init(buffer);
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
