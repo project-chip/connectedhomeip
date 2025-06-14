@@ -2414,6 +2414,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
     def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [
     ], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: typing.Optional[FabricAdmin.FabricAdmin] = None, name: str = '', keypair: typing.Optional[p256keypair.P256Keypair] = None):
+        assert fabricAdmin is not None  # fabricAdmin must be provided
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
@@ -2454,7 +2455,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._caIndex
 
     @property
-    def fabricAdmin(self) -> FabricAdmin.FabricAdmin:
+    def fabricAdmin(self) -> typing.Optional[FabricAdmin.FabricAdmin]:
         return self._fabricAdmin
 
     async def Commission(self, nodeid) -> int:
@@ -2706,7 +2707,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         if parameters is None:
             raise ValueError("ICD registration parameter required.")
-        if len(parameters.symmetricKey) != 16:
+        if parameters.symmetricKey is None or len(parameters.symmetricKey) != 16:
             raise ValueError("symmetricKey should be 16 bytes")
 
         self.CheckIsActive()
@@ -2943,7 +2944,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
 
         # Device should hold a reference to the key to avoid it being GC-ed.
         self._externalKeyPair = operationalKey
-        nativeKey = operationalKey.create_native_object()
+        nativeKey = operationalKey._create_native_object()
 
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
