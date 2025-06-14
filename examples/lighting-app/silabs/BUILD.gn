@@ -215,7 +215,10 @@ silabs_executable("lighting_app") {
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-Map=matter-silabs-lighting-example.map",
+  ]
 
   if (chip_print_memory_usage) {
     ldflags += [
