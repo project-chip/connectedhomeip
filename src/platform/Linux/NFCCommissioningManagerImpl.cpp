@@ -68,37 +68,13 @@ namespace {} // namespace
 
 static SCARD_IO_REQUEST pioSendPci;
 
-// Message to send to an NFC Tag.
-class NFCMessage
-{
-private:
-    // Pointer to the NFC Tag instance to communicate with
-    TagInstance * pTagInstance;
-
-    uint8_t * pMessage;
-    size_t messageSize = 0;
-
-public:
-    NFCMessage(TagInstance * instance, System::PacketBufferHandle && msgBuf) : pTagInstance(instance)
-    {
-        messageSize = msgBuf->DataLength();
-        pMessage    = new uint8_t[messageSize];
-        std::memcpy(pMessage, msgBuf->Start(), messageSize);
-    }
-
-    ~NFCMessage() { delete[] pMessage; }
-
-    TagInstance * GetTagInstance() { return pTagInstance; }
-
-    uint8_t * GetMessage() { return pMessage; }
-
-    size_t GetMessageSize() { return messageSize; }
-};
-
 // This NFC Tag contains all the variables, handles and buffers related to one NFC tag instance
 class TagInstance
 {
 private:
+    static constexpr uint32_t kMagicNumber = 0xDEADBEEF;
+
+    uint32_t mMagicNumber;
     Transport::NFCBase * nfcBase;
     const Transport::PeerAddress peerAddress;
     char * readerName;
@@ -122,6 +98,7 @@ public:
     {
         readerName    = strdup(name); // Allocate memory and copy the string
         discriminator = 0;            // Will be retrieved when RetrieveDiscriminator() is called
+        mMagicNumber  = kMagicNumber;
 
         memset(mAPDUTxBuffer, 0, sizeof(mAPDUTxBuffer));
         memset(mAPDURxBuffer, 0, sizeof(mAPDURxBuffer));
@@ -134,7 +111,10 @@ public:
         {
             free(readerName);
         }
+        mMagicNumber = 0; // Invalidate the magic number
     }
+
+    bool IsValid() const { return mMagicNumber == kMagicNumber; }
 
     void Print()
     {
@@ -176,12 +156,12 @@ public:
     //
     // When the tag's response is fully received, OnNfcTagResponse() notification
     // will be called.
-    void SendChainedAPDUs(uint8_t * pMessage, size_t messageSize)
+    void SendChainedAPDUs(ByteSpan dataToSend)
     {
         CHIP_ERROR res;
-        uint32_t totalLength         = static_cast<uint32_t>(messageSize);
-        uint32_t nbrOfBytesRemaining = static_cast<uint32_t>(messageSize);
-        uint8_t * pNextDataToSend    = pMessage;
+        uint32_t totalLength            = static_cast<uint32_t>(dataToSend.size());
+        uint32_t nbrOfBytesRemaining    = static_cast<uint32_t>(dataToSend.size());
+        const uint8_t * pNextDataToSend = dataToSend.data();
 
         while (nbrOfBytesRemaining > 0)
         {
@@ -431,7 +411,7 @@ public:
 
     /////////////////////////////////////////////////////////////////
 
-    CHIP_ERROR SendTransportAPDU(uint8_t * dataToSend, uint32_t dataToSendLength, bool isLastBlock, uint32_t totalLength,
+    CHIP_ERROR SendTransportAPDU(const uint8_t * dataToSend, uint32_t dataToSendLength, bool isLastBlock, uint32_t totalLength,
                                  uint8_t * pRcvBuffer, uint32_t * pRcvLength)
     {
 
@@ -499,12 +479,14 @@ public:
 
     CHIP_ERROR SendOnNfcTagResponse(System::PacketBufferHandle && buffer)
     {
+        chip::DeviceLayer::StackLock lock;
         nfcBase->OnNfcTagResponse(peerAddress, std::move(buffer));
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SendOnNfcTagError()
     {
+        chip::DeviceLayer::StackLock lock;
         nfcBase->OnNfcTagError(peerAddress);
         return CHIP_NO_ERROR;
     }
@@ -530,10 +512,27 @@ CHIP_ERROR NFCCommissioningManagerImpl::_Init()
 
     pLastTagInstanceUsed = nullptr;
 
+    // Start the NFC processing thread
+    mThreadRunning = true;
+    mNfcThread     = std::thread(&NFCCommissioningManagerImpl::NfcThreadMain, this);
+
     return CHIP_NO_ERROR;
 }
 
-void NFCCommissioningManagerImpl::_Shutdown() {}
+void NFCCommissioningManagerImpl::_Shutdown()
+{
+    // Stop the NFC thread
+    {
+        std::lock_guard<std::mutex> lock(mQueueMutex);
+        mThreadRunning = false;
+        mQueueCondition.notify_one();
+    }
+
+    if (mNfcThread.joinable())
+    {
+        mNfcThread.join();
+    }
+}
 
 // ===== start implement virtual methods on NfcApplicationDelegate.
 
@@ -582,6 +581,15 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
     return canSendToPeer;
 }
 
+void NFCCommissioningManagerImpl::EnqueueMessage(std::unique_ptr<NFCMessage> message)
+{
+    {
+        std::lock_guard<std::mutex> lock(mQueueMutex);
+        mMessageQueue.push(std::move(message)); // Move the unique_ptr into the queue
+    }
+    mQueueCondition.notify_one();
+}
+
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     TagInstance * pTargetedTagInstance = nullptr;
@@ -607,37 +615,57 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
 
     VerifyOrReturnLogError(pTargetedTagInstance != nullptr, CHIP_ERROR_PEER_NODE_NOT_FOUND);
 
-    NFCMessage * nfcMessage = new (std::nothrow) NFCMessage(pTargetedTagInstance, std::move(msgBuf));
-    VerifyOrReturnLogError(((nfcMessage != nullptr) && (nfcMessage->GetMessage() != nullptr)), CHIP_ERROR_NO_MEMORY);
+    // Create the NFCMessage as a unique_ptr
+    auto nfcMessage = std::make_unique<NFCMessage>(pTargetedTagInstance, std::move(msgBuf));
+    VerifyOrReturnLogError(nfcMessage->IsMessageValid(), CHIP_ERROR_NO_MEMORY);
 
-    // SendChainedAPDUs(pTagInstance) will be executed asynchronously
-    PlatformMgr().ScheduleWork(SendToNfcTag, reinterpret_cast<intptr_t>(nfcMessage));
+    // Enqueue the message for processing in the NFC thread
+    EnqueueMessage(std::move(nfcMessage));
 
     return CHIP_NO_ERROR;
 }
 
-// Static function called by ScheduleWork()
-void NFCCommissioningManagerImpl::SendToNfcTag(intptr_t arg)
+void NFCCommissioningManagerImpl::NfcThreadMain()
 {
-    sInstance.SendChainedAPDUs(arg);
-}
-
-void NFCCommissioningManagerImpl::SendChainedAPDUs(intptr_t arg)
-{
-    NFCMessage * nfcMessage = reinterpret_cast<NFCMessage *>(arg);
-    if (nfcMessage == nullptr)
+    while (mThreadRunning)
     {
-        ChipLogError(DeviceLayer, "Invalid nfcMessage!");
-        return;
+        std::unique_ptr<NFCMessage> message;
+
+        // Wait for a message to process
+        {
+            std::unique_lock<std::mutex> lock(mQueueMutex);
+            mQueueCondition.wait(lock, [this]() { return !mMessageQueue.empty() || !mThreadRunning; });
+
+            // If the thread is signaled to stop and the queue is empty, exit the loop
+            if (!mThreadRunning && mMessageQueue.empty())
+            {
+                break;
+            }
+
+            // Retrieve the message from the queue
+            message = std::move(mMessageQueue.front());
+            mMessageQueue.pop();
+        }
+
+        // Process the message
+        if (message)
+        {
+            TagInstance * tagInstance = message->GetTagInstance();
+            if (tagInstance == nullptr || !tagInstance->IsValid())
+            {
+                ChipLogError(DeviceLayer, "Invalid TagInstance detected. Discarding message.");
+                continue; // Skip processing this message
+            }
+
+            // Send the data to the NFC tag
+            ByteSpan dataToSend = message->GetDataToSend();
+            tagInstance->SendChainedAPDUs(dataToSend);
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Null NFCMessage detected. Skipping.");
+        }
     }
-
-    uint8_t * pMessage = nfcMessage->GetMessage();
-    size_t messageSize = nfcMessage->GetMessageSize();
-    nfcMessage->GetTagInstance()->SendChainedAPDUs(pMessage, messageSize);
-
-    // When we reach this point, the message has been sent, the response has been
-    //  received. nfcMessage can be safely deleted.
-    delete nfcMessage;
 }
 
 // Start scan on all available readers and scan for NFC Tags.
