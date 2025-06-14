@@ -671,9 +671,14 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
+{
+    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, value.data(), value.size());
+}
+
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
     CHIP_ERROR err                    = CHIP_NO_ERROR;
     size_t keyLength                  = 0;
@@ -701,10 +706,18 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 
     keySpan.reduce_size(kEnableKeyLength);
     return err;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 }
+#else
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 } // namespace Provision
 } // namespace Silabs
