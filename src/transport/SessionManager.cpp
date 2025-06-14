@@ -32,12 +32,13 @@
 #include "transport/TraceMessage.h"
 #include <app/util/basic-types.h>
 #include <credentials/GroupDataProvider.h>
-#include <inttypes.h>
+#include <credentials/GroupDataProviderImpl.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPKeyIds.h>
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
@@ -1160,6 +1161,22 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     bool decrypted = false;
     while (!decrypted && iter->Next(groupContext))
     {
+        Crypto::SymmetricKeyContext * keyContext =
+            Credentials::GetGroupDataProvider()->GetKeyContext(groupContext.fabric_index, groupContext.group_id);
+        if (keyContext == nullptr)
+        {
+            continue;
+        }
+
+        // Get session ID from the key
+        uint16_t keySessionId = keyContext->GetKeyHash();
+
+        // Only try to decrypt if the session IDs match
+        if (keySessionId != partialPacketHeader.GetSessionId())
+        {
+            continue;
+        }
+
         CryptoContext context(groupContext.keyContext);
         msgCopy = msg.CloneData();
         if (msgCopy.IsNull())
