@@ -36,7 +36,6 @@ using namespace std::chrono_literals;
 namespace {
 
 // Constants
-constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
 
@@ -321,7 +320,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mTrack->onMessage(
         [this, addr](rtc::binary message) {
             // This is an RTP packet
-            sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), int(message.size()), 0,
+            sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                    reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
         },
         nullptr);

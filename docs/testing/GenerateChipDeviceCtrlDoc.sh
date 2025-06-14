@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright (c) 2024 Project CHIP Authors
 #
@@ -14,13 +15,24 @@
 # limitations under the License.
 #
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+SCRIPT_DIR=$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)
+export PYTHONPATH="$SCRIPT_DIR/../../src/controller/python"
+FILENAME='ChipDeviceCtrlAPI.md'
 
-pydoc-markdown -m chip.ChipDeviceCtrl '{
+if [[ $# -ne 1 ]]; then
+    echo 'usage: GenerateChipDeviceCtrlDoc.sh build_directory'
+    exit 1
+fi
+
+pydoc-markdown -I "$PYTHONPATH" --py3 -m chip.ChipDeviceCtrl '{
     renderer: {
       type: markdown,
       descriptive_class_title: false,
       render_toc: true,
-      insert_header_anchors: true
+      render_toc_title: "ChipDeviceCtrl.py API",
+      insert_header_anchors: false,
+      add_full_prefix: false,
     }
-  }' >"$SCRIPT_DIR"/ChipDeviceCtrlAPI.md
+  }' >"$1"/"$FILENAME"
+
+awk '/\(\#chip.ChipDeviceCtrl/ {gsub(/\./, "", $0)} 1' "$1/$FILENAME" >"$1"/tmp && mv "$1"/tmp "$1/$FILENAME"
