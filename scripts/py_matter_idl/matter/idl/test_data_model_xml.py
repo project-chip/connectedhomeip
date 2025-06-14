@@ -28,9 +28,9 @@ except ImportError:
 
 from matter.idl.generators.idl import IdlGenerator
 from matter.idl.generators.storage import GeneratorStorage
-from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.lint.lint_rules_parser import CreateParser as CreateLintParser
 from matter.idl.lint.lint_rules_parser import LintRulesContext
+from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.matter_idl_types import Idl
 
 
