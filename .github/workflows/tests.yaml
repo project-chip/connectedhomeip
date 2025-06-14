@@ -195,6 +195,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/scene.xml \
+                      src/app/zap-templates/zcl/data-model/chip/service-area-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/soil-measurement-cluster.xml \
