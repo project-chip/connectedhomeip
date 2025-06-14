@@ -1054,7 +1054,11 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    if (_this->mIsPeerLIT)
+    // If subscription client is capable to handle checkIn message and peer operation mode is LIT,
+    // CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT is set as subscriptionTerminationCause, subscription drops can usefully wait for a
+    // check-in message before trying to resubscribe, otherwise, CHIP_ERROR_TIMEOUT is used as subscriptionTerminationCause, and the
+    // subscription retry would not wait for check-in and still continue.
+    if (_this->mIsPeerLIT && _this->mReadPrepareParams.mRegisteredCheckInToken)
     {
         subscriptionTerminationCause = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
     }
@@ -1184,7 +1188,13 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
         mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
     }
 
-    mIsPeerLIT = aReadPrepareParams.mIsPeerLIT;
+    mIsPeerLIT                                 = aReadPrepareParams.mIsPeerLIT;
+    mReadPrepareParams.mRegisteredCheckInToken = aReadPrepareParams.mRegisteredCheckInToken;
+
+    if (aReadPrepareParams.mRegisteredCheckInToken)
+    {
+        ChipLogProgress(DataManagement, "Peer device has been registered with ICD CheckIn token");
+    }
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
 
