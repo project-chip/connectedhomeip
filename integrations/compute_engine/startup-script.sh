@@ -32,6 +32,10 @@ source scripts/activate.sh
 python3 -u scripts/examples/conformance_report.py
 cp /tmp/conformance_report/conformance_report.html out/coverage/coverage/html
 
+# Generate Memory Usage Report
+python3 -u scripts/tools/memory/memory_report.py
+cp /tmp/memory_report/memory_report.html out/coverage/coverage/html
+
 # Upload
 cd out/coverage/coverage
 gcloud app deploy webapp_config.yaml 2>&1 | tee /tmp/matter_publish.log
