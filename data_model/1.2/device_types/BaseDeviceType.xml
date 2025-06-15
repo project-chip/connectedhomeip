@@ -97,4 +97,30 @@ Davis, CA 95616, USA
     <condition name="EZ-Target" summary="the endpoint is a Target for Zigbee EZ-Mode Finding &amp; Binding"/>
     <condition name="BridgedPowerSourceInfo" summary="the endpoint represents a Bridged Device, for which information about the state of its power source is available to the Bridge"/>
   </conditions>
+  <clusters>
+    <cluster id="0x001D" name="Descriptor" side="server">
+      <mandatoryConform/>
+      <features>
+        <feature code="" name="TagList">
+          <mandatoryConform>
+            <condition name="Duplicate"/>
+          </mandatoryConform>
+        </feature>
+      </features>
+    </cluster>
+    <cluster id="0x001E" name="Binding" side="server">
+      <mandatoryConform>
+        <andTerm>
+          <condition name="Simple"/>
+          <condition name="Client"/>
+        </andTerm>
+      </mandatoryConform>
+    </cluster>
+    <cluster id="0x0040" name="Fixed Label" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0041" name="User Label" side="server">
+      <optionalConform/>
+    </cluster>
+  </clusters>
 </deviceType>
