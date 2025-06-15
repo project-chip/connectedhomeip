@@ -71,6 +71,7 @@ jobs:
                         --target linux-arm64-fabric-admin-clang-rpc \
                         --target linux-arm64-fabric-bridge-no-ble-clang-rpc \
                         --target linux-arm64-fabric-sync-no-ble-clang \
+                        --target linux-arm64-camera-controller-clang \
                         build \
                      "
             - name: Bloat report - chip-tool
