@@ -936,8 +936,7 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
     if specification_version < 0x01040000:
         specification_version &= 0xFFFF00FF
 
-    version_to_dm = {0x01020000: PrebuiltDataModelDirectory.k1_2,
-                     0x01030000: PrebuiltDataModelDirectory.k1_3,
+    version_to_dm = {0x01030000: PrebuiltDataModelDirectory.k1_3,
                      0x01040000: PrebuiltDataModelDirectory.k1_4,
                      0x01040100: PrebuiltDataModelDirectory.k1_4_1,
                      0x01040200: PrebuiltDataModelDirectory.k1_4_2}

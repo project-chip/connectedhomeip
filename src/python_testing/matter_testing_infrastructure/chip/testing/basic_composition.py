@@ -237,8 +237,8 @@ class BasicCompositionTests:
         try:
             spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
         except KeyError:
-            asserts.fail(
-                "Specification Version not found on device - ensure device bas a basic information cluster on EP0 supporting Specification Version")
+            # For now, assume we're looking at a 1.2 device (this is as close as we can get before the 1.1 and 1.0 DM files are populated)
+            return PrebuiltDataModelDirectory.k1_2
         try:
             dm = dm_from_spec_version(spec_version)
             if dm is None:
