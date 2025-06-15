@@ -16,17 +16,14 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/BitMask.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
-chip::BitMask<Feature> GetFeatureMapFromCmdLine();
+chip::BitMask<DeviceEnergyManagement::Feature> GetDEMFeatureMap();
 
 } // namespace DeviceEnergyManagement
 } // namespace Clusters

@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#include "EnergyManagementAppCmdLineOptions.h"
-
+#include <DEMDelegate.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
 #include <ElectricalPowerMeasurementDelegate.h>
@@ -44,7 +43,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
-using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::PowerTopology;
 
 static std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
