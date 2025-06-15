@@ -30,6 +30,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <set>
 
 using namespace chip;
 using namespace chip::app;
@@ -1647,6 +1648,20 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
     }
 }
+bool CameraAVStreamMgmtServer::StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities)
+{
+    std::set<Globals::StreamUsageEnum> seenStreamUsages;
+
+    for (auto streamUsage : aStreamUsagePriorities)
+    {
+        if (!seenStreamUsages.insert(streamUsage).second)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
                                                          const Commands::VideoStreamAllocate::DecodableType & commandData)
@@ -2011,6 +2026,10 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
     std::vector<Globals::StreamUsageEnum> rankedStreamPriorities;
     auto iter = streamPriorities.begin();
 
+    // If any video, audio or snapshot streams exist fail the command.
+    VerifyOrReturn(!mAllocatedVideoStreams.empty() || !mAllocatedAudioStreams.empty() || !mAllocatedSnapshotStreams.empty(),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
+
     while (iter.Next())
     {
         auto & streamUsage = iter.GetValue();
@@ -2019,6 +2038,11 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
+        // If any requested value is not found in SupportedStreamUsages,
+        // return DynamicConstraintError.
+        auto it = std::find(mSupportedStreamUsages.begin(), mSupportedStreamUsages.end(), streamUsage);
+        VerifyOrReturn(it != mSupportedStreamUsages.end(),
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
         rankedStreamPriorities.push_back(streamUsage);
     }
 
@@ -2027,6 +2051,11 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
         return;
     }
+
+    // If there are duplicate stream usages in StreamPriorities,
+    // return AlreadyExists
+    VerifyOrReturn(!StreamPrioritiesHasDuplicates(rankedStreamPriorities),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists));
 
     CHIP_ERROR err = SetStreamUsagePriorities(rankedStreamPriorities);
 

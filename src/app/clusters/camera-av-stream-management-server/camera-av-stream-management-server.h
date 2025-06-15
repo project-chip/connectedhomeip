@@ -719,6 +719,8 @@ private:
 
     void ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
 
+    bool StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
+
     /**
      * @brief Inherited from CommandHandlerInterface
      */
