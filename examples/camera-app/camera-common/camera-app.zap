@@ -5224,7 +5224,7 @@
           "name": "Zone Management",
           "code": 1360,
           "mfgCode": null,
-          "define": "CAMERA_AV_STREAM_MANAGEMENT_CLUSTER",
+          "define": "ZONE_MANAGEMENT_CLUSTER",
           "side": "server",
           "enabled": 1,
           "apiMaturity": "provisional",
