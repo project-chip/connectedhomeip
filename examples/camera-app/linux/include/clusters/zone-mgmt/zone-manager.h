@@ -35,12 +35,13 @@ namespace ZoneManagement {
 class ZoneManager : public ZoneMgmtDelegate
 {
 public:
-    Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStruct & zone,
+    Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone,
                                                                 uint16_t & outZoneID) override;
 
-    Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStruct & zone) override;
+    Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID,
+                                                                const TwoDCartesianZoneDecodableStruct & zone) override;
 
-    Protocols::InteractionModel::Status GetTwoDCartesianZone(const DataModel::Nullable<uint16_t> zoneID,
+    Protocols::InteractionModel::Status GetTwoDCartesianZone(const Optional<DataModel::Nullable<uint16_t>> zoneID,
                                                              const std::vector<TwoDCartesianZoneStruct> & outZones) override;
 
     Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID) override;

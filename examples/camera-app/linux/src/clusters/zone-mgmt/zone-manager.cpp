@@ -35,20 +35,22 @@ void ZoneManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
     mCameraDevice = aCameraDevice;
 }
 
-Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const TwoDCartesianZoneStruct & zone, uint16_t & outZoneID)
+Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone,
+                                                                         uint16_t & outZoneID)
 {
     outZoneID = kInvalidZoneID;
 
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStruct & zone)
+Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_t zoneID,
+                                                                         const TwoDCartesianZoneDecodableStruct & zone)
 {
 
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ZoneManager::GetTwoDCartesianZone(const DataModel::Nullable<uint16_t> zoneID,
+Protocols::InteractionModel::Status ZoneManager::GetTwoDCartesianZone(const Optional<DataModel::Nullable<uint16_t>> zoneID,
                                                                       const std::vector<TwoDCartesianZoneStruct> & outZones)
 {
 

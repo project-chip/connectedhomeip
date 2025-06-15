@@ -35,10 +35,11 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-using TwoDCartesianZoneStruct   = Structs::TwoDCartesianZoneStruct::Type;
-using TwoDCartesianVertexStruct = Structs::TwoDCartesianVertexStruct::Type;
-using ZoneInformationStruct     = Structs::ZoneInformationStruct::Type;
-using ZoneTriggerControlStruct  = Structs::ZoneTriggerControlStruct::Type;
+using TwoDCartesianZoneDecodableStruct = Structs::TwoDCartesianZoneStruct::DecodableType;
+using TwoDCartesianZoneStruct          = Structs::TwoDCartesianZoneStruct::Type;
+using TwoDCartesianVertexStruct        = Structs::TwoDCartesianVertexStruct::Type;
+using ZoneInformationStruct            = Structs::ZoneInformationStruct::Type;
+using ZoneTriggerControlStruct         = Structs::ZoneTriggerControlStruct::Type;
 
 class ZoneMgmtServer;
 
@@ -64,7 +65,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStruct & zone,
+    virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone,
                                                                         uint16_t & outZoneID) = 0;
 
     /**
@@ -77,7 +78,8 @@ public:
      *   @return Success if the update is successful; otherwise, the command SHALL be
      *   rejected with an appropriate error.
      */
-    virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStruct & zone) = 0;
+    virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID,
+                                                                        const TwoDCartesianZoneDecodableStruct & zone) = 0;
 
     /**
      *    @brief Command Delegate for retrieval of a TwoDCartesianZone for a given zoneID.
@@ -89,7 +91,7 @@ public:
      *   @return Success if the retrieval is successful; otherwise, the command SHALL be
      *   rejected with an appropriate error.
      */
-    virtual Protocols::InteractionModel::Status GetTwoDCartesianZone(const DataModel::Nullable<uint16_t> zoneID,
+    virtual Protocols::InteractionModel::Status GetTwoDCartesianZone(const Optional<DataModel::Nullable<uint16_t>> zoneID,
                                                                      const std::vector<TwoDCartesianZoneStruct> & outZones) = 0;
 
     /**
@@ -208,6 +210,12 @@ public:
     uint8_t GetSensitivity() const { return mSensitivity; }
     const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const { return mTwoDCartesianMax; }
 
+    CHIP_ERROR AddZone(const ZoneInformationStruct & zone);
+    CHIP_ERROR RemoveZone(uint16_t zoneId);
+
+    CHIP_ERROR AddTrigger(const ZoneTriggerControlStruct & trigger);
+    CHIP_ERROR RemoveTrigger(uint16_t zoneId);
+
     // Send Zone events
     Protocols::InteractionModel::Status GenerateZoneTriggerredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
@@ -244,6 +252,7 @@ private:
 
     CHIP_ERROR ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
+    Protocols::InteractionModel::Status ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone);
     /**
      * @brief Inherited from CommandHandlerInterface
      */

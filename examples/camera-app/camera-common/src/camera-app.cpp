@@ -68,7 +68,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
         avsmFeatures.Set(CameraAvStreamManagement::Feature::kAudio);
-        avsmOptionalAttrs.Set(OptionalAttribute::kMicrophoneAGCEnabled);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled);
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasLocalStorage())
@@ -90,26 +90,26 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
     {
         avsmFeatures.Set(CameraAvStreamManagement::Feature::kNightVision);
-        avsmOptionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
     {
-        avsmOptionalAttrs.Set(OptionalAttribute::kHardPrivacyModeOn);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn);
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
     {
-        avsmOptionalAttrs.Set(OptionalAttribute::kStatusLightEnabled);
-        avsmOptionalAttrs.Set(OptionalAttribute::kStatusLightBrightness);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness);
     }
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
     {
-        features.Set(CameraAvStreamManagement::Feature::kImageControl);
-        avsmOptionalAttrs.Set(OptionalAttribute::kImageFlipVertical);
-        avsmOptionalAttrs.Set(OptionalAttribute::kImageFlipHorizontal);
-        avsmOptionalAttrs.Set(OptionalAttribute::kImageRotation);
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kImageControl);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kImageRotation);
     }
 
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
