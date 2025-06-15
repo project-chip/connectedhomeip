@@ -128,6 +128,8 @@ CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t aSensitivity)
 
     mDelegate.OnAttributeChanged(Attributes::Sensitivity::Id);
     MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id));
+
+    return CHIP_NO_ERROR;
 }
 
 // AttributeAccessInterface
@@ -162,14 +164,15 @@ CHIP_ERROR ZoneMgmtServer::Read(const ConcreteReadAttributePath & aPath, Attribu
         ReturnErrorOnFailure(aEncoder.Encode(mSensitivityMax));
         break;
     case Sensitivity::Id:
-        VerifyOrReturnError(
-            !HasFeature(Feature::kPerZoneSens), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSens feature is supported", mEndpointId));
+        VerifyOrReturnError(!HasFeature(Feature::kPerZoneSensitivity), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSensitivity feature is supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSensitivity));
         break;
     case TwoDCartesianMax::Id:
         VerifyOrReturnError(
-            HasFeature(Feature::kTwoDCart), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kTwoDimensionalCartesianZone), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get TwoDCartesianMax, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mTwoDCartesianMax));
         break;
@@ -185,9 +188,10 @@ CHIP_ERROR ZoneMgmtServer::Write(const ConcreteDataAttributePath & aPath, Attrib
     switch (aPath.mAttributeId)
     {
     case Sensitivity::Id: {
-        VerifyOrReturnError(
-            !HasFeature(Feature::kPerZoneSens), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSens feature is supported", mEndpointId));
+        VerifyOrReturnError(!HasFeature(Feature::kPerZoneSensitivity), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSensitivity feature is supported",
+                                         mEndpointId));
         uint8_t sensitivity;
         ReturnErrorOnFailure(aDecoder.Decode(sensitivity));
         return SetSensitivity(sensitivity);
@@ -207,7 +211,7 @@ void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     case Commands::CreateTwoDCartesianZone::Id:
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Creating TwoDCartesian Zone", mEndpointId);
 
-        if (!HasFeature(Feature::kTwoDCart) || !HasFeature(Feature::kUserDefined))
+        if (!HasFeature(Feature::kTwoDimensionalCartesianZone) || !HasFeature(Feature::kUserDefined))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -222,7 +226,7 @@ void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     case Commands::UpdateTwoDCartesianZone::Id:
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Updating TwoDCartesian Zone", mEndpointId);
 
-        if (!HasFeature(Feature::kTwoDCart) || !HasFeature(Feature::kUserDefined))
+        if (!HasFeature(Feature::kTwoDimensionalCartesianZone) || !HasFeature(Feature::kUserDefined))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -237,7 +241,7 @@ void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     case Commands::GetTwoDCartesianZone::Id:
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Get TwoDCartesian Zone", mEndpointId);
 
-        if (!HasFeature(Feature::kTwoDCart))
+        if (!HasFeature(Feature::kTwoDimensionalCartesianZone))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -280,24 +284,89 @@ void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
+CHIP_ERROR ZoneMgmtServer::AddZone(const ZoneInformationStruct & zone)
+{
+    mZones.push_back(zone);
+    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
+    mDelegate.OnAttributeChanged(Attributes::Zones::Id);
+    MatterReportingAttributeChangeCallback(path);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ZoneMgmtServer::RemoveZone(uint16_t zoneId)
+{
+    mZones.erase(
+        std::remove_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & zone) { return zone.zoneID == zoneId; }),
+        mZones.end());
+    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
+    mDelegate.OnAttributeChanged(Attributes::Zones::Id);
+    MatterReportingAttributeChangeCallback(path);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ZoneMgmtServer::AddTrigger(const ZoneTriggerControlStruct & trigger)
+{
+    mTriggers.push_back(trigger);
+    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
+    mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
+    MatterReportingAttributeChangeCallback(path);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ZoneMgmtServer::RemoveTrigger(uint16_t zoneId)
+{
+    mTriggers.erase(std::remove_if(mTriggers.begin(), mTriggers.end(),
+                                   [&](const ZoneTriggerControlStruct & trigger) { return trigger.zoneID == zoneId; }),
+                    mTriggers.end());
+    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
+    mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
+    MatterReportingAttributeChangeCallback(path);
+
+    return CHIP_NO_ERROR;
+}
+
+Status ZoneMgmtServer::ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone)
+{
+    VerifyOrReturnError(zone.name.size() <= 32, Status::ConstraintError);
+
+    size_t listCount = 0;
+    if (zone.vertices.ComputeSize(&listCount) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(listCount >= 3 && listCount <= 12, Status::ConstraintError);
+    }
+
+    if (zone.color.HasValue())
+    {
+        VerifyOrReturnError(zone.color.Value().size() == 7 && zone.color.Value().size() == 9, Status::ConstraintError);
+    }
+
+    return Status::Success;
+}
+
 void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
                                                    const Commands::CreateTwoDCartesianZone::DecodableType & commandData)
 {
     Commands::CreateTwoDCartesianZoneResponse::Type response;
-    uint16_t zoneID = 0;
+    uint16_t zoneID     = 0;
+    auto & zoneToCreate = commandData.zone;
 
-    auto & zone = commandData.zone;
-
-    // Call the delegate
-    Status status = mDelegate.CreateTwoDCartesianZone(zone, zoneID);
-
+    Status status = ValidateTwoDCartesianZone(zoneToCreate);
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
-    // Add to the vector
+    // Call the delegate
+    status = mDelegate.CreateTwoDCartesianZone(zoneToCreate, zoneID);
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
 
     response.zoneID = zoneID;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -306,19 +375,23 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
 void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
                                                    const Commands::UpdateTwoDCartesianZone::DecodableType & commandData)
 {
-    auto & zoneID = commandData.zoneID;
-    auto & zone   = commandData.zone;
+    uint16_t zoneID     = commandData.zoneID;
+    auto & zoneToUpdate = commandData.zone;
 
-    // Call the delegate
-    Status status = mDelegate.UpdateTwoDCartesianZone(zoneID, zone);
-
+    Status status = ValidateTwoDCartesianZone(zoneToUpdate);
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
-    // Update vector
+    // Call the delegate
+    status = mDelegate.UpdateTwoDCartesianZone(zoneID, zoneToUpdate);
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
@@ -327,10 +400,9 @@ void ZoneMgmtServer::HandleGetTwoDCartesianZone(HandlerContext & ctx,
                                                 const Commands::GetTwoDCartesianZone::DecodableType & commandData)
 {
     Commands::GetTwoDCartesianZoneResponse::Type response;
-    auto & zoneID = commandData.zoneID;
+    Optional<DataModel::Nullable<uint16_t>> zoneID = commandData.zoneID;
 
     std::vector<TwoDCartesianZoneStruct> zones;
-
     // Call the delegate
     Status status = mDelegate.GetTwoDCartesianZone(zoneID, zones);
 
@@ -340,16 +412,17 @@ void ZoneMgmtServer::HandleGetTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    response.zones = zones;
+    response.zones = DataModel::List<const TwoDCartesianZoneStruct>(zones.data(), zones.size());
+
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void ZoneMgmtServer::HandleRemoveZone(HandlerContext & ctx, const Commands::RemoveZone::DecodableType & commandData)
 {
-    auto & zoneID = commandData.zoneID;
+    uint16_t zoneID = commandData.zoneID;
 
     // Call the delegate
-    Status status = mDelegate.RemoveZone(zoneID, zones);
+    Status status = mDelegate.RemoveZone(zoneID);
 
     if (status != Status::Success)
     {
@@ -363,7 +436,7 @@ void ZoneMgmtServer::HandleRemoveZone(HandlerContext & ctx, const Commands::Remo
 void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
                                                  const Commands::CreateOrUpdateTrigger::DecodableType & commandData)
 {
-    auto & trigger = commandData.trigger;
+    ZoneTriggerControlStruct trigger = commandData.trigger;
 
     // Call the delegate
     Status status = mDelegate.CreateOrUpdateTrigger(trigger);
@@ -379,7 +452,7 @@ void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
 
 void ZoneMgmtServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::RemoveTrigger::DecodableType & commandData)
 {
-    auto & zoneID = commandData.zoneID;
+    uint16_t zoneID = commandData.zoneID;
 
     // Call the delegate
     Status status = mDelegate.RemoveTrigger(zoneID);
