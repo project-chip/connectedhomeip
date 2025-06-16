@@ -1645,7 +1645,7 @@ class ChipDeviceControllerBase():
         for v in attributes:
             if len(v) == 2:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], 0, 0, v[1].value))
+                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
             else:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     v[0], v[1], v[2], 1, v[1].value))
@@ -1679,7 +1679,7 @@ class ChipDeviceControllerBase():
         for v in attributes:
             if len(v) == 2:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    invalid_endpoint, v[0], v[1], 1, v[0].value))
+                    invalid_endpoint, v[0], v[1], 1, v[0].value))   # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
             else:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     invalid_endpoint, v[0], 0, 0, v[0].value))
