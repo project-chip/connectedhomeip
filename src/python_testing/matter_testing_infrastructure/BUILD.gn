@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("//src/python_testing/matter_testing_infrastructure/data_model_xmls.gni")
+import("//src/python_testing/matter_testing_infrastructure/idt_tools.gni")
 import("$dir_pw_build/python.gni")
 import("$dir_pw_build/python_dist.gni")
 import("$dir_pw_build/zip.gni")
@@ -120,4 +121,9 @@ pw_python_distribution("chip-testing") {
     "${root_out_dir}/data_model/zip_1_4_1.zip > chip/testing/data_model/1.4.1/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4_2.zip > chip/testing/data_model/1.4.2/allfiles.zip",
   ]
+  if (include_idt_files) {
+    foreach(file, idt_files) {
+      extra_files += [ "${file} > chip/testing/" + get_path_info(file, "file") ]
+    }
+  }
 }

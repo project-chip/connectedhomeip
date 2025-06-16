@@ -1,0 +1,28 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+declare_args() {
+  # To build the chip-testing Python wheel with a full set of files
+  # for the Interoperability Debug Tool (IDT), set the following flag to `true`.
+  include_idt_files = false
+}
+
+idt_files = [
+  "${chip_root}/credentials/fetch_paa_certs_from_dcl.py",
+  "${chip_root}/src/python_testing/post_certification_tests/production_device_checks.py",
+  "${chip_root}/src/python_testing/TC_DA_1_2.py",
+  "${chip_root}/src/python_testing/TC_DA_1_7.py",
+]
