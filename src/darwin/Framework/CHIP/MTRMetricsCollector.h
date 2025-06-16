@@ -54,6 +54,8 @@ void ShutdownMetricsCollection();
  */
 - (MTRMetrics *)metricSnapshot:(BOOL)resetCollection;
 
+- (MTRMetrics *)metricSnapshotForCategory:(NSString *)category removeMetrics:(BOOL)removeMetrics;
+
 /**
  * @brief This method clears any metrics collected.
  */

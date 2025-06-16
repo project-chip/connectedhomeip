@@ -15,6 +15,8 @@
  */
 
 #import "MTRDeviceTestDelegate.h"
+#include <Foundation/Foundation.h>
+#include <Matter/Matter.h>
 
 @implementation MTRDeviceTestDelegate
 - (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state
@@ -159,6 +161,19 @@
 - (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device
 {
     return self.forceTimeSynchronizationLossDetectionCadenceToZero;
+}
+
+- (void)otaTransferEnded:(MTRDevice *)device metrics:(MTRMetrics *)metrics
+{
+    if (self.onOTATransferEnd != nil) {
+        NSArray<NSString *> * keys = [metrics allKeys];
+        NSMutableDictionary<NSString *, id> * dataDict = [NSMutableDictionary dictionaryWithCapacity:[keys count]];
+        for (NSString * key in keys) {
+            MTRMetricData * data = [metrics metricDataForKey:key];
+            [dataDict setValue:data forKey:key];
+        }
+        self.onOTATransferEnd(@[ dataDict ]);
+    }
 }
 
 @end
