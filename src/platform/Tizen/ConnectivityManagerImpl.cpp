@@ -207,11 +207,6 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
     Internal::WiFiMgr().RemoveAllConfigs();
 }
 
-bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    return false;
-}
-
 ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
 {
     return mWiFiAPMode;

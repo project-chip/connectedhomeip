@@ -51,7 +51,10 @@ CHIP_ERROR ProvideOfferCommand::RunCommand()
     // Convert the stream usage into its enum type:
     auto streamUsage = static_cast<StreamUsageEnum>(mStreamUsage);
 
-    return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage);
+    return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage,
+                                                  NullOptional, // "Empty" for video
+                                                  NullOptional  // "Empty" for audio
+    );
 }
 
 CHIP_ERROR SolicitOfferCommand::RunCommand()

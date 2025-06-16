@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcrunm_2_1_fifo
 #     script-args: >
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --storage-path admin_storage.json
@@ -32,7 +32,7 @@
 #       --endpoint 1
 #       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:0
 #       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2
-#       --app-pipe_prefix /tmp/chip_rvc_fifo_
+#       --app-pipe /tmp/rvcrunm_2_1_fifo
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -134,7 +134,9 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
 
-        if self.check_pics("RVCRUNM.S.M.CAN_TEST_MODE_FAILURE"):
+        can_test_mode_failure = self.check_pics("RVCRUNM.S.M.CAN_TEST_MODE_FAILURE")
+        can_manually_control = self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED")
+        if can_test_mode_failure and can_manually_control:
             asserts.assert_true(self.mode_fail in modes,
                                 "The MODE_CHANGE_FAIL PIXIT value (%d) is not a supported mode" % (self.mode_fail))
             self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.mode_fail))

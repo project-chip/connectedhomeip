@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include "fsl_sss_policy.h"
 
 ex_sss_boot_ctx_t gex_sss_chip_ctx;
+static int is_session_open = 0;
 
 #if ENABLE_REENTRANCY
 
@@ -75,10 +76,9 @@ static Mutex sSEObjMutex;
 
 #endif // #if ENABLE_REENTRANCY
 
-/* Open session to se05x */
-CHIP_ERROR se05x_sessionOpen(void)
+/* Open session to se05x secure element. Default is the plain session */
+CHIP_ERROR se05x_session_open(void)
 {
-    static int is_session_open = 0;
     if (is_session_open)
     {
         return CHIP_NO_ERROR;
@@ -112,13 +112,68 @@ CHIP_ERROR se05x_sessionOpen(void)
     return CHIP_NO_ERROR;
 }
 
+#if !ENABLE_SE05X_RND_GEN
+extern void free_entropy_context_h();
+#endif
+
+/* Close session to se05x */
+CHIP_ERROR se05x_close_session(void)
+{
+    if (!is_session_open)
+    {
+        ChipLogDetail(Crypto, "se05x info: session not open");
+    }
+    else
+    {
+        ex_sss_session_close(&gex_sss_chip_ctx);
+        memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
+        is_session_open = 0;
+    }
+
+#if !ENABLE_SE05X_RND_GEN
+    free_entropy_context_h();
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
+/* Check if key exists in se05x */
+CHIP_ERROR se05x_check_object_exists(uint32_t keyid)
+{
+    smStatus_t smstatus   = SM_NOT_OK;
+    SE05x_Result_t exists = kSE05x_Result_NA;
+
+    if (se05x_session_open() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x error: Error in session open");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (gex_sss_chip_ctx.ks.session != NULL)
+    {
+        smstatus = Se05x_API_CheckObjectExists(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, &exists);
+        if (smstatus != SM_OK)
+        {
+            ChipLogError(Crypto, "se05x error: Error in Se05x_API_CheckObjectExists");
+            return CHIP_ERROR_INTERNAL;
+        }
+        if (exists == kSE05x_Result_FAILURE)
+        {
+            ChipLogError(Crypto, "se05x warn: Key doesnot exists");
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 /* Delete key in se05x */
 void se05x_delete_key(uint32_t keyid)
 {
     smStatus_t smstatus   = SM_NOT_OK;
     SE05x_Result_t exists = kSE05x_Result_NA;
 
-    if (se05x_sessionOpen() != CHIP_NO_ERROR)
+    if (se05x_session_open() != CHIP_NO_ERROR)
     {
         ChipLogError(Crypto, "se05x error: Error in session open");
         return;
@@ -218,7 +273,8 @@ CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t k
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
+/* Get certificate from se05x */
+CHIP_ERROR se05x_get_certificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
 {
     sss_object_t keyObject = { 0 };
     sss_status_t status    = kStatus_SSS_Fail;
@@ -229,7 +285,7 @@ CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
 
     certBitLen = (*buflen) * 8;
 
-    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
@@ -243,7 +299,8 @@ CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t buflen)
+/* Set certificate in se05x */
+CHIP_ERROR se05x_set_certificate(uint32_t keyId, const uint8_t * buf, size_t buflen)
 {
     sss_object_t keyObject = { 0 };
     sss_status_t status    = kStatus_SSS_Fail;
@@ -261,7 +318,27 @@ CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t bufle
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t * sigBuf, size_t * sigBufLen)
+/* Set Binary data in se05x */
+CHIP_ERROR se05x_set_binary_data(uint32_t keyId, const uint8_t * buf, size_t buflen)
+{
+    sss_object_t keyObject = { 0 };
+    sss_status_t status    = kStatus_SSS_Fail;
+
+    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    status = sss_key_object_allocate_handle(&keyObject, keyId, kSSS_KeyPart_Default, kSSS_CipherType_Binary, buflen,
+                                            kKeyObject_Mode_Transient);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, buflen * 8, NULL, 0);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
+/* Perform internal sign in se05x (only on SE051H) */
+CHIP_ERROR se05x_perform_internal_sign(uint32_t keyId, uint8_t * sigBuf, size_t * sigBufLen)
 {
 #if SSS_HAVE_APPLET_SE051_H
     smStatus_t status                                   = SM_NOT_OK;
@@ -306,7 +383,7 @@ void se05x_delete_crypto_objects(void)
         return;
     }
 
-    if (se05x_sessionOpen() != CHIP_NO_ERROR)
+    if (se05x_session_open() != CHIP_NO_ERROR)
     {
         return;
     }

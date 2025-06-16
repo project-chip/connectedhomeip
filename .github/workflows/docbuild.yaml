@@ -37,6 +37,7 @@ jobs:
         run: |
           python3 -m venv venv
           venv/bin/pip3 install -r docs/requirements.txt
+      # --- Build HTML ---
       - name: Build documentation
         working-directory: matter/docs
         run: |

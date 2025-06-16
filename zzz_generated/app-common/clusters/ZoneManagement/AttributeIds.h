@@ -12,21 +12,33 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 namespace Attributes {
-namespace SupportedZoneSources {
+namespace MaxUserDefinedZones {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedZoneSources
+} // namespace MaxUserDefinedZones
+
+namespace MaxZones {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace MaxZones
 
 namespace Zones {
-inline constexpr AttributeId Id = 0x00000001;
+inline constexpr AttributeId Id = 0x00000002;
 } // namespace Zones
 
 namespace Triggers {
-inline constexpr AttributeId Id = 0x00000002;
+inline constexpr AttributeId Id = 0x00000003;
 } // namespace Triggers
 
+namespace SensitivityMax {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace SensitivityMax
+
 namespace Sensitivity {
-inline constexpr AttributeId Id = 0x00000003;
+inline constexpr AttributeId Id = 0x00000005;
 } // namespace Sensitivity
+
+namespace TwoDCartesianMax {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace TwoDCartesianMax
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

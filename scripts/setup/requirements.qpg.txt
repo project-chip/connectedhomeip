@@ -1,3 +1,8 @@
 pylzma
 intelhex
-ecdsa
+ecdsa==0.19.0
+cryptography
+
+--index-url https://gitlab.com/api/v4/projects/66835490/packages/pypi/simple
+qorvo-platform-tools==1.3.10
+oscrypto @ git+https://github.com/wbond/oscrypto.git@1547f535001ba568b239b8797465536759c742a3
