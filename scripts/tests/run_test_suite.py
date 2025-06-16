@@ -300,7 +300,7 @@ def cmd_list(context):
     is_flag=True,
     default=False,
     show_default=True,
-    help='Use a Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning')
+    help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, chip_repl_yaml_tester,
@@ -354,6 +354,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             chip_tool_with_python = paths_finder.get('darwinframeworktool.py')
         else:
             chip_tool_with_python = paths_finder.get('chiptool.py')
+
+    if ble_wifi and sys.platform != "linux":
+        raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(

@@ -381,8 +381,6 @@ class TestDefinition:
                     # For the app indicated by self.target, give it the 'default' key to add to the register
                     if command == target_app:
                         key = 'default'
-                    else:
-                        key = os.path.basename(command[-1])
                     if ble_controller_app is not None:
                         command += ["--ble-controller", str(ble_controller_app), "--wifi"]
                     app = App(runner, command)
