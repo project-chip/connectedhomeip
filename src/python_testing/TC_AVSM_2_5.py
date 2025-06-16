@@ -74,7 +74,6 @@ class TC_AVSM_2_5(MatterBaseTest):
                 "TH selects a value for BitRate based on the codec in aMicrophoneCapabilities.supportedCodes.",
                 "Store this value as aBitrate",
             ),
-
             TestStep(
                 5,
                 "TH reads StreamUsagePriorities attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
@@ -171,6 +170,12 @@ class TC_AVSM_2_5(MatterBaseTest):
         logger.info(f"Rx'StreamUsagePriorities : {aStreamUsagePriorities}")
 
         self.step(6)
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
+        )
+        logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
+
+        self.step(5)
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(

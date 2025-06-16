@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-arm_arch = "armv7e-m"
+import("qpg_sdk.gni")
+
 arm_abi = "aapcs"
 arm_cpu = "cortex-m4"
-arm_float_abi = "soft"
