@@ -47,6 +47,7 @@ OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
 SUPPORTED_CODE=(core clusters all)
 CODE="core"
+QUIET_FLAG=""
 
 skip_gn=false
 TEST_TARGET=check
@@ -60,6 +61,7 @@ help() {
     echo
     echo "Misc:"
     echo "    -h, --help              Print this help, then exit."
+    echo "    -q, --quiet             Decrease verbosity level."
     echo
     echo "Build/Output options:"
     echo "    -o, --output_root=DIR   Set the build output directory."
@@ -111,6 +113,10 @@ for i in "$@"; do
             ;;
         --python)
             ENABLE_PYTHON=true
+            shift
+            ;;
+        -q | --quiet)
+            QUIET_FLAG="--quiet"
             shift
             ;;
         *)
@@ -217,32 +223,21 @@ fi
 # ------------------------------------------------------------------------------
 mkdir -p "$COVERAGE_ROOT"
 
-lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors inconsistent \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
-    --exclude=/usr/include/* \
-    --ignore-errors format,unsupported,inconsistent \
-    --output-file "$COVERAGE_ROOT/lcov_base.info"
-
-lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
+lcov --capture --all --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors format,unsupported,inconsistent \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
-    --output-file "$COVERAGE_ROOT/lcov_test.info"
-
-lcov --ignore-errors format,unsupported,inconsistent \
-    --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
-    --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
-    --output-file "$COVERAGE_ROOT/lcov_final.info"
+    --output-file "$COVERAGE_ROOT/lcov_final.info" \
+    "$QUIET_FLAG"
 
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --ignore-errors inconsistent,category,count \
     --rc max_message_count=1000 \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
-    --header-title "Matter SDK Coverage Report"
+    --header-title "Matter SDK Coverage Report" \
+    "$QUIET_FLAG"
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
