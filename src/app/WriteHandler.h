@@ -194,9 +194,9 @@ private:
     DataModel::ActionReturnStatus CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
                                                     const ConcreteAttributePath & aPath);
 
-    // TODO add comment
     Status CheckWriteAccess(const Access::SubjectDescriptor & aSubject, const ConcreteAttributePath & aPath,
-                            const std::optional<DataModel::AttributeEntry> & attributeEntry);
+                            const Access::Privilege & aRequiredPrivilege);
+
     // Write the given data to the given path
     CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
                                 TLV::TLVReader & aData);

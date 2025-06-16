@@ -773,10 +773,16 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
 
+    // 1. To make sure that we have at least some access against the concrete path.
+    // TODO should this stay as kView or as kOperate?
+    Status writeAccessStatus = CheckWriteAccess(aSubject, aPath, Access::Privilege::kView);
+    VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
+
+    // 2. Get AttributeEntry
     DataModel::AttributeFinder finder(mDataModelProvider);
+
     std::optional<DataModel::AttributeEntry> attributeEntry = finder.Find(aPath);
 
-    Status existenceStatus = Status::Success;
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
     {
@@ -784,18 +790,16 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
         Status attributeErrorStatus =
             IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId) ? Status::UnsupportedWrite : Status::UnsupportedAttribute;
 
-        existenceStatus = DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
+        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
     }
 
     // Allow writes on writable attributes only
     VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
 
-    Status writeAccessStatus = CheckWriteAccess(aSubject, aPath, attributeEntry.value());
+    // 3. Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege
 
+    writeAccessStatus = CheckWriteAccess(aSubject, aPath, *attributeEntry->GetWritePrivilege());
     VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
-
-    // We only communicate on Existence failures if we are sure access is granted
-    VerifyOrReturnValue(existenceStatus == Status::Success, existenceStatus);
 
     // validate that timed write is enforced
     VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
@@ -805,7 +809,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
 }
 
 Status WriteHandler::CheckWriteAccess(const Access::SubjectDescriptor & aSubject, const ConcreteAttributePath & aPath,
-                                      const std::optional<DataModel::AttributeEntry> & attributeEntry)
+                                      const Access::Privilege & aRequiredPrivilege)
 {
 
     bool checkAcl = true;
@@ -832,7 +836,7 @@ Status WriteHandler::CheckWriteAccess(const Access::SubjectDescriptor & aSubject
 
         //  NOTE: we know that attributeEntry has a GetWritePrivilege based on the check before the call to this function.
         //        so we just directly reference it.
-        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, *attributeEntry->GetWritePrivilege());
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, aRequiredPrivilege);
 
         if (err == CHIP_NO_ERROR)
         {
