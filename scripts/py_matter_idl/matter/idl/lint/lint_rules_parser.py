@@ -277,9 +277,8 @@ class LintRulesTransformer(Transformer):
     lint_rules_grammar.lark.
     """
 
-    def __init__(self, file_name: str):
+    def __init__(self):
         self.context = LintRulesContext()
-        self.file_name = file_name
 
     def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
@@ -329,13 +328,8 @@ class LintRulesTransformer(Transformer):
 
     @v_args(inline=True)
     def load_xml(self, path):
-        if not os.path.isabs(path):
-            if self.file_name:
-                path = os.path.abspath(os.path.join(
-                    os.path.dirname(self.file_name), path))
-            else:
-                path = os.path.abspath(path)
-        self.context.LoadXml(path)
+        if os.path.exists(path):
+            self.context.LoadXml(path)
 
     @v_args(inline=True)
     def required_global_attribute(self, name, code):
@@ -368,20 +362,19 @@ class LintRulesTransformer(Transformer):
 
 
 class Parser:
-    def __init__(self, file_name: Optional[str] = None):
+    def __init__(self):
         self.parser = Lark.open(
             'lint_rules_grammar.lark', rel_to=__file__, parser='lalr',
             propagate_positions=True, maybe_placeholders=True)
-        self.file_name = file_name
 
     def parse(self, file: str):
-        data = LintRulesTransformer(self.file_name).transform(
+        data = LintRulesTransformer().transform(
             self.parser.parse(file))
         return data
 
 
-def CreateParser(file_name: Optional[str] = None):
+def CreateParser():
     """
     Generates a parser that will process a ".matter" file into a IDL
     """
-    return Parser(file_name)
+    return Parser()
