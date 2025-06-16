@@ -52,8 +52,8 @@ CHIP_ERROR ProvideOfferCommand::RunCommand()
     auto streamUsage = static_cast<StreamUsageEnum>(mStreamUsage);
 
     return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage,
-                                                  MakeOptional(app::DataModel::NullNullable), // "Null" for video
-                                                  MakeOptional(app::DataModel::NullNullable)  // "Null" for audio
+                                                  NullOptional, // "Empty" for video
+                                                  NullOptional  // "Empty" for audio
     );
 }
 
