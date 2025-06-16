@@ -198,6 +198,13 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, CommissioningMod
     return CopyTextRecordValue(buffer, bufferLen, static_cast<uint16_t>(value));
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, BitFlags<JointFabricMode> value)
+{
+    return CopyTextRecordValue(buffer, bufferLen, static_cast<uint16_t>(value.Raw()));
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 template <class T>
 CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, std::optional<T> value)
 {
@@ -294,6 +301,10 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     case TxtFieldKey::kCommissionerPasscode:
         return CopyTextRecordValue(buffer, bufferLen,
                                    static_cast<uint16_t>(params.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0));
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    case TxtFieldKey::kJointFabricMode:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetJointFabricMode());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     default:
         return CopyTxtRecord(key, buffer, bufferLen, static_cast<BaseAdvertisingParams<CommissionAdvertisingParameters>>(params));
     }

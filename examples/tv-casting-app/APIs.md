@@ -15,7 +15,7 @@ Matter Casting consists of three parts:
     [example Matter content-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app/android/App/content-app)
     for Android builds on top of the Matter SDK to demonstrate how a TV Content
     app works.
--   **The TV platform app**: The TV platform app implements the Casting Video  
+-   **The TV platform app**: The TV platform app implements the Casting Video
     Player device type and provides common capabilities around media playback on
     the TV such as play/pause, keypad navigation, input and output control,
     content search, and an implementation of an app platform as described in the
@@ -432,9 +432,13 @@ int main(int argc, char * argv[]) {
     VerifyOrReturnValue(
         err == CHIP_NO_ERROR, 0,
         ChipLogError(AppServer, "Initialization of CommissionableDataProvider failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    // TODO: provide your version of revocation delegate and a trust store properly filled with DCL.
+    chip::Credentials::DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
     err = appParameters.Create(&rotatingDeviceIdUniqueIdProvider, &gCommissionableDataProvider,
                                chip::Credentials::Examples::GetExampleDACProvider(),
-                               GetDefaultDACVerifier(chip::Credentials::GetTestAttestationTrustStore()), &serverInitParamsProvider);
+                               GetDefaultDACVerifier(chip::Credentials::GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked),
+                               &serverInitParamsProvider);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "Creation of AppParameters failed %" CHIP_ERROR_FORMAT, err.Format()));
 
