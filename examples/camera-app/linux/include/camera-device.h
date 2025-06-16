@@ -291,6 +291,9 @@ private:
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
 
+    bool MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
+                                    chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum & outCodec);
+
     // Various cluster server delegates
     ChimeManager mChimeManager;
     WebRTCProviderManager mWebRTCProviderManager;

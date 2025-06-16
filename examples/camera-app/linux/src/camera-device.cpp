@@ -573,16 +573,90 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
     return CameraError::SUCCESS;
 }
 
+// Find the closest allocated snapshot stream with resolution >= requested, or closest possible
+bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
+                                              ImageCodecEnum & outCodec)
+{
+    int requestedPixels = requested.width * requested.height;
+    int bestDiff        = std::numeric_limits<int>::max();
+    auto bestIt         = mSnapshotStreams.end();
+
+    for (auto iter = mSnapshotStreams.begin(); iter != mSnapshotStreams.end(); ++iter)
+    {
+        if (!iter->isAllocated)
+            continue;
+        int streamPixels = iter->snapshotStreamParams.minResolution.width * iter->snapshotStreamParams.minResolution.height;
+        if (streamPixels >= requestedPixels)
+        {
+            int diff = streamPixels - requestedPixels;
+            if (diff < bestDiff)
+            {
+                bestDiff = diff;
+                bestIt   = iter;
+            }
+        }
+    }
+
+    // If no stream >= requested, pick closest possible (smallest diff)
+    if (bestIt == mSnapshotStreams.end())
+    {
+        bestDiff = std::numeric_limits<int>::max();
+        for (auto iter = mSnapshotStreams.begin(); iter != mSnapshotStreams.end(); ++iter)
+        {
+            if (!iter->isAllocated)
+                continue;
+            int streamPixels = iter->snapshotStreamParams.minResolution.width * iter->snapshotStreamParams.minResolution.height;
+            int diff         = std::abs(streamPixels - requestedPixels);
+            if (diff < bestDiff)
+            {
+                bestDiff = diff;
+                bestIt   = iter;
+            }
+        }
+    }
+
+    if (bestIt != mSnapshotStreams.end())
+    {
+        outResolution = bestIt->snapshotStreamParams.minResolution;
+        outCodec      = bestIt->snapshotStreamParams.imageCodec;
+        return true;
+    }
+    else
+    {
+        outResolution = { 0, 0 };
+        outCodec      = ImageCodecEnum::kJpeg;
+        return false;
+    }
+}
+
 CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
                                           const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot)
 {
-    uint16_t streamId = streamID.IsNull() ? 1 : streamID.Value();
-    auto it           = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(),
-                                     [streamId](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamId; });
-    if (it == mSnapshotStreams.end())
+    VideoResolutionStruct matchedRes;
+    ImageCodecEnum matchedCodec;
+
+    if (streamID.IsNull())
     {
-        ChipLogError(Camera, "Snapshot streamID : %u not found", streamId);
-        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+        if (!MatchClosestSnapshotParams(resolution, matchedRes, matchedCodec))
+        {
+            ChipLogError(Camera, "No matching snapshot stream found for requested resolution %ux%u", resolution.width,
+                         resolution.height);
+            return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+        }
+    }
+    else
+    {
+        uint16_t streamId = streamID.Value();
+        auto it           = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
+            return s.snapshotStreamParams.snapshotStreamID == streamId;
+        });
+        if (it == mSnapshotStreams.end())
+        {
+            ChipLogError(Camera, "Snapshot stream not found for stream ID %u", streamId);
+            return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+        }
+        matchedRes   = it->snapshotStreamParams.minResolution;
+        matchedCodec = it->snapshotStreamParams.imageCodec;
     }
 
     // Read from image file stored from snapshot stream.
@@ -608,9 +682,8 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
 
     file.close();
 
-    outImageSnapshot.imageRes.width  = it->snapshotStreamParams.minResolution.width;
-    outImageSnapshot.imageRes.height = it->snapshotStreamParams.minResolution.height;
-    outImageSnapshot.imageCodec      = it->snapshotStreamParams.imageCodec;
+    outImageSnapshot.imageRes   = matchedRes;
+    outImageSnapshot.imageCodec = matchedCodec;
 
     return CameraError::SUCCESS;
 }
