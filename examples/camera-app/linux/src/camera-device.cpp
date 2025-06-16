@@ -574,59 +574,46 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
 }
 
 // Find the closest allocated snapshot stream with resolution >= requested, or closest possible
-bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
-                                              ImageCodecEnum & outCodec)
+bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & matchedResolution,
+                                              ImageCodecEnum & matchedCodec)
 {
-    int requestedPixels = requested.width * requested.height;
-    int bestDiff        = std::numeric_limits<int>::max();
-    auto bestIt         = mSnapshotStreams.end();
+    int64_t requestedPixels = static_cast<int64_t>(requested.width) * requested.height;
+    int64_t bestDiff        = std::numeric_limits<int64_t>::max();
+    int64_t bestGEQDiff     = std::numeric_limits<int64_t>::max();
 
-    for (auto iter = mSnapshotStreams.begin(); iter != mSnapshotStreams.end(); ++iter)
+    const SnapshotStream * bestStream    = nullptr;
+    const SnapshotStream * bestGEQStream = nullptr;
+
+    for (const auto & stream : mSnapshotStreams)
     {
-        if (!iter->isAllocated)
-            continue;
-        int streamPixels = iter->snapshotStreamParams.minResolution.width * iter->snapshotStreamParams.minResolution.height;
-        if (streamPixels >= requestedPixels)
+        int64_t streamPixels = static_cast<int64_t>(stream.snapshotStreamParams.minResolution.width) *
+            stream.snapshotStreamParams.minResolution.height;
+        int64_t diff    = streamPixels - requestedPixels;
+        int64_t absDiff = std::abs(diff);
+
+        // Candidate 1: First stream with resolution >= requested
+        if (diff >= 0 && diff < bestGEQDiff)
         {
-            int diff = streamPixels - requestedPixels;
-            if (diff < bestDiff)
-            {
-                bestDiff = diff;
-                bestIt   = iter;
-            }
+            bestGEQDiff   = diff;
+            bestGEQStream = &stream;
+        }
+
+        // Candidate 2: Closest stream (absolute difference)
+        if (absDiff < bestDiff)
+        {
+            bestDiff   = absDiff;
+            bestStream = &stream;
         }
     }
 
-    // If no stream >= requested, pick closest possible (smallest diff)
-    if (bestIt == mSnapshotStreams.end())
+    const SnapshotStream * chosen = bestGEQStream ? bestGEQStream : bestStream;
+    if (chosen)
     {
-        bestDiff = std::numeric_limits<int>::max();
-        for (auto iter = mSnapshotStreams.begin(); iter != mSnapshotStreams.end(); ++iter)
-        {
-            if (!iter->isAllocated)
-                continue;
-            int streamPixels = iter->snapshotStreamParams.minResolution.width * iter->snapshotStreamParams.minResolution.height;
-            int diff         = std::abs(streamPixels - requestedPixels);
-            if (diff < bestDiff)
-            {
-                bestDiff = diff;
-                bestIt   = iter;
-            }
-        }
-    }
-
-    if (bestIt != mSnapshotStreams.end())
-    {
-        outResolution = bestIt->snapshotStreamParams.minResolution;
-        outCodec      = bestIt->snapshotStreamParams.imageCodec;
+        matchedResolution = chosen->snapshotStreamParams.minResolution;
+        matchedCodec      = chosen->snapshotStreamParams.imageCodec;
         return true;
     }
-    else
-    {
-        outResolution = { 0, 0 };
-        outCodec      = ImageCodecEnum::kJpeg;
-        return false;
-    }
+    return false;
 }
 
 CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
