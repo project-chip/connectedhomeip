@@ -106,27 +106,28 @@ public:
     /**
      * @brief Handles the completion of a stop motion action.
      *
-     * This function is called when a motion action has been stopped. It should be used to update
-     * the closure control state accordingly after the motion action has completed.
+     * This function is called when a motion action has been stopped. 
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the stop motion action.
      */
     void OnStopMotionActionComplete();
 
     /**
      * @brief Handles the completion of the stop calibration action.
      *
-     * This function is called when the calibration action has been stopped.
-     * It should update the closure control state accordingly to reflect the
-     * completion of the calibration process.
+     * This function is called when the calibration action has been stopped. 
+     * It should update the internal state of the closure control endpoint to reflect the 
+     * completion of the stop calibration action.
      */
     void OnStopCalibrateActionComplete();
 
     /**
-     * @brief Handles the completion of a calibration action for the closure control endpoint.
+     * @brief Handles the completion of a calibration action.
      *
-     * This method is called when the calibration process is finished. It updates the internal logic state
-     * to reflect that the main state is stopped, sets the overall state and target to their appropriate
-     * values indicating calibration completion, resets the countdown timer, and generates a movement
-     * completed event.
+     * This method is called when the calibration process is finished.
+     * It should update the internal state of the closure control endpoint to reflect the 
+     * completion of the calibration action, resets the countdown timer and generates 
+     * a motion completed event.
      */
     void OnCalibrateActionComplete();
 
@@ -134,8 +135,9 @@ public:
      * @brief Handles the completion of a motion action for closure control.
      *
      * This function is called when a move-to action has finished executing.
-     * It should update the internal state of the closure control endpoint
-     * to reflect the completion of the motion action.
+     * It should update the internal state of the closure control endpoint to reflect the 
+     * completion of the move-to action, resets the countdown timer and generates 
+     * a motion completed event.
      */
     void OnMoveToActionComplete();
 

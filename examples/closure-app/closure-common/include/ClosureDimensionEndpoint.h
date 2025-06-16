@@ -98,39 +98,41 @@ public:
      */
     ClusterLogic & GetLogic() { return mLogic; }
 
-    /**
-     * @brief Handles the completion of a stop motion action for the closure dimension endpoint.
+        /**
+     * @brief Handles the completion of a stop motion action.
      *
-     * This function is called when a motion action (such as opening or closing) has been stopped.
-     * It should update the internal state of the closure dimension to reflect the completion of the stop action.
-     * Implement any necessary logic to synchronize the endpoint's state with the actual hardware or system status.
+     * This function is called when a motion action has been stopped. 
+     * It should update the internal state of the closure dimension endpoint to reflect 
+     * the completion of the stop motion action.
      */
     void OnStopMotionActionComplete();
 
     /**
-     * @brief Handles post-calibration logic for the closure dimension endpoint.
+     * @brief Handles the completion of the stop calibration action.
      *
-     * This function is called when the calibration action has been stopped.
-     * It should update the closure dimension state and perform any necessary
-     * cleanup or state transitions required after calibration completes.
+     * This function is called when the calibration action has been stopped. 
+     * It should update the internal state of the closure dimension endpoint to reflect 
+     * the completion of the stop calibration action.
      */
     void OnStopCalibrateActionComplete();
 
     /**
-     * @brief Handles the completion of a calibration action for the closure dimension endpoint.
+     * @brief Handles the completion of a calibration action.
      *
-     * This method updates the internal logic state to reflect that calibration has completed.
-     * It sets the current state to a fully closed position, marks the calibration as complete,
-     * and sets the mode to automatic. The target state is reset to null.
+     * This method is called when the calibration process is finished.
+     * It should update the internal state of the closure dimension endpoint to reflect 
+     * the completion of the calibration action, resets the countdown timer and generates 
+     * a motion completed event.
      */
     void OnCalibrateActionComplete();
 
     /**
-     * @brief Handles post-action updates for closure dimension state.
+     * @brief Handles the completion of a motion action for closure control.
      *
-     * This method is called after a "MoveTo" action is completed. It should be used to update
-     * the internal state of the closure dimension endpoint to reflect the new position or state
-     * resulting from the completed action.
+     * This function is called when a move-to action has finished executing.
+     * It should update the internal state of the closure dimension endpoint to reflect
+     * the completion of the move-to action, resets the countdown timer and generates
+     * a motion completed event.
      */
     void OnMoveToActionComplete();
 

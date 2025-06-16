@@ -65,14 +65,10 @@ public:
     static ClosureManager & GetInstance() { return sClosureMgr; }
 
     /**
-     * @brief Handles the calibration command for the closure manager.
+     * @brief Handles the calibration command for the closure.
      *
-     * This method prepares all endpoints for calibration by:
-     * - Setting the countdown time for calibration.
-     * - Resetting the current and target states of all endpoints to null.
-     * - Logging errors and returning failure status if any operation fails.
-     * - Posting a calibration action event to the application task.
-     * - Marking calibration as in progress.
+     * This method processes the calibration command, which is used to initiate a
+     * calibration action for a closure..
      *
      * @return chip::Protocols::InteractionModel::Status
      *         Returns Status::Success if all operations succeed, otherwise Status::Failure.
@@ -80,11 +76,10 @@ public:
     chip::Protocols::InteractionModel::Status OnCalibrateCommand();
 
     /**
-     * @brief Handles the MoveTo command for the ClosureManager.
+     * @brief Handles the MoveTo command for the Closure.
      *
      * This method processes the MoveTo command, which is used to initiate a motion action
-     * for a closure device (such as a window covering or door). It takes optional parameters
-     * specifying the target position, whether to latch, and the desired speed of movement.
+     * for a closure.
      *
      * @param position Optional target position for the closure device.
      * @param latch Optional flag indicating whether the closure should latch after moving.
@@ -97,11 +92,9 @@ public:
         const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed);
 
     /**
-     * @brief Handles the Stop command for the ClosureManager.
+     * @brief Handles the Stop command for the Closure.
      *
-     * This function is invoked when a Stop command is received. It should contain
-     * the logic to process the Stop command and initiate the appropriate stop action
-     * for the closure device (e.g., stopping a motor or actuator).
+     * This method processes the Stop command, which is used to stop an action for a closure.
      *
      * @return chip::Protocols::InteractionModel::Status
      *         Returns Status::Success if the Stop command is handled successfully,
@@ -109,9 +102,32 @@ public:
      */
     chip::Protocols::InteractionModel::Status OnStopCommand();
 
+    /**
+     * @brief Sets the current action being performed by the closure device.
+     *
+     * @param action The action to set, represented as chip::app::Clusters::ClosureControl::Action_t.
+     */
+    void SetCurrentAction(Action_t newAction)
+    {
+        mCurrentAction = newAction;
+    }
+
+    /**
+     * @brief Retrieves the current action being performed by the closure device.
+     *
+     * @return The current action as defined by chip::app::Clusters::ClosureControl::Action_t.
+     */
+    const Action_t & GetCurrentAction() const
+    {
+        return mCurrentAction;
+    }
+
 private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
+    bool isCalibrationInProgress = false;
+    Action_t mCurrentAction = Action_t::INVALID_ACTION;
+
     // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;
     static constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
@@ -144,13 +160,10 @@ private:
     /**
     * @brief Handles the completion of a closure action.
     *
-    * This method is called when a closure action has completed. It performs
-    * necessary state updates and notifies relevant endpoints based on the
-    * type of action that was completed.
+    * This method is called when a closure action has completed. It notifies relevant endpoints
+    * based on the type of action that was completed.
     *
-    * @param action The action that has completed. This is of type Action_t and
-    *               can be one of CALIBRATE_ACTION, STOP_MOTION_ACTION,
-    *               STOP_CALIBRATE_ACTION, MOVE_TO_ACTION, or others.
+    * @param action The action that has completed, used to notify relevant endpoints.
     */
     void HandleClosureActionComplete(Action_t action);
 
@@ -169,9 +182,8 @@ private:
     /**
      * @brief Handles a closure event by updating the current action and scheduling the completion handler.
      *
-     * This method processes the incoming closure event, updates the internal state to reflect
-     * the new action, and schedules the completion of the closure action to be executed asynchronously
-     * on the platform manager's work queue.
+     * This method processes the incoming closure event and schedules the completion of the closure action 
+     * to be executed asynchronously on the platform manager's work queue.
      *
      * @param event Pointer to the AppEvent containing closure event details.
      */
@@ -189,6 +201,4 @@ private:
      * @param timerCbArg Pointer to the callback argument (unused).
      */
     static void TimerEventHandler(void * timerCbArg);
-
-    bool isCalibrationInProgress = false;
 };

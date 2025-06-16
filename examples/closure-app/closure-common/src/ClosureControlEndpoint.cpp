@@ -33,20 +33,17 @@ constexpr ElapsedS kDefaultCountdownTime = 30;
 
 Status ClosureControlDelegate::HandleCalibrateCommand()
 {
-    ChipLogProgress(AppServer, "HandleCalibrateCommand");
     return ClosureManager::GetInstance().OnCalibrateCommand();
 }
 
 Status ClosureControlDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
                                               const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
-    ChipLogProgress(AppServer, "HandleMoveToCommand");
     return ClosureManager::GetInstance().OnMoveToCommand(position, latch, speed);
 }
 
 Status ClosureControlDelegate::HandleStopCommand()
 {
-    ChipLogProgress(AppServer, "HandleStopCommand");
     return ClosureManager::GetInstance().OnStopCommand();
 }
 
