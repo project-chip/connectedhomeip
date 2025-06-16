@@ -193,4 +193,14 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendEmptyPacket)
     EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
 }
 
+TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
+{
+    auto packet0 = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize, 0);
+    packet0->SetDataLength(packet0->MaxDataLength());
+    
+    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(std::move(packet0).Retain(), true));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Error);
+    EXPECT_EQ(packet0->DataLength(), packet0->MaxDataLength());
+}
+
 } // namespace
