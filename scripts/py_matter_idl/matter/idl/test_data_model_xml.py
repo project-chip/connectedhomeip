@@ -202,6 +202,10 @@ endpoint 2 {
         self.assertEqual(required_attributes[1].filter_cluster, 123)
         self.assertEqual(required_attributes[1].name, "NoElements")
 
+        # Only two attributes should be added to the required
+        # list, the others should be filtered out.
+        self.assertEqual(len(required_attributes), 2)
+
     def testClusterDerivation(self):
         # This test is based on a subset of ModeBase and Mode_Dishwasher original xml files
 
