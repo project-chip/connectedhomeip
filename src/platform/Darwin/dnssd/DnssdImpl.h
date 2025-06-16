@@ -18,6 +18,7 @@
 #pragma once
 
 #include <dns_sd.h>
+#include <dnssd/dnssd_config.h>
 #include <lib/core/Global.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -80,6 +81,9 @@ public:
     CHIP_ERROR Remove(GenericContext * context);
     CHIP_ERROR RemoveAllOfType(ContextType type);
     CHIP_ERROR Has(GenericContext * context);
+#if DNSSD_VERBOSE_CONTEXT_PRINT
+    void Print() const;
+#endif
 
     /**
      * @brief
