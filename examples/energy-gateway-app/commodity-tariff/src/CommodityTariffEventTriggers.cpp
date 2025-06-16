@@ -94,7 +94,10 @@ void SetTestEventTrigger_TariffDataUpdated()
         if (LoadJsonFile(preset, json_root))
         {
             ChipLogProgress(NotSpecified, "The tariff file opened successfully");
-            dg->LoadTariffData(json_root);
+            if ( CHIP_NO_ERROR == dg->LoadTariffData(json_root) )
+            {
+                dg->TariffDataUpdate();
+            }
         }
         else
         {
@@ -112,9 +115,17 @@ void SetTestEventTrigger_TariffDataUpdated()
 
 void SetTestEventTrigger_TariffDataClear()
 {
+    CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
+
+    dg->CleanupTariffData();
+}
+
+void SetTestEventTrigger_ForcedOneDayForward()
+{
     // TODO
 }
-void SetTestEventTrigger_ForcedOneDayForward()
+
+void SetTestEventTrigger_ForcedDayEntryForward()
 {
     // TODO
 }
@@ -136,6 +147,10 @@ bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)
     case CommodityTariffTrigger::kForcedOneDayForward:
         ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Forced OneDay Forward");
         SetTestEventTrigger_ForcedOneDayForward();
+        break;
+    case CommodityTariffTrigger::kForcedOneDayEntryForward:
+        ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Forced DayEntry Forward");
+        SetTestEventTrigger_ForcedDayEntryForward();
         break;
 
     default:
