@@ -24,11 +24,11 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
 
-// this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
-static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1,
-              "Exactly one software diagnostics cluster instance may exist");
-static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId,
-              "The software diagnostics cluster must be on endpoint 0");
+// for fixed endpoint, this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
+// the static assert is skipped in case of dynamic endpoints.
+static_assert((SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+               SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
+              SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
 namespace {
 
