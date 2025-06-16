@@ -67,10 +67,13 @@ Status ServerInstance::HandleGetDatasetRequest(CommandHandlerInterface::HandlerC
     VerifyOrReturnValue(IsCommandOverCASESession(ctx), Status::UnsupportedAccess);
 
     CHIP_ERROR err = mDelegate->GetDataset(dataset, type);
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_ERROR_NOT_FOUND)
     {
-        return err == CHIP_IM_GLOBAL_STATUS(NotFound) ? StatusIB(err).mStatus : Status::Failure;
+        // The spec mandates that we return an empty dataset, NOT a NotFound status.
+        dataset.Init(ByteSpan());
+        return Status::Success;
     }
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
 
