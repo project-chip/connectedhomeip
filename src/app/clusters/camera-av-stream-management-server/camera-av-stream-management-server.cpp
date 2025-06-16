@@ -2027,7 +2027,7 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
     auto iter = streamPriorities.begin();
 
     // If any video, audio or snapshot streams exist fail the command.
-    VerifyOrReturn(!mAllocatedVideoStreams.empty() || !mAllocatedAudioStreams.empty() || !mAllocatedSnapshotStreams.empty(),
+    VerifyOrReturn(mAllocatedVideoStreams.empty() && mAllocatedAudioStreams.empty() && mAllocatedSnapshotStreams.empty(),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     while (iter.Next())
