@@ -133,7 +133,7 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
         return logic->SetMainState(MainStateEnum::kDisengaged);
     case ClosureControlTestEventTrigger::kClearEvent:
-        // TODO
+        // TODO : Implement logic to clear test event after Test plan Spec issue #5429 is resolved.
         return CHIP_ERROR_NOT_IMPLEMENTED;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
