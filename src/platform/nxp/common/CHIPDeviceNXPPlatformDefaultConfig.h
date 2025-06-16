@@ -141,7 +141,7 @@
 #endif // CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE
 
 #ifndef CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY
-/* If supported, the Thread task should have a highter priority than the app task */
+/* If supported, the Thread task should have a higher priority than the app task */
 #define CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY 5
 #endif // CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY
 

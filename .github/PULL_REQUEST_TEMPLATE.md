@@ -60,4 +60,4 @@ code readable:
 -   [ ] Try to avoid "squashing" and "force-update" in commit history
 -   [ ] CI time didn't increase
 
-See: [PULL_REQUEST_GUIDELINES.md](../docs/pull_request_guidelines.md)
+See: [Pull Request Guidelines](https://project-chip.github.io/connectedhomeip-doc/pull_request_guidelines.html)
