@@ -201,12 +201,20 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
+        "Closure Control": [
+            "CountdownTime",
+            "OverallState",
+            "OverallTarget",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Closure Dimension": [
             "CurrentState",
             "Target",
             "UnitRange",
-            "LimitRange"
+            "LimitRange",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Commodity Price": [
             "TariffUnit",
