@@ -1249,7 +1249,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_CommandHandlerFillsUpResponse)
     EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
     EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
 
-    sendResponse = true;
+    sendResponse           = true;
     commandDispatchedCount = 0;
     DrainAndServiceIO();
 
