@@ -132,7 +132,8 @@ class TC_IDM_1_4(MatterBaseTest):
             asserts.assert_equal(e.status, Status.InvalidAction,
                                  "DUT sent back an unexpected error, we were expecting InvalidAction")
             logging.info("DUT successfully failed to process `MaxPathsPerInvoke + 1` InvokeRequests")
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: Multiple error types are expected depending on DUT capability
+            # assert_raises is not used here because we validate error types
             chip_error_no_memory = 0x0b
             asserts.assert_equal(e.err, chip_error_no_memory, "Unexpected error while trying to send InvokeRequest")
             # TODO it is possible we want to confirm DUT can handle up to MTU max. But that is not in test plan as of right now.
