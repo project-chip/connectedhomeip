@@ -43,7 +43,7 @@ public:
 
         INVALID_ACTION
     };
-   
+
     /**
      * @brief Initializes the ClosureManager and its associated resources.
      *
@@ -137,7 +137,7 @@ private:
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
 
-    
+
     /**
      * @brief Starts or restarts the closure function timer with the specified timeout.
      *
@@ -182,7 +182,7 @@ private:
     /**
      * @brief Handles a closure event by updating the current action and scheduling the completion handler.
      *
-     * This method processes the incoming closure event and schedules the completion of the closure action 
+     * This method processes the incoming closure event and schedules the completion of the closure action
      * to be executed asynchronously on the platform manager's work queue.
      *
      * @param event Pointer to the AppEvent containing closure event details.

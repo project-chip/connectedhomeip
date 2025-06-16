@@ -102,11 +102,11 @@ public:
      * @return ClusterLogic& Reference to the internal ClusterLogic object.
      */
     ClusterLogic & GetLogic() { return mLogic; }
-    
+
     /**
      * @brief Handles the completion of a stop motion action.
      *
-     * This function is called when a motion action has been stopped. 
+     * This function is called when a motion action has been stopped.
      * It should update the internal state of the closure control endpoint to reflect the
      * completion of the stop motion action.
      */
@@ -115,8 +115,8 @@ public:
     /**
      * @brief Handles the completion of the stop calibration action.
      *
-     * This function is called when the calibration action has been stopped. 
-     * It should update the internal state of the closure control endpoint to reflect the 
+     * This function is called when the calibration action has been stopped.
+     * It should update the internal state of the closure control endpoint to reflect the
      * completion of the stop calibration action.
      */
     void OnStopCalibrateActionComplete();
@@ -125,8 +125,8 @@ public:
      * @brief Handles the completion of a calibration action.
      *
      * This method is called when the calibration process is finished.
-     * It should update the internal state of the closure control endpoint to reflect the 
-     * completion of the calibration action, resets the countdown timer and generates 
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the calibration action, resets the countdown timer and generates
      * a motion completed event.
      */
     void OnCalibrateActionComplete();
@@ -135,8 +135,8 @@ public:
      * @brief Handles the completion of a motion action for closure control.
      *
      * This function is called when a move-to action has finished executing.
-     * It should update the internal state of the closure control endpoint to reflect the 
-     * completion of the move-to action, resets the countdown timer and generates 
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the move-to action, resets the countdown timer and generates
      * a motion completed event.
      */
     void OnMoveToActionComplete();

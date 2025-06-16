@@ -180,7 +180,7 @@ void ClosureManager::HandleClosureEvent(AppEvent * event)
     default:
         break;
     }
-    
+
     ClosureManager::GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
 }
 
@@ -205,7 +205,7 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
 
 chip::Protocols::InteractionModel::Status  ClosureManager::OnCalibrateCommand()
 {
-  VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, 
+  VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR,
                       Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
   AppEvent event;
@@ -221,7 +221,7 @@ chip::Protocols::InteractionModel::Status  ClosureManager::OnCalibrateCommand()
 chip::Protocols::InteractionModel::Status  ClosureManager::OnStopCommand()
 {
   // this function will contain the code for Stop command handling and initiate the stop action.
-  return Status::Success; 
+  return Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(
