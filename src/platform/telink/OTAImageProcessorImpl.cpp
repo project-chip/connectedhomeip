@@ -246,12 +246,12 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
 
         if (GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Reject OTA image, wrong vendor ID");
+            ChipLogDetail(DeviceLayer, "Failed to retrieve local Vendor ID for OTA validation");
             return CHIP_ERROR_INCORRECT_STATE;
         }
         if (GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Reject OTA image, wrong product ID");
+            ChipLogDetail(DeviceLayer, "Failed to retrieve local Product ID for OTA validation");
             return CHIP_ERROR_INCORRECT_STATE;
         }
         if (header.mVendorId != vendorId || header.mProductId != productId)
