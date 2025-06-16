@@ -45,37 +45,28 @@ from mobly import asserts
 
 def current_position_matcher(position: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        for entry in report.value:
-            if entry.Position == position:
-                return True
-        else:
-            return False
+        if report.value.position == position:
+            return True
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
 
 
-def current_speed_matcher(speed: int) -> AttributeMatcher:
+def current_speed_matcher(speed: Globals.Enums.ThreeLevelAutoEnum) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        for entry in report.value:
-            if entry.Speed == speed:
-                return True
-        else:
-            return False
+        if report.value.speed == speed:
+            return True
     return AttributeMatcher.from_callable(description=f"CurrentState.Speed is {speed}", matcher=predicate)
 
 
 def current_position_and_speed_matcher(position: int, speed: Globals.Enums.ThreeLevelAutoEnum) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        for entry in report.value:
-            if (entry.Position == position) and (entry.Speed == speed):
-                return True
-        else:
-            return False
+        if (report.value.position == position) and (report.value.speed == speed):
+            return True
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position} and CurrentState.Speed is {speed}", matcher=predicate)
 
 
@@ -177,8 +168,8 @@ class TC_CLDIM_3_1(MatterBaseTest):
         else:
             # STEP 3b: Set Position to MaxPosition
             self.step("3b")
+            sub_handler.reset()
             try:
-                sub_handler.reset()
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
                     endpoint=endpoint
@@ -211,6 +202,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         else:
             # STEP 4b: Set Speed to Medium
             self.step("4b")
+            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
@@ -238,6 +230,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
         # STEP 5a: Set Position to min_position
         self.step("5a")
+        sub_handler.reset()
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position),
@@ -271,6 +264,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         else:
             # STEP 6b: Set Position to MaxPosition and Speed to High
             self.step("6b")
+            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
@@ -296,7 +290,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             # STEP 6d: Wait for CurrentState.Position to be updated to MaxPosition and CurrentState.Speed to High
             self.step("6d")
             sub_handler.await_all_expected_report_matches(
-                expected_matchers=[current_position_and_speed_matcher(min_position, Globals.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
+                expected_matchers=[current_position_and_speed_matcher(max_position, Globals.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
 
 
 if __name__ == "__main__":
