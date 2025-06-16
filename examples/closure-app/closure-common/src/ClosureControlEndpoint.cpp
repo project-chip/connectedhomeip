@@ -37,7 +37,7 @@ Status ClosureControlDelegate::HandleCalibrateCommand()
 }
 
 Status ClosureControlDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
-                                              const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                                   const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     return ClosureManager::GetInstance().OnMoveToCommand(position, latch, speed);
 }
@@ -116,7 +116,6 @@ void ClosureControlEndpoint::OnStopCalibrateActionComplete()
     // This function should handle closure control state updation after stopping of calibration Action.
 }
 
-
 void ClosureControlEndpoint::OnStopMotionActionComplete()
 {
     // This function should handle closure control state updation after stopping of Motion Action.
@@ -124,11 +123,9 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
-    DataModel::Nullable<GenericOverallState> overallState(
-    GenericOverallState(MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)),
-                        MakeOptional(DataModel::MakeNullable(true)),
-                        MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)),
-                        MakeOptional(DataModel::MakeNullable(true))));
+    DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(
+        MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+        MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)), MakeOptional(DataModel::MakeNullable(true))));
     DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
 
     mLogic.SetMainState(MainStateEnum::kStopped);

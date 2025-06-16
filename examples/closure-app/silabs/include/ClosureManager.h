@@ -28,15 +28,15 @@
 
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
-#include <lib/core/DataModelTypes.h>
 #include <AppEvent.h>
+#include <lib/core/DataModelTypes.h>
 
 class ClosureManager
 {
 public:
     enum Action_t
     {
-        CALIBRATE_ACTION   = 0,
+        CALIBRATE_ACTION = 0,
         MOVE_TO_ACTION,
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
@@ -86,10 +86,9 @@ public:
      * @param speed Optional speed setting for the movement, represented as a ThreeLevelAutoEnum.
      * @return chip::Protocols::InteractionModel::Status Status of the command handling operation.
      */
-    chip::Protocols::InteractionModel::Status OnMoveToCommand(
-        const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum>  position,
-        const chip::Optional<bool>  latch,
-        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed);
+    chip::Protocols::InteractionModel::Status
+    OnMoveToCommand(const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
+                    const chip::Optional<bool> latch, const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed);
 
     /**
      * @brief Handles the Stop command for the Closure.
@@ -107,26 +106,20 @@ public:
      *
      * @param action The action to set, represented as chip::app::Clusters::ClosureControl::Action_t.
      */
-    void SetCurrentAction(Action_t newAction)
-    {
-        mCurrentAction = newAction;
-    }
+    void SetCurrentAction(Action_t newAction) { mCurrentAction = newAction; }
 
     /**
      * @brief Retrieves the current action being performed by the closure device.
      *
      * @return The current action as defined by chip::app::Clusters::ClosureControl::Action_t.
      */
-    const Action_t & GetCurrentAction() const
-    {
-        return mCurrentAction;
-    }
+    const Action_t & GetCurrentAction() const { return mCurrentAction; }
 
 private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
     bool isCalibrationInProgress = false;
-    Action_t mCurrentAction = Action_t::INVALID_ACTION;
+    Action_t mCurrentAction      = Action_t::INVALID_ACTION;
 
     // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;
@@ -136,7 +129,6 @@ private:
     chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
-
 
     /**
      * @brief Starts or restarts the closure function timer with the specified timeout.
@@ -158,13 +150,13 @@ private:
     void CancelTimer();
 
     /**
-    * @brief Handles the completion of a closure action.
-    *
-    * This method is called when a closure action has completed. It notifies relevant endpoints
-    * based on the type of action that was completed.
-    *
-    * @param action The action that has completed, used to notify relevant endpoints.
-    */
+     * @brief Handles the completion of a closure action.
+     *
+     * This method is called when a closure action has completed. It notifies relevant endpoints
+     * based on the type of action that was completed.
+     *
+     * @param action The action that has completed, used to notify relevant endpoints.
+     */
     void HandleClosureActionComplete(Action_t action);
 
     /**

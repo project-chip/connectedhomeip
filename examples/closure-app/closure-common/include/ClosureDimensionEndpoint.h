@@ -98,7 +98,7 @@ public:
      */
     ClusterLogic & GetLogic() { return mLogic; }
 
-        /**
+    /**
      * @brief Handles the completion of a stop motion action.
      *
      * This function is called when a motion action has been stopped.

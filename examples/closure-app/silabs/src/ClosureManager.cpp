@@ -17,9 +17,9 @@
  */
 
 #include "ClosureManager.h"
+#include "AppTask.h"
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
-#include "AppTask.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
@@ -77,9 +77,9 @@ void ClosureManager::Init()
 {
     // Create cmsis os sw timer for light timer.
     mClosureTimer = osTimerNew(TimerEventHandler, // timer callback handler
-                             osTimerOnce,       // no timer reload (one-shot timer)
-                             (void *) this,     // pass the app task obj context
-                             NULL               // No osTimerAttr_t to provide.
+                               osTimerOnce,       // no timer reload (one-shot timer)
+                               (void *) this,     // pass the app task obj context
+                               NULL               // No osTimerAttr_t to provide.
     );
 
     if (mClosureTimer == NULL)
@@ -112,7 +112,6 @@ void ClosureManager::StartTimer(uint32_t aTimeoutMs)
     }
 }
 
-
 void ClosureManager::CancelTimer()
 {
     if (osTimerStop(mClosureTimer) == osError)
@@ -129,25 +128,25 @@ void ClosureManager::InitiateAction(AppEvent * event)
     ClosureManager instance = ClosureManager::GetInstance();
 
     switch (action)
-        {
-        case Action_t::CALIBRATE_ACTION:
-            ChipLogDetail(AppServer, "Initiating calibration action");
-            break;
-        case Action_t::STOP_MOTION_ACTION:
-            ChipLogDetail(AppServer, "Initiating stop motion action");
-            break;
-        case Action_t::STOP_CALIBRATE_ACTION:
-            ChipLogDetail(AppServer, "Initiating stop calibration action");
-            instance.SetCurrentAction(Action_t::STOP_CALIBRATE_ACTION);
-            instance.StartTimer(kCountdownTimeSeconds * 1000);
-            break;
-        case Action_t::MOVE_TO_ACTION:
-            ChipLogDetail(AppServer, "Initiating move to action");
-            break;
-        default:
-            ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
-            return;
-        }
+    {
+    case Action_t::CALIBRATE_ACTION:
+        ChipLogDetail(AppServer, "Initiating calibration action");
+        break;
+    case Action_t::STOP_MOTION_ACTION:
+        ChipLogDetail(AppServer, "Initiating stop motion action");
+        break;
+    case Action_t::STOP_CALIBRATE_ACTION:
+        ChipLogDetail(AppServer, "Initiating stop calibration action");
+        instance.SetCurrentAction(Action_t::STOP_CALIBRATE_ACTION);
+        instance.StartTimer(kCountdownTimeSeconds * 1000);
+        break;
+    case Action_t::MOVE_TO_ACTION:
+        ChipLogDetail(AppServer, "Initiating move to action");
+        break;
+    default:
+        ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
+        return;
+    }
 }
 
 void ClosureManager::HandleClosureEvent(AppEvent * event)
@@ -159,23 +158,27 @@ void ClosureManager::HandleClosureEvent(AppEvent * event)
     {
     case Action_t::CALIBRATE_ACTION:
         ChipLogError(AppServer, "Starting calibration action");
-        PlatformMgr().ScheduleWork([](intptr_t){ ClosureManager::GetInstance().HandleClosureActionComplete(
-            ClosureManager::GetInstance().GetCurrentAction()); });
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager::GetInstance().HandleClosureActionComplete(ClosureManager::GetInstance().GetCurrentAction());
+        });
         break;
     case Action_t::STOP_MOTION_ACTION:
         ChipLogError(AppServer, "Starting stop motion action");
-        PlatformMgr().ScheduleWork([](intptr_t){ ClosureManager::GetInstance().HandleClosureActionComplete(
-            ClosureManager::GetInstance().GetCurrentAction()); });
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager::GetInstance().HandleClosureActionComplete(ClosureManager::GetInstance().GetCurrentAction());
+        });
         break;
     case Action_t::STOP_CALIBRATE_ACTION:
         ChipLogError(AppServer, "Starting stop calibrate action");
-        PlatformMgr().ScheduleWork([](intptr_t){ ClosureManager::GetInstance().HandleClosureActionComplete(
-            ClosureManager::GetInstance().GetCurrentAction()); });
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager::GetInstance().HandleClosureActionComplete(ClosureManager::GetInstance().GetCurrentAction());
+        });
         break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogError(AppServer, "Starting move to action");
-        PlatformMgr().ScheduleWork([](intptr_t){ ClosureManager::GetInstance().HandleClosureActionComplete(
-            ClosureManager::GetInstance().GetCurrentAction()); });
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager::GetInstance().HandleClosureActionComplete(ClosureManager::GetInstance().GetCurrentAction());
+        });
         break;
     default:
         break;
@@ -192,72 +195,69 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     // once sClosureTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type              = AppEvent::kEventType_Closure;
+    event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = closureMgr->GetCurrentAction();
-    event.Handler           = HandleClosureEvent;
+    event.Handler             = HandleClosureEvent;
     AppTask::GetAppTask().PostEvent(&event);
 
     // Reset the current action after handling the timer event
     closureMgr->SetCurrentAction(Action_t::INVALID_ACTION);
 }
 
-
-
-chip::Protocols::InteractionModel::Status  ClosureManager::OnCalibrateCommand()
+chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-  VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR,
-                      Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for calibration"));
+    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
-  AppEvent event;
-  event.Type              = AppEvent::kEventType_Closure;
-  event.ClosureEvent.Action = CALIBRATE_ACTION;
-  event.Handler           = InitiateAction;
-  AppTask::GetAppTask().PostEvent(&event);
+    AppEvent event;
+    event.Type                = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = CALIBRATE_ACTION;
+    event.Handler             = InitiateAction;
+    AppTask::GetAppTask().PostEvent(&event);
 
-  isCalibrationInProgress = true;
-  return Status::Success;
+    isCalibrationInProgress = true;
+    return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status  ClosureManager::OnStopCommand()
+chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 {
-  // this function will contain the code for Stop command handling and initiate the stop action.
-  return Status::Success;
+    // this function will contain the code for Stop command handling and initiate the stop action.
+    return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(
-        const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum>  position,
-        const chip::Optional<bool>  latch,
-        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum>  speed)
+chip::Protocols::InteractionModel::Status
+ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
+                                const chip::Optional<bool> latch,
+                                const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed)
 {
-  // this function will contain the code for MoveTo command handling and initiate the motion action.
-  return Status::Success;
+    // this function will contain the code for MoveTo command handling and initiate the motion action.
+    return Status::Success;
 }
 
 void ClosureManager::HandleClosureActionComplete(Action_t action)
 {
-        switch (action)
-        {
-        case Action_t::CALIBRATE_ACTION:
-        {
-            isCalibrationInProgress = false;
-            GetInstance().ep1.OnCalibrateActionComplete();
-            GetInstance().ep2.OnCalibrateActionComplete();
-            GetInstance().ep3.OnCalibrateActionComplete();
-            break;
-        }
-        case Action_t::STOP_MOTION_ACTION:
-            // This should handle the completion of a stop motion action.
-          break;
-        case Action_t::STOP_CALIBRATE_ACTION:
-            // This should handle the completion of a stop calibration action.
-          break;
-        case Action_t::MOVE_TO_ACTION:
-            // This should handle the completion of a move-to action.
-          break;
-        default:
-            ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
-            break;
-        }
+    switch (action)
+    {
+    case Action_t::CALIBRATE_ACTION: {
+        isCalibrationInProgress = false;
+        GetInstance().ep1.OnCalibrateActionComplete();
+        GetInstance().ep2.OnCalibrateActionComplete();
+        GetInstance().ep3.OnCalibrateActionComplete();
+        break;
+    }
+    case Action_t::STOP_MOTION_ACTION:
+        // This should handle the completion of a stop motion action.
+        break;
+    case Action_t::STOP_CALIBRATE_ACTION:
+        // This should handle the completion of a stop calibration action.
+        break;
+    case Action_t::MOVE_TO_ACTION:
+        // This should handle the completion of a move-to action.
+        break;
+    default:
+        ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
+        break;
+    }
     // Reset the current action after handling the closure action
     GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
 }
