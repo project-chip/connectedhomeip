@@ -359,8 +359,7 @@ def run_tests_no_exit(
                 paaTrustStorePath=str(
                     matter_test_config.paa_trust_store_path),
                 catTags=matter_test_config.controller_cat_tags,
-                dacRevocationSetPath=str(
-                    matter_test_config.dac_revocation_set_path),
+                dacRevocationSetPath=matter_test_config.dac_revocation_set_path if matter_test_config.dac_revocation_set_path else ""
             )
         test_config.user_params["default_controller"] = global_stash.stash_globally(
             default_controller)
