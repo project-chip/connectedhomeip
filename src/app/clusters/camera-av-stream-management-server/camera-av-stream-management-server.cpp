@@ -2082,6 +2082,11 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     VerifyOrReturn(commandData.requestedResolution.width >= 1 && commandData.requestedResolution.height >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
+    // If SoftLivestreamPrivacyModeEnabled or HardPrivacyModeOn, return
+    // InvalidInState.
+    VerifyOrReturn(!mSoftLivestreamPrivacyModeEnabled && !mHardPrivacyModeOn,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
+
     // Call the delegate
     Status status = mDelegate.CaptureSnapshot(snapshotStreamID, requestedResolution, image);
 
