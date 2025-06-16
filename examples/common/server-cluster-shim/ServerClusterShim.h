@@ -59,8 +59,8 @@ namespace app {
         DataVersion GetDataVersion(const ConcreteClusterPath & path) const override;
         BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override
         {
-            return {};
-        } // TODO(sergiosoares): implement this
+            return {}; // Not supported by Ember
+        }
         CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
         Span<const ConcreteClusterPath> GetPaths() const override
