@@ -458,6 +458,8 @@ class ClusterAttributeChangeAccumulator:
             data = transaction.GetAttribute(path)
             # Ensure path.Path and path.AttributeType are not None before accessing their properties
             if path.Path is not None and path.AttributeType is not None:
+                # mypy assertion: EndpointId should not be None when Path is not None
+                assert path.Path.EndpointId is not None
                 value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                        value=data, timestamp_utc=datetime.now(timezone.utc))
                 logging.info(f"Got subscription report for {path.AttributeType}: {data}")
@@ -670,8 +672,8 @@ class MatterTestConfig:
     trace_to: List[str] = field(default_factory=list)
 
     # Accepted Terms and Conditions if used
-    tc_version_to_simulate: int = None
-    tc_user_response_to_simulate: int = None
+    tc_version_to_simulate: Optional[int] = None
+    tc_user_response_to_simulate: Optional[int] = None
     # path to device attestation revocation set json file
     dac_revocation_set_path: Optional[pathlib.Path] = None
 
@@ -721,7 +723,6 @@ class ClusterPathLocation:
 
 @dataclass
 class AttributePathLocation(ClusterPathLocation):
-    cluster_id: Optional[int] = None
     attribute_id: Optional[int] = None
 
     def as_cluster_string(self, mapper: ClusterMapper):
@@ -853,7 +854,7 @@ class MatterStackState:
 
     def _init_stack(self, already_initialized: bool, **kwargs):
         if already_initialized:
-            self._chip_stack = builtins.chipStack
+            self._chip_stack = getattr(builtins, "chipStack")
             self._logger.warn(
                 "Re-using existing ChipStack object found in current interpreter: "
                 "storage path %s will be ignored!" % (self._config.storage_path)
@@ -861,7 +862,7 @@ class MatterStackState:
             # TODO: Warn that storage will not follow what we set in config
         else:
             self._chip_stack = ChipStack(**kwargs)
-            builtins.chipStack = self._chip_stack
+            setattr(builtins, "chipStack", self._chip_stack)
 
         chip.logging.RedirectToPythonLogging()
 
@@ -888,7 +889,7 @@ class MatterStackState:
             # managed elsewhere so we have to be careful not to touch unless
             # we initialized ourselves.
             self._certificate_authority_manager.Shutdown()
-            global_chip_stack = builtins.chipStack
+            global_chip_stack = getattr(builtins, "chipStack")
             global_chip_stack.Shutdown()
 
     @property
@@ -905,7 +906,7 @@ class MatterStackState:
 
     @property
     def stack(self) -> ChipStack:
-        return builtins.chipStack
+        return getattr(builtins, "chipStack")
 
 
 class MatterBaseTest(base_test.BaseTestClass):
