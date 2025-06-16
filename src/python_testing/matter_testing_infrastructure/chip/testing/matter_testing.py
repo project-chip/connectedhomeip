@@ -60,14 +60,13 @@ import chip.logging
 import chip.native
 import chip.testing.global_stash as global_stash
 from chip.ChipStack import ChipStack
-from chip.clusters import Attribute
-from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters import Attribute, ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
-                                        get_setup_payload_info)
+                                        get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
 from chip.testing.runner import TestRunnerHooks, TestStep
@@ -1596,7 +1595,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
 
     def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
-        return get_setup_payload_info(self.matter_test_config)
+        """
+        Get and builds the payload info provided in the execution.
+        Returns:
+            List[SetupPayloadInfo]: List of Payload used by the test case
+        """
+        return get_setup_payload_info_config(self.matter_test_config)
 
     def wait_for_user_input(self,
                             prompt_msg: str,

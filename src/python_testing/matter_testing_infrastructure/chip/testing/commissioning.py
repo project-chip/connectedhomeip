@@ -26,7 +26,6 @@ from typing import Any, List, Optional
 import chip.testing.global_stash as global_stash
 from chip import ChipDeviceCtrl, discovery
 from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.clusters import ClusterObjects as ClusterObjects
 from chip.exceptions import ChipStackError
 from chip.setup_payload import SetupPayload
 from mobly import asserts, base_test, signals
@@ -216,7 +215,7 @@ async def commission_devices(
     return all(commissioned)
 
 
-def get_setup_payload_info(matter_test_config: Any) -> List[SetupPayloadInfo]:
+def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadInfo]:
     """
     Get and builds the payload info provided in the execution.
 
@@ -287,7 +286,7 @@ class CommissionDeviceTest(base_test.BaseTestClass):
             tc_version_to_simulate=meta_config['tc_version_to_simulate'],
             tc_user_response_to_simulate=meta_config['tc_user_response_to_simulate'],
         )
-        self.setup_payloads: List[SetupPayloadInfo] = get_setup_payload_info(
+        self.setup_payloads: List[SetupPayloadInfo] = get_setup_payload_info_config(
             global_stash.unstash_globally(test_config.user_params['matter_test_config']))
 
     def test_run_commissioning(self):
