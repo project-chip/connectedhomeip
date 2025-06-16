@@ -333,12 +333,11 @@ CameraDevice::~CameraDevice()
     }
 }
 
-CHIP_ERROR CameraDevice::Init()
+void CameraDevice::Init()
 {
     InitializeCameraDevice();
     InitializeStreams();
     mWebRTCProviderManager.Init();
-    return CHIP_NO_ERROR;
 }
 
 CameraError CameraDevice::InitializeCameraDevice()

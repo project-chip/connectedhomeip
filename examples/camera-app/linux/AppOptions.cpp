@@ -16,6 +16,7 @@
  */
 
 #include "AppOptions.h"
+#include "camera-device.h"
 
 using namespace chip::ArgParser;
 using namespace chip::System;
@@ -26,7 +27,7 @@ using chip::ArgParser::PrintArgError;
 
 constexpr uint16_t kOptionVideoDevicePath = 0xFF01;
 
-static std::string sVideoDevicePath = "/dev/video0";
+static std::string sVideoDevicePath = Camera::kDefaultVideoDevicePath;
 
 bool AppOptions::IsEmptyString(const char * value)
 {
@@ -61,9 +62,12 @@ OptionSet * AppOptions::GetOptions()
         {},
     };
 
-    static OptionSet options = { AppOptions::HandleOptions, optionsDef, "PROGRAM OPTIONS",
-                                 "  --video-device <value>\n"
-                                 "      Path to a V4L2 video capture device (default: /dev/video0).\n" };
+    // Build the help string using the constant
+    static const std::string helpString = "  --video-device <value>\n"
+                                          "      Path to a V4L2 video capture device (default: " +
+        std::string(Camera::kDefaultVideoDevicePath) + ").\n";
+
+    static OptionSet options = { AppOptions::HandleOptions, optionsDef, "PROGRAM OPTIONS", helpString.c_str() };
 
     return &options;
 }

@@ -66,6 +66,8 @@ static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
 
 namespace Camera {
 
+inline constexpr const char * kDefaultVideoDevicePath = "/dev/video0";
+
 // Camera defined constants for Pan, Tilt, Zoom bounding values
 constexpr int16_t kMinPanValue  = -90;
 constexpr int16_t kMaxPanValue  = 90;
@@ -88,7 +90,7 @@ public:
 
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() override { return *this; }
 
-    CHIP_ERROR Init();
+    void Init();
 
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
@@ -272,7 +274,7 @@ public:
 
 private:
     int videoDeviceFd            = -1;
-    std::string mVideoDevicePath = "/dev/video0";
+    std::string mVideoDevicePath = kDefaultVideoDevicePath;
     std::vector<VideoStream> mVideoStreams;       // Vector to hold available video streams
     std::vector<AudioStream> mAudioStreams;       // Vector to hold available audio streams
     std::vector<SnapshotStream> mSnapshotStreams; // Vector to hold available snapshot streams
