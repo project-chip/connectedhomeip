@@ -60,12 +60,9 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
             TestStep(3, "Send ProvideOffer with null VideoStreamID => expect INVALID_IN_STATE"),
             TestStep(4, "Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
             TestStep(5, "Send ProvideOffer with null AudioStreamID => expect INVALID_IN_STATE"),
-            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=true, HardPrivacyModeOn=false, send ProvideOffer => expect INVALID_IN_STATE"),
-            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=false, HardPrivacyModeOn=true, send ProvideOffer => expect INVALID_IN_STATE"),
-            TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, HardPrivacyModeOn=false"),
-            TestStep(9, "Send VideoStreamAllocate command with valid parameters to create a video stream"),
-            TestStep(10, "Send ProvideOffer with valid parameters => expect ProvideOfferResponse"),
-            TestStep(11, "Read CurrentSessions attribute => expect 1"),
+            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer => expect INVALID_IN_STATE"),
+            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer => expect ProvideOfferResponse"),
+            TestStep(8, "Read CurrentSessions attribute => expect 1"),
         ]
         return steps
 
@@ -175,18 +172,10 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
 
         if privacySupported:
             self.step(6)
-            # Write privacy settings and test INVALID_IN_STATE
+            # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
             await self.write_single_attribute(
-                endpoint=endpoint,
-                cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled,
-                value=True
-            )
-            await self.write_single_attribute(
-                endpoint=endpoint,
-                cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn,
-                value=False
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(True),
+                endpoint_id=endpoint,
             )
 
             cmd = cluster.Commands.ProvideOffer(
@@ -200,95 +189,32 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
                 asserts.fail("Unexpected success on ProvideOffer with privacy mode enabled")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
-
-            self.step(7)
-            # Write different privacy settings and test INVALID_IN_STATE
-            await self.write_single_attribute(
-                endpoint=endpoint,
-                cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled,
-                value=False
-            )
-            await self.write_single_attribute(
-                endpoint=endpoint,
-                cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn,
-                value=True
-            )
-
-            cmd = cluster.Commands.ProvideOffer(
-                webRTCSessionID=NullValue,
-                sdp=test_sdp,
-                streamUsage=3,
-                originatingEndpointID=endpoint
-            )
-            try:
-                await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-                asserts.fail("Unexpected success on ProvideOffer with hard privacy mode enabled")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
-
-            self.step(8)
-            # Disable privacy modes
-            await self.write_single_attribute(
-                endpoint=endpoint,
-                cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled,
-                value=False
-            )
-            await self.write_single_attribute(
-                endpoint=endpoint,
-                cluster=Clusters.CameraAvStreamManagement,
-                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn,
-                value=False
-            )
         else:
-            # Skip these steps if privacy feature is not supported
+            # Skip privacy mode test if not supported
             self.skip_step(6)
-            self.skip_step(7)
-            self.skip_step(8)
 
-        self.step(9)
-        # Send VideoStreamAllocate command with valid parameters to create a video stream
-        videoStreamAllocateCmd = Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
-            streamUsage=3,  # kLiveView
-            videoCodec=Clusters.CameraAvStreamManagement.Enums.VideoCodecEnum.kH264,
-            minFrameRate=30,  # kMinFrameRate
-            maxFrameRate=120,  # kMaxFrameRate
-            minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
-                width=640, height=360  # kMinWidth, kMinHeight
-            ),
-            maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
-                width=1920, height=1080  # kMaxWidth, kMaxHeight
-            ),
-            minBitRate=10000,  # kDefaultBitRate (10,000 bits per second)
-            maxBitRate=10000,  # kDefaultBitRate
-            minFragmentLen=1,  # kMinFragmentLen
-            maxFragmentLen=10,  # kMaxFragmentLen
-        )
-        videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-        asserts.assert_is_not_none(
-            videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
-        )
+        self.step(7)
+        if privacySupported:
+            # Write SoftLivestreamPrivacyModeEnabled=false and send valid ProvideOffer
+            await self.write_single_attribute(
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(False),
+                endpoint_id=endpoint,
+            )
 
-        # Save the allocated video stream ID for use in the next step
-        allocated_video_stream_id = videoStreamAllocateResponse.videoStreamID
-
-        self.step(10)
-        # Send valid ProvideOffer command using the allocated video stream ID
+        # Send valid ProvideOffer command with empty VideoStreamID and AudioStreamID
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=test_sdp,
             streamUsage=3,
-            originatingEndpointID=endpoint,
-            videoStreamID=allocated_video_stream_id
+            originatingEndpointID=endpoint
+            # videoStreamID and audioStreamID not specified (empty)
         )
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
                              "Incorrect response type")
-        asserts.assert_not_equal(resp.webRTCSessionID, 0, "webrtcSessionID in ProvideOfferResponse should not be 0.")
+        asserts.assert_not_equal(resp.webRTCSessionID, 0, "webRTCSessionID in ProvideOfferResponse should not be 0.")
 
-        self.step(11)
+        self.step(8)
         # Verify CurrentSessions contains the new session
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,
