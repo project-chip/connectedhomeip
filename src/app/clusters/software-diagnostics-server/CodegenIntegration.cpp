@@ -59,17 +59,12 @@ constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId
 
 void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    // Restrict cluster to endpoint 0 for dynamic endpoint.
-    if (SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 0)
-    {
-        VerifyOrDie(endpointId == kRootEndpointId);
-    }
-
+    VerifyOrReturn(endpointId == kRootEndpointId);
     const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = IsAttributeEnabled(endpointId, Attributes::ThreadMetrics::Id),
-        .enableCurrentHeapFree   = IsAttributeEnabled(endpointId, Attributes::CurrentHeapFree::Id),
-        .enableCurrentHeapUsed   = IsAttributeEnabled(endpointId, Attributes::CurrentHeapUsed::Id),
-        .enableCurrentWatermarks = IsAttributeEnabled(endpointId, Attributes::CurrentHeapHighWatermark::Id),
+        .enableThreadMetrics     = IsAttributeEnabled(kRootEndpointId, Attributes::ThreadMetrics::Id),
+        .enableCurrentHeapFree   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapFree::Id),
+        .enableCurrentHeapUsed   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapUsed::Id),
+        .enableCurrentWatermarks = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapHighWatermark::Id),
     };
 
     gServer.Create(enabledAttributes);
@@ -84,6 +79,7 @@ void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 
 void emberAfSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
+    VerifyOrReturn(endpointId == kRootEndpointId);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)
     {
