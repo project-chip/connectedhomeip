@@ -58,6 +58,8 @@ class TC_JCM_1_1(MatterBaseTest):
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.fabric_b_ctrl = None
         self.storage_fabric_b = self.user_params.get("fabric_b_storage", None)
+        self.fabric_a_server_app = None
+        self.fabric_b_server_app = None
 
         jfc_server_app = self.user_params.get("jfc_server_app", None)
         if not jfc_server_app:
@@ -194,17 +196,22 @@ class TC_JCM_1_1(MatterBaseTest):
         }
         self.ecoBCATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex()
 
-    # def teardown_class(self):
-    #     if self.fabric_a_admin is not None:
-    #         self.fabric_a_admin.terminate()
-    #     if self.fabric_b_admin is not None:
-    #         self.fabric_b_admin.terminate()
-    #     if self.fabric_a_ctrl is not None:
-    #         self.fabric_a_ctrl.terminate()
-    #     if self.fabric_b_ctrl is not None:
-    #         self.fabric_b_ctrl.terminate()
+    def teardown_class(self):
+        # Stop all Subprocesses that were started
+        if self.fabric_a_admin is not None:
+            self.fabric_a_admin.terminate()
+        if self.fabric_b_admin is not None:
+            self.fabric_b_admin.terminate()
+        if self.fabric_a_ctrl is not None:
+            self.fabric_a_ctrl.terminate()
+        if self.fabric_b_ctrl is not None:
+            self.fabric_b_ctrl.terminate()
+        if self.fabric_a_server_app is not None:
+            self.fabric_a_server_app.terminate()
+        if self.fabric_b_server_app is not None:
+            self.fabric_b_server_app.terminate()
 
-    #     super().teardown_class()
+        super().teardown_class()
 
     def steps_TC_JCM_1_1(self) -> list[TestStep]:
         return [
@@ -266,14 +273,14 @@ class TC_JCM_1_1(MatterBaseTest):
 
         self.step("3")
         self.thserver_fabric_a_passcode = random.randint(110220011, 110220999)
-        fabric_a_server_app = AppServerSubprocess(
+        self.fabric_a_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
             discriminator=random.randint(0, 4095),
             passcode=self.thserver_fabric_a_passcode,
             extra_args=["--capabilities", "0x04"])
-        fabric_a_server_app.start(
+        self.fabric_a_server_app.start(
             expected_output="Server initialization complete",
             timeout=10)
 
@@ -300,14 +307,14 @@ class TC_JCM_1_1(MatterBaseTest):
 
         self.step("4")
         self.thserver_fabric_b_passcode = random.randint(110220011, 110220999)
-        fabric_b_server_app = AppServerSubprocess(
+        self.fabric_b_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_b,
             port=random.randint(5001, 5999),
             discriminator=random.randint(0, 4095),
             passcode=self.thserver_fabric_b_passcode,
             extra_args=["--capabilities", "0x04"])
-        fabric_b_server_app.start(
+        self.fabric_b_server_app.start(
             expected_output="Server initialization complete",
             timeout=10)
 
