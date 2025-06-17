@@ -685,7 +685,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                                                    reportInterval=(100, 1000))
             if len(subscription.GetEvents()) == 0:
                 test_failure = 'Wildcard event subscription returned no events'
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
             # Connection over PASE will fail subscriptions with "Unsupported access"
             # TODO: ideally we should SKIP this test for PASE connections
             _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess

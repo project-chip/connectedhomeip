@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:133
+            image: ghcr.io/project-chip/chip-build:140
             options: --user root
 
         steps:
@@ -58,7 +58,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:133
+            image: ghcr.io/project-chip/chip-build:140
             options: --user root
 
         steps:
@@ -79,7 +79,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:133
+            image: ghcr.io/project-chip/chip-build-esp32:140
             options: --user root
 
         steps:
@@ -100,7 +100,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:133
+            image: ghcr.io/project-chip/chip-build-nrf-platform:140
             options: --user root
 
         steps:
@@ -121,7 +121,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:133
+            image: ghcr.io/project-chip/chip-build-telink:140
             options: --user root
 
         steps:
@@ -133,7 +133,7 @@ jobs:
                 platform: telink
             # - name: Update Zephyr to specific revision (for developers purpose)
             #   shell: bash
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 8f0b3c350ff99dce5569bf4879d322d3aa0a84fd"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 050e732c8ba66ece6058aac1591508e0e3510729"
             - name: CI Examples Telink
               shell: bash
               run: |

@@ -2420,6 +2420,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedGeneralCommissioningClusterNetworkRecoveryReasonAttributeCallback implements ChipClusters.GeneralCommissioningCluster.NetworkRecoveryReasonAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedGeneralCommissioningClusterGeneratedCommandListAttributeCallback implements ChipClusters.GeneralCommissioningCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -17947,27 +17968,6 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
-  public static class DelegatedZoneManagementClusterSupportedZoneSourcesAttributeCallback implements ChipClusters.ZoneManagementCluster.SupportedZoneSourcesAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Integer> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedZoneManagementClusterZonesAttributeCallback implements ChipClusters.ZoneManagementCluster.ZonesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -18001,6 +18001,27 @@ public class ClusterInfoMapping {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct>");
       responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedZoneManagementClusterTwoDCartesianMaxAttributeCallback implements ChipClusters.ZoneManagementCluster.TwoDCartesianMaxAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct");
+      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 
@@ -18375,7 +18396,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterRankedVideoStreamPrioritiesListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.RankedVideoStreamPrioritiesListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterStreamUsagePrioritiesAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.StreamUsagePrioritiesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20468,12 +20489,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(ArrayList<ChipStructs.TlsClientManagementClusterTLSEndpointStruct> endpoints) {
+    public void onSuccess(ChipStructs.TlsClientManagementClusterTLSEndpointStruct endpoint) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      // endpoints: TLSEndpointStruct
+      // endpoint: Struct TLSEndpointStruct
       // Conversion from this type to Java is not properly implemented yet
-
       callback.onSuccess(responseValues);
     }
 
@@ -29458,6 +29478,38 @@ public class ClusterInfoMapping {
     );
     zoneManagementClusterInteractionInfoMap.put("removeZone", zoneManagementremoveZoneInteractionInfo);
 
+    Map<String, CommandParameterInfo> zoneManagementcreateOrUpdateTriggerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo zoneManagementcreateOrUpdateTriggerInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ZoneManagementCluster) cluster)
+        .createOrUpdateTrigger((DefaultClusterCallback) callback
+        , (ChipStructs.ZoneManagementClusterZoneTriggerControlStruct)
+        commandArguments.get("trigger")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        zoneManagementcreateOrUpdateTriggerCommandParams
+    );
+    zoneManagementClusterInteractionInfoMap.put("createOrUpdateTrigger", zoneManagementcreateOrUpdateTriggerInteractionInfo);
+
+    Map<String, CommandParameterInfo> zoneManagementremoveTriggerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo zoneManagementremoveTriggerzoneIDCommandParameterInfo = new CommandParameterInfo("zoneID", Integer.class, Integer.class);
+    zoneManagementremoveTriggerCommandParams.put("zoneID",zoneManagementremoveTriggerzoneIDCommandParameterInfo);
+    InteractionInfo zoneManagementremoveTriggerInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ZoneManagementCluster) cluster)
+        .removeTrigger((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("zoneID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        zoneManagementremoveTriggerCommandParams
+    );
+    zoneManagementClusterInteractionInfoMap.put("removeTrigger", zoneManagementremoveTriggerInteractionInfo);
+
     commandMap.put("zoneManagement", zoneManagementClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> cameraAvStreamManagementClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -29549,11 +29601,11 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo = new CommandParameterInfo("maxBitRate", Long.class, Long.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxBitRate",cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateminFragmentLenCommandParameterInfo = new CommandParameterInfo("minFragmentLen", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("minFragmentLen",cameraAvStreamManagementvideoStreamAllocateminFragmentLenCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateminKeyFrameIntervalCommandParameterInfo = new CommandParameterInfo("minKeyFrameInterval", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("minKeyFrameInterval",cameraAvStreamManagementvideoStreamAllocateminKeyFrameIntervalCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxFragmentLenCommandParameterInfo = new CommandParameterInfo("maxFragmentLen", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxFragmentLen",cameraAvStreamManagementvideoStreamAllocatemaxFragmentLenCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxKeyFrameIntervalCommandParameterInfo = new CommandParameterInfo("maxKeyFrameInterval", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxKeyFrameInterval",cameraAvStreamManagementvideoStreamAllocatemaxKeyFrameIntervalCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("watermarkEnabled",cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo);
@@ -29589,10 +29641,10 @@ public class ClusterInfoMapping {
              commandArguments.get("maxBitRate")
 
            , (Integer)
-             commandArguments.get("minFragmentLen")
+             commandArguments.get("minKeyFrameInterval")
 
            , (Integer)
-             commandArguments.get("maxFragmentLen")
+             commandArguments.get("maxKeyFrameInterval")
 
            , (Optional<Boolean>)
              commandArguments.get("watermarkEnabled")
@@ -31894,6 +31946,18 @@ public class ClusterInfoMapping {
         unitTestingglobalEchoRequestCommandParams
       );
     unitTestingClusterInteractionInfoMap.put("globalEchoRequest", unitTestingglobalEchoRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> unitTestingtestCheckCommandFlagsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo unitTestingtestCheckCommandFlagsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster)
+        .testCheckCommandFlags((DefaultClusterCallback) callback, 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        unitTestingtestCheckCommandFlagsCommandParams
+    );
+    unitTestingClusterInteractionInfoMap.put("testCheckCommandFlags", unitTestingtestCheckCommandFlagsInteractionInfo);
 
     Map<String, CommandParameterInfo> unitTestingtestDifferentVendorMeiRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

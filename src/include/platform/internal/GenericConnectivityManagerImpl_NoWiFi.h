@@ -71,7 +71,6 @@ public:
     System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
     CHIP_ERROR _GetAndLogWiFiStatsCounters(void);
-    bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
     static const char * _WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode);
@@ -183,12 +182,6 @@ template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetAndLogWiFiStatsCounters(void)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_CanStartWiFiScan()
-{
-    return false;
 }
 
 template <class ImplClass>

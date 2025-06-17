@@ -42,6 +42,12 @@ CHIP_ERROR EmptyProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuild
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
+CHIP_ERROR EmptyProvider::EventInfo(const app::ConcreteEventPath & path, app::DataModel::EventEntry & eventInfo)
+{
+    // no events in empty providers as there are no clusters
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
+}
+
 CHIP_ERROR EmptyProvider::ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
