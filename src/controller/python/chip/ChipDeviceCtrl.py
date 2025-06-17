@@ -1818,10 +1818,21 @@ class ChipDeviceControllerBase():
             else:
                 urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
                 # endpoint + (cluster) event / endpoint + cluster
-                if issubclass(pathTuple[1], ClusterObjects.Cluster):
-                    return ClusterAttribute.EventPath.from_cluster(EndpointId=pathTuple[0], Cluster=pathTuple[1], Urgent=urgent)
-                elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):
-                    return ClusterAttribute.EventPath.from_event(EndpointId=pathTuple[0], Event=pathTuple[1], Urgent=urgent)
+                # type: ignore[arg-type]
+                # Fixing these typing errors is a high risk to affect existing functionality.
+                # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+#                    These mismatches are intentional and safe within the current logic.
+                if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
+                    return ClusterAttribute.EventPath.from_cluster(
+                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                        Cluster=pathTuple[1], Urgent=urgent  # type: ignore[arg-type]
+                    )
+                elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):  # type: ignore[arg-type]
+                    return ClusterAttribute.EventPath.from_event(
+                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                        Event=pathTuple[1],  # type: ignore[arg-type]
+                        Urgent=urgent
+                    )
                 else:
                     raise ValueError("Unsupported Attribute Path")
 
