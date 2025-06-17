@@ -22,41 +22,29 @@
 
 namespace bridge {
 
+// Forward declaration: AdministratorCommissioning uses the device to initialize and
+// handle interfaces, bridged device contains the AdministratorCommissioning
+class BridgedDevice;
+
 /**
  * @brief CADMIN cluster implementation for handling attribute interactions of bridged device endpoints.
  *
- * The current Administrator Commissioning Cluster server's zap generated code will automatically
- * register an Attribute Access Interface for the root node endpoint implementation. In order to
- * properly respond to a read attribute for bridged devices we are representing, we override the
- * currently registered Attribute Interface such that we are first to receive any read attribute
- * request on Administrator Commissioning Cluster, and if it is not an endpoint for a device we
- * are a bridge for we redirect to the default cluster server implementation of Administrator
- * Commissioning Cluster.
  */
 class BridgedAdministratorCommissioning : public chip::app::AttributeAccessInterface
 {
 public:
-    // Register for the AdministratorCommissioning cluster on all endpoints.
-    BridgedAdministratorCommissioning() :
-        AttributeAccessInterface(chip::NullOptional, chip::app::Clusters::AdministratorCommissioning::Id)
-    {}
+    // Admin commissioning will be tied to the endpoint specific to this
+    // device. Device `GetEndpointId` MUST be set.
+    //
+    // Automatically registers itself to the AttributeAccessInterfaceRegistry
+    BridgedAdministratorCommissioning(BridgedDevice & device);
+    virtual ~BridgedAdministratorCommissioning();
 
-    CHIP_ERROR Init();
-
+    /// The only AAI we support: reading some attributes
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
 
-    // We do not allow writing to CADMIN attributes of a bridged device endpoint. We simply redirect
-    // write requests to the original attribute interface.
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
-    {
-        VerifyOrDie(mOriginalAttributeInterface);
-        return mOriginalAttributeInterface->Write(aPath, aDecoder);
-    }
-
 private:
-    // If mOriginalAttributeInterface is removed from here, the class description needs to be updated
-    // to reflect this change.
-    chip::app::AttributeAccessInterface * mOriginalAttributeInterface = nullptr;
+    BridgedDevice & mDevice;
 };
 
 } // namespace bridge

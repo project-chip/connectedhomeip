@@ -208,6 +208,69 @@ TEST_F(TestClosureControlClusterLogic, Init_InvalidConformance)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 }
 
+TEST_F(TestClosureControlClusterLogic, ReadFeatureMap_Init)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+}
+
+TEST_F(TestClosureControlClusterLogic, GetFeatureMap_WithoutInit)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    BitFlags<Feature> featureMap;
+    EXPECT_EQ(logic->GetFeatureMap(featureMap), CHIP_ERROR_INCORRECT_STATE);
+
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, GetFeatureMap_WithInit)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    BitFlags<Feature> featureMap;
+    EXPECT_EQ(logic->GetFeatureMap(featureMap), CHIP_NO_ERROR);
+
+    EXPECT_EQ(featureMap, conformance.FeatureMap());
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, GetClusterRevision_WithoutInit)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
+    EXPECT_EQ(logic->GetClusterRevision(clusterRevision), CHIP_ERROR_INCORRECT_STATE);
+
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, GetClusterRevision_WithInit)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    uint16_t kExpectedClusterRevision = 1u;
+    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
+    EXPECT_EQ(logic->GetClusterRevision(clusterRevision), CHIP_NO_ERROR);
+
+    EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
 TEST_F(TestClosureControlClusterLogic, SetMainState_Stopped)
 {
     conformance.FeatureMap().Set(Feature::kPositioning);

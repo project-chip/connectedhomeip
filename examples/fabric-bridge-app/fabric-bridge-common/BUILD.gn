@@ -59,6 +59,8 @@ source_set("fabric-bridge-lib") {
     "BridgedDeviceBasicInformationImpl.h",
     "BridgedDeviceManager.cpp",
     "BridgedDeviceManager.h",
+    "RootEndpointOnlyAccessInterface.cpp",
+    "RootEndpointOnlyAccessInterface.h",
   ]
 
   deps = [

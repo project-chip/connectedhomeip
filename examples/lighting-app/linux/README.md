@@ -136,15 +136,21 @@ Obtain tracing json file.
 
 ## Trigger event using lighting-app event named pipe
 
-You can send a command to lighting-app to trigger specific event via
-lighting-app event named pipe /tmp/chip_lighting_fifo-<PID>.
+You can send a command to lighting-app to trigger specific event by adding the
+--app-pipe argument and providing the path of the file to use `<file_path>`.
+
+### Example to enable named pipes
+
+```
+sudo out/debug/chip-lighting-app --app-pipe /tmp/chip_lighting_fifo
+```
 
 ### Trigger `SoftwareFault` events
 
 1. Generate event `SoftwareFault` when a software fault takes place on the Node.
 
 ```
-$ echo '{"Name":"SoftwareFault"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"SoftwareFault"}' > /tmp/chip_lighting_fifo
 ```
 
 ### Trigger `HardwareFault` events
@@ -153,21 +159,21 @@ $ echo '{"Name":"SoftwareFault"}' > /tmp/chip_lighting_fifo-<PID>
    hardware faults currently detected by the Node.
 
 ```
-$ echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_lighting_fifo
 ```
 
 2. Generate event `RadioFaultChange` to indicate a change in the set of radio
    faults currently detected by the Node.
 
 ```
-$ echo '{"Name":"RadioFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"RadioFaultChange"}' > /tmp/chip_lighting_fifo
 ```
 
 3. Generate event `NetworkFaultChange` to indicate a change in the set of
    network faults currently detected by the Node.
 
 ```
-$ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_lighting_fifo
 ```
 
 4. Generate event `BootReason` to indicate the reason that caused the device to
@@ -192,7 +198,7 @@ $ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
     reboot.
 
 ```
-$ echo '{"Name":"<BootReason>"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"<BootReason>"}' > /tmp/chip_lighting_fifo
 ```
 
 ### Trigger Switch events
@@ -201,41 +207,41 @@ $ echo '{"Name":"<BootReason>"}' > /tmp/chip_lighting_fifo-<PID>
    position.
 
 ```
-$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 2. Generate event `InitialPress`, when the momentary switch starts to be
    pressed.
 
 ```
-$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 3. Generate event `LongPress`, when the momentary switch has been pressed for a
    "long" time.
 
 ```
-$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 4. Generate event `ShortRelease`, when the momentary switch has been released.
 
 ```
-$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 5. Generate event `LongRelease` when the momentary switch has been released and
    after having been pressed for a long time.
 
 ```
-$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 6. Generate event `MultiPressOngoing` to indicate how many times the momentary
    switch has been pressed in a multi-press sequence, during that sequence.
 
 ```
-$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/chip_lighting_fifo
 ```
 
 7. Generate event `MultiPressComplete` to indicate how many times the momentary
@@ -243,5 +249,5 @@ $ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCount
    that the sequence has ended.
 
 ```
-$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/chip_lighting_fifo
 ```
