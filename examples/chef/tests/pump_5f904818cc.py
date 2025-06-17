@@ -18,7 +18,7 @@
 import logging
 from typing import Any
 
-# import chip.clusters as Clusters
+import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 # from chip.interaction_model import Status
 # from chip.testing.matter_asserts import is_valid_uint_value
@@ -31,17 +31,48 @@ logger = logging.getLogger(__name__)
 class TC_PUMP(MatterBaseTest):
     """Tests for chef pump device."""
 
+    # Always receive attribute update reports, regardless of the time delta between them.
+    _SUBSCRIPTION_MIN_INTERVAL_SEC = 0
+
+    # Set this to a large value so liveliness updates aren't received during test.
+    _SUBSCRIPTION_MAX_INTERVAL_SEC = 3600
+
     def desc_TC_PUMP(self) -> str:
         return "[TC_PUMP] Mandatory functionality with chef pump device as server"
 
     def steps_TC_PUMP(self):
-        return [TestStep(1, "[PUMP] Commissioning already done.", is_commissioning=True)]
+        return [TestStep(1, "[PUMP] Commissioning already done.", is_commissioning=True),
+                TestStep(2, "[PUMP] Assert initial attribute values are expected."),
+                TestStep(3, "[PUMP] Subscribe to all required attributes.")]
 
     @async_test_body
     async def test_TC_PUMP(self):
         # *** STEP 1 ***
-        # Commissioning already done
         self.step(1)
+
+        # ** STEP 2 ***
+        self.step(2)
+        onOff = await self.read_single_attribute_check_success(
+            endpoint=1, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
+        asserts.assert_equal(onOff, False)
+        level = await self.read_single_attribute_check_success(
+            endpoint=1, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
+        asserts.assert_equal(level, 1)
+
+        # ** STEP 3 ***
+        self.step(3)
+        on_off_sub = await self.self.default_controller.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(1, Clusters.Objects.OnOff.Attributes.OnOff)],
+            reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
+            keepSubscriptions=False,
+        )
+        level_control_sub = await self.self.default_controller.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(1, Clusters.Objects.OnOff.Attributes.OnOff)],
+            reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
+            keepSubscriptions=True,  # Keep previous subscriptions.
+        )
 
 
 if __name__ == "__main__":
