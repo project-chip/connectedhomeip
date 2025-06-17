@@ -175,6 +175,21 @@ class EEVSEBaseTestHelper:
     async def send_test_event_trigger_evse_diagnostics_complete(self):
         await self.send_test_event_triggers(eventTrigger=0x0099000000000020)
 
+    async def send_test_event_trigger_evse_set_soc_low(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000030)
+
+    async def send_test_event_trigger_evse_set_soc_high(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000031)
+
+    async def send_test_event_trigger_evse_set_soc_clear(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000032)
+
+    async def send_test_event_trigger_evse_set_vehicleid(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000040)
+
+    async def send_test_event_trigger_evse_trigger_rfid(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000050)
+
     def validate_energy_transfer_started_event(self, event_data, session_id, expected_state, expected_max_charge):
         asserts.assert_equal(session_id, event_data.sessionID,
                              f"EnergyTransferStarted event session ID was {event_data.sessionID}, expected {session_id}")
