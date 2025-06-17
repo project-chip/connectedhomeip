@@ -153,7 +153,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
 
 void ClosureManager::HandleClosureEvent(AppEvent * event)
 {
-    Action_t action = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
+    Action_t action           = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
     ClosureManager & instance = ClosureManager::GetInstance();
 
     switch (action)
