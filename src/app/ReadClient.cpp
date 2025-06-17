@@ -1054,7 +1054,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    // If subscription client is capable to handle checkIn message and peer operation mode is LIT,
+    // If subscription client is able to handle check-in messages and peer operation mode is LIT,
     // CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT is set as subscriptionTerminationCause, subscription drops can usefully wait for a
     // check-in message before trying to resubscribe, otherwise, CHIP_ERROR_TIMEOUT is used as subscriptionTerminationCause, and the
     // subscription retry would not wait for check-in and still continue.
