@@ -1530,7 +1530,7 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
 }
 
 //
-// This validates the re-subscription logic within ReadClient that has register icd token with the LIT device.
+// This validates the re-subscription logic within ReadClient that has registered an icd token with the LIT device.
 // This achieves it by overriding the timeout for the liveness timer within ReadClient to be a smaller value than
 // the nominal max interval of the subscription. This causes the subscription to fail on the client side, triggering
 // re-subscription when device is operating as LIT and client has not registered its token in device.
