@@ -16,5 +16,15 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/administrator-commissioning-server.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/AdministratorCommissioningCluster.cpp"
+    "${CLUSTER_DIR}/AdministratorCommissioningCluster.h"
+    "${CLUSTER_DIR}/AdministratorCommissioningLogic.cpp"
+    "${CLUSTER_DIR}/AdministratorCommissioningLogic.h"
 )
