@@ -41,7 +41,7 @@ declare enable_ble=true
 declare enable_ipv4=true
 declare enable_wifi_paf=true
 declare chip_detail_logging=false
-declare chip_mdns
+declare chip_mdns=minimal
 declare case_retry_delta
 declare install_virtual_env
 declare clean_virtual_env=yes
@@ -49,6 +49,20 @@ declare install_pytest_requirements=yes
 declare install_jupyterlab=no
 declare -a extra_packages
 declare -a extra_gn_args
+
+# Detect OS and set override some defaults accordingly.
+OS_TYPE="$(uname -s)"
+case "$OS_TYPE" in
+    "Darwin")
+        enable_wifi_paf=false
+        ;;
+    "Linux")
+        enable_wifi_paf=true
+        ;;
+    *)
+        enable_wifi_paf=false
+        ;;
+esac
 
 help() {
 
@@ -59,22 +73,22 @@ help() {
 Input Options:
   -g, --gn_args ARGS                                        Additional verbatim arguments to pass to the gn command.
                                                             May be specified multiple times.
-  -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=true)
-  -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=true)
-  -4, --enable_ipv4         <true/false>                    Enable IPv4 in the controller (default=false)
+  -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=$enable_ble)
+  -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=$enable_wifi_paf)
+  -4, --enable_ipv4         <true/false>                    Enable IPv4 in the controller (default=$enable_ipv4)
   -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
-                                                            By default it is false.
+                                                            By default it is $chip_detail_logging.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
-                                                            By default it is minimal.
+                                                            By default it is $chip_mdns.
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
                                                             <path> represents where the virtual environment is to be created.
   -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
-                                                            Defaults to yes.
+                                                            Defaults to $clean_virtual_env.
   --include_pytest_deps  <yes|no>                           Install requirements.txt for running scripts/tests and
                                                             src/python_testing scripts.
-                                                            Defaults to yes.
+                                                            Defaults to $install_pytest_requirements.
   -j, --jupyter-lab                                         Install jupyterlab requirements.
   -E, --extra_packages PACKAGE                              Install extra Python packages from PyPI.
                                                             May be specified multiple times.

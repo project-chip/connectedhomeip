@@ -28,7 +28,29 @@ using namespace chip::app::Clusters::ClosureControl;
 using Protocols::InteractionModel::Status;
 
 namespace {
+
 constexpr ElapsedS kDefaultCountdownTime = 30;
+
+enum class ClosureControlTestEventTrigger : uint64_t
+{
+    // MainState is Error(3) Test Event | Simulate that the device is in error state, add at least one element to the
+    // CurrentErrorList attribute
+    kMainStateIsError = 0x0104000000000000,
+
+    // MainState is Protected(5) Test Event | Simulate that the device is in protected state
+    kMainStateIsProtected = 0x0104000000000001,
+
+    // MainState is Disengaged(6) Test Event | Simulate that the device is in disengaged state
+    kMainStateIsDisengaged = 0x0104000000000002,
+
+    // MainState is SetupRequired(7) Test Event | Simulate that the device is in SetupRequired state
+    kMainStateIsSetupRequired = 0x0104000000000003,
+
+    // MainState Test clear Event | Returns the device to pre-test status for that test event.
+    kClearEvent = 0x0104000000000004,
+
+};
+
 } // namespace
 
 Status ClosureControlDelegate::HandleCalibrateCommand()
@@ -87,6 +109,30 @@ ElapsedS ClosureControlDelegate::GetWaitingForMotionCountdownTime()
     // This function should return the waiting for motion countdown time.
     // For now, we will return kDefaultCountdownTime.
     return kDefaultCountdownTime;
+}
+
+CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
+{
+    eventTrigger                           = clearEndpointInEventTrigger(eventTrigger);
+    ClosureControlTestEventTrigger trigger = static_cast<ClosureControlTestEventTrigger>(eventTrigger);
+    ClusterLogic * logic                   = GetLogic();
+
+    switch (trigger)
+    {
+    case ClosureControlTestEventTrigger::kMainStateIsSetupRequired:
+        return logic->SetMainState(MainStateEnum::kSetupRequired);
+    case ClosureControlTestEventTrigger::kMainStateIsProtected:
+        return logic->SetMainState(MainStateEnum::kProtected);
+    case ClosureControlTestEventTrigger::kMainStateIsError:
+        return logic->SetMainState(MainStateEnum::kError);
+    case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
+        return logic->SetMainState(MainStateEnum::kDisengaged);
+    case ClosureControlTestEventTrigger::kClearEvent:
+        // TODO : Implement logic to clear test event after Test plan Spec issue #5429 is resolved.
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 }
 
 CHIP_ERROR ClosureControlEndpoint::Init()

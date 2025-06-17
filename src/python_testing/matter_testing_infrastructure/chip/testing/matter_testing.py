@@ -1616,13 +1616,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         for qr_code in self.matter_test_config.qr_code_content:
             try:
                 setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
                 asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
         for manual_code in self.matter_test_config.manual_code:
             try:
                 setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
                 asserts.fail(
                     f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
 

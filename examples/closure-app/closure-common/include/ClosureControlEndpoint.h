@@ -25,6 +25,7 @@
 #include <app/clusters/closure-control-server/closure-control-server.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -36,13 +37,13 @@ namespace ClosureControl {
 
 /**
  * @class ClosureControlDelegate
- * @brief A delegate class that handles Closure Control commands at the application level.
+ * @brief Delegate class for handling closure control commands and Test event triggers.
  *
- * This class is responsible for processing Closure Control commands such as Stop, MoveTo, and Calibrate
- * according to specific business logic. It is designed to be used as a delegate for the Closure Control cluster.
- *
+ * Inherits from DelegateBase and TestEventTriggerHandler to provide implementations
+ * for closure control operations such as Stop, MoveTo, Calibration, and
+ * error retrieval, and Test event triggering.
  */
-class ClosureControlDelegate : public DelegateBase
+class ClosureControlDelegate : public DelegateBase, public TestEventTriggerHandler
 {
 public:
     ClosureControlDelegate() {}
@@ -60,6 +61,17 @@ public:
     ElapsedS GetCalibrationCountdownTime() override;
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;
+
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
+
+    // Delegate specific functions and variables
+
+    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
+
+    ClusterLogic * GetLogic() const { return mLogic; }
+
+private:
+    ClusterLogic * mLogic;
 };
 
 /**
@@ -80,7 +92,9 @@ class ClosureControlEndpoint
 public:
     ClosureControlEndpoint(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
-    {}
+    {
+        mDelegate.SetLogic(&mLogic);
+    }
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
