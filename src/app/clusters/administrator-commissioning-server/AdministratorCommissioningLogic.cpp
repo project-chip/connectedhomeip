@@ -29,14 +29,6 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace {
-
-DataModel::ActionReturnStatus ClusterFailure(StatusCode code)
-{
-    return ClusterStatusCode::ClusterSpecificFailure(code);
-}
-
-} // namespace
 
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioningWindow(
     FabricIndex fabricIndex, const AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData)
@@ -56,24 +48,29 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioning
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
-    VerifyOrReturnError(fabricInfo != nullptr, ClusterFailure(StatusCode::kPAKEParameterError));
-    VerifyOrReturnError(failSafeContext.IsFailSafeFullyDisarmed(), ClusterFailure(StatusCode::kBusy));
+    VerifyOrReturnError(fabricInfo != nullptr, ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
+    VerifyOrReturnError(failSafeContext.IsFailSafeFullyDisarmed(), ClusterStatusCode::ClusterSpecificFailure(StatusCode::kBusy));
 
-    VerifyOrReturnError(!commissionMgr.IsCommissioningWindowOpen(), ClusterFailure(StatusCode::kBusy));
-    VerifyOrReturnError(iterations >= kSpake2p_Min_PBKDF_Iterations, ClusterFailure(StatusCode::kPAKEParameterError));
-    VerifyOrReturnError(iterations <= kSpake2p_Max_PBKDF_Iterations, ClusterFailure(StatusCode::kPAKEParameterError));
-    VerifyOrReturnError(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, ClusterFailure(StatusCode::kPAKEParameterError));
-    VerifyOrReturnError(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length, ClusterFailure(StatusCode::kPAKEParameterError));
+    VerifyOrReturnError(!commissionMgr.IsCommissioningWindowOpen(), ClusterStatusCode::ClusterSpecificFailure(StatusCode::kBusy));
+    VerifyOrReturnError(iterations >= kSpake2p_Min_PBKDF_Iterations,
+                        ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
+    VerifyOrReturnError(iterations <= kSpake2p_Max_PBKDF_Iterations,
+                        ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
+    VerifyOrReturnError(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length,
+                        ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
+    VerifyOrReturnError(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+                        ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
 
     VerifyOrReturnError(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(), Status::InvalidCommand);
     VerifyOrReturnError(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), Status::InvalidCommand);
     VerifyOrReturnError(discriminator <= kMaxDiscriminatorValue, Status::InvalidCommand);
 
-    VerifyOrReturnError(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR, ClusterFailure(StatusCode::kPAKEParameterError));
+    VerifyOrReturnError(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR,
+                        ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
     VerifyOrReturnError(commissionMgr.OpenEnhancedCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations,
                                                                       salt, fabricIndex,
                                                                       fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
-                        ClusterFailure(StatusCode::kPAKEParameterError));
+                        ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
     ChipLogProgress(Zcl, "Commissioning window is now open");
     return Status::Success;
 }
@@ -90,15 +87,15 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenBasicCommissi
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
-    VerifyOrReturnError(fabricInfo != nullptr, ClusterFailure(StatusCode::kPAKEParameterError));
+    VerifyOrReturnError(fabricInfo != nullptr, ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
 
-    VerifyOrReturnError(!commissionMgr.IsCommissioningWindowOpen(), ClusterFailure(StatusCode::kBusy));
-    VerifyOrReturnError(failSafeContext.IsFailSafeFullyDisarmed(), ClusterFailure(StatusCode::kBusy));
+    VerifyOrReturnError(!commissionMgr.IsCommissioningWindowOpen(), ClusterStatusCode::ClusterSpecificFailure(StatusCode::kBusy));
+    VerifyOrReturnError(failSafeContext.IsFailSafeFullyDisarmed(), ClusterStatusCode::ClusterSpecificFailure(StatusCode::kBusy));
     VerifyOrReturnError(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(), Status::InvalidCommand);
     VerifyOrReturnError(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), Status::InvalidCommand);
     VerifyOrReturnError(commissionMgr.OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
                             commissioningTimeout, fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
-                        ClusterFailure(StatusCode::kPAKEParameterError));
+                        ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
     return Status::Success;
@@ -115,7 +112,7 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
     if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
-        return ClusterFailure(StatusCode::kWindowNotOpen);
+        return ClusterStatusCode::ClusterSpecificFailure(StatusCode::kWindowNotOpen);
     }
 
     Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
