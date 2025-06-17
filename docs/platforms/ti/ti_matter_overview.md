@@ -61,19 +61,19 @@ configuration file.
 
 ## Matter Stack to TI Platform Interface
 
-Matter interacts with OpenThread and the TI-BLE stack to achieve
-the protocol and application functionality. A Bluetooth LE profile is registered
-with the TI-BLE stack to enable provisioning and configuration. Once the device
-is provisioned Matter will configure the OpenThread interface to connect to an
+Matter interacts with OpenThread and the TI-BLE stack to achieve the protocol
+and application functionality. A Bluetooth LE profile is registered with the
+TI-BLE stack to enable provisioning and configuration. Once the device is
+provisioned Matter will configure the OpenThread interface to connect to an
 existing Thread network or to start its own network. From there the Matter IP
-messages are sent to the Protocol Buffers to be routed to the OpenThread stack for
-transmission. Matter Impl (Implementation) layer acts as an interface between
-Matter stack and the TI platform components such as BLE stack, OpenThread,
-FreeRTOS. It also supports components such as connectivity manager that provides
-the implementation for functionality required by Matter stack. Overall,
-applications generally only need to interface with the Cluster Library from
-Matter. The transport of messages and configuration of the device is all handled
-by the platform implementation files.
+messages are sent to the Protocol Buffers to be routed to the OpenThread stack
+for transmission. Matter Impl (Implementation) layer acts as an interface
+between Matter stack and the TI platform components such as BLE stack,
+OpenThread, FreeRTOS. It also supports components such as connectivity manager
+that provides the implementation for functionality required by Matter stack.
+Overall, applications generally only need to interface with the Cluster Library
+from Matter. The transport of messages and configuration of the device is all
+handled by the platform implementation files.
 
 <hr>
 
