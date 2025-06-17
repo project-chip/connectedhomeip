@@ -43,7 +43,6 @@ static_assert((kAdministratorCommissioningFixedClusterCount == 0) ||
                    AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "Fixed administrator commissioning MUST be on endpoint 0");
 
-
 #ifdef ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
 using ClusterImpl = AdministratorCommissioningWithBasicCommissioningWindowCluster;
 #else
@@ -56,7 +55,8 @@ LazyRegisteredServerCluster<ClusterImpl> gServer;
 
 void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
 {
-    if (endpointId != kRootEndpointId) {
+    if (endpointId != kRootEndpointId)
+    {
         return;
     }
 
@@ -77,7 +77,8 @@ void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
 
 void emberAfAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
 {
-    if (endpointId != kRootEndpointId) {
+    if (endpointId != kRootEndpointId)
+    {
         return;
     }
 
