@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 class TC_PUMP(MatterBaseTest):
     """Tests for chef pump device."""
 
-    # Ignore report if its < 1s since the last report.
+    # Ignore report if it is < 1s since the last report.
     _SUBSCRIPTION_MIN_INTERVAL_SEC = 1
 
     # Set this to a large value so any liveliness updates aren't received during test.
@@ -46,48 +46,99 @@ class TC_PUMP(MatterBaseTest):
                 TestStep(3, "[PUMP] Subscribe to all required attributes."),
                 TestStep(4, "[PUMP] Turn on pump.")]
 
+    async def _read_on_off(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=1, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
+
+    async def _read_current_level(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=1, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
+
+    async def _read_temperature(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=1, cluster=Clusters.Objects.TemperatureMeasurement, attribute=Clusters.Objects.TemperatureMeasurement.MeasuredValue,
+        )
+
+    async def _read_pressure(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=1, cluster=Clusters.Objects.PressureMeasurement, attribute=Clusters.Objects.PressureMeasurement.MeasuredValue,
+        )
+
+    async def _read_flow(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=1, cluster=Clusters.Objects.FlowMeasurement, attribute=Clusters.Objects.FlowMeasurement.MeasuredValue,
+        )
+
+    async def _read_pump_capacity(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=1, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.Capacity,
+        )
+
+    async def _read_pump_status(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=1, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.PumpStatus,
+        )
+
+    async def _subscribe_attribute(self, attribute):
+        sub = await self.default_controller.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(1, attribute)],
+            reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
+            keepSubscriptions=True,
+        )
+        attr_cb = AttributeChangeCallback(attribute)
+        sub.SetAttributeUpdateCallback(attr_cb)
+        return sub, attr_cb
+
     @async_test_body
     async def test_TC_PUMP(self):
         # *** STEP 1 ***
+        # Commissioning already done.
         self.step(1)
 
         # ** STEP 2 ***
+        # Assert initial attribute values are expected.
         self.step(2)
-        onOff = await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
-        asserts.assert_equal(onOff, False)
-        level = await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
-        asserts.assert_equal(level, 1)
+        asserts.assert_equal(await self._read_on_off(), False)
+        asserts.assert_equal(await self._read_current_level(), 1)
+        temp = self._read_temperature()
+        asserts.assert_equal(temp, 0)
+        pressure = self._read_pressure()
+        asserts.assert_equal(pressure, 0)
+        flow = self._read_flow()
+        asserts.assert_equal(flow, 0)
+        pump_capacity = self._read_pump_capacity()
+        asserts.assert_equal(pump_capacity, 0)
+        pump_status = self._read_pump_status()
+        asserts.assert_equal(pump_status, 0)
 
         # ** STEP 3 ***
         self.step(3)
-        on_off_sub = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(1, Clusters.Objects.OnOff.Attributes.OnOff)],
-            reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
-            keepSubscriptions=False,
-        )
-        on_off_attr_cb = AttributeChangeCallback(Clusters.Objects.OnOff.Attributes.OnOff)
-        on_off_sub.SetAttributeUpdateCallback(on_off_attr_cb)
-        current_level_sub = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(1, Clusters.Objects.LevelControl.Attributes.CurrentLevel)],
-            reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
-            keepSubscriptions=True,  # Keep previous subscriptions.
-        )
-        current_level_attr_cb = AttributeChangeCallback(Clusters.Objects.LevelControl.Attributes.CurrentLevel)
-        current_level_sub.SetAttributeUpdateCallback(current_level_attr_cb)
+        # Subscribe to all required attributes.
+        on_off_sub, on_off_cb = await self._subscribe_attribute(Clusters.Objects.OnOff.Attributes.OnOff)
+        current_level_sub, current_level_cb = await self._subscribe_attribute(Clusters.Objects.LevelControl.Attributes.CurrentLevel)
+        temp_sub, temp_cb = await self._subscribe_attribute(Clusters.Objects.TemperatureMeasurement.MeasuredValue)
+        pressure_sub, pressure_cb = await self._subscribe_attribute(Clusters.Objects.PressureMeasurement.MeasuredValue)
+        flow_sub, flow_cb = await self._subscribe_attribute(Clusters.Objects.FlowMeasurement.MeasuredValue)
+        capacity_sub, capacity_cb = await self._subscribe_attribute(Clusters.Objects.PumpConfigurationAndControl.Capacity)
+        status_sub, status_cb = await self._subscribe_attribute(Clusters.Objects.PumpConfigurationAndControl.PumpStatus)
 
         # ** STEP 4 **
         self.step(4)
+        # Turn on pump.
         await self.send_single_cmd(
             cmd=Clusters.Objects.OnOff.Commands.On(),
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=1,
         )
-        asserts.assert_equal(on_off_attr_cb.wait_for_report(), True)
+        asserts.assert_equal(on_off_cb.wait_for_report(), True)
+        asserts.assert_equal(await self._read_current_level(), 1)
+        asserts.assert_true(temp_cb.wait_for_report() > temp)
+        asserts.assert_true(pressure_cb.wait_for_report() > pressure)
+        asserts.assert_true(flow_cb.wait_for_report() > flow)
+        asserts.assert_true(capacity_cb.wait_for_report() > pump_capacity)
+        asserts.assert_equal(status_cb.wait_for_report(), 32)
 
 
 if __name__ == "__main__":
