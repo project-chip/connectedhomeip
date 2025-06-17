@@ -32,7 +32,10 @@ class TC_PUMP(MatterBaseTest):
 
     # Set this to a large value so any liveliness updates aren't received during test.
     _SUBSCRIPTION_MAX_INTERVAL_SEC = 3600
-    _PUMP_ENDPOINT = 1  # Define a constant for the pump endpoint
+
+    _PUMP_ENDPOINT = 1
+
+    _MIN_LEVEL = 1
 
     def desc_TC_PUMP(self) -> str:
         return "[TC_PUMP] Mandatory functionality with chef pump device as server"
@@ -47,41 +50,41 @@ class TC_PUMP(MatterBaseTest):
 
     async def _read_on_off(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
+            endpoint=self._PUMP_ENDPOINT, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
 
     async def _read_current_level(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
+            endpoint=self._PUMP_ENDPOINT, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
 
     async def _read_temperature(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.TemperatureMeasurement, attribute=Clusters.Objects.TemperatureMeasurement.Attributes.MeasuredValue,
+            endpoint=self._PUMP_ENDPOINT, cluster=Clusters.Objects.TemperatureMeasurement, attribute=Clusters.Objects.TemperatureMeasurement.Attributes.MeasuredValue,
         )
 
     async def _read_pressure(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.PressureMeasurement, attribute=Clusters.Objects.PressureMeasurement.Attributes.MeasuredValue,
+            endpoint=self._PUMP_ENDPOINT, cluster=Clusters.Objects.PressureMeasurement, attribute=Clusters.Objects.PressureMeasurement.Attributes.MeasuredValue,
         )
 
     async def _read_flow(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.FlowMeasurement, attribute=Clusters.Objects.FlowMeasurement.Attributes.MeasuredValue,
+            endpoint=self._PUMP_ENDPOINT, cluster=Clusters.Objects.FlowMeasurement, attribute=Clusters.Objects.FlowMeasurement.Attributes.MeasuredValue,
         )
 
     async def _read_pump_capacity(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.Attributes.Capacity,
+            endpoint=self._PUMP_ENDPOINT, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.Attributes.Capacity,
         )
 
     async def _read_pump_status(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.Attributes.PumpStatus,
+            endpoint=self._PUMP_ENDPOINT, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.Attributes.PumpStatus,
         )
 
     async def _subscribe_attribute(self, attribute):
         sub = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
-            attributes=[(1, attribute)],
+            attributes=[(self._PUMP_ENDPOINT, attribute)],
             reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
             keepSubscriptions=True,
         )
@@ -99,7 +102,7 @@ class TC_PUMP(MatterBaseTest):
         # Assert initial attribute values are expected.
         self.step(2)
         asserts.assert_equal(await self._read_on_off(), False)
-        asserts.assert_equal(await self._read_current_level(), 1)
+        asserts.assert_equal(await self._read_current_level(), self._MIN_LEVEL)
         temp = await self._read_temperature()
         asserts.assert_equal(temp, 0)
         pressure = await self._read_pressure()
@@ -128,10 +131,10 @@ class TC_PUMP(MatterBaseTest):
             cmd=Clusters.Objects.OnOff.Commands.On(),
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=1,
+            endpoint=self._PUMP_ENDPOINT,
         )
         asserts.assert_equal(on_off_cb.wait_for_report(), True)
-        asserts.assert_equal(await self._read_current_level(), 1)
+        asserts.assert_equal(await self._read_current_level(), self._MIN_LEVEL)
         temp_ = temp_cb.wait_for_report()
         asserts.assert_true(temp_ > temp, "Temperature raise not reported.")
         temp = temp_
@@ -154,7 +157,7 @@ class TC_PUMP(MatterBaseTest):
                 cmd=Clusters.Objects.LevelControl.Commands.MoveToLevel(level=level),
                 dev_ctrl=self.default_controller,
                 node_id=self.dut_node_id,
-                endpoint=1,
+                endpoint=self._PUMP_ENDPOINT,
             )
             asserts.assert_equal(current_level_cb.wait_for_report(), level)
             temp_ = temp_cb.wait_for_report()
@@ -171,7 +174,7 @@ class TC_PUMP(MatterBaseTest):
             pump_capacity = pump_capacity_
             # On/Off and status unchanged
             asserts.assert_equal(await self._read_on_off(), True)
-            asserts.assert_equal(await self._read_pump_status(), 32)
+            asserts.assert_equal(await self._read_pump_status(), Clusters.Objects.PumpConfigurationAndControl.Bitmaps.PumpStatus.kRunning)
 
         # ** STEP 6 **
         # Turn Off pump.
@@ -181,7 +184,7 @@ class TC_PUMP(MatterBaseTest):
             cmd=Clusters.Objects.OnOff.Commands.Off(),
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=1,
+            endpoint=self._PUMP_ENDPOINT,
         )
         asserts.assert_equal(on_off_cb.wait_for_report(), False)
         asserts.assert_equal(await self._read_current_level(), current_level)
