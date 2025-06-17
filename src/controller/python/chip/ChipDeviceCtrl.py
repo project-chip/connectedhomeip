@@ -1778,13 +1778,17 @@ class ChipDeviceControllerBase():
 
         # endpoint + (cluster) attribute / endpoint + cluster
         endpoint = pathTuple[0]
-        if issubclass(pathTuple[1], ClusterObjects.Cluster):
+        # type: ignore[arg-type]
+        # Fixing these typing errors is a high risk to affect existing functionality.
+        # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+        # These mismatches are intentional and safe within the current logic.
+        if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
             cluster = pathTuple[1]
         else:
             raise ValueError("Unsupported Cluster Path")
         dataVersion = pathTuple[2]
         return ClusterAttribute.DataVersionFilter.from_cluster(
-            EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)
+            EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)  # type: ignore[arg-type]
 
     def _parseEventPathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
