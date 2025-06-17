@@ -32,6 +32,7 @@ class TC_PUMP(MatterBaseTest):
 
     # Set this to a large value so any liveliness updates aren't received during test.
     _SUBSCRIPTION_MAX_INTERVAL_SEC = 3600
+    _PUMP_ENDPOINT = 1  # Define a constant for the pump endpoint
 
     def desc_TC_PUMP(self) -> str:
         return "[TC_PUMP] Mandatory functionality with chef pump device as server"
