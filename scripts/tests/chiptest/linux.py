@@ -122,7 +122,7 @@ def CreateNamespacesForAppTest():
     # address to be gone.
 
     logging.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
-    for i in range(100):  # wait at most 10 seconds
+    for _ in range(100):  # wait at most 10 seconds
         output = subprocess.check_output(['ip', 'addr'])
         if b'tentative' not in output:
             logging.info('No more tentative addresses')
@@ -231,6 +231,10 @@ class WpaSupplicantMock(threading.Thread):
         state = "disconnected"
         current_network = "/"
 
+        def __init__(self, mock):
+            super().__init__()
+            self.mock = mock
+
         @sdbus.dbus_method_async("s")
         async def AutoScan(self, arg):
             pass
@@ -241,24 +245,26 @@ class WpaSupplicantMock(threading.Thread):
 
         @sdbus.dbus_method_async("a{sv}", "o")
         async def AddNetwork(self, args):
-            # Mock AP association process.
-            await self.State.set_async("associating")
-            await self.State.set_async("associated")
-            await self.State.set_async("completed")
             # Always return our pre-defined mock network.
             return WpaSupplicantMock.WpaNetwork.path
 
         @sdbus.dbus_method_async("o")
         async def SelectNetwork(self, path):
-            self.current_network = path
+            async def associate():
+                # Mock AP association process.
+                await self.State.set_async("associating")
+                await self.State.set_async("associated")
+                await self.State.set_async("completed")
+            await self.CurrentNetwork.set_async(path)
+            asyncio.create_task(associate())
 
         @sdbus.dbus_method_async("o")
         async def RemoveNetwork(self, path):
-            self.current_network = "/"
+            await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
         async def RemoveAllNetworks(self):
-            self.current_network = "/"
+            await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
         async def Disconnect(self):
@@ -280,6 +286,10 @@ class WpaSupplicantMock(threading.Thread):
         def CurrentNetwork(self):
             return self.current_network
 
+        @CurrentNetwork.setter_private
+        def CurrentNetwork_setter(self, value):
+            self.current_network = value
+
         @sdbus.dbus_property_async("s")
         def CurrentAuthMode(self):
             return "WPA2-PSK"
@@ -289,9 +299,13 @@ class WpaSupplicantMock(threading.Thread):
         path = "/fi/w1/wpa_supplicant1/Interfaces/1/Networks/1"
         enabled = False
 
+        def __init__(self, mock):
+            super().__init__()
+            self.mock = mock
+
         @sdbus.dbus_property_async("a{sv}")
         def Properties(self):
-            return {}
+            return {"ssid": ("s", self.mock.ssid)}
 
         @sdbus.dbus_property_async("b")
         def Enabled(self):
@@ -310,12 +324,14 @@ class WpaSupplicantMock(threading.Thread):
         # Expose interfaces of our service.
         self.wpa = WpaSupplicantMock.Wpa()
         self.wpa.export_to_dbus(self.wpa.path)
-        self.iface = WpaSupplicantMock.WpaInterface()
+        self.iface = WpaSupplicantMock.WpaInterface(self)
         self.iface.export_to_dbus(self.iface.path)
-        self.net = WpaSupplicantMock.WpaNetwork()
+        self.net = WpaSupplicantMock.WpaNetwork(self)
         self.net.export_to_dbus(self.net.path)
 
-    def __init__(self):
+    def __init__(self, ssid: str, password: str):
+        self.ssid = ssid
+        self.password = password
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.startup())
         super().__init__(target=self.loop.run_forever)
