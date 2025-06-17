@@ -1584,10 +1584,54 @@ DataModel::Nullable<Percent> EnergyEvseDelegate::GetStateOfCharge()
 {
     return mStateOfCharge;
 }
+CHIP_ERROR EnergyEvseDelegate::SetStateOfCharge(DataModel::Nullable<uint8_t> newValue)
+{
+    DataModel::Nullable<uint8_t> oldValue = mStateOfCharge;
+
+    mStateOfCharge = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "StateOfCharge updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "StateOfCharge updated to %d", mStateOfCharge.Value());
+        }
+
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, StateOfCharge::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<int64_t> EnergyEvseDelegate::GetBatteryCapacity()
 {
     return mBatteryCapacity;
 }
+CHIP_ERROR  EnergyEvseDelegate::SetBatteryCapacity(DataModel::Nullable<int64_t> newValue)
+{
+    DataModel::Nullable<int64_t> oldValue = mBatteryCapacity;
+
+    mBatteryCapacity = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "BatteryCapacity updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "BatteryCapacity updated to %ld", mBatteryCapacity.Value());
+        }
+
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, BatteryCapacity::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 
 /* PNC attributes*/
 DataModel::Nullable<CharSpan> EnergyEvseDelegate::GetVehicleID()

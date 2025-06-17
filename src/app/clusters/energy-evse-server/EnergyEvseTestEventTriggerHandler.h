@@ -70,11 +70,11 @@ enum class EnergyEvseTrigger : uint64_t
     // EV Charge TimeOfUse Mode clear | Simulate clearing the EVSE Mode TimeOfUse tag
     kEVTimeOfUseModeClear = 0x0099000000000021,
     // EVSE Set SoC Low | Simulate a vehicle reporting 20% State of Charge, 70kWh battery capacity
-    kEVSESetSocLow = 0x0099000000000030,
+    kEVSESetSoCLow = 0x0099000000000030,
     // EVSE Set SoC High | Simulate a vehicle reporting 95% State of Charge, 70kWh battery capacity
-    kEVSESetSocLow = 0x0099000000000031,
+    kEVSESetSoCHigh = 0x0099000000000031,
     // EVSE Set SoC Clear | Simulate no vehicle State of Charge information
-    kEVSESetSocClear = 0x0099000000000032,
+    kEVSESetSoCClear = 0x0099000000000032,
     // EVSE Set VehicleID | Simulate a vehicle ID being sent
     kEVSESetVehicleID = 0x0099000000000040,
     // EVSE Trigger RFID | Simulate an RFID tag being activated

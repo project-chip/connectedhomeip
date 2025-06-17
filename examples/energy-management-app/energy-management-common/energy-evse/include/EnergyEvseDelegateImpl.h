@@ -282,7 +282,10 @@ public:
 
     /* SOC attributes */
     DataModel::Nullable<Percent> GetStateOfCharge() override;
+    CHIP_ERROR SetStateOfCharge(DataModel::Nullable<uint8_t>);
     DataModel::Nullable<int64_t> GetBatteryCapacity() override;
+    CHIP_ERROR SetBatteryCapacity(DataModel::Nullable<int64_t>);
+
     /* PNC attributes*/
     DataModel::Nullable<CharSpan> GetVehicleID() override;
     /* Session SESS attributes */
