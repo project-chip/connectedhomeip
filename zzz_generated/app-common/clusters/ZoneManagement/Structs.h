@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -124,20 +124,22 @@ using DecodableType = Type;
 namespace ZoneTriggerControlStruct {
 enum class Fields : uint8_t
 {
-    kInitialDuration      = 0,
-    kAugmentationDuration = 1,
-    kMaxDuration          = 2,
-    kBlindDuration        = 3,
-    kSensitivity          = 4,
+    kZoneID               = 0,
+    kInitialDuration      = 1,
+    kAugmentationDuration = 2,
+    kMaxDuration          = 3,
+    kBlindDuration        = 4,
+    kSensitivity          = 5,
 };
 
 struct Type
 {
 public:
-    uint16_t initialDuration      = static_cast<uint16_t>(0);
-    uint16_t augmentationDuration = static_cast<uint16_t>(0);
+    uint16_t zoneID               = static_cast<uint16_t>(0);
+    uint32_t initialDuration      = static_cast<uint32_t>(0);
+    uint32_t augmentationDuration = static_cast<uint32_t>(0);
     uint32_t maxDuration          = static_cast<uint32_t>(0);
-    uint16_t blindDuration        = static_cast<uint16_t>(0);
+    uint32_t blindDuration        = static_cast<uint32_t>(0);
     Optional<uint8_t> sensitivity;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

@@ -43,8 +43,8 @@
 	branch  = master
 [submodule "qpg_sdk"]
 	path = third_party/qpg_sdk/repo
-	url = https://github.com/Qorvo/QMatter
-	branch  = vlatest-libs
+	url = https://gitlab.com/qorvo_sdk/public/stacks/matter-support-qorvo.git
+	branch  = main
 	platforms = qpg
 [submodule "freertos"]
 	path = third_party/freertos/repo
@@ -349,4 +349,5 @@
 [submodule "third_party/openthread/ot-realtek"]
 	path = third_party/openthread/ot-realtek
 	url = https://github.com/rtkconnectivity/ot-realtek.git
+	branch = matter_support
 	platforms = realtek

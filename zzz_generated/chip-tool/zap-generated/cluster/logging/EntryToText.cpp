@@ -4270,14 +4270,20 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::ZoneManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::ZoneManagement::Attributes::SupportedZoneSources::Id:
-            return "SupportedZoneSources";
+        case chip::app::Clusters::ZoneManagement::Attributes::MaxUserDefinedZones::Id:
+            return "MaxUserDefinedZones";
+        case chip::app::Clusters::ZoneManagement::Attributes::MaxZones::Id:
+            return "MaxZones";
         case chip::app::Clusters::ZoneManagement::Attributes::Zones::Id:
             return "Zones";
         case chip::app::Clusters::ZoneManagement::Attributes::Triggers::Id:
             return "Triggers";
+        case chip::app::Clusters::ZoneManagement::Attributes::SensitivityMax::Id:
+            return "SensitivityMax";
         case chip::app::Clusters::ZoneManagement::Attributes::Sensitivity::Id:
             return "Sensitivity";
+        case chip::app::Clusters::ZoneManagement::Attributes::TwoDCartesianMax::Id:
+            return "TwoDCartesianMax";
         case chip::app::Clusters::ZoneManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ZoneManagement::Attributes::AcceptedCommandList::Id:
@@ -4331,8 +4337,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AllocatedAudioStreams";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedSnapshotStreams::Id:
             return "AllocatedSnapshotStreams";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::Id:
-            return "RankedVideoStreamPrioritiesList";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::StreamUsagePriorities::Id:
+            return "StreamUsagePriorities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::Id:
             return "SoftRecordingPrivacyModeEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::Id:
@@ -6068,6 +6074,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "GetTwoDCartesianZone";
         case chip::app::Clusters::ZoneManagement::Commands::RemoveZone::Id:
             return "RemoveZone";
+        case chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::Id:
+            return "CreateOrUpdateTrigger";
+        case chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::Id:
+            return "RemoveTrigger";
         default:
             return "Unknown";
         }

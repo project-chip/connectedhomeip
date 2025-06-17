@@ -32,18 +32,9 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
-using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
-using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
-using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
-
-using namespace Camera;
-
 namespace {
 
 // Constants
-constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
 
@@ -89,6 +80,11 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
 }
 
 } // namespace
+
+void WebRTCProviderManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
+{
+    mCameraDevice = aCameraDevice;
+}
 
 void WebRTCProviderManager::Init()
 {
@@ -167,6 +163,8 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     outSession.peerNodeID  = args.peerNodeId;
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
+    mVideoStreamID         = 0;
+    mAudioStreamID         = 0;
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
@@ -179,6 +177,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
         else
         {
             outSession.videoStreamID = args.videoStreamId.Value();
+            mVideoStreamID           = args.videoStreamId.Value().Value();
         }
     }
     else
@@ -197,6 +196,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
         else
         {
             outSession.audioStreamID = args.audioStreamId.Value();
+            mAudioStreamID           = args.audioStreamId.Value().Value();
         }
     }
     else
@@ -209,6 +209,10 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     mCurrentSessionId      = args.sessionId;
 
     outDeferredOffer = LinuxDeviceOptions::GetInstance().cameraDeferredOffer;
+
+    // Acquire the Video and Audio Streams from the CameraAVStreamManagement
+    // cluster and update the reference counts.
+    AcquireAudioVideoStreams();
 
     MoveToState(State::SendingOffer);
 
@@ -235,6 +239,19 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
         ChipLogProgress(Camera, "mMediaController is null. Failed to Register WebRTC Transport");
         return;
     }
+
+    // Set the Video track on the transport
+    if (mVideoTrack && mWebrtcTransportMap[sessionId])
+    {
+        mWebrtcTransportMap[sessionId]->SetVideoTrack(mVideoTrack);
+    }
+
+    // Set the Audio track on the transport
+    if (mAudioTrack && mWebrtcTransportMap[sessionId])
+    {
+        mWebrtcTransportMap[sessionId]->SetAudioTrack(mAudioTrack);
+    }
+
     mMediaController->RegisterTransport(mWebrtcTransportMap[sessionId].get(), mVideoStreamID, mAudioStreamID);
 }
 
@@ -247,6 +264,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     outSession.peerNodeID  = args.peerNodeId;
     outSession.streamUsage = args.streamUsage;
     outSession.fabricIndex = args.fabricIndex;
+    mVideoStreamID         = 0;
+    mAudioStreamID         = 0;
 
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
@@ -296,6 +315,28 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         mWebrtcTransportMap[args.sessionId] =
             std::unique_ptr<WebrtcTransport>(new WebrtcTransport(args.sessionId, mPeerId.GetNodeId(), mPeerConnection));
     }
+
+    // Only set up onTrack callback if you expect to RECEIVE tracks (answerer role)
+    mPeerConnection->onTrack([this, sessionId = args.sessionId](std::shared_ptr<rtc::Track> track) {
+        ChipLogProgress(Camera, "Remote track received for session %u", sessionId);
+
+        // Check if this is a video track based on the media description
+        auto description = track->description();
+        if (description.type() == "video")
+        {
+            mVideoTrack = track;
+            ChipLogProgress(Camera, "Video track updated from remote peer");
+        }
+        else if (description.type() == "audio")
+        {
+            mAudioTrack = track;
+            ChipLogProgress(Camera, "Audio track updated from remote peer");
+        }
+    });
+
+    // Acquire the Video and Audio Streams from the CameraAVStreamManagement
+    // cluster and update the reference counts.
+    AcquireAudioVideoStreams();
 
     MoveToState(State::SendingAnswer);
     rtc::Description remoteOffer(args.sdp, rtc::Description::Type::Offer);
@@ -386,6 +427,12 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
     if (mWebrtcTransportMap.find(sessionId) != mWebrtcTransportMap.end())
     {
         ChipLogProgress(Camera, "Delete Webrtc Transport for the session: %u", sessionId);
+
+        // Release the Video and Audio Streams from the CameraAVStreamManagement
+        // cluster and update the reference counts.
+        // TODO: Lookup the sessionID to get the Video/Audio StreamID
+        ReleaseAudioVideoStreams();
+
         mWebrtcTransportMap.erase(sessionId);
     }
 
@@ -405,8 +452,80 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
                                            const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
-    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
-    return CHIP_NO_ERROR;
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+
+    return avsmDelegate.ValidateStreamUsage(streamUsage, videoStreamId, audioStreamId);
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateVideoStreamID(uint16_t videoStreamId)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+
+    return avsmDelegate.ValidateVideoStreamID(videoStreamId);
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+
+    return avsmDelegate.ValidateAudioStreamID(audioStreamId);
+}
+
+CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+
+    return avsmDelegate.IsPrivacyModeActive(isActive);
+}
+
+bool WebRTCProviderManager::HasAllocatedVideoStreams()
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return false;
+    }
+
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+
+    return avsmDelegate.HasAllocatedVideoStreams();
+}
+
+bool WebRTCProviderManager::HasAllocatedAudioStreams()
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return false;
+    }
+
+    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+
+    return avsmDelegate.HasAllocatedAudioStreams();
 }
 
 void WebRTCProviderManager::MoveToState(const State targetState)
@@ -609,4 +728,15 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
 
     // Now invoke the command using the found session handle
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);
+}
+
+CHIP_ERROR WebRTCProviderManager::AcquireAudioVideoStreams()
+{
+    return mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportAcquireAudioVideoStreams(mAudioStreamID, mVideoStreamID);
+}
+
+CHIP_ERROR WebRTCProviderManager::ReleaseAudioVideoStreams()
+{
+    // TODO: Use passed in audio/video stream ids corresponding to a sessionId.
+    return mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportReleaseAudioVideoStreams(mAudioStreamID, mVideoStreamID);
 }

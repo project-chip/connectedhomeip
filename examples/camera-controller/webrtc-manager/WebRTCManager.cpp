@@ -23,8 +23,11 @@
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
+#include <arpa/inet.h>
 #include <cstdio>
+#include <netinet/in.h>
 #include <string>
+#include <sys/socket.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -33,9 +36,11 @@ using namespace std::chrono_literals;
 namespace {
 
 // Constants
-constexpr const char * kWebRTCDataChannelName = "urn:csa:matter:av-metadata";
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
+
+constexpr const char * kStreamGstDestIp    = "127.0.0.1";
+constexpr uint16_t kVideoStreamGstDestPort = 5000;
 
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
@@ -84,12 +89,7 @@ WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicE
 
 WebRTCManager::~WebRTCManager()
 {
-    // Close the peer connection if they exist
-    if (mPeerConnection)
-    {
-        mPeerConnection->close();
-        mPeerConnection.reset();
-    }
+    Disconnect();
 }
 
 void WebRTCManager::Init()
@@ -199,10 +199,47 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vec
     return CHIP_NO_ERROR;
 }
 
+void WebRTCManager::CloseRTPSocket()
+{
+    if (mRTPSocket != -1)
+    {
+        ChipLogProgress(Camera, "Closing RTP socket");
+        close(mRTPSocket);
+        mRTPSocket = -1;
+    }
+}
+
+void WebRTCManager::Disconnect()
+{
+    ChipLogProgress(Camera, "Disconnecting WebRTC session");
+
+    // Close the peer connection
+    if (mPeerConnection)
+    {
+        mPeerConnection->close();
+        mPeerConnection.reset();
+    }
+
+    // Close the RTP socket
+    CloseRTPSocket();
+
+    // Reset track
+    mTrack.reset();
+
+    // Clear state
+    mCurrentVideoStreamId = 0;
+    mPendingSessionId     = 0;
+    mLocalDescription.clear();
+    mLocalCandidates.clear();
+}
+
 CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)
 {
     ChipLogProgress(Camera, "Attempting to establish WebRTC connection to node 0x" ChipLogFormatX64 " on endpoint 0x%x",
                     ChipLogValueX64(nodeId), endpointId);
+
+    // Clean up any existing connection first
+    Disconnect();
 
     FabricIndex fabricIndex       = commissioner.GetFabricIndex();
     const FabricInfo * fabricInfo = commissioner.GetFabricTable()->FindFabricWithIndex(fabricIndex);
@@ -235,18 +272,58 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         ChipLogProgress(Camera, "%s", candidateStr.c_str());
     });
 
-    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
+    mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
         ChipLogProgress(Camera, "[PeerConnection State: %s]", GetPeerConnectionStateStr(state));
+
+        // Check if the session is now established (connected)
+        if (state == rtc::PeerConnection::State::Connected)
+        {
+            // Call the callback to notify DeviceManager
+            if (mSessionEstablishedCallback && mCurrentVideoStreamId != 0)
+            {
+                mSessionEstablishedCallback(mCurrentVideoStreamId);
+            }
+        }
+        else if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
+                 state == rtc::PeerConnection::State::Closed)
+        {
+            // Clean up resources when connection is lost
+            CloseRTPSocket();
+        }
     });
 
     mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
         ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
     });
 
+    // Create UDP socket for RTP forwarding
+    mRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (mRTPSocket == -1)
+    {
+        ChipLogError(Camera, "Failed to create RTP socket: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    sockaddr_in addr     = {};
+    addr.sin_family      = AF_INET;
+    addr.sin_addr.s_addr = inet_addr(kStreamGstDestIp);
+    addr.sin_port        = htons(kVideoStreamGstDestPort);
+
     rtc::Description::Video media("video", rtc::Description::Direction::RecvOnly);
     media.addH264Codec(kVideoH264PayloadType);
     media.setBitrate(kVideoBitRate);
     mTrack = mPeerConnection->addTrack(media);
+
+    auto session = std::make_shared<rtc::RtcpReceivingSession>();
+    mTrack->setMediaHandler(session);
+
+    mTrack->onMessage(
+        [this, addr](rtc::binary message) {
+            // This is an RTP packet
+            sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
+                   reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
+        },
+        nullptr);
 
     ChipLogProgress(Camera, "Generate and set the SDP");
     mPeerConnection->setLocalDescription();
@@ -254,7 +331,9 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage)
+CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage,
+                                       Optional<app::DataModel::Nullable<uint16_t>> videoStreamId,
+                                       Optional<app::DataModel::Nullable<uint16_t>> audioStreamId)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer command to the peer device");
 
@@ -264,11 +343,15 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR err =
-        mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
-                                           MakeOptional(DataModel::NullNullable), // "Null" for video
-                                           MakeOptional(DataModel::NullNullable)  // "Null" for audio
-        );
+    // Store the stream ID for the callback
+    if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
+    {
+        mCurrentVideoStreamId = videoStreamId.Value().Value();
+        ChipLogProgress(Camera, "Tracking stream ID %u for WebRTC session", mCurrentVideoStreamId);
+    }
+
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage,
+                                                        kWebRTCRequesterDynamicEndpointId, videoStreamId, audioStreamId);
 
     if (err != CHIP_NO_ERROR)
     {
