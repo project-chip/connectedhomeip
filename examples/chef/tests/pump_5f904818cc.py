@@ -80,7 +80,7 @@ class TC_PUMP(MatterBaseTest):
         current_level_sub.SetAttributeUpdateCallback(current_level_attr_cb)
 
         # ** STEP 4 **
-        self.send_single_cmd(
+        await self.send_single_cmd(
             cmd=Clusters.Objects.OnOff.Commands.On(),
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
