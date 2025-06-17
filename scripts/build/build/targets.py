@@ -814,7 +814,6 @@ def BuildTelinkTarget():
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
-    target.AppendModifier('newlib', newlib_libc_config=True)
 
     return target
 

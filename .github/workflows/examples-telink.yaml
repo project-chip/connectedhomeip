@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:138
+            image: ghcr.io/project-chip/chip-build-telink:140
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -57,8 +57,8 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            # - name: Update Zephyr version 3.7.0 (develop) to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 8f0b3c350ff99dce5569bf4879d322d3aa0a84fd"
+            # - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 050e732c8ba66ece6058aac1591508e0e3510729"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs
@@ -166,14 +166,27 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl321x) Lighting App with OTA (LZMA), Factory Data
+            - name: Build example Telink (tl321x) Lighting App with OTA (LZMA), Shell, Factory Data
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-compress-lzma-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-compress-lzma-shell-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3218x light-app-ota-compress-lzma-factory-data \
-                    out/telink-tl3218x-light-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
+                    telink tl3218x light-app-ota-compress-lzma-shell-factory-data \
+                    out/telink-tl3218x-light-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl321x_retention) Light Switch App with OTA, Factory Data
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl3218x_retention light-switch-app-ota-factory-data \
+                    out/telink-tl3218x_retention-light-switch-ota-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -197,10 +210,10 @@ jobs:
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-tflm-newlib' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-tflm' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl7218x light-app-tflm-newlib \
-                    out/telink-tl7218x-light-tflm-newlib/zephyr/zephyr.elf \
+                    telink tl7218x light-app-tflm \
+                    out/telink-tl7218x-light-tflm/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -373,7 +386,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:138
+            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:140
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -392,7 +405,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             # - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py dc28389d22e984b61715ea3c965605c247854cab"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 5a53841781b3be928f599e8fcc1f4ad80c83523b"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs
@@ -481,11 +494,11 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl321x_retention) Light Switch App with OTA, Shell, Factory Data
+            - name: Build example Telink (tl321x_retention) Light Switch App with OTA, Factory Data
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota-shell-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota-factory-data' build"
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
