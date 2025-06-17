@@ -61,13 +61,13 @@ class TC_PUMP(MatterBaseTest):
 
         # ** STEP 3 ***
         self.step(3)
-        on_off_sub = await self.self.default_controller.ReadAttribute(
+        on_off_sub = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[(1, Clusters.Objects.OnOff.Attributes.OnOff)],
             reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
             keepSubscriptions=False,
         )
-        level_control_sub = await self.self.default_controller.ReadAttribute(
+        level_control_sub = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[(1, Clusters.Objects.OnOff.Attributes.OnOff)],
             reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
