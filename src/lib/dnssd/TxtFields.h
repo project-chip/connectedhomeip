@@ -20,6 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <system/SystemClock.h>
 
 #include <cstddef>
@@ -49,6 +50,10 @@ static constexpr size_t kKeyPairingInstructionMaxLength   = 128;
 static constexpr size_t kKeyPairingHintMaxLength          = 10;
 static constexpr size_t kKeyCommissionerPasscodeMaxLength = 1;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+static constexpr size_t kKeyJointFabricModeMaxLength = 3;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 enum class TxtKeyUse : uint8_t
 {
     kNone,
@@ -73,6 +78,9 @@ enum class TxtFieldKey : uint8_t
     kSessionActiveThreshold,
     kTcpSupported,
     kLongIdleTimeICD,
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    kJointFabricMode,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     kCount,
 };
 
@@ -101,6 +109,9 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { kKeySessionActiveThresholdMaxLength, TxtFieldKey::kSessionActiveThreshold, TxtKeyUse::kCommon, "SAT" },
     { kKeyTcpSupportedMaxLength, TxtFieldKey::kTcpSupported, TxtKeyUse::kCommon, "T" },
     { kKeyLongIdleTimeICDMaxLength, TxtFieldKey::kLongIdleTimeICD, TxtKeyUse::kCommon, "ICD" },
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    { kKeyJointFabricModeMaxLength, TxtFieldKey::kJointFabricMode, TxtKeyUse::kCommission, "JF" },
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 };
 #ifdef CHIP_CONFIG_TEST
 
@@ -110,6 +121,9 @@ uint16_t GetProduct(const ByteSpan & value);
 uint16_t GetVendor(const ByteSpan & value);
 uint16_t GetLongDiscriminator(const ByteSpan & value);
 uint8_t GetCommissioningMode(const ByteSpan & value);
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+BitFlags<JointFabricMode> GetJointFabricMode(const ByteSpan & value);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 uint32_t GetDeviceType(const ByteSpan & value);
 void GetDeviceName(const ByteSpan & value, char * name);
 void GetRotatingDeviceId(const ByteSpan & value, uint8_t * rotatingId, size_t * len);

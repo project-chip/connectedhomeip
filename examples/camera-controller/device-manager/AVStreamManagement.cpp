@@ -23,15 +23,15 @@ using namespace ::chip;
 
 namespace {
 
-constexpr uint16_t kMinFrameRate   = 30;
-constexpr uint16_t kMaxFrameRate   = 120;
-constexpr uint32_t kDefaultBitRate = 10'000; // bits per second
-constexpr uint16_t kMinFragmentLen = 1;
-constexpr uint16_t kMaxFragmentLen = 10;
-constexpr uint16_t kMinWidth       = 640;
-constexpr uint16_t kMinHeight      = 360;
-constexpr uint16_t kMaxWidth       = 1920;
-constexpr uint16_t kMaxHeight      = 1080;
+constexpr uint16_t kMinFrameRate        = 30;
+constexpr uint16_t kMaxFrameRate        = 120;
+constexpr uint32_t kDefaultBitRate      = 10000; // bits per second
+constexpr uint16_t kMinKeyFrameInterval = 1000;
+constexpr uint16_t kMaxKeyFrameInterval = 10000;
+constexpr uint16_t kMinWidth            = 640;
+constexpr uint16_t kMinHeight           = 360;
+constexpr uint16_t kMaxWidth            = 1920;
+constexpr uint16_t kMaxHeight           = 1080;
 
 } // namespace
 
@@ -69,8 +69,8 @@ CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId end
     mVideoStreamAllocate.minBitRate = kDefaultBitRate;
     mVideoStreamAllocate.maxBitRate = kDefaultBitRate;
 
-    mVideoStreamAllocate.minFragmentLen = kMinFragmentLen;
-    mVideoStreamAllocate.maxFragmentLen = kMaxFragmentLen;
+    mVideoStreamAllocate.minKeyFrameInterval = kMinKeyFrameInterval;
+    mVideoStreamAllocate.maxKeyFrameInterval = kMaxKeyFrameInterval;
 
     mEndpointId  = endpointId;
     mCommandType = CommandType::kVideoStreamAllocate;

@@ -255,6 +255,7 @@ ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
+CMAC
 cmake
 CMakeLists
 CMD

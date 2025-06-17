@@ -17521,7 +17521,7 @@ public class ClusterIDMapping {
             AllocatedVideoStreams(15L),
             AllocatedAudioStreams(16L),
             AllocatedSnapshotStreams(17L),
-            RankedVideoStreamPrioritiesList(18L),
+            StreamUsagePriorities(18L),
             SoftRecordingPrivacyModeEnabled(19L),
             SoftLivestreamPrivacyModeEnabled(20L),
             HardPrivacyModeOn(21L),
@@ -17650,7 +17650,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinFragmentLen(8),MaxFragmentLen(9),WatermarkEnabled(10),OSDEnabled(11),;
+                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinKeyFrameInterval(8),MaxKeyFrameInterval(9),WatermarkEnabled(10),OSDEnabled(11),;
                     private final int id;
                     VideoStreamAllocateCommandField(int id) {
                         this.id = id;

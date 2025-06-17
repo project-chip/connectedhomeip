@@ -77,6 +77,8 @@ except ImportError:
         os.path.join(DEFAULT_CHIP_ROOT, 'credentials')))
     import fetch_paa_certs_from_dcl
 
+sys.path.append(os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing')))
+
 
 @dataclass
 class Failure:
@@ -96,7 +98,7 @@ class Hooks():
     def stop(self, duration: int):
         pass
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         self.current_test = name
         pass
 
@@ -127,7 +129,8 @@ class Hooks():
 class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def test_TestEventTriggersCheck(self):
-        self.connect_over_pase(self.default_controller)
+        setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
+        await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         gd = Clusters.GeneralDiagnostics
         ret = await self.read_single_attribute_check_success(cluster=gd, attribute=gd.Attributes.TestEventTriggersEnabled)
         asserts.assert_equal(ret, 0, "TestEventTriggers are still on")
@@ -136,7 +139,8 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
 class DclCheck(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
-        self.connect_over_pase(self.default_controller)
+        setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
+        await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         bi = Clusters.BasicInformation
         self.vid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.VendorID)
         self.pid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.ProductID)

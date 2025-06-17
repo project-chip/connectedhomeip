@@ -19,7 +19,7 @@
 #include <CommissionerMain.h>
 #include <admin/FabricAdmin.h>
 #include <admin/PairingManager.h>
-#include <bridge/include/Bridge.h>
+#include <bridge/Bridge.h>
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "ShellCommands.h"

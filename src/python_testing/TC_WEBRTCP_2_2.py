@@ -39,6 +39,7 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
+from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -57,6 +58,8 @@ class TC_WebRTCProvider_2_2(MatterBaseTest):
             TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
             TestStep(2, "Send SolicitOffer with valid parameters => expect DeferredOffer=FALSE"),
             TestStep(3, "Read CurrentSessions attribute => expect 1"),
+            TestStep(4, "Send EndSession with invalid WebRTCSessionID => expect NOT_FOUND"),
+            TestStep(5, "Send EndSession with valid WebRTCSessionID => expect SUCCESS"),
         ]
         return steps
 
@@ -98,6 +101,9 @@ class TC_WebRTCProvider_2_2(MatterBaseTest):
         #     "audioStreamID in SolicitOfferResponse should be valid."
         # )
 
+        # Save the session ID for later steps
+        current_session_id = resp.webRTCSessionID
+
         self.step(3)
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,
@@ -105,6 +111,26 @@ class TC_WebRTCProvider_2_2(MatterBaseTest):
             attribute=cluster.Attributes.CurrentSessions
         )
         asserts.assert_equal(len(current_sessions), 1, "Expected CurrentSessions to be 1")
+
+        # Verify the session contains the correct WebRTCSessionID
+        asserts.assert_equal(current_sessions[0].id, current_session_id, "Session ID should match")
+
+        self.step(4)
+        # Send EndSession with invalid WebRTCSessionID (current + 1)
+        invalid_session_id = current_session_id + 1
+        cmd = cluster.Commands.EndSession(webRTCSessionID=invalid_session_id)
+        try:
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            asserts.fail("Unexpected success on EndSession with invalid WebRTCSessionID")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound, "Expected NOT_FOUND status code")
+
+        self.step(5)
+        # Send EndSession with valid WebRTCSessionID
+        cmd = cluster.Commands.EndSession(webRTCSessionID=current_session_id)
+        resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        # EndSession command should succeed (no exception thrown)
+        # Verify that the response is successful (typically no specific response content for success)
 
 
 if __name__ == "__main__":

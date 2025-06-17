@@ -1873,6 +1873,45 @@ private:
     StringBuilder<kLineBufferSize> mStringBuilder{};
 };
 
+// Utility class to take subject Key IDs (AKID/SKID) and convert them to DCL format ("A5:FF:00.....:DE:AD").
+class KeyIdStringifier
+{
+public:
+    KeyIdStringifier() = default;
+
+    /**
+     * @brief Returns the null-terminated string buffer owned by the class containing converted KeyID.
+     *
+     * LIFETIME NOTE: The last returned value from KeyIdToHex is valid until the next call.
+     *
+     * This is optimized for standard 20-byte AKID/SKID but works for any length, truncating very long ones.
+     *
+     * @param keyIdBuffer - buffer of bytes of the key ID.
+     * @return pointer to class-owned storage of a null-terminated string in DCL format.
+     */
+    const char * KeyIdToHex(ByteSpan keyIdBuffer)
+    {
+        mStringBuilder.Reset();
+        if (keyIdBuffer.empty())
+        {
+            mStringBuilder.Add("<EMPTY KEY ID>");
+            return mStringBuilder.c_str();
+        }
+
+        mStringBuilder.AddFormat("%02X", keyIdBuffer[0]);
+        for (size_t i = 1; i < keyIdBuffer.size(); ++i)
+        {
+            mStringBuilder.Add(":");
+            mStringBuilder.AddFormat("%02X", keyIdBuffer[i]);
+        }
+
+        return mStringBuilder.AddMarkerIfOverflow().c_str();
+    }
+
+private:
+    StringBuilder<(Crypto::kAuthorityKeyIdentifierLength * 3) + 1> mStringBuilder;
+};
+
 /**
  * @brief Checks for resigned version of the certificate in the list and returns it.
  *

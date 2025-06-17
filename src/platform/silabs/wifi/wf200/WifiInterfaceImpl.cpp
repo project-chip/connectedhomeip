@@ -299,22 +299,6 @@ inline int16_t ConvertRcpiToRssi(uint32_t rcpi)
     VerifyOrReturnValue(rssi >= std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::min());
     return rssi;
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-/**
- * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
- *
- * @param[in] ip New IPv4 address
- */
-void GotIPv4Address(uint32_t ip)
-{
-    ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", (ip & 0xFF), (ip >> 8 & 0xFF), (ip >> 16 & 0xFF), (ip >> 24 & 0xFF));
-    sta_ip = ip;
-
-    NotifyIPv4Change(true);
-}
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
 } // namespace
 
 /****************************************************************************
@@ -602,6 +586,16 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack()
                         ChipLogError(DeviceLayer, "wfx_bus_start failed: %lx", status));
     return CHIP_NO_ERROR;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+void WifiInterface::GotIPv4Address(uint32_t ip)
+{
+    ChipLogDetail(DeviceLayer, "DHCP IP=%ld.%ld.%ld.%ld", (ip & 0xFF), (ip >> 8 & 0xFF), (ip >> 16 & 0xFF), (ip >> 24 & 0xFF));
+    sta_ip = ip;
+
+    NotifyIPv4Change(true);
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 CHIP_ERROR WifiInterfaceImpl::GetMacAddress(sl_wfx_interface_t interface, MutableByteSpan & address)
 {
@@ -959,9 +953,9 @@ void WifiInterfaceImpl::ProcessEvents(void * arg)
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
                 uint8_t dhcp_state = dhcpclient_poll(sta_netif);
 
-                if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !WifiInterfaceImpl::GetIstance().HasNotifiedIPv4())
+                if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !WifiInterfaceImpl::GetInstance().HasNotifiedIPv4())
                 {
-                    WifiInterface::GetInstance().GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
+                    WifiInterfaceImpl::GetInstance().GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     if (!hasNotifiedWifiConnectivity)
                     {
                         ChipLogProgress(DeviceLayer, "will notify WiFi connectivity");
@@ -971,7 +965,7 @@ void WifiInterfaceImpl::ProcessEvents(void * arg)
                 }
                 else if (dhcp_state == DHCP_OFF)
                 {
-                    NotifyIPv4Change(false);
+                    WifiInterfaceImpl::GetInstance().NotifyIPv4Change(false);
                 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
                 if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) &&

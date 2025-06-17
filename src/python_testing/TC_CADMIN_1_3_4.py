@@ -217,7 +217,7 @@ class TC_CADMIN(MatterBaseTest):
                 await self.th1.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
-            except ChipStackError as e:
+            except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Error occurs if a NOC for the fabric already exists, which may depend on device state. Can not use assert_raises because it not always fails
                 asserts.assert_equal(e.err,  0x0000007E,
                                      "Expected to return Trying to add NOC for fabric that already exists")
             """
