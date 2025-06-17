@@ -123,7 +123,8 @@ pw_python_distribution("chip-testing") {
   ]
   if (include_idt_files) {
     foreach(file, idt_files) {
-      extra_files += [ "${file} > chip/testing/" + get_path_info(file, "file") ]
+      extra_files +=
+          [ "${file} > chip/testing/idt/" + get_path_info(file, "file") ]
     }
   }
 }
