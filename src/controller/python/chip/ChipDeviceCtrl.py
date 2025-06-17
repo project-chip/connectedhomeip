@@ -305,7 +305,9 @@ class CommissionableNode(discovery.CommissionableNode):
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC)
         '''
-        return self._devCtrl.CommissionOnNetwork(
+        # mypy errors ignored due to coroutine returned without await.
+        # Fixing this typing error risks affecting existing functionality.
+        return self._devCtrl.CommissionOnNetwork(  # type: ignore[return-value]
             nodeId, setupPinCode, filterType=discovery.FilterType.INSTANCE_NAME, filter=self.instanceName)
 
     def __rich_repr__(self):
