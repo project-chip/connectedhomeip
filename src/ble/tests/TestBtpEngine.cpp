@@ -184,13 +184,30 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendThreePacket)
 TEST_F(TestBtpEngine, HandleCharacteristicSendEmptyPacket)
 {
     EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
+}
 
-    auto packet0 = System::PacketBufferHandle::New(20);
-    packet0->SetDataLength(20);
+TEST_F(TestBtpEngine, HandleCharacteristicSendOnePacketWithAck)
+{
+    auto packet0 = System::PacketBufferHandle::New(15);
+    packet0->SetDataLength(15);
+
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), true));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
+}
+
+TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithAck)
+{
+    auto packet0 = System::PacketBufferHandle::New(30);
+    packet0->SetDataLength(30);
 
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
     EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
+    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
+
+    //add correct test
 }
 
 TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
@@ -198,7 +215,14 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     auto packet0 = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize, 0);
     packet0->SetDataLength(packet0->MaxDataLength());
     
-    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(std::move(packet0).Retain(), true));
+    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), true));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Error);
+    EXPECT_EQ(packet0->DataLength(), packet0->MaxDataLength());
+
+    auto packet1 = System::PacketBufferHandle::New(15, 0);
+    packet1->SetDataLength(15);
+
+    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Error);
     EXPECT_EQ(packet0->DataLength(), packet0->MaxDataLength());
 }
