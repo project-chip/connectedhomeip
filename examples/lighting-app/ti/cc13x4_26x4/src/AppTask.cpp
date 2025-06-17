@@ -37,9 +37,9 @@
 #include <platform/ti/cc13xx_26xx/OTAImageProcessorImpl.h>
 #endif
 
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <inet/EndPointStateOpenThread.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 

@@ -43,7 +43,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
-
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
 

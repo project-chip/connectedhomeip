@@ -50,8 +50,8 @@
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
-#include <src/platform/ti/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
 #include <inet/EndPointStateOpenThread.h>
+#include <src/platform/ti/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
