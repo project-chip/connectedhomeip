@@ -98,7 +98,8 @@ void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to register SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        ChipLogError(AppServer, "Failed to register SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
 }
 
@@ -113,7 +114,8 @@ void emberAfSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to unregister SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        ChipLogError(AppServer, "Failed to unregister SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
     gServers[arrayIndex].Destroy();
 }
