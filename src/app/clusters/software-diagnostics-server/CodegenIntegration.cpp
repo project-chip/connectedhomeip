@@ -17,6 +17,7 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
+#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -32,7 +33,28 @@ static_assert((SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig
 
 namespace {
 
-LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>> gServer;
+static constexpr size_t kSoftwareDiagnosticsFixedClusterCount =
+    SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kSoftwareDiagnosticsMaxClusterCount =
+    kSoftwareDiagnosticsFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>>
+    gServers[kSoftwareDiagnosticsMaxClusterCount];
+
+// Find the 0-based array index corresponding to the given endpoint id.
+// Log an error if not found.
+bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+{
+    uint16_t arrayIndex =
+        emberAfGetClusterServerEndpointIndex(endpointId, SoftwareDiagnostics::Id, kSoftwareDiagnosticsFixedClusterCount);
+
+    if (arrayIndex >= kSoftwareDiagnosticsMaxClusterCount)
+    {
+        ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
+        return false;
+    }
+    return true;
+}
 
 // compile-time evaluated method if "is <EP>::SoftwareDiagnostics::<ATTR>" enabled
 constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
@@ -56,20 +78,46 @@ constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId
 
 } // namespace
 
-void MatterSoftwareDiagnosticsPluginServerInitCallback()
+void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    // NOTE: Code already asserts that only kRootEndpointId is registered.
+    uint16_t arrayIndex = 0;
+    if (!findEndpointWithLog(endpointId, arrayIndex))
+    {
+        return;
+    }
+
     const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = IsAttributeEnabled(kRootEndpointId, Attributes::ThreadMetrics::Id),
-        .enableCurrentHeapFree   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapFree::Id),
-        .enableCurrentHeapUsed   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapUsed::Id),
-        .enableCurrentWatermarks = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapHighWatermark::Id),
+        .enableThreadMetrics     = IsAttributeEnabled(endpointId, Attributes::ThreadMetrics::Id),
+        .enableCurrentHeapFree   = IsAttributeEnabled(endpointId, Attributes::CurrentHeapFree::Id),
+        .enableCurrentHeapUsed   = IsAttributeEnabled(endpointId, Attributes::CurrentHeapUsed::Id),
+        .enableCurrentWatermarks = IsAttributeEnabled(endpointId, Attributes::CurrentHeapHighWatermark::Id),
     };
-    gServer.Create(enabledAttributes);
-    (void) CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
+
+    gServers[arrayIndex].Create(enabledAttributes);
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+    }
 }
-void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
+
+void emberAfSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
-    (void) CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    gServer.Destroy();
+    uint16_t arrayIndex = 0;
+    if (!findEndpointWithLog(endpointId, arrayIndex))
+    {
+        return;
+    }
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to unregister SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+    }
+    gServers[arrayIndex].Destroy();
 }
+
+void MatterSoftwareDiagnosticsPluginServerInitCallback() {}
+
+void MatterSoftwareDiagnosticsPluginServerShutdownCallback() {}
