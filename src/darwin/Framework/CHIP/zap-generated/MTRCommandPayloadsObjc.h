@@ -11302,9 +11302,9 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nonnull maxBitRate MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull minFragmentLen MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull minKeyFrameInterval MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull maxFragmentLen MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull maxKeyFrameInterval MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nullable watermarkEnabled MTR_PROVISIONALLY_AVAILABLE;
 
@@ -11793,7 +11793,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nonnull videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRCameraAVSettingsUserLevelManagementClusterViewportStruct * _Nonnull viewport MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDataTypeViewportStruct * _Nonnull viewport MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -14020,7 +14020,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRTLSClientManagementClusterFindEndpointParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable endpointID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull endpointID MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -14050,7 +14050,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRTLSClientManagementClusterFindEndpointResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull endpoints MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRTLSClientManagementClusterTLSEndpointStruct * _Nonnull endpoint MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRTLSClientManagementClusterFindEndpointResponseParams with a response-value dictionary

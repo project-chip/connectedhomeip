@@ -147,7 +147,7 @@ void WiseconnectWifiInterface::ResetConnectivityNotificationFlags(void)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-void WiseconnectWifiInterface::GotIPv4Address(uint32_t ip)
+void WifiInterface::GotIPv4Address(uint32_t ip)
 {
     // Acquire the new IP address
     for (int i = 0; i < 4; ++i)

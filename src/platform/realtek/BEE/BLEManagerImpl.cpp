@@ -334,12 +334,6 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (val)
-    {
-        mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
-        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
-    }
-
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
@@ -644,6 +638,12 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
 
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);
+
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
+    }
 
     // Start advertising
     matter_ble_adv_stop();
