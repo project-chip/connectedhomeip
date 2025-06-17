@@ -1808,12 +1808,16 @@ class ChipDeviceControllerBase():
             # Wildcard
             return ClusterAttribute.EventPath()
         elif not isinstance(pathTuple, tuple):
+            # type: ignore[arg-type]
+            # Fixing these typing errors is a high risk to affect existing functionality.
+            # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+            # These mismatches are intentional and safe within the current logic.
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.Cluster):
-                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.ClusterEvent):
-                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)
+            elif issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[arg-type]
+                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)  # type: ignore[arg-type]
+            elif issubclass(pathTuple, ClusterObjects.ClusterEvent):  # type: ignore[arg-type]
+                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)  # type: ignore[arg-type]
             else:
                 raise ValueError("Unsupported Event Path")
         else:
@@ -1825,7 +1829,7 @@ class ChipDeviceControllerBase():
                 # type: ignore[arg-type]
                 # Fixing these typing errors is a high risk to affect existing functionality.
                 # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
-#                    These mismatches are intentional and safe within the current logic.
+                # These mismatches are intentional and safe within the current logic.
                 if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
                     return ClusterAttribute.EventPath.from_cluster(
                         EndpointId=pathTuple[0],    # type: ignore[arg-type]
