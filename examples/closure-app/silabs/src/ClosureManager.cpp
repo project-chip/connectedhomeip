@@ -125,7 +125,10 @@ void ClosureManager::InitiateAction(AppEvent * event)
 {
     Action_t action = static_cast<Action_t>(event->ClosureEvent.Action);
 
-    ClosureManager instance = ClosureManager::GetInstance();
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    instance.CancelTimer(); // Cancel any existing timer before starting a new action
+    instance.SetCurrentAction(action);
 
     switch (action)
     {
@@ -137,7 +140,6 @@ void ClosureManager::InitiateAction(AppEvent * event)
         break;
     case Action_t::STOP_CALIBRATE_ACTION:
         ChipLogDetail(AppServer, "Initiating stop calibration action");
-        instance.SetCurrentAction(Action_t::STOP_CALIBRATE_ACTION);
         instance.StartTimer(kCountdownTimeSeconds * 1000);
         break;
     case Action_t::MOVE_TO_ACTION:
@@ -152,56 +154,55 @@ void ClosureManager::InitiateAction(AppEvent * event)
 void ClosureManager::HandleClosureEvent(AppEvent * event)
 {
     Action_t action = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
-    ClosureManager::GetInstance().SetCurrentAction(action);
+    ClosureManager & instance = ClosureManager::GetInstance();
 
     switch (action)
     {
     case Action_t::CALIBRATE_ACTION:
         ChipLogError(AppServer, "Starting calibration action");
         PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager::GetInstance().HandleClosureActionComplete(ClosureManager::GetInstance().GetCurrentAction());
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureActionComplete(instance.GetCurrentAction());
         });
         break;
     case Action_t::STOP_MOTION_ACTION:
         ChipLogError(AppServer, "Starting stop motion action");
         PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager::GetInstance().HandleClosureActionComplete(ClosureManager::GetInstance().GetCurrentAction());
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureActionComplete(instance.GetCurrentAction());
         });
         break;
     case Action_t::STOP_CALIBRATE_ACTION:
         ChipLogError(AppServer, "Starting stop calibrate action");
         PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager::GetInstance().HandleClosureActionComplete(ClosureManager::GetInstance().GetCurrentAction());
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureActionComplete(instance.GetCurrentAction());
         });
         break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogError(AppServer, "Starting move to action");
         PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager::GetInstance().HandleClosureActionComplete(ClosureManager::GetInstance().GetCurrentAction());
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureActionComplete(instance.GetCurrentAction());
         });
         break;
     default:
         break;
     }
-
-    ClosureManager::GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
 }
 
 void ClosureManager::TimerEventHandler(void * timerCbArg)
 {
-    ClosureManager * closureMgr = static_cast<ClosureManager *>(timerCbArg);
+    ClosureManager * closureManager = static_cast<ClosureManager *>(timerCbArg);
 
     // The timer event handler will be called in the context of the timer task
     // once sClosureTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = closureMgr->GetCurrentAction();
+    event.ClosureEvent.Action = closureManager->GetCurrentAction();
     event.Handler             = HandleClosureEvent;
     AppTask::GetAppTask().PostEvent(&event);
-
-    // Reset the current action after handling the timer event
-    closureMgr->SetCurrentAction(Action_t::INVALID_ACTION);
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
