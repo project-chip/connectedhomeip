@@ -1193,7 +1193,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
     if (aReadPrepareParams.mRegisteredCheckInToken)
     {
-        ChipLogProgress(DataManagement, "Peer device has been registered with ICD CheckIn token");
+        ChipLogProgress(DataManagement, "Peer device has been registered with ICD Check-In token");
     }
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
