@@ -79,7 +79,6 @@ ti_simplelink_executable("pump_app") {
   output_name = "chip-${ti_simplelink_board}-pump-example.out"
 
   sources = [
-    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/CHIPDeviceManager.cpp",
     "${project_dir}/main/DeviceCallbacks.cpp",
