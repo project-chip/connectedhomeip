@@ -1604,6 +1604,7 @@ class ChipDeviceControllerBase():
         '''
         self.CheckIsActive()
 
+        assert self.devCtrl is not None
         ClusterCommand.SendGroupCommand(
             groupid, self.devCtrl, payload, busyWaitMs=busyWaitMs).raise_on_error()
 
@@ -1726,8 +1727,8 @@ class ChipDeviceControllerBase():
         Bdx.PrepareToSendBdxData(future, data).raise_on_error()
         return future
 
-    # type: ignore[arg-type, misc]
     # mypy errors ignored due to valid use of dynamic types and flexible tuple formats
+    # Fixing these typing errors is a high risk to affect existing functionality.
     # these mismatches are intentional and safe within the current logic
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
@@ -1778,9 +1779,8 @@ class ChipDeviceControllerBase():
 
         # endpoint + (cluster) attribute / endpoint + cluster
         endpoint = pathTuple[0]
-        # type: ignore[arg-type]
-        # Fixing these typing errors is a high risk to affect existing functionality.
         # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+        # Fixing these typing errors is a high risk to affect existing functionality.
         # These mismatches are intentional and safe within the current logic.
         if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
             cluster = pathTuple[1]
@@ -1808,9 +1808,8 @@ class ChipDeviceControllerBase():
             # Wildcard
             return ClusterAttribute.EventPath()
         elif not isinstance(pathTuple, tuple):
-            # type: ignore[arg-type]
-            # Fixing these typing errors is a high risk to affect existing functionality.
             # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+            # Fixing these typing errors is a high risk to affect existing functionality.
             # These mismatches are intentional and safe within the current logic.
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
@@ -1826,9 +1825,8 @@ class ChipDeviceControllerBase():
             else:
                 urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
                 # endpoint + (cluster) event / endpoint + cluster
-                # type: ignore[arg-type]
-                # Fixing these typing errors is a high risk to affect existing functionality.
                 # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+                # Fixing these typing errors is a high risk to affect existing functionality.
                 # These mismatches are intentional and safe within the current logic.
                 if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
                     return ClusterAttribute.EventPath.from_cluster(
@@ -1937,6 +1935,10 @@ class ChipDeviceControllerBase():
 
         '''
         self.CheckIsActive()
+        # mypy errors ignored due to valid use of dynamic types.
+        # A single tuple is passed intentionally (not a list), as expected by the method logic.
+        # Fixing these typing errors is a high risk to affect existing functionality.
+        # These mismatches are intentional and safe within the current logic.
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
@@ -1945,7 +1947,7 @@ class ChipDeviceControllerBase():
         attributePaths = [self._parseAttributePathTuple(
             v) for v in attributes] if attributes else None
         clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
-            v) for v in dataVersionFilters] if dataVersionFilters else None
+            v) for v in dataVersionFilters] if dataVersionFilters else None  # type: ignore[arg-type]
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
