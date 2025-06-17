@@ -37,16 +37,15 @@ import logging
 import os
 import random
 import tempfile
-import time
-
-import builtins
+import base64
 
 import chip.clusters as Clusters
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, MatterStackState, MatterTestConfig, parse_matter_test_args
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from chip import ChipStack, CertificateAuthority
+from chip import CertificateAuthority
 from chip.storage import PersistentStorage
+from configparser import ConfigParser
 
 
 class TC_JCM_1_1(MatterBaseTest):
@@ -80,12 +79,15 @@ class TC_JCM_1_1(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         if self.storage_fabric_a is None:
-            self.storage_fabric_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
-            logging.info("Temporary storage directory: %s", self.storage_fabric_a.name)
+            self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
+            self.storage_fabric_a = self.storage_directory_ecosystem_a.name
+            logging.info("Temporary storage directory: %s", self.storage_fabric_a)
         if self.storage_fabric_b is None:
-            self.storage_fabric_b = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_B_")
-            logging.info("Temporary storage directory: %s", self.storage_fabric_b.name)
+            self.storage_directory_ecosystem_b = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_B_")
+            self.storage_fabric_b = self.storage_directory_ecosystem_b.name
+            logging.info("Temporary storage directory: %s", self.storage_fabric_b)
 
+        # Initialize Ecosystem A
         self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_a_vid = 0xFFF1
 
@@ -93,7 +95,6 @@ class TC_JCM_1_1(MatterBaseTest):
         self.fabric_a_admin = AppServerSubprocess(
             jfa_server_app,
             storage_dir=self.storage_fabric_a,
-            # storage_dir="/tmp/TC_JCM_1_1_A_e9j542kk/",
             port=random.randint(5001, 5999),
             discriminator=random.randint(0, 4095),
             passcode=self.jfadmin_fabric_a_passcode,
@@ -106,7 +107,6 @@ class TC_JCM_1_1(MatterBaseTest):
         self.fabric_a_ctrl = JFControllerSubprocess(
             jfc_server_app,
             rpc_server_port=33033,
-            # storage_dir="/tmp/TC_JCM_1_1_A_e9j542kk/",
             storage_dir=self.storage_fabric_a,
             vendor_id=self.jfctrl_fabric_a_vid)
         self.fabric_a_ctrl.start(
@@ -118,6 +118,30 @@ class TC_JCM_1_1(MatterBaseTest):
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
             expected_output="[JF] Anchor Administrator commissioned with sucess")
 
+        # Extract the Ecosystem A certificates and inject them in the storage that will be provided to the Python Controller
+        jfcStorage = ConfigParser()
+        jfcStorage.read(self.storage_fabric_a+'/chip_tool_config.alpha.ini')
+        self.ecoACtrlStorage = {
+            "sdk-config": {
+                "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
+                "ExampleOpCredsICAKey1": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
+                "ExampleCARootCert1": jfcStorage.get("Default", "ExampleCARootCert0"),
+                "ExampleCAIntermediateCert1": jfcStorage.get("Default", "ExampleCAIntermediateCert0"),
+            },
+            "repl-config": {
+                "caList": {
+                    "1": [
+                        {
+                            "fabricId": 1,
+                            "vendorId": self.jfctrl_fabric_a_vid
+                        }
+                    ]
+                }
+            }
+        }
+        self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex()
+
+        # Initialize Ecosystem B
         self.jfadmin_fabric_b_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_b_vid = 0xFFF2
 
@@ -125,7 +149,6 @@ class TC_JCM_1_1(MatterBaseTest):
         self.fabric_b_admin = AppServerSubprocess(
             jfa_server_app,
             storage_dir=self.storage_fabric_b,
-            # storage_dir="/tmp/TC_JCM_1_1_B_a5uxeocg/",
             port=random.randint(5001, 5999),
             discriminator=random.randint(0, 4095),
             passcode=self.jfadmin_fabric_b_passcode,
@@ -139,7 +162,6 @@ class TC_JCM_1_1(MatterBaseTest):
             jfc_server_app,
             rpc_server_port=33055,
             storage_dir=self.storage_fabric_b,
-            # storage_dir="/tmp/TC_JCM_1_1_B_a5uxeocg/",
             vendor_id=self.jfctrl_fabric_b_vid)
         self.fabric_b_ctrl.start(
             expected_output="CHIP task running",
@@ -150,21 +172,39 @@ class TC_JCM_1_1(MatterBaseTest):
             message=f"pairing onnetwork 11 {self.jfadmin_fabric_b_passcode} --anchor true",
             expected_output="[JF] Anchor Administrator commissioned with sucess")
 
-    def teardown_class(self):
-        if self.fabric_a_admin is not None:
-            self.fabric_a_admin.terminate()
-        if self.fabric_b_admin is not None:
-            self.fabric_b_admin.terminate()
-        if self.fabric_a_ctrl is not None:
-            self.fabric_a_ctrl.terminate()
-        if self.fabric_b_ctrl is not None:
-            self.fabric_b_ctrl.terminate()
-        if self.storage_fabric_a is not None:
-            self.storage_fabric_a.cleanup()
-        if self.storage_fabric_b is not None:
-            self.storage_fabric_b.cleanup()
+        jfcStorage = ConfigParser()
+        jfcStorage.read(self.storage_fabric_b+'/chip_tool_config.alpha.ini')
+        self.ecoBCtrlStorage = {
+            "sdk-config": {
+                "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
+                "ExampleOpCredsICAKey1": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
+                "ExampleCARootCert1": jfcStorage.get("Default", "ExampleCARootCert0"),
+                "ExampleCAIntermediateCert1": jfcStorage.get("Default", "ExampleCAIntermediateCert0"),
+            },
+            "repl-config": {
+                "caList": {
+                    "1": [
+                        {
+                            "fabricId": 1,
+                            "vendorId": self.jfctrl_fabric_b_vid
+                        }
+                    ]
+                }
+            }
+        }
+        self.ecoBCATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex()
 
-        super().teardown_class()
+    # def teardown_class(self):
+    #     if self.fabric_a_admin is not None:
+    #         self.fabric_a_admin.terminate()
+    #     if self.fabric_b_admin is not None:
+    #         self.fabric_b_admin.terminate()
+    #     if self.fabric_a_ctrl is not None:
+    #         self.fabric_a_ctrl.terminate()
+    #     if self.fabric_b_ctrl is not None:
+    #         self.fabric_b_ctrl.terminate()
+
+    #     super().teardown_class()
 
     def steps_TC_JCM_1_1(self) -> list[TestStep]:
         return [
@@ -177,66 +217,58 @@ class TC_JCM_1_1(MatterBaseTest):
     @async_test_body
     async def test_TC_JCM_1_1(self):
 
-        self.step("1")
-        # TODO: Create admin_storage.json from INI file of each controller
-        _fabric_a_persistent_storage = PersistentStorage(path=self.storage_fabric_a+"admin_storage.json")
+        # Creating a Controller for Ecosystem A
+        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
         _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        devCtrlA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
             nodeId=101,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
-            # TODO: Extract AdminCATs from INI file
-            catTags=[0xFFFF_0001]
-        )
+            catTags=[int(self.ecoACATs, 16)])
 
-        _fabric_b_persistent_storage = PersistentStorage(path=self.storage_fabric_b+"admin_storage.json")
+        # Creating a Controller for Ecosystem A
+        _fabric_b_persistent_storage = PersistentStorage(jsonData=self.ecoBCtrlStorage)
         _certAuthorityManagerB = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_b_persistent_storage)
         _certAuthorityManagerB.LoadAuthoritiesFromStorage()
-        devCtrlB = _certAuthorityManagerB.activeCaList[0].adminList[0].NewController(
+        devCtrlEcoB = _certAuthorityManagerB.activeCaList[0].adminList[0].NewController(
             nodeId=201,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
-            catTags=[0xFFFF_0001]
-        )
+            catTags=[int(self.ecoBCATs, 16)])
 
-        # TODO: Parse response NOC and ICAC to extract certificates
-        responseA = await devCtrlA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
-            returnClusterObject=True
-        )
+        self.step("1")
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            returnClusterObject=True)
+        asserts.assert_equal(
+            self.jfctrl_fabric_a_vid,
+            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
+            "JF-Admin App on Ecosystem A doesn't have the correct VID")
 
-        responseB = await devCtrlB.ReadAttribute(
-            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
-            returnClusterObject=True
-        )
-
-        self.fabric_a_ctrl.send(
-            message="operationalcredentials read fabrics 1 0",
-            expected_output=f"VendorID: {int(self.jfctrl_fabric_a_vid)}",
-            timeout=10)
-        self.fabric_b_ctrl.send(
-            message="operationalcredentials read fabrics 11 0",
-            expected_output=f"VendorID: {int(self.jfctrl_fabric_b_vid)}",
-            timeout=10)
+        response = await devCtrlEcoB.ReadAttribute(
+            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            returnClusterObject=True)
+        asserts.assert_equal(
+            self.jfctrl_fabric_b_vid,
+            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
+            "JF-Admin App on Ecosystem A doesn't have the correct VID")
 
         self.step("2")
-        self.fabric_a_ctrl.send(
-            message="operationalcredentials read nocs 1 0",
-            expected_output="NOCs: 1 entries",
-            timeout=10)
-        self.fabric_b_ctrl.send(
-            message="operationalcredentials read nocs 11 0",
-            expected_output="NOCs: 1 entries",
-            timeout=10)
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+            returnClusterObject=True)
+        response = await devCtrlEcoB.ReadAttribute(
+            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+            returnClusterObject=True)
 
         self.step("3")
         self.thserver_fabric_a_passcode = random.randint(110220011, 110220999)
         fabric_a_server_app = AppServerSubprocess(
             self.th_server_app,
-            storage_dir=self.storage_fabric_a.name,
+            storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
             discriminator=random.randint(0, 4095),
             passcode=self.thserver_fabric_a_passcode,
@@ -248,26 +280,29 @@ class TC_JCM_1_1(MatterBaseTest):
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 2 {self.thserver_fabric_a_passcode}",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
-            timeout=10
-        )
+            timeout=10)
 
-        self.fabric_a_ctrl.send(
-            message="operationalcredentials read fabrics 2 0",
-            expected_output=f"VendorID: {int(self.jfctrl_fabric_a_vid)}",
-            timeout=10
-        )
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=2, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            returnClusterObject=True)
+        asserts.assert_equal(
+            self.jfctrl_fabric_a_vid,
+            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
+            "JF-Admin App on Ecosystem A doesn't have the correct VID")
 
-        self.fabric_a_ctrl.send(
-            message="accesscontrol read acl 2 0",
-            expected_output="[1]: 18446744065119551489",
-            timeout=10
-        )
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=2, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            returnClusterObject=True)
+        asserts.assert_equal(
+            18446744065119551489,
+            response[0][Clusters.AccessControl].acl[0].subjects[0],
+            "EcoA Server App Subjects field has wrong value")
 
         self.step("4")
         self.thserver_fabric_b_passcode = random.randint(110220011, 110220999)
         fabric_b_server_app = AppServerSubprocess(
             self.th_server_app,
-            storage_dir=self.storage_fabric_b.name,
+            storage_dir=self.storage_fabric_b,
             port=random.randint(5001, 5999),
             discriminator=random.randint(0, 4095),
             passcode=self.thserver_fabric_b_passcode,
@@ -279,22 +314,23 @@ class TC_JCM_1_1(MatterBaseTest):
         self.fabric_b_ctrl.send(
             message=f"pairing onnetwork 22 {self.thserver_fabric_b_passcode}",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000016: success",
-            timeout=10
-        )
+            timeout=10)
 
-        self.fabric_b_ctrl.send(
-            message="operationalcredentials read fabrics 22 0",
-            expected_output=f"VendorID: {int(self.jfctrl_fabric_b_vid)}",
-            timeout=10
-        )
+        response = await devCtrlEcoB.ReadAttribute(
+            nodeid=22, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            returnClusterObject=True)
+        asserts.assert_equal(
+            self.jfctrl_fabric_b_vid,
+            response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
+            "JF-Admin App on Ecosystem A doesn't have the correct VID")
 
-        self.fabric_b_ctrl.send(
-            message="accesscontrol read acl 22 0",
-            expected_output="[1]: 18446744065119551489",
-            timeout=10
-        )
-
-        self.teardown_test()
+        response = await devCtrlEcoB.ReadAttribute(
+            nodeid=22, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            returnClusterObject=True)
+        asserts.assert_equal(
+            18446744065119551489,
+            response[0][Clusters.AccessControl].acl[0].subjects[0],
+            "EcoA Server App Subjects field has wrong value")
 
 
 if __name__ == "__main__":
