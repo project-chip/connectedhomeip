@@ -626,6 +626,7 @@ class MatterTestConfig:
     timeout: typing.Union[int, None] = None
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
+    app_pipe: Optional[str] = None
     pipe_name: typing.Union[str, None] = None
     fail_on_skipped_tests: bool = False
 
@@ -648,7 +649,7 @@ class MatterTestConfig:
     wifi_passphrase: Optional[str] = None
     thread_operational_dataset: Optional[str] = None
 
-    pics: dict[bool, str] = field(default_factory=dict)
+    pics: dict[str, bool] = field(default_factory=dict)
 
     # Node ID for basic DUT
     dut_node_ids: List[int] = field(default_factory=list)
@@ -1071,7 +1072,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         return self.matter_test_config.dut_node_ids[0]
 
-    def get_endpoint(self, default: Optional[int] = 0) -> int:
+    def get_endpoint(self, default: int = 0) -> int:
         return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
 
     def setup_class(self):
@@ -1171,21 +1172,23 @@ class MatterBaseTest(base_test.BaseTestClass):
             node_id = self.dut_node_id
         try:
             commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
-                                                                          discriminator=rnd_discriminator, option=1)
+                                                                          discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
             params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
             return params
 
         except InteractionModelError as e:
             asserts.fail(e.status, 'Failed to open commissioning window')
+            raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor, fabricFiltered: bool = True) -> object:
+        # type: ignore[list-item]
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_all_endpoints(
-            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+            self, cluster: ClusterObjects.Cluster, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
@@ -1198,7 +1201,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
 
-        read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])
+        read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])  # type: ignore[list-item]
         attrs = {}
         for endpoint in read_response:
             attr_ret = read_response[endpoint][cluster][attribute]
@@ -1206,7 +1209,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attrs
 
     async def read_single_attribute_check_success(
-            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+            self, cluster: ClusterObjects.Cluster, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -1215,6 +1218,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.get_endpoint()
 
+        # type: ignore[list-item]
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
@@ -1237,7 +1241,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attr_ret
 
     async def read_single_attribute_expect_error(
-            self, cluster: object, attribute: object,
+            self, cluster: ClusterObjects.Cluster, attribute: ClusterObjects.ClusterAttributeDescriptor,
             error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
@@ -1247,6 +1251,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.get_endpoint()
 
+        # type: ignore[list-item]
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
         err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
@@ -1263,7 +1268,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: object, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -1299,7 +1304,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                                             payloadCapability=payloadCapability)
         return result
 
-    async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
+    async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
            The enableKey can be passed into the function, or omitted which will then
@@ -1319,7 +1324,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=0, cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey, eventTrigger))
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey, uint(eventTrigger)))
 
         except InteractionModelError as e:
             asserts.fail(
@@ -2183,7 +2188,7 @@ def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterO
 
 async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
     """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
+    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])  # type: ignore[list-item]
     matching = [e for e in wildcard.attributes.keys()
                 if accept_function(wildcard, e)]
     return matching
@@ -2221,7 +2226,7 @@ has_attribute = decorators.has_attribute
 has_command = decorators.has_command
 has_feature = decorators.has_feature
 should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
-_get_all_matching_endpoints = decorators._get_all_matching_endpoints
+_get_all_matching_endpoints = decorators._get_all_matching_endpoints  # type: ignore[assignment]
 _has_feature = decorators._has_feature
 _has_command = decorators._has_command
 _has_attribute = decorators._has_attribute
