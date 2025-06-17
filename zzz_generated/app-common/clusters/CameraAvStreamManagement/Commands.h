@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -136,7 +137,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AudioStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     AudioCodecEnum audioCodec            = static_cast<AudioCodecEnum>(0);
@@ -181,11 +181,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AudioStreamAllocateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t audioStreamID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -197,7 +196,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AudioStreamAllocateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t audioStreamID = static_cast<uint16_t>(0);
 
@@ -216,7 +214,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AudioStreamDeallocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t audioStreamID = static_cast<uint16_t>(0);
 
@@ -242,18 +239,18 @@ public:
 namespace VideoStreamAllocate {
 enum class Fields : uint8_t
 {
-    kStreamUsage      = 0,
-    kVideoCodec       = 1,
-    kMinFrameRate     = 2,
-    kMaxFrameRate     = 3,
-    kMinResolution    = 4,
-    kMaxResolution    = 5,
-    kMinBitRate       = 6,
-    kMaxBitRate       = 7,
-    kMinFragmentLen   = 8,
-    kMaxFragmentLen   = 9,
-    kWatermarkEnabled = 10,
-    kOSDEnabled       = 11,
+    kStreamUsage         = 0,
+    kVideoCodec          = 1,
+    kMinFrameRate        = 2,
+    kMaxFrameRate        = 3,
+    kMinResolution       = 4,
+    kMaxResolution       = 5,
+    kMinBitRate          = 6,
+    kMaxBitRate          = 7,
+    kMinKeyFrameInterval = 8,
+    kMaxKeyFrameInterval = 9,
+    kWatermarkEnabled    = 10,
+    kOSDEnabled          = 11,
 };
 
 struct Type
@@ -262,7 +259,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::VideoStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     VideoCodecEnum videoCodec            = static_cast<VideoCodecEnum>(0);
@@ -270,10 +266,10 @@ public:
     uint16_t maxFrameRate                = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
-    uint32_t minBitRate     = static_cast<uint32_t>(0);
-    uint32_t maxBitRate     = static_cast<uint32_t>(0);
-    uint16_t minFragmentLen = static_cast<uint16_t>(0);
-    uint16_t maxFragmentLen = static_cast<uint16_t>(0);
+    uint32_t minBitRate          = static_cast<uint32_t>(0);
+    uint32_t maxBitRate          = static_cast<uint32_t>(0);
+    uint16_t minKeyFrameInterval = static_cast<uint16_t>(0);
+    uint16_t maxKeyFrameInterval = static_cast<uint16_t>(0);
     Optional<bool> watermarkEnabled;
     Optional<bool> OSDEnabled;
 
@@ -297,10 +293,10 @@ public:
     uint16_t maxFrameRate                = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
-    uint32_t minBitRate     = static_cast<uint32_t>(0);
-    uint32_t maxBitRate     = static_cast<uint32_t>(0);
-    uint16_t minFragmentLen = static_cast<uint16_t>(0);
-    uint16_t maxFragmentLen = static_cast<uint16_t>(0);
+    uint32_t minBitRate          = static_cast<uint32_t>(0);
+    uint32_t maxBitRate          = static_cast<uint32_t>(0);
+    uint16_t minKeyFrameInterval = static_cast<uint16_t>(0);
+    uint16_t maxKeyFrameInterval = static_cast<uint16_t>(0);
     Optional<bool> watermarkEnabled;
     Optional<bool> OSDEnabled;
 
@@ -319,11 +315,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::VideoStreamAllocateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -335,7 +330,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::VideoStreamAllocateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
 
@@ -356,7 +350,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::VideoStreamModify::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
     Optional<bool> watermarkEnabled;
@@ -395,7 +388,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::VideoStreamDeallocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
 
@@ -436,7 +428,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SnapshotStreamAllocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
     uint16_t maxFrameRate     = static_cast<uint16_t>(0);
@@ -483,11 +474,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SnapshotStreamAllocateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t snapshotStreamID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -499,7 +489,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SnapshotStreamAllocateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t snapshotStreamID = static_cast<uint16_t>(0);
 
@@ -520,7 +509,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SnapshotStreamModify::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t snapshotStreamID = static_cast<uint16_t>(0);
     Optional<bool> watermarkEnabled;
@@ -559,7 +547,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SnapshotStreamDeallocate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t snapshotStreamID = static_cast<uint16_t>(0);
 
@@ -594,7 +581,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetStreamPriorities::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Globals::StreamUsageEnum> streamPriorities;
 
@@ -630,7 +616,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CaptureSnapshot::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<uint16_t> snapshotStreamID;
     Structs::VideoResolutionStruct::Type requestedResolution;
@@ -669,13 +654,12 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CaptureSnapshotResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan data;
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
     Structs::VideoResolutionStruct::Type resolution;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -687,7 +671,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CaptureSnapshotResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan data;
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);

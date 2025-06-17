@@ -28,7 +28,15 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 1
+#   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     factory-reset: false
+#     quiet: true
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 
@@ -50,6 +58,9 @@ class TC_SC_3_4(MatterBaseTest):
 
     def steps_TC_SC_3_4(self) -> list[TestStep]:
         steps = [
+
+            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT"),
+
             TestStep(1, "TH constructs and sends a Sigma1 message with a resumptionID and NO initiatorResumeMIC to DUT",
                      "DUT sends a status report to the TH with a FAILURE general code , Protocol ID of SECURE_CHANNEL (0x0000), and Protocol Code of INVALID_PARAMETER (0X0002). DUT MUST perform no further processing after sending the status report."),
 
@@ -94,13 +105,9 @@ class TC_SC_3_4(MatterBaseTest):
 
         expectedErrorCode = CHIP_ERROR_CODES.get(expectedErrorName)
 
-        try:
+        with asserts.assert_raises(ChipStackError) as e:
             await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
-            asserts.fail(
-                "Unexpected success return from CASE Establishment after injecting fault, CASE Establishment should have failed")
-        except ChipStackError as e:
-            asserts.assert_equal(e.err,  expectedErrorCode,
-                                 f"Expected to return {expectedErrorName}")
+        asserts.assert_equal(e.exception.err,  expectedErrorCode, f"Expected to return {expectedErrorName}")
 
     def ensure_fault_injection_point_was_reached(self, faultID):
         asserts.assert_equal(GetFaultCounter(faultID), 1)
@@ -109,8 +116,17 @@ class TC_SC_3_4(MatterBaseTest):
     @async_test_body
     async def test_TC_SC_3_4(self):
 
-        self.step(1)
         self.th = self.default_controller
+
+        self.step("precondition")
+        # DUT Should be Commissioned Already, Now we try to Establish a CASE Session with it
+        try:
+            await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
+        except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected
+            asserts.fail(
+                f"Unexpected Failure, TH Should be able to establish a CASE Session with DUT \nError = {e}")
+
+        self.step(1)
         # using FaultInjection to skip InitiatorResumeMIC from Sigma1 with Resumption
         FailAtFault(faultID=CHIPFaultId.CASESkipInitiatorResumeMIC,
                     numCallsToSkip=0,
@@ -138,7 +154,7 @@ class TC_SC_3_4(MatterBaseTest):
         self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
         try:
             await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected
             asserts.fail(
                 f"Unexpected CASE Establishment Failure, CASE Should have succeeded. Having an invalid InitiatorResumeMIC should have resulted in CASE falling back to the standard CASE without resumption. \nError = {e}")
         self.ensure_fault_injection_point_was_reached(faultID=CHIPFaultId.CASECorruptInitiatorResumeMIC)
