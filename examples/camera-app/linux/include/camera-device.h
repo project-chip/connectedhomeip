@@ -66,7 +66,7 @@ static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
 
 namespace Camera {
 
-inline constexpr const char * kDefaultVideoDevicePath = "/dev/video0";
+constexpr const char * kDefaultVideoDevicePath = "/dev/video0";
 
 // Camera defined constants for Pan, Tilt, Zoom bounding values
 constexpr int16_t kMinPanValue  = -90;

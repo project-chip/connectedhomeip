@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "AppOptions.h"
 #include "camera-app.h"
 #include "camera-device.h"
 
@@ -31,9 +30,17 @@ CameraDevice gCameraDevice;
 
 void ApplicationInit()
 {
-    const std::string videoDevicePath = AppOptions::GetVideoDevicePath();
-    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit() with Video Device Path: %s", videoDevicePath.c_str());
-    gCameraDevice.SetVideoDevicePath(videoDevicePath);
+    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
+    if (LinuxDeviceOptions::GetInstance().cameraVideoDevice.HasValue())
+    {
+        std::string videoDevicePath = LinuxDeviceOptions::GetInstance().cameraVideoDevice.Value();
+        ChipLogDetail(Camera, "Using video device path from options: %s", videoDevicePath.c_str());
+        gCameraDevice.SetVideoDevicePath(videoDevicePath);
+    }
+    else
+    {
+        ChipLogDetail(Camera, "Using default video device path: %s", Camera::kDefaultVideoDevicePath);
+    }
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);
 }
@@ -45,7 +52,7 @@ void ApplicationShutdown()
 
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) == 0);
+    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
     ChipLinuxAppMainLoop();
 
