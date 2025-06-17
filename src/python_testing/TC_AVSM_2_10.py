@@ -58,12 +58,12 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
             TestStep(
                 1,
-                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify SNP is supported.",
             ),
             TestStep(
                 2,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 1. Store StreamID as aStreamID.",
             ),
             TestStep(
@@ -73,12 +73,12 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
-                "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null.",
+                "TH sends the CaptureSnapshot command with SnapshotStreamID set to aStreamID + 1.",
                 "DUT responds with NOT_FOUND status code.",
             ),
             TestStep(
                 5,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null",
                 "DUT responds with CaptureSnapshotResponse command with the image in the Data field.",
             ),
             TestStep(
@@ -88,13 +88,23 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 7,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 0.",
             ),
             TestStep(
                 8,
                 "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null.",
                 "DUT responds with NOT_FOUND status code.",
+            ),
+            TestStep(
+                9,
+                "If DUT supports Privacy feature, TH writes SoftLivestreamPrivacyModeEnabled = true on DUT",
+                "DUT responds with a SUCCESS status code.",
+            ),
+            TestStep(
+                10,
+                "TH sends the CaptureSnapshot command with SnapshotStreamID set to aStreamID.",
+                "DUT responds with INVALID_IN_STATE status code.",
             ),
         ]
 
@@ -116,6 +126,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
         snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
         asserts.assert_true(snpSupport, "Snapshot Feature is not supported.")
+        self.privacySupport = (aFeatureMap & cluster.Bitmaps.Feature.kPrivacy) > 0
 
         self.step(2)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
@@ -205,6 +216,30 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 e.status, Status.NotFound, "Unexpected error returned when expecting NOT_FOUND due to 0 allocated snapshot streams"
             )
             pass
+
+        if self.privacySupport:
+            self.step(9)
+            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(True),
+                                                       endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{True}")
+
+            self.step(10)
+            try:
+                await self.send_single_cmd(
+                    cmd=commands.CaptureSnapshot(snapshotStreamID=aStreamID, requestedResolution=aResolution), endpoint=endpoint)
+                asserts.assert_true(False, "Unexpected success when expecting INVALID_IN_STATE due to SoftPrivacy mode set to On")
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.InvalidInState,
+                    "Unexpected error returned when expecting INVALID_IN_STATE due to SoftPrivacy mode set to On",
+                )
+                pass
+
+        else:
+            self.skip_step(9)
+            self.skip_step(10)
 
 
 if __name__ == "__main__":
