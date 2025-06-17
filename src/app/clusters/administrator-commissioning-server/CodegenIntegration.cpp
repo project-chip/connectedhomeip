@@ -29,10 +29,20 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
+// AdministraotrCommissioningCluster implementation is specifically implemented
+// only for the root endpoint (endpoint 0)
+// So either:
+//   - we have a fixed config and it is endpoint 0 OR
+//   - we have a fully dynamic config
+
 static constexpr size_t kAdministratorCommissioningFixedClusterCount =
     AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size();
-static constexpr size_t kAdministratorCommissioningMaxClusterCount =
-    kAdministratorCommissioningFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+static_assert((kAdministratorCommissioningFixedClusterCount == 0) ||
+                  ((kAdministratorCommissioningFixedClusterCount == 1) &&
+                   AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
+              "Fixed administrator commissioning MUST be on endpoint 0");
+
 
 #ifdef ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
 using ClusterImpl = AdministratorCommissioningWithBasicCommissioningWindowCluster;
@@ -40,16 +50,13 @@ using ClusterImpl = AdministratorCommissioningWithBasicCommissioningWindowCluste
 using ClusterImpl = AdministratorCommissioningCluster;
 #endif
 
-LazyRegisteredServerCluster<ClusterImpl> gServers[kAdministratorCommissioningMaxClusterCount];
+LazyRegisteredServerCluster<ClusterImpl> gServer;
 
 } // namespace
 
 void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, AdministratorCommissioning::Id,
-                                                               kAdministratorCommissioningFixedClusterCount);
-    if (arrayIndex >= kAdministratorCommissioningMaxClusterCount)
-    {
+    if (endpointId != kRootEndpointId) {
         return;
     }
 
@@ -60,8 +67,8 @@ void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
         rawFeatureMap = 0;
     }
 
-    gServers[arrayIndex].Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(rawFeatureMap));
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
+    gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(rawFeatureMap));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Admin Commissioning register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
@@ -70,19 +77,16 @@ void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
 
 void emberAfAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, AdministratorCommissioning::Id,
-                                                               kAdministratorCommissioningFixedClusterCount);
-    if (arrayIndex >= kAdministratorCommissioningMaxClusterCount)
-    {
+    if (endpointId != kRootEndpointId) {
         return;
     }
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Admin Commissioning unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
-    gServers[arrayIndex].Destroy();
+    gServer.Destroy();
 }
 
 void MatterAdministratorCommissioningPluginServerInitCallback() {}
