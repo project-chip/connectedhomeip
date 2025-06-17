@@ -124,8 +124,8 @@ class TC_PUMP(MatterBaseTest):
         status_sub, status_cb = await self._subscribe_attribute(Clusters.Objects.PumpConfigurationAndControl.Attributes.PumpStatus)
 
         # ** STEP 4 **
-        self.step(4)
         # Turn on pump.
+        self.step(4)
         await self.send_single_cmd(
             cmd=Clusters.Objects.OnOff.Commands.On(),
             dev_ctrl=self.default_controller,
@@ -148,6 +148,7 @@ class TC_PUMP(MatterBaseTest):
 
         # ** STEP 5 **
         # Increase level.
+        self.step(5)
         levels = [50, 100, 150]
         for level in levels:
             # Move to level
