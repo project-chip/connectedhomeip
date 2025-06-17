@@ -52,6 +52,11 @@ class AVSMTestBase:
         logger.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
 
         asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
+
+        # Check for Watermark and OSD features
+        watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=aSnapshotCapabilities[0].imageCodec,
@@ -59,6 +64,8 @@ class AVSMTestBase:
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
@@ -94,15 +101,15 @@ class AVSMTestBase:
             endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
         )
         logger.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
-        aRankedStreamPriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePrioritiesList
         )
-        logger.info(f"Rx'd RankedVideoStreamPrioritiesList : {aRankedStreamPriorities}")
-        asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
+        logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
+        asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
@@ -139,10 +146,10 @@ class AVSMTestBase:
             return
 
         # Allocate one for the test steps
-        aRankedStreamPriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd RankedVideoStreamPrioritiesList: {aRankedStreamPriorities}")
+        logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
@@ -160,13 +167,17 @@ class AVSMTestBase:
         )
         logger.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
 
+        # Check for Watermark and OSD features
+        watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
         try:
-            asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
+            asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
             asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -174,8 +185,10 @@ class AVSMTestBase:
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")

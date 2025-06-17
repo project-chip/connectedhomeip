@@ -62,9 +62,12 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
+// These variables need to be in global scope for bridged-actions-stub.cpp to access them
+std::vector<Room *> gRooms;
+std::vector<Action *> gActions;
+
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_bridge_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 BridgeCommandDelegate sBridgeCommandDelegate;
 
@@ -77,8 +80,6 @@ EndpointId gCurrentEndpointId;
 EndpointId gFirstDynamicEndpointId;
 // Power source is on the same endpoint as the composed device
 Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
-std::vector<Room *> gRooms;
-std::vector<Action *> gActions;
 
 const int16_t minMeasuredValue     = -27315;
 const int16_t maxMeasuredValue     = 32766;
@@ -389,6 +390,11 @@ std::vector<EndpointListInfo> GetEndpointListInfo(chip::EndpointId parentId)
 std::vector<Action *> GetActionListInfo(chip::EndpointId parentId)
 {
     return gActions;
+}
+
+std::vector<Room *> GetRoomListInfo(chip::EndpointId parentId)
+{
+    return gRooms;
 }
 
 namespace {
@@ -745,46 +751,6 @@ void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint1
     }
 }
 
-bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Actions::Commands::InstantAction::DecodableType & commandData)
-{
-    bool hasInvokeID      = false;
-    uint32_t invokeID     = 0;
-    EndpointId endpointID = commandPath.mEndpointId;
-    auto & actionID       = commandData.actionID;
-
-    if (commandData.invokeID.HasValue())
-    {
-        hasInvokeID = true;
-        invokeID    = commandData.invokeID.Value();
-    }
-
-    if (actionID == action1.getActionId() && action1.getIsVisible())
-    {
-        // Turn On Lights in Room 1
-        runOnOffRoomAction(&room1, true, endpointID, actionID, invokeID, hasInvokeID);
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-        return true;
-    }
-    if (actionID == action2.getActionId() && action2.getIsVisible())
-    {
-        // Turn On Lights in Room 2
-        runOnOffRoomAction(&room2, true, endpointID, actionID, invokeID, hasInvokeID);
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-        return true;
-    }
-    if (actionID == action3.getActionId() && action3.getIsVisible())
-    {
-        // Turn Off Lights in Room 1
-        runOnOffRoomAction(&room1, false, endpointID, actionID, invokeID, hasInvokeID);
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-        return true;
-    }
-
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
-    return true;
-}
-
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
@@ -1085,9 +1051,9 @@ void ApplicationInit()
         }
     }
 
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    if (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR)
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();

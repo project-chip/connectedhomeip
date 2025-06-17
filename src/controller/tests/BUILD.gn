@@ -15,6 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+import("${chip_root}/src/controller/flags.gni")
+import("${chip_root}/src/lib/lib.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -35,8 +37,15 @@ chip_test_suite("tests") {
       "TestEventNumberCaching.cpp",
       "TestReadChunking.cpp",
       "TestServerCommandDispatch.cpp",
-      "TestWriteChunking.cpp",
     ]
+
+    # At some instances, this Test end ups allocating more than 32 Timers, and since the fake platform doesn`t use the heap, the maximum number of allowed timers is 32.
+    # So we get failures because we can't allocate any more timers, in the log it looks like:
+    # SendMessage() to UDP:[::1]:5541 failed: b
+    # deactivating since the Fake platform is mostly done to test Platform APIs
+    if (chip_device_platform != "fake") {
+      test_sources += [ "TestWriteChunking.cpp" ]
+    }
 
     # Not supported on efr32.
     if (chip_device_platform != "efr32") {
@@ -45,6 +54,10 @@ chip_test_suite("tests") {
         "TestExampleOperationalCredentialsIssuer.cpp",
       ]
     }
+  }
+
+  if (chip_support_commissioning_in_controller && chip_build_controller) {
+    test_sources += [ "TestAutoCommissioner.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

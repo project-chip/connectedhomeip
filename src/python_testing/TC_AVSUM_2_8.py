@@ -36,9 +36,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, has_feature,
-                                         run_if_endpoint_matches)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from TC_AVSUMTestBase import AVSUMTestBase
 
 
@@ -53,12 +53,11 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
             TestStep(2, "Send DPTZRelativeMove with an unknown stream ID, but valid Zoom Delta verify NotFound response"),
             TestStep(3, "Send a VideoStreamAllocate command to AVStreamManagement to allocate a video stream ID. Record the returned ID"),
             TestStep(4, "Send DPTZRelativeMove with the allocated stream ID, invalid Zoom Delta. Verify ConstraintError response"),
-            TestStep(5, "Send DPTZRelativeMove with the allocated stream ID, valid Zoom Delta. But a viewport hasn't been set. Verify NotFound response"),
-            TestStep(6, "Create a viewport with a valid AR. Set this via DPTZSetViewport"),
-            TestStep(7, "Setup deltaX and deltaY to move beyond the cartesian plan, send via DPTZRelativeMove. Verify success"),
-            TestStep(8, "Setup deltaX to move the viewport to the right, send via DPTZRelativeMove. Verify success"),
-            TestStep(9, "Setup deltaY to move the viewport down, send via DPTZRelativeMove. Verify success"),
-            TestStep(10, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of 100%, verify no error on max out of sensor size"),
+            TestStep(5, "Create a viewport with a valid AR. Set this via DPTZSetViewport"),
+            TestStep(6, "Setup deltaX and deltaY to move beyond the cartesian plan, send via DPTZRelativeMove. Verify success"),
+            TestStep(7, "Setup deltaX to move the viewport to the right, send via DPTZRelativeMove. Verify success"),
+            TestStep(8, "Setup deltaY to move the viewport down, send via DPTZRelativeMove. Verify success"),
+            TestStep(9, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of 100%, verify no error on max out of sensor size"),
         ]
         return steps
 
@@ -70,7 +69,8 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ) and
-                             has_cluster(Clusters.CameraAvStreamManagement))
+                             has_feature(Clusters.CameraAvStreamManagement,
+                                         Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo))
     async def test_TC_AVSUM_2_8(self):
         clusterAVSTR = Clusters.Objects.CameraAvStreamManagement
         attributesAVSTR = clusterAVSTR.Attributes
@@ -95,10 +95,6 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=101, expected_status=Status.ConstraintError)
 
         self.step(5)
-        # Send a dptzrelativemove for the correct stream, valid ZoomDelta, but we haven't actually set a viewport yet
-        await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=50, expected_status=Status.NotFound)
-
-        self.step(6)
         # Set a viewport
         viewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.Viewport)
         sensordimensions = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.VideoSensorParams)
@@ -106,26 +102,24 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
         viewportwidth = viewport.x2 - viewport.x1
         viewportheight = viewport.y2 - viewport.y1
         x1 = sensordimensions.sensorWidth - viewportwidth
-        passingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1, y1=0,
-                                                                                              x2=sensordimensions.sensorWidth,
-                                                                                              y2=viewportheight)
+        passingviewport = Globals.Structs.ViewportStruct(x1=x1, y1=0, x2=sensordimensions.sensorWidth, y2=viewportheight)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, passingviewport)
 
-        self.step(7)
+        self.step(6)
         # Send a dptzrelativemove based on the set viewport, move to beyond cartesian plane
         deltaX = -x1 * 2
         deltaY = -viewportheight * 2
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaX=deltaX, deltaY=deltaY)
 
-        self.step(8)
+        self.step(7)
         # Send a dptzrelativemove based on the current viewport, move to the right
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaX=100)
 
-        self.step(9)
+        self.step(8)
         # Send a dptzrelativemove based on the new viewport, move down
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaY=100)
 
-        self.step(10)
+        self.step(9)
         # Send a dptzrelativemove based on the new viewport, zoom to beyond sensor size
         currentsize = (viewport.x2-viewport.x1) * (viewport.y2-viewport.y1)
         sensorsize = sensordimensions.sensorWidth * sensordimensions.sensorHeight
