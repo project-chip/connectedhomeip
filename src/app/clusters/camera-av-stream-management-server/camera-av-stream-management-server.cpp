@@ -2079,6 +2079,19 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     auto & requestedResolution = commandData.requestedResolution;
     ImageSnapshot image;
 
+    if (!CheckSnapshotStreamsAvailability(ctx))
+    {
+        return;
+    }
+
+    if (!snapshotStreamID.IsNull())
+    {
+        if (!ValidateSnapshotStreamId(snapshotStreamID, ctx))
+        {
+            return;
+        }
+    }
+
     VerifyOrReturn(commandData.requestedResolution.width >= 1 && commandData.requestedResolution.height >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
@@ -2107,6 +2120,31 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     response.resolution = image.imageRes;
     response.imageCodec = image.imageCodec;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+bool CameraAVStreamMgmtServer::CheckSnapshotStreamsAvailability(HandlerContext & ctx)
+{
+    if (mAllocatedSnapshotStreams.empty())
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: No snapshot streams are allocated", mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return false;
+    }
+    return true;
+}
+
+bool CameraAVStreamMgmtServer::ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID,
+                                                        HandlerContext & ctx)
+{
+    auto found = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+                              [&](const SnapshotStreamStruct & s) { return s.snapshotStreamID == snapshotStreamID.Value(); });
+    if (found == mAllocatedSnapshotStreams.end())
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: No snapshot stream exist by id %d", mEndpointId, snapshotStreamID.Value());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return false;
+    }
+    return true;
 }
 
 } // namespace CameraAvStreamManagement
