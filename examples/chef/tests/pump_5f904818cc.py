@@ -44,7 +44,8 @@ class TC_PUMP(MatterBaseTest):
         return [TestStep(1, "[PUMP] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[PUMP] Assert initial attribute values are expected."),
                 TestStep(3, "[PUMP] Subscribe to all required attributes."),
-                TestStep(4, "[PUMP] Turn on pump.")]
+                TestStep(4, "[PUMP] Turn on pump."),
+                TestStep(5, "[PUMP] Increase level.")]
 
     async def _read_on_off(self):
         return await self.read_single_attribute_check_success(
@@ -109,8 +110,7 @@ class TC_PUMP(MatterBaseTest):
         asserts.assert_equal(flow, 0)
         pump_capacity = await self._read_pump_capacity()
         asserts.assert_equal(pump_capacity, 0)
-        pump_status = await self._read_pump_status()
-        asserts.assert_equal(pump_status, 0)
+        asserts.assert_equal(await self._read_pump_status(), 0)
 
         # ** STEP 3 ***
         self.step(3)
@@ -136,12 +136,42 @@ class TC_PUMP(MatterBaseTest):
         asserts.assert_equal(await self._read_current_level(), 1)
         temp_ = temp_cb.wait_for_report()
         asserts.assert_true(temp_ > temp, "Temperature raise not reported.")
+        temp = temp_
         pressure_ = pressure_cb.wait_for_report()
         asserts.assert_true(pressure_ > pressure, "Pressure raise not reported.")
+        pressure = pressure_
         flow_ = flow_cb.wait_for_report()
         asserts.assert_true(flow_ > flow, "Flow raise not reported.")
-        asserts.assert_equal(await self._read_pump_capacity(), 0)
+        flow = flow_
+        asserts.assert_equal(await self._read_pump_capacity(), 0)  # Capacity is 0 at min level.
         asserts.assert_equal(status_cb.wait_for_report(), 32)
+
+        # ** STEP 5 **
+        # Increase level.
+        levels = [50, 100, 150]
+        for level in levels:
+            # Move to level
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.LevelControl.Commands.MoveToLevel(level=level),
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                endpoint=1,
+            )
+            asserts.assert_equal(current_level_cb.wait_for_report(), level)
+            temp_ = temp_cb.wait_for_report()
+            asserts.assert_true(temp_ > temp, "Temperature raise not reported.")
+            temp = temp_
+            pressure_ = pressure_cb.wait_for_report()
+            asserts.assert_true(pressure_ > pressure, "Pressure raise not reported.")
+            pressure = pressure_
+            flow_ = flow_cb.wait_for_report()
+            asserts.assert_true(flow_ > flow, "Flow raise not reported.")
+            flow = flow_
+            pump_capacity_ = capacity_cb.wait_for_report()
+            asserts.assert_true(pump_capacity_ > pump_capacity, "Pump capacity raise not reported.")
+            pump_capacity = pump_capacity_
+            asserts.assert_equal(await self._read_on_off(), True)
+            asserts.assert_equal(status_cb.wait_for_report(), 32)
 
 
 if __name__ == "__main__":
