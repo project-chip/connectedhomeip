@@ -372,7 +372,7 @@ CHIP_ERROR Storage::SetSoftwareVersionString(const char * value, size_t len)
 
 CHIP_ERROR Storage::GetSoftwareVersionString(char * value, size_t max)
 {
-    size_t hw_version_len = 0; // @ithout counting null-terminator
+    size_t hw_version_len = 0; // Without counting null-terminator
 
     CHIP_ERROR err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_SoftwareVersionString, value, max, hw_version_len);
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING)
