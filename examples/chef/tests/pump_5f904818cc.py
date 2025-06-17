@@ -45,7 +45,8 @@ class TC_PUMP(MatterBaseTest):
                 TestStep(2, "[PUMP] Assert initial attribute values are expected."),
                 TestStep(3, "[PUMP] Subscribe to all required attributes."),
                 TestStep(4, "[PUMP] Turn on pump."),
-                TestStep(5, "[PUMP] Increase level.")]
+                TestStep(5, "[PUMP] Increase level."),
+                TestStep(6, "[PUMP] Turn off pump.")]
 
     async def _read_on_off(self):
         return await self.read_single_attribute_check_success(
@@ -174,6 +175,23 @@ class TC_PUMP(MatterBaseTest):
             # On/Off and status unchanged
             asserts.assert_equal(await self._read_on_off(), True)
             asserts.assert_equal(await self._read_pump_status(), 32)
+
+        # ** STEP 6 **
+        # Turn Off pump.
+        current_level = await self._read_current_level()
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.OnOff.Commands.Off(),
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=1,
+        )
+        asserts.assert_equal(on_off_cb.wait_for_report(), False)
+        asserts.assert_equal(await self._read_current_level(), current_level)
+        asserts.assert_equal(temp_cb.wait_for_report(), 0)
+        asserts.assert_equal(pressure_cb.wait_for_report(), 0)
+        asserts.assert_equal(flow_cb.wait_for_report(), 0)
+        asserts.assert_equal(capacity_cb.wait_for_report(), 0)
+        asserts.assert_equal(status_cb.wait_for_report(), 0)
 
 
 if __name__ == "__main__":
