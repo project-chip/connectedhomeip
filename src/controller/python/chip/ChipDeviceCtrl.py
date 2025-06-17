@@ -1685,6 +1685,7 @@ class ChipDeviceControllerBase():
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     invalid_endpoint, v[0], 0, 0, v[0].value))
 
+        assert self.devCtrl is not None
         ClusterAttribute.WriteGroupAttributes(
             groupid, self.devCtrl, attrs, busyWaitMs=busyWaitMs).raise_on_error()
 
