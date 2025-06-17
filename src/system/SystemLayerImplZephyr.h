@@ -17,7 +17,8 @@
 
 /**
  *    @file
- *      This file declares an implementation of LayerImplZephyr.
+ *      This file declares an implementation of System::Layer dedicated to Zephyr RTOS, which
+ *      does not use select().
  */
 
 #pragma once
@@ -49,7 +50,6 @@ public:
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
 public:
-    // Platform implementation.
     std::optional<Clock::Timestamp> GetNextAwakenTime();
     CHIP_ERROR HandlePlatformTimer();
 

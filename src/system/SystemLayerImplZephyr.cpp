@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file implements LayerImplZephyr.
+ *      This file implements System::Layer dedicated to Zephyr RTOS, which does not use select().
  */
 
 #include <lib/support/CodeUtils.h>

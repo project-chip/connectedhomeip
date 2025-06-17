@@ -98,10 +98,7 @@ private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    void ProcessEventLoopUsingSockets();
     void ProcessDeviceEvents();
-#else
-    void ProcessEventLoop();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     volatile bool mShouldRunEventLoop;

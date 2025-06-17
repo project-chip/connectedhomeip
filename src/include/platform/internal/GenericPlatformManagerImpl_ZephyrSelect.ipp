@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Contains non-inline method definitions for the
- *          GenericPlatformManagerImpl_Zephyr<> template.
+ *          GenericPlatformManagerImpl_Zephyr<> template which uses select().
  */
 
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_CPP
@@ -36,7 +36,6 @@
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
 
-#include <zephyr/kernel.h>
 #include <zephyr/sys/reboot.h>
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
@@ -51,16 +50,12 @@ namespace Internal {
 
 namespace {
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 System::LayerSocketsLoop & SystemLayerSocketsLoop()
 {
     return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
 }
 
 K_WORK_DEFINE(sSignalWork, [](k_work *) { SystemLayerSocketsLoop().Signal(); });
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // anonymous namespace
 
@@ -114,17 +109,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_UnlockChipStack(void)
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
-#if !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    // If the platform timer is being updated by a thread other than the event loop thread,
-    // trigger the event loop thread to recalculate its wait time by posting a no-op event
-    // to the event queue.
-    if (k_current_get() != &mChipThread)
-    {
-        ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
-        ReturnErrorOnFailure(Impl()->PostEvent(&noop));
-    }
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
+    // Let Systemlayer.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
@@ -132,15 +117,6 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void)
 {
     mShouldRunEventLoop = false;
-
-#if !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    if (k_current_get() != &mChipThread)
-    {
-        ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
-        ReturnErrorOnFailure(Impl()->PostEvent(&noop));
-    }
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
     return CHIP_NO_ERROR;
 }
 
@@ -166,7 +142,6 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDe
 
     SYSTEM_STATS_INCREMENT(System::Stats::kPlatformMgr_NumEvents);
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wake CHIP thread to process the event. If the function is called from ISR, such as a Zephyr
     // timer handler, do not signal the thread directly because that involves taking a mutex, which
     // is forbidden in ISRs. Instead, submit a task to the system work queue to do the singalling.
@@ -178,51 +153,7 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDe
     {
         SystemLayerSocketsLoop().Signal();
     }
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
     return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
-void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
-{
-    Impl()->LockChipStack();
-
-    if (mShouldRunEventLoop)
-    {
-        ChipLogError(DeviceLayer, "Error trying to run the event loop while it is already running");
-        return;
-    }
-    mShouldRunEventLoop = true;
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    ProcessEventLoopUsingSockets();
-#else
-    ProcessEventLoop();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    Impl()->UnlockChipStack();
-}
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-template <class ImplClass>
-void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessEventLoopUsingSockets()
-{
-    SystemLayerSocketsLoop().EventLoopBegins();
-    while (mShouldRunEventLoop)
-    {
-        SystemLayerSocketsLoop().PrepareEvents();
-
-        Impl()->UnlockChipStack();
-        SystemLayerSocketsLoop().WaitForEvents();
-        Impl()->LockChipStack();
-
-        SystemLayerSocketsLoop().HandleEvents();
-
-        ProcessDeviceEvents();
-    }
-    SystemLayerSocketsLoop().EventLoopEnds();
 }
 
 template <class ImplClass>
@@ -237,58 +168,35 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessDeviceEvents()
     }
 }
 
-#else
-
 template <class ImplClass>
-void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessEventLoop()
+void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 {
-    System::LayerImplZephyr & systemLayer = static_cast<System::LayerImplZephyr &>(DeviceLayer::SystemLayer());
+    Impl()->LockChipStack();
 
+    if (mShouldRunEventLoop)
+    {
+        ChipLogError(DeviceLayer, "Error trying to run the event loop while it is already running");
+        return;
+    }
+    mShouldRunEventLoop = true;
+
+    SystemLayerSocketsLoop().EventLoopBegins();
     while (mShouldRunEventLoop)
     {
-        k_timeout_t timeout = K_FOREVER;
-        bool eventReceived  = false;
-        ChipDeviceEvent event;
-
-        // Get the awaken time for the next timer
-        std::optional<System::Clock::Timestamp> nextAwakenTime = systemLayer.GetNextAwakenTime();
-        if (nextAwakenTime.has_value())
-        {
-            System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
-            if (nextAwakenTime.value() > now)
-            {
-                // Calculate the timeout
-                System::Clock::Timestamp delay = nextAwakenTime.value() - now;
-                timeout                        = K_MSEC(delay.count());
-            }
-            else
-            {
-                // Call into the system layer to dispatch the callback functions for all timers
-                // that have expired.
-                CHIP_ERROR err = systemLayer.HandlePlatformTimer();
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(DeviceLayer, "Error handling CHIP timers: %" CHIP_ERROR_FORMAT, err.Format());
-                }
-                // Some timer already expired, do not wait if event queue is empty
-                timeout = K_NO_WAIT;
-            }
-        }
+        SystemLayerSocketsLoop().PrepareEvents();
 
         Impl()->UnlockChipStack();
-        eventReceived = k_msgq_get(&mChipEventQueue, &event, timeout) == 0;
+        SystemLayerSocketsLoop().WaitForEvents();
         Impl()->LockChipStack();
 
-        while (eventReceived)
-        {
-            SYSTEM_STATS_DECREMENT(System::Stats::kPlatformMgr_NumEvents);
-            Impl()->DispatchEvent(&event);
-            eventReceived = k_msgq_get(&mChipEventQueue, &event, K_NO_WAIT) == 0;
-        }
-    }
-}
+        SystemLayerSocketsLoop().HandleEvents();
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+        ProcessDeviceEvents();
+    }
+    SystemLayerSocketsLoop().EventLoopEnds();
+
+    Impl()->UnlockChipStack();
+}
 
 template <class ImplClass>
 void GenericPlatformManagerImpl_Zephyr<ImplClass>::EventLoopTaskMain(void * thisPtr, void *, void *)
