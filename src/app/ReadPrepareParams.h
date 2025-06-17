@@ -48,8 +48,8 @@ struct ReadPrepareParams
     bool mKeepSubscriptions             = false;
     bool mIsFabricFiltered              = true;
 
-    // If set to true, indicates that the peer device is known to be a LIT ICD. This can be set by the application if it has prior knowledge of the
-    // peer's operating mode (e.g. from previous reads of IcdManagementCluster::OperatingMode). This is useful for
+    // If set to true, indicates that the peer device is known to be a LIT ICD. This can be set by the application if it has prior
+    // knowledge of the peer's operating mode (e.g. from previous reads of IcdManagementCluster::OperatingMode). This is useful for
     // subscriptions that do not include the OperatingMode attribute in the set of paths that are subscribed to.
     //
     // This field is ignored for read operations.
