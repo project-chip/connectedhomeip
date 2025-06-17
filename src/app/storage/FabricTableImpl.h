@@ -83,7 +83,12 @@ public:
     using EntryIterator = CommonIterator<TableEntry>;
     using EntryIndex    = Data::EntryIndex;
     using Serializer    = DefaultSerializer<StorageId, StorageData>;
-    using IterateFnType = std::function<CHIP_ERROR(EntryIterator & certBuffer)>;
+
+    /**
+     * @brief a function to process an EntryIterator; the iterator parameter has a lifetime of the function call & is destroyed when
+     * the function completes.
+     */
+    using IterateFnType = std::function<CHIP_ERROR(EntryIterator & iterator)>;
 
     virtual ~FabricTableImpl() { Finish(); };
 
@@ -149,6 +154,13 @@ public:
     void SetTableSize(uint16_t endpointEntryTableSize, uint16_t maxPerFabric);
     bool IsInitialized() { return (mStorage != nullptr); }
 
+    /**
+     * @brief Iterates through all entries in fabric, calling iterateFn with the allocated iterator.
+     * @param fabric the fabric to iterate entries for
+     * @param store the in-memory buffer that an entry will be read into
+     * @param iterateFn the function that will be called with the iterator; the resulting CHIP_ERROR is proxied as a result of the
+     * method
+     */
     template <size_t kEntryMaxBytes>
     CHIP_ERROR IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store, IterateFnType iterateFn);
 

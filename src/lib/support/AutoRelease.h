@@ -27,13 +27,19 @@
 namespace chip {
 
 /// RAII class for iterators that guarantees that Release() will be called
-/// on the underlying type
+/// on the underlying type.  This is effectively a simple unique_ptr, except
+/// calling Release instead of delete
 template <typename Releasable>
 class AutoRelease
 {
 public:
     AutoRelease(Releasable * releasable) : mReleasable(releasable) {}
     ~AutoRelease() { Release(); }
+
+    // Not copyable or movable
+    AutoRelease(const AutoRelease &)             = delete;
+    AutoRelease(const AutoRelease &&)            = delete;
+    AutoRelease & operator=(const AutoRelease &) = delete;
 
     inline Releasable * operator->() { return mReleasable; }
     inline const Releasable * operator->() const { return mReleasable; }
