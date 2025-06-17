@@ -116,20 +116,34 @@ public:
     bool operator==(const PeerAddress & other) const
     {
         // Compare common fields
-        if (mTransportType != other.mTransportType || mIPAddress != other.mIPAddress || mPort != other.mPort ||
-            mInterface != other.mInterface)
+        if (mTransportType != other.mTransportType)
         {
             return false;
         }
 
-        // Compare transport-type-specific fields
-        if (mTransportType == Type::kNfc)
+        // Compare transport-type specific fields
+        switch (mTransportType)
         {
-            return mId.mNFCShortId == other.mId.mNFCShortId;
-        }
+            case Type::kNfc:
+                return (mId.mNFCShortId == other.mId.mNFCShortId);
 
-        // For other transport types, no additional fields to compare
-        return true;
+            case Type::kUdp:
+            case Type::kTcp:
+               return (mIPAddress == other.mIPAddress &&
+                       mPort == other.mPort &&
+                       mInterface == other.mInterface);
+
+            case Type::kWiFiPAF:
+               return (mIPAddress == other.mIPAddress &&
+                       mPort == other.mPort &&
+                       mInterface == other.mInterface &&
+                       mId.mRemoteId == other.mId.mRemoteId);
+
+            case Type::kBle:
+            default:
+                // For transport types with no additional fields to compare
+                return true;
+        }
     }
 
     bool operator!=(const PeerAddress & other) const { return !(*this == other); }
