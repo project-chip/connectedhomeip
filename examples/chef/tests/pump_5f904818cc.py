@@ -56,7 +56,7 @@ class TC_PUMP(MatterBaseTest):
             endpoint=1, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
         asserts.assert_equal(onOff, False)
         level = await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
+            endpoint=1, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
         asserts.assert_equal(level, 1)
 
         # ** STEP 3 ***
