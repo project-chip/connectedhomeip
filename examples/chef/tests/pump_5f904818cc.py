@@ -143,7 +143,7 @@ class TC_PUMP(MatterBaseTest):
         flow_ = flow_cb.wait_for_report()
         asserts.assert_true(flow_ > flow, "Flow raise not reported.")
         flow = flow_
-        asserts.assert_equal(await self._read_pump_capacity(), 0)  # Capacity is 0 at min level.
+        asserts.assert_equal(capacity_cb.wait_for_report(), 0)  # Capacity is 0 at min level.
         asserts.assert_equal(status_cb.wait_for_report(), 32)
 
         # ** STEP 5 **
