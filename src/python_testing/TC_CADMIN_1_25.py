@@ -35,7 +35,7 @@ import random
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.testing.event_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
 from chip.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
