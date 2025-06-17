@@ -170,8 +170,9 @@ class TC_PUMP(MatterBaseTest):
             pump_capacity_ = capacity_cb.wait_for_report()
             asserts.assert_true(pump_capacity_ > pump_capacity, "Pump capacity raise not reported.")
             pump_capacity = pump_capacity_
+            # On/Off and status unchanged
             asserts.assert_equal(await self._read_on_off(), True)
-            asserts.assert_equal(status_cb.wait_for_report(), 32)
+            asserts.assert_equal(await self._read_pump_status(), 32)
 
 
 if __name__ == "__main__":
