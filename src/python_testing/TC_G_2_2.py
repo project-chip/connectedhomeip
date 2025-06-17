@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -31,6 +31,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -85,9 +86,8 @@ class TC_G_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_G_2_2(self):
-        if self.matter_test_config.endpoint is None or self.matter_test_config.endpoint != 0:
+        if self.matter_test_config.endpoint is None:
             self.matter_test_config.endpoint = 0
-        #self.endpoint = self.get_endpoint()
 
         # Pre-Conditions: Comissioning
         self.step(0)
@@ -111,7 +111,7 @@ class TC_G_2_2(MatterBaseTest):
             epochStartTime2=18446744073709551614)
 
         cmd = Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey)
-        resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
+        resp = await self.send_single_cmd(dev_ctrl=th1, endpoint=0, node_id=self.dut_node_id, cmd=cmd)
 
         self.step("1b")
         GroupKeyMapStruct = Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct
