@@ -124,7 +124,6 @@ public:
     CHIP_ERROR Init();
 
     void InvokeCommand(HandlerContext & handlerContext) override;
-
 };
 
 CHIP_ERROR AdministratorCommissioningCommandHandler::Init()
