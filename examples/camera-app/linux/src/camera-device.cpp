@@ -1324,7 +1324,7 @@ bool CameraDevice::AddSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotS
             ChipLogError(Camera, "No available slot for stream allocation");
             return false;
         }
-        streamId = (streamId + 1) % kMaxSnapshotStreams; // Wraps to 0 after max-1
+        streamId = static_cast<uint16_t>((streamId + 1) % kMaxSnapshotStreams); // Wraps to 0 after max-1
     }
 
     outStreamID                   = streamId;
