@@ -521,24 +521,24 @@ self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 ```
 
 In the case that a test script requires the use of named-pipe commands to
-achieve the manual steps, you can use the `write_to_app_pipe(command)` to send
-these commands. This command requires the test class to define a `self.app_pipe`
-string value with the name of the pipe. This depends on how the app is set up.
+achieve the manual steps, you can use the method
+`write_to_app_pipe(command,app_pipe)` to send these commands. This method
+requires value for `app_pipe`, if is not provided in the method it will use
+argument from the CMD or CI argument `--app-pipe` which must contain the string
+value with path of the pipe. This value depends on how the --app-pipe in the app
+is set up.
 
-If the name of the pipe is dynamic and based on the app's PID, the following
-snippet can be added to the start of tests that use the `write_to_app_pipe`
-method.
+Note: The name of the pipe can be anything while is a valid file path.
 
-```python
-app_pid = self.matter_test_config.app_pid
-if app_pid != 0:
-	self.is_ci = true
-	self.app_pipe = "/tmp/chip_<app name>_fifo_" + str(app_pid)
+Example of usage:
+
+```bash
+First run the app with the desired app-pipe path:
+./out/darwin-arm64-all-clusters/chip-all-clusters-app --app-pipe  /tmp/ref_alm_2_2
+
+Then execute the test with the app-pipe argument with the value defined while running the app.
+python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/ref_alm_2_2  --int-arg PIXIT.REFALM.AlarmThreshold:1
 ```
-
-This requires the test to be executed with the `--app-pid` flag set if the
-manual steps should be executed by the script. This flag sets the process ID of
-the DUT's matter application.
 
 ### Running on a separate machines
 

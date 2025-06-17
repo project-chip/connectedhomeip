@@ -65,7 +65,12 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
 
 Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationDelegate(const char * dacRevocationSetPath)
 {
-    VerifyOrReturnValue(dacRevocationSetPath != nullptr, nullptr);
+    if (dacRevocationSetPath == nullptr)
+    {
+        ChipLogError(Controller,
+                     "Received a nullptr dacRevocationSetPath. Using empty string so that attestation checks don't fail!");
+        dacRevocationSetPath = "";
+    }
 
     static Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
     testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
@@ -536,8 +541,13 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     ChipLogProgress(Support, "Using device attestation PAA trust store path %s.", paaTrustStorePath);
 
     // Initialize device attestation verifier
+    // TODO: Ensure that attestation revocation data is actually provided.
+    chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    chip::Credentials::DeviceAttestationVerifier * dacVerifier        = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+    auto * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+    VerifyOrDie(dacVerifier != nullptr);
+    dacVerifier->EnableVerboseLogs(true);
+
     SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;
