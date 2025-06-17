@@ -124,25 +124,21 @@ public:
         // Compare transport-type specific fields
         switch (mTransportType)
         {
-            case Type::kNfc:
-                return (mId.mNFCShortId == other.mId.mNFCShortId);
+        case Type::kNfc:
+            return (mId.mNFCShortId == other.mId.mNFCShortId);
 
-            case Type::kUdp:
-            case Type::kTcp:
-               return (mIPAddress == other.mIPAddress &&
-                       mPort == other.mPort &&
-                       mInterface == other.mInterface);
+        case Type::kUdp:
+        case Type::kTcp:
+            return (mIPAddress == other.mIPAddress && mPort == other.mPort && mInterface == other.mInterface);
 
-            case Type::kWiFiPAF:
-               return (mIPAddress == other.mIPAddress &&
-                       mPort == other.mPort &&
-                       mInterface == other.mInterface &&
-                       mId.mRemoteId == other.mId.mRemoteId);
+        case Type::kWiFiPAF:
+            return (mIPAddress == other.mIPAddress && mPort == other.mPort && mInterface == other.mInterface &&
+                    mId.mRemoteId == other.mId.mRemoteId);
 
-            case Type::kBle:
-            default:
-                // For transport types with no additional fields to compare
-                return true;
+        case Type::kBle:
+        default:
+            // For transport types with no additional fields to compare
+            return true;
         }
     }
 
