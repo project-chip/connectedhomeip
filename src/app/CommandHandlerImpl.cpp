@@ -70,8 +70,15 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
 
         const size_t commandBufferMaxSize = mpResponder->GetCommandResponseMaxBufferSize();
         auto commandPacket                = System::PacketBufferHandle::New(commandBufferMaxSize);
-
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
+        // On some platforms we can get more available length in the packet than what we requested.
+        // It is vital that we only use up to commandBufferMaxSize for the entire packet and
+        // nothing more.
+        uint16_t reservedSize = 0;
+        if (commandPacket->AvailableDataLength() > commandBufferMaxSize)
+        {
+            reservedSize = static_cast<uint16_t>(commandPacket->AvailableDataLength() - commandBufferMaxSize);
+        }
 
         mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeResponseBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
@@ -83,7 +90,8 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
 
         // MIC might require up to kMaxTagLen. We need to make sure to reserve this space
         // at the end of the buffer.
-        ReturnErrorOnFailure(mInvokeResponseBuilder.GetWriter()->ReserveBuffer(MessagePacketBuffer::kMaxFooterSize));
+        ReturnErrorOnFailure(mInvokeResponseBuilder.GetWriter()->ReserveBuffer(
+            static_cast<uint32_t>(reservedSize + MessagePacketBuffer::kMaxFooterSize)));
 
         // Sending an InvokeResponse to an InvokeResponse is going to be removed from the spec soon.
         // It was never implemented in the SDK, and there are no command responses that expect a
