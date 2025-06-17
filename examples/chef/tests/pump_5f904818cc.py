@@ -22,7 +22,7 @@ import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 # from chip.interaction_model import Status
 # from chip.testing.matter_asserts import is_valid_uint_value
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, AttributeChangeCallback, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -31,10 +31,10 @@ logger = logging.getLogger(__name__)
 class TC_PUMP(MatterBaseTest):
     """Tests for chef pump device."""
 
-    # Always receive attribute update reports, regardless of the time delta between them.
-    _SUBSCRIPTION_MIN_INTERVAL_SEC = 0
+    # Ignore report if its < 1s since the last report.
+    _SUBSCRIPTION_MIN_INTERVAL_SEC = 1
 
-    # Set this to a large value so liveliness updates aren't received during test.
+    # Set this to a large value so any liveliness updates aren't received during test.
     _SUBSCRIPTION_MAX_INTERVAL_SEC = 3600
 
     def desc_TC_PUMP(self) -> str:
@@ -43,7 +43,8 @@ class TC_PUMP(MatterBaseTest):
     def steps_TC_PUMP(self):
         return [TestStep(1, "[PUMP] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[PUMP] Assert initial attribute values are expected."),
-                TestStep(3, "[PUMP] Subscribe to all required attributes.")]
+                TestStep(3, "[PUMP] Subscribe to all required attributes."),
+                TestStep(4, "[PUMP] Turn on pump.")]
 
     @async_test_body
     async def test_TC_PUMP(self):
@@ -67,12 +68,25 @@ class TC_PUMP(MatterBaseTest):
             reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
             keepSubscriptions=False,
         )
-        level_control_sub = await self.default_controller.ReadAttribute(
+        on_off_attr_cb = AttributeChangeCallback(Clusters.Objects.OnOff.Attributes.OnOff)
+        on_off_sub.SetAttributeUpdateCallback(on_off_attr_cb)
+        current_level_sub = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
-            attributes=[(1, Clusters.Objects.OnOff.Attributes.OnOff)],
+            attributes=[(1, Clusters.Objects.LevelControl.Attributes.CurrentLevel)],
             reportInterval=(self._SUBSCRIPTION_MIN_INTERVAL_SEC, self._SUBSCRIPTION_MAX_INTERVAL_SEC),
             keepSubscriptions=True,  # Keep previous subscriptions.
         )
+        current_level_attr_cb = AttributeChangeCallback(Clusters.Objects.LevelControl.Attributes.CurrentLevel)
+        current_level_sub.SetAttributeUpdateCallback(current_level_attr_cb)
+
+        # ** STEP 4 **
+        self.send_single_cmd(
+            cmd=Clusters.Objects.OnOff.Commands.On(),
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=1,
+        )
+        asserts.assert_equal(on_off_attr_cb.wait_for_report(), True)
 
 
 if __name__ == "__main__":
