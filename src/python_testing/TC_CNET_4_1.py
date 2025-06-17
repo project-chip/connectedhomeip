@@ -143,7 +143,7 @@ class TC_CNET_4_1(MatterBaseTest):
                                       "NetworkID field is an octet string within a length range 1 to 32")
         else:
             logger.info(f"Current cluster is not connected in the endpoint: {self.get_endpoint()}, skipping.")
-            self.skip_all_remaining_steps()
+            self.mark_all_remaining_steps_skipped()
             return
 
         self.step(6)
