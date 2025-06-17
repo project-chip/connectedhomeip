@@ -23,7 +23,6 @@
 #include <fabric-bridge-common/BridgedDevice.h>
 #include <fabric-bridge-common/BridgedDeviceBasicInformationImpl.h>
 #include <fabric-bridge-common/BridgedDeviceManager.h>
-#include <fabric-bridge-common/RootEndpointOnlyAccessInterface.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -208,7 +207,6 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-RootEndpointOnlyAccessInterface gAdministratorCommissioningOverride(AdministratorCommissioning::Id);
 BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
@@ -226,7 +224,6 @@ CHIP_ERROR BridgeInit(FabricAdminDelegate * delegate)
 
     BridgedDeviceManager::Instance().Init();
     FabricBridge::Instance().SetDelegate(delegate);
-    ReturnErrorOnFailure(gAdministratorCommissioningOverride.Init());
     ReturnErrorOnFailure(CommissionerControlInit(delegate));
 
     return CHIP_NO_ERROR;
@@ -234,7 +231,6 @@ CHIP_ERROR BridgeInit(FabricAdminDelegate * delegate)
 
 CHIP_ERROR BridgeShutdown()
 {
-    gAdministratorCommissioningOverride.Shutdown();
     CHIP_ERROR err = CommissionerControlShutdown();
     if (err != CHIP_NO_ERROR)
     {

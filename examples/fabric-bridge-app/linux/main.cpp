@@ -23,7 +23,6 @@
 #include <fabric-bridge-common/BridgedDevice.h>
 #include <fabric-bridge-common/BridgedDeviceBasicInformationImpl.h>
 #include <fabric-bridge-common/BridgedDeviceManager.h>
-#include <fabric-bridge-common/RootEndpointOnlyAccessInterface.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -256,7 +255,6 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-RootEndpointOnlyAccessInterface gAdministratorCommissioningOverride(AdministratorCommissioning::Id);
 BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
@@ -281,7 +279,6 @@ void ApplicationInit()
 #endif
 
     bridge::BridgedDeviceManager::Instance().Init();
-    VerifyOrDie(bridge::gAdministratorCommissioningOverride.Init() == CHIP_NO_ERROR);
     VerifyOrDieWithMsg(bridge::gAdministratorCommissioningCommandHandler.Init() == CHIP_NO_ERROR, NotSpecified,
                        "Failed to initialize Commissioner command handler");
 
@@ -292,7 +289,6 @@ void ApplicationInit()
 void ApplicationShutdown()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationShutdown()");
-    bridge::gAdministratorCommissioningOverride.Shutdown();
 
     if (bridge::CommissionerControlShutdown() != CHIP_NO_ERROR)
     {
