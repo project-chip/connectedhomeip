@@ -1055,7 +1055,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
     // If subscription client is able to handle check-in messages and peer operation mode is LIT,
-    // use CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT is set as subscriptionTerminationCause.
+    // use CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT as subscriptionTerminationCause.
     // This will cause us to wait for a check-in message before trying to re-subscribe, instead of trying
     // (and probably failing, because we are dealing with a LIT ICD) off a timer.
     if (_this->mIsPeerLIT && _this->mReadPrepareParams.mRegisteredCheckInToken)
