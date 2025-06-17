@@ -56,27 +56,27 @@ class TC_PUMP(MatterBaseTest):
 
     async def _read_temperature(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.TemperatureMeasurement, attribute=Clusters.Objects.TemperatureMeasurement.MeasuredValue,
+            endpoint=1, cluster=Clusters.Objects.TemperatureMeasurement, attribute=Clusters.Objects.TemperatureMeasurement.Attributes.MeasuredValue,
         )
 
     async def _read_pressure(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.PressureMeasurement, attribute=Clusters.Objects.PressureMeasurement.MeasuredValue,
+            endpoint=1, cluster=Clusters.Objects.PressureMeasurement, attribute=Clusters.Objects.PressureMeasurement.Attributes.MeasuredValue,
         )
 
     async def _read_flow(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.FlowMeasurement, attribute=Clusters.Objects.FlowMeasurement.MeasuredValue,
+            endpoint=1, cluster=Clusters.Objects.FlowMeasurement, attribute=Clusters.Objects.FlowMeasurement.Attributes.MeasuredValue,
         )
 
     async def _read_pump_capacity(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.Capacity,
+            endpoint=1, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.Attributes.Capacity,
         )
 
     async def _read_pump_status(self):
         return await self.read_single_attribute_check_success(
-            endpoint=1, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.PumpStatus,
+            endpoint=1, cluster=Clusters.Objects.PumpConfigurationAndControl, attribute=Clusters.Objects.PumpConfigurationAndControl.Attributes.PumpStatus,
         )
 
     async def _subscribe_attribute(self, attribute):
@@ -117,11 +117,11 @@ class TC_PUMP(MatterBaseTest):
         # Subscribe to all required attributes.
         on_off_sub, on_off_cb = await self._subscribe_attribute(Clusters.Objects.OnOff.Attributes.OnOff)
         current_level_sub, current_level_cb = await self._subscribe_attribute(Clusters.Objects.LevelControl.Attributes.CurrentLevel)
-        temp_sub, temp_cb = await self._subscribe_attribute(Clusters.Objects.TemperatureMeasurement.MeasuredValue)
-        pressure_sub, pressure_cb = await self._subscribe_attribute(Clusters.Objects.PressureMeasurement.MeasuredValue)
-        flow_sub, flow_cb = await self._subscribe_attribute(Clusters.Objects.FlowMeasurement.MeasuredValue)
-        capacity_sub, capacity_cb = await self._subscribe_attribute(Clusters.Objects.PumpConfigurationAndControl.Capacity)
-        status_sub, status_cb = await self._subscribe_attribute(Clusters.Objects.PumpConfigurationAndControl.PumpStatus)
+        temp_sub, temp_cb = await self._subscribe_attribute(Clusters.Objects.TemperatureMeasurement.Attributes.MeasuredValue)
+        pressure_sub, pressure_cb = await self._subscribe_attribute(Clusters.Objects.PressureMeasurement.Attributes.MeasuredValue)
+        flow_sub, flow_cb = await self._subscribe_attribute(Clusters.Objects.FlowMeasurement.Attributes.MeasuredValue)
+        capacity_sub, capacity_cb = await self._subscribe_attribute(Clusters.Objects.PumpConfigurationAndControl.Attributes.Capacity)
+        status_sub, status_cb = await self._subscribe_attribute(Clusters.Objects.PumpConfigurationAndControl.Attributes.PumpStatus)
 
         # ** STEP 4 **
         self.step(4)
