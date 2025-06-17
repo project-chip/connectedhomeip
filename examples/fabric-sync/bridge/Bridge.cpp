@@ -17,11 +17,13 @@
 
 #include "Bridge.h"
 
-#include "BridgedAdministratorCommissioning.h"
-#include "BridgedDevice.h"
-#include "BridgedDeviceBasicInformationImpl.h"
-#include "BridgedDeviceManager.h"
 #include "FabricBridge.h"
+
+#include <fabric-bridge-common/BridgedAdministratorCommissioning.h>
+#include <fabric-bridge-common/BridgedDevice.h>
+#include <fabric-bridge-common/BridgedDeviceBasicInformationImpl.h>
+#include <fabric-bridge-common/BridgedDeviceManager.h>
+#include <fabric-bridge-common/RootEndpointOnlyAccessInterface.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -206,7 +208,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
+RootEndpointOnlyAccessInterface gAdministratorCommissioningOverride(AdministratorCommissioning::Id);
 BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
@@ -224,7 +226,7 @@ CHIP_ERROR BridgeInit(FabricAdminDelegate * delegate)
 
     BridgedDeviceManager::Instance().Init();
     FabricBridge::Instance().SetDelegate(delegate);
-    ReturnErrorOnFailure(gBridgedAdministratorCommissioning.Init());
+    ReturnErrorOnFailure(gAdministratorCommissioningOverride.Init());
     ReturnErrorOnFailure(CommissionerControlInit(delegate));
 
     return CHIP_NO_ERROR;
@@ -232,6 +234,7 @@ CHIP_ERROR BridgeInit(FabricAdminDelegate * delegate)
 
 CHIP_ERROR BridgeShutdown()
 {
+    gAdministratorCommissioningOverride.Shutdown();
     CHIP_ERROR err = CommissionerControlShutdown();
     if (err != CHIP_NO_ERROR)
     {

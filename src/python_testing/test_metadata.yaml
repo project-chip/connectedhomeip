@@ -29,6 +29,10 @@ not_automated:
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_4.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_9.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_12.py
+      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_22.py

@@ -136,7 +136,7 @@ CHIP_ERROR SetUpCodePairer::Connect()
     CHIP_ERROR err = StartDiscoveryOverDNSSD();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to start discovery over DNS-SD: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "Failed to start commissionable node discovery over DNS-SD: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
 }
@@ -150,7 +150,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverBLE()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    ChipLogProgress(Controller, "Starting commissioning discovery over BLE");
+    ChipLogProgress(Controller, "Starting commissionable node discovery over BLE");
 
     // Handle possibly-sync callbacks.
     mWaitingForDiscovery[kBLETransport] = true;
@@ -202,7 +202,7 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverBLE()
     mWaitingForDiscovery[kBLETransport] = false;
 #if CONFIG_NETWORK_LAYER_BLE
     VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    ChipLogDetail(Controller, "Stopping commissioning discovery over BLE");
+    ChipLogProgress(Controller, "Stopping commissionable node discovery over BLE");
     return mBleLayer->CancelBleIncompleteConnection();
 #else
     return CHIP_NO_ERROR;
@@ -211,7 +211,7 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverBLE()
 
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverDNSSD()
 {
-    ChipLogProgress(Controller, "Starting commissioning discovery over DNS-SD");
+    ChipLogProgress(Controller, "Starting commissionable node discovery over DNS-SD");
 
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone);
     if (mSetupPayloads.size() == 1)
@@ -245,7 +245,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverDNSSD()
 
 CHIP_ERROR SetUpCodePairer::StopDiscoveryOverDNSSD()
 {
-    ChipLogDetail(Controller, "Stopping commissioning discovery over DNS-SD");
+    ChipLogProgress(Controller, "Stopping commissionable node discovery over DNS-SD");
 
     mWaitingForDiscovery[kIPTransport] = false;
 
@@ -258,13 +258,13 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (mSetupPayloads.size() != 1)
     {
-        ChipLogError(Controller, "WiFiPAF commissioning does not support concatenated QR codes yet.");
+        ChipLogError(Controller, "Wi-Fi PAF commissioning does not support concatenated QR codes yet.");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
     auto & payload = mSetupPayloads[0];
 
-    ChipLogProgress(Controller, "Starting commissioning discovery over WiFiPAF");
+    ChipLogProgress(Controller, "Starting commissionable node discovery over Wi-Fi PAF");
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     const SetupDiscriminator connDiscriminator(payload.discriminator);
@@ -282,7 +282,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
                                                                      OnWiFiPAFSubscribeError);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "Commissionable node discovery over Wi-Fi PAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
         mWaitingForDiscovery[kWiFiPAFTransport] = false;
     }
     return err;
@@ -437,7 +437,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR
 
 void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
 {
-    ChipLogError(Controller, "Commissioning discovery over BLE failed: %" CHIP_ERROR_FORMAT, err.Format());
+    ChipLogError(Controller, "Commissionable node discovery over BLE failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kBLETransport] = false;
     LogErrorOnFailure(err);
 }
@@ -446,7 +446,7 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
 {
-    ChipLogProgress(Controller, "Discovered device to be commissioned over WiFiPAF, RemoteId: %lu", mRemoteId);
+    ChipLogProgress(Controller, "Discovered device to be commissioned over Wi-Fi PAF, RemoteId: %lu", mRemoteId);
 
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
     auto param                              = SetUpCodePairerParameters();
@@ -461,7 +461,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
 
 void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 {
-    ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed: %" CHIP_ERROR_FORMAT, err.Format());
+    ChipLogError(Controller, "Commissionable node discovery over Wi-Fi PAF failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 }
 

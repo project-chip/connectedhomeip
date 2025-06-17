@@ -43,6 +43,51 @@ from mobly import asserts
 
 
 class TC_ACL_2_8(MatterBaseTest):
+    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
+        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        if not events:
+            raise AssertionError(f"No events found for {acec_event} to determine the latest event number.")
+        return max([e.Header.EventNumber for e in events])
+
+    def _get_relevant_acl_events(self, all_events: list, expected_add_subject_node_id: int, expected_change_subject_node_ids: list) -> tuple:
+        """
+        Extracts the most recent 'added' and 'changed' events for a specific node from all events.
+
+        Args:
+            all_events: List of all AccessControlEntryChanged events
+            expected_add_subject_node_id: Node ID expected in the 'added' event subjects
+            expected_change_subject_node_ids: List of node IDs expected in the 'changed' event subjects
+
+        Returns:
+            Tuple containing the relevant 'added' and 'changed' events in chronological order
+        """
+        # First find the most recent "added" event
+        added_events = [e for e in all_events if (
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
+            e.Data.latestValue.subjects == [expected_add_subject_node_id]
+        )]
+        asserts.assert_true(len(added_events) > 0, f"Expected 'added' event for node {expected_add_subject_node_id} not found")
+        added_event = sorted(added_events, key=lambda e: e.Header.EventNumber)[-1]
+
+        # Guarantee we have a valid added_event
+        asserts.assert_is_not_none(added_event, f"Added event for node {expected_add_subject_node_id} must not be None")
+
+        # Then find the most recent "changed" event that occurred after the "added" event
+        changed_events = [e for e in all_events if (
+            e.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
+            e.Data.latestValue.subjects == expected_change_subject_node_ids and
+            e.Header.EventNumber > added_event.Header.EventNumber
+        )]
+        asserts.assert_true(len(changed_events) > 0,
+                            f"Expected 'changed' event for node {expected_add_subject_node_id} not found after the 'added' event")
+        changed_event = sorted(changed_events, key=lambda e: e.Header.EventNumber)[-1]
+
+        # Guarantee we have a valid changed_event
+        asserts.assert_is_not_none(changed_event, f"Changed event for node {expected_add_subject_node_id} must not be None")
+
+        return (added_event, changed_event)
+
     def _verify_acl_event(
             self,
             event,
@@ -224,26 +269,27 @@ class TC_ACL_2_8(MatterBaseTest):
             fabricFiltered=True
         )
 
-        asserts.assert_equal(
-            len(events), 2, "Should have exactly 2 events")
+        # Below event filtering and parsing is currently required in the event that the DUT is not reset before running this test.
+        added_event, changed_event = self._get_relevant_acl_events(events, self.th1.nodeId, [self.th1.nodeId, 1111])
+        logging.info(f"TH1 Events: added_event={added_event}, changed_event={changed_event}")
 
         # Verify event contents match expected sequence
         self._verify_acl_event(
-            events[0],
+            added_event,
             NullValue,
             0,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
             self.th1.nodeId,
             f1)
         self._verify_acl_event(
-            events[1],
+            changed_event,
             self.th1.nodeId,
             NullValue,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
             [self.th1.nodeId, 1111],
             f1)
 
-        for event in events:
+        for event in [added_event, changed_event]:
             asserts.assert_not_equal(
                 event.Data.fabricIndex,
                 f2,
@@ -257,12 +303,12 @@ class TC_ACL_2_8(MatterBaseTest):
             fabricFiltered=True
         )
 
-        asserts.assert_equal(
-            len(events), 2, "Should have exactly 2 events")
+        added_event, changed_event = self._get_relevant_acl_events(events, self.th2.nodeId, [self.th2.nodeId, 2222])
+        logging.info(f"TH2 Events: added_event={added_event}, changed_event={changed_event}")
 
         # Verify event contents match expected sequence
         self._verify_acl_event(
-            events[0],
+            added_event,
             NullValue,
             0,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
@@ -270,14 +316,14 @@ class TC_ACL_2_8(MatterBaseTest):
             f2)
 
         self._verify_acl_event(
-            events[1],
+            changed_event,
             self.th2.nodeId,
             NullValue,
             Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
             [self.th2.nodeId, 2222],
             f2)
 
-        for event in events:
+        for event in [added_event, changed_event]:
             asserts.assert_not_equal(
                 event.Data.fabricIndex,
                 f1,

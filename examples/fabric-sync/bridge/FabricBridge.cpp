@@ -14,16 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "FabricBridge.h"
-#include "BridgedDevice.h"
-#include "BridgedDeviceManager.h"
+
+#include <fabric-bridge-common/BridgedDevice.h>
+#include <fabric-bridge-common/BridgedDeviceManager.h>
 
 #include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
 #include <lib/core/CHIPError.h>
 
 #include <string>
-#include <thread>
 
 using namespace chip;
 

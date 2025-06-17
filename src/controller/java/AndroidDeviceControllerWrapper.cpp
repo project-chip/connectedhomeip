@@ -156,7 +156,10 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     else
     {
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+        // TODO: Ensure that attestation revocation data is actually provided.
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        chip::Credentials::SetDeviceAttestationVerifier(
+            GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked));
     }
 
     // Because garbage collection may delay the removal of old controller instances, two instances could temporarily exist.
@@ -635,6 +638,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(job
 
     deviceAttestationVerifier = new Credentials::DefaultDACVerifier(attestationTrustStoreBridge);
     VerifyOrExit(deviceAttestationVerifier != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    deviceAttestationVerifier->EnableVerboseLogs(true);
 
     if (mAttestationTrustStoreBridge != nullptr)
     {

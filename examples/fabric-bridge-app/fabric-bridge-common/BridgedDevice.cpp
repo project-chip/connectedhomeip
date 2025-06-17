@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -116,6 +117,11 @@ void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttr
                                                    app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id);
         }
     });
+}
+
+void BridgedDevice::RegisterClusters()
+{
+    mAdministratorCommissioningCluster = std::make_unique<BridgedAdministratorCommissioning>(*this);
 }
 
 } // namespace bridge

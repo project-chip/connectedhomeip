@@ -71,6 +71,16 @@ public:
 
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
 
+    CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override;
+
+    CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
+    bool HasAllocatedVideoStreams() override;
+
+    bool HasAllocatedAudioStreams() override;
+
 private:
     enum class CommandType : uint8_t
     {

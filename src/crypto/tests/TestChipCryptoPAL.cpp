@@ -3392,3 +3392,37 @@ TEST_F(TestChipCryptoPAL, PemEncodingWorks)
         EXPECT_EQ(numLines, 2u);
     }
 }
+
+TEST_F(TestChipCryptoPAL, KeyIdStringifierWorks)
+{
+    KeyIdStringifier stringifier;
+    const char * result = nullptr;
+
+    // Case with Empty ByteSpan.
+    result = stringifier.KeyIdToHex(ByteSpan{});
+    EXPECT_STREQ(result, "<EMPTY KEY ID>");
+
+    // Case with 1 byte (no colons!).
+    const uint8_t oneByte[] = { 0xAB };
+    result                  = stringifier.KeyIdToHex(ByteSpan{ oneByte });
+    EXPECT_STREQ(result, "AB");
+
+    // Case with specific key that is < the typical length.
+    const uint8_t kDeadBeefBytes[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x12, 0x34 };
+    result                         = stringifier.KeyIdToHex(ByteSpan{ kDeadBeefBytes });
+    EXPECT_STREQ(result, "DE:AD:BE:EF:12:34");
+
+    // Case with 20 bytes (typical SKID/AKID length).
+    uint8_t kTypicalKeyId[kAuthorityKeyIdentifierLength] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+                                                             0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13 };
+    result                                               = stringifier.KeyIdToHex(ByteSpan{ kTypicalKeyId });
+    EXPECT_STREQ(result, "00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:10:11:12:13");
+
+    // Case with 21 bytes (truncation) with ellipsis.
+    uint8_t kTooLongKeyId[kAuthorityKeyIdentifierLength + 1] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A,
+                                                                 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14 };
+
+    result = stringifier.KeyIdToHex(ByteSpan{ kTooLongKeyId });
+    EXPECT_TRUE(strstr(result, "...") != nullptr);
+    EXPECT_STREQ(result, "00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:10:11:12:...");
+}
