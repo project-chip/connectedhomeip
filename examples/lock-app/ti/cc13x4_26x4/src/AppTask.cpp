@@ -320,7 +320,7 @@ int AppTask::Init()
     nativeParams.unlockCb              = [] { ThreadStackMgr().UnlockThreadStack(); };
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
-    
+
     // Initialize info provider
     sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
