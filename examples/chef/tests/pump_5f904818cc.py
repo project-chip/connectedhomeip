@@ -178,6 +178,7 @@ class TC_PUMP(MatterBaseTest):
 
         # ** STEP 6 **
         # Turn Off pump.
+        self.step(6)
         current_level = await self._read_current_level()
         await self.send_single_cmd(
             cmd=Clusters.Objects.OnOff.Commands.Off(),
