@@ -18,7 +18,8 @@ RUN set -x \
     && : # last line
 
 # Setup Zephyr version: 3.3.0; branch: develop_3.3
-ARG ZEPHYR_REVISION=c02df4a2bf7598d0a62b4d98f7f274bcbc1af4af
+ARG ZEPHYR_REVISION=19006f8ec3482e91bbddafc0730640998d033d4e
+ARG N22_BIN_REVISION=1f37e056bd06cac9d164a8d1d2c7dbfce940d119
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install --break-system-packages -U --no-cache-dir west \
@@ -30,6 +31,7 @@ RUN set -x \
     && west init -l \
     && west update -o=--depth=1 -n -f smart \
     && west blobs fetch hal_telink \
+    && scripts/utils/telink_w91_post_build $PWD ${N22_BIN_REVISION} 1 \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

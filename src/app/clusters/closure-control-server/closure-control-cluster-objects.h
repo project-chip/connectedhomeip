@@ -32,35 +32,35 @@ namespace ClosureControl {
 struct GenericOverallState : public Structs::OverallStateStruct::Type
 {
     GenericOverallState(Optional<DataModel::Nullable<PositioningEnum>> positioningValue       = NullOptional,
-                        Optional<DataModel::Nullable<LatchingEnum>> latchingValue             = NullOptional,
+                        Optional<DataModel::Nullable<bool>> latchValue                        = NullOptional,
                         Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speedValue = NullOptional,
-                        Optional<DataModel::Nullable<uint32_t>> extraInfoValue                = NullOptional)
+                        Optional<DataModel::Nullable<bool>> secureStateValue                  = NullOptional)
     {
-        Set(positioningValue, latchingValue, speedValue, extraInfoValue);
+        Set(positioningValue, latchValue, speedValue, secureStateValue);
     }
 
     GenericOverallState(const GenericOverallState & overallState) { *this = overallState; }
 
     GenericOverallState & operator=(const GenericOverallState & overallState)
     {
-        Set(overallState.positioning, overallState.latching, overallState.speed, overallState.extraInfo);
+        Set(overallState.positioning, overallState.latch, overallState.speed, overallState.secureState);
         return *this;
     }
 
     void Set(Optional<DataModel::Nullable<PositioningEnum>> positioningValue       = NullOptional,
-             Optional<DataModel::Nullable<LatchingEnum>> latchingValue             = NullOptional,
+             Optional<DataModel::Nullable<bool>> latchValue                        = NullOptional,
              Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speedValue = NullOptional,
-             Optional<DataModel::Nullable<uint32_t>> extraInfoValue                = NullOptional)
+             Optional<DataModel::Nullable<bool>> secureStateValue                  = NullOptional)
     {
         positioning = positioningValue;
-        latching    = latchingValue;
+        latch       = latchValue;
         speed       = speedValue;
-        extraInfo   = extraInfoValue;
+        secureState = secureStateValue;
     }
 
     bool operator==(const Structs::OverallStateStruct::Type & rhs) const
     {
-        return positioning == rhs.positioning && latching == rhs.latching && speed == rhs.speed && extraInfo == rhs.extraInfo;
+        return positioning == rhs.positioning && latch == rhs.latch && speed == rhs.speed && secureState == rhs.secureState;
     }
 };
 
@@ -70,7 +70,7 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
 struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
 {
     GenericOverallTarget(Optional<TargetPositionEnum> targetPositionValue = NullOptional,
-                         Optional<TargetLatchEnum> targetLatchValue       = NullOptional,
+                         Optional<bool> targetLatchValue                  = NullOptional,
                          Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         Set(targetPositionValue, targetLatchValue, speedValue);
@@ -84,8 +84,7 @@ struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
         return *this;
     }
 
-    void Set(Optional<TargetPositionEnum> targetPositionValue = NullOptional,
-             Optional<TargetLatchEnum> targetLatchValue       = NullOptional,
+    void Set(Optional<TargetPositionEnum> targetPositionValue = NullOptional, Optional<bool> targetLatchValue = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         position = targetPositionValue;

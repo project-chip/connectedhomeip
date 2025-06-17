@@ -37,7 +37,11 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     {{/first}}
         case Commands::{{asUpperCamelCase commandName}}::Id: {
             Commands::{{asUpperCamelCase commandName}}::DecodableType commandData;
+            {{#if isFabricScoped}}
+            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+            {{else}}
             TLVError = DataModel::Decode(aDataTlv, commandData);
+            {{/if}}
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAf{{asUpperCamelCase parent.clusterName}}Cluster{{asUpperCamelCase commandName}}Callback(apCommandObj, aCommandPath, commandData);

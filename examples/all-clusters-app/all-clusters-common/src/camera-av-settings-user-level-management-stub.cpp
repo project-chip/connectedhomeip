@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <camera-av-settings-user-level-management-instance.h>
 
 using namespace chip;
@@ -25,20 +26,15 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using chip::Protocols::InteractionModel::Status;
 
-static AVSettingsUserLevelManagementDelegate * gDelegate                           = nullptr;
-static CameraAvSettingsUserLevelMgmtServer * gAVSettingsUserLevelManagementCluster = nullptr;
-static constexpr EndpointId kEndpointId                                            = 1;
-
-CameraAvSettingsUserLevelMgmtServer * GetInstance()
-{
-    return gAVSettingsUserLevelManagementCluster;
-}
+std::unique_ptr<AVSettingsUserLevelManagementDelegate> gDelegate;
+std::unique_ptr<CameraAvSettingsUserLevelMgmtServer> gAVSettingsUserLevelManagementCluster;
+static constexpr EndpointId kEndpointId = 1;
 
 void Shutdown()
 {
     if (gAVSettingsUserLevelManagementCluster != nullptr)
     {
-        delete gAVSettingsUserLevelManagementCluster;
+        gDelegate                             = nullptr;
         gAVSettingsUserLevelManagementCluster = nullptr;
     }
 }
@@ -50,12 +46,26 @@ bool AVSettingsUserLevelManagementDelegate::CanChangeMPTZ()
     return true;
 }
 
-bool AVSettingsUserLevelManagementDelegate::IsValidVideoStreamID(uint16_t aVideoStreamID)
+void AVSettingsUserLevelManagementDelegate::VideoStreamAllocated(uint16_t aStreamID)
 {
-    // The server needs to verify that the provided Video Stream ID is valid and known and subject to digital modification
-    // The camera app needs to also have an instance of AV Stream Management, querying that to determine validity of the provided
-    // id.
-    return true;
+    // The app needs to invoke this whenever the AV Stream Manager allocates a video stream; this informs the server of the
+    // id that is now subject to DPTZ, and the default viewport of the device
+    Globals::Structs::ViewportStruct::Type viewport = { 0, 0, 1920, 1080 };
+    this->GetServer()->AddMoveCapableVideoStream(aStreamID, viewport);
+}
+
+void AVSettingsUserLevelManagementDelegate::VideoStreamDeallocated(uint16_t aStreamID)
+{
+    // The app needs to invoke this whenever the AV Stream Manager deallocates a video stream; this informs the server of the
+    // deallocated id that is now not subject to DPTZ
+    this->GetServer()->RemoveMoveCapableVideoStream(aStreamID);
+}
+
+void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport)
+{
+    // The app needs to invoke this whenever the AV Stream Manager updates the device level default Viewport.  This informs
+    // the server of the new viewport that shall be appled to all known streams.
+    this->GetServer()->UpdateMoveCapableVideoStreams(aViewport);
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
@@ -103,7 +113,8 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset(uint8_t aPreset)
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport)
+Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID,
+                                                              Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
@@ -113,19 +124,41 @@ Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStr
 }
 
 Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta)
+                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
+                                                               Globals::Structs::ViewportStruct::Type & aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
-    // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
-    // and set the new values for the viewpoort based on the pixel movement requested
+    // The application needs to interact with its instance of AVStreamManagement to access the stream, validate
+    // new dimensions after application of the deltas, and set the new values for the viewport based on the pixel movement
+    // requested
+    // The passed in viewport is empty, and needs to be populated by the delegate with the value of the viewport after
+    // applying all deltas within the constraints of the sensor.
     //
+    aViewport = { 0, 0, 1920, 1080 };
     return Status::Success;
+}
+
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers)
+{
+    mptzPresetHelpers.clear();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DPTZStruct> dptzStreams)
+{
+    dptzStreams.clear();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback()
+{
+    return CHIP_NO_ERROR;
 }
 
 void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId aEndpointId)
 {
     VerifyOrDie(aEndpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gDelegate == nullptr && gAVSettingsUserLevelManagementCluster == nullptr);
+    VerifyOrDie(!gDelegate && !gAVSettingsUserLevelManagementCluster);
     const int16_t appPanMin     = -90;
     const int16_t appPanMax     = 90;
     const int16_t appTiltMin    = -45;
@@ -133,7 +166,7 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     const uint8_t appZoomMax    = 75;
     const uint8_t appMaxPresets = 5;
 
-    gDelegate = new AVSettingsUserLevelManagementDelegate;
+    gDelegate = std::make_unique<AVSettingsUserLevelManagementDelegate>();
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
         CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
@@ -143,15 +176,15 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzStreams,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
 
-    gAVSettingsUserLevelManagementCluster =
-        new CameraAvSettingsUserLevelMgmtServer(kEndpointId, gDelegate, avsumFeatures, avsumAttrs, appMaxPresets);
+    gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
+        kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
     gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom

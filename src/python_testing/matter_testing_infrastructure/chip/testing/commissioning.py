@@ -99,9 +99,27 @@ class CustomCommissioningParameters:
     randomDiscriminator: int
 
 
+class PairingStatus:
+    """
+    This class is used to store the pairing status of a commissioning process with a device.
+    if the commissioning Process is unsuccessful then we pass the exception to the class which sets the PairingStatus
+    to False. If we do not pass any exception when creating the Pairing status then the commissioning status
+    is set to true to indicate that the commissioning process has succeeded.
+    """
+
+    def __init__(self, exception: Optional[Exception] = None):
+        self.exception = exception
+
+    def __bool__(self):
+        return self.exception is None
+
+    def __str__(self):
+        return str(self.exception) if self.exception else "Pairing Successful"
+
+
 async def commission_device(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
-) -> bool:
+) -> PairingStatus:
     """
     Starts the commissioning process of a chip device.
 
@@ -115,8 +133,10 @@ async def commission_device(
         commissioning_info: Specifies the type of commissioning method to use.
 
     Returns:
-        True if the commissioning process completes successfully. False otherwise,
-        except in case of an error which logs the exception details.
+        PairingStatus object which can evaluated in conditional statements
+        if the commissioning process completes successfully PairingStatus is evaluated to True else False along
+        with storing the reason for pairing failure by storing the exception raised during commissioning process.
+
     """
 
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
@@ -130,10 +150,10 @@ async def commission_device(
             await dev_ctrl.CommissionOnNetwork(
                 nodeId=node_id, setupPinCode=info.passcode, filterType=info.filter_type, filter=info.filter_value
             )
-            return True
-        except ChipStackError as e:
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
             logging.error("Commissioning failed: %s" % e)
-            return False
+            return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
             await dev_ctrl.CommissionWiFi(
@@ -144,10 +164,10 @@ async def commission_device(
                 commissioning_info.wifi_passphrase,
                 isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
             )
-            return True
-        except ChipStackError as e:
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
             logging.error("Commissioning failed: %s" % e)
-            return False
+            return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
             await dev_ctrl.CommissionThread(
@@ -157,10 +177,10 @@ async def commission_device(
                 commissioning_info.thread_operational_dataset,
                 isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
             )
-            return True
-        except ChipStackError as e:
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
             logging.error("Commissioning failed: %s" % e)
-            return False
+            return PairingStatus(exception=e)
     else:
         raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
 

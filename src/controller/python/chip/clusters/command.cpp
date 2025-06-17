@@ -80,7 +80,7 @@ public:
     void OnResponse(CommandSender * apCommandSender, const CommandSender::ResponseData & aResponseData) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+        uint8_t buffer[CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES];
         uint32_t size = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
@@ -131,8 +131,7 @@ public:
 
         gOnCommandSenderResponseCallback(
             mAppContext, path.mEndpointId, path.mClusterId, path.mCommandId, index, to_underlying(statusIB.mStatus),
-            statusIB.mClusterStatus.HasValue() ? statusIB.mClusterStatus.Value() : chip::python::kUndefinedClusterStatus, buffer,
-            size);
+            statusIB.mClusterStatus.has_value() ? *statusIB.mClusterStatus : chip::python::kUndefinedClusterStatus, buffer, size);
     }
 
     void OnError(const CommandSender * apCommandSender, const CommandSender::ErrorData & aErrorData) override
@@ -140,7 +139,7 @@ public:
         CHIP_ERROR protocolError = aErrorData.error;
         StatusIB status(protocolError);
         gOnCommandSenderErrorCallback(mAppContext, to_underlying(status.mStatus),
-                                      status.mClusterStatus.ValueOr(chip::python::kUndefinedClusterStatus),
+                                      status.mClusterStatus.value_or(chip::python::kUndefinedClusterStatus),
                                       // If we have an actual IM status, pass 0
                                       // for the error code, because otherwise
                                       // the callee will think we have a stack

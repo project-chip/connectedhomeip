@@ -41,9 +41,14 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from support_modules.cadmin_support import CADMINSupport
 
 
 class TC_CADMIN_1_22_24(MatterBaseTest):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.support = CADMINSupport(self)
+
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
             params = await self.th1.OpenCommissioningWindow(
@@ -53,11 +58,6 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
             asserts.fail('Failed to open commissioning window')
-
-    async def get_window_status(self) -> int:
-        AC_cluster = Clusters.AdministratorCommissioning
-        window_status = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=AC_cluster, attribute=AC_cluster.Attributes.WindowStatus)
-        return window_status
 
     def pics_TC_CADMIN_1_22(self) -> list[str]:
         return ["CADMIN.S"]
@@ -93,25 +93,23 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         sleep(1)
 
         self.step(4)
-        window_status = await self.get_window_status()
+        window_status = await self.support.get_window_status(th=self.th1)
         asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=901, iteration=10000, discriminator=self.discriminator, option=1)
-
-        except ChipStackError as e:
-            # Since we provided 901 seconds as the timeout duration,
-            # we should not be able to open comm window as duration is too long.
-            # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
-            _INVALID_COMMAND = 0x00000585
-            asserts.assert_equal(e.err,  _INVALID_COMMAND,
-                                 "Expected to error as we provided failure value for opening commissioning window")
+        # Since we provided 901 seconds as the timeout duration,
+        # we should not be able to open comm window as duration is too long.
+        # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
+        _INVALID_COMMAND = 0x00000585
+        asserts.assert_equal(cm.exception.err,  _INVALID_COMMAND,
+                             "Expected to error as we provided failure value for opening commissioning window")
 
         self.step(6)
-        window_status2 = await self.get_window_status()
+        window_status2 = await self.support.get_window_status(th=self.th1)
         asserts.assert_equal(window_status2, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 
@@ -149,28 +147,27 @@ class TC_CADMIN_1_22_24(MatterBaseTest):
         # TODO: Issue noticed when initially attempting to check window status after waiting for timeout to occur, issue is detailed here: https://github.com/project-chip/connectedhomeip/issues/35983
         # Workaround in place below until above issue resolved
         try:
-            window_status = await self.get_window_status()
+            window_status = await self.support.get_window_status(th=self.th1)
         except asyncio.CancelledError:
-            window_status = await self.get_window_status()
+            window_status = await self.support.get_window_status(th=self.th1)
 
         asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=179, iteration=10000, discriminator=self.discriminator, option=1)
 
-        except ChipStackError as e:
-            # Since we provided 179 seconds as the timeout duration,
-            # we should not be able to open comm window as duration is too long.
-            # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
-            _INVALID_COMMAND = 0x00000585
-            asserts.assert_equal(e.err, _INVALID_COMMAND,
-                                 "Expected to error as we provided failure value for opening commissioning window")
+        # Since we provided 179 seconds as the timeout duration,
+        # we should not be able to open comm window as duration is too long.
+        # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
+        _INVALID_COMMAND = 0x00000585
+        asserts.assert_equal(cm.exception.err, _INVALID_COMMAND,
+                             "Expected to error as we provided failure value for opening commissioning window")
 
         self.step(6)
-        window_status2 = await self.get_window_status()
+        window_status2 = await self.support.get_window_status(th=self.th1)
         asserts.assert_equal(window_status2, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                              "Commissioning window is expected to be closed, but was found to be open")
 

@@ -232,6 +232,7 @@ private:
     ScanDoneCallback mScanDoneCallback{ nullptr };
     WiFiNetwork mWantedNetwork{};
     bool mInternalScan{ false };
+    bool mDirectedScanning{ false };
     uint8_t mRouterSolicitationCounter = 0;
     bool mSsidFound{ false };
     uint32_t mConnectionRecoveryCounter{ 0 };

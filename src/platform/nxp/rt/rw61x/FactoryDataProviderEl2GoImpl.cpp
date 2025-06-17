@@ -53,6 +53,10 @@ extern "C" {
 #define FACTORY_DATA_PROVIDER_PRINTF(...)
 #endif
 
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#error("OTA FACTORY DATA PROCESSOR NOT SUPPORTED WITH THIS FACTORY DATA PRVD IMPL")
+#endif
+
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START_OFFSET[];
 extern uint32_t __FACTORY_DATA_SIZE[];
@@ -211,7 +215,6 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     uint8_t hash[MCUXCLHASH_OUTPUT_SIZE_SHA_256]     = { 0 };
     mcuxClEls_KeyIndex_t key_index                   = MCUXCLELS_KEY_SLOTS;
     mcuxClEls_EccByte_t ecc_signature[MCUXCLELS_ECC_SIGNATURE_SIZE];
-    uint8_t digest[kSHA256_Hash_Length];
     uint16_t BlobSize  = 0;
     uint16_t KeyIdSize = 0;
     uint32_t Addr;
@@ -223,8 +226,7 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
         SearchForId(FactoryDataId::kEl2GoDacKeyId, (uint8_t *) &el2go_dac_key_id, sizeof(el2go_dac_key_id), KeyIdSize));
 
     /* Calculate message HASH to sign */
-    memset(&digest[0], 0, sizeof(digest));
-    res = Hash_SHA256(digestToSign.data(), digestToSign.size(), &digest[0]);
+    res = Hash_SHA256(digestToSign.data(), digestToSign.size(), &hash[0]);
     if (res != CHIP_NO_ERROR)
     {
         return res;
@@ -277,6 +279,11 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     els_enable();
 
     return CHIP_NO_ERROR;
+}
+
+FactoryDataProvider & FactoryDataPrvdImpl()
+{
+    return FactoryDataProviderImpl::sInstance;
 }
 
 } // namespace DeviceLayer

@@ -23,7 +23,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/sear_1_6_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,6 +31,7 @@
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --endpoint 1
+#       --app-pipe /tmp/sear_1_6_fifo
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -50,7 +51,6 @@ class TC_SEAR_1_6(MatterBaseTest):
         super().__init__(*args)
         self.endpoint = None
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_sear_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ServiceArea
@@ -88,11 +88,6 @@ class TC_SEAR_1_6(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-            self.app_pipe = self.app_pipe + str(app_pid)
 
         self.print_step(1, "Commissioning, already done")
 
