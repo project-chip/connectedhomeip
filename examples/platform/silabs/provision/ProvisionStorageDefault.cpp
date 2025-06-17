@@ -702,7 +702,8 @@ CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
     VerifyOrReturnError(value.size() == kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Write the key to the configuration storage
-    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, value.data(), value.size()));
+    ReturnErrorOnFailure(
+        SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, value.data(), value.size()));
 
     return CHIP_NO_ERROR;
 #else
