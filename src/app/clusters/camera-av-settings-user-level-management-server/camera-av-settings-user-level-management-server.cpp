@@ -100,12 +100,12 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
                                          mEndpointId));
     }
 
-    if (SupportsOptAttr(OptionalAttributes::kDptzRelativeMove))
+    if (SupportsOptAttr(OptionalAttributes::kDptzStreams))
     {
         VerifyOrReturnError(HasFeature(Feature::kDigitalPTZ), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If "
-                                         "DPTZRelativeMove is enabled, then DigitalPTZ feature is required",
+                                         "DPTZStreams is enabled, then DigitalPTZ feature is required",
                                          mEndpointId));
     }
 
@@ -373,27 +373,59 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
 /**
  * Methods handling known video stream IDs, the addition and removal thereof.
  */
-void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStreamID(uint16_t aVideoStreamID)
+void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(uint16_t aVideoStreamID,
+                                                                    Globals::Structs::ViewportStruct::Type aViewport)
 {
-    mDptzRelativeMove.push_back(aVideoStreamID);
-    MarkDirty(Attributes::DPTZRelativeMove::Id);
+    DPTZStruct dptzEntry;
+    dptzEntry.videoStreamID = aVideoStreamID;
+    dptzEntry.viewport      = aViewport;
+    mDptzStreams.push_back(dptzEntry);
+    MarkDirty(Attributes::DPTZStreams::Id);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::RemoveMoveCapableVideoStreamID(uint16_t aVideoStreamID)
+void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(uint16_t aVideoStreamID,
+                                                                       Globals::Structs::ViewportStruct::Type aViewport)
+{
+    auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
+                           [aVideoStreamID](const DPTZStruct & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
+
+    if (it == mDptzStreams.end())
+    {
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]. No matching video stream ID, update not possible. ID=%d.",
+                     mEndpointId, aVideoStreamID);
+        return;
+    }
+
+    it->viewport = aViewport;
+    MarkDirty(Attributes::DPTZStreams::Id);
+}
+
+void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport)
+{
+    for (auto & dptzStream : mDptzStreams)
+    {
+        dptzStream.viewport = aViewport;
+    }
+
+    MarkDirty(Attributes::DPTZStreams::Id);
+}
+
+void CameraAvSettingsUserLevelMgmtServer::RemoveMoveCapableVideoStream(uint16_t aVideoStreamID)
 {
     // Verify that this is a known ID, if it is, remove from the list
     //
-    auto it = std::find(mDptzRelativeMove.begin(), mDptzRelativeMove.end(), aVideoStreamID);
+    auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
+                           [aVideoStreamID](const DPTZStruct & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
 
-    if (it == mDptzRelativeMove.end())
+    if (it == mDptzStreams.end())
     {
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]. No matching video stream ID, removal not possible. ID=%d.",
                      mEndpointId, aVideoStreamID);
         return;
     }
 
-    mDptzRelativeMove.erase(it);
-    MarkDirty(Attributes::DPTZRelativeMove::Id);
+    mDptzStreams.erase(it);
+    MarkDirty(Attributes::DPTZStreams::Id);
 }
 
 /**
@@ -401,9 +433,10 @@ void CameraAvSettingsUserLevelMgmtServer::RemoveMoveCapableVideoStreamID(uint16_
  */
 bool CameraAvSettingsUserLevelMgmtServer::KnownVideoStreamID(uint16_t aVideoStreamID)
 {
-    auto it = std::find(mDptzRelativeMove.begin(), mDptzRelativeMove.end(), aVideoStreamID);
+    auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
+                           [aVideoStreamID](const DPTZStruct & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
 
-    return (it == mDptzRelativeMove.end() ? false : true);
+    return (it == mDptzStreams.end() ? false : true);
 }
 
 /**
@@ -468,12 +501,12 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(Attribu
     });
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeDPTZRelativeMove(AttributeValueEncoder & aEncoder)
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeDPTZStreams(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & dptzRelativeMove : mDptzRelativeMove)
+        for (const auto & dptzStream : mDptzStreams)
         {
-            ReturnErrorOnFailure(encoder.Encode(dptzRelativeMove));
+            ReturnErrorOnFailure(encoder.Encode(dptzStream));
         }
 
         return CHIP_NO_ERROR;
@@ -504,7 +537,7 @@ void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
     }
 
     // Load DPTZRelativeMove
-    err = mDelegate.LoadDPTZRelativeMove(mDptzRelativeMove);
+    err = mDelegate.LoadDPTZStreams(mDptzStreams);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unable to load the DPTZRelativeMove from the KVS.", mEndpointId);
@@ -551,12 +584,12 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
                                          mEndpointId));
 
         return ReadAndEncodeMPTZPresets(aEncoder);
-    case DPTZRelativeMove::Id:
+    case DPTZStreams::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kDigitalPTZ), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: can not get DPTZRelativeMove, feature is not supported",
                          mEndpointId));
-        return ReadAndEncodeDPTZRelativeMove(aEncoder);
+        return ReadAndEncodeDPTZStreams(aEncoder);
     case ZoomMax::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kMechanicalZoom), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
@@ -1188,28 +1221,29 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
                                                                 const Commands::DPTZSetViewport::DecodableType & commandData)
 {
-    uint16_t videoStreamID                 = commandData.videoStreamID;
-    Structs::ViewportStruct::Type viewport = commandData.viewport;
+    uint16_t videoStreamID                          = commandData.videoStreamID;
+    Globals::Structs::ViewportStruct::Type viewport = commandData.viewport;
 
     // Is this a video stream ID of which we have already been informed?
-    // If not, ask the delegate if it's ok.  If yes, add to our set and proceed, if not, fail.
+    // If not, fail.
     //
     if (!KnownVideoStreamID(videoStreamID))
     {
-        // Call the delegate to validate that the videoStreamID is known; if yes then add to our list and proceed
-        //
-        if (!mDelegate.IsValidVideoStreamID(videoStreamID))
-        {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unknown Video Stream ID provided. ID: %d", mEndpointId,
-                         videoStreamID);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-            return;
-        }
-        AddMoveCapableVideoStreamID(videoStreamID);
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unknown Video Stream ID provided. ID: %d", mEndpointId,
+                     videoStreamID);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
     }
 
     // Call the delegate
     Status status = mDelegate.DPTZSetViewport(videoStreamID, viewport);
+
+    if (status == Status::Success)
+    {
+        // Update the viewport of our stream in DPTZStreams
+        //
+        UpdateMoveCapableVideoStream(videoStreamID, viewport);
+    }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -1247,8 +1281,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
         return;
     }
 
-    // Call the delegate
-    Status status = mDelegate.DPTZRelativeMove(videoStreamID, deltaX, deltaY, zoomDelta);
+    // Create a viewport and call the delegate; on success update our Stream Viewport with that which was set
+    Globals::Structs::ViewportStruct::Type viewport;
+    Status status = mDelegate.DPTZRelativeMove(videoStreamID, deltaX, deltaY, zoomDelta, viewport);
+
+    if (status == Status::Success)
+    {
+        UpdateMoveCapableVideoStream(videoStreamID, viewport);
+    }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }

@@ -726,6 +726,17 @@ void DoorLockServer::setCredentialCommandHandler(
     // appclusters, 5.2.4.41.1: we should return DUPLICATE in the response if we're trying to create duplicated credential entry
     for (uint16_t i = 1; CredentialTypeEnum::kProgrammingPIN != credentialType && (i <= maxNumberOfCredentials); ++i)
     {
+        // Ignore the slot we are trying to set, because setting a credential to
+        // the same value as it already has should be just fine.
+        //
+        // This is not clearly defined in the spec;
+        // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11707
+        // tracks that.
+        if (i == credentialIndex)
+        {
+            continue;
+        }
+
         EmberAfPluginDoorLockCredentialInfo currentCredential;
         if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, i, credentialType, currentCredential))
         {
@@ -2210,8 +2221,7 @@ DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId,
                         "[SetCredential] Unable to create new user for credential: internal error "
                         "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
                         endpointId, credential.credentialIndex, availableUserIndex,
-                        status.HasClusterSpecificCode() ? status.GetClusterSpecificCode().Value()
-                                                        : (to_underlying(status.GetStatus())));
+                        status.GetClusterSpecificCode().value_or(to_underlying(status.GetStatus())));
         return DlStatus::kFailure;
     }
 
@@ -3575,9 +3585,9 @@ void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
 {
     VerifyOrDie(nullptr != commandObj);
 
-    if (status.HasClusterSpecificCode())
+    if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
     {
-        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, status.GetClusterSpecificCode().Value()) == CHIP_NO_ERROR);
+        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, *clusterStatus) == CHIP_NO_ERROR);
     }
     else
     {
