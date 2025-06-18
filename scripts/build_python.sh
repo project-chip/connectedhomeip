@@ -99,13 +99,12 @@ while (($#)); do
             shift
             ;;
         --enable_wifi_paf | -p)
-            declare enable_wifi_paf=true
-            enable_wifi_paf=$2
-            if [[ "$enable_wifi_paf" != "true" && "$enable_wifi_paf" != "false" ]]; then
-                echo "enable_wifi_paf should have a true/false value, not '$enable_wifi_paf'"
+            declare wifi_paf_arg=$2
+            if [[ "$wifi_paf_arg" != "true" && "$wifi_paf_arg" != "false" ]]; then
+                echo "enable_wifi_paf should have a true/false value, not '$wifi_paf_arg'"
                 exit
             fi
-            wifi_paf_config="chip_device_config_enable_wifipaf=$enable_wifi_paf"
+            wifi_paf_config="chip_device_config_enable_wifipaf=$wifi_paf_arg"
             shift
             ;;
         --enable_ipv4 | -4)
@@ -220,7 +219,7 @@ export SYSTEM_VERSION_COMPAT=0
 # Make all possible human redable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_inet_config_enable_ipv4=$enable_ipv4 $wifi_paf_config chip_crypto=\"boringssl\" $all_extra_gn_args"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_inet_config_enable_ipv4=$enable_ipv4${wifi_paf_config:+ $wifi_paf_config} chip_crypto=\"boringssl\" $all_extra_gn_args"
 
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels
