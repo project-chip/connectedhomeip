@@ -116,7 +116,7 @@ constexpr int kCHIPoBLE_CCC_AttributeIndex = 3;
 #ifdef CONFIG_BT_BONDABLE
 constexpr uint8_t kMatterBleIdentity = 1;
 #else
-constexpr uint8_t kMatterBleIdentity = 0;
+constexpr uint8_t kMatterBleIdentity   = 0;
 #endif // CONFIG_BT_BONDABLE
 
 int InitRandomStaticAddress(bool idPresent, int & id)
