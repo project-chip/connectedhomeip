@@ -723,7 +723,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
 {
     SCARDHANDLE cardHandle;
     DWORD dwActiveProtocol;
-    std::shared_ptr<TagInstance>  tagInstance = nullptr;
+    std::shared_ptr<TagInstance> tagInstance = nullptr;
 
     // Before launching a new scan of a reader, we should discard all the saved instances using this readerName
     EraseAllTagInstancesUsingReaderName(readerName);
@@ -753,7 +753,8 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
         else
         {
             // This couple (readerName, cardHandle) is not known yet: Create a new TagInstance
-            auto newTagInstance = std::make_shared<TagInstance>(mNFCBase, Transport::PeerAddress::NFC(nfcShortId), readerName, cardHandle);
+            auto newTagInstance =
+                std::make_shared<TagInstance>(mNFCBase, Transport::PeerAddress::NFC(nfcShortId), readerName, cardHandle);
 
             ReturnErrorOnFailure(newTagInstance->RetrieveDiscriminator());
 
@@ -776,7 +777,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
 
 // Function to search for a TagInstance based on readerName and cardHandle
 std::shared_ptr<TagInstance> NFCCommissioningManagerImpl::SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName,
-                                                                                        SCARDHANDLE cardHandle)
+                                                                                                       SCARDHANDLE cardHandle)
 {
     for (auto & instance : tagInstances)
     {
@@ -813,7 +814,7 @@ void NFCCommissioningManagerImpl::EraseAllTagInstancesUsingReaderName(const char
     {
         if (strcmp((*it)->GetReaderName(), readerName) == 0)
         {
-            (*it)->Invalidate();  // Mark as invalid before erasing
+            (*it)->Invalidate(); // Mark as invalid before erasing
             // tagInstance will be deleted automatically when both the tagInstances vector
             //  and the message queue will no more use it.
             it = tagInstances.erase(it);
