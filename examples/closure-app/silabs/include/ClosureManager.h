@@ -67,8 +67,9 @@ public:
     /**
      * @brief Handles the calibration command for the closure.
      *
-     * This method processes the calibration command, which is used to initiate a
-     * calibration action for a closure..
+     * This method initiates the calibration process by setting a countdown timer.
+     * It posts a calibration action event to the application task and marks
+     * the calibration action as in progress.
      *
      * @return chip::Protocols::InteractionModel::Status
      *         Returns Status::Success if all operations succeed, otherwise Status::Failure.
@@ -166,28 +167,25 @@ private:
      * It logs the initiation of the corresponding action and, for certain actions, may start a timer.
      *
      * @param event Pointer to the AppEvent containing the action to initiate.
-     *
-     * If an invalid action is received, a log entry is generated and no action is taken.
      */
     static void InitiateAction(AppEvent * event);
 
     /**
-     * @brief Handles a closure event by updating the current action and scheduling the completion handler.
+     * @brief Handles a closure action complete event.
      *
-     * This method processes the incoming closure event and schedules the completion of the closure action
+     * This method processes closure action complete event and schedules the completion of the closure action
      * to be executed asynchronously on the platform manager's work queue.
      *
      * @param event Pointer to the AppEvent containing closure event details.
      */
 
-    static void HandleClosureEvent(AppEvent * event);
+    static void HandleClosureActionCompleteEvent(AppEvent * event);
 
     /**
      * @brief Timer event handler for the ClosureManager.
      *
-     * This static function is called when the closure timer expires. It is executed in the context
-     * of the timer task. The handler creates an AppEvent and posts the event to the application
-     * task queue. This ensures that the closure event is processed in the context of the application
+     * This static function is called when the closure timer expires. The handler creates an AppEvent and
+     * posts the event to the application task queue. This ensures that the closure event is processed in the context of the application
      * task rather than the timer task.
      *
      * @param timerCbArg Pointer to the callback argument (unused).

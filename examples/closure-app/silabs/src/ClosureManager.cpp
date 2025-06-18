@@ -135,13 +135,15 @@ void ClosureManager::InitiateAction(AppEvent * event)
     {
     case Action_t::CALIBRATE_ACTION:
         ChipLogDetail(AppServer, "Initiating calibration action");
+        // Timer used in sample application to simulate the calibration process.
+        // In a real application, this would be replaced with actual calibration logic.
+        instance.StartTimer(kCountdownTimeSeconds * 1000);
         break;
     case Action_t::STOP_MOTION_ACTION:
         ChipLogDetail(AppServer, "Initiating stop motion action");
         break;
     case Action_t::STOP_CALIBRATE_ACTION:
         ChipLogDetail(AppServer, "Initiating stop calibration action");
-        instance.StartTimer(kCountdownTimeSeconds * 1000);
         break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogDetail(AppServer, "Initiating move to action");
@@ -149,45 +151,6 @@ void ClosureManager::InitiateAction(AppEvent * event)
     default:
         ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
         return;
-    }
-}
-
-void ClosureManager::HandleClosureEvent(AppEvent * event)
-{
-    Action_t currentAction = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
-
-    switch (currentAction)
-    {
-    case Action_t::CALIBRATE_ACTION:
-        ChipLogDetail(AppServer, "Starting calibration action");
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    case Action_t::STOP_MOTION_ACTION:
-        ChipLogDetail(AppServer, "Starting stop motion action");
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    case Action_t::STOP_CALIBRATE_ACTION:
-        ChipLogDetail(AppServer, "Starting stop calibrate action");
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    case Action_t::MOVE_TO_ACTION:
-        ChipLogError(AppServer, "Starting move to action");
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    default:
-        break;
     }
 }
 
@@ -201,8 +164,43 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = closureManager->GetCurrentAction();
-    event.Handler             = HandleClosureEvent;
+    event.Handler             = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
+}
+
+void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
+{
+    Action_t currentAction = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
+
+    switch (currentAction)
+    {
+    case Action_t::CALIBRATE_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureActionComplete(instance.GetCurrentAction());
+        });
+        break;
+    case Action_t::STOP_MOTION_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureActionComplete(instance.GetCurrentAction());
+        });
+        break;
+    case Action_t::STOP_CALIBRATE_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureActionComplete(instance.GetCurrentAction());
+        });
+        break;
+    case Action_t::MOVE_TO_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureActionComplete(instance.GetCurrentAction());
+        });
+        break;
+    default:
+        break;
+    }
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
@@ -210,6 +208,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
+    // Post an event to initiate the calibration action asynchronously.
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = CALIBRATE_ACTION;
@@ -240,10 +239,10 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     switch (action)
     {
     case Action_t::CALIBRATE_ACTION: {
-        isCalibrationInProgress = false;
         GetInstance().ep1.OnCalibrateActionComplete();
         GetInstance().ep2.OnCalibrateActionComplete();
         GetInstance().ep3.OnCalibrateActionComplete();
+        isCalibrationInProgress = false;
         break;
     }
     case Action_t::STOP_MOTION_ACTION:
