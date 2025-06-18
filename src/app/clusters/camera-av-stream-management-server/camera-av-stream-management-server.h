@@ -719,6 +719,8 @@ private:
 
     void ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
 
+    bool StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
+
     /**
      * @brief Inherited from CommandHandlerInterface
      */
@@ -743,6 +745,10 @@ private:
     void HandleSetStreamPriorities(HandlerContext & ctx, const Commands::SetStreamPriorities::DecodableType & req);
 
     void HandleCaptureSnapshot(HandlerContext & ctx, const Commands::CaptureSnapshot::DecodableType & req);
+
+    bool CheckSnapshotStreamsAvailability(HandlerContext & ctx);
+
+    bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, HandlerContext & ctx);
 };
 
 } // namespace CameraAvStreamManagement
