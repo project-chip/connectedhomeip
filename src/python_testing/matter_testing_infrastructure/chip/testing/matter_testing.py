@@ -1373,7 +1373,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                 test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
-            self.runner_hook.test_stop(exception=exception, duration=test_duration)
+            # Convert the exception to a simple Exception with the same message
+            exception_test_stop = Exception(str(exception))
+            self.runner_hook.test_stop(exception=exception_test_stop, duration=test_duration)
 
             def extract_error_text() -> tuple[str, str]:
                 no_stack_trace = ("Stack Trace Unavailable", "")
