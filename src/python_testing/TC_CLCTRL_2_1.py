@@ -59,8 +59,8 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             TestStep(4, "Read the CountdownTime attribute", "CountdownTime is returned by the DUT if it is supported, otherwise skip"),
             TestStep(5, "Read the MainState attribute", "MainState of the ClosureControl cluster is returned by the DUT"),
             TestStep(6, "Read the CurrentErrorList attribute", "CurrentErrorList of the ClosureControl cluster is returned by the DUT"),
-            TestStep(7, "Read the OverallState attribute",
-                     "OverallState of the ClosureControl cluster is returned by the DUT and the fields of the struct are validated"),
+            TestStep(7, "Read the OverallCurrentState  attribute",
+                     "OverallCurrentState  of the ClosureControl cluster is returned by the DUT and the fields of the struct are validated"),
             TestStep(8, "Read the OverallTarget attribute",
                      "OverallTarget of the ClosureControl cluster is returned by the DUT and the fields of the struct are validated"),
             TestStep(9, "Read the LatchControlModes attribute",
@@ -132,42 +132,44 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             asserts.assert_less_equal(error, 0xBF, "CurrentErrorList value is out of range")
             asserts.assert_greater_equal(error, 0x00, "CurrentErrorList value is out of range")
 
-        # STEP 7: Read OverallState attribute
+        # STEP 7: Read OverallCurrentState  attribute
         self.step(7)
-        overall_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallStateStruct] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallState)
+        overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
 
-        if overall_state is NullValue:
-            logging.info("OverallState is NULL, skipping field validations")
+        if overall_current_state is NullValue:
+            logging.info("OverallCurrentState  is NULL, skipping field validations")
         else:
-            logging.info(f"OverallState: {overall_state}")
+            logging.info(f"OverallCurrentState : {overall_current_state}")
 
-            # Check Positioning feature in OverallState - PS feature (bit 0)
-            if is_positioning_supported and overall_state.positioning is not NullValue:
+            # Check Positioning feature in OverallCurrentState  - PS feature (bit 0)
+            if is_positioning_supported and overall_current_state.position is not NullValue:
                 logging.info(
-                    f"OverallState.positioning: {overall_state.positioning, Clusters.ClosureControl.Enums.PositioningEnum(overall_state.positioning).name}")
+                    f"OverallCurrentState.position: {overall_current_state.position, Clusters.ClosureControl.Enums.PositioningEnum(overall_current_state.position).name}")
                 asserts.assert_less_equal(
-                    overall_state.positioning, Clusters.ClosureControl.Enums.PositioningEnum.kOpenedAtSignature, "OverallState.positioning is out of range")
+                    overall_current_state.position, Clusters.ClosureControl.Enums.PositioningEnum.kOpenedAtSignature, "OverallCurrentState.position is out of range")
                 asserts.assert_greater_equal(
-                    overall_state.positioning, Clusters.ClosureControl.Enums.PositioningEnum.kFullyClosed, "OverallState.positioning is out of range")
+                    overall_current_state.position, Clusters.ClosureControl.Enums.PositioningEnum.kFullyClosed, "OverallCurrentState.position is out of range")
 
-            # Check MotionLatching feature in OverallState - LT feature (bit 1)
-            if is_latching_supported and overall_state.latch is not NullValue:
-                logging.info(f"OverallState.latch: {overall_state.latch}")
-                asserts.assert_true(isinstance(overall_state.latch, bool), "OverallState.latch is not a boolean value")
+            # Check MotionLatching feature in OverallCurrentState  - LT feature (bit 1)
+            if is_latching_supported and overall_current_state.latch is not NullValue:
+                logging.info(f"OverallCurrentState .latch: {overall_current_state.latch}")
+                asserts.assert_true(isinstance(overall_current_state.latch, bool),
+                                    "OverallCurrentState .latch is not a boolean value")
 
-            # Check Speed feature in OverallState - SP feature (bit 3)
+            # Check Speed feature in OverallCurrentState  - SP feature (bit 3)
             if is_speed_supported:
                 logging.info(
-                    f"OverallState.speed: {overall_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum(overall_state.speed).name}")
-                asserts.assert_less_equal(overall_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh,
-                                          "OverallState.speed is out of range")
-                asserts.assert_greater_equal(overall_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kAuto,
-                                             "OverallState.speed is out of range")
+                    f"OverallCurrentState .speed: {overall_current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum(overall_current_state.speed).name}")
+                asserts.assert_less_equal(overall_current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh,
+                                          "OverallCurrentState .speed is out of range")
+                asserts.assert_greater_equal(overall_current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kAuto,
+                                             "OverallCurrentState .speed is out of range")
 
-            # Check SecureState attribute in OverallState
+            # Check SecureState attribute in OverallCurrentState
             if is_positioning_supported or is_latching_supported:
-                logging.info(f"OverallState.secureState: {overall_state.secureState}")
-                asserts.assert_true(isinstance(overall_state.secureState, bool), "OverallState.secureState is not a boolean value")
+                logging.info(f"OverallCurrentState .secureState: {overall_current_state.secureState}")
+                asserts.assert_true(isinstance(overall_current_state.secureState, bool),
+                                    "OverallCurrentState .secureState is not a boolean value")
 
         # STEP 8: Read OverallTarget attribute
         self.step(8)
