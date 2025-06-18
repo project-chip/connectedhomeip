@@ -36,6 +36,7 @@ class WebRTCClient
 public:
     int client_id;
     std::shared_ptr<rtc::PeerConnection> pc;
+    std::shared_ptr<rtc::DataChannel> dc;
     rtc::Configuration config;
     SdpOfferCallback offerCb;
     SdpAnswerCallback answerCb;
@@ -108,12 +109,24 @@ void InitialisePeerConnection(void * Client)
     });
 
     // Create a data channel for communication
-    auto dc = client->pc->createDataChannel("test");
+    client->dc = client->pc->createDataChannel("test");
+    if (Client == nullptr)
+    {
+        ChipLogError(NotSpecified, "Client is null");
+        return;
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    if (rtcClient->pc == nullptr)
+    {
+        ChipLogError(NotSpecified, "PeerConnection is null");
+        return;
+    }
 
     // Set up event handlers for the data channel
-    dc->onOpen([&]() { ChipLogProgress(NotSpecified, "[DataChannel open: %s]", dc->label().c_str()); });
-    dc->onClosed([&]() { ChipLogProgress(NotSpecified, "[DataChannel closed: %s]", dc->label().c_str()); });
-    dc->onMessage([](auto data) {
+    client->dc->onOpen([&]() { ChipLogProgress(NotSpecified, "[DataChannel open: %s]", client->dc->label().c_str()); });
+    client->dc->onClosed([&]() { ChipLogProgress(NotSpecified, "[DataChannel closed: %s]", client->dc->label().c_str()); });
+    client->dc->onMessage([](auto data) {
         if (std::holds_alternative<std::string>(data))
         {
             ChipLogProgress(NotSpecified, "[Received message: %s]", std::get<std::string>(data).c_str());
@@ -199,12 +212,36 @@ void CreateOffer(void * Client)
     // Call the offer callback with the offer description
     if (rtcClient->offerCb)
     {
-        rtcClient->offerCb(description.typeString().c_str(), rtcClient->client_id);
+        std::string sdpOffer = description.typeString();
+        rtcClient->offerCb(sdpOffer.c_str(), rtcClient->client_id);
     }
 }
 
 // Function to create an answer for the peer connection
-void CreateAnswer(void * Client, const std::string & offer, std::function<void(std::string)> callback, int index) {}
+void CreateAnswer(void * Client, const std::string & offer, std::function<void(std::string)> callback, int index)
+{
+    if (Client == nullptr)
+    {
+        ChipLogError(NotSpecified, "Client is null");
+        return;
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    if (rtcClient->pc == nullptr)
+    {
+        ChipLogError(NotSpecified, "PeerConnection is null");
+        return;
+    }
+
+    // Set the remote offer
+    rtcClient->pc->setRemoteDescription(rtc::Description(offer, "offer"));
+
+    // Create an answer for the peer connection
+    rtc::Description answer = rtcClient->pc->createAnswer();
+
+    // Call the provided callback with the answer description
+    rtcClient->answerCb(answer.typeString().c_str(), rtcClient->client_id);
+}
 
 // Function to get the local session description
 const char * GetLocalSdp(void * Client)
@@ -227,7 +264,29 @@ const char * GetLocalSdp(void * Client)
 }
 
 // Function to set the remote session description
-void SetAnswer(void * Client, const std::string & answer) {}
+void SetAnswer(void * Client, const std::string & answer)
+{
+    if (Client == nullptr)
+    {
+        ChipLogError(NotSpecified, "Client is null");
+        return;
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    if (rtcClient->pc == nullptr)
+    {
+        ChipLogError(NotSpecified, "PeerConnection is null");
+        return;
+    }
+
+    // Create a remote description from the answer string
+    rtc::Description remoteDescription(answer, "answer");
+
+    // Set the remote description on the PeerConnection
+    rtcClient->pc->setRemoteDescription(remoteDescription);
+
+    ChipLogProgress(NotSpecified, "Remote description set successfully");
+}
 
 // Function to set the remote candidate
 void SetCandidate(void * Client, const std::string & candidate)
@@ -250,7 +309,23 @@ void SetCandidate(void * Client, const std::string & candidate)
 }
 
 // Function to send data over the data channel
-void SendData(void * Client, const std::string & data) {}
+void SendData(void * Client, const std::string & data)
+{
+    if (Client == nullptr)
+    {
+        ChipLogError(NotSpecified, "Client is null");
+        return;
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    if (rtcClient->dc == nullptr)
+    {
+        ChipLogError(NotSpecified, "Datachannel is null");
+        return;
+    }
+
+    rtcClient->dc->send(data);
+}
 
 // Function to set callbacks for various events
 void SetCallbacks(void * Client, SdpOfferCallback offer_callback, SdpAnswerCallback answer_callback, IceCallback ice_callback,
