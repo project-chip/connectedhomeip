@@ -73,8 +73,7 @@ Status ServerInstance::HandleGetDatasetRequest(CommandHandlerInterface::HandlerC
         dataset.Init(ByteSpan());
         return Status::Success;
     }
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, Status::Failure);
-    return Status::Success;
+    return StatusIB(err).mStatus;
 }
 
 Status ServerInstance::HandleSetActiveDatasetRequest(CommandHandlerInterface::HandlerContext & ctx,
