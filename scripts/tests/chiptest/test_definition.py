@@ -25,9 +25,11 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
 
+
 TEST_NODE_ID = '0x12344321'
 TEST_DISCRIMINATOR = '3840'
 TEST_PASSCODE = '20202021'
+TEST_SETUP_QR_CODE = 'MT:-24J042C00KA0648G00'
 
 
 class App:
@@ -439,12 +441,8 @@ class TestDefinition:
             else:
                 pairing_server_args = []
                 if ble_controller_tool is not None:
-                    # Explicitly use ble-wifi pairing to force the use of BLE
-                    # exchange and AP association. The code-wifi pairing skips
-                    # BLE commissioning if devices can be commissioned over IP
-                    # network.
                     pairing_cmd = paths.chip_tool_with_python_cmd + [
-                        "pairing", "ble-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_PASSCODE, TEST_DISCRIMINATOR]
+                        "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE]
                     pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
                 else:
                     pairing_cmd = paths.chip_tool_with_python_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]

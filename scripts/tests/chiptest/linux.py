@@ -73,8 +73,8 @@ class IsolatedNetworkNamespace:
         "ip netns add tool",
 
         # Create links for switch to net connections
-        "ip link add {app_link_name} type veth peer name eth-app-switch",
-        "ip link add {tool_link_name} type veth peer name eth-tool-switch",
+        "ip link add {app_link_name} type veth peer name {app_link_name}-switch",
+        "ip link add {tool_link_name} type veth peer name {tool_link_name}-switch",
         "ip link add eth-ci type veth peer name eth-ci-switch",
 
         # Link the connections together
@@ -84,8 +84,8 @@ class IsolatedNetworkNamespace:
         # Bridge all the connections together.
         "ip link add name br1 type bridge",
         "ip link set br1 up",
-        "ip link set eth-app-switch master br1",
-        "ip link set eth-tool-switch master br1",
+        "ip link set {app_link_name}-switch master br1",
+        "ip link set {tool_link_name}-switch master br1",
         "ip link set eth-ci-switch master br1",
 
         # Create link between virtual host 'tool' and the test runner
@@ -99,7 +99,7 @@ class IsolatedNetworkNamespace:
         "ip netns exec app ip addr add 10.10.10.1/24 dev {app_link_name}",
         "ip netns exec app ip link set dev {app_link_name} up",
         "ip netns exec app ip link set dev lo up",
-        "ip link set dev eth-app-switch up",
+        "ip link set dev {app_link_name}-switch up",
         # Force IPv6 to use ULAs that we control.
         "ip netns exec app ip -6 addr flush {app_link_name}",
         "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev {app_link_name}",
@@ -111,7 +111,7 @@ class IsolatedNetworkNamespace:
         "ip netns exec tool ip addr add 10.10.10.2/24 dev {tool_link_name}",
         "ip netns exec tool ip link set dev {tool_link_name} up",
         "ip netns exec tool ip link set dev lo up",
-        "ip link set dev eth-tool-switch up",
+        "ip link set dev {tool_link_name}-switch up",
         # Force IPv6 to use ULAs that we control.
         "ip netns exec tool ip -6 addr flush {tool_link_name}",
         "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}",
@@ -127,8 +127,8 @@ class IsolatedNetworkNamespace:
         "ip link delete br1",
 
         "ip link delete eth-ci-switch",
-        "ip link delete eth-tool-switch",
-        "ip link delete eth-app-switch",
+        "ip link delete {tool_link_name}-switch",
+        "ip link delete {app_link_name}-switch",
 
         "ip netns del tool",
         "ip netns del app",
@@ -278,6 +278,7 @@ class WpaSupplicantMock(threading.Thread):
                 # Mock AP association process.
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
+                self.mock.networking.setup_app_link_up()
                 await self.State.set_async("completed")
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
@@ -353,9 +354,10 @@ class WpaSupplicantMock(threading.Thread):
         self.net = WpaSupplicantMock.WpaNetwork(self)
         self.net.export_to_dbus(self.net.path)
 
-    def __init__(self, ssid: str, password: str):
+    def __init__(self, ssid: str, password: str, ns: IsolatedNetworkNamespace):
         self.ssid = ssid
         self.password = password
+        self.networking = ns
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.startup())
         super().__init__(target=self.loop.run_forever)
