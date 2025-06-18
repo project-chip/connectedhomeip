@@ -45,13 +45,13 @@ def EnsurePrivateState():
     logging.info("Ensuring /run is privately accessible")
 
     logging.debug("Making / private")
-    if os.system("mount --make-private /") != 0:
+    if subprocess.run(["mount", "--make-private", "/"]).returncode != 0:
         logging.error("Failed to make / private")
         logging.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
     logging.debug("Remounting /run")
-    if os.system("mount -t tmpfs tmpfs /run") != 0:
+    if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/run"]).returncode != 0:
         logging.error("Failed to mount /run as a temporary filesystem")
         logging.error("Are you using --privileged if running in docker?")
         sys.exit(1)
@@ -179,7 +179,7 @@ class IsolatedNetworkNamespace:
         command = command.format(app_link_name=self.app_link_name,
                                  tool_link_name=self.tool_link_name)
         logging.debug("Executing: %s", command)
-        if os.system(command) != 0:
+        if subprocess.run(command.split()).returncode != 0:
             logging.error("Failed to execute '%s'" % command)
             logging.error("Are you using --privileged if running in docker?")
             sys.exit(1)
