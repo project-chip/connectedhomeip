@@ -1193,8 +1193,8 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
     if (aReadPrepareParams.mRegisteredCheckInToken)
     {
-        ChipLogProgress(DataManagement,  "ICD Check-In token has been registered in peer device %" PRIu32,
-                        ChipLogValueX64(GetPeerNodeId()));
+        ChipLogProgress(DataManagement, "ICD Check-In token has been registered in peer device " ChipLogFormatScopedNodeId,
+                        ChipLogValueScopedNodeId(GetPeerScopedId));
     }
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
