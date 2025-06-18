@@ -2288,7 +2288,7 @@ provisional cluster ClosureControl = 260 {
   command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
 }
 
-/** Ceiling values are dedicated for closures that close a ceiling, such as horizontal awnings, pergolas, etc. */
+/** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
 provisional cluster ClosureDimension = 261 {
   revision 1;
 
