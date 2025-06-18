@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <lib/support/BitFlags.h>
+#include <system/SystemLayerImpl.h>
 
 namespace chip {
 namespace Test {
@@ -33,7 +34,15 @@ public:
     ICDConfigurationDataTestAccess() = delete;
     ICDConfigurationDataTestAccess(ICDConfigurationData * data) : mData(data) {}
 
+    // Add wrappers for private methods used in tests
     void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mData->SetFeatureMap(featureMap); }
+    void SetICDMode(ICDConfigurationData::ICDMode mode) { mData->SetICDMode(mode); }
+    CHIP_ERROR SetSlowPollingInterval(System::Clock::Milliseconds32 interval) { return mData->SetSlowPollingInterval(interval); }
+    CHIP_ERROR SetSlowPollingFallback(System::Clock::Milliseconds32 fallback) { return mData->SetSlowPollingFallback(fallback); }
+    CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> active, Optional<System::Clock::Milliseconds32> idle)
+    {
+        return mData->SetModeDurations(active, idle);
+    }
 
 private:
     ICDConfigurationData * mData = nullptr;

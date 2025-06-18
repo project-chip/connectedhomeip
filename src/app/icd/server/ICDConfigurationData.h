@@ -123,8 +123,33 @@ private:
     friend class chip::Test::ICDConfigurationDataTestAccess;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
-    void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };
     void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
+
+    /**
+     * @brief Sets the slow polling interval for the ICD.
+     *
+     * If LIT support is not enabled, the interval cannot be set higher than the SIT polling threshold.
+     * If LIT support is enabled, any value is accepted.
+     *
+     * @param[in] slowPollInterval The slow polling interval in milliseconds.
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the value is invalid.
+     */
+    CHIP_ERROR SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval);
+
+    /**
+     * @brief Sets the fallback value for the slow polling interval.
+     *
+     * This function sets the fallback slow polling interval, which is used when the configured
+     * slow polling interval exceeds the allowed threshold when operation in SIT mode. The provided value must
+     * be less than or equal to the SIT polling threshold (kSITPollingThreshold).
+     *
+     * This fallback Slow Polling configuration allows ICD LIT device to configure a longer SlowPollingInterval
+     * when operating as LIT, but use a faster SlowPollingInterval when the device must operate as a SIT
+     *
+     * @param[in] slowPollFallback The fallback slow polling interval in milliseconds.
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the value is invalid.
+     */
+    CHIP_ERROR SetSlowPollingFallback(System::Clock::Milliseconds32 slowPollFallback);
 
     static constexpr System::Clock::Milliseconds16 kMinLitActiveModeThreshold = System::Clock::Milliseconds16(5000);
 
@@ -189,6 +214,10 @@ private:
 #endif
     System::Clock::Milliseconds32 mSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
     System::Clock::Milliseconds32 mFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+
+    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_FALLBACK <= kSitIcdSlowPollMaximum),
+                  "The SIT slow polling intervals fallback cannot greater than 15 seconds");
+    System::Clock::Milliseconds32 mSlowPollingFallback = CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_FALLBACK;
 
     BitFlags<app::Clusters::IcdManagement::Feature> mFeatureMap;
 
