@@ -291,7 +291,8 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
     ChipLogDetail(NotSpecified, "Issuer: %s", ChipLogFormat(100, "%.*s", static_cast<int>(issuerName.size()), issuerName.data()));
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetSerialNumberHexStr(certDer, serialNumber), false);
-    ChipLogDetail(NotSpecified, "Serial Number: %s", ChipLogFormat(100, "%.*s", static_cast<int>(serialNumber.size()), serialNumber.data()));
+    ChipLogDetail(NotSpecified, "Serial Number: %s",
+                  ChipLogFormat(100, "%.*s", static_cast<int>(serialNumber.size()), serialNumber.data()));
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetAKIDHexStr(certDer, akid), false);
     ChipLogDetail(NotSpecified, "AKID: %s", ChipLogFormat(100, "%.*s", static_cast<int>(akid.size()), akid.data()));

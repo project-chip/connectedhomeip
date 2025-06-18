@@ -56,7 +56,8 @@ CHIP_ERROR HexToBytes(chip::CharSpan hex, F bufferAllocator, size_t * octetCount
     size_t byteCount = chip::Encoding::HexToBytes(hex.data(), hex.size(), buffer, bufferSize);
     if (byteCount == 0 && hex.size() != 0)
     {
-        ChipLogError(NotSpecified, "Error while encoding '%s' as an octet string.", ChipLogFormat(100, "%.*s", static_cast<int>(hex.size()), hex.data()));
+        ChipLogError(NotSpecified, "Error while encoding '%s' as an octet string.",
+                     ChipLogFormat(100, "%.*s", static_cast<int>(hex.size()), hex.data()));
         return CHIP_ERROR_INTERNAL;
     }
 
