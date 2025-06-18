@@ -38,7 +38,8 @@ import chip.clusters as Clusters
 from chip.tlv import uint
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main, AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator)
 from mobly import asserts
 
 
@@ -63,7 +64,7 @@ def current_position_matcher(position: Clusters.ClosureControl.Enums.CurrentPosi
                 return True
         else:
             return False
-    return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {Position}", matcher=predicate)
+    return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {position}", matcher=predicate)
 
 
 def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) -> AttributeMatcher:
@@ -102,7 +103,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
                      "LatchControlModes of the ClosureControl cluster is returned by the DUT; Value saved as LatchControlModes"),
             TestStep("2g", "Read the OverallCurrentState attribute",
                      "OverallCurrentState of the ClosureControl cluster is returned by the DUT; Latching field is saved as CurrentLatch"),
-            TestStep("2h", "Preparing Latch-State: If CurrentLatch is False, skip steps 2i to 2m."),
+            TestStep("2h", "Preparing Latch-State: If CurrentLatch is False, skip steps 2i to 2m"),
             TestStep("2i", "If LatchControlModes Bit 1 = 0, skip step 2j"),
             TestStep("2j", "Send MoveTo command with Latch = False", "Receive SUCCESS response from the DUT"),
             TestStep("2k", "If LatchControlModes Bit 1 = 1, skip step 2l"),
@@ -112,7 +113,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             TestStep("3 ", "Read the CountdownTime attribute when no operation is in progress", "CountdownTime should be 0 or null"),
             TestStep("4a", "Read the OverallCurrentState attribute",
                      "OverallCurrentState of the ClosureControl cluster is returned by the DUT; Position field is saved as CurrentPosition"),
-            TestStep("4b", "Preparing Position-State: If CurrentPosition is FullyClosed, skip steps 4c and 4d."),
+            TestStep("4b", "Preparing Position-State: If CurrentPosition is FullyClosed, skip steps 4c and 4d"),
             TestStep("4c", "Send MoveTo command with Position = MoveToFullyClosed", "Receive SUCCESS response from the DUT"),
             TestStep("4d", "Wait until a subscription report with OverallCurrentState.Position is received",
                      "OverallCurrentState.Position should be FullyClosed"),
@@ -146,7 +147,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout  # default_timeout = 90 seconds
         # make sure the user defined timeout does not violate the spec requirement
         asserts.assert_true(timeout <= countdown_time_max,
-                            "Timeout should be less than {countdown_time_max} seconds, got: {timeout} seconds.")
+                            f"Timeout should be less than {countdown_time_max} seconds, got: {timeout} seconds.")
 
         self.step(1)
         attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
@@ -227,7 +228,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
                     try:
                         await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": False}))
                     except InteractionModelError as e:
-                        asserts.assert_equal(e.status, Status.Success, "MoveTo command with Latch = False failed: {e}")
+                        asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
                     self.step("2k")
                     self.skip_step("2l")
@@ -240,7 +241,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         self.step(3)
         countdown_time: typing.Union[NullValue, uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         asserts.assert_true(countdown_time == 0 or countdown_time == NullValue,
-                            "CountdownTime should be 0 or null when no operation is in progress, got: {countdown_time}.")
+                            f"CountdownTime should be 0 or null when no operation is in progress, got: {countdown_time}.")
 
         # STEP 4: Verify the CountdownTime when an operation is triggered
         self.step("4a")
@@ -263,9 +264,9 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
             self.step("4c")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed}))
+                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Position": Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed}))
             except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "MoveTo command to FullyClosed position failed: {e}")
+                asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 
             self.step("4d")
             sub_handler.await_all_expected_report_matches(expected_matches=[current_position_matcher(
@@ -273,9 +274,9 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step("4e")
         try:
-            await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen}))
+            await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Position": Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen}))
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "MoveTo command to FullyOpened position failed: {e}")
+            asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyOpened position failed: {e}")
 
         self.step("4f")
         sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
@@ -314,14 +315,14 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         else:
             self.step("5b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"position": Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed}))
+                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Position": Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed}))
             except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "MoveTo command to FullyClosed position failed: {e}")
+                asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 
             self.step("5c")
             countdown_time_before_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_true(countdown_time_before_interruption > 0 and countdown_time_before_interruption <
-                                countdown_time_max, "CountdownTime before interruption: {countdown_time_before_interruption}.")
+                                countdown_time_max, f"CountdownTime before interruption: {countdown_time_before_interruption}.")
             logging.info(f"CountdownTime before interruption: {countdown_time_before_interruption}")
 
             self.step("5d")
@@ -338,7 +339,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             self.step("5f")
             countdown_time_after_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_true(countdown_time_after_interruption == 0,
-                                "CountdownTime after interruption not 0, but: {countdown_time_after_interruption}.")
+                                f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}.")
             logging.info(f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}")
 
 
