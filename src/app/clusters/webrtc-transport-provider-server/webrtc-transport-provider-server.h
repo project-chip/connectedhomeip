@@ -308,6 +308,16 @@ public:
      */
     void Shutdown();
 
+    /**
+     * @brief Get a reference to the current WebRTC sessions.
+     *
+     * This method provides read-only access to the current list of active WebRTC sessions
+     * managed by this server instance.
+     *
+     * @return const std::vector<WebRTCSessionStruct>& Reference to the current sessions list.
+     */
+    const std::vector<WebRTCSessionStruct> & GetCurrentSessions() const { return mCurrentSessions; }
+
 private:
     enum class UpsertResultEnum : uint8_t
     {

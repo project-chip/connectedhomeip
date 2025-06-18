@@ -1051,7 +1051,7 @@ cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -1807,7 +1807,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
     handle command OpenBasicCommissioningWindow;
