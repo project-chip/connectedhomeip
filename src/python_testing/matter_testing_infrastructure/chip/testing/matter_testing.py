@@ -1182,8 +1182,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor, fabricFiltered: bool = True) -> object:
-        # type: ignore[list-item]
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)  # type: ignore[list-item]
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
@@ -1218,8 +1217,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.get_endpoint()
 
-        # type: ignore[list-item]
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)  # type: ignore[list-item]
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
@@ -1251,8 +1249,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.get_endpoint()
 
-        # type: ignore[list-item]
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)  # type: ignore[list-item]
         attr_ret = result[endpoint][cluster][attribute]
         err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
         error_type_ok = attr_ret is not None and isinstance(
