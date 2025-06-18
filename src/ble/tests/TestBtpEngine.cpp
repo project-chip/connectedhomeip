@@ -196,7 +196,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendOnePacketWithAck)
     EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
 }
 
-TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithAck)
+TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithIncorrectAck)
 {
     auto packet0 = System::PacketBufferHandle::New(30);
     packet0->SetDataLength(30);
@@ -206,8 +206,24 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithAck)
     EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
     EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, false));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
+}
 
-    //add correct test
+TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithCorrectAck)
+{
+    auto packet0 = System::PacketBufferHandle::New(30);
+    packet0->SetDataLength(30);
+
+    auto data0 = packet0->Start();
+    ASSERT_NE(data0, nullptr);
+    std::iota(data0, data0 + 30, 0);
+
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
 }
 
 TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
