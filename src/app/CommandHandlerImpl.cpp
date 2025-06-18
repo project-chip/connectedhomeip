@@ -88,9 +88,8 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
             ReturnErrorOnFailure(mInvokeResponseBuilder.ReserveSpaceForMoreChunkedMessages());
         }
 
-        // MIC might require up to kMaxTagLen. We need to make sure to reserve this space
-        // at the end of the buffer.
-        ReturnErrorOnFailure(mInvokeResponseBuilder.GetWriter()->ReserveBuffer(reservedSize + MessagePacketBuffer::kMaxFooterSize));
+        // Reserving space for MIC at the end.
+        ReturnErrorOnFailure(mInvokeResponseBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         // Sending an InvokeResponse to an InvokeResponse is going to be removed from the spec soon.
         // It was never implemented in the SDK, and there are no command responses that expect a
