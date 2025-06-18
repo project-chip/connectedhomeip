@@ -89,7 +89,8 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
         }
 
         // Reserving space for MIC at the end.
-        ReturnErrorOnFailure(mInvokeResponseBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+        ReturnErrorOnFailure(
+            mInvokeResponseBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         // Sending an InvokeResponse to an InvokeResponse is going to be removed from the spec soon.
         // It was never implemented in the SDK, and there are no command responses that expect a
