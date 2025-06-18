@@ -51,6 +51,7 @@ chip_test_suite("tests") {
     if (chip_device_platform != "efr32") {
       test_sources += [
         "TestCommissioningWindowOpener.cpp",
+        "TestCommissioningWindowParams.cpp",
         "TestExampleOperationalCredentialsIssuer.cpp",
       ]
     }

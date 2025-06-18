@@ -71,8 +71,7 @@ TEST_F(TestCommissioningWindowOpener, OpenBasicCommissioningWindowVerifier_Succe
 {
     chip::System::Clock::Seconds16 timeout(300);
     Callback::Callback<Controller::OnOpenBasicCommissioningWindow> callback(OCWVerifierCallback, this);
-    CHIP_ERROR err = opener.OpenBasicCommissioningWindow(0x1234, timeout, &callback);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(opener.OpenBasicCommissioningWindow(0x1234, timeout, &callback), CHIP_NO_ERROR);
 }
 
 TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_SuccessArguments)
@@ -80,40 +79,39 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_SuccessArg
     chip::System::Clock::Seconds16 timeout(300);
     SetupPayload ignored;
     Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
-    CHIP_ERROR err = opener.OpenCommissioningWindow(0x1234, timeout, sTestSpake2p01_IterationCount,
-                                                    3840, Optional(20202021U), Optional(ByteSpan(sTestSpake2p01_Salt)),
-                                                    &callback, ignored, false);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(opener.OpenCommissioningWindow(0x1234, timeout, sTestSpake2p01_IterationCount,
+                                            3840, Optional(20202021U), Optional(ByteSpan(sTestSpake2p01_Salt)),
+                                            &callback, ignored, false), CHIP_NO_ERROR);
 }
 
 TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Success)
 {
     Callback::Callback<Controller::OnOpenCommissioningWindowWithVerifier> callback(OCWVerifierCallback, this);
-
-    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
-                                                        .SetNodeId(0x1234)
-                                                        .SetTimeout(300)
-                                                        .SetIteration(sTestSpake2p01_IterationCount)
-                                                        .SetDiscriminator(3840)
-                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt))
-                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
-                                                        .SetCallback(&callback));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    Controller::CommissioningWindowVerifierParams params;
+    params.SetNodeId(0x1234)
+    .SetTimeout(300)
+    .SetIteration(sTestSpake2p01_IterationCount)
+    .SetDiscriminator(3840)
+    .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+    .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
+    .SetCallback(&callback);
+    EXPECT_EQ(opener.OpenCommissioningWindow(params),
+            CHIP_NO_ERROR);
 }
 
 TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_InvalidSalt)
 {
     Callback::Callback<Controller::OnOpenCommissioningWindowWithVerifier> callback(OCWVerifierCallback, this);
 
-    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
+    EXPECT_EQ(opener.OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
                                                         .SetNodeId(0x1234)
                                                         .SetTimeout(300)
                                                         .SetIteration(sTestSpake2p01_IterationCount)
                                                         .SetDiscriminator(3840)
                                                         .SetSalt(ByteSpan())
                                                         .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
-                                                        .SetCallback(&callback));
-    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+                                                        .SetCallback(&callback)),
+            CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_InvalidVerifier)
