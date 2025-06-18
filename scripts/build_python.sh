@@ -39,7 +39,7 @@ OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
 declare enable_ble=true
 declare enable_ipv4=true
-declare enable_wifi_paf=true
+declare wifi_paf_config=""
 declare chip_detail_logging=false
 declare chip_mdns=minimal
 declare case_retry_delta
@@ -49,20 +49,6 @@ declare install_pytest_requirements=yes
 declare install_jupyterlab=no
 declare -a extra_packages
 declare -a extra_gn_args
-
-# Detect OS and set override some defaults accordingly.
-OS_TYPE="$(uname -s)"
-case "$OS_TYPE" in
-    "Darwin")
-        enable_wifi_paf=false
-        ;;
-    "Linux")
-        enable_wifi_paf=true
-        ;;
-    *)
-        enable_wifi_paf=false
-        ;;
-esac
 
 help() {
 
@@ -74,7 +60,7 @@ Input Options:
   -g, --gn_args ARGS                                        Additional verbatim arguments to pass to the gn command.
                                                             May be specified multiple times.
   -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=$enable_ble)
-  -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=$enable_wifi_paf)
+  -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=SDK default behavior)
   -4, --enable_ipv4         <true/false>                    Enable IPv4 in the controller (default=$enable_ipv4)
   -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
                                                             By default it is $chip_detail_logging.
@@ -113,11 +99,13 @@ while (($#)); do
             shift
             ;;
         --enable_wifi_paf | -p)
+            declare enable_wifi_paf=true
             enable_wifi_paf=$2
             if [[ "$enable_wifi_paf" != "true" && "$enable_wifi_paf" != "false" ]]; then
                 echo "enable_wifi_paf should have a true/false value, not '$enable_wifi_paf'"
                 exit
             fi
+            wifi_paf_config="chip_device_config_enable_wifipaf=$enable_wifi_paf"
             shift
             ;;
         --enable_ipv4 | -4)
@@ -198,7 +186,9 @@ echo "  chip_mdns=\"$chip_mdns\""
 echo "  chip_case_retry_delta=\"$chip_case_retry_delta\""
 echo "  pregen_dir=\"$pregen_dir\""
 echo "  enable_ble=\"$enable_ble\""
-echo "  enable_wifi_paf=\"$enable_wifi_paf\""
+if [[ $wifi_paf_config != "" ]]; then
+    echo "  $wifi_paf_config"
+fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 
 if [[ -n "${all_extra_gn_args}" ]]; then
@@ -230,7 +220,7 @@ export SYSTEM_VERSION_COMPAT=0
 # Make all possible human redable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_inet_config_enable_ipv4=$enable_ipv4 chip_device_config_enable_wifipaf=$enable_wifi_paf chip_crypto=\"boringssl\" $all_extra_gn_args"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_inet_config_enable_ipv4=$enable_ipv4 $wifi_paf_config chip_crypto=\"boringssl\" $all_extra_gn_args"
 
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels
