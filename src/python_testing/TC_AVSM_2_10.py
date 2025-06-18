@@ -227,7 +227,8 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         try:
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=aStreamID))
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            asserts.fail(
+                f"Expected SnapshotStreamDeallocate to succeed, but it failed with status: {e.status}")
             pass
 
         self.step(9)
