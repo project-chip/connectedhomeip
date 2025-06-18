@@ -390,10 +390,7 @@ Status Instance::ValidateTargets(
 
     uint8_t dayOfWeekBitmap = 0;
 
-    auto iter = chargingTargetSchedules.begin();
-    while (iter.Next())
-    {
-        auto & entry    = iter.GetValue();
+    auto iterateStatus = chargingTargetSchedules.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
         uint8_t bitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
         ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
 
@@ -401,15 +398,12 @@ Status Instance::ValidateTargets(
         {
             // A bit has already been set - Return ConstraintError
             ChipLogError(AppServer, "DayOfWeekForSequence has a bit set which has already been set in another entry.");
-            return Status::ConstraintError;
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         dayOfWeekBitmap |= bitmask; // add this day Of week to the previously seen days
 
-        auto iterInner   = entry.chargingTargets.begin();
         uint8_t innerIdx = 0;
-        while (iterInner.Next())
-        {
-            auto & targetStruct          = iterInner.GetValue();
+        return entry.chargingTargets.Iterate([&](auto & targetStruct, bool &) -> CHIP_ERROR {
             uint16_t minutesPastMidnight = targetStruct.targetTimeMinutesPastMidnight;
             ChipLogProgress(AppServer, "[%d] MinutesPastMidnight : %d", innerIdx,
                             static_cast<short unsigned int>(minutesPastMidnight));
@@ -417,7 +411,7 @@ Status Instance::ValidateTargets(
             if (minutesPastMidnight > 1439)
             {
                 ChipLogError(AppServer, "MinutesPastMidnight has invalid value (%d)", static_cast<int>(minutesPastMidnight));
-                return Status::ConstraintError;
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
 
             // If SocReporting is supported, targetSoc must have a value in the range [0, 100]
@@ -426,27 +420,27 @@ Status Instance::ValidateTargets(
                 if (!targetStruct.targetSoC.HasValue())
                 {
                     ChipLogError(AppServer, "kSoCReporting is supported but TargetSoC does not have a value");
-                    return Status::Failure;
+                    return CHIP_IM_GLOBAL_STATUS(Failure);
                 }
 
                 if (targetStruct.targetSoC.Value() > 100)
                 {
                     ChipLogError(AppServer, "TargetSoC has invalid value (%d)", static_cast<int>(targetStruct.targetSoC.Value()));
-                    return Status::ConstraintError;
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
                 }
             }
             else if (targetStruct.targetSoC.HasValue() && targetStruct.targetSoC.Value() != 100)
             {
                 // If SocReporting is not supported but targetSoc has a value, it must be 100
                 ChipLogError(AppServer, "TargetSoC has can only be 100%% if SOC feature is not supported");
-                return Status::ConstraintError;
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
 
             // One or both of targetSoc and addedEnergy must be specified
             if (!(targetStruct.targetSoC.HasValue()) && !(targetStruct.addedEnergy.HasValue()))
             {
                 ChipLogError(AppServer, "Must have one of AddedEnergy or TargetSoC");
-                return Status::Failure;
+                return CHIP_IM_GLOBAL_STATUS(Failure);
             }
 
             // Validate the value of addedEnergy, if specified is >= 0
@@ -454,23 +448,14 @@ Status Instance::ValidateTargets(
             {
                 ChipLogError(AppServer, "AddedEnergy has invalid value (%ld)",
                              static_cast<signed long int>(targetStruct.addedEnergy.Value()));
-                return Status::ConstraintError;
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
             innerIdx++;
-        }
+            return CHIP_NO_ERROR;
+        });
+    });
 
-        if (iterInner.GetStatus() != CHIP_NO_ERROR)
-        {
-            return Status::InvalidCommand;
-        }
-    }
-
-    if (iter.GetStatus() != CHIP_NO_ERROR)
-    {
-        return Status::InvalidCommand;
-    }
-
-    return Status::Success;
+    return IMGlobalStatusFromError(iterateStatus, Status::InvalidCommand);
 }
 
 void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData)

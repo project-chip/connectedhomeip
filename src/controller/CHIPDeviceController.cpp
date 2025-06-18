@@ -2623,10 +2623,7 @@ CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo & info)
             Fabrics::TypeInfo::DecodableType fabrics;
             ReturnErrorOnFailure(this->mAttributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
             // this is a best effort attempt to find a matching fabric, so no error checking on iter
-            auto iter = fabrics.begin();
-            while (iter.Next())
-            {
-                auto & fabricDescriptor = iter.GetValue();
+            auto iterateStatus = fabrics.Iterate([&](auto & fabricDescriptor, bool &) -> CHIP_ERROR {
                 ChipLogProgress(Controller,
                                 "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
                                 " fabric.nodeId=0x" ChipLogFormatX64,
@@ -2641,7 +2638,7 @@ CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo & info)
                         ChipLogError(Controller, "DeviceCommissioner::OnDone - fabric root key size mismatch %u != %u",
                                      static_cast<unsigned>(rootKeySpan.size()),
                                      static_cast<unsigned>(Crypto::kP256_PublicKey_Length));
-                        continue;
+                        return CHIP_NO_ERROR;
                     }
                     P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
                     Crypto::P256PublicKey deviceRootPublicKey(rootPubKeySpan);
@@ -2657,8 +2654,13 @@ CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo & info)
                         info.remoteNodeId = fabricDescriptor.nodeID;
                     }
                 }
-            }
+                return CHIP_NO_ERROR;
+            });
 
+            if (CHIP_NO_ERROR != iterateStatus)
+            {
+                ChipLogError(Controller, "DeviceCommissioner::ParseFabrics - error decoding fabrics");
+            }
             return CHIP_NO_ERROR;
         }
         default:
