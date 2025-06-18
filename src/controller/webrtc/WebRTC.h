@@ -118,7 +118,7 @@ void CreateAnswer(void * Client, const std::string & offer, std::function<void(s
  * @return const char *
  *     A pointer to the local session description string.
  */
-const char * GetLocalSdp(void * Client);
+const char *GetLocalSdp(void * Client);
 
 /**
  * @brief
