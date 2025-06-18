@@ -1377,7 +1377,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             # to avoid serialization issues when sending it through multiprocessing.
             # This prevents errors like "ModuleNotFoundError: No module named 'chip'",
             # which occur when the original exception type is not picklable.
-            # 
             # TODO: Improve this by logging the full traceback before conversion,
             # or by implementing a serializable wrapper to preserve more context.
             exception_test_stop = Exception(str(exception))
