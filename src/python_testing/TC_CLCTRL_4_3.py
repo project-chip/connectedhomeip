@@ -95,7 +95,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
             TestStep("2b", "Establish a wildcard subscription to all attributes on the ClosureControl cluster",
                      "Subscription successfully established"),
-            TestStep("2c", "Read the LatchControlModes attribute",
+            TestStep("2c", "If LT is supported, read the LatchControlModes attribute",
                      "LatchControlModes of the ClosureControl cluster is returned by the DUT; Value saved as LatchControlModes"),
             TestStep("3 ", "Send MoveTo command with no fields", "Receive INVALID_COMMAND response from the DUT"),
             TestStep("4a", "Check PS and LT feature support",
