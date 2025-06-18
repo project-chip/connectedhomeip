@@ -17,8 +17,8 @@
  */
 
 #include "ClosureManager.h"
-#include "AppTask.h"
 #include "AppConfig.h"
+#include "AppTask.h"
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
 
@@ -154,7 +154,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
 
 void ClosureManager::HandleClosureEvent(AppEvent * event)
 {
-    Action_t currentAction           = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
+    Action_t currentAction = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
 
     switch (currentAction)
     {
