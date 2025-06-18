@@ -1182,7 +1182,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor, fabricFiltered: bool = True) -> object:
+        # autopep8: off
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)  # type: ignore[list-item]
+        # autopep8: on
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
@@ -1199,8 +1201,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
-
+        # autopep8: off
         read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])  # type: ignore[list-item]
+        # autopep8: on
         attrs = {}
         for endpoint in read_response:
             attr_ret = read_response[endpoint][cluster][attribute]
@@ -1216,8 +1219,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-
+        # autopep8: off
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)  # type: ignore[list-item]
+        # autopep8: on
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
@@ -1248,8 +1252,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-
+        # autopep8: off
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)  # type: ignore[list-item]
+        # autopep8: on
         attr_ret = result[endpoint][cluster][attribute]
         err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
         error_type_ok = attr_ret is not None and isinstance(
@@ -2185,7 +2190,9 @@ def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterO
 
 async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
     """ Returns a list of endpoints matching the accept condition. """
+    # autopep8: off
     wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])  # type: ignore[list-item]
+    # autopep8: on
     matching = [e for e in wildcard.attributes.keys()
                 if accept_function(wildcard, e)]
     return matching
@@ -2223,7 +2230,9 @@ has_attribute = decorators.has_attribute
 has_command = decorators.has_command
 has_feature = decorators.has_feature
 should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
+# autopep8: off
 _get_all_matching_endpoints = decorators._get_all_matching_endpoints  # type: ignore[assignment]
+# autopep8: on
 _has_feature = decorators._has_feature
 _has_command = decorators._has_command
 _has_attribute = decorators._has_attribute
