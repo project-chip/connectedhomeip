@@ -207,7 +207,8 @@ OtaProviderLogic::QueryImage(const ConcreteCommandPath & commandPath,
     }
     if (location.HasValue())
     {
-        ChipLogDetail(Zcl, "  Location: %s", ChipLogFormat(100, "%.*s", static_cast<int>(location.Value().size()), location.Value().data()));
+        ChipLogDetail(Zcl, "  Location: %s",
+                      ChipLogFormat(100, "%.*s", static_cast<int>(location.Value().size()), location.Value().data()));
     }
     if (requestorCanConsent.HasValue())
     {

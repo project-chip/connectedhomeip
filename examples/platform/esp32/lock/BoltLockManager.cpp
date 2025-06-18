@@ -380,8 +380,9 @@ bool BoltLockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, E
     ESP_LOGI(TAG,
              "Found occupied user [endpoint=%d,name=\"%s\",credentialsCount=%u,uniqueId=%" PRIu32
              ",type=%u,credentialRule=%u,createdBy=%d,lastModifiedBy=%d]",
-             endpointId, ChipLogFormat(100, "%.*s", static_cast<int>(user.userName.size()), user.userName.data()), user.credentials.size(), user.userUniqueId,
-             to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
+             endpointId, ChipLogFormat(100, "%.*s", static_cast<int>(user.userName.size()), user.userName.data()),
+             user.credentials.size(), user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule),
+             user.createdBy, user.lastModifiedBy);
 
     return true;
 }

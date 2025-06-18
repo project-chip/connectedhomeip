@@ -348,7 +348,8 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
     bool isValidLength = location.size() == kExpectedFixedLocationLength;
     if (!isValidLength)
     {
-        ChipLogError(Zcl, "Invalid country code: '%s'", ChipLogFormat(100, "%.*s", static_cast<int>(location.size()), location.data()));
+        ChipLogError(Zcl, "Invalid country code: '%s'",
+                     ChipLogFormat(100, "%.*s", static_cast<int>(location.size()), location.data()));
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 

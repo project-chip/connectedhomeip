@@ -1023,8 +1023,8 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
 
     if (!mDelegate->IsSetSelectedAreasAllowed(locationStatusText))
     {
-        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea, ChipLogFormat(100, "%.*s", static_cast<int>(locationStatusText.size()),
-                     locationStatusText.data()));
+        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea,
+                     ChipLogFormat(100, "%.*s", static_cast<int>(locationStatusText.size()), locationStatusText.data()));
         return false;
     }
 
