@@ -2177,7 +2177,7 @@ cluster IcdManagement = 70 {
   command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
-/** This cluster provides an interface for controlling a Closure device. */
+/** This cluster provides an interface for controlling a Closure. */
 provisional cluster ClosureControl = 260 {
   revision 1;
 
