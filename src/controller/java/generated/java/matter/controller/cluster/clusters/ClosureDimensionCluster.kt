@@ -297,7 +297,7 @@ class ClosureDimensionCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Targetstate attribute not found in response" }
+    requireNotNull(attributeData) { "TargetState attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
