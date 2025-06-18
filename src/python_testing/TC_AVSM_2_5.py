@@ -169,9 +169,9 @@ class TC_AVSM_2_5(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
         logger.info(f"Rx'StreamUsagePriorities : {aStreamUsagePriorities}")
+        asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
         self.step(6)
-        asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],

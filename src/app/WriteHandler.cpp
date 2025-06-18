@@ -24,7 +24,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -812,7 +811,10 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
                                          .endpoint    = aPath.mEndpointId,
                                          .requestType = Access::RequestType::kAttributeWriteRequest,
                                          .entityId    = aPath.mAttributeId };
-        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, RequiredPrivilege::ForWriteAttribute(aPath));
+
+        // NOTE: we know that attributeEntry has a GetWriteProvilege based on the check above.
+        //       so we just directly reference it.
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, *attributeEntry->GetWritePrivilege());
 
         if (err != CHIP_NO_ERROR)
         {

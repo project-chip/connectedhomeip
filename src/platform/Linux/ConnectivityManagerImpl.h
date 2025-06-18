@@ -152,12 +152,6 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 public:
-    void
-    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
-    {
-        mpStatusChangeCallback = statusChangeCallback;
-    }
-
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -202,6 +196,13 @@ private:
 
 public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
+    void UpdateEthernetNetworkingStatus();
+
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
@@ -281,8 +282,8 @@ private:
     // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.
     std::mutex mWpaSupplicantMutex;
 
-    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 #endif
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     // ==================== ConnectivityManager Private Methods ====================
 

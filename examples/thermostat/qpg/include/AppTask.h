@@ -50,11 +50,12 @@ public:
 
     static void ButtonEventHandler(uint8_t btnIdx, bool btnPressed);
 
+    static void OpenCommissioning(intptr_t arg);
+
 private:
     friend AppTask & GetAppTask(void);
 
     static void InitServer(intptr_t arg);
-    static void OpenCommissioning(intptr_t arg);
 
     void DispatchEvent(AppEvent * event);
 

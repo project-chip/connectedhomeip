@@ -151,7 +151,7 @@ async def commission_device(
                 nodeId=node_id, setupPinCode=info.passcode, filterType=info.filter_type, filter=info.filter_value
             )
             return PairingStatus()
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
             logging.error("Commissioning failed: %s" % e)
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
@@ -165,7 +165,7 @@ async def commission_device(
                 isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
             )
             return PairingStatus()
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
             logging.error("Commissioning failed: %s" % e)
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
@@ -178,7 +178,7 @@ async def commission_device(
                 isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
             )
             return PairingStatus()
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
             logging.error("Commissioning failed: %s" % e)
             return PairingStatus(exception=e)
     else:

@@ -69,6 +69,18 @@ public:
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
+    void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
+
+    CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override;
+
+    CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
+    bool HasAllocatedVideoStreams() override;
+
+    bool HasAllocatedAudioStreams() override;
+
 private:
     enum class CommandType : uint8_t
     {
@@ -103,6 +115,10 @@ private:
 
     CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
+    CHIP_ERROR AcquireAudioVideoStreams();
+
+    CHIP_ERROR ReleaseAudioVideoStreams();
+
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                   const chip::SessionHandle & sessionHandle);
 
@@ -110,6 +126,7 @@ private:
 
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
     std::shared_ptr<rtc::Track> mVideoTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
 
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mOriginatingEndpointId;
@@ -134,6 +151,10 @@ private:
     uint16_t mAudioStreamID;
 
     MediaController * mMediaController = nullptr;
+
+    // Handle to the Camera Device interface. For accessing other
+    // clusters, if required.
+    CameraDeviceInterface * mCameraDevice = nullptr;
 };
 
 } // namespace Camera

@@ -630,7 +630,7 @@ def BuildQorvoTarget():
 
     # board
     target.AppendFixedTargets([
-        TargetPart('qpg6105', board=QpgBoard.QPG6105),
+        TargetPart('qpg6200', board=QpgBoard.QPG6200),
     ])
 
     # apps
@@ -814,7 +814,6 @@ def BuildTelinkTarget():
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
-    target.AppendModifier('newlib', newlib_libc_config=True)
 
     return target
 
